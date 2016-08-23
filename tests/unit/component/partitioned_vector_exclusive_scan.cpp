@@ -42,7 +42,7 @@ struct opt
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_with_policy(
+void exclusive_scan_algo_tests_with_policy(
     std::size_t size, DistPolicy const& dist_policy,
     hpx::partitioned_vector<T>& in,
     std::vector<T> ver, ExPolicy const& policy)
@@ -58,7 +58,7 @@ void inclusive_scan_algo_tests_with_policy(
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(policy,
+    hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), out.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -71,7 +71,7 @@ void inclusive_scan_algo_tests_with_policy(
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_segmented_out_with_policy(
+void exclusive_scan_algo_tests_segmented_out_with_policy(
     std::size_t size, DistPolicy const& in_dist_policy,
     DistPolicy const& out_dist_policy,
     hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
@@ -88,7 +88,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy(
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(policy,
+    hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), out.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -101,7 +101,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy(
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_inplace_with_policy(
+void exclusive_scan_algo_tests_inplace_with_policy(
     std::size_t size, DistPolicy const& dist_policy,
     std::vector<T> ver, ExPolicy const& policy)
 {
@@ -118,7 +118,7 @@ void inclusive_scan_algo_tests_inplace_with_policy(
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(policy,
+    hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), in.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -133,7 +133,7 @@ void inclusive_scan_algo_tests_inplace_with_policy(
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_with_policy_async(
+void exclusive_scan_algo_tests_with_policy_async(
     std::size_t size, DistPolicy const& dist_policy,
     hpx::partitioned_vector<T>& in,
     std::vector<T> ver, ExPolicy const& policy)
@@ -150,7 +150,7 @@ void inclusive_scan_algo_tests_with_policy_async(
     t1.restart();
 
     auto res =
-        hpx::parallel::inclusive_scan(policy,
+        hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
@@ -164,7 +164,7 @@ void inclusive_scan_algo_tests_with_policy_async(
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_segmented_out_with_policy_async(
+void exclusive_scan_algo_tests_segmented_out_with_policy_async(
     std::size_t size, DistPolicy const& in_dist_policy,
     DistPolicy const& out_dist_policy,
     hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
@@ -183,7 +183,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy_async(
     t1.restart();
 
     auto res =
-        hpx::parallel::inclusive_scan(policy,
+        hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
@@ -197,7 +197,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy_async(
 }
 
 template <typename T, typename DistPolicy, typename ExPolicy>
-void inclusive_scan_algo_tests_inplace_with_policy_async(
+void exclusive_scan_algo_tests_inplace_with_policy_async(
     std::size_t size, DistPolicy const& dist_policy,
     std::vector<T> ver, ExPolicy const& policy)
 {
@@ -215,7 +215,7 @@ void inclusive_scan_algo_tests_inplace_with_policy_async(
     t1.restart();
 
     auto res =
-        hpx::parallel::inclusive_scan(policy,
+        hpx::parallel::exclusive_scan(policy,
         in.begin(), in.end(), in.begin(), val, opt<T>());
     res.get();
 
@@ -232,7 +232,7 @@ void inclusive_scan_algo_tests_inplace_with_policy_async(
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename DistPolicy>
-void inclusive_scan_tests_with_policy(std::size_t size,
+void exclusive_scan_tests_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
     using namespace hpx::parallel;
@@ -246,24 +246,24 @@ void inclusive_scan_tests_with_policy(std::size_t size,
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     //sync
-    inclusive_scan_algo_tests_with_policy<T>(
+    exclusive_scan_algo_tests_with_policy<T>(
         size, policy, in, ver, seq);
-    inclusive_scan_algo_tests_with_policy<T>(
+    exclusive_scan_algo_tests_with_policy<T>(
         size, policy, in, ver, par);
 
     //async
-    inclusive_scan_algo_tests_with_policy_async<T>(
+    exclusive_scan_algo_tests_with_policy_async<T>(
         size, policy, in, ver, seq(task));
-    inclusive_scan_algo_tests_with_policy_async<T>(
+    exclusive_scan_algo_tests_with_policy_async<T>(
         size, policy, in, ver, par(task));
 }
 
 template <typename T, typename DistPolicy>
-void inclusive_scan_tests_segmented_out_with_policy(std::size_t size,
+void exclusive_scan_tests_segmented_out_with_policy(std::size_t size,
     DistPolicy const& in_policy, DistPolicy const& out_policy)
 {
     using namespace hpx::parallel;
@@ -279,24 +279,24 @@ void inclusive_scan_tests_segmented_out_with_policy(std::size_t size,
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     //sync
-    inclusive_scan_algo_tests_segmented_out_with_policy<T>(
+    exclusive_scan_algo_tests_segmented_out_with_policy<T>(
         size, in_policy, out_policy, in, out, ver, seq);
-    inclusive_scan_algo_tests_segmented_out_with_policy<T>(
+    exclusive_scan_algo_tests_segmented_out_with_policy<T>(
         size, in_policy, out_policy, in, out, ver, par);
 
     //async
-    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
+    exclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
         size, in_policy, out_policy, in, out, ver, seq(task));
-    inclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
+    exclusive_scan_algo_tests_segmented_out_with_policy_async<T>(
         size, in_policy, out_policy, in, out, ver, par(task));
 }
 
 template <typename T, typename DistPolicy>
-void inclusive_scan_tests_inplace_with_policy(std::size_t size,
+void exclusive_scan_tests_inplace_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
     using namespace hpx::parallel;
@@ -307,45 +307,43 @@ void inclusive_scan_tests_inplace_with_policy(std::size_t size,
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     //sync
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, seq);
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, par);
+    exclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, seq);
+    exclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, par);
 
     //async
-    inclusive_scan_algo_tests_inplace_with_policy_async<T>(
+    exclusive_scan_algo_tests_inplace_with_policy_async<T>(
         size, policy, ver, seq(task));
-    inclusive_scan_algo_tests_inplace_with_policy_async<T>(
+    exclusive_scan_algo_tests_inplace_with_policy_async<T>(
         size, policy, ver, par(task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void inclusive_scan_tests()
+void exclusive_scan_tests()
 {
     std::size_t const length = 1000000;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
-    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
-    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3, localities));
-    inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(localities));
+    exclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
+    exclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
+    exclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3, localities));
+    exclusive_scan_tests_with_policy<T>(length, hpx::container_layout(localities));
     
-    inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
+    exclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
 
-    inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
-
-    inclusive_scan_tests_segmented_out_with_policy<T>(length,
+    exclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(localities));
 
-    inclusive_scan_tests_segmented_out_with_policy<T>(length,
+    exclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(10));
 
-    inclusive_scan_tests_inplace_with_policy<T>(length,
+    exclusive_scan_tests_inplace_with_policy<T>(length,
         hpx::container_layout(localities));
 }
 
@@ -354,8 +352,8 @@ void inclusive_scan_tests()
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    inclusive_scan_tests<int>();
-    inclusive_scan_tests<double>();
+    exclusive_scan_tests<int>();
+    exclusive_scan_tests<double>();
 
     return hpx::util::report_errors();
 }

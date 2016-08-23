@@ -32,6 +32,7 @@ set(tests
     partitioned_vector_transform_reduce
     partitioned_vector_fill
     partitioned_vector_inclusive_scan
+    partitioned_vector_exclusive_scan
    )
 
 # add executable needed for launch_process_test
@@ -110,6 +111,11 @@ set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_co
 
 set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_inclusive_scan_PARAMETERS
+    LOCALITIES 3
+    THREADS_PER_LOCALITY 3)
+
+set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_exclusive_scan_PARAMETERS
     LOCALITIES 3
     THREADS_PER_LOCALITY 3)
 
