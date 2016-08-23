@@ -25,6 +25,7 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>

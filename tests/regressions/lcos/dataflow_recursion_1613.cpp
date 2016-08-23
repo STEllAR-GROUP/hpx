@@ -13,6 +13,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <functional>
 #include <vector>
 
 #define NUM_FUTURES std::size_t(300)

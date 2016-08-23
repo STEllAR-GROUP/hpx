@@ -15,7 +15,6 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/ref.hpp>
 
 #include <list>
 #include <mutex>

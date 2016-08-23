@@ -17,9 +17,9 @@
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/ref.hpp>
 
 #include <chrono>
+#include <functional>
 #include <type_traits>
 
 namespace hpx { namespace threads { namespace detail
@@ -60,8 +60,8 @@ namespace hpx { namespace threads { namespace detail
                 std::true_type) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
-            t.async_wait(util::bind(handler, boost::ref(scheduler),
-                boost::ref(global_state), std::true_type()));
+            t.async_wait(util::bind(handler, std::ref(scheduler),
+                std::ref(global_state), std::true_type()));
         }
     }
 
@@ -91,8 +91,8 @@ namespace hpx { namespace threads { namespace detail
             std::true_type) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
-        t.async_wait(util::bind(handler, boost::ref(scheduler),
-            boost::ref(global_state), std::true_type()));
+        t.async_wait(util::bind(handler, std::ref(scheduler),
+            std::ref(global_state), std::true_type()));
     }
 }}}
 

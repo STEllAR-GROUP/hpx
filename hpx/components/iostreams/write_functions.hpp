@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <deque>
+#include <functional>
 #include <iterator>
 #include <ostream>
 #include <type_traits>

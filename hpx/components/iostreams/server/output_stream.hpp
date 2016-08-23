@@ -17,6 +17,8 @@
 #include <hpx/components/iostreams/server/order_output.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
+#include <functional>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace iostreams { namespace server

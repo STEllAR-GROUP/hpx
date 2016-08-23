@@ -10,6 +10,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <functional>
+
 namespace hpx { namespace util
 {
     boost::uint64_t thread_aware_timer::take_time_stamp()
@@ -20,7 +22,7 @@ namespace hpx { namespace util
         hpx::util::io_service_pool* pool = hpx::get_thread_pool("timer_pool");
 
         // ... and schedule the handler to run on the first of its OS-threads.
-        pool->get_io_service(0).post(hpx::util::bind(&sample_time, boost::ref(p)));
+        pool->get_io_service(0).post(hpx::util::bind(&sample_time, std::ref(p)));
         return p.get_future().get();
     }
 }}

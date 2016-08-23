@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     };
 
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exted with non-zero status");
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

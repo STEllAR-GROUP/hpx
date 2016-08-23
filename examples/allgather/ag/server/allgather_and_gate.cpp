@@ -13,7 +13,6 @@
 #include "allgather_and_gate.hpp"
 
 #include <boost/format.hpp>
-#include <boost/ref.hpp>
 
 #include <fstream>
 #include <iostream>

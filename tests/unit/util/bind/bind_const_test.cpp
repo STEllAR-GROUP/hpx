@@ -23,7 +23,6 @@
 #include <hpx/util/bind.hpp>
 
 namespace placeholders = hpx::util::placeholders;
-#include <boost/ref.hpp>
 
 #include <iostream>
 

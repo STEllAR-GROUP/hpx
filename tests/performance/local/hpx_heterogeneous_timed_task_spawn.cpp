@@ -11,6 +11,7 @@
 
 #include "worker_timed.hpp"
 
+#include <functional>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -18,7 +19,6 @@
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
-#include <boost/ref.hpp>
 #include <boost/cstdint.hpp>
 
 using boost::program_options::variables_map;
@@ -186,7 +186,7 @@ int hpx_main(
         // Randomly shuffle the entire sequence to deal with drift.
         using hpx::util::placeholders::_1;
         std::random_shuffle(payloads.begin(), payloads.end(),
-            hpx::util::bind(&shuffler, boost::ref(prng), _1));
+            hpx::util::bind(&shuffler, std::ref(prng), _1));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.

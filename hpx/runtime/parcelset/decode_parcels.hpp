@@ -16,6 +16,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <functional>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -208,7 +209,7 @@ namespace hpx { namespace parcelset
 //             hpx::applier::register_thread_nullary(
 //                 util::bind(
 //                     util::one_shot(&decode_message<Parcelport, Buffer>),
-//                     boost::ref(parcelport), std::move(buffer), 1, num_thread),
+//                     std::ref(parcelport), std::move(buffer), 1, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,
 //                 parcelport.get_next_num_thread());
@@ -227,7 +228,7 @@ namespace hpx { namespace parcelset
 //             hpx::applier::register_thread_nullary(
 //                 util::bind(
 //                     util::one_shot(&decode_message<Parcelport, Buffer>),
-//                     boost::ref(parcelport), std::move(buffer), 0, num_thread),
+//                     std::ref(parcelport), std::move(buffer), 0, num_thread),
 //                 "decode_parcels",
 //                 threads::pending, true, threads::thread_priority_boost,
 //                 parcelport.get_next_num_thread());

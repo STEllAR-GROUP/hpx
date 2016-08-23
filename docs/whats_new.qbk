@@ -21,9 +21,13 @@ particular order):
 * Added a new type of performance counter which allows to return a list of
   values for each invocation. We also added a first counter of this type which
   collects a histogram of the times between parcels being created.
+* Added new LCOs: `hpx::lcos::channel` and `hpx::lcos::local::channel` which
+  are very similar to the well known channel constructs used in the Go language.
 
 [heading Breaking Changes]
 
+* We have dropped support for the gcc compiler versions V4.6 and 4.7. The
+  minimal gcc version we now test on is gcc V4.8.
 * We have removed (default) support for `boost::chrono` in interfaces, uses of
   it have been replaced with `std::chrono`. This facility can be still enabled
   at configure time by specifying `-DHPX_WITH_BOOST_CHRONO_COMPATIBILITY=On`
@@ -33,11 +37,39 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2301] - Algorithm overloads fix for VS2013
+* [pr    2299] - Replace boost::[c]ref with std::[c]ref, add inspect checks
+* [pr    2297] - Fixing compilation with no hw_loc
+* [pr    2295] - Making sure for_loop(par, 0, N, ...) is actually executed in
+                 parallel
+* [pr    2294] - Throwing exceptions if the runtime is not up and running
+* [pr    2293] - Removing unused parcel port code
+* [pr    2292] - Refactor function vtables
+* [pr    2291] - Fixing 2286
+* [pr    2290] - Simplify algorithm overloads
+* [issue 2288] - Remove dormant parcelports
+* [issue 2286] - adjustments to parcel handling to support parcelports that do
+                 not need a connection cache
+* [pr    2285] - add CMake option to disable package export
+* [pr    2283] - Add more inspect checks for use of deprecated components
+* [issue 2282] - Arithmetic exception in executor static chunker
+* [issue 2281] - For loop doesn't parallelize
+* [pr    2280] - Fixing 2277: build failure with PAPI
+* [pr    2279] - Child vs parent stealing
+* [issue 2277] - master branch build failure (53c5b4f) with papi
+* [pr    2276] - Compile time launch policies
+* [pr    2275] - Replace boost::chrono with std::chrono in interfaces
+* [pr    2274] - Replace most uses of Boost.Assign with initializer list
+* [pr    2273] - Fixed typos
+* [pr    2272] - Inspect checks
+* [pr    2270] - Adding test verifying -Ihpx.os_threads=all
 * [pr    2269] - Added inspect check for now obsolete boost type traits
 * [pr    2268] - Moving more code into source files
 * [issue 2267] - Add inspect support to deprecate Boost.TypeTraits
+* [pr    2265] - Adding channel LCO
 * [pr    2264] - Make support for std::ref mandatory
 * [pr    2263] - Constrain tuple_member forwarding constructor
+* [issue 2262] - Test hpx.os_threads=all
 * [issue 2261] - OS X: Error: no matching constructor for initialization of
                  'hpx::lcos::local::condition_variable_any'
 * [issue 2260] - Make support for std::ref mandatory
@@ -51,6 +83,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2252] - Prepare V1.0
 * [pr    2251] - Convert to 0.9.99
 * [pr    2249] - Adding iterator_facade and iterator_adaptor
+* [issue 2248] - Need a feature to yield to a new task immediately
 * [pr    2246] - Adding split_future
 * [pr    2245] - Add an example for handing over a component instance to
                  a dynamically launched locality

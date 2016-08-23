@@ -9,6 +9,7 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -137,7 +138,7 @@ int app_main(
     for (boost::uint32_t i = 0; i != threads - 1; ++i)
     {
         workers.add_thread(new boost::thread(invoke_n_workers,
-            boost::ref(b), boost::ref(elapsed[i]), tasks));
+            std::ref(b), std::ref(elapsed[i]), tasks));
     }
 
     double total_elapsed = 0;

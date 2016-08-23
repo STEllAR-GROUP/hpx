@@ -18,6 +18,7 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
+#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -458,8 +459,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 &hpx::parallel::v1::detail::reduce_by_key_impl<
                                     ExPolicy&&, RanIter, RanIter2,
                                     OutIter, OutIter2, Compare&&, Func&&>,
-                                std::forward<ExPolicy>(policy),
-                                key_first, key_last,
+                                policy, key_first, key_last,
                                 values_first, keys_output, values_output,
                                 std::forward<Compare>(comp),
                                 std::forward<Func>(func)))
