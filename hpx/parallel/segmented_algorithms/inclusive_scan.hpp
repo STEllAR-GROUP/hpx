@@ -32,23 +32,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
-<<<<<<< HEAD
-        struct merge_inclusive_scan
-        {
-            // adds init to each element from first to dest 
-=======
         
+        // adds init to each element from first to dest 
         struct merge_inclusive_scan
         {
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             template <typename InIter, typename OutIter, typename T, typename Op>
             OutIter operator() (InIter first, InIter last,
                 OutIter dest, T init, Op && op)
             {
-<<<<<<< HEAD
-=======
-                // add init to each element
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                 for (/* */; first != last; (void) ++first, ++dest)
                 {
                     *dest = op(init, *first);
@@ -58,19 +49,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         ///////////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
 
         // do inclusive scan returns result as vector
         template <typename Value>
         struct segmented_inclusive_scan_vector
             : public detail::algorithm<
                 segmented_inclusive_scan_vector<Value>, Value>
-=======
-        template <typename Value, typename Algo>
-        struct segmented_inclusive_scan_vector
-            : public detail::algorithm<
-                segmented_inclusive_scan_vector<Value, Algo>, Value>
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
         {
             typedef Value vector_type;
 
@@ -90,11 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // use first element as init value for inclusive_scan
                 if (result.size() != 0) {
                     result[0] = *first;
-<<<<<<< HEAD
                     inclusive_scan<typename vector_type::iterator>().sequential(
-=======
-                    Algo().sequential(
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                         std::forward<ExPolicy>(policy), first+1, last, result.begin()+1,
                         std::forward<value_type>(*first), std::forward<Op>(op));
                 }
@@ -108,16 +88,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, Op && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-<<<<<<< HEAD
- 
-=======
-                
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
+
                 typedef util::detail::algorithm_result<ExPolicy, vector_type> result;
 
                 vector_type res(std::distance(first, last));
 
-<<<<<<< HEAD
                 // use first element as the init value for inclusive_scan
                 if (res.size() != 0) {
                     res[0] = *first;
@@ -126,15 +101,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return result::get(
                     dataflow([=, &op](vector_type r) {
                         inclusive_scan<typename vector_type::iterator>().parallel(
-=======
-                if (res.size() != 0) {
-                    res[0] = *first;
-                }
-                
-                return result::get(
-                    dataflow([=, &op](vector_type r) {
-                        Algo().parallel(
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                             hpx::parallel::par, first+1, last, r.begin()+1,
                             std::forward<value_type>(*first), std::forward<Op>(op));
                         return r;
@@ -171,21 +137,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef std::vector<T> vector_type;
 
             return segmented_scan_seq_non<
-<<<<<<< HEAD
                 segmented_inclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_inclusive_scan(),
                     // new init value is last element from 
                     // segmented_incluisve_scan_vector + last init value
-=======
-                segmented_inclusive_scan_vector<vector_type,
-                    inclusive_scan<typename vector_type::iterator>>
-                >(
-                    std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
-                    merge_inclusive_scan(), 
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                     [op] (vector_type v, T val) {
                         return op(v.back(), val);
                     }
@@ -222,20 +179,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef std::vector<T> vector_type;
 
             return segmented_scan_par_non<
-<<<<<<< HEAD
                 segmented_inclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_inclusive_scan(),
                     // last T of scan is in the back
-=======
-                segmented_inclusive_scan_vector<vector_type,
-                    inclusive_scan<typename vector_type::iterator>>
-                >(
-                    std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
-                    merge_inclusive_scan(),
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                     [] (vector_type v) {
                         return v.back();
                     }

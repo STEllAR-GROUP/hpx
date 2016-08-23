@@ -32,8 +32,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // returns the last value of the scan
         // used to compute the next init value
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
         template <typename T, typename InIter, typename Op>
         T sequential_segmented_scan_T(InIter first, InIter last,
             Op && op)
@@ -49,10 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return ret;
         }
 
-<<<<<<< HEAD
         // does a scan and returns last value of the scan
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
         template <typename Value>
         struct segmented_scan_T
             : public detail::algorithm<segmented_scan_T<Value>, Value>
@@ -113,11 +108,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-<<<<<<< HEAD
         // do the scan (exclusive/inclusive)
         // does not return anything
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
         template <typename Algo>
         struct segmented_scan_void :
             public detail::algorithm<segmented_scan_void<Algo>>
@@ -132,10 +124,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy && policy, InIter first,
                 InIter last, OutIter dest, T && init, Op && op)
             {
-<<<<<<< HEAD
-=======
-                InIter first_t = first;
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                 Algo().sequential(
                     std::forward<ExPolicy>(policy), first, last, dest,
                     std::forward<T>(init), std::forward<Op>(op));
@@ -312,12 +300,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::vector<local_iterator_in_tuple> in_iters;
             std::vector<segment_iterator_out> out_iters;
 
-<<<<<<< HEAD
             // 1. Step: scan on each partition, push last T of scan into results
-=======
-            // 1. Step: scan on each partition, get last T of the scan
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
-            OutIter temp_dest = dest;
             if (sit_in == send_in)
             {
                 // all elements on the same partition
@@ -373,10 +356,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     out_iters.push_back(sit_out);
                 }
             }
-<<<<<<< HEAD
-=======
-    
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
+            
             // first init value is the given init value
             T last_value = init;
             for (std::size_t i = 0; i < results.size(); ++i) {
@@ -425,11 +405,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             std::vector<vector_type> results;
 
-<<<<<<< HEAD
             // scan on each partition, push whole result vector into results
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
-            OutIter temp_dest = dest;
             if (sit == send)
             {
                 // all elements on the same partition
@@ -474,12 +450,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
 
-<<<<<<< HEAD
             // merge results with given merge algorithm f1
             // update init value with function f2
-=======
-            // merge results
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             T last_value = init;
             for (auto res : results) {
                 dest = f1(res.begin(), res.end(),
@@ -539,11 +511,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             in_iters.reserve(count);
             out_iters.reserve(count);
 
-<<<<<<< HEAD
             // 1. Step: scan on each partition, push last T of scan into results
-=======
-            // 1. Step: scan on each partition, get last T of the scan
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             if (sit_in == send_in)
             {
                 // all elements on the same partition
@@ -705,11 +673,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             OutIter final_dest = dest;
             std::advance(final_dest, std::distance(first, last));
 
-<<<<<<< HEAD
             // scan on each partition, push whole result vector into results
-=======
-            // dispatch scan on each segment
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             if (sit == send)
             {
                 // all elements on the same partition
@@ -782,10 +746,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::util::unwrapped(
                             [&, dest](T last_value, vector_type r)
                             {
-<<<<<<< HEAD
                                 // merge function
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                                 f1(r.begin(), r.end(), dest, last_value, op);
                             }
                         ), workitems.back(), res

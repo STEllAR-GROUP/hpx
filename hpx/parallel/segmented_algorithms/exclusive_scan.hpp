@@ -35,18 +35,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         
         struct merge_exclusive_scan
         {
-<<<<<<< HEAD
             // adds init to each element except for the first one
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             template <typename InIter, typename OutIter, typename T, typename Op>
             OutIter operator() (InIter first, InIter last,
                 OutIter dest, T init, Op && op)
             {
-<<<<<<< HEAD
-=======
-                // add init to each element except for the first one
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                 *dest = init;
                 for (++first, ++dest; first != last; (void) ++first, ++dest)
                 {
@@ -57,7 +50,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
         
         ///////////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
 
         // do exclusive scan returns result as vector
         // first element of result vector is last T of scan 
@@ -69,12 +61,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct segmented_exclusive_scan_vector
             : public detail::algorithm<
                 segmented_exclusive_scan_vector<Value>, Value>
-=======
-        template <typename Value, typename Algo>
-        struct segmented_exclusive_scan_vector
-            : public detail::algorithm<
-                segmented_exclusive_scan_vector<Value, Algo>, Value>
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
         {
             typedef Value vector_type;
 
@@ -91,15 +77,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 vector_type result(std::distance(first, last));
 
-<<<<<<< HEAD
                 // use first element to save the last T of scan
                 if (result.size() != 0) {
                     exclusive_scan<typename vector_type::iterator>().sequential(
-=======
-                // use first element as init value
-                if (result.size() != 0) {
-                    Algo().sequential(
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                         std::forward<ExPolicy>(policy), first+1, last, result.begin()+1,
                         std::forward<value_type>(*first), std::forward<Op>(op));
                     result[0] = op(result.back(), *(last-1));
@@ -118,18 +98,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef util::detail::algorithm_result<ExPolicy, vector_type> result;
 
                 vector_type res(std::distance(first, last));
-<<<<<<< HEAD
                 
                 // use first element to save last T of scan
                 return result::get(
                     dataflow([=, &op](vector_type r) {
                         exclusive_scan<typename vector_type::iterator>().parallel(
-=======
-
-                return result::get(
-                    dataflow([=, &op](vector_type r) {
-                        Algo().parallel(
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                             hpx::parallel::par, first+1, last, r.begin()+1,
                             std::forward<value_type>(*first), std::forward<Op>(op));
                         r[0] = op(r.back(), *(last-1));
@@ -137,11 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                     }, std::move(res)));
             }
-<<<<<<< HEAD
         }; 
-=======
-        };
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
 
         ///////////////////////////////////////////////////////////////////////
         // sequential implementation
@@ -171,21 +140,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef std::vector<T> vector_type;
 
             return segmented_scan_seq_non<
-<<<<<<< HEAD
                 segmented_exclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_exclusive_scan(),
                     // new init value is first element from 
                     // segmented_excluisve_scan_vector + last init value
-=======
-                segmented_exclusive_scan_vector<vector_type,
-                    exclusive_scan<typename vector_type::iterator>>
-                >(
-                    std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
-                    merge_exclusive_scan(), 
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                     [op] (vector_type v, T val) {
                         return op(v.front(), val);
                     }
@@ -221,21 +181,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef std::vector<T> vector_type;
 
             return segmented_scan_par_non<
-<<<<<<< HEAD
                 segmented_exclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, std::move(init), std::forward<Op>(op),
                     merge_exclusive_scan(),
                     // last T of scan is on the front
                     // see segmented_exclusive_scan_vector
-=======
-                segmented_exclusive_scan_vector<vector_type,
-                    exclusive_scan<typename vector_type::iterator>>
-                >(
-                    std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
-                    merge_exclusive_scan(),
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
                     [] (vector_type v) {
                         return v.front();
                     }
@@ -253,10 +204,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
 
-<<<<<<< HEAD
             // check if OutIter is segmented in the same way as SegIter
-=======
->>>>>>> 0fc95c01481bc3f11b5ff4c14c4817850d6ec03f
             if (is_segmented_the_same(first, last, dest, is_out_seg()))
             {
                 return segmented_exclusive_scan_seq(
