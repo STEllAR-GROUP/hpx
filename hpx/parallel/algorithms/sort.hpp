@@ -31,6 +31,7 @@
 #include <boost/exception_ptr.hpp>
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <list>
 #include <type_traits>

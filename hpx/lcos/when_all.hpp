@@ -149,7 +149,6 @@ namespace hpx
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/ref.hpp>
 
 #include <algorithm>
 #include <cstddef>

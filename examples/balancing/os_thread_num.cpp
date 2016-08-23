@@ -10,6 +10,7 @@
 #include <hpx/util/bind.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <functional>
 #include <map>
 
 using boost::lockfree::queue;
@@ -83,8 +84,8 @@ int hpx_main(variables_map& vm)
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
                 register_work(hpx::util::bind(&get_os_thread_num
-                                        , boost::ref(barr)
-                                        , boost::ref(os_threads))
+                                        , std::ref(barr)
+                                        , std::ref(os_threads))
                   , "get_os_thread_num"
                   , pending
                   , thread_priority_normal

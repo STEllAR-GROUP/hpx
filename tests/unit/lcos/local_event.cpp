@@ -12,6 +12,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -65,7 +66,7 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             futs.push_back(
-                hpx::async(&local_event_test, boost::ref(e), boost::ref(c))
+                hpx::async(&local_event_test, std::ref(e), std::ref(c))
             );
         }
 

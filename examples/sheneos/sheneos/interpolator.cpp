@@ -15,6 +15,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstring>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -356,8 +357,8 @@ namespace sheneos
                 overall_result[indicies[i]] = result[i];
         }
 
-        boost::reference_wrapper<context_data const> data_;
-        boost::reference_wrapper<std::vector<double> > overall_result_;
+        std::reference_wrapper<context_data const> data_;
+        std::reference_wrapper<std::vector<double> > overall_result_;
         std::shared_ptr<partitions_type> partitions_;
     };
 
@@ -470,8 +471,8 @@ namespace sheneos
                 overall_results[indicies[i]] = result[i];
         }
 
-        boost::reference_wrapper<context_data const> data_;
-        boost::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
+        std::reference_wrapper<context_data const> data_;
+        std::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
         std::shared_ptr<partitions_type> partitions_;
     };
 

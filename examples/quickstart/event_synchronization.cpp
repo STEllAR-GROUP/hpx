@@ -10,7 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/ref.hpp>
+#include <functional>
 
 struct data
 {
@@ -45,7 +45,7 @@ int main()
     hpx::lcos::local::counting_semaphore sem;
 
     for (std::size_t i = 0; i < 10; ++i)
-        hpx::apply(&worker, i, boost::ref(d), boost::ref(sem));
+        hpx::apply(&worker, i, std::ref(d), std::ref(sem));
 
     d.initialize("initialized");    // signal the event
 

@@ -15,11 +15,10 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <utility>
 #include <vector>
-
-#include <boost/ref.hpp>
 
 #if defined(HPX_HAVE_MM_PREFETCH)
 #if defined(HPX_MSVC)
@@ -56,7 +55,7 @@ namespace hpx { namespace parallel { namespace util
             typedef typename base_type::reference reference;
 
         private:
-            typedef hpx::util::tuple<boost::reference_wrapper<Ts>...> ranges_type;
+            typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;
 
             ranges_type rngs_;
             base_iterator base_;
@@ -209,7 +208,7 @@ namespace hpx { namespace parallel { namespace util
         struct prefetcher_context
         {
         private:
-            typedef hpx::util::tuple<boost::reference_wrapper<Ts>...> ranges_type;
+            typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;
 
             Itr it_begin_;
             Itr it_end_;
@@ -406,9 +405,9 @@ namespace hpx { namespace parallel { namespace util
             hpx::util::detail::all_of<hpx::traits::is_range<Ts>...>::value,
             "All variadic parameters have to represent ranges");
 
-        typedef hpx::util::tuple<boost::reference_wrapper<Ts const>...> ranges_type;
+        typedef hpx::util::tuple<std::reference_wrapper<Ts const>...> ranges_type;
 
-        auto && ranges = ranges_type(boost::ref(rngs)...);
+        auto && ranges = ranges_type(std::cref(rngs)...);
         return detail::prefetcher_context<Itr, Ts const...>(
             base_begin, base_end, std::move(ranges), p_factor);
     }

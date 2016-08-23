@@ -9,6 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <functional>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -30,7 +32,7 @@ void test_thread_id_for_running_thread_is_not_default_constructed_id()
 {
     hpx::lcos::local::barrier b1(2);
     hpx::lcos::local::barrier b2(2);
-    hpx::thread t(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t(&do_nothing, std::ref(b1), std::ref(b2));
     b1.wait();
 
     HPX_TEST_NEQ(t.get_id(), hpx::thread::id());
@@ -44,8 +46,8 @@ void test_different_threads_have_different_ids()
     hpx::lcos::local::barrier b1(3);
     hpx::lcos::local::barrier b2(3);
 
-    hpx::thread t(&do_nothing, boost::ref(b1), boost::ref(b2));
-    hpx::thread t2(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t(&do_nothing, std::ref(b1), std::ref(b2));
+    hpx::thread t2(&do_nothing, std::ref(b1), std::ref(b2));
     b1.wait();
 
     HPX_TEST_NEQ(t.get_id(), t2.get_id());
@@ -60,9 +62,9 @@ void test_thread_ids_have_a_total_order()
     hpx::lcos::local::barrier b1(4);
     hpx::lcos::local::barrier b2(4);
 
-    hpx::thread t1(&do_nothing, boost::ref(b1), boost::ref(b2));
-    hpx::thread t2(&do_nothing, boost::ref(b1), boost::ref(b2));
-    hpx::thread t3(&do_nothing, boost::ref(b1), boost::ref(b2));
+    hpx::thread t1(&do_nothing, std::ref(b1), std::ref(b2));
+    hpx::thread t2(&do_nothing, std::ref(b1), std::ref(b2));
+    hpx::thread t3(&do_nothing, std::ref(b1), std::ref(b2));
     b1.wait();
 
     hpx::thread::id t1_id = t1.get_id();

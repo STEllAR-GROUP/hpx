@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/ref.hpp
+// hpxinspect:nodeprecatedname:boost::reference_wrapper
+
 #ifndef HPX_UTIL_DECAY_HPP
 #define HPX_UTIL_DECAY_HPP
 

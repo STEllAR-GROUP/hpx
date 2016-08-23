@@ -9,6 +9,7 @@
 
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
+#include <functional>
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
@@ -19,7 +20,6 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
-#include <boost/ref.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -138,7 +138,7 @@ int app_main(
 
     // Randomly shuffle the entire sequence to deal with drift.
     std::random_shuffle(payloads.begin(), payloads.end(),
-        boost::bind(&shuffler, boost::ref(prng), _1));
+        boost::bind(&shuffler, std::ref(prng), _1));
 
     ///////////////////////////////////////////////////////////////////////
     // Validate the payloads.

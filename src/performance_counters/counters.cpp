@@ -34,6 +34,7 @@
 #include <boost/spirit/include/qi_directive.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -557,8 +558,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_types(std::move(func), mode, ec);
     }
@@ -570,8 +571,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_type(name, std::move(func), mode, ec);
     }
@@ -583,8 +584,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_type(info, std::move(func), mode, ec);
     }

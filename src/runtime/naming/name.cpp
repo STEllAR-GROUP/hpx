@@ -27,9 +27,9 @@
 #include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/ref.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -352,7 +352,7 @@ namespace hpx { namespace naming
                     HPX_ASSERT(new_gid != invalid_gid);
                     return agas::incref(new_gid, new_credit)
                         .then(
-                            hpx::util::bind(postprocess_incref, boost::ref(gid))
+                            hpx::util::bind(postprocess_incref, std::ref(gid))
                         );
                 }
 

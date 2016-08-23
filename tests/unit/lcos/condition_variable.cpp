@@ -16,8 +16,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-
 #include <chrono>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -134,7 +134,7 @@ void test_condition_notify_one_wakes_from_wait()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_without_predicate, boost::ref(data));
+    hpx::thread thread(&wait_for_flag::wait_without_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
@@ -151,7 +151,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_with_predicate, boost::ref(data));
+    hpx::thread thread(&wait_for_flag::wait_with_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
@@ -168,7 +168,7 @@ void test_condition_notify_one_wakes_from_wait_until()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data));
+    hpx::thread thread(&wait_for_flag::wait_until_without_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
@@ -185,7 +185,7 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data));
+    hpx::thread thread(&wait_for_flag::wait_until_with_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
@@ -203,7 +203,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
     wait_for_flag data;
 
     hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate,
-        boost::ref(data));
+        std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
@@ -256,7 +256,7 @@ void test_condition_notify_all_wakes_from_wait()
         for(unsigned i=0;i<5;++i)
         {
             group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate,
-                boost::ref(data)));
+                std::ref(data)));
         }
 
         {
@@ -287,7 +287,7 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
         for(unsigned i=0;i<5;++i)
         {
             group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate,
-                boost::ref(data)));
+                std::ref(data)));
         }
 
         {
@@ -318,7 +318,7 @@ void test_condition_notify_all_wakes_from_wait_until()
         for(unsigned i=0;i<5;++i)
         {
             group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate,
-                boost::ref(data)));
+                std::ref(data)));
         }
 
         {
@@ -349,7 +349,7 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
         for(unsigned i=0;i<5;++i)
         {
             group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate,
-                boost::ref(data)));
+                std::ref(data)));
         }
 
         {
@@ -380,7 +380,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
         for(unsigned i=0;i<5;++i)
         {
             group.push_back(hpx::thread(&wait_for_flag
-                ::relative_wait_until_with_predicate, boost::ref(data)));
+                ::relative_wait_until_with_predicate, std::ref(data)));
         }
 
         {
