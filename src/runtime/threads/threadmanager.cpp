@@ -192,6 +192,17 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // Enumerate all matching threads
+    template <typename SchedulingPolicy>
+    bool threadmanager_impl<SchedulingPolicy>::enumerate_threads(
+        util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state) const
+    {
+        std::lock_guard<mutex_type> lk(mtx_);
+        return pool_.enumerate_threads(f, state);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Abort all threads which are in suspended state. This will set
     // the state of all suspended threads to \a pending while
     // supplying the wait_abort extended state flag

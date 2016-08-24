@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -855,6 +856,28 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
             return count;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Enumerate matching threads from all queues
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
+            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+            {
+                result = result &&
+                    high_priority_queues_[i]->enumerate_threads(f, state);
+            }
+
+            result = result && low_priority_queue_.enumerate_threads(f, state);
+
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+            {
+                result = result && queues_[i]->enumerate_threads(f, state);
+            }
+            return result;
         }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

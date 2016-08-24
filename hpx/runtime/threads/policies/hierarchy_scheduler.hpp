@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -264,6 +265,23 @@ namespace hpx { namespace threads { namespace policies
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
                     result += tree[i][j]->get_thread_count(state);
+                }
+            }
+            return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Enumerate matching threads from all queues
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
+            for(size_type i = 0; i < tree.size(); ++i)
+            {
+                for(size_type j = 0; j < tree[i].size(); ++j)
+                {
+                    result = result && tree[i][j]->enumerate_threads(f, state);
                 }
             }
             return result;
