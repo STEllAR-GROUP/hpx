@@ -7,6 +7,7 @@
 
 #include "matrix.hh"
 
+#include <cstddef>
 
 
 std::ostream& operator<<(std::ostream& os, const vector_t& x)

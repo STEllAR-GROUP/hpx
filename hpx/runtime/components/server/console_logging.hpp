@@ -14,6 +14,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

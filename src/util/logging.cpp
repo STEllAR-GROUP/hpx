@@ -27,6 +27,7 @@
 #include <boost/filesystem/operations.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -163,7 +164,7 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            boost::uint32_t locality_id = naming::invalid_locality_id;
+            std::uint32_t locality_id = naming::invalid_locality_id;
             applier::applier* appl = applier::get_applier_ptr();
             if (appl) {
                 error_code ec(lightweight);
@@ -172,13 +173,13 @@ namespace hpx { namespace util
 
             if (naming::invalid_locality_id != locality_id) {
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
                     << std::setfill('0') << locality_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
             }
         }
     };
@@ -226,7 +227,7 @@ namespace hpx { namespace util
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
                     std::stringstream out;
-                    out << std::hex << std::setw(sizeof(boost::uint32_t))
+                    out << std::hex << std::setw(sizeof(std::uint32_t))
                         << std::setfill('0') << self->get_thread_phase();
                     str.prepend_string(out.str());
                     return;
@@ -234,7 +235,7 @@ namespace hpx { namespace util
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
+            str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
         }
     };
 
@@ -247,17 +248,17 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            boost::uint32_t parent_locality_id = threads::get_parent_locality_id();
+            std::uint32_t parent_locality_id = threads::get_parent_locality_id();
             if (naming::invalid_locality_id != parent_locality_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
                     << std::setfill('0') << parent_locality_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
             }
         }
     };
@@ -300,13 +301,13 @@ namespace hpx { namespace util
             if (0 != parent_phase) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t))
+                out << std::hex << std::setw(sizeof(std::uint32_t))
                     << std::setfill('0') << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
             }
         }
     };
@@ -320,18 +321,18 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            boost::uint64_t component_id = threads::get_self_component_id();
+            std::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint64_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint64_t)*2)
                     << std::setfill('0')
                     << component_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint64_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint64_t)*2, '-'));
             }
         }
     };

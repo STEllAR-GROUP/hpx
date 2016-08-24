@@ -29,7 +29,6 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_MOVABLE_ONLY(promise_base);
 
-            typedef R result_type;
             typedef SharedState shared_state_type;
 
         public:

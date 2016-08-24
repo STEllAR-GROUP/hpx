@@ -9,16 +9,17 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int32_t increment(boost::int32_t i)
+std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
 HPX_PLAIN_ACTION(increment);
 
-boost::int32_t increment_with_future(hpx::shared_future<boost::int32_t> fi)
+std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
@@ -28,7 +29,7 @@ HPX_PLAIN_ACTION(increment_with_future);
 struct decrement_server
   : hpx::components::managed_component_base<decrement_server>
 {
-    boost::int32_t call(boost::int32_t i) const
+    std::int32_t call(std::int32_t i) const
     {
         return i - 1;
     }
@@ -49,21 +50,21 @@ void test_remote_async(hpx::id_type const& target)
     {
         increment_action inc;
 
-        hpx::future<boost::int32_t> f1 = hpx::async(inc, target, 42);
+        hpx::future<std::int32_t> f1 = hpx::async(inc, target, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, 42);
         HPX_TEST_EQ(f2.get(), 43);
     }
 
     {
         increment_with_future_action inc;
-        hpx::promise<boost::int32_t> p;
-        hpx::shared_future<boost::int32_t> f = p.get_future();
+        hpx::promise<std::int32_t> p;
+        hpx::shared_future<std::int32_t> f = p.get_future();
 
-        hpx::future<boost::int32_t> f1 = hpx::async(inc, target, f);
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f1 = hpx::async(inc, target, f);
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, f);
 
         p.set_value(42);
@@ -74,17 +75,17 @@ void test_remote_async(hpx::id_type const& target)
     {
         increment_action inc;
 
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async(hpx::util::bind(inc, target, 42));
         HPX_TEST_EQ(f1.get(), 43);
     }
 
     {
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async<increment_action>(target, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async<increment_action>(hpx::launch::all, target, 42);
         HPX_TEST_EQ(f2.get(), 43);
     }
@@ -96,10 +97,10 @@ void test_remote_async(hpx::id_type const& target)
 
         call_action call;
 
-        hpx::future<boost::int32_t> f1 = hpx::async(call, dec, 42);
+        hpx::future<std::int32_t> f1 = hpx::async(call, dec, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, call, dec, 42);
         HPX_TEST_EQ(f2.get(), 41);
     }
@@ -111,18 +112,18 @@ void test_remote_async(hpx::id_type const& target)
 
         call_action call;
 
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async(hpx::util::bind(call, dec, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::util::bind(call, _1, 42), dec);
         HPX_TEST_EQ(f2.get(), 41);
 
-        hpx::future<boost::int32_t> f3 =
+        hpx::future<std::int32_t> f3 =
             hpx::async(hpx::util::bind(call, _1, _2), dec, 42);
         HPX_TEST_EQ(f3.get(), 41);
     }
@@ -132,22 +133,22 @@ void test_remote_async(hpx::id_type const& target)
             hpx::components::new_<decrement_server>(target);
         hpx::id_type dec = dec_f.get();
 
-        hpx::future<boost::int32_t> f1 =
+        hpx::future<std::int32_t> f1 =
             hpx::async<call_action>(dec, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f2 =
             hpx::async<call_action>(hpx::launch::all, dec, 42);
         HPX_TEST_EQ(f2.get(), 41);
     }
 
     {
         increment_with_future_action inc;
-        hpx::shared_future<boost::int32_t> f =
+        hpx::shared_future<std::int32_t> f =
             hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
 
-        hpx::future<boost::int32_t> f1 = hpx::async(inc, target, f);
-        hpx::future<boost::int32_t> f2 =
+        hpx::future<std::int32_t> f1 = hpx::async(inc, target, f);
+        hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, f);
 
         HPX_TEST_EQ(f1.get(), 44);

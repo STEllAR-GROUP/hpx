@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 
+#include <cstdint>
 #include <map>
 #include <utility>
 #include <vector>
@@ -62,15 +63,15 @@ locality_namespace::service_async<parcelset::endpoints_type>(
   , threads::thread_priority priority
     );
 
-template lcos::future<std::vector<boost::uint32_t> >
-locality_namespace::service_async<std::vector<boost::uint32_t> >(
+template lcos::future<std::vector<std::uint32_t> >
+locality_namespace::service_async<std::vector<std::uint32_t> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::future<boost::uint32_t>
-locality_namespace::service_async<boost::uint32_t>(
+template lcos::future<std::uint32_t>
+locality_namespace::service_async<std::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority

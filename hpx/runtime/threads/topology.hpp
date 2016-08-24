@@ -24,6 +24,7 @@
 #if defined(HPX_HAVE_HWLOC)
 #include <hpx/error_code.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #endif

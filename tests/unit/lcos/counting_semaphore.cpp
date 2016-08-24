@@ -10,9 +10,10 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/ref.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -31,7 +32,7 @@ int hpx_main()
     hpx::lcos::local::counting_semaphore sem;
 
     for (std::size_t i = 0; i != 10; ++i)
-        hpx::apply(&worker, boost::ref(sem));
+        hpx::apply(&worker, std::ref(sem));
 
     // Wait for all threads to finish executing.
     sem.wait(10);

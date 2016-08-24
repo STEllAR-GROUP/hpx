@@ -33,6 +33,8 @@
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -48,7 +50,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     {
         typedef hpx::lcos::local::spinlock mutex_type;
     public:
-        receiver(boost::asio::io_service& io_service, boost::uint64_t max_inbound_size,
+        receiver(boost::asio::io_service& io_service, std::uint64_t max_inbound_size,
             connection_handler& parcelport)
           : socket_(io_service)
           , max_inbound_size_(max_inbound_size)
@@ -143,7 +145,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // Determine the length of the serialized data.
-                boost::uint64_t inbound_size = buffer_.size_;
+                std::uint64_t inbound_size = buffer_.size_;
 
                 if (inbound_size > max_inbound_size_)
                 {
@@ -161,10 +163,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // determine the size of the chunk buffer
                 std::size_t num_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_.num_chunks_.first));
+                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
                 std::size_t num_non_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_.num_chunks_.second));
+                        static_cast<std::uint32_t>(buffer_.num_chunks_.second));
 
                 void (receiver::*f)(boost::system::error_code const&,
                         Handler) = nullptr;
@@ -240,7 +242,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // add appropriately sized chunk buffers for the zero-copy data
                 std::size_t num_zero_copy_chunks =
                     static_cast<std::size_t>(
-                        static_cast<boost::uint32_t>(buffer_.num_chunks_.first));
+                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
 
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
@@ -342,7 +344,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
 
-        boost::uint64_t max_inbound_size_;
+        std::uint64_t max_inbound_size_;
 
         bool ack_;
 

@@ -17,7 +17,7 @@
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <cstdarg>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

@@ -11,7 +11,6 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/ref.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -49,7 +48,7 @@ void parameters_test_impl(Parameters &&... params)
 template <typename ... Parameters>
 void parameters_test(Parameters &&... params)
 {
-    parameters_test_impl(boost::ref(params)...);
+    parameters_test_impl(std::ref(params)...);
     parameters_test_impl(std::ref(params)...);
     parameters_test_impl(std::forward<Parameters>(params)...);
 }

@@ -15,6 +15,7 @@
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

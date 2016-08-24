@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
+#include <cstddef>
+
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
 namespace hpx { namespace test { namespace server

@@ -11,6 +11,8 @@
 #include <hpx/components/process/util/terminate.hpp>
 #include <hpx/components/process/util/wait_for_exit.hpp>
 
+#include <functional>
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
     hpx::components::process::server::child::terminate_action,

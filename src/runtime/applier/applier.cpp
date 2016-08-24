@@ -25,6 +25,9 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -295,7 +298,7 @@ namespace hpx { namespace applier
 #endif
     {}
 
-    void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
+    void applier::initialize(std::uint64_t rts, std::uint64_t mem)
     {
         naming::resolver_client & agas_client = get_agas_client();
         runtime_support_id_ = naming::id_type(
@@ -326,7 +329,7 @@ namespace hpx { namespace applier
         return hpx::naming::get_agas_client().get_local_locality(ec);
     }
 
-    boost::uint32_t applier::get_locality_id(error_code& ec) const
+    std::uint32_t applier::get_locality_id(error_code& ec) const
     {
         return naming::get_locality_id_from_gid(get_raw_locality(ec));
     }
@@ -432,7 +435,7 @@ namespace hpx { namespace applier
 #if defined(HPX_HAVE_SECURITY)
         // we look up the certificate of the originating locality, no matter
         // whether this parcel was routed through another locality or not
-        boost::uint32_t locality_id =
+        std::uint32_t locality_id =
             naming::get_locality_id_from_gid(p.get_parcel_id());
         error_code ec(lightweight);
         components::security::signed_certificate const& cert =
@@ -519,7 +522,7 @@ namespace hpx { namespace applier
                 client.route(
                     std::move(p),
                     util::bind(&detail::parcel_sent_handler,
-                        boost::ref(parcel_handler_),
+                        std::ref(parcel_handler_),
                         util::placeholders::_1, util::placeholders::_2),
                     threads::thread_priority_normal);
                 break;
@@ -586,7 +589,7 @@ namespace hpx { namespace applier
     }
 
     // The function \a get_locality_id returns the id of this locality
-    boost::uint32_t get_locality_id(error_code& ec) //-V659
+    std::uint32_t get_locality_id(error_code& ec) //-V659
     {
         applier** appl = applier::applier_.get();
         return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;

@@ -11,6 +11,8 @@
 
 #include <hpx/runtime/serialization/access.hpp>
 
+#include <cstdint>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -23,7 +25,7 @@ using hpx::finalize;
 struct small_object
 {
   private:
-    boost::uint64_t x_;
+    std::uint64_t x_;
 
     friend class hpx::serialization::access;
 
@@ -47,7 +49,7 @@ struct small_object
     }
 
     small_object(
-        boost::uint64_t x
+        std::uint64_t x
         )
       : x_(x)
     {
@@ -76,8 +78,8 @@ struct small_object
         std::cout << "small_object: dtor(" << x_ << ")\n";
     }
 
-    boost::uint64_t operator()(
-        boost::uint64_t const& z_
+    std::uint64_t operator()(
+        std::uint64_t const& z_
         )
     {
         std::cout << "small_object: call(" << x_ << ", " << z_ << ")\n";
@@ -89,8 +91,8 @@ struct small_object
 struct big_object
 {
   private:
-    boost::uint64_t x_;
-    boost::uint64_t y_;
+    std::uint64_t x_;
+    std::uint64_t y_;
 
     friend class hpx::serialization::access;
 
@@ -116,8 +118,8 @@ struct big_object
     }
 
     big_object(
-        boost::uint64_t x
-      , boost::uint64_t y
+        std::uint64_t x
+      , std::uint64_t y
         )
       : x_(x)
       , y_(y)
@@ -149,9 +151,9 @@ struct big_object
         std::cout << "big_object: dtor(" << x_ << ", " << y_ << ")\n";
     }
 
-    boost::uint64_t operator()(
-        boost::uint64_t const& z_
-      , boost::uint64_t const& w_
+    std::uint64_t operator()(
+        std::uint64_t const& z_
+      , std::uint64_t const& w_
         )
     {
         std::cout << "big_object: call(" << x_ << ", " << y_
@@ -181,11 +183,11 @@ int hpx_main(variables_map& vm)
 
             small_object const f(17);
 
-            function<boost::uint64_t(boost::uint64_t const&)> f0(f);
+            function<std::uint64_t(std::uint64_t const&)> f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&)> f1(f0);
+            function<std::uint64_t(std::uint64_t const&)> f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&)> f2;
+            function<std::uint64_t(std::uint64_t const&)> f2;
 
             f2 = f0;
 
@@ -202,13 +204,13 @@ int hpx_main(variables_map& vm)
 
             big_object const f(5, 12);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)>
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&)>
                 f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)>
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&)>
                 f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)> f2;
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&)> f2;
 
             f2 = f0;
 
@@ -227,11 +229,11 @@ int hpx_main(variables_map& vm)
 
             small_object const f(17);
 
-            function<boost::uint64_t(boost::uint64_t const&), false> f0(f);
+            function<std::uint64_t(std::uint64_t const&), false> f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&), false> f1(f0);
+            function<std::uint64_t(std::uint64_t const&), false> f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&), false> f2;
+            function<std::uint64_t(std::uint64_t const&), false> f2;
 
             f2 = f0;
 
@@ -248,13 +250,13 @@ int hpx_main(variables_map& vm)
 
             big_object const f(5, 12);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&),
                 false> f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&),
                 false> f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
+            function<std::uint64_t(std::uint64_t const&, std::uint64_t const&),
                 false> f2;
 
             f2 = f0;

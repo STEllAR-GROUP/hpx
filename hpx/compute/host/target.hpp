@@ -16,6 +16,7 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 

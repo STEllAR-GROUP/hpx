@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////

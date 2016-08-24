@@ -13,9 +13,10 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/array.hpp>
-#include <boost/cstdint.hpp>
 
 #include <climits>
+#include <cstddef>
+#include <cstdint>
 #include <type_traits>
 
 namespace hpx { namespace components { namespace security
@@ -44,7 +45,7 @@ namespace hpx { namespace components { namespace security
                 capability_non_const_delegation = 7
             };
 
-            static boost::uint64_t const root_certificate_authority_capability =
+            static std::uint64_t const root_certificate_authority_capability =
                 (1ull << capability_certificate_authority) +
                 (1ull << capability_create_component_delegation) +
                 (1ull << capability_const_delegation) +
@@ -60,7 +61,7 @@ namespace hpx { namespace components { namespace security
             std::fill(bits_.begin(), bits_.end(), 0);
         }
 
-        capability(boost::uint64_t bits)
+        capability(std::uint64_t bits)
         {
             std::fill(bits_.begin(), bits_.end(), 0);
             for (std::size_t i = 0;

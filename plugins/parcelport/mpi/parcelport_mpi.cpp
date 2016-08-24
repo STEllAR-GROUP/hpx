@@ -35,6 +35,7 @@
 #include <boost/archive/basic_archive.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -58,7 +59,8 @@ namespace hpx { namespace parcelset
     {
         typedef policies::mpi::sender_connection connection_type;
         typedef std::true_type  send_early_parcel;
-        typedef std::true_type do_background_work;
+        typedef std::true_type  do_background_work;
+        typedef std::true_type  use_connection_cache;
 
         static const char * type()
         {

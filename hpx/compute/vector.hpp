@@ -17,6 +17,7 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <initializer_list>
 #include <memory>
 #include <type_traits>

@@ -9,6 +9,7 @@
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 

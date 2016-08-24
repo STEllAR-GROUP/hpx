@@ -29,6 +29,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -232,9 +233,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<E>::value);
             }
 
+            // the for_loop should be executed sequentially either if the
+            // execution policy enforces sequential execution of if the
+            // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
                     is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<B>::value
+                    (!std::is_integral<B>::value &&
+                     !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
 
             std::size_t size = parallel::v1::detail::distance(first, last);

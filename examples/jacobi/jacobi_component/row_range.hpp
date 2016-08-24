@@ -13,6 +13,7 @@
 #include <boost/range/iterator.hpp>
 #include <boost/range/mutable_iterator.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace jacobi

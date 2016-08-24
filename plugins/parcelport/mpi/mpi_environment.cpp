@@ -15,6 +15,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <string>
 

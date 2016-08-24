@@ -41,6 +41,7 @@
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -63,7 +64,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::uint64_t /*parameter2*/)
             {}
 
             double get_value()
@@ -94,7 +95,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::uint64_t /*parameter2*/)
             {}
 
             double get_value()
@@ -126,7 +127,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag(aggregating_type_tag)>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::uint64_t /*parameter2*/)
             {}
 
             double get_value()
@@ -157,7 +158,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t parameter2)
+            counter_type_from_statistic(std::uint64_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
@@ -191,7 +192,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::uint64_t /*parameter2*/)
             {}
 
             double get_value()
@@ -222,7 +223,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(boost::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::uint64_t /*parameter2*/)
             {}
 
             double get_value()
@@ -249,7 +250,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            boost::uint64_t parameter1, boost::uint64_t parameter2)
+            std::uint64_t parameter1, std::uint64_t parameter2)
       : base_type_holder(info),
         timer_(util::bind(&statistics_counter::evaluate, this_()),
             util::bind(&statistics_counter::on_terminate, this_()),
@@ -282,9 +283,9 @@ namespace hpx { namespace performance_counters { namespace server
 
         hpx::performance_counters::counter_value value;
 
-        prev_value_.value_ = static_cast<boost::int64_t>(value_->get_value());
+        prev_value_.value_ = static_cast<std::int64_t>(value_->get_value());
         prev_value_.status_ = status_new_data;
-        prev_value_.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        prev_value_.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
         value = prev_value_;                              // return value
 
@@ -560,7 +561,7 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_name(paths.parentinstancename_, base_name, ec);
                 if (ec) return naming::invalid_gid;
 
-                std::vector<boost::int64_t> parameters;
+                std::vector<std::int64_t> parameters;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as interval
                     // time (ms)

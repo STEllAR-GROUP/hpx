@@ -13,13 +13,14 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool get_endpoint(std::string const& addr,
-        boost::uint16_t port, boost::asio::ip::tcp::endpoint& ep);
+        std::uint16_t port, boost::asio::ip::tcp::endpoint& ep);
 
     HPX_API_EXPORT std::string get_endpoint_name(
         boost::asio::ip::tcp::endpoint const& ep);
@@ -27,7 +28,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     HPX_API_EXPORT boost::asio::ip::tcp::endpoint
-    resolve_hostname(std::string const& hostname, boost::uint16_t port,
+    resolve_hostname(std::string const& hostname, std::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     HPX_API_EXPORT bool split_ip_address(std::string const& v,
-        std::string& host, boost::uint16_t& port);
+        std::string& host, std::uint16_t& port);
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
@@ -46,7 +47,7 @@ namespace hpx { namespace util
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
     endpoint_iterator_type HPX_EXPORT connect_begin(
-        std::string const & address, boost::uint16_t port,
+        std::string const & address, std::uint16_t port,
         boost::asio::io_service& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
@@ -65,7 +66,7 @@ namespace hpx { namespace util
     }
 
     endpoint_iterator_type HPX_EXPORT accept_begin(
-        std::string const & address, boost::uint16_t port,
+        std::string const & address, std::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////

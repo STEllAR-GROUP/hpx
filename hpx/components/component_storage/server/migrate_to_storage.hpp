@@ -15,6 +15,7 @@
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -76,7 +77,7 @@ namespace hpx { namespace components { namespace server
         {
             using components::stubs::runtime_support;
 
-            boost::uint32_t pin_count = ptr->pin_count();
+            std::uint32_t pin_count = ptr->pin_count();
 
             if (pin_count == ~0x0u)
             {

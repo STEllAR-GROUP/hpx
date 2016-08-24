@@ -18,6 +18,7 @@
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <vector>
 

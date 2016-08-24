@@ -23,6 +23,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>

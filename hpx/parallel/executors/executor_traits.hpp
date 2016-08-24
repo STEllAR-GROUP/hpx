@@ -21,6 +21,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <functional>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>

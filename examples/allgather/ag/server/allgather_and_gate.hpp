@@ -12,6 +12,7 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/util.hpp>
 
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

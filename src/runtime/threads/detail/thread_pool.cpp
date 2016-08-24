@@ -27,7 +27,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/ref.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/thread/mutex.hpp>
@@ -37,6 +36,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iomanip>
 #include <mutex>
 #include <numeric>
@@ -393,7 +393,7 @@ namespace hpx { namespace threads { namespace detail
                 // create a new thread
                 threads_.push_back(boost::thread(
                         &thread_pool::thread_func, this, thread_num,
-                        boost::ref(topology_), boost::ref(*startup_)
+                        std::ref(topology_), std::ref(*startup_)
                     ));
 
                 // set the new threads affinity (on Windows systems)

@@ -6,12 +6,13 @@
 #if !defined(HPX_226CC70A_D749_4ADA_BB55_70F85566B5CC)
 #define HPX_226CC70A_D749_4ADA_BB55_70F85566B5CC
 
-#include <queue>
-#include <vector>
-
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <cstddef>
+#include <queue>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server

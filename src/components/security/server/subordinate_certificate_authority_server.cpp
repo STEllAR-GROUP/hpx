@@ -8,9 +8,11 @@
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace components { namespace security { namespace server
 {
-    boost::uint64_t get_subordinate_certificate_authority_msb()
+    std::uint64_t get_subordinate_certificate_authority_msb()
     {
         return naming::replace_locality_id(
             HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB

@@ -20,8 +20,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <list>
 #include <map>
@@ -105,7 +105,7 @@ namespace hpx { namespace parcelset
         /// parcelports are enabled.
         virtual bool can_connect(locality const &, bool use_alternative_parcelport)
         {
-            return can_bootstrap() || use_alternative_parcelport;
+            return use_alternative_parcelport || can_bootstrap();
         }
 
         /// Queues a parcel for transmission to another locality
@@ -173,7 +173,7 @@ namespace hpx { namespace parcelset
         virtual bool do_background_work(std::size_t num_thread) = 0;
 
         // retrieve performance counter value for given statistics type
-        virtual boost::int64_t get_connection_cache_statistics(
+        virtual std::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type, bool reset) = 0;
 
         /// Return the name of this locality
@@ -197,53 +197,53 @@ namespace hpx { namespace parcelset
         /// Performance counter data
 
         /// number of parcels sent
-        boost::uint64_t get_parcel_send_count(bool reset)
+        std::uint64_t get_parcel_send_count(bool reset)
         {
             return parcels_sent_.num_parcels(reset);
         }
 
         /// number of messages sent
-        boost::uint64_t get_message_send_count(bool reset)
+        std::uint64_t get_message_send_count(bool reset)
         {
             return parcels_sent_.num_messages(reset);
         }
 
         /// number of parcels received
-        boost::uint64_t get_parcel_receive_count(bool reset)
+        std::uint64_t get_parcel_receive_count(bool reset)
         {
             return parcels_received_.num_parcels(reset);
         }
 
         /// number of messages received
-        boost::uint64_t get_message_receive_count(bool reset)
+        std::uint64_t get_message_receive_count(bool reset)
         {
             return parcels_received_.num_messages(reset);
         }
 
         /// the total time it took for all sends, from async_write to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_sending_time(bool reset)
+        std::int64_t get_sending_time(bool reset)
         {
             return parcels_sent_.total_time(reset);
         }
 
         /// the total time it took for all receives, from async_read to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_receiving_time(bool reset)
+        std::int64_t get_receiving_time(bool reset)
         {
             return parcels_received_.total_time(reset);
         }
 
         /// the total time it took for all sender-side serialization operations
         /// (nanoseconds)
-        boost::int64_t get_sending_serialization_time(bool reset)
+        std::int64_t get_sending_serialization_time(bool reset)
         {
             return parcels_sent_.total_serialization_time(reset);
         }
 
         /// the total time it took for all receiver-side serialization
         /// operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time(bool reset)
+        std::int64_t get_receiving_serialization_time(bool reset)
         {
             return parcels_received_.total_serialization_time(reset);
         }
@@ -251,54 +251,54 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_SECURITY)
         /// the total time it took for all sender-side security operations
         /// (nanoseconds)
-        boost::int64_t get_sending_security_time(bool reset)
+        std::int64_t get_sending_security_time(bool reset)
         {
             return parcels_sent_.total_security_time(reset);
         }
 
         /// the total time it took for all receiver-side security
         /// operations (nanoseconds)
-        boost::int64_t get_receiving_security_time(bool reset)
+        std::int64_t get_receiving_security_time(bool reset)
         {
             return parcels_received_.total_security_time(reset);
         }
 #endif
 
         /// total data sent (bytes)
-        boost::uint64_t get_data_sent(bool reset)
+        std::uint64_t get_data_sent(bool reset)
         {
             return parcels_sent_.total_bytes(reset);
         }
 
         /// total data (uncompressed) sent (bytes)
-        boost::uint64_t get_raw_data_sent(bool reset)
+        std::uint64_t get_raw_data_sent(bool reset)
         {
             return parcels_sent_.total_raw_bytes(reset);
         }
 
         /// total data received (bytes)
-        boost::uint64_t get_data_received(bool reset)
+        std::uint64_t get_data_received(bool reset)
         {
             return parcels_received_.total_bytes(reset);
         }
 
         /// total data (uncompressed) received (bytes)
-        boost::uint64_t get_raw_data_received(bool reset)
+        std::uint64_t get_raw_data_received(bool reset)
         {
             return parcels_received_.total_raw_bytes(reset);
         }
 
-        boost::int64_t get_buffer_allocate_time_sent(bool reset)
+        std::int64_t get_buffer_allocate_time_sent(bool reset)
         {
             return parcels_sent_.total_buffer_allocate_time(reset);
         }
 
-        boost::int64_t get_buffer_allocate_time_received(bool reset)
+        std::int64_t get_buffer_allocate_time_received(bool reset)
         {
             return parcels_received_.total_buffer_allocate_time(reset);
         }
 
-        boost::uint64_t get_pending_parcels_count(bool /*reset*/)
+        std::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
             std::lock_guard<lcos::local::spinlock> l(mtx_);
             return pending_parcels_.size();
@@ -324,12 +324,12 @@ namespace hpx { namespace parcelset
         }
 
         /// Return the configured maximal allowed message data size
-        boost::uint64_t get_max_inbound_message_size() const
+        std::uint64_t get_max_inbound_message_size() const
         {
             return max_inbound_message_size_;
         }
 
-        boost::uint64_t get_max_outbound_message_size() const
+        std::uint64_t get_max_outbound_message_size() const
         {
             return max_outbound_message_size_;
         }
@@ -389,8 +389,8 @@ namespace hpx { namespace parcelset
         locality here_;
 
         /// The maximally allowed message size
-        boost::uint64_t const max_inbound_message_size_;
-        boost::uint64_t const max_outbound_message_size_;
+        std::uint64_t const max_inbound_message_size_;
+        std::uint64_t const max_outbound_message_size_;
 
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;

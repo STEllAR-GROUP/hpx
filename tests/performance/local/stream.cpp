@@ -26,6 +26,7 @@
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

@@ -9,6 +9,7 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <cstddef>
 #include <vector>
 
 using hpx::util::high_resolution_timer;

@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/client.hpp>
 
+#include <cstddef>
 #include <string>
 
 #include "stubs/configuration.hpp"

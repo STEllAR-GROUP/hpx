@@ -20,6 +20,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 

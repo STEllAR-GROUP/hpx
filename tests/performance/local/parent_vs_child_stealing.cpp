@@ -8,17 +8,19 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include "worker_timed.hpp"
-
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <numeric>
 #include <vector>
 
+#include "worker_timed.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t iterations = 10000;
-boost::uint64_t delay = 0;
+std::uint64_t delay = 0;
 
 void just_wait()
 {
@@ -32,7 +34,7 @@ double measure_one(Policy policy)
     std::vector<hpx::future<void> > threads;
     threads.reserve(iterations);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
@@ -41,7 +43,7 @@ double measure_one(Policy policy)
 
     hpx::wait_all(threads);
 
-    boost::uint64_t stop = hpx::util::high_resolution_clock::now();
+    std::uint64_t stop = hpx::util::high_resolution_clock::now();
     return (stop - start) / 1e9;
 }
 
@@ -107,7 +109,7 @@ int main(int argc, char* argv[])
 
     cmdline.add_options()
         ("delay",
-            po::value<boost::uint64_t>(&delay)->default_value(0),
+            po::value<std::uint64_t>(&delay)->default_value(0),
             "time to busy wait in delay loop [microseconds] "
             "(default: no busy waiting)")
         ("num_threads",

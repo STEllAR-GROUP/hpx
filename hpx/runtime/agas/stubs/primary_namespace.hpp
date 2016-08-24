@@ -19,6 +19,7 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -93,7 +94,7 @@ struct HPX_EXPORT primary_namespace
 
     static naming::gid_type get_service_instance(naming::gid_type const& dest)
     {
-        boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
+        std::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
             HPX_THROW_EXCEPTION(bad_parameter,

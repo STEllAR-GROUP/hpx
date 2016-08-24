@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <mutex>
 

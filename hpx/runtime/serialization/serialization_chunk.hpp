@@ -9,10 +9,9 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 
 #if CHAR_BIT != 8
@@ -44,14 +43,14 @@ namespace hpx { namespace serialization
         chunk_data data_;       // index or pointer
         std::size_t size_;
         // size of the serialization_chunk starting at index_/pos_
-        boost::uint8_t type_;   // chunk_type
+        std::uint8_t type_;   // chunk_type
     };
 
     ///////////////////////////////////////////////////////////////////////
     inline serialization_chunk create_index_chunk(std::size_t index, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, static_cast<boost::uint8_t>(chunk_type_index)
+            { 0 }, size, static_cast<std::uint8_t>(chunk_type_index)
         };
         retval.data_.index_ = index;
         return retval;
@@ -60,7 +59,7 @@ namespace hpx { namespace serialization
     inline serialization_chunk create_pointer_chunk(void const* pos, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, static_cast<boost::uint8_t>(chunk_type_pointer)
+            { 0 }, size, static_cast<std::uint8_t>(chunk_type_pointer)
         };
         retval.data_.cpos_ = pos;
         return retval;

@@ -8,6 +8,7 @@
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/asio_util.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -17,7 +18,7 @@
 namespace hpx { namespace util
 {
     std::string map_hostnames::map(std::string host_name,
-        boost::uint16_t port) const
+        std::uint16_t port) const
     {
         if (host_name == "localhost") {
             // map local host to loopback ip address (that's a quick hack

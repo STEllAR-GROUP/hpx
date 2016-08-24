@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <type_traits>
@@ -45,9 +45,9 @@ namespace hpx { namespace serialization
     template <typename Archive>
     struct HPX_EXPORT basic_archive
     {
-        static const boost::uint64_t npos = boost::uint64_t(-1);
+        static const std::uint64_t npos = std::uint64_t(-1);
 
-        basic_archive(boost::uint32_t flags)
+        basic_archive(std::uint32_t flags)
           : flags_(flags)
           , size_(0)
         {}
@@ -93,7 +93,7 @@ namespace hpx { namespace serialization
                 true : false;
         }
 
-        boost::uint32_t flags() const
+        std::uint32_t flags() const
         {
             return flags_;
         }
@@ -122,7 +122,7 @@ namespace hpx { namespace serialization
         }
 
     protected:
-        boost::uint32_t flags_;
+        std::uint32_t flags_;
         std::size_t size_;
     };
 

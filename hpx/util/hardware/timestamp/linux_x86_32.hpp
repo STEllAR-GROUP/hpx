@@ -8,14 +8,14 @@
 #if !defined(HPX_1CA2FF5A_2757_440C_8D2D_240A48191E63)
 #define HPX_1CA2FF5A_2757_440C_8D2D_240A48191E63
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util { namespace hardware
 {
 
-inline boost::uint64_t timestamp()
+inline std::uint64_t timestamp()
 {
-    boost::uint64_t r = 0;
+    std::uint64_t r = 0;
 
     #if defined(HPX_HAVE_RDTSCP)
         __asm__ __volatile__ (

@@ -11,17 +11,18 @@
 #include <hpx/config.hpp>
 #if defined(HPX_WINDOWS)
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
+
 #include <intrin.h>
 #include <windows.h>
 
 namespace hpx { namespace util { namespace hardware
 {
-    inline boost::uint64_t timestamp()
+    inline std::uint64_t timestamp()
     {
         LARGE_INTEGER now;
         QueryPerformanceCounter(&now);
-        return static_cast<boost::uint64_t>(now.QuadPart);
+        return static_cast<std::uint64_t>(now.QuadPart);
     }
 }}}
 

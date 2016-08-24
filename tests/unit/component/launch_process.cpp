@@ -12,6 +12,7 @@
 
 #include <boost/filesystem.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

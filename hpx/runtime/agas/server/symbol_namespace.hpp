@@ -22,14 +22,15 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
 
 namespace hpx { namespace agas
 {
@@ -87,8 +88,8 @@ struct HPX_EXPORT symbol_namespace
               , time_(0)
             {}
 
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
+            boost::atomic<std::int64_t> count_;
+            boost::atomic<std::int64_t> time_;
         };
 
         counter_data()
@@ -96,19 +97,19 @@ struct HPX_EXPORT symbol_namespace
 
     public:
         // access current counter values
-        boost::int64_t get_bind_count(bool);
-        boost::int64_t get_resolve_count(bool);
-        boost::int64_t get_unbind_count(bool);
-        boost::int64_t get_iterate_names_count(bool);
-        boost::int64_t get_on_event_count(bool);
-        boost::int64_t get_overall_count(bool);
+        std::int64_t get_bind_count(bool);
+        std::int64_t get_resolve_count(bool);
+        std::int64_t get_unbind_count(bool);
+        std::int64_t get_iterate_names_count(bool);
+        std::int64_t get_on_event_count(bool);
+        std::int64_t get_overall_count(bool);
 
-        boost::int64_t get_bind_time(bool);
-        boost::int64_t get_resolve_time(bool);
-        boost::int64_t get_unbind_time(bool);
-        boost::int64_t get_iterate_names_time(bool);
-        boost::int64_t get_on_event_time(bool);
-        boost::int64_t get_overall_time(bool);
+        std::int64_t get_bind_time(bool);
+        std::int64_t get_resolve_time(bool);
+        std::int64_t get_unbind_time(bool);
+        std::int64_t get_iterate_names_time(bool);
+        std::int64_t get_on_event_time(bool);
+        std::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_bind_count();
@@ -131,7 +132,7 @@ struct HPX_EXPORT symbol_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
+        update_time_on_exit(boost::atomic<std::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
           , t_(t)
         {}
@@ -141,8 +142,8 @@ struct HPX_EXPORT symbol_namespace
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
+        std::uint64_t started_at_;
+        boost::atomic<std::int64_t>& t_;
     };
 
   public:
@@ -188,7 +189,7 @@ struct HPX_EXPORT symbol_namespace
 
     void register_server_instance(
         char const* servicename
-      , boost::uint32_t locality_id = naming::invalid_locality_id
+      , std::uint32_t locality_id = naming::invalid_locality_id
       , error_code& ec = throws
         );
 

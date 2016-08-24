@@ -11,6 +11,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
+#include <cstddef>
 #include <string>
 
 #include "../server/configuration.hpp"

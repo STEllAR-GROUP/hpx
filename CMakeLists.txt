@@ -933,7 +933,7 @@ hpx_check_for_cxx11_std_chrono(
   REQUIRED "HPX needs support for C++11 std::chrono")
 
 hpx_check_for_cxx11_std_cstdint(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)
+  REQUIRED "HPX needs support for C++11 std::[u]intX_t")
 
 hpx_check_for_cxx11_std_initializer_list(
   REQUIRED "HPX needs support for C++11 std::initializer_list")

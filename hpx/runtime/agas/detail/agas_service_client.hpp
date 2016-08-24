@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -38,7 +39,7 @@ namespace hpx { namespace agas { namespace detail
         virtual void register_counter_types() = 0;
 
         virtual void register_server_instance(
-            boost::uint32_t locality_id) = 0;
+            std::uint32_t locality_id) = 0;
 
         virtual bool unregister_server(
             request const& req

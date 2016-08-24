@@ -14,6 +14,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
+
 static int alloc_count = 0;
 static int dealloc_count = 0;
 

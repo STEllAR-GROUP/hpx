@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
+# include <cstddef>
 # include <string>
 # include <iostream>
 #endif
@@ -22,7 +23,7 @@
 //
 #include "sort_tests.hpp"
 //
-//#define EXTRA_DEBUG
+#define EXTRA_DEBUG
 //
 namespace debug {
     template<typename T>
@@ -135,14 +136,25 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
         }
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,14 +236,25 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
         }
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,18 +328,30 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
 
     std::cout << "Async time " << async_seconds << " Sync time " << sync_seconds << "\n";
     bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    HPX_TEST(is_equal);
     if (is_equal) {
         //std::cout << "Test Passed\n";
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -51,13 +51,16 @@ namespace boost
       { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)",
         "hpx::util::atomic_count" },
       { "(\\bboost\\s*::\\s*function\\b)", "hpx::util::function_nonser" },
-      { "(\\bboost\\s*::\\s*shared_ptr\\b)", "std::shared_otr" },
+      { "(\\bboost\\s*::\\s*shared_ptr\\b)", "std::shared_ptr" },
       { "(\\bboost\\s*::\\s*make_shared\\b)", "std::make_shared" },
       { "(\\bboost\\s*::\\s*enable_shared_from_this\\b)",
         "std::enable_shared_from_this" },
       { "(\\bboost\\s*::\\s*bind\\b)", "hpx::util::bind" },
       { "(\\bboost\\s*::\\s*unique_lock\\b)", "std::unique_lock" },
-      { "(\\bboost\\s*::\\s*chrono)", "std::chrono" },
+      { "(\\bboost\\s*::\\s*chrono\\b)", "std::chrono" },
+      { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },
+      { "(\\bboost\\s*::\\s*(c?ref)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2" },
       { "(\\bNULL\\b)", "nullptr" },
       { nullptr, nullptr }
     };

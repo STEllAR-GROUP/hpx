@@ -23,6 +23,7 @@
 #include <hpx/compute/vector.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
 #include <type_traits>
 #include <utility>

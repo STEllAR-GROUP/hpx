@@ -11,6 +11,7 @@
 #include <hpx/util/decay.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring> // for std::memmove
 #include <iterator>
 #include <memory>

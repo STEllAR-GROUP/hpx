@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////

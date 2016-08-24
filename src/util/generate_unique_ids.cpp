@@ -9,6 +9,7 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <cstddef>
 #include <mutex>
 
 namespace hpx { namespace util

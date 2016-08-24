@@ -35,6 +35,8 @@ namespace boost
       { "boost/enable_shared_from_this\\.hpp", "memory" },
       { "boost/bind\\.hpp", "hpx/util/bind.hpp" },
       { "boost/(chrono/)?chrono\\.hpp", "chrono" },
+      { "boost/(core/)?ref\\.hpp", "functional" },
+      { "boost/cstdint\\.hpp", "cstdint.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { nullptr, nullptr }
     };

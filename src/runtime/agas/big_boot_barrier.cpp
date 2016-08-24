@@ -47,10 +47,11 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/ref.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -130,11 +131,11 @@ namespace hpx { namespace agas { namespace detail
         {
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
-            boost::uint32_t max_id = registry.get_max_registered_id();
+            std::uint32_t max_id = registry.get_max_registered_id();
 
             for (const std::string& s : unassigned_ids.typenames)
             {
-                boost::uint32_t id = registry.try_get_id(s);
+                std::uint32_t id = registry.try_get_id(s);
                 if (id == hpx::serialization::detail::id_registry::invalid_id)
                 {
                     // this id is not registered yet
@@ -170,7 +171,7 @@ namespace hpx { namespace agas { namespace detail
             registry.fill_missing_typenames();
         }
 
-        std::vector<boost::uint32_t> ids;
+        std::vector<std::uint32_t> ids;
     };
 }}} // namespace hpx::agas::detail
 
@@ -204,10 +205,10 @@ struct registration_header
     // TODO: pass head address as a GVA
     registration_header(
         parcelset::endpoints_type const& endpoints_
-      , boost::uint64_t primary_ns_ptr_
-      , boost::uint64_t symbol_ns_ptr_
-      , boost::uint32_t cores_needed_
-      , boost::uint32_t num_threads_
+      , std::uint64_t primary_ns_ptr_
+      , std::uint64_t symbol_ns_ptr_
+      , std::uint32_t cores_needed_
+      , std::uint32_t num_threads_
       , std::string const& hostname_
       , detail::unassigned_typename_sequence const& typenames_
       , naming::gid_type prefix_ = naming::gid_type()
@@ -223,10 +224,10 @@ struct registration_header
     {}
 
     parcelset::endpoints_type endpoints;
-    boost::uint64_t primary_ns_ptr;
-    boost::uint64_t symbol_ns_ptr;
-    boost::uint32_t cores_needed;
-    boost::uint32_t num_threads;
+    std::uint64_t primary_ns_ptr;
+    std::uint64_t symbol_ns_ptr;
+    std::uint32_t cores_needed;
+    std::uint32_t num_threads;
     std::string hostname;           // hostname of locality
     detail::unassigned_typename_sequence typenames;
     naming::gid_type prefix;        // suggested prefix (optional)
@@ -261,8 +262,8 @@ struct notification_header
       , naming::address const& primary_ns_address_
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
-      , boost::uint32_t num_localities_
-      , boost::uint32_t used_cores_
+      , std::uint32_t num_localities_
+      , std::uint32_t used_cores_
       , parcelset::endpoints_type const & agas_endpoints_
       , detail::assigned_id_sequence const & ids_
     ) :
@@ -284,8 +285,8 @@ struct notification_header
     naming::address primary_ns_address;
     naming::address component_ns_address;
     naming::address symbol_ns_address;
-    boost::uint32_t num_localities;
-    boost::uint32_t used_cores;
+    std::uint32_t num_localities;
+    std::uint32_t used_cores;
     parcelset::endpoints_type agas_endpoints;
     detail::assigned_id_sequence ids;
 
@@ -508,7 +509,7 @@ void register_worker(registration_header const& header)
             agas_client.get_bootstrap_symbol_ns_ptr());
 
     // assign cores to the new locality
-    boost::uint32_t first_core = rt.assign_cores(header.hostname,
+    std::uint32_t first_core = rt.assign_cores(header.hostname,
         header.cores_needed);
 
     big_boot_barrier & bbb = get_big_boot_barrier();
@@ -585,8 +586,8 @@ void register_worker(registration_header const& header)
 #else
         // delay the final response until the runtime system is up and running
         void (big_boot_barrier::*f)(
-            boost::uint32_t,
-            boost::uint32_t,
+            std::uint32_t,
+            std::uint32_t,
             parcelset::locality const&,
             notify_worker_action,
             notification_header&&)
@@ -595,7 +596,7 @@ void register_worker(registration_header const& header)
             = new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(f)
-              , boost::ref(get_big_boot_barrier())
+              , std::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(prefix)
               , dest
@@ -779,7 +780,7 @@ void register_worker_security(registration_header_security const& header)
                 new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(&big_boot_barrier::apply)
-              , boost::ref(get_big_boot_barrier())
+              , std::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(header.prefix)
               , notify_worker_security_action()
@@ -872,16 +873,16 @@ void big_boot_barrier::wait_bootstrap()
 
 namespace detail
 {
-    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores)
+    std::uint32_t get_number_of_pus_in_cores(std::uint32_t num_cores)
     {
         threads::topology& top = threads::create_topology();
 
-        boost::uint32_t num_pus = 0;
-        for (boost::uint32_t i = 0; i != num_cores; ++i)
+        std::uint32_t num_pus = 0;
+        for (std::uint32_t i = 0; i != num_cores; ++i)
         {
-            boost::uint32_t num_pus_core = static_cast<boost::uint32_t>(
+            std::uint32_t num_pus_core = static_cast<std::uint32_t>(
                 top.get_number_of_core_pus(std::size_t(i)));
-            if (num_pus_core == ~boost::uint32_t(0))
+            if (num_pus_core == ~std::uint32_t(0))
                 return num_cores;       // assume one pu per core
 
             num_pus += num_pus_core;
@@ -906,9 +907,9 @@ void big_boot_barrier::wait_hosted(
 
     // get the number of cores we need for our locality. This respects the
     // affinity description. Cores that are partially used are counted as well
-    boost::uint32_t cores_needed = rt.assign_cores();
-    boost::uint32_t num_threads =
-        boost::uint32_t(rt.get_config().get_os_thread_count());
+    std::uint32_t cores_needed = rt.assign_cores();
+    std::uint32_t num_threads =
+        std::uint32_t(rt.get_config().get_os_thread_count());
 
     naming::gid_type suggested_prefix;
 
@@ -916,7 +917,7 @@ void big_boot_barrier::wait_hosted(
     if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
-            util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
+            util::safe_lexical_cast<std::uint32_t>(locality_str, -1));
     }
 
     // pre-load all unassigned ids
@@ -935,7 +936,7 @@ void big_boot_barrier::wait_hosted(
 
     std::srand(static_cast<unsigned>(util::high_resolution_clock::now()));
     apply(
-          static_cast<boost::uint32_t>(std::rand()) // random first parcel id
+          static_cast<std::uint32_t>(std::rand()) // random first parcel id
         , 0
         , bootstrap_agas
         , register_worker_action()

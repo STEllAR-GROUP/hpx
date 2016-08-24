@@ -35,6 +35,8 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -93,7 +95,7 @@ namespace hpx
 
         ///
         typedef void hpx_errorsink_function_type(
-            boost::uint32_t, std::string const&);
+            std::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
         runtime(
@@ -138,7 +140,7 @@ namespace hpx
         struct tls_tag {};
         static util::thread_specific_ptr<runtime*, tls_tag> runtime_;
         static util::thread_specific_ptr<std::string, tls_tag> thread_name_;
-        static util::thread_specific_ptr<boost::uint64_t, tls_tag> uptime_;
+        static util::thread_specific_ptr<std::uint64_t, tls_tag> uptime_;
 
         /// \brief access configuration information
         util::runtime_configuration& get_config()
@@ -159,7 +161,7 @@ namespace hpx
         static std::string get_thread_name();
 
         /// \brief Return the system uptime measure on the thread executing this call
-        static boost::uint64_t get_system_uptime();
+        static std::uint64_t get_system_uptime();
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
@@ -177,10 +179,10 @@ namespace hpx
             return topology_;
         }
 
-        boost::uint32_t assign_cores(std::string const& locality_basename,
-            boost::uint32_t num_threads);
+        std::uint32_t assign_cores(std::string const& locality_basename,
+            std::uint32_t num_threads);
 
-        boost::uint32_t assign_cores();
+        std::uint32_t assign_cores();
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
@@ -214,9 +216,9 @@ namespace hpx
 
         virtual applier::applier& get_applier() = 0;
 
-        virtual boost::uint64_t get_runtime_support_lva() const = 0;
+        virtual std::uint64_t get_runtime_support_lva() const = 0;
 
-        virtual boost::uint64_t get_memory_lva() const = 0;
+        virtual std::uint64_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread,
             boost::exception_ptr const& e) = 0;
@@ -338,7 +340,7 @@ namespace hpx
         components::security::signed_certificate const&
             get_locality_certificate(error_code& ec) const;
         components::security::signed_certificate const&
-            get_locality_certificate(boost::uint32_t locality_id, error_code& ec) const;
+            get_locality_certificate(std::uint32_t locality_id, error_code& ec) const;
 
         void sign_parcel_suffix(
             components::security::parcel_suffix const& suffix,
@@ -396,7 +398,7 @@ namespace hpx
         threads::topology& topology_;
 
         // locality basename -> used cores
-        typedef std::map<std::string, boost::uint32_t> used_cores_map_type;
+        typedef std::map<std::string, std::uint32_t> used_cores_map_type;
         used_cores_map_type used_cores_map_;
 
         boost::atomic<state> state_;

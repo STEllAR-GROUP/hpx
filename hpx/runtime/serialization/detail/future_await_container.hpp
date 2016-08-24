@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstddef>
 #include <list>
 #include <map>
 #include <memory>

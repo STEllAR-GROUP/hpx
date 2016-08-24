@@ -26,6 +26,8 @@
 #include <boost/atomic.hpp>
 
 #include <chrono>
+#include <cstddef>
+#include <functional>
 #include <memory>
 
 namespace hpx { namespace threads { namespace detail
@@ -314,7 +316,7 @@ namespace hpx { namespace threads { namespace detail
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait(util::bind(&detail::set_thread_state,
             wake_id, pending, wait_timeout, priority,
-            std::size_t(-1), boost::ref(throws)));
+            std::size_t(-1), std::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
@@ -357,7 +359,7 @@ namespace hpx { namespace threads { namespace detail
         // requested actions
         thread_init_data data(
             util::bind(&at_timer<SchedulingPolicy>,
-                boost::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
+                std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
                 priority),
             "at_timer (expire at)", 0, priority, thread_num);
 

@@ -12,9 +12,8 @@
 // System Header Files
 #include <cerrno>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
-#include <cstdarg>
+#include <cstring>
 
 #include <fstream>
 #include <iostream>

@@ -13,9 +13,9 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/interval_timer.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
-            boost::uint64_t parameter1, boost::uint64_t parameter2);
+            std::uint64_t parameter1, std::uint64_t parameter2);
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value
@@ -105,7 +105,7 @@ namespace hpx { namespace performance_counters { namespace server
         boost::scoped_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;
 
-        boost::uint64_t parameter1_, parameter2_;
+        std::uint64_t parameter1_, parameter2_;
     };
 }}}
 

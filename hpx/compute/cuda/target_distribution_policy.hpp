@@ -23,6 +23,7 @@
 #include <hpx/compute/detail/target_distribution_policy.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <type_traits>
 #include <utility>

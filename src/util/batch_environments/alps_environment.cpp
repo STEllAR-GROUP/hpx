@@ -7,6 +7,7 @@
 #include <hpx/util/batch_environments/alps_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

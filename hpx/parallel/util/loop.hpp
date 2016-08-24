@@ -11,6 +11,7 @@
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <utility>
 #include <vector>

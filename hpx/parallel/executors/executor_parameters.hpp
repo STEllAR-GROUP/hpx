@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/ref.hpp
+// hpxinspect:nodeprecatedname:boost::reference_wrapper
+
 #if !defined(HPX_PARALLEL_EXECUTOR_PARAMETERS)
 #define HPX_PARALLEL_EXECUTOR_PARAMETERS
 
@@ -15,15 +18,15 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 
-#include <cstdarg>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/ref.hpp>
+
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
-#include <boost/ref.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
