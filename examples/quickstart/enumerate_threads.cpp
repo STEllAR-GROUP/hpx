@@ -8,6 +8,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 
+#include <functional>
 #include <vector>
 
 int const num_threads = 10;
