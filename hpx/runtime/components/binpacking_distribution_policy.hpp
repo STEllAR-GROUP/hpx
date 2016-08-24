@@ -23,6 +23,8 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -38,12 +40,12 @@ namespace hpx { namespace components
     {
         /// \cond NOINTERNAL
         inline std::vector<std::size_t>
-        get_items_count(std::size_t count, std::vector<boost::uint64_t> && values)
+        get_items_count(std::size_t count, std::vector<std::uint64_t> && values)
         {
             std::size_t maxcount = 0;
             std::size_t existing = 0;
 
-            for (boost::uint64_t value: values)
+            for (std::uint64_t value: values)
             {
                 maxcount = (std::max)(maxcount, std::size_t(value));
                 existing += value;
@@ -73,7 +75,7 @@ namespace hpx { namespace components
             std::size_t created_count = 0;
             for (std::size_t i = 0; i != num_localities; ++i)
             {
-                boost::uint64_t value = values[i];
+                std::uint64_t value = values[i];
                 std::size_t numcreate = overflow_count +
                     std::size_t((maxcount - value) * hole_ratio);
 
@@ -105,21 +107,21 @@ namespace hpx { namespace components
             return to_create;
         }
 
-        inline hpx::future<std::vector<boost::uint64_t> >
+        inline hpx::future<std::vector<std::uint64_t> >
         retrieve_counter_values(
             std::vector<performance_counters::performance_counter> && counters)
         {
             using namespace hpx::performance_counters;
 
-            std::vector<hpx::future<boost::uint64_t> > values;
+            std::vector<hpx::future<std::uint64_t> > values;
             values.reserve(counters.size());
 
             for (performance_counter const& counter: counters)
-                values.push_back(counter.get_value<boost::uint64_t>());
+                values.push_back(counter.get_value<std::uint64_t>());
 
             return hpx::dataflow(hpx::launch::sync,
                 hpx::util::unwrapped(
-                    [](std::vector<boost::uint64_t> && values)
+                    [](std::vector<std::uint64_t> && values)
                     {
                         return values;
                     }),
@@ -127,7 +129,7 @@ namespace hpx { namespace components
         }
 
         template <typename String>
-        hpx::future<std::vector<boost::uint64_t> > get_counter_values(
+        hpx::future<std::vector<std::uint64_t> > get_counter_values(
             String component_name, std::string const& counter_name,
             std::vector<hpx::id_type> const& localities)
         {
@@ -154,14 +156,14 @@ namespace hpx { namespace components
         }
 
         inline hpx::id_type const& get_best_locality(
-            hpx::future<std::vector<boost::uint64_t> > && f,
+            hpx::future<std::vector<std::uint64_t> > && f,
             std::vector<hpx::id_type> const& localities)
         {
-            std::vector<boost::uint64_t> values = f.get();
+            std::vector<std::uint64_t> values = f.get();
 
             std::size_t best_locality = 0;
-            boost::uint64_t min_value =
-                (std::numeric_limits<boost::uint64_t>::max)();
+            std::uint64_t min_value =
+                (std::numeric_limits<std::uint64_t>::max)();
 
             for (std::size_t i = 0; i != values.size(); ++i)
             {
@@ -184,7 +186,7 @@ namespace hpx { namespace components
 
             template <typename ...Ts>
             hpx::future<hpx::id_type> operator()(
-                hpx::future<std::vector<boost::uint64_t> > && values,
+                hpx::future<std::vector<std::uint64_t> > && values,
                 Ts&&... vs) const
             {
                 hpx::id_type const& best_locality =
@@ -210,7 +212,7 @@ namespace hpx { namespace components
             template <typename ...Ts>
             hpx::future<std::vector<bulk_locality_result> >
             operator()(
-                hpx::future<std::vector<boost::uint64_t> > && values,
+                hpx::future<std::vector<std::uint64_t> > && values,
                 std::size_t count, Ts&&... vs) const
             {
                 std::vector<std::size_t> to_create =
@@ -359,7 +361,7 @@ namespace hpx { namespace components
             }
 
             // schedule creation of all objects across given localities
-            hpx::future<std::vector<boost::uint64_t> > values =
+            hpx::future<std::vector<std::uint64_t> > values =
                 detail::get_counter_values(
                     hpx::components::unique_component_name<
                         hpx::components::component_factory<
@@ -397,7 +399,7 @@ namespace hpx { namespace components
             if (localities_.size() > 1)
             {
                 // schedule creation of all objects across given localities
-                hpx::future<std::vector<boost::uint64_t> > values =
+                hpx::future<std::vector<std::uint64_t> > values =
                     detail::get_counter_values(
                         hpx::components::unique_component_name<
                             hpx::components::component_factory<

@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/client.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -77,7 +78,7 @@ namespace sheneos
         ///                  in the range of this partition.
         hpx::lcos::future<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
-            boost::uint32_t eosvalues)
+            std::uint32_t eosvalues)
         {
             return stubs::partition3d::interpolate_async(this->get_id(),
                 ye, temp, rho, eosvalues);
@@ -91,7 +92,7 @@ namespace sheneos
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
-            boost::uint32_t eosvalues)
+            std::uint32_t eosvalues)
         {
             return stubs::partition3d::interpolate(this->get_id(),
                 ye, temp, rho, eosvalues);
@@ -107,7 +108,7 @@ namespace sheneos
         ///                  in the range of the given partition.
         hpx::lcos::future<double>
         interpolate_one_async(double ye, double temp, double rho,
-            boost::uint32_t eosvalue)
+            std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_one_async(this->get_id(),
                 ye, temp, rho, eosvalue);
@@ -122,7 +123,7 @@ namespace sheneos
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
         double interpolate_one(double ye, double temp, double rho,
-            boost::uint32_t eosvalue)
+            std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_one(this->get_id(),
                 ye, temp, rho, eosvalue);
@@ -137,7 +138,7 @@ namespace sheneos
         ///                  in the range of the given partition.
         hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue)
+            std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_one_bulk_async(this->get_id(),
                 coords, eosvalue);
@@ -151,7 +152,7 @@ namespace sheneos
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
         std::vector<double> interpolate_one_bulk(
-            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalue)
+            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_one_bulk(this->get_id(),
                 coords, eosvalue);
@@ -167,7 +168,7 @@ namespace sheneos
         ///                  in the range of the given partition.
         hpx::lcos::future<std::vector<std::vector<double> > >
         interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue)
+            std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_bulk_async(this->get_id(),
                 coords, eosvalue);
@@ -182,7 +183,7 @@ namespace sheneos
         ///                  in the range of the given partition.
         std::vector<std::vector<double> >
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue)
+            std::uint32_t eosvalue)
         {
             return stubs::partition3d::interpolate_bulk(this->get_id(),
                 coords, eosvalue);

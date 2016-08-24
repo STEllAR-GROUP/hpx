@@ -26,12 +26,13 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/lcos/latch.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/ref.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <mutex>
@@ -172,12 +173,12 @@ namespace hpx {
 #endif
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
-            parcel_handler_, boost::uint64_t(runtime_support_.get()),
-            boost::uint64_t(memory_.get()));
+            parcel_handler_, std::uint64_t(runtime_support_.get()),
+            std::uint64_t(memory_.get()));
         parcel_handler_.initialize(agas_client_, &applier_);
 
-        applier_.initialize(boost::uint64_t(runtime_support_.get()),
-        boost::uint64_t(memory_.get()));
+        applier_.initialize(std::uint64_t(runtime_support_.get()),
+        std::uint64_t(memory_.get()));
 
 #if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking
@@ -335,7 +336,7 @@ namespace hpx {
 
         threads::thread_init_data data(
             util::bind(&runtime_impl::run_helper, this, func,
-                boost::ref(result_)),
+                std::ref(result_)),
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
 
@@ -402,7 +403,7 @@ namespace hpx {
 
         boost::thread t (util::bind(
                 &runtime_impl<SchedulingPolicy>::wait_helper,
-                this, boost::ref(mtx), boost::ref(cond), boost::ref(running)
+                this, std::ref(mtx), std::ref(cond), std::ref(running)
             ));
 
         // wait for the thread to run
@@ -450,7 +451,7 @@ namespace hpx {
             boost::unique_lock<boost::mutex> l(mtx);
 
             boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
-                boost::ref(cond), boost::ref(mtx)));
+                std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
             t.join();

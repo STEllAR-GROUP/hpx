@@ -22,20 +22,20 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <cstdint>
 #include <iostream>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 
 // Class representing a Sierpinski triangle
 class sierpinski{
     public:
-    boost::uint64_t black_triangles, white_triangles;
+    std::uint64_t black_triangles, white_triangles;
     double area;
 
     sierpinski(){}
-    sierpinski(boost::uint64_t black, boost::uint64_t white, double area){
+    sierpinski(std::uint64_t black, std::uint64_t white, double area){
         this->black_triangles = black;
         this->white_triangles = white;
         this->area = area;
@@ -65,7 +65,7 @@ class sierpinski{
 
 ///////////////////////////////////////////////////////////////////////////////
 // forward declaration of the get_sierpinski function
-sierpinski get_sierpinski(boost::uint64_t n, double len);
+sierpinski get_sierpinski(std::uint64_t n, double len);
 
 
 // This is to generate the required boilerplate we need for the remote
@@ -74,7 +74,7 @@ HPX_PLAIN_ACTION(get_sierpinski, get_sierpinski_action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-sierpinski get_sierpinski(boost::uint64_t n, double len)
+sierpinski get_sierpinski(std::uint64_t n, double len)
 {
     if (n == 0)
         return sierpinski(1, 0, sqrt(3)/4.0*len*len);
@@ -100,8 +100,8 @@ sierpinski get_sierpinski(boost::uint64_t n, double len)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
-    boost::uint64_t len = vm["side-length"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
+    std::uint64_t len = vm["side-length"].as<std::uint64_t>();
 
     {
         get_sierpinski_action s;
@@ -125,12 +125,12 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "n-value",
-          boost::program_options::value<boost::uint64_t>()->default_value(5),
+          boost::program_options::value<std::uint64_t>()->default_value(5),
           "n value for the Sierpinski function")
         ;
     desc_commandline.add_options()
         ( "side-length",
-          boost::program_options::value<boost::uint64_t>()->default_value(100),
+          boost::program_options::value<std::uint64_t>()->default_value(100),
           "side-length of the original triangle")
         ;
 

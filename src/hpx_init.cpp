@@ -36,7 +36,6 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include <boost/ref.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #  include <cstdlib>
@@ -44,6 +43,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <new>
@@ -316,7 +316,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
         {
-            dump_config(hpx::runtime const& rt) : rt_(boost::cref(rt)) {}
+            dump_config(hpx::runtime const& rt) : rt_(std::cref(rt)) {}
 
             void operator()() const
             {
@@ -326,7 +326,7 @@ namespace hpx
                 std::cout << "----------------------------------\n";
             }
 
-            boost::reference_wrapper<hpx::runtime const> rt_;
+            std::reference_wrapper<hpx::runtime const> rt_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -411,7 +411,7 @@ namespace hpx
                 // itself to run after the given interval
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, destination, counter_format,
+                        std::ref(counters), interval, destination, counter_format,
                         counter_shortnames, csv_header);
 
                 // schedule to print counters at shutdown, if requested

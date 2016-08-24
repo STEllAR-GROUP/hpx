@@ -10,13 +10,15 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstdint>
+
 #define ENABLE_DEBUG false
 
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object
 {
   private:
-    boost::uint64_t x_;
+    std::uint64_t x_;
 
     friend class hpx::serialization::access;
 
@@ -47,7 +49,7 @@ struct small_object
     }
 
     small_object(
-        boost::uint64_t x
+        std::uint64_t x
         )
       : x_(x)
     {
@@ -99,8 +101,8 @@ struct small_object
         }
     }
 
-    boost::uint64_t operator()(
-        boost::uint64_t const& z_
+    std::uint64_t operator()(
+        std::uint64_t const& z_
         )
     {
         if(ENABLE_DEBUG)
@@ -140,8 +142,8 @@ struct small_object
 struct big_object
 {
   private:
-    boost::uint64_t x_;
-    boost::uint64_t y_;
+    std::uint64_t x_;
+    std::uint64_t y_;
 
     friend class hpx::serialization::access;
 
@@ -173,8 +175,8 @@ struct big_object
     }
 
     big_object(
-        boost::uint64_t x
-      , boost::uint64_t y
+        std::uint64_t x
+      , std::uint64_t y
         )
       : x_(x)
       , y_(y)
@@ -229,9 +231,9 @@ struct big_object
         }
     }
 
-    boost::uint64_t operator()(
-        boost::uint64_t const& z_
-      , boost::uint64_t const& w_
+    std::uint64_t operator()(
+        std::uint64_t const& z_
+      , std::uint64_t const& w_
         )
     {
         if(ENABLE_DEBUG)

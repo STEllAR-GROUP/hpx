@@ -16,10 +16,10 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/variant.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <string>
 #include <utility>
@@ -27,7 +27,7 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    typedef std::vector<boost::int64_t> bounds_type;
+    typedef std::vector<std::int64_t> bounds_type;
 
     enum distribution_type
     {
@@ -41,13 +41,13 @@ namespace hpx { namespace threads { namespace detail
         enum type { unknown, thread, socket, numanode, core, pu };
         HPX_API_EXPORT static char const* type_name(type t);
 
-        static boost::int64_t all_entities()
+        static std::int64_t all_entities()
         {
-            return (std::numeric_limits<boost::int64_t>::min)();
+            return (std::numeric_limits<std::int64_t>::min)();
         }
 
-        spec_type(type t = unknown, boost::int64_t min = all_entities(),
-                boost::int64_t max = all_entities())
+        spec_type(type t = unknown, std::int64_t min = all_entities(),
+                std::int64_t max = all_entities())
           : type_(t), index_bounds_()
         {
             if (t != unknown) {

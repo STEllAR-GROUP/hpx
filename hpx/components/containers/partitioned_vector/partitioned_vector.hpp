@@ -28,10 +28,10 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -55,7 +55,7 @@ namespace hpx { namespace server
             {}
 
             partition_data(id_type const& part, std::size_t size,
-                    boost::uint32_t locality_id)
+                    std::uint32_t locality_id)
               : partition_(part),
                 size_(size), locality_id_(locality_id)
             {}
@@ -67,7 +67,7 @@ namespace hpx { namespace server
 
             hpx::id_type partition_;
             std::size_t size_;
-            boost::uint32_t locality_id_;
+            std::uint32_t locality_id_;
 
         private:
             friend class hpx::serialization::access;
@@ -187,7 +187,7 @@ namespace hpx
                 base_type;
 
             partition_data(id_type const& part, std::size_t size,
-                    boost::uint32_t locality_id)
+                    std::uint32_t locality_id)
               : base_type(part, size, locality_id)
             {}
 
@@ -269,7 +269,7 @@ namespace hpx
             std::move(data.partitions_.begin(), data.partitions_.end(),
                 std::back_inserter(partitions_));
 
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             typedef typename partitions_vector_type::const_iterator const_iterator;
@@ -551,7 +551,7 @@ namespace hpx
                 creator(policy, num_parts, part_size);
 
             // now initialize our data structures
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             std::size_t num_part = 0;
@@ -561,7 +561,7 @@ namespace hpx
             for (bulk_locality_result const& r: f.get())
             {
                 using naming::get_locality_id_from_id;
-                boost::uint32_t locality = get_locality_id_from_id(r.first);
+                std::uint32_t locality = get_locality_id_from_id(r.first);
                 for (hpx::id_type const& id: r.second)
                 {
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
@@ -648,14 +648,14 @@ namespace hpx
             }
             wait_all(objs);
 
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             partitions_vector_type partitions;
             partitions.reserve(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
-                boost::uint32_t locality = rhs.partitions_[i].locality_id_;
+                std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
                 partitions.push_back(partition_data(objs[i].get(),
                     rhs.partitions_[i].size_, locality));
@@ -1501,42 +1501,42 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        iterator begin(boost::uint32_t id)
+        iterator begin(std::uint32_t id)
         {
             return iterator(this, get_global_index(segment_begin(id), 0));
         }
 
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        const_iterator begin(boost::uint32_t id) const
+        const_iterator begin(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        const_iterator cbegin(boost::uint32_t id) const
+        const_iterator cbegin(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        iterator end(boost::uint32_t id)
+        iterator end(std::uint32_t id)
         {
             return iterator(this, get_global_index(segment_end(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        const_iterator end(boost::uint32_t id) const
+        const_iterator end(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        const_iterator cend(boost::uint32_t id) const
+        const_iterator cend(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0));
         }
@@ -1624,7 +1624,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // Return local segment iterator
-        local_segment_iterator segment_begin(boost::uint32_t id)
+        local_segment_iterator segment_begin(std::uint32_t id)
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1633,7 +1633,7 @@ namespace hpx
                 partitions_.end(), id);
         }
 
-        const_local_segment_iterator segment_begin(boost::uint32_t id) const
+        const_local_segment_iterator segment_begin(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1642,7 +1642,7 @@ namespace hpx
                 partitions_.cend(), id);
         }
 
-        const_local_segment_iterator segment_cbegin(boost::uint32_t id) const
+        const_local_segment_iterator segment_cbegin(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1651,7 +1651,7 @@ namespace hpx
                 partitions_.cend(), id);
         }
 
-        local_segment_iterator segment_end(boost::uint32_t id)
+        local_segment_iterator segment_end(std::uint32_t id)
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1659,7 +1659,7 @@ namespace hpx
             return local_segment_iterator(partitions_.end());
         }
 
-        const_local_segment_iterator segment_end(boost::uint32_t id) const
+        const_local_segment_iterator segment_end(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1667,7 +1667,7 @@ namespace hpx
             return const_local_segment_iterator(partitions_.cend());
         }
 
-        const_local_segment_iterator segment_cend(boost::uint32_t id) const
+        const_local_segment_iterator segment_cend(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives

@@ -13,6 +13,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 

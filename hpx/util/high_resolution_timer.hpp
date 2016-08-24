@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util
 {
@@ -28,7 +28,7 @@ namespace hpx { namespace util
         }
 
         high_resolution_timer(double t)
-          : start_time_(static_cast<boost::uint64_t>(t * 1e9))
+          : start_time_(static_cast<std::uint64_t>(t * 1e9))
         {}
 
         static double now()
@@ -45,14 +45,14 @@ namespace hpx { namespace util
             return double(take_time_stamp() - start_time_) * 1e-9;
         }
 
-        boost::int64_t elapsed_microseconds() const
+        std::int64_t elapsed_microseconds() const
         {
-            return boost::int64_t((take_time_stamp() - start_time_) * 1e-3);
+            return std::int64_t((take_time_stamp() - start_time_) * 1e-3);
         }
 
-        boost::int64_t elapsed_nanoseconds() const
+        std::int64_t elapsed_nanoseconds() const
         {
-            return boost::int64_t(take_time_stamp() - start_time_);
+            return std::int64_t(take_time_stamp() - start_time_);
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
@@ -66,13 +66,13 @@ namespace hpx { namespace util
         }
 
     protected:
-        static boost::uint64_t take_time_stamp()
+        static std::uint64_t take_time_stamp()
         {
             return util::high_resolution_clock::now();
         }
 
     private:
-        boost::uint64_t start_time_;
+        std::uint64_t start_time_;
     };
 }} // namespace hpx::util
 

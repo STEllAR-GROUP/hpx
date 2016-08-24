@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_IS_CHUNK_ALLOCATOR_MAR_24_2015)
 #define HPX_TRAITS_IS_CHUNK_ALLOCATOR_MAR_24_2015
 
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx { namespace traits

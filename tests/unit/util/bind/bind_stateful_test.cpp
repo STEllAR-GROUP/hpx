@@ -23,6 +23,7 @@
 
 namespace placeholders = hpx::util::placeholders;
 
+#include <functional>
 #include <iostream>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -170,35 +171,35 @@ void stateful_function_object_test()
 
     int n = x.state();
 
-    test( hpx::util::bind( boost::ref(x) ), n, 17041 );
+    test( hpx::util::bind( std::ref(x) ), n, 17041 );
     n += 3*17041;
 
-    test( hpx::util::bind( boost::ref(x), 1 ), n, 1 );
+    test( hpx::util::bind( std::ref(x), 1 ), n, 1 );
     n += 3*1;
 
-    test( hpx::util::bind( boost::ref(x), 1, 2 ), n, 1+2 );
+    test( hpx::util::bind( std::ref(x), 1, 2 ), n, 1+2 );
     n += 3*(1+2);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3 ), n, 1+2+3 );
+    test( hpx::util::bind( std::ref(x), 1, 2, 3 ), n, 1+2+3 );
     n += 3*(1+2+3);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4 ), n, 1+2+3+4 );
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4 ), n, 1+2+3+4 );
     n += 3*(1+2+3+4);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5 ), n, 1+2+3+4+5 );
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4, 5 ), n, 1+2+3+4+5 );
     n += 3*(1+2+3+4+5);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5, 6 ), n, 1+2+3+4+5+6 );
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4, 5, 6 ), n, 1+2+3+4+5+6 );
     n += 3*(1+2+3+4+5+6);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5, 6, 7 ), n, 1+2+3+4+5+6+7 );
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4, 5, 6, 7 ), n, 1+2+3+4+5+6+7 );
     n += 3*(1+2+3+4+5+6+7);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5,
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4, 5,
         6, 7, 8 ), n, 1+2+3+4+5+6+7+8 );
     n += 3*(1+2+3+4+5+6+7+8);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5,
+    test( hpx::util::bind( std::ref(x), 1, 2, 3, 4, 5,
         6, 7, 8, 9 ), n, 1+2+3+4+5+6+7+8+9 );
     n += 3*(1+2+3+4+5+6+7+8+9);
 

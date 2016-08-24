@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>

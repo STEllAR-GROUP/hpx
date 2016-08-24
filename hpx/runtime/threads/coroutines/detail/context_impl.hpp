@@ -33,6 +33,8 @@
 
 #include <boost/version.hpp>
 
+#include <cstddef>
+
 /*
    ContextImpl concept documentation.
    A ContextImpl holds a context plus its stack.

@@ -10,6 +10,7 @@
 
 #include <boost/program_options.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace htts2
@@ -34,17 +35,17 @@ driver::driver(int argc, char** argv, bool allow_unregistered)
         , "print out program usage (this message)")
 
         ( "osthreads,t"
-        , boost::program_options::value<boost::uint64_t>
+        , boost::program_options::value<std::uint64_t>
                 (&osthreads_)->default_value(1)
         , "number of OS-threads to use")
 
         ( "tasks"
-        , boost::program_options::value<boost::uint64_t>
+        , boost::program_options::value<std::uint64_t>
                 (&tasks_)->default_value(500000)
         , "number of tasks per OS-thread to invoke")
 
         ( "payload"
-        , boost::program_options::value<boost::uint64_t>
+        , boost::program_options::value<std::uint64_t>
                 (&payload_duration_)->default_value(5000)
         , "duration of payload in nanoseconds")
 

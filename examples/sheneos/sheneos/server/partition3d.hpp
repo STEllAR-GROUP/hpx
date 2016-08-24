@@ -12,6 +12,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -102,7 +104,7 @@ namespace sheneos { namespace server
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
-            boost::uint32_t eosvalues);
+            std::uint32_t eosvalues);
 
         /// Perform an interpolation of one given field on this partition.
         ///
@@ -112,7 +114,7 @@ namespace sheneos { namespace server
         /// \param eosvalues [in] The EOS value to interpolate. Must be
         ///                  in the range of this partition.
         double interpolate_one(double ye, double temp, double rho,
-            boost::uint32_t eosvalue);
+            std::uint32_t eosvalue);
 
         /// Perform several interpolations of all given fields on this partition.
         ///
@@ -122,7 +124,7 @@ namespace sheneos { namespace server
         ///                  in the range of this partition.
         std::vector<std::vector<double> >
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalues);
+            std::uint32_t eosvalues);
 
         /// Perform several interpolations of one given field on this partition.
         ///
@@ -132,7 +134,7 @@ namespace sheneos { namespace server
         ///                  in the range of this partition.
         std::vector<double>
         interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue);
+            std::uint32_t eosvalue);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -146,9 +148,9 @@ namespace sheneos { namespace server
 
     protected:
         double interpolate_one(sheneos_coord const& c,
-            boost::uint32_t eosvalue);
+            std::uint32_t eosvalue);
         std::vector<double> interpolate(sheneos_coord const& c,
-            boost::uint32_t eosvalues);
+            std::uint32_t eosvalues);
 
     private:
         dimension dim_[dimension::dim];

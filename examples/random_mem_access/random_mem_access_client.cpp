@@ -11,6 +11,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <cstddef>
 #include <vector>
 #include <time.h>
 

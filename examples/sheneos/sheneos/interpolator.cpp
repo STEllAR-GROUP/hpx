@@ -14,7 +14,10 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -356,8 +359,8 @@ namespace sheneos
                 overall_result[indicies[i]] = result[i];
         }
 
-        boost::reference_wrapper<context_data const> data_;
-        boost::reference_wrapper<std::vector<double> > overall_result_;
+        std::reference_wrapper<context_data const> data_;
+        std::reference_wrapper<std::vector<double> > overall_result_;
         std::shared_ptr<partitions_type> partitions_;
     };
 
@@ -366,7 +369,7 @@ namespace sheneos
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_one_context(std::shared_ptr<partitions_type> parts, std::size_t s,
-                boost::uint32_t eos)
+                std::uint32_t eos)
           : partitions(parts), size(s), eosvalue(eos)
         {}
 
@@ -407,13 +410,13 @@ namespace sheneos
 
         std::shared_ptr<partitions_type> partitions;
         std::size_t size;
-        boost::uint32_t eosvalue;
+        std::uint32_t eosvalue;
     };
 
     hpx::lcos::future<std::vector<double> >
     interpolator::interpolate_one_bulk_async(
         std::vector<sheneos_coord> const& coords,
-        boost::uint32_t eosvalue) const
+        std::uint32_t eosvalue) const
     {
         namespace naming = hpx::naming;
         namespace lcos = hpx::lcos;
@@ -470,8 +473,8 @@ namespace sheneos
                 overall_results[indicies[i]] = result[i];
         }
 
-        boost::reference_wrapper<context_data const> data_;
-        boost::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
+        std::reference_wrapper<context_data const> data_;
+        std::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
         std::shared_ptr<partitions_type> partitions_;
     };
 
@@ -481,7 +484,7 @@ namespace sheneos
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_context(std::shared_ptr<partitions_type> parts, std::size_t s,
-                boost::uint32_t eos)
+                std::uint32_t eos)
           : partitions(parts), size(s), eosvalues(eos)
         {}
 
@@ -522,12 +525,12 @@ namespace sheneos
 
         std::shared_ptr<partitions_type> partitions;
         std::size_t size;
-        boost::uint32_t eosvalues;
+        std::uint32_t eosvalues;
     };
 
     hpx::lcos::future<std::vector<std::vector<double> > >
     interpolator::interpolate_bulk_async(
-        std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues) const
+        std::vector<sheneos_coord> const& coords, std::uint32_t eosvalues) const
     {
         namespace naming = hpx::naming;
         namespace lcos = hpx::lcos;

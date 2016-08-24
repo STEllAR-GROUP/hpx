@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <cstddef>
 #include <string>
 
 #include "../dimension.hpp"

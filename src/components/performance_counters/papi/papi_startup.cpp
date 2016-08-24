@@ -8,14 +8,6 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <cctype>
-#include <set>
-#include <string>
-#include <utility>
-
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
-
 #include <hpx/util/bind.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
@@ -29,6 +21,16 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/exception.hpp>
+
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
+
+#include <cctype>
+#include <cstdint>
+#include <functional>
+#include <set>
+#include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -71,7 +73,7 @@ namespace hpx { namespace performance_counters { namespace papi
 
         // validate thread label taken from counter name
         std::string label;
-        boost::uint32_t tix = util::get_counter_thread(paths, label);
+        std::uint32_t tix = util::get_counter_thread(paths, label);
         if (tix == thread_mapper::invalid_index)
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -107,7 +109,7 @@ namespace hpx { namespace performance_counters { namespace papi
     {
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
         std::string label;
-        boost::uint32_t tix = 0;
+        std::uint32_t tix = 0;
         while (!((label = tm.get_thread_label(tix++)).empty()))
         {
             if (mode == discover_counters_minimal)
@@ -145,7 +147,7 @@ namespace hpx { namespace performance_counters { namespace papi
                 std::string evstr((*gi)->long_descr);
                 info.helptext_ = "returns the count of occurrences of \""+
                     evstr+"\" in "+(*it)+" instance";
-                if (!f(info, boost::ref(ec)) || ec) return false;
+                if (!f(info, std::ref(ec)) || ec) return false;
             }
         }
         return true;

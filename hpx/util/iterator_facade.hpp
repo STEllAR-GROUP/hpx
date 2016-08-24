@@ -16,6 +16,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <memory>
 #include <type_traits>

@@ -10,6 +10,7 @@
 
 #include "stencil_iterator.hpp"
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>

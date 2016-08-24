@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 #if defined(HPX_WINDOWS)
 
-#include <intrin.h>
+#include <cstdint>
 
-#include <boost/cstdint.hpp>
+#include <intrin.h>
 
 namespace hpx { namespace util { namespace hardware
 {
@@ -31,11 +31,11 @@ struct cpuid_register
     };
 };
 
-void cpuid(boost::uint32_t (&cpuinfo)[4], boost::uint32_t eax)
+void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
 { ::__cpuid(cpuinfo, eax); }
 
-void cpuidex(boost::uint32_t (&cpuinfo)[4], boost::uint32_t eax,
-             boost::uint32_t ecx)
+void cpuidex(std::uint32_t (&cpuinfo)[4], std::uint32_t eax,
+             std::uint32_t ecx)
 { ::__cpuidex(cpuinfo, eax, ecx); }
 
 }}}

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 
-#include <boost/ref.hpp>
+#include <cstddef>
 
 namespace hpx { namespace test
 {

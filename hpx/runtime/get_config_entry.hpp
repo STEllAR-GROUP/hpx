@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <string>
 

@@ -12,9 +12,9 @@
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
 #endif
-#include <boost/cstdint.hpp>
 
 #include <chrono>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace statistics
@@ -23,9 +23,9 @@ namespace hpx { namespace util { namespace cache { namespace statistics
     class local_full_statistics : public local_statistics
     {
     private:
-        boost::int64_t get_and_reset_value(boost::int64_t& value, bool reset)
+        std::int64_t get_and_reset_value(std::int64_t& value, bool reset)
         {
-            boost::int64_t result = value;
+            std::int64_t result = value;
             if (reset) value = 0;
             return result;
         }
@@ -36,8 +36,8 @@ namespace hpx { namespace util { namespace cache { namespace statistics
               : count_(0), time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            std::int64_t count_;
+            std::int64_t time_;
         };
 
     public:
@@ -66,14 +66,14 @@ namespace hpx { namespace util { namespace cache { namespace statistics
                 return stat.get_entry_;
             }
 
-            static boost::uint64_t now()
+            static std::uint64_t now()
             {
 #if defined(__bgq__)
                 return GetTimeBase();
 #else
                 std::chrono::nanoseconds ns =
                     std::chrono::steady_clock::now().time_since_epoch();
-                return static_cast<boost::uint64_t>(ns.count());
+                return static_cast<std::uint64_t>(ns.count());
 #endif
             }
 
@@ -90,62 +90,62 @@ namespace hpx { namespace util { namespace cache { namespace statistics
                 ++data_.count_;
             }
 
-            boost::int64_t started_at_;
+            std::int64_t started_at_;
             api_counter_data& data_;
         };
 
         /// The function \a get_get_entry_count returns the number of
         /// invocations of the get_entry() API function of the cache.
-        boost::int64_t get_get_entry_count(bool reset)
+        std::int64_t get_get_entry_count(bool reset)
         {
             return get_and_reset_value(get_entry_.count_, reset);
         }
 
         /// The function \a get_insert_entry_count returns the number of
         /// invocations of the insert_entry() API function of the cache.
-        boost::int64_t get_insert_entry_count(bool reset)
+        std::int64_t get_insert_entry_count(bool reset)
         {
             return get_and_reset_value(insert_entry_.count_, reset);
         }
 
         /// The function \a get_update_entry_count returns the number of
         /// invocations of the update_entry() API function of the cache.
-        boost::int64_t get_update_entry_count(bool reset)
+        std::int64_t get_update_entry_count(bool reset)
         {
             return get_and_reset_value(update_entry_.count_, reset);
         }
 
         /// The function \a get_erase_entry_count returns the number of
         /// invocations of the erase() API function of the cache.
-        boost::int64_t get_erase_entry_count(bool reset)
+        std::int64_t get_erase_entry_count(bool reset)
         {
             return get_and_reset_value(erase_entry_.count_, reset);
         }
 
         /// The function \a get_get_entry_time returns the overall time spent
         /// executing of the get_entry() API function of the cache.
-        boost::int64_t get_get_entry_time(bool reset)
+        std::int64_t get_get_entry_time(bool reset)
         {
             return get_and_reset_value(get_entry_.time_, reset);
         }
 
         /// The function \a get_insert_entry_time returns the overall time
         /// spent executing of the insert_entry() API function of the cache.
-        boost::int64_t get_insert_entry_time(bool reset)
+        std::int64_t get_insert_entry_time(bool reset)
         {
             return get_and_reset_value(insert_entry_.time_, reset);
         }
 
         /// The function \a get_update_entry_time returns the overall time
         /// spent executing of the update_entry() API function of the cache.
-        boost::int64_t get_update_entry_time(bool reset)
+        std::int64_t get_update_entry_time(bool reset)
         {
             return get_and_reset_value(update_entry_.time_, reset);
         }
 
         /// The function \a get_erase_entry_time returns the overall time spent
         /// executing of the erase() API function of the cache.
-        boost::int64_t get_erase_entry_time(bool reset)
+        std::int64_t get_erase_entry_time(bool reset)
         {
             return get_and_reset_value(erase_entry_.time_, reset);
         }

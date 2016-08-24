@@ -20,6 +20,7 @@
 #include <hpx/compute/cuda/get_targets.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

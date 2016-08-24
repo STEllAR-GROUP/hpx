@@ -13,6 +13,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -60,7 +62,7 @@ int hpx_main(variables_map& vm)
         // create the threads which will wait on the barrier
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work(hpx::util::bind
-                (&local_barrier_test, boost::ref(b), boost::ref(c)));
+                (&local_barrier_test, std::ref(b), std::ref(c)));
 
         b.wait(); // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c);

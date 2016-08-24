@@ -11,6 +11,8 @@
 #include <hpx/lcos/local/barrier.hpp>
 
 #include <chrono>
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -66,7 +68,7 @@ int hpx_main(variables_map& vm)
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work(hpx::util::bind
-                (&suspend_test, boost::ref(b), iterations, suspend_duration));
+                (&suspend_test, std::ref(b), iterations, suspend_duration));
 
         b.wait(); // Wait for all hpx-threads to enter the barrier.
     }

@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
+
 #ifndef HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
@@ -14,6 +16,10 @@
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <boost/cstdint.hpp>
+
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <type_traits>
@@ -30,7 +36,7 @@ namespace hpx { namespace serialization
         typedef basic_archive<input_archive> base_type;
 
         typedef
-            std::map<boost::uint64_t, detail::ptr_helper_ptr>
+            std::map<std::uint64_t, detail::ptr_helper_ptr>
             pointer_tracker;
 
         template <typename Container>
@@ -44,14 +50,14 @@ namespace hpx { namespace serialization
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            boost::uint64_t endianess = 0ul;
+            std::uint64_t endianess = 0ul;
             load(endianess);
             if (endianess)
                 this->base_type::flags_ = hpx::serialization::endian_big;
 
             // load flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
-            boost::uint32_t flags = 0;
+            std::uint32_t flags = 0;
             load(flags);
             this->base_type::flags_ = flags;
 
@@ -166,7 +172,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void load_integral(T & val, std::false_type)
         {
-            boost::int64_t l;
+            std::int64_t l;
             load_integral_impl(l);
             val = static_cast<T>(l);
         }
@@ -174,7 +180,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void load_integral(T & val, std::true_type)
         {
-            boost::uint64_t ul;
+            std::uint64_t ul;
             load_integral_impl(ul);
             val = static_cast<T>(ul);
         }
@@ -252,7 +258,7 @@ namespace hpx { namespace serialization
 
         // make functions visible through adl
         friend void register_pointer(input_archive& ar,
-                boost::uint64_t pos, detail::ptr_helper_ptr helper)
+                std::uint64_t pos, detail::ptr_helper_ptr helper)
         {
             pointer_tracker& tracker = ar.pointer_tracker_;
             HPX_ASSERT(tracker.find(pos) == tracker.end());
@@ -261,11 +267,11 @@ namespace hpx { namespace serialization
         }
 
         template <typename Helper>
-        friend Helper & tracked_pointer(input_archive& ar, boost::uint64_t pos)
+        friend Helper & tracked_pointer(input_archive& ar, std::uint64_t pos)
         {
             // gcc has some lookup problems when using
             // nested type inside friend function
-            std::map<boost::uint64_t, detail::ptr_helper_ptr>::iterator
+            std::map<std::uint64_t, detail::ptr_helper_ptr>::iterator
                 it = ar.pointer_tracker_.find(pos);
             HPX_ASSERT(it != ar.pointer_tracker_.end());
 

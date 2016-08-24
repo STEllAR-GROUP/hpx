@@ -13,6 +13,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <string>

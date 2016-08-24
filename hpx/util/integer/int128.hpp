@@ -12,12 +12,11 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
 #include <new>
-
-#include <boost/cstdint.hpp>
 
 namespace hpx { namespace util { namespace integer
 {
@@ -26,8 +25,8 @@ namespace hpx { namespace util { namespace integer
     {
     private:
         // Binary correct representation of signed 128bit integer
-        boost::uint64_t lo;
-        boost::int64_t hi;
+        std::uint64_t lo;
+        std::int64_t hi;
 
     protected:
         // Some global operator functions must be friends
@@ -45,8 +44,8 @@ namespace hpx { namespace util { namespace integer
             if (a < 0) this->hi = -1ll;
         };
 
-        inline int128 (const boost::uint64_t & a) throw () : lo (a), hi (0ll) {};
-        inline int128 (const boost::int64_t & a) throw () : lo (a), hi (0ll) {
+        inline int128 (const std::uint64_t & a) throw () : lo (a), hi (0ll) {};
+        inline int128 (const std::int64_t & a) throw () : lo (a), hi (0ll) {
             if (a < 0) this->hi = -1ll;
         };
 
@@ -61,7 +60,7 @@ namespace hpx { namespace util { namespace integer
 
     private:
         // Special internal constructors
-        int128 (const boost::uint64_t & a, const boost::int64_t & b) throw ()
+        int128 (const std::uint64_t & a, const std::int64_t & b) throw ()
             : lo (a), hi (b) {};
 
     public:
@@ -105,8 +104,8 @@ namespace hpx { namespace util { namespace integer
 
         // Common methods
         int toInt () const throw () { return (int) this->lo; };
-        boost::int64_t toInt64 () const throw ()
-            { return (boost::uint64_t) this->lo; };
+        std::int64_t toInt64 () const throw ()
+            { return (std::uint64_t) this->lo; };
 
         const char * toString (unsigned int radix = 10) const throw ();
         float toFloat () const throw ();

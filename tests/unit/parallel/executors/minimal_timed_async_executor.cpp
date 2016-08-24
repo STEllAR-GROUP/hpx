@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
+#include <functional>
 #include <string>
 #include <utility>
 #include <type_traits>
@@ -47,11 +48,11 @@ void test_timed_apply(Executor& exec)
 
         using hpx::util::placeholders::_1;
         traits::apply_execute_after(exec, milliseconds(10),
-            hpx::util::bind(&apply_test, boost::ref(l), boost::ref(id), _1), 42
+            hpx::util::bind(&apply_test, std::ref(l), std::ref(id), _1), 42
         );
 
         traits::apply_execute_after(exec, milliseconds(10),
-            &apply_test, boost::ref(l), boost::ref(id), 42);
+            &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 
@@ -65,10 +66,10 @@ void test_timed_apply(Executor& exec)
         typedef hpx::parallel::timed_executor_traits<Executor> traits;
         traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
             hpx::util::deferred_call(
-                &apply_test, boost::ref(l), boost::ref(id), 42));
+                &apply_test, std::ref(l), std::ref(id), 42));
 
         traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
-            &apply_test, boost::ref(l), boost::ref(id), 42);
+            &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 

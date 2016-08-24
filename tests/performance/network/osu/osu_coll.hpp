@@ -8,6 +8,7 @@
 #define LARGE_MESSAGE_SIZE 8192
 #define ITERATIONS_LARGE 100
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

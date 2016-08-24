@@ -23,6 +23,7 @@
 
 namespace placeholders = hpx::util::placeholders;
 
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -47,7 +48,7 @@ int main()
 
     HPX_TEST( x.m == 42 );
 
-    hpx::util::bind( &X::m, boost::ref(x) )() = 17041;
+    hpx::util::bind( &X::m, std::ref(x) )() = 17041;
 
     HPX_TEST( x.m == 17041 );
 

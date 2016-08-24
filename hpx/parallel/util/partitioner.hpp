@@ -27,6 +27,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <list>
 #include <memory>

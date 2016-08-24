@@ -32,6 +32,7 @@
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <string>

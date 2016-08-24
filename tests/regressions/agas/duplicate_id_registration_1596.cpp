@@ -13,6 +13,8 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
+
 using namespace std;
 
 namespace server

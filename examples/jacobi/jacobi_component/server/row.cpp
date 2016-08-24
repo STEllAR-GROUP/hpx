@@ -7,6 +7,8 @@
 #include <hpx/hpx.hpp>
 #include "row.hpp"
 
+#include <cstddef>
+
 namespace jacobi
 {
     namespace server

@@ -32,6 +32,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <iterator>
 #include <memory>

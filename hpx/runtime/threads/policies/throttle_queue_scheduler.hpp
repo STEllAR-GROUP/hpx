@@ -18,6 +18,8 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <time.h>
@@ -121,7 +123,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             bool ret = throttle(num_thread, apex_current_threads_ <
                 apex_current_desired_active_threads); // am I throttled?

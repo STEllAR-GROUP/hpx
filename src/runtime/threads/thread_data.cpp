@@ -183,7 +183,7 @@ namespace hpx { namespace threads
         return 0;
     }
 
-    boost::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id()
     {
         return naming::invalid_locality_id;
     }
@@ -204,7 +204,7 @@ namespace hpx { namespace threads
         return get_self_id()->get_parent_thread_phase();
     }
 
-    boost::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id()
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)

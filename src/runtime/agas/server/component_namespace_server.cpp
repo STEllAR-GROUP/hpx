@@ -17,6 +17,8 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -162,7 +164,7 @@ response component_namespace::service(
               , boost::str(boost::format(
                     "invalid action code encountered in request, "
                     "action_code(%x)")
-                    % boost::uint16_t(req.get_action_code())));
+                    % std::uint16_t(req.get_action_code())));
             return response();
         }
     };
@@ -317,7 +319,7 @@ response component_namespace::bind_prefix(
 { // {{{ bind_prefix implementation
     // parameters
     std::string key = req.get_name();
-    boost::uint32_t prefix = req.get_locality_id();
+    std::uint32_t prefix = req.get_locality_id();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -487,12 +489,12 @@ response component_namespace::resolve_id(
             ec = make_success_code();
 
         return response(component_ns_resolve_id
-                      , std::vector<boost::uint32_t>());
+                      , std::vector<std::uint32_t>());
     }
 
     else
     {
-        std::vector<boost::uint32_t> p;
+        std::vector<std::uint32_t> p;
 
         prefixes_type const& prefixes = it->second;
         prefixes_type::const_iterator pit = prefixes.begin()
@@ -665,10 +667,10 @@ response component_namespace::get_num_localities(
         if (&ec != &throws)
             ec = make_success_code();
 
-        response(component_ns_num_localities, boost::uint32_t(0), no_success);
+        response(component_ns_num_localities, std::uint32_t(0), no_success);
     }
 
-    boost::uint32_t num_localities = static_cast<boost::uint32_t>(it->second.size());
+    std::uint32_t num_localities = static_cast<std::uint32_t>(it->second.size());
 
     LAGAS_(info) << (boost::format(
         "component_namespace::get_num_localities, key(%1%), localities(%2%)")
@@ -726,7 +728,7 @@ response component_namespace::statistics_counter(
     typedef component_namespace::counter_data cd;
 
     using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
@@ -826,43 +828,43 @@ response component_namespace::statistics_counter(
 } // }}}
 
 // access current counter values
-boost::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
 {
     return util::get_and_reset_value(bind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
+std::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
 {
     return util::get_and_reset_value(resolve_id_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
+std::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
 {
     return util::get_and_reset_value(unbind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
+std::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
 {
     return util::get_and_reset_value(iterate_types_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data
+std::int64_t component_namespace::counter_data
         ::get_component_type_name_count(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
+std::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
 {
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
+std::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.count_, reset) +
         util::get_and_reset_value(bind_name_.count_, reset) +
@@ -874,43 +876,43 @@ boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 }
 
 // access execution time counters
-boost::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
 {
     return util::get_and_reset_value(bind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
+std::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
 {
     return util::get_and_reset_value(resolve_id_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
+std::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
 {
     return util::get_and_reset_value(unbind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
+std::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
 {
     return util::get_and_reset_value(iterate_types_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data
+std::int64_t component_namespace::counter_data
         ::get_component_type_name_time(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
+std::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
 {
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_overall_time(bool reset)
+std::int64_t component_namespace::counter_data::get_overall_time(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.time_, reset) +
         util::get_and_reset_value(bind_name_.time_, reset) +

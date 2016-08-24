@@ -29,12 +29,17 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "worker_timed.hpp"
-
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
+#include <boost/random.hpp>
+
+#include <cstdint>
+#include <functional>
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
@@ -43,12 +48,7 @@
 
 #include <qthread/qthread.h>
 
-#include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
-#include <boost/random.hpp>
-#include <boost/ref.hpp>
+#include "worker_timed.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -61,19 +61,19 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Applications globals.
-boost::atomic<boost::uint64_t> donecount(0);
+boost::atomic<std::uint64_t> donecount(0);
 
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t min_delay = 0;
-boost::uint64_t max_delay = 0;
-boost::uint64_t total_delay = 0;
-boost::uint64_t seed = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t min_delay = 0;
+std::uint64_t max_delay = 0;
+std::uint64_t total_delay = 0;
+std::uint64_t seed = 0;
 bool header = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    std::uint64_t cores
   , double walltime
     )
 {
@@ -101,16 +101,16 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t shuffler(
+std::uint64_t shuffler(
     boost::random::mt19937_64& prng
-  , boost::uint64_t high
+  , std::uint64_t high
     )
 {
     if (high == 0)
         throw std::logic_error("high value was 0");
 
     // Our range is [0, x).
-    boost::random::uniform_int_distribution<boost::uint64_t>
+    boost::random::uniform_int_distribution<std::uint64_t>
         dist(0, high - 1);
 
     return dist(prng);
@@ -121,7 +121,7 @@ extern "C" aligned_t worker_func(
     void* p
     )
 {
-    boost::uint64_t const delay_ = reinterpret_cast<boost::uint64_t>(p);
+    std::uint64_t const delay_ = reinterpret_cast<std::uint64_t>(p);
 
     worker_timed(delay_ * 1000);
 
@@ -139,7 +139,7 @@ int qthreads_main(
         ///////////////////////////////////////////////////////////////////////
         // Initialize the PRNG seed.
         if (!seed)
-            seed = boost::uint64_t(std::time(nullptr));
+            seed = std::uint64_t(std::time(nullptr));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate command-line arguments.
@@ -170,7 +170,7 @@ int qthreads_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Randomly generate a description of the heterogeneous workload.
-        std::vector<boost::uint64_t> payloads;
+        std::vector<std::uint64_t> payloads;
         payloads.reserve(tasks);
 
         // For random numbers, we use a 64-bit specialization of Boost.Random's
@@ -178,32 +178,32 @@ int qthreads_main(
         // dimensions, cycle length 2 ^ 19937 - 1)
         boost::random::mt19937_64 prng(seed);
 
-        boost::uint64_t current_sum = 0;
+        std::uint64_t current_sum = 0;
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
         {
             // Credit to Spencer Ruport for putting this algorithm on
             // stackoverflow.
-            boost::uint64_t const low_calc
+            std::uint64_t const low_calc
                 = (total_delay - current_sum) - (max_delay * (tasks - 1 - i));
 
             bool const negative
                 = (total_delay - current_sum) < (max_delay * (tasks - 1 - i));
 
-            boost::uint64_t const low
+            std::uint64_t const low
                 = (negative || (low_calc < min_delay)) ? min_delay : low_calc;
 
-            boost::uint64_t const high_calc
+            std::uint64_t const high_calc
                 = (total_delay - current_sum) - (min_delay * (tasks - 1 - i));
 
-            boost::uint64_t const high
+            std::uint64_t const high
                 = (high_calc > max_delay) ? max_delay : high_calc;
 
             // Our range is [low, high].
-            boost::random::uniform_int_distribution<boost::uint64_t>
+            boost::random::uniform_int_distribution<std::uint64_t>
                 dist(low, high);
 
-            boost::uint64_t const payload = dist(prng);
+            std::uint64_t const payload = dist(prng);
 
             if (payload < min_delay)
                 throw std::logic_error("task delay is below minimum");
@@ -218,14 +218,14 @@ int qthreads_main(
         // Randomly shuffle the entire sequence to deal with drift.
         using hpx::util::placeholders::_1;
         std::random_shuffle(payloads.begin(), payloads.end(),
-            hpx::util::bind(&shuffler, boost::ref(prng), _1));
+            hpx::util::bind(&shuffler, std::ref(prng), _1));
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.
         if (payloads.size() != tasks)
             throw std::logic_error("incorrect number of tasks generated");
 
-        boost::uint64_t const payloads_sum =
+        std::uint64_t const payloads_sum =
             std::accumulate(payloads.begin(), payloads.end(), 0LLU);
         if (payloads_sum != total_delay)
             throw std::logic_error("incorrect total delay generated");
@@ -236,7 +236,7 @@ int qthreads_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Queue the tasks in a serial loop.
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
         {
             void* const ptr = reinterpret_cast<void*>(payloads[i]);
             qthread_fork(&worker_func, ptr, nullptr);
@@ -274,31 +274,31 @@ int main(
         , "print out program usage (this message)")
 
         ( "shepherds,s"
-        , value<boost::uint64_t>()->default_value(1),
+        , value<std::uint64_t>()->default_value(1),
          "number of shepherds to use")
 
         ( "workers-per-shepherd,w"
-        , value<boost::uint64_t>()->default_value(1),
+        , value<std::uint64_t>()->default_value(1),
          "number of worker OS-threads per shepherd")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
 
         ( "min-delay"
-        , value<boost::uint64_t>(&min_delay)->default_value(0)
+        , value<std::uint64_t>(&min_delay)->default_value(0)
         , "minimum number of iterations in the delay loop")
 
         ( "max-delay"
-        , value<boost::uint64_t>(&max_delay)->default_value(0)
+        , value<std::uint64_t>(&max_delay)->default_value(0)
         , "maximum number of iterations in the delay loop")
 
         ( "total-delay"
-        , value<boost::uint64_t>(&total_delay)->default_value(0)
+        , value<std::uint64_t>(&total_delay)->default_value(0)
         , "total number of delay iterations to be executed")
 
         ( "seed"
-        , value<boost::uint64_t>(&seed)->default_value(0)
+        , value<std::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
           "choosen based on the current system time)")
 
@@ -322,9 +322,9 @@ int main(
 
     // Set qthreads environment variables.
     std::string const shepherds = std::to_string
-        (vm["shepherds"].as<boost::uint64_t>());
+        (vm["shepherds"].as<std::uint64_t>());
     std::string const workers = std::to_string
-        (vm["workers-per-shepherd"].as<boost::uint64_t>());
+        (vm["workers-per-shepherd"].as<std::uint64_t>());
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);
     setenv("QT_NUM_WORKERS_PER_SHEPHERD", workers.c_str(), 1);

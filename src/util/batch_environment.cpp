@@ -16,6 +16,7 @@
 #include <hpx/util/batch_environments/slurm_environment.hpp>
 #include <hpx/util/batch_environments/pbs_environment.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <utility>

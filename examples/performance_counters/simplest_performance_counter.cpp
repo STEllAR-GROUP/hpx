@@ -11,11 +11,13 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 // The atomic variable 'counter' ensures the thread safety of the counter.
-boost::atomic<boost::int64_t> counter(0);
+boost::atomic<std::int64_t> counter(0);
 
-boost::int64_t some_performance_data(bool reset)
+std::int64_t some_performance_data(bool reset)
 {
     return hpx::util::get_and_reset_value(counter, reset);
 }

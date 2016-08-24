@@ -7,6 +7,7 @@
 #ifndef JACOBI_SMP_JACOBI_HPP
 #define JACOBI_SMP_JACOBI_HPP
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <string>

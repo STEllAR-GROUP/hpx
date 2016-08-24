@@ -14,6 +14,7 @@
 
 #include <boost/thread/once.hpp>
 
+#include <cstddef>
 #include <memory>   // for placement new
 #include <type_traits>
 

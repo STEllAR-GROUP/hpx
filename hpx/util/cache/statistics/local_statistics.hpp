@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/cache/statistics/no_statistics.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace statistics
 {

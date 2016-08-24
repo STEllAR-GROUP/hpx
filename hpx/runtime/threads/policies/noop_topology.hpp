@@ -22,6 +22,8 @@
 #include <cpu-features.h>
 #endif
 
+#include <cstddef>
+
 namespace hpx { namespace threads
 {
 

@@ -23,6 +23,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -32,13 +33,13 @@
 BOOST_FUSION_DEFINE_STRUCT(
     (hpx)(performance_counters)(memory),
     proc_statm,
-    (boost::uint64_t,   size)
-    (boost::uint64_t,   resident)
-    (boost::uint64_t,   share)
-    (boost::uint64_t,   text)
-    (boost::uint64_t,   lib)
-    (boost::uint64_t,   data)
-    (boost::uint64_t,   dt)
+    (std::uint64_t,   size)
+    (std::uint64_t,   resident)
+    (std::uint64_t,   share)
+    (std::uint64_t,   text)
+    (std::uint64_t,   lib)
+    (std::uint64_t,   data)
+    (std::uint64_t,   dt)
     )
 
 namespace hpx { namespace performance_counters { namespace memory
@@ -65,7 +66,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
         qi::rule<Iterator, proc_statm(), ascii::space_type> start;
 
-        qi::uint_parser<boost::uint64_t> uint64_t_;
+        qi::uint_parser<std::uint64_t> uint64_t_;
     };
 
     struct ifstream_raii
@@ -89,7 +90,7 @@ namespace hpx { namespace performance_counters { namespace memory
         std::ifstream stm;
     };
 
-    bool read_proc_statm(proc_statm& ps, boost::int32_t pid)
+    bool read_proc_statm(proc_statm& ps, std::int32_t pid)
     {
         std::string filename
             = boost::str(boost::format("/proc/%1%/statm") % pid);
@@ -115,7 +116,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // Returns virtual memory usage.
-    boost::uint64_t read_psm_virtual(bool)
+    std::uint64_t read_psm_virtual(bool)
     {
         proc_statm ps;
 
@@ -126,7 +127,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 "hpx::performance_counters::memory::read_psm_virtual",
                 boost::str( boost::format("failed to parse '/proc/%1%/statm'")
                           % getpid()));
-            return boost::uint64_t(-1);
+            return std::uint64_t(-1);
         }
 
         // ps.size is in pages, but we need to return the number of bytes.
@@ -134,7 +135,7 @@ namespace hpx { namespace performance_counters { namespace memory
     }
 
     // Returns resident memory usage.
-    boost::uint64_t read_psm_resident(bool)
+    std::uint64_t read_psm_resident(bool)
     {
         proc_statm ps;
 
@@ -145,7 +146,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 "hpx::performance_counters::memory::read_psm_resident",
                 boost::str( boost::format("failed to parse '/proc/%1%/statm'")
                           % getpid()));
-            return boost::uint64_t(-1);
+            return std::uint64_t(-1);
         }
 
         // ps.resident is in pages, but we need to return the number of bytes.

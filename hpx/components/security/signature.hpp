@@ -17,6 +17,8 @@
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
 
+#include <cstddef>
+
 #include <sodium.h>
 
 namespace hpx { namespace components { namespace security

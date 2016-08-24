@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iostream>
 #include <memory>

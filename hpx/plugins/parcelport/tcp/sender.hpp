@@ -31,8 +31,8 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>

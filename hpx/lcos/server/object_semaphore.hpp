@@ -19,6 +19,7 @@
 
 #include <boost/intrusive/slist.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -69,11 +70,11 @@ struct object_semaphore
             boost::intrusive::link_mode<boost::intrusive::normal_link>
         > hook_type;
 
-        queue_value_entry(ValueType const& val, boost::uint64_t count)
+        queue_value_entry(ValueType const& val, std::uint64_t count)
           : val_(val), count_(count) {}
 
         ValueType val_;
-        boost::uint64_t count_;
+        std::uint64_t count_;
         hook_type slist_hook_;
     };
 
@@ -132,7 +133,7 @@ struct object_semaphore
             abort_pending(deadlock);
     } // }}}
 
-    void signal(ValueType const& val, boost::uint64_t count)
+    void signal(ValueType const& val, std::uint64_t count)
     { // {{{
         // push back the new value onto the queue
         std::unique_ptr<queue_value_entry> node

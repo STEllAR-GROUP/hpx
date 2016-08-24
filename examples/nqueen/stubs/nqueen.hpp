@@ -15,6 +15,8 @@
 
 #include <examples/nqueen/server/nqueen.hpp>
 
+#include <cstddef>
+
 namespace nqueen { namespace stubs
 {
 

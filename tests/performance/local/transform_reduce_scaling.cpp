@@ -10,11 +10,12 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
@@ -67,16 +68,16 @@ void measure_transform_reduce_old(std::size_t size)
     HPX_UNUSED(result);
 }
 
-boost::uint64_t average_out_transform_reduce(std::size_t vector_size)
+std::uint64_t average_out_transform_reduce(std::size_t vector_size)
 {
     measure_transform_reduce(vector_size);
-    return boost::uint64_t(1);
+    return std::uint64_t(1);
 }
 
-boost::uint64_t average_out_transform_reduce_old(std::size_t vector_size)
+std::uint64_t average_out_transform_reduce_old(std::size_t vector_size)
 {
     measure_transform_reduce_old(vector_size);
-    return boost::uint64_t(1);
+    return std::uint64_t(1);
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -87,8 +88,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(test_count < 0 || test_count == 0) {
         hpx::cout << "test_count cannot be less than zero...\n" << hpx::flush;
     } else {
-        boost::uint64_t tr_time = average_out_transform_reduce(vector_size);
-        boost::uint64_t tr_old_time = average_out_transform_reduce_old(
+        std::uint64_t tr_time = average_out_transform_reduce(vector_size);
+        std::uint64_t tr_old_time = average_out_transform_reduce_old(
             vector_size);
 
         if(csvoutput) {

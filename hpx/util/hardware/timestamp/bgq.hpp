@@ -15,10 +15,12 @@
 
 #include <hwi/include/bqc/A2_inlines.h>
 
+#include <cstdint>
+
 namespace hpx { namespace util { namespace hardware
 {
 
-inline boost::uint64_t timestamp()
+inline std::uint64_t timestamp()
 {
     return GetTimeBase();
 }

@@ -28,6 +28,8 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -411,7 +413,7 @@ namespace hpx { namespace parcelset
 #endif
         }
 
-        boost::uint32_t destination_locality_id() const
+        std::uint32_t destination_locality_id() const
         {
             return naming::get_locality_id_from_id(destinations()[0]);
         }
@@ -469,7 +471,7 @@ namespace hpx { namespace parcelset
 
         // generate unique parcel id
         static naming::gid_type generate_unique_id(
-            boost::uint32_t locality_id = naming::invalid_locality_id);
+            std::uint32_t locality_id = naming::invalid_locality_id);
 
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);

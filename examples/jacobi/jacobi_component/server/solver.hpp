@@ -15,6 +15,7 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace jacobi

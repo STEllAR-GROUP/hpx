@@ -45,7 +45,9 @@
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -70,7 +72,7 @@ struct addressing_service::gva_cache_key
 
     explicit gva_cache_key(
         naming::gid_type const& id_
-      , boost::uint64_t count_ = 1
+      , std::uint64_t count_ = 1
         )
       : key_(naming::detail::get_stripped_gid(id_)
            , naming::detail::get_stripped_gid(id_) + (count_ - 1))
@@ -83,7 +85,7 @@ struct addressing_service::gva_cache_key
         return boost::icl::lower(key_);
     }
 
-    boost::uint64_t get_count() const
+    std::uint64_t get_count() const
     {
         naming::gid_type const size = boost::icl::length(key_);
         HPX_ASSERT(size.get_msb() == 0);
@@ -154,7 +156,7 @@ addressing_service::addressing_service(
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
-    boost::uint64_t rts_lva, boost::uint64_t mem_lva)
+    std::uint64_t rts_lva, std::uint64_t mem_lva)
 { // {{{
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
@@ -223,7 +225,7 @@ addressing_service::get_bootstrap_symbol_ns_ptr() const
 
 namespace detail
 {
-    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores);
+    std::uint32_t get_number_of_pus_in_cores(std::uint32_t num_cores);
 }
 
 void addressing_service::launch_bootstrap(
@@ -244,8 +246,8 @@ void addressing_service::launch_bootstrap(
         naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     // store number of cores used by other processes
-    boost::uint32_t cores_needed = rt.assign_cores();
-    boost::uint32_t first_used_core = rt.assign_cores(
+    std::uint32_t cores_needed = rt.assign_cores();
+    std::uint32_t first_used_core = rt.assign_cores(
         pp ? pp->get_locality_name() : "", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
@@ -290,7 +292,7 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
-    boost::uint32_t num_threads = hpx::util::get_entry_as<boost::uint32_t>(
+    std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
         ini_, "hpx.os_threads", 1u);
     request locality_req(locality_ns_allocate, endpoints, 4, num_threads); //-V112
     client_->service_locality(locality_req, action_priority_, throws);
@@ -382,7 +384,7 @@ std::vector<response> addressing_service::bulk_service(
 bool addressing_service::register_locality(
     parcelset::endpoints_type const & endpoints
   , naming::gid_type& prefix
-  , boost::uint32_t num_threads
+  , std::uint32_t num_threads
   , error_code& ec
     )
 { // {{{
@@ -559,7 +561,7 @@ bool addressing_service::get_console_locality(
             (rep.get_status() == success))
         {
             prefix = rep.get_gid();
-            boost::uint32_t console = naming::get_locality_id_from_gid(prefix);
+            std::uint32_t console = naming::get_locality_id_from_gid(prefix);
 
             {
                 std::lock_guard<mutex_type> lock(console_cache_mtx_);
@@ -603,7 +605,7 @@ bool addressing_service::get_localities(
             if (ec || (success != rep.get_status()))
                 return false;
 
-            const std::vector<boost::uint32_t> p = rep.get_localities();
+            const std::vector<std::uint32_t> p = rep.get_localities();
 
             if (!p.size())
                 return false;
@@ -623,7 +625,7 @@ bool addressing_service::get_localities(
             if (ec || (success != rep.get_status()))
                 return false;
 
-            const std::vector<boost::uint32_t> p = rep.get_localities();
+            const std::vector<std::uint32_t> p = rep.get_localities();
 
             if (!p.size())
                 return false;
@@ -658,7 +660,7 @@ std::map<naming::gid_type, parcelset::endpoints_type>
 } //}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint32_t addressing_service::get_num_localities(
+std::uint32_t addressing_service::get_num_localities(
     components::component_type type
   , error_code& ec
     )
@@ -670,7 +672,7 @@ boost::uint32_t addressing_service::get_num_localities(
             response rep = client_->service_locality(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
-                return boost::uint32_t(-1);
+                return std::uint32_t(-1);
 
             return rep.get_num_localities();
         }
@@ -679,17 +681,17 @@ boost::uint32_t addressing_service::get_num_localities(
         response rep = client_->service_component(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return boost::uint32_t(-1);
+            return std::uint32_t(-1);
 
         return rep.get_num_localities();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_localities");
     }
-    return boost::uint32_t(-1);
+    return std::uint32_t(-1);
 } // }}}
 
-lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
+lcos::future<std::uint32_t> addressing_service::get_num_localities_async(
     components::component_type type
     )
 { // {{{ get_num_localities implementation
@@ -706,7 +708,7 @@ lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint32_t addressing_service::get_num_overall_threads(
+std::uint32_t addressing_service::get_num_overall_threads(
     error_code& ec
     )
 { // {{{ get_num_overall_threads implementation
@@ -715,24 +717,24 @@ boost::uint32_t addressing_service::get_num_overall_threads(
         response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return boost::uint32_t(0);
+            return std::uint32_t(0);
 
         return rep.get_num_overall_threads();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_overall_threads");
     }
-    return boost::uint32_t(0);
+    return std::uint32_t(0);
 } // }}}
 
-lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
+lcos::future<std::uint32_t> addressing_service::get_num_overall_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
     return stubs::locality_namespace::service_async<std::uint32_t>(target, req);
 } // }}}
 
-std::vector<boost::uint32_t> addressing_service::get_num_threads(
+std::vector<std::uint32_t> addressing_service::get_num_threads(
     error_code& ec
     )
 { // {{{ get_num_threads implementation
@@ -741,22 +743,22 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
         response rep = client_->service_locality(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return std::vector<boost::uint32_t>();
+            return std::vector<std::uint32_t>();
 
         return rep.get_num_threads();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_threads");
     }
-    return std::vector<boost::uint32_t>();
+    return std::vector<std::uint32_t>();
 } // }}}
 
-lcos::future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
+lcos::future<std::vector<std::uint32_t> > addressing_service::get_num_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
     return stubs::locality_namespace::service_async<
-        std::vector<boost::uint32_t> >(target, req);
+        std::vector<std::uint32_t> >(target, req);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -813,7 +815,7 @@ std::string addressing_service::get_component_type_name(
 } // }}}
 
 components::component_type addressing_service::register_factory(
-    boost::uint32_t prefix
+    std::uint32_t prefix
   , std::string const& name
   , error_code& ec
     )
@@ -835,7 +837,7 @@ components::component_type addressing_service::register_factory(
 
 ///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::get_id_range(
-    boost::uint64_t count
+    std::uint64_t count
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
   , error_code& ec
@@ -846,7 +848,7 @@ bool addressing_service::get_id_range(
         request req(primary_ns_allocate
           , parcelset::endpoints_type()
           , count
-          , boost::uint32_t(-1));
+          , std::uint32_t(-1));
         response rep = client_->service_primary(req, ec);
 
         error const s = rep.get_status();
@@ -867,9 +869,9 @@ bool addressing_service::get_id_range(
 
 bool addressing_service::bind_range_local(
     naming::gid_type const& lower_id
-  , boost::uint64_t count
+  , std::uint64_t count
   , naming::address const& baseaddr
-  , boost::uint64_t offset
+  , std::uint64_t offset
   , error_code& ec
     )
 { // {{{ bind_range implementation
@@ -938,9 +940,9 @@ bool addressing_service::bind_postproc(
 
 hpx::future<bool> addressing_service::bind_range_async(
     naming::gid_type const& lower_id
-  , boost::uint64_t count
+  , std::uint64_t count
   , naming::address const& baseaddr
-  , boost::uint64_t offset
+  , std::uint64_t offset
   , naming::gid_type const& locality
     )
 {
@@ -972,7 +974,7 @@ hpx::future<bool> addressing_service::bind_range_async(
 
 hpx::future<naming::address> addressing_service::unbind_range_async(
     naming::gid_type const& lower_id
-  , boost::uint64_t count
+  , std::uint64_t count
     )
 {
     agas::request req(primary_ns_unbind_gid,
@@ -987,7 +989,7 @@ hpx::future<naming::address> addressing_service::unbind_range_async(
 
 bool addressing_service::unbind_range_local(
     naming::gid_type const& lower_id
-  , boost::uint64_t count
+  , std::uint64_t count
   , naming::address& addr
   , error_code& ec
     )
@@ -1113,7 +1115,7 @@ bool addressing_service::is_local_address_cached(
 // }
 
 bool addressing_service::is_local_lva_encoded_address(
-    boost::uint64_t msb
+    std::uint64_t msb
     )
 {
     // NOTE: This should still be migration safe.
@@ -1127,8 +1129,8 @@ bool addressing_service::resolve_locally_known_addresses(
     )
 {
     // LVA-encoded GIDs (located on this machine)
-    boost::uint64_t lsb = id.get_lsb();
-    boost::uint64_t msb =
+    std::uint64_t lsb = id.get_lsb();
+    std::uint64_t msb =
         naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
     if (is_local_lva_encoded_address(msb))
@@ -1175,7 +1177,7 @@ bool addressing_service::resolve_locally_known_addresses(
         return true;
     }
 
-    boost::uint64_t locality_msb =
+    std::uint64_t locality_msb =
         get_local_locality().get_msb() | HPX_AGAS_NS_MSB;
 
     if (HPX_AGAS_PRIMARY_NS_LSB == lsb)
@@ -1729,18 +1731,18 @@ void addressing_service::route(
 // to the acknowledged number of credits. The compensated credits are non-zero
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
-boost::int64_t addressing_service::synchronize_with_async_incref(
+std::int64_t addressing_service::synchronize_with_async_incref(
     hpx::future<std::int64_t> fut
   , naming::id_type const& id
-  , boost::int64_t compensated_credit
+  , std::int64_t compensated_credit
     )
 {
     return fut.get() + compensated_credit;
 }
 
-lcos::future<boost::int64_t> addressing_service::incref_async(
+lcos::future<std::int64_t> addressing_service::incref_async(
     naming::gid_type const& id
-  , boost::int64_t credit
+  , std::int64_t credit
   , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
@@ -1749,10 +1751,10 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
     if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        lcos::future<boost::int64_t> (
+        lcos::future<std::int64_t> (
                 addressing_service::*incref_async_ptr)(
             naming::gid_type const&
-          , boost::int64_t
+          , std::int64_t
           , naming::id_type const&
         ) = &addressing_service::incref_async;
 
@@ -1764,7 +1766,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::future<boost::int64_t>();
+        return lcos::future<std::int64_t>();
     }
 
     HPX_ASSERT(keep_alive != naming::invalid_id);
@@ -1781,9 +1783,9 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
     //   3        10        10        0           0        10
     //   4        10        11        0           1        10
 
-    std::pair<naming::gid_type, boost::int64_t> pending_incref;
+    std::pair<naming::gid_type, std::int64_t> pending_incref;
     bool has_pending_incref = false;
-    boost::int64_t pending_decrefs = 0;
+    std::int64_t pending_decrefs = 0;
 
     {
         std::lock_guard<mutex_type> l(refcnt_requests_mtx_);
@@ -1856,7 +1858,7 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
     naming::gid_type const& gid
-  , boost::int64_t credit
+  , std::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
@@ -1867,12 +1869,12 @@ void addressing_service::decref(
         // reschedule this call as an HPX thread
         void (addressing_service::*decref_ptr)(
             naming::gid_type const&
-          , boost::int64_t
+          , std::int64_t
           , error_code&
         ) = &addressing_service::decref;
 
         threads::register_thread_nullary(
-            util::deferred_call(decref_ptr, this, raw, credit, boost::ref(throws)),
+            util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
             "addressing_service::decref", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);
@@ -1944,7 +1946,7 @@ bool addressing_service::register_name(
 } // }}}
 
 static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
-    boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
+    std::int64_t mutable_gid_credit, std::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
     if ((f.has_exception() && mutable_gid_credit != 0) || !f.get())
@@ -1969,13 +1971,13 @@ lcos::future<bool> addressing_service::register_name_async(
     future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
-    boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
+    std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
         using util::placeholders::_1;
         return f.then(util::bind(
                 util::one_shot(&correct_credit_on_failure),
-                _1, id, boost::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
+                _1, id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
             ));
     }
 
@@ -2200,7 +2202,7 @@ void addressing_service::update_cache_entry(
           , error_code&
         ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
-            util::deferred_call(update_cache_entry_ptr, this, id, g, boost::ref(throws)),
+            util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
             "addressing_service::update_cache_entry", threads::pending, true,
             threads::thread_priority_normal, std::size_t(-1),
             threads::thread_stacksize_default, ec);
@@ -2209,7 +2211,7 @@ void addressing_service::update_cache_entry(
     try {
         // The entry in AGAS for a locality's RTS component has a count of 0,
         // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t count = (g.count ? g.count : 1);
+        const std::uint64_t count = (g.count ? g.count : 1);
 
         LAGAS_(debug) <<
             ( boost::format(
@@ -2274,7 +2276,7 @@ bool addressing_service::get_cache_entry(
     std::unique_lock<mutex_type> lock(gva_cache_mtx_);
     if(gva_cache_->get_entry(k, idbase_key, gva))
     {
-        const boost::uint64_t id_msb =
+        const std::uint64_t id_msb =
             naming::detail::strip_internal_bits_from_gid(gid.get_msb());
 
         if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
@@ -2534,80 +2536,80 @@ bool addressing_service::retrieve_statistics_counter(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
-boost::uint64_t addressing_service::get_cache_entries(bool reset)
+std::uint64_t addressing_service::get_cache_entries(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->size();
 }
 
-boost::uint64_t addressing_service::get_cache_hits(bool reset)
+std::uint64_t addressing_service::get_cache_hits(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().hits(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_misses(bool reset)
+std::uint64_t addressing_service::get_cache_misses(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().misses(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_evictions(bool reset)
+std::uint64_t addressing_service::get_cache_evictions(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().evictions(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insertions(bool reset)
+std::uint64_t addressing_service::get_cache_insertions(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().insertions(reset);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t addressing_service::get_cache_get_entry_count(bool reset)
+std::uint64_t addressing_service::get_cache_get_entry_count(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insertion_entry_count(bool reset)
+std::uint64_t addressing_service::get_cache_insertion_entry_count(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_update_entry_count(bool reset)
+std::uint64_t addressing_service::get_cache_update_entry_count(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_erase_entry_count(bool reset)
+std::uint64_t addressing_service::get_cache_erase_entry_count(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_count(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_get_entry_time(bool reset)
+std::uint64_t addressing_service::get_cache_get_entry_time(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_time(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_insertion_entry_time(bool reset)
+std::uint64_t addressing_service::get_cache_insertion_entry_time(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_time(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_update_entry_time(bool reset)
+std::uint64_t addressing_service::get_cache_update_entry_time(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_time(reset);
 }
 
-boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
+std::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 {
     std::lock_guard<mutex_type> lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_time(reset);
@@ -2620,40 +2622,40 @@ void addressing_service::register_counter_types()
     using util::placeholders::_2;
 
     // install
-    util::function_nonser<boost::int64_t(bool)> cache_entries(
+    util::function_nonser<std::int64_t(bool)> cache_entries(
         util::bind(&addressing_service::get_cache_entries, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_hits(
+    util::function_nonser<std::int64_t(bool)> cache_hits(
         util::bind(&addressing_service::get_cache_hits, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_misses(
+    util::function_nonser<std::int64_t(bool)> cache_misses(
         util::bind(&addressing_service::get_cache_misses, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_evictions(
+    util::function_nonser<std::int64_t(bool)> cache_evictions(
         util::bind(&addressing_service::get_cache_evictions, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_insertions(
+    util::function_nonser<std::int64_t(bool)> cache_insertions(
         util::bind(&addressing_service::get_cache_insertions, this, _1));
 
-    util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
+    util::function_nonser<std::int64_t(bool)> cache_get_entry_count(
         util::bind(
             &addressing_service::get_cache_get_entry_count, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_insertion_count(
+    util::function_nonser<std::int64_t(bool)> cache_insertion_count(
         util::bind(
             &addressing_service::get_cache_insertion_entry_count, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
+    util::function_nonser<std::int64_t(bool)> cache_update_entry_count(
         util::bind(
             &addressing_service::get_cache_update_entry_count, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
+    util::function_nonser<std::int64_t(bool)> cache_erase_entry_count(
         util::bind(
             &addressing_service::get_cache_erase_entry_count, this, _1));
 
-    util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
+    util::function_nonser<std::int64_t(bool)> cache_get_entry_time(
         util::bind(
             &addressing_service::get_cache_get_entry_time, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_insertion_time(
+    util::function_nonser<std::int64_t(bool)> cache_insertion_time(
         util::bind(
             &addressing_service::get_cache_insertion_entry_time, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
+    util::function_nonser<std::int64_t(bool)> cache_update_entry_time(
         util::bind(
             &addressing_service::get_cache_update_entry_time, this, _1));
-    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
+    util::function_nonser<std::int64_t(bool)> cache_erase_entry_time(
         util::bind(
             &addressing_service::get_cache_erase_entry_time, this, _1));
 
@@ -2779,7 +2781,7 @@ void addressing_service::register_counter_types()
     client_->register_counter_types();
 
     // register root server
-    boost::uint32_t locality_id =
+    std::uint32_t locality_id =
         naming::get_locality_id_from_gid(get_local_locality());
     client_->register_server_instance(locality_id);
 } // }}}

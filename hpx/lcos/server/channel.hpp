@@ -17,6 +17,7 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 

@@ -13,6 +13,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/throw_exception.hpp>
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -238,7 +239,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     void list_events(std::string const& scope);
 
     // get relevant thread label and index from counter description
-    boost::uint32_t get_counter_thread(counter_path_elements const&, std::string&);
+    std::uint32_t get_counter_thread(counter_path_elements const&, std::string&);
 
 }}}}
 

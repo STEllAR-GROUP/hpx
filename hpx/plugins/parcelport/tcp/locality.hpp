@@ -22,6 +22,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/io/ios_state.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace parcelset
@@ -32,10 +33,10 @@ namespace hpx { namespace parcelset
         {
         public:
             locality()
-              : port_(boost::uint16_t(-1))
+              : port_(std::uint16_t(-1))
             {}
 
-            locality(std::string const& addr, boost::uint16_t port)
+            locality(std::string const& addr, std::uint16_t port)
               : address_(addr), port_(port)
             {}
 
@@ -44,7 +45,7 @@ namespace hpx { namespace parcelset
                 return address_;
             }
 
-            boost::uint16_t port() const
+            std::uint16_t port() const
             {
                 return port_;
             }
@@ -56,7 +57,7 @@ namespace hpx { namespace parcelset
 
             explicit operator bool() const HPX_NOEXCEPT
             {
-                return port_ != boost::uint16_t(-1);
+                return port_ != std::uint16_t(-1);
             }
 
             void save(serialization::output_archive & ar) const
@@ -92,7 +93,7 @@ namespace hpx { namespace parcelset
             }
 
             std::string address_;
-            boost::uint16_t port_;
+            std::uint16_t port_;
         };
     }}
 }}

@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

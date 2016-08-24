@@ -18,6 +18,8 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
+#include <cstdint>
+#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -285,7 +287,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename zip_iterator<reducebykey_iter, keystate_iter_type>
               ::reference zip_ref;
             //
-            const uint64_t number_of_keys = std::distance(key_first, key_last);
+            const std::uint64_t number_of_keys = std::distance(key_first, key_last);
             //
             key_state.assign(number_of_keys, reduce_key_series_states());
             {
@@ -589,7 +591,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "iterators : Random_access for inputs and Output for outputs.");
 
-        const uint64_t number_of_keys = std::distance(key_first, key_last);
+        const std::uint64_t number_of_keys = std::distance(key_first, key_last);
 
         if (number_of_keys <= 1)
         { // we only have a single key/value so that is our output

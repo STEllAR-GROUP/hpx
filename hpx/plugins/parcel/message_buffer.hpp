@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
