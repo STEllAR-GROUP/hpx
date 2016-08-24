@@ -8,12 +8,11 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/cstdint.hpp>
 
 namespace hpx { namespace serialization { namespace detail
 {
@@ -24,7 +23,7 @@ namespace hpx { namespace serialization { namespace detail
         return inst.get();
     }
 
-    void id_registry::cache_id(boost::uint32_t id, ctor_t ctor)
+    void id_registry::cache_id(std::uint32_t id, ctor_t ctor)
     {
         if (id >= cache.size()) //-V104
         {
@@ -52,7 +51,7 @@ namespace hpx { namespace serialization { namespace detail
     }
 
     void id_registry::register_typename(
-        const std::string& type_name, boost::uint32_t id)
+        const std::string& type_name, std::uint32_t id)
     {
         HPX_ASSERT(id != invalid_id);
 
@@ -105,7 +104,7 @@ namespace hpx { namespace serialization { namespace detail
         }
     }
 
-    boost::uint32_t id_registry::try_get_id(const std::string& type_name) const
+    std::uint32_t id_registry::try_get_id(const std::string& type_name) const
     {
         typename_to_id_t::const_iterator it =
             typename_to_id.find(type_name);
@@ -136,9 +135,9 @@ namespace hpx { namespace serialization { namespace detail
         return factory.get();
     }
 
-    boost::uint32_t polymorphic_id_factory::get_id(const std::string& type_name)
+    std::uint32_t polymorphic_id_factory::get_id(const std::string& type_name)
     {
-        boost::uint32_t id = id_registry::instance().try_get_id(type_name);
+        std::uint32_t id = id_registry::instance().try_get_id(type_name);
 
         if (id == id_registry::invalid_id)
         {

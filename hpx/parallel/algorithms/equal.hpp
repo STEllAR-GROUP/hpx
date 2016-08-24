@@ -23,6 +23,7 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -144,87 +145,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the operator==().
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
-    ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
-    ///           If the length of the range [first1, last1) does not equal
-    ///           the length of the range [first2, last2), it returns false.
-    ///
-    template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2)
-    {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
-            > is_seq;
-
-        return detail::equal_binary().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, detail::equal_to());
-    }
-
-    /// Returns true if the range [first1, last1) is equal to the range
-    /// [first2, last2), and false otherwise.
-    ///
-    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
     ///         applications of the predicate \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -239,10 +159,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -293,13 +214,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           If the length of the range [first1, last1) does not equal
     ///           the length of the range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred = detail::equal_to>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, F && f)
+        InIter2 first2, InIter2 last2, Pred && op = Pred())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter1>::value),
@@ -316,7 +238,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::equal_binary().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, std::forward<F>(f));
+            first1, last1, first2, last2, std::forward<Pred>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -394,82 +316,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// starting at first2, and false otherwise.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
-    ///         operator==().
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
-    ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
-    ///
-    template <typename ExPolicy, typename InIter1, typename InIter2>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    equal(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2)
-    {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
-            > is_seq;
-
-        return detail::equal().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, detail::equal_to());
-    }
-
-    /// Returns true if the range [first1, last1) is equal to the range
-    /// starting at first2, and false otherwise.
-    ///
-    /// \note   Complexity: At most \a last1 - \a first1 applications of the
     ///         predicate \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -484,10 +330,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -534,13 +381,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a equal algorithm returns true if the elements in the
     ///           two ranges are equal, otherwise it returns false.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred = detail::equal_to>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2,
-        F && f)
+        Pred && op = Pred())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter1>::value),
@@ -557,7 +405,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::equal().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, std::forward<F>(f));
+            first1, last1, first2, std::forward<Pred>(op));
     }
 }}}
 

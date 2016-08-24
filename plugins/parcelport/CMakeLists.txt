@@ -7,8 +7,6 @@
 # We explicitly disable ibverbs and ipc for now as they don't work currently
 
 set(parcelport_plugins
-  #ibverbs
-  #ipc
   mpi
   tcp)
 

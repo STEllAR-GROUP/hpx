@@ -17,6 +17,7 @@
 #include <boost/shared_array.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx { namespace serialization

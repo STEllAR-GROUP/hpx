@@ -16,6 +16,7 @@
 #include "win_perf_counters.hpp"
 #include "hpx_counters.hpp"
 
+#include <cstdint>
 #include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,7 +56,7 @@ void install_windows_counters()
 }
 
 // Update the data to be exposed as the windows performance counter values.
-void update_windows_counters(boost::uint64_t value)
+void update_windows_counters(std::uint64_t value)
 {
     // Set raw counter data for queue length.
     ULONG status = PerfSetULongCounterValue

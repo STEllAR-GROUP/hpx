@@ -18,8 +18,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -123,11 +124,11 @@ namespace hpx { namespace performance_counters { namespace server
         if (base_values[0].scale_inverse_ && base_values[0].scaling_ != 1.0) //-V550
         {
             base_values[0].value_ =
-                static_cast<boost::int64_t>(value * base_values[0].scaling_);
+                static_cast<std::int64_t>(value * base_values[0].scaling_);
         }
         else {
             base_values[0].value_ =
-                static_cast<boost::int64_t>(value / base_values[0].scaling_);
+                static_cast<std::int64_t>(value / base_values[0].scaling_);
         }
         return base_values[0];
     }

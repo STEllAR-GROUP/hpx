@@ -7,6 +7,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -40,7 +41,7 @@ int hpx_main(
 
         id_type a_id = a.get_id();
         gid_type a_gid = get_stripped_gid(a_id.get_gid());
-        boost::uint64_t b_lva = b.get_lva();
+        std::uint64_t b_lva = b.get_lva();
 
         // Resolve a_gid.
         address addr = hpx::agas::resolve(a_id).get();
@@ -53,7 +54,7 @@ int hpx_main(
         // Change a's GID to point to b.
 
         // Rebind the GID.
-        boost::uint64_t a_lva = addr.address_;
+        std::uint64_t a_lva = addr.address_;
         addr.address_ = b_lva;
         HPX_TEST(get_agas_client().bind_local(a_gid, addr));
 

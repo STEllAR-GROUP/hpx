@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 
-
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/config/asio.hpp>
@@ -20,6 +19,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/generator_iterator.hpp>
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -298,7 +298,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         if (scope == "native" || scope == "all") list_native();
     }
 
-    boost::uint32_t get_counter_thread(counter_path_elements const& cpe,
+    std::uint32_t get_counter_thread(counter_path_elements const& cpe,
                                        std::string& label)
     {
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();

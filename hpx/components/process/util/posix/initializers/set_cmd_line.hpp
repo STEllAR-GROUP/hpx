@@ -20,6 +20,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

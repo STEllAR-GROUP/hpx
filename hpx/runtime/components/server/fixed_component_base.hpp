@@ -20,8 +20,8 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <type_traits>
 
@@ -56,7 +56,7 @@ public:
     typedef fixed_component<this_component_type> wrapping_type;
 
     /// \brief Construct an empty fixed_component
-    fixed_component_base(boost::uint64_t msb, boost::uint64_t lsb)
+    fixed_component_base(std::uint64_t msb, std::uint64_t lsb)
       : msb_(msb)
       , lsb_(lsb)
     {}
@@ -159,7 +159,7 @@ public:
     }
 #endif
 
-    void set_locality_id(boost::uint32_t locality_id, error_code& ec = throws)
+    void set_locality_id(std::uint32_t locality_id, error_code& ec = throws)
     {
         if (gid_) {
             HPX_THROWS_IF(ec, invalid_status,
@@ -183,7 +183,7 @@ public:
     // Pinning functionality
     void pin() {}
     void unpin() {}
-    boost::uint32_t pin_count() const { return 0; }
+    std::uint32_t pin_count() const { return 0; }
 
     void mark_as_migrated()
     {
@@ -195,8 +195,8 @@ public:
 
 private:
     mutable naming::gid_type gid_;
-    boost::uint64_t msb_;
-    boost::uint64_t lsb_;
+    std::uint64_t msb_;
+    std::uint64_t lsb_;
 };
 
 namespace detail

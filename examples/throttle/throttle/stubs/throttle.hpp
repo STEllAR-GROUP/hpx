@@ -12,6 +12,8 @@
 
 #include "../server/throttle.hpp"
 
+#include <cstddef>
+
 namespace throttle { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////

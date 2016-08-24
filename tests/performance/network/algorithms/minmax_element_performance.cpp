@@ -14,6 +14,8 @@
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -47,7 +49,7 @@ struct random_fill
 double run_min_element_benchmark(int test_count,
     hpx::partitioned_vector<int> const& v)
 {
-    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::util::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -65,7 +67,7 @@ double run_min_element_benchmark(int test_count,
 double run_max_element_benchmark(int test_count,
     hpx::partitioned_vector<int> const& v)
 {
-    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::util::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
@@ -83,7 +85,7 @@ double run_max_element_benchmark(int test_count,
 double run_minmax_element_benchmark(int test_count,
     hpx::partitioned_vector<int> const& v)
 {
-    boost::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = hpx::util::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {

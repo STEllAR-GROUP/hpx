@@ -14,8 +14,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <mutex>
 
 namespace hpx { namespace performance_counters { namespace parcels
@@ -45,29 +44,29 @@ namespace hpx { namespace performance_counters { namespace parcels
 
             void add_data(data_point const& x);
 
-            boost::int64_t num_parcels(bool reset);
-            boost::int64_t num_messages(bool reset);
-            boost::int64_t total_bytes(bool reset);
-            boost::int64_t total_raw_bytes(bool reset);
-            boost::int64_t total_time(bool reset);
-            boost::int64_t total_serialization_time(bool reset);
+            std::int64_t num_parcels(bool reset);
+            std::int64_t num_messages(bool reset);
+            std::int64_t total_bytes(bool reset);
+            std::int64_t total_raw_bytes(bool reset);
+            std::int64_t total_time(bool reset);
+            std::int64_t total_serialization_time(bool reset);
 #if defined(HPX_HAVE_SECURITY)
-            boost::int64_t total_security_time(bool reset);
+            std::int64_t total_security_time(bool reset);
 #endif
-            boost::int64_t total_buffer_allocate_time(bool reset);
+            std::int64_t total_buffer_allocate_time(bool reset);
 
         private:
-            boost::int64_t overall_bytes_;
-            boost::int64_t overall_time_;
-            boost::int64_t serialization_time_;
+            std::int64_t overall_bytes_;
+            std::int64_t overall_time_;
+            std::int64_t serialization_time_;
 #if defined(HPX_HAVE_SECURITY)
-            boost::int64_t security_time_;
+            std::int64_t security_time_;
 #endif
-            boost::int64_t num_parcels_;
-            boost::int64_t num_messages_;
-            boost::int64_t overall_raw_bytes_;
+            std::int64_t num_parcels_;
+            std::int64_t num_messages_;
+            std::int64_t overall_raw_bytes_;
 
-            boost::int64_t buffer_allocate_time_;
+            std::int64_t buffer_allocate_time_;
 
             // Create mutex for accumulator functions.
             mutable mutex_type acc_mtx;
@@ -91,28 +90,28 @@ namespace hpx { namespace performance_counters { namespace parcels
         }
 
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::num_parcels(bool reset)
+        inline std::int64_t gatherer<Mutex>::num_parcels(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(num_parcels_, reset);
         }
 
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::num_messages(bool reset)
+        inline std::int64_t gatherer<Mutex>::num_messages(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(num_messages_, reset);
         }
 
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::total_time(bool reset)
+        inline std::int64_t gatherer<Mutex>::total_time(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(overall_time_, reset);
         }
 
         template <typename Mutex>
-        inline boost::int64_t
+        inline std::int64_t
         gatherer<Mutex>::total_serialization_time(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
@@ -121,7 +120,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 
 #if defined(HPX_HAVE_SECURITY)
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::total_security_time(bool reset)
+        inline std::int64_t gatherer<Mutex>::total_security_time(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(security_time_, reset);
@@ -129,21 +128,21 @@ namespace hpx { namespace performance_counters { namespace parcels
 #endif
 
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::total_bytes(bool reset)
+        inline std::int64_t gatherer<Mutex>::total_bytes(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(overall_bytes_, reset);
         }
 
         template <typename Mutex>
-        inline boost::int64_t gatherer<Mutex>::total_raw_bytes(bool reset)
+        inline std::int64_t gatherer<Mutex>::total_raw_bytes(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(overall_raw_bytes_, reset);
         }
 
         template <typename Mutex>
-        inline boost::int64_t
+        inline std::int64_t
         gatherer<Mutex>::total_buffer_allocate_time(bool reset)
         {
             std::lock_guard<mutex_type> l(acc_mtx);

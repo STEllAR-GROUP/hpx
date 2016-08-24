@@ -14,6 +14,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,7 +247,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     naming::gid_type locality_raw_counter_creator(counter_info const& info,
-        hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
+        hpx::util::function_nonser<std::int64_t(bool)> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #endif
 
 #include <hpx/exception.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/version.hpp>
@@ -24,6 +25,7 @@
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -34,22 +36,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    boost::uint8_t major_version()
+    std::uint8_t major_version()
     {
         return HPX_VERSION_MAJOR;
     }
 
-    boost::uint8_t minor_version()
+    std::uint8_t minor_version()
     {
         return HPX_VERSION_MINOR;
     }
 
-    boost::uint8_t subminor_version()
+    std::uint8_t subminor_version()
     {
         return HPX_VERSION_SUBMINOR;
     }
 
-    boost::uint32_t full_version()
+    std::uint32_t full_version()
     {
         return HPX_VERSION_FULL;
     }
@@ -62,7 +64,7 @@ namespace hpx
             HPX_VERSION_SUBMINOR);
     }
 
-    boost::uint8_t agas_version()
+    std::uint8_t agas_version()
     {
         return HPX_AGAS_VERSION;
     }
@@ -246,11 +248,20 @@ namespace hpx
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
 #endif
 
-        strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+        if (get_runtime_ptr() == nullptr)
+        {
+            strm << "  HPX_PREFIX (configured)=unknown\n";
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
-        strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
+            strm << "  HPX_PREFIX=unknown\n";
 #endif
-
+        }
+        else
+        {
+            strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
+            strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
+#endif
+        }
         return strm.str();
     }
 

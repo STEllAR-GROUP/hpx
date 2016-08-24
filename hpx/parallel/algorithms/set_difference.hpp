@@ -25,8 +25,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/shared_array.hpp>
-
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -138,10 +136,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a set_difference requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a set_difference requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -190,13 +189,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+        typename OutIter, typename Pred = detail::less>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, OutIter dest, F && f)
+        InIter2 first2, InIter2 last2, OutIter dest, Pred && op = Pred())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter1>::value),
@@ -218,101 +217,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::set_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, dest, std::forward<F>(f));
-    }
-
-    /// Constructs a sorted range beginning at dest consisting of all elements
-    /// present in the range [first1, last1) and not present in the range
-    /// [first2, last2). This algorithm expects both input ranges to be sorted
-    /// with operator<
-    ///
-    /// \note   Complexity: At most 2*(N1 + N2 - 1) comparisons, where \a N1 is
-    ///         the length of the first sequence and \a N2 is the length of the
-    ///         second sequence.
-    ///
-    /// Equivalent elements are treated individually, that is, if some element
-    /// is found \a m times in [first1, last1) and \a n times in
-    /// [first2, last2), it will be copied to \a dest exactly std::max(m-n, 0)
-    /// times. The resulting range cannot overlap with either of the input
-    /// ranges.
-    ///
-    /// The resulting range cannot overlap with either of the input ranges.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with a sequential execution policy object execute in sequential
-    /// order in the calling thread (\a sequential_execution_policy) or in a
-    /// single new thread spawned from the current thread
-    /// (for \a sequential_task_execution_policy).
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a set_difference algorithm returns a \a hpx::future<OutIter>
-    ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a set_difference algorithm returns the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename OutIter>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    set_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, OutIter dest)
-    {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
-            "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<InIter1>::value ||
-               !hpx::traits::is_random_access_iterator<InIter2>::value ||
-               !hpx::traits::is_random_access_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::set_difference<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, dest,
-            std::less<typename std::iterator_traits<InIter1>::value_type>());
+            first1, last1, first2, last2, dest, std::forward<Pred>(op));
     }
 }}}
 

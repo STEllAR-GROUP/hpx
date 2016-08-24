@@ -10,8 +10,8 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 
-
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -54,14 +54,14 @@ using hpx::find_here;
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int64_t old_credit
+  , std::int64_t old_credit
     );
 
 HPX_PLAIN_ACTION(split);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
-inline boost::int64_t get_credit(id_type const& id)
+inline std::int64_t get_credit(id_type const& id)
 {
     return get_credit_from_gid(id.get_gid());
 }
@@ -70,7 +70,7 @@ inline boost::int64_t get_credit(id_type const& id)
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int64_t old_credit
+  , std::int64_t old_credit
     )
 {
     cout << "[" << find_here() << "/" << target << "]: "
@@ -104,7 +104,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
+    std::uint64_t const delay = vm["delay"].as<std::uint64_t>();
 
     typedef typename Client::server_type server_type;
 
@@ -177,7 +177,7 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of milliseconds to wait for object destruction")
         ;
 

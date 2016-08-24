@@ -14,13 +14,13 @@
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <string>
 
@@ -280,7 +280,7 @@ namespace hpx
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
         // [locality] tag.
-        typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
+        typedef boost::error_info<detail::tag_throw_locality, std::uint32_t>
             throw_locality;
 
         // Stores the information about the hostname of the locality the exception
@@ -292,7 +292,7 @@ namespace hpx
         // Stores the information about the pid of the OS process the exception
         // has been raised on. This information will show up in error messages
         // under the [pid] tag.
-        typedef boost::error_info<detail::tag_throw_pid, boost::int64_t>
+        typedef boost::error_info<detail::tag_throw_pid, std::int64_t>
             throw_pid;
 
         // Stores the information about the shepherd thread the exception has been
@@ -364,8 +364,8 @@ namespace hpx
         HPX_EXPORT boost::exception_ptr
             construct_exception(Exception const& e,
                 std::string const& func, std::string const& file, long line,
-                std::string const& back_trace = "", boost::uint32_t node = 0,
-                std::string const& hostname = "", boost::int64_t pid = -1,
+                std::string const& back_trace = "", std::uint32_t node = 0,
+                std::string const& hostname = "", std::int64_t pid = -1,
                 std::size_t shepherd = ~0, std::size_t thread_id = 0,
                 std::string const& thread_name = "",
                 std::string const& env = "", std::string const& config = "",
@@ -522,14 +522,14 @@ namespace hpx
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_EXPORT boost::uint32_t get_error_locality_id(hpx::exception const& e);
+    HPX_EXPORT std::uint32_t get_error_locality_id(hpx::exception const& e);
 
     /// \copydoc get_error_locality_id(hpx::exception const& e)
-    HPX_EXPORT boost::uint32_t get_error_locality_id(hpx::error_code const& e);
+    HPX_EXPORT std::uint32_t get_error_locality_id(hpx::error_code const& e);
 
     /// \cond NOINTERNAL
-    HPX_EXPORT boost::uint32_t get_error_locality_id(boost::exception const& e);
-    HPX_EXPORT boost::uint32_t get_error_locality_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::uint32_t get_error_locality_id(boost::exception const& e);
+    HPX_EXPORT std::uint32_t get_error_locality_id(boost::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the locality id where the exception was thrown.
@@ -637,14 +637,14 @@ namespace hpx
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_EXPORT boost::int64_t get_error_process_id(hpx::exception const& e);
+    HPX_EXPORT std::int64_t get_error_process_id(hpx::exception const& e);
 
     /// \copydoc get_error_process_id(hpx::exception const& e)
-    HPX_EXPORT boost::int64_t get_error_process_id(hpx::error_code const& e);
+    HPX_EXPORT std::int64_t get_error_process_id(hpx::error_code const& e);
 
     /// \cond NOINTERNAL
-    HPX_EXPORT boost::int64_t get_error_process_id(boost::exception const& e);
-    HPX_EXPORT boost::int64_t get_error_process_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::int64_t get_error_process_id(boost::exception const& e);
+    HPX_EXPORT std::int64_t get_error_process_id(boost::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the environment of the OS-process at the point the

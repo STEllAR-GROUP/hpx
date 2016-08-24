@@ -22,6 +22,7 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -117,6 +118,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a is_sorted requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
+    ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -154,12 +161,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           If the range [first, last) contains less than two elements,
     ///           the function always returns true.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred>
+    template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    is_sorted(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
+    is_sorted(ExPolicy && policy, FwdIter first, FwdIter last,
+        Pred && pred = Pred())
     {
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -170,65 +178,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::is_sorted<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<Pred>(pred));
-    }
-
-    /// Determines if the range [first, last) is sorted. Uses operator
-    /// < to compare elements.
-    /// elements.
-    ///
-    /// \note   Complexity: at most (N+S-1) comparisons where
-    ///         \a N = distance(first, last).
-    ///         \a S = number of partitions
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of that the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     that the algorithm will be applied to.
-    ///
-    /// The comparison operations in the parallel \a is_sorted algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// executes in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a is_sorted algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a is_sorted algorithm returns a \a hpx::future<bool>
-    ///           if the execution policy is of type \a task_execution_policy
-    ///           and returns \a bool otherwise.
-    ///           The \a is_sorted algorithm returns a bool if each element in
-    ///           the sequence [first, last) is greater than or equal to the
-    ///           previous element. If the range [first, last) contains less
-    ///           than two elements, the function always returns true.
-    ///
-    template <typename ExPolicy, typename FwdIter>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    is_sorted(ExPolicy && policy, FwdIter first, FwdIter last)
-    {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
-        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-
-        return detail::is_sorted<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::less<value_type>());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -329,6 +278,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a is_sorted_until requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
+    ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -366,12 +321,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred>
+    template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
-    is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
+    is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last,
+        Pred && pred = Pred())
     {
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -382,63 +338,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         return detail::is_sorted_until<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<Pred>(pred));
-    }
-
-    /// Returns the first element in the range [first, last) that is not sorted.
-    ///
-    /// \note   Complexity: at most (N+S-1) comparisons where
-    ///         \a N = distance(first, last).
-    ///         \a S = number of partitions
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of that the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     that the algorithm will be applied to.
-    ///
-    /// The comparison operations in the parallel \a is_sorted_until algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy executes in sequential order in the
-    /// calling thread.
-    ///
-    /// The comparison operations in the parallel \a is_sorted_until algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
-    /// permitted to execute in an unordered fashion in unspecified threads,
-    /// and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a is_sorted_until algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a task_execution_policy
-    ///           and returns \a FwdIter otherwise.
-    ///           The \a is_sorted_until algorithm returns the first unsorted
-    ///           element. If the sequence has less than two elements or the
-    ///           sequence is sorted, last is returned.
-    ///
-    template <typename ExPolicy, typename FwdIter>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    >::type
-    is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last)
-    {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
-        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-
-        return detail::is_sorted_until<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::less<value_type>());
     }
 }}}
 

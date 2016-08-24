@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <numeric>
 #include <string>

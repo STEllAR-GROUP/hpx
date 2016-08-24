@@ -14,6 +14,7 @@
 #include <boost/range/functions.hpp>
 #include <boost/range/iterator_range.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>

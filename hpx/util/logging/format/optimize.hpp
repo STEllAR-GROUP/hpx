@@ -24,13 +24,14 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 
+#include <cstddef>
+#include <cstring>
+#include <cwchar>
 #include <map>
 #include <memory>
 #include <vector>
 #include <utility>
 
-#include <cstring>
-#include <cwchar>
 
 namespace hpx { namespace util { namespace logging {
 

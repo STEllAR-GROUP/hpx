@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -19,7 +20,7 @@ namespace hpx { namespace performance_counters { namespace memory
 {
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
-    boost::uint64_t read_psm_virtual(bool)
+    std::uint64_t read_psm_virtual(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
@@ -42,14 +43,14 @@ namespace hpx { namespace performance_counters { namespace memory
                     "hpx::performance_counters::memory::read_psm_virtual",
                     boost::str(boost::format("format message failed with %x (while "
                         "retrieving message for %x)") % GetLastError() % hr));
-                return boost::uint64_t(-1);
+                return std::uint64_t(-1);
             }
 
             std::string msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::performance_counters::memory::read_psm_virtual", msg);
-            return boost::uint64_t(-1);
+            return std::uint64_t(-1);
         }
 
         return pmc.WorkingSetSize;
@@ -57,7 +58,7 @@ namespace hpx { namespace performance_counters { namespace memory
 
     ///////////////////////////////////////////////////////////////////////////
     // returns resident memory value
-    boost::uint64_t read_psm_resident(bool)
+    std::uint64_t read_psm_resident(bool)
     {
         PROCESS_MEMORY_COUNTERS_EX pmc;
         std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
@@ -80,14 +81,14 @@ namespace hpx { namespace performance_counters { namespace memory
                     "hpx::performance_counters::memory::read_psm_resident",
                     boost::str(boost::format("format message failed with %x (while "
                         "retrieving message for %x)") % GetLastError() % hr));
-                return boost::uint64_t(-1);
+                return std::uint64_t(-1);
             }
 
             std::string msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::performance_counters::memory::read_psm_resident", msg);
-            return boost::uint64_t(-1);
+            return std::uint64_t(-1);
         }
 
         return pmc.PrivateUsage;

@@ -19,6 +19,7 @@
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
+#include <cstdint>
 #include <map>
 #include <sstream>
 #include <utility>
@@ -175,7 +176,7 @@ namespace hpx { namespace components { namespace security
         }
 
         signed_type<certificate> const&
-        at_locality(boost::uint32_t locality_id, error_code& ec = throws) const
+        at_locality(std::uint32_t locality_id, error_code& ec = throws) const
         {
             naming::gid_type subject(
                 hpx::naming::replace_locality_id(

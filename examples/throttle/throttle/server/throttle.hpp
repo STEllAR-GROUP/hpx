@@ -14,6 +14,8 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
+
 namespace throttle { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////

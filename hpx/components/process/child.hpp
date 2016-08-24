@@ -14,8 +14,6 @@
 
 #include <hpx/components/process/server/child.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <utility>
 
 namespace hpx { namespace components { namespace process

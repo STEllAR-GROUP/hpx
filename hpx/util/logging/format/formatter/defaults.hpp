@@ -28,7 +28,7 @@
 #include <hpx/util/logging/format/formatter/time_strf.hpp>
 #include <hpx/util/logging/format/formatter/spacer.hpp>
 #include <hpx/util/logging/format/formatter/thread_id.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <stdio.h>
 #include <time.h>
 #include <sstream>
@@ -61,15 +61,15 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
 template<class convert = do_convert_format::prepend>
-struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>,
+struct idx_t : is_generic, formatter::non_const_context<std::uint64_t>,
     hpx::util::logging::op_equal::always_equal  {
-    typedef formatter::non_const_context<boost::uint64_t> non_const_context_base;
+    typedef formatter::non_const_context<std::uint64_t> non_const_context_base;
     typedef convert convert_type;
 
     idx_t() : non_const_context_base(0ull) {}
     template<class msg_type> void operator()(msg_type & str) const {
         std::basic_ostringstream<char_type> idx;
-        idx << std::hex << std::setw(sizeof(boost::uint64_t)*2)
+        idx << std::hex << std::setw(sizeof(std::uint64_t)*2)
             << std::setfill('0') << ++context();
 
         convert::write( idx.str(), str );

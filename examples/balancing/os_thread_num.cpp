@@ -10,6 +10,9 @@
 #include <hpx/util/bind.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <map>
 
 using boost::lockfree::queue;
@@ -35,13 +38,13 @@ using hpx::flush;
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
-boost::uint64_t num_iterations = 0;
+std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 double delay()
 {
     double d = 0.;
-    for (boost::uint64_t i = 0; i < num_iterations; ++i)
+    for (std::uint64_t i = 0; i < num_iterations; ++i)
         d += 1 / (2. * i + 1);
     return d;
 }
@@ -66,7 +69,7 @@ typedef std::multimap<std::size_t, std::size_t, std::greater<std::size_t> >
 int hpx_main(variables_map& vm)
 {
     {
-        num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
+        num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
         const bool csv = vm.count("csv");
 
@@ -83,8 +86,8 @@ int hpx_main(variables_map& vm)
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
                 register_work(hpx::util::bind(&get_os_thread_num
-                                        , boost::ref(barr)
-                                        , boost::ref(os_threads))
+                                        , std::ref(barr)
+                                        , std::ref(os_threads))
                   , "get_os_thread_num"
                   , pending
                   , thread_priority_normal
@@ -139,7 +142,7 @@ int main(int argc, char* argv[])
         , "number of PX-threads to invoke")
 
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(65536)
+        , value<std::uint64_t>()->default_value(65536)
         , "number of iterations in the delay loop")
 
         ( "csv"

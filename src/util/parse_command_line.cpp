@@ -9,6 +9,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cctype>
+#include <cstddef>
 #include <fstream>
 #include <stdexcept>
 #include <string>

@@ -21,10 +21,10 @@
 //
 
 #include <hpx/util/bind.hpp>
-#include <boost/ref.hpp>
 
 namespace placeholders = hpx::util::placeholders;
 
+#include <functional>
 #include <iostream>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -194,7 +194,7 @@ struct Y
 
 void function_object_test()
 {
-    using boost::ref;
+    using std::ref;
 
     short i(6);
 
@@ -217,7 +217,7 @@ void function_object_test()
 
 void function_object_test2()
 {
-    using boost::ref;
+    using std::ref;
 
     short i(6);
 
@@ -346,7 +346,7 @@ struct V
 
 void member_function_test()
 {
-    using boost::ref;
+    using std::ref;
 
     X x;
 
@@ -436,7 +436,7 @@ void member_function_test()
 
 void member_function_void_test()
 {
-    using boost::ref;
+    using std::ref;
 
     V v;
 

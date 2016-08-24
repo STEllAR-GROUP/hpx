@@ -11,8 +11,7 @@
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <utility>
@@ -21,12 +20,12 @@ namespace hpx { namespace iostreams { namespace detail
 {
     struct order_output
     {
-        typedef std::map<boost::uint64_t, buffer> output_data_type;
-        typedef std::pair<boost::uint64_t, output_data_type> data_type;
-        typedef std::map<boost::uint32_t, data_type> output_data_map_type;
+        typedef std::map<std::uint64_t, buffer> output_data_type;
+        typedef std::pair<std::uint64_t, output_data_type> data_type;
+        typedef std::map<std::uint32_t, data_type> output_data_map_type;
 
         template <typename F, typename Mutex>
-        void output(boost::uint32_t locality_id, boost::uint64_t count,
+        void output(std::uint32_t locality_id, std::uint64_t count,
             detail::buffer in, F const& write_f, Mutex& mtx)
         {
             std::unique_lock<Mutex> l(mtx);

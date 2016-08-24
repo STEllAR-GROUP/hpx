@@ -9,7 +9,6 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/address_v4.hpp>
@@ -18,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <cstdint>
 #include <ctime>
 #include <sstream>
 #include <string>
@@ -38,7 +38,7 @@ boost::asio::detail::winsock_init<>::manual manual_winsock_init;
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool get_endpoint(std::string const& addr, boost::uint16_t port,
+    bool get_endpoint(std::string const& addr, std::uint16_t port,
         boost::asio::ip::tcp::endpoint& ep)
     {
         using namespace boost::asio::ip;
@@ -66,7 +66,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     boost::asio::ip::tcp::endpoint
-    resolve_hostname(std::string const& hostname, boost::uint16_t port,
+    resolve_hostname(std::string const& hostname, std::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;
@@ -143,17 +143,17 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     bool split_ip_address(std::string const& v, std::string& host,
-        boost::uint16_t& port)
+        std::uint16_t& port)
     {
         std::string::size_type p = v.find_first_of(":");
 
         std::string tmp_host;
-        boost::uint16_t tmp_port = 0;
+        std::uint16_t tmp_port = 0;
 
         try {
             if (p != std::string::npos) {
                 tmp_host = v.substr(0, p);
-                tmp_port = boost::lexical_cast<boost::uint16_t>(v.substr(p+1));
+                tmp_port = boost::lexical_cast<std::uint16_t>(v.substr(p+1));
             }
             else {
                 tmp_host = v;
@@ -216,7 +216,7 @@ namespace hpx { namespace util
     }
 
     endpoint_iterator_type connect_begin(std::string const & address,
-        boost::uint16_t port,
+        std::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;
@@ -267,7 +267,7 @@ namespace hpx { namespace util
     }
 
     endpoint_iterator_type accept_begin(std::string const & address,
-        boost::uint16_t port,
+        std::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;

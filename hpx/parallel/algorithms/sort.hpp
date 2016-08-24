@@ -17,6 +17,7 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -30,6 +31,8 @@
 #include <boost/exception_ptr.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -385,11 +388,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,
-        typename Compare = std::less<
-            typename std::remove_reference<
-                typename traits::projected_result_of<Proj, RandomIt>::type
-            >::type
-        >,
+        typename Compare = detail::less,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<RandomIt>::value &&

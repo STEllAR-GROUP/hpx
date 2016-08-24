@@ -16,6 +16,8 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {

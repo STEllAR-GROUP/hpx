@@ -15,6 +15,8 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -29,7 +31,7 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     counter_status install_counter_type(std::string const& name,
         counter_type type, std::string const& helptext,
-        std::string const& uom, boost::uint32_t version, error_code& ec)
+        std::string const& uom, std::uint32_t version, error_code& ec)
     {
         counter_info info(type, name, helptext,
             version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
@@ -52,7 +54,7 @@ namespace hpx { namespace performance_counters
         counter_type type, std::string const& helptext,
         create_counter_func const& create_counter,
         discover_counters_func const& discover_counters,
-        boost::uint32_t version, std::string const& uom, error_code& ec)
+        std::uint32_t version, std::string const& uom, error_code& ec)
     {
         counter_info info(type, name, helptext,
             version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
@@ -72,7 +74,7 @@ namespace hpx { namespace performance_counters
     // provide the data in a way, which will uninstall it automatically during
     // shutdown.
     counter_status install_counter_type(std::string const& name,
-        hpx::util::function_nonser<boost::int64_t(bool)> const& counter_value,
+        hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
         using hpx::util::placeholders::_1;

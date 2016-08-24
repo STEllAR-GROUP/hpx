@@ -22,6 +22,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <iterator>
 #include <mutex>
@@ -80,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             unlimited_channel()
-              : closed_(false)
+              : get_generation_(0), set_generation_(0), closed_(false)
             {}
 
         protected:
@@ -121,6 +122,7 @@ namespace hpx { namespace lcos { namespace local
                     hpx::future<T> f;
                     if (!buffer_.try_receive(generation, &f))
                     {
+                        l.unlock();
                         return hpx::make_exceptional_future<T>(
                             HPX_GET_EXCEPTION(hpx::invalid_status,
                                 "hpx::lcos::local::channel::get",
@@ -152,12 +154,14 @@ namespace hpx { namespace lcos { namespace local
 
             void set(std::size_t generation, T && t)
             {
-                std::lock_guard<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
                 if(closed_)
                 {
+                    l.unlock();
                     HPX_THROW_EXCEPTION(hpx::invalid_status,
                         "hpx::lcos::local::channel::set",
                         "attempting to write to a closed channel");
+                    return;
                 }
 
                 ++set_generation_;
@@ -172,9 +176,11 @@ namespace hpx { namespace lcos { namespace local
                 std::unique_lock<mutex_type> l(mtx_);
                 if(closed_)
                 {
+                    l.unlock();
                     HPX_THROW_EXCEPTION(hpx::invalid_status,
                         "hpx::lcos::local::channel::close",
                         "attempting to close an already closed channel");
+                    return;
                 }
 
                 closed_ = true;

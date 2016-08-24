@@ -13,6 +13,8 @@
 #include <boost/lockfree/policies.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <cstddef>
+
 namespace boost { namespace lockfree
 {
     ///////////////////////////////////////////////////////////////////////////

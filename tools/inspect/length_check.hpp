@@ -10,6 +10,7 @@
 #define BOOST_EIGHTY_CHECK_HPP
 
 #include "inspector.hpp"
+#include <cstddef>
 
 namespace boost
 {

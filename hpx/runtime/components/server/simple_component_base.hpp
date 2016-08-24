@@ -21,6 +21,8 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <sstream>
 #include <type_traits>
@@ -112,7 +114,7 @@ namespace hpx { namespace components
         {
             return naming::address(get_locality(),
                 components::get_component_type<wrapped_type>(),
-                boost::uint64_t(static_cast<this_component_type const*>(this)));
+                std::uint64_t(static_cast<this_component_type const*>(this)));
         }
 
     protected:
@@ -236,7 +238,7 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin() {}
         void unpin() {}
-        boost::uint32_t pin_count() const { return 0; }
+        std::uint32_t pin_count() const { return 0; }
 
         void mark_as_migrated()
         {

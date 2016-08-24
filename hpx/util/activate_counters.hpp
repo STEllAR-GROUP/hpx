@@ -10,10 +10,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
-
-#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

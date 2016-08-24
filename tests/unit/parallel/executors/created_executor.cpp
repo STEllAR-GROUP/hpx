@@ -11,6 +11,7 @@
 #include <hpx/util/deferred_call.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iostream>
 #include <iterator>

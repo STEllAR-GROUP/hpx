@@ -8,6 +8,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
+#include <functional>
 
 int global;
 
@@ -16,19 +17,19 @@ int& foo(){ return global; }
 void test_make_ready_future()
 {
     hpx::future<int&> f =
-        hpx::make_ready_future(boost::ref(global));
+        hpx::make_ready_future(std::ref(global));
     HPX_TEST(&f.get() == &global);
 
     hpx::future<int&> f_at =
         hpx::make_ready_future_at(
             std::chrono::system_clock::now() + std::chrono::seconds(1)
-          , boost::ref(global));
+          , std::ref(global));
     HPX_TEST(&f_at.get() == &global);
 
     hpx::future<int&> f_after =
         hpx::make_ready_future_after(
             std::chrono::seconds(1)
-          , boost::ref(global));
+          , std::ref(global));
     HPX_TEST(&f_after.get() == &global);
 }
 

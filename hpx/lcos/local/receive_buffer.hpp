@@ -16,6 +16,7 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <mutex>

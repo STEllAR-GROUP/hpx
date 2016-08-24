@@ -17,6 +17,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -105,7 +106,7 @@ namespace hpx { namespace agas { namespace detail
         void register_counter_types();
 
         void register_server_instance(
-            boost::uint32_t locality_id);
+            std::uint32_t locality_id);
 
         bool unregister_server(
             request const& req

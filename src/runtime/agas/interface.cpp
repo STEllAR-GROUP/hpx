@@ -14,6 +14,8 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -172,7 +174,7 @@ naming::id_type resolve_name(
 //     return agas_.get_localities(type, ec);
 // }
 
-lcos::future<boost::uint32_t> get_num_localities(
+lcos::future<std::uint32_t> get_num_localities(
     components::component_type type
     )
 {
@@ -180,7 +182,7 @@ lcos::future<boost::uint32_t> get_num_localities(
     return agas_.get_num_localities_async();
 }
 
-boost::uint32_t get_num_localities(
+std::uint32_t get_num_localities(
     launch::sync_policy
   , components::component_type type
   , error_code& ec
@@ -190,13 +192,13 @@ boost::uint32_t get_num_localities(
     return agas_.get_num_localities(type, ec);
 }
 
-lcos::future<std::vector<boost::uint32_t> > get_num_threads()
+lcos::future<std::vector<std::uint32_t> > get_num_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
 }
 
-std::vector<boost::uint32_t> get_num_threads(
+std::vector<std::uint32_t> get_num_threads(
     launch::sync_policy
   , error_code& ec
     )
@@ -205,13 +207,13 @@ std::vector<boost::uint32_t> get_num_threads(
     return agas_.get_num_threads(ec);
 }
 
-lcos::future<boost::uint32_t> get_num_overall_threads()
+lcos::future<std::uint32_t> get_num_overall_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
 }
 
-boost::uint32_t get_num_overall_threads(
+std::uint32_t get_num_overall_threads(
     launch::sync_policy
   , error_code& ec
     )
@@ -308,7 +310,7 @@ naming::address resolve(
 hpx::future<bool> bind(
     naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -319,7 +321,7 @@ bool bind(
     launch::sync_policy
   , naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
   , error_code& ec
     )
 {
@@ -351,7 +353,7 @@ bool bind(
 
 hpx::future<naming::address> unbind(
     naming::gid_type const& id
-  , boost::uint64_t count
+  , std::uint64_t count
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -361,7 +363,7 @@ hpx::future<naming::address> unbind(
 naming::address unbind(
     launch::sync_policy
   , naming::gid_type const& id
-  , boost::uint64_t count
+  , std::uint64_t count
   , error_code& ec
     )
 {
@@ -430,7 +432,7 @@ naming::id_type get_console_locality(
     return naming::id_type(console, naming::id_type::unmanaged);
 }
 
-boost::uint32_t get_locality_id(error_code& ec)
+std::uint32_t get_locality_id(error_code& ec)
 {
     if (get_runtime_ptr() == nullptr)
         return naming::invalid_locality_id;
@@ -463,7 +465,7 @@ naming::gid_type get_next_id(
 ///////////////////////////////////////////////////////////////////////////////
 void decref(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , error_code& ec
   )
 {
@@ -472,9 +474,9 @@ void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::int64_t> incref(
+hpx::future<std::int64_t> incref(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , naming::id_type const& keep_alive_
   )
 {
@@ -489,10 +491,10 @@ hpx::future<boost::int64_t> incref(
     return resolver.incref_async(gid, credits, keep_alive);
 }
 
-boost::int64_t incref(
+std::int64_t incref(
     launch::sync_policy
   , naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , naming::id_type const& keep_alive_
   , error_code& ec
   )

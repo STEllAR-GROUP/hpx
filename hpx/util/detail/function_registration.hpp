@@ -12,7 +12,7 @@
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/get_table.hpp>
+#include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <string>
 #include <type_traits>
@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT function_registration_info_base
     {
-        virtual void const* get_table_ptr() const = 0;
+        virtual void const* get_vtable() const = 0;
 
         virtual ~function_registration_info_base() {}
     };
@@ -58,9 +58,9 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename T>
     struct function_registration_info : function_registration_info_base
     {
-        virtual void const* get_table_ptr() const
+        virtual void const* get_vtable() const
         {
-            return detail::get_table<VTable, T>();
+            return detail::get_vtable<VTable, T>();
         }
     };
 
@@ -89,7 +89,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTable>
-    VTable const* get_table_ptr(std::string const& name)
+    VTable const* get_vtable(std::string const& name)
     {
         detail::function_registration_info_base *
             p(
@@ -97,7 +97,7 @@ namespace hpx { namespace util { namespace detail
                     create<function_registration_info_base>(name)
             );
 
-        return static_cast<VTable const*>(p->get_table_ptr());
+        return static_cast<VTable const*>(p->get_vtable());
     }
 
     template <

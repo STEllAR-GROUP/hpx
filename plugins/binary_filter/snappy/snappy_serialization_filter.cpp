@@ -12,9 +12,10 @@
 
 #include <boost/format.hpp>
 
-#include <snappy.h>
-
+#include <cstddef>
 #include <cstring>
+
+#include <snappy.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE();

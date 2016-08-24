@@ -11,6 +11,8 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
@@ -74,8 +76,8 @@ namespace jacobi_smp {
                             jacobi_kernel_wrap
                           , range(y, y_end)
                           , n
-                          , boost::ref(*grid_new)
-                          , boost::cref(*grid_old)
+                          , std::ref(*grid_new)
+                          , std::cref(*grid_old)
                         )
                       , trigger
                     );
@@ -87,8 +89,8 @@ namespace jacobi_smp {
                         jacobi_kernel_wrap
                       , range(y, y_end)
                       , n
-                      , boost::ref(*grid_new)
-                      , boost::cref(*grid_old)
+                      , std::ref(*grid_new)
+                      , std::cref(*grid_old)
                     )
                 );
             }

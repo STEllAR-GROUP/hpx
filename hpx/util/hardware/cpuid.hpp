@@ -14,7 +14,6 @@
    || defined(__i686__) || defined(__i386) || defined(_M_IX86)      \
    || defined(__X86__) || defined(_X86_) || defined(__THW_INTEL__)  \
    || defined(__I86__) || defined(__INTEL__)
-    #include <boost/cstdint.hpp>
 
     #include <hpx/util/hardware/bit_manipulation.hpp>
 
@@ -24,10 +23,12 @@
         #include <hpx/util/hardware/cpuid/linux_x86.hpp>
     #endif
 
+    #include <cstdint>
+
     namespace hpx { namespace util { namespace hardware
     {
 
-    typedef boost::uint32_t cpu_info [4];
+    typedef std::uint32_t cpu_info [4];
 
     struct cpu_feature
     {
@@ -57,9 +58,9 @@
     {
         cpu_feature::info feature;
         char const* name;
-        boost::uint32_t function;
+        std::uint32_t function;
         cpuid_register::info register_;
-        boost::uint32_t bit;
+        std::uint32_t bit;
     };
 
     const cpuid_table_type cpuid_table[] = {

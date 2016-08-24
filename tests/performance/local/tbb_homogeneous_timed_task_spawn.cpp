@@ -41,6 +41,7 @@
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
 
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -59,13 +60,13 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    std::uint64_t cores
   , double walltime
     )
 {
@@ -99,7 +100,7 @@ struct spawner : tbb::task
     {
         set_ref_count(static_cast<int>(tasks + 1));
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
         {
             worker_func& a = *new (tbb::task::allocate_child()) worker_func();
 
@@ -129,7 +130,7 @@ int tbb_main(
 
     tbb::task::spawn_root_and_wait(a);
 
-    print_results(vm["threads"].as<boost::uint64_t>(), t.elapsed());
+    print_results(vm["threads"].as<std::uint64_t>(), t.elapsed());
 
     return 0;
 }
@@ -150,15 +151,15 @@ int main(
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>()->default_value(1),
+        , value<std::uint64_t>()->default_value(1),
          "number of OS-threads to use")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks (e.g. px-threads) to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(0)
+        , value<std::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "no-header"
@@ -181,7 +182,7 @@ int main(
         header = false;
 
     // Setup the TBB environment.
-    tbb::task_scheduler_init init(vm["threads"].as<boost::uint64_t>());
+    tbb::task_scheduler_init init(vm["threads"].as<std::uint64_t>());
 
     return tbb_main(vm);
 }

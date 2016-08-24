@@ -20,8 +20,8 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -44,7 +44,7 @@ namespace hpx { namespace applier
         ~applier()
         {}
 
-        void initialize(boost::uint64_t rts, boost::uint64_t mem);
+        void initialize(std::uint64_t rts, std::uint64_t mem);
 
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
@@ -79,7 +79,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
-        boost::uint32_t get_locality_id(error_code& ec = throws) const;
+        std::uint32_t get_locality_id(error_code& ec = throws) const;
 
         /// \brief Return list of localities of all remote localities
         ///        registered with the AGAS service for a specific component

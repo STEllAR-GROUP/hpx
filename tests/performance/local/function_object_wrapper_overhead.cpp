@@ -10,12 +10,13 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include "worker_timed.hpp"
-
-#include <functional>
-
 #include <boost/function.hpp>
 #include <boost/program_options.hpp>
+
+#include <cstdint>
+#include <functional>
+
+#include "worker_timed.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -24,8 +25,8 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
-boost::uint64_t iterations = 500000;
-boost::uint64_t delay = 5;
+std::uint64_t iterations = 500000;
+std::uint64_t delay = 5;
 
 struct foo
 {
@@ -38,9 +39,9 @@ struct foo
 };
 
 template <typename F>
-void run(F const & f, boost::uint64_t local_iterations)
+void run(F const & f, std::uint64_t local_iterations)
 {
-    boost::uint64_t i = 0;
+    std::uint64_t i = 0;
     hpx::util::high_resolution_timer t;
 
     for (; i < local_iterations; ++i)
@@ -101,11 +102,11 @@ int main(
         , "print out program usage (this message)")
 
         ( "iterations"
-        , value<boost::uint64_t>(&iterations)->default_value(500000)
+        , value<std::uint64_t>(&iterations)->default_value(500000)
         , "number of iterations to invoke for each test")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(5)
+        , value<std::uint64_t>(&delay)->default_value(5)
         , "duration of delay in microseconds")
         ;
 

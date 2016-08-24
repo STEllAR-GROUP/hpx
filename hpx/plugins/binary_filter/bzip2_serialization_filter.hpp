@@ -16,6 +16,7 @@
 
 #include <boost/iostreams/filter/bzip2.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 

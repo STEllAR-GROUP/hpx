@@ -16,6 +16,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
+#include <functional>
 #include <mutex>
 #include <thread>
 #include <type_traits>

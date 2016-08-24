@@ -447,7 +447,7 @@ namespace hpx { namespace lcos { namespace detail
                 traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(cb, std::move(this_),
-                state, boost::ref(sched)));
+                state, std::ref(sched)));
         }
 
         template <typename Executor>
@@ -467,7 +467,7 @@ namespace hpx { namespace lcos { namespace detail
                 traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(cb, std::move(this_),
-                state, boost::ref(exec)));
+                state, std::ref(exec)));
         }
 
     protected:

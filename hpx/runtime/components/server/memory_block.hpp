@@ -20,9 +20,10 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <type_traits>
 
@@ -97,13 +98,13 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         /// \brief get_ptr returns the address of the first byte allocated for
         ///        this memory_block.
-        boost::uint8_t* get_ptr()
+        std::uint8_t* get_ptr()
         {
-            return reinterpret_cast<boost::uint8_t*>(this + 1);
+            return reinterpret_cast<std::uint8_t*>(this + 1);
         }
-        boost::uint8_t const* get_ptr() const
+        std::uint8_t const* get_ptr() const
         {
-            return reinterpret_cast<boost::uint8_t const*>(this + 1);
+            return reinterpret_cast<std::uint8_t const*>(this + 1);
         }
 
         /// return the size of the memory block contained in this instance
@@ -200,7 +201,7 @@ namespace hpx { namespace components
         {}
 
         /// \brief Return a pointer to the wrapped memory_block_data instance
-        boost::uint8_t* get_ptr()
+        std::uint8_t* get_ptr()
         {
             if (!data_) {
                 std::ostringstream strm;
@@ -213,7 +214,7 @@ namespace hpx { namespace components
             }
             return data_->get_ptr();
         }
-        boost::uint8_t const* get_ptr() const
+        std::uint8_t const* get_ptr() const
         {
             if (!data_) {
                 std::ostringstream strm;

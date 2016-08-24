@@ -21,8 +21,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <cstdint>
 #include <list>
 #include <map>
@@ -106,7 +106,7 @@ namespace hpx { namespace parcelset
         /// parcelports are enabled.
         virtual bool can_connect(locality const &, bool use_alternative_parcelport)
         {
-            return can_bootstrap() || use_alternative_parcelport;
+            return use_alternative_parcelport || can_bootstrap();
         }
 
         /// Queues a parcel for transmission to another locality

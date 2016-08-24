@@ -11,6 +11,8 @@
 
 #include <boost/random.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(int);

@@ -12,6 +12,8 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <functional>
+
 static int forty_two() { return 42; }
 
 struct Seventeen
@@ -117,52 +119,52 @@ static void target_test()
 //{
 //    {
 //        ReturnInt ri(17);
-//        hpx::util::function_nonser0<int> f = boost::ref(ri);
+//        hpx::util::function_nonser0<int> f = std::ref(ri);
 //
 //        // References and values are equal
-//        HPX_TEST(f == boost::ref(ri));
+//        HPX_TEST(f == std::ref(ri));
 //        HPX_TEST(f == ri);
-//        HPX_TEST(boost::ref(ri) == f);
-//        HPX_TEST(!(f != boost::ref(ri)));
+//        HPX_TEST(std::ref(ri) == f);
+//        HPX_TEST(!(f != std::ref(ri)));
 //        HPX_TEST(!(f != ri));
-//        HPX_TEST(!(boost::ref(ri) != f));
+//        HPX_TEST(!(std::ref(ri) != f));
 //        HPX_TEST(ri == f);
 //        HPX_TEST(!(ri != f));
 //
 //        // Values equal, references inequal
 //        ReturnInt ri2(17);
 //        HPX_TEST(f == ri2);
-//        HPX_TEST(f != boost::ref(ri2));
-//        HPX_TEST(boost::ref(ri2) != f);
+//        HPX_TEST(f != std::ref(ri2));
+//        HPX_TEST(std::ref(ri2) != f);
 //        HPX_TEST(!(f != ri2));
-//        HPX_TEST(!(f == boost::ref(ri2)));
-//        HPX_TEST(!(boost::ref(ri2) == f));
+//        HPX_TEST(!(f == std::ref(ri2)));
+//        HPX_TEST(!(std::ref(ri2) == f));
 //        HPX_TEST(ri2 == f);
 //        HPX_TEST(!(ri2 != f));
 //    }
 //
 //    {
 //        ReturnInt ri(17);
-//        hpx::util::function_nonser<int(void)> f = boost::ref(ri);
+//        hpx::util::function_nonser<int(void)> f = std::ref(ri);
 //
 //        // References and values are equal
-//        HPX_TEST(f == boost::ref(ri));
+//        HPX_TEST(f == std::ref(ri));
 //        HPX_TEST(f == ri);
-//        HPX_TEST(boost::ref(ri) == f);
-//        HPX_TEST(!(f != boost::ref(ri)));
+//        HPX_TEST(std::ref(ri) == f);
+//        HPX_TEST(!(f != std::ref(ri)));
 //        HPX_TEST(!(f != ri));
-//        HPX_TEST(!(boost::ref(ri) != f));
+//        HPX_TEST(!(std::ref(ri) != f));
 //        HPX_TEST(ri == f);
 //        HPX_TEST(!(ri != f));
 //
 //        // Values equal, references inequal
 //        ReturnInt ri2(17);
 //        HPX_TEST(f == ri2);
-//        HPX_TEST(f != boost::ref(ri2));
-//        HPX_TEST(boost::ref(ri2) != f);
+//        HPX_TEST(f != std::ref(ri2));
+//        HPX_TEST(std::ref(ri2) != f);
 //        HPX_TEST(!(f != ri2));
-//        HPX_TEST(!(f == boost::ref(ri2)));
-//        HPX_TEST(!(boost::ref(ri2) == f));
+//        HPX_TEST(!(f == std::ref(ri2)));
+//        HPX_TEST(!(std::ref(ri2) == f));
 //        HPX_TEST(ri2 == f);
 //        HPX_TEST(!(ri2 != f));
 //    }

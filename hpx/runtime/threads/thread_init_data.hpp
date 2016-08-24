@@ -16,6 +16,7 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 
 namespace hpx { namespace threads
@@ -100,7 +101,7 @@ namespace hpx { namespace threads
         util::thread_description description;
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        boost::uint32_t parent_locality_id;
+        std::uint32_t parent_locality_id;
         threads::thread_id_repr_type parent_id;
         std::size_t parent_phase;
 #endif

@@ -26,7 +26,6 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/cstdint.hpp>
 #include <boost/version.hpp>
 
 #if BOOST_VERSION < 105100
@@ -38,6 +37,7 @@
 #include <boost/context/all.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
@@ -253,17 +253,17 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_EXPORT void reset_stack();
             HPX_EXPORT void rebind_stack();
 
-            typedef boost::atomic<boost::int64_t> counter_type;
+            typedef boost::atomic<std::int64_t> counter_type;
 
             HPX_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_EXPORT static boost::uint64_t get_stack_unbind_count(bool
+            HPX_EXPORT static std::uint64_t get_stack_unbind_count(bool
                 reset);
-            HPX_EXPORT static boost::uint64_t increment_stack_unbind_count();
+            HPX_EXPORT static std::uint64_t increment_stack_unbind_count();
 
             HPX_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_EXPORT static boost::uint64_t get_stack_recycle_count(bool
+            HPX_EXPORT static std::uint64_t get_stack_recycle_count(bool
                 reset);
-            HPX_EXPORT static boost::uint64_t increment_stack_recycle_count();
+            HPX_EXPORT static std::uint64_t increment_stack_recycle_count();
 
         private:
             friend void swap_context(fcontext_context_impl& from,

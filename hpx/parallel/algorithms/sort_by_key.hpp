@@ -116,9 +116,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     template <
         typename ExPolicy, typename KeyIter, typename ValueIter,
-        typename Compare = std::less<
-            typename std::iterator_traits<KeyIter>::value_type
-        >
+        typename Compare = detail::less
     >
     typename util::detail::algorithm_result<
         ExPolicy,

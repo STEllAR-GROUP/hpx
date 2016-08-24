@@ -30,10 +30,10 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace hpx
@@ -148,7 +148,7 @@ namespace hpx
     /// This function returns the system uptime measured in nanoseconds for the
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
-    HPX_API_EXPORT boost::uint64_t get_system_uptime();
+    HPX_API_EXPORT std::uint64_t get_system_uptime();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the
@@ -276,7 +276,7 @@ namespace hpx
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
     HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
+        get_locality_certificate(std::uint32_t locality_id, error_code& ec = throws);
 
     /// \brief Add the given certificate to the certificate store of this locality.
     ///

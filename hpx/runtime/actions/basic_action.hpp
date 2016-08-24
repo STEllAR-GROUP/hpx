@@ -46,6 +46,7 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <memory>
 #include <sstream>

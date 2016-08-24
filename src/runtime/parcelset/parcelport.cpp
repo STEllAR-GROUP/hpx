@@ -20,6 +20,8 @@
 #include <hpx/exception.hpp>
 
 #include <cstdint>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -121,6 +123,8 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::uint64_t HPX_EXPORT get_max_inbound_size(parcelport& pp)
+
     // Update performance counter data
     void parcelport::add_received_data(
         performance_counters::parcels::data_point const& data)

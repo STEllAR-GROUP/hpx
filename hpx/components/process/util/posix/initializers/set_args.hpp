@@ -16,6 +16,7 @@
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

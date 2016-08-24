@@ -10,6 +10,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -19,12 +20,12 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // generate unique parcel id
     naming::gid_type parcel::generate_unique_id(
-        boost::uint32_t locality_id_default)
+        std::uint32_t locality_id_default)
     {
-        static boost::atomic<boost::uint64_t> id(0);
+        static boost::atomic<std::uint64_t> id(0);
 
         error_code ec(lightweight);        // ignore all errors
-        boost::uint32_t locality_id = hpx::get_locality_id(ec);
+        std::uint32_t locality_id = hpx::get_locality_id(ec);
         if (locality_id == naming::invalid_locality_id)
             locality_id = locality_id_default;
 

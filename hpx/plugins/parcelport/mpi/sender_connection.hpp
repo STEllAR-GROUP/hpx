@@ -19,6 +19,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>

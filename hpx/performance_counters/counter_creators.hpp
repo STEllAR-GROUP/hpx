@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include <cstdint>
 #include <string>
@@ -72,7 +72,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_API_EXPORT naming::gid_type locality_raw_counter_creator(
-        counter_info const&, hpx::util::function_nonser<boost::int64_t(bool)> const&,
+        counter_info const&, hpx::util::function_nonser<std::int64_t(bool)> const&,
         error_code&);
 
     ///////////////////////////////////////////////////////////////////////////

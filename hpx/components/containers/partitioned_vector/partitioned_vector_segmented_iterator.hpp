@@ -26,6 +26,7 @@
 
 #include <boost/integer.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>
@@ -568,7 +569,7 @@ namespace hpx
             typedef typename std::iterator_traits<BaseIterator>::reference
                 reference;
 
-            is_requested_locality(boost::uint32_t locality_id =
+            is_requested_locality(std::uint32_t locality_id =
                     naming::invalid_locality_id)
               : locality_id_(locality_id)
             {}
@@ -579,7 +580,7 @@ namespace hpx
                        locality_id_ == val.locality_id_;
             }
 
-            boost::uint32_t locality_id_;
+            std::uint32_t locality_id_;
         };
     }
 
@@ -608,7 +609,7 @@ namespace hpx
 
         local_segment_vector_iterator(
                 BaseIter const& it, BaseIter const& end,
-                boost::uint32_t locality_id)
+                std::uint32_t locality_id)
           : base_type(it), predicate_(locality_id), end_(end)
         {
             satisfy_predicate();

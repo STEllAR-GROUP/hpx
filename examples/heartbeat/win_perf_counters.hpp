@@ -12,12 +12,14 @@
 // This is code specific to Windows
 #if defined(HPX_WINDOWS)
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Install the windows performance counters exposing  the HPX counters.
 void install_windows_counters();
 
 // Update the data to be exposed as the windows performance counter values.
-void update_windows_counters(boost::uint64_t value);
+void update_windows_counters(std::uint64_t value);
 
 // Uninstall the windows performance counters exposing  the HPX counters.
 void uninstall_windows_counters();

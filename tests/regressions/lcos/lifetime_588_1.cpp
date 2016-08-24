@@ -11,6 +11,7 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <vector>
 
 #define NUM_INSTANCES 100

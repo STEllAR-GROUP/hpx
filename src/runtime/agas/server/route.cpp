@@ -13,6 +13,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <utility>
 #include <vector>

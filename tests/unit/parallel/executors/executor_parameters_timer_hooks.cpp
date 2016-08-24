@@ -9,11 +9,13 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
-
-#include <boost/ref.hpp>
-#include <boost/atomic.hpp>
 
 #include "../algorithms/foreach_tests.hpp"
 
@@ -24,12 +26,12 @@ void chunk_size_test_seq(Parameters && params)
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
-    test_for_each(seq.with(boost::ref(params)), iterator_tag());
-    test_for_each_async(seq(task).with(boost::ref(params)), iterator_tag());
+    test_for_each(seq.with(std::ref(params)), iterator_tag());
+    test_for_each_async(seq(task).with(std::ref(params)), iterator_tag());
 
     sequential_executor seq_exec;
-    test_for_each(seq.on(seq_exec).with(boost::ref(params)), iterator_tag());
-    test_for_each_async(seq(task).on(seq_exec).with(boost::ref(params)), iterator_tag());
+    test_for_each(seq.on(seq_exec).with(std::ref(params)), iterator_tag());
+    test_for_each_async(seq(task).on(seq_exec).with(std::ref(params)), iterator_tag());
 }
 
 template <typename Parameters>
@@ -38,12 +40,12 @@ void chunk_size_test_par(Parameters && params)
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
-    test_for_each(par.with(boost::ref(params)), iterator_tag());
-    test_for_each_async(par(task).with(boost::ref(params)), iterator_tag());
+    test_for_each(par.with(std::ref(params)), iterator_tag());
+    test_for_each_async(par(task).with(std::ref(params)), iterator_tag());
 
     parallel_executor par_exec;
-    test_for_each(par.on(par_exec).with(boost::ref(params)), iterator_tag());
-    test_for_each_async(par(task).on(par_exec).with(boost::ref(params)), iterator_tag());
+    test_for_each(par.on(par_exec).with(std::ref(params)), iterator_tag());
+    test_for_each_async(par(task).on(par_exec).with(std::ref(params)), iterator_tag());
 }
 
 struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
@@ -65,7 +67,7 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
     }
 
     std::string name_;
-    boost::uint64_t time_;
+    std::uint64_t time_;
     boost::atomic<std::size_t> count_;
 };
 

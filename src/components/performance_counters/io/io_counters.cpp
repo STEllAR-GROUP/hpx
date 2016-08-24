@@ -24,6 +24,7 @@
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
 
+#include <cstdint>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -32,13 +33,13 @@
 BOOST_FUSION_DEFINE_STRUCT(
     (hpx)(performance_counters)(io),
     proc_io,
-    (boost::uint64_t, riss)
-    (boost::uint64_t, wiss)
-    (boost::uint64_t, rsysc)
-    (boost::uint64_t, wsysc)
-    (boost::uint64_t, rstor)
-    (boost::uint64_t, wstor)
-    (boost::uint64_t, wcanc)
+    (std::uint64_t, riss)
+    (std::uint64_t, wiss)
+    (std::uint64_t, rsysc)
+    (std::uint64_t, wsysc)
+    (std::uint64_t, rstor)
+    (std::uint64_t, wstor)
+    (std::uint64_t, wcanc)
     )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ namespace hpx { namespace performance_counters { namespace io
           }
 
           qi::rule<I, proc_io(), ascii::space_type> start;
-          qi::uint_parser<boost::uint64_t> uint64_t_;
+          qi::uint_parser<std::uint64_t> uint64_t_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -99,49 +100,49 @@ namespace hpx { namespace performance_counters { namespace io
                 boost::str(boost::format("failed to parse " PROC_IO_PATH) % pid));
     }
 
-    boost::uint64_t get_pio_riss(bool)
+    std::uint64_t get_pio_riss(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.riss;
     }
 
-    boost::uint64_t get_pio_wiss(bool)
+    std::uint64_t get_pio_wiss(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wiss;
     }
 
-    boost::uint64_t get_pio_rsysc(bool)
+    std::uint64_t get_pio_rsysc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.rsysc;
     }
 
-    boost::uint64_t get_pio_wsysc(bool)
+    std::uint64_t get_pio_wsysc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wsysc;
     }
 
-    boost::uint64_t get_pio_rstor(bool)
+    std::uint64_t get_pio_rstor(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.rstor;
     }
 
-    boost::uint64_t get_pio_wstor(bool)
+    std::uint64_t get_pio_wstor(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wstor;
     }
 
-    boost::uint64_t get_pio_wcanc(bool)
+    std::uint64_t get_pio_wcanc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);

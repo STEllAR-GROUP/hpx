@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2014-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,19 +13,24 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    struct copyable_vtable : vtable
+    struct copyable_vtable
     {
         template <typename T>
-        HPX_FORCEINLINE static void copy(void** v, void* const* src)
+        HPX_FORCEINLINE static void _copy(void** v, void* const* src)
         {
             if (sizeof(T) <= vtable::function_storage_size)
             {
-                new (v) T(get<T>(src));
+                new (v) T(vtable::get<T>(src));
             } else {
-                *v = new T(get<T>(src));
+                *v = new T(vtable::get<T>(src));
             }
         }
-        typedef void (*copy_t)(void**, void* const*);
+        void (*copy)(void**, void* const*);
+
+        template <typename T>
+        HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) HPX_NOEXCEPT
+          : copy(&copyable_vtable::template _copy<T>)
+        {}
     };
 }}}
 

@@ -7,7 +7,10 @@
 #define HPX_UTIL_CACHE_ENTRY_NOV_17_2008_1032AM
 
 #include <hpx/config.hpp>
+
 #include <boost/operators.hpp>
+
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace entries

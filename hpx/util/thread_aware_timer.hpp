@@ -10,7 +10,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util
 {
@@ -30,7 +30,7 @@ namespace hpx { namespace util
         }
 
         thread_aware_timer(double t)
-          : start_time_(static_cast<boost::uint64_t>(t * 1e9))
+          : start_time_(static_cast<std::uint64_t>(t * 1e9))
         {}
 
         static double now()
@@ -47,14 +47,14 @@ namespace hpx { namespace util
             return double(take_time_stamp() - start_time_) * 1e-9;
         }
 
-        boost::int64_t elapsed_microseconds() const
+        std::int64_t elapsed_microseconds() const
         {
-            return boost::int64_t((take_time_stamp() - start_time_) * 1e-3);
+            return std::int64_t((take_time_stamp() - start_time_) * 1e-3);
         }
 
-        boost::int64_t elapsed_nanoseconds() const
+        std::int64_t elapsed_nanoseconds() const
         {
-            return boost::int64_t(take_time_stamp() - start_time_);
+            return std::int64_t(take_time_stamp() - start_time_);
         }
 
         double elapsed_max() const   // return estimated maximum value for elapsed()
@@ -68,15 +68,15 @@ namespace hpx { namespace util
         }
 
     protected:
-        static void sample_time(hpx::lcos::local::promise<boost::uint64_t>& p)
+        static void sample_time(hpx::lcos::local::promise<std::uint64_t>& p)
         {
             p.set_value(util::high_resolution_clock::now());
         }
 
-        HPX_EXPORT static boost::uint64_t take_time_stamp();
+        HPX_EXPORT static std::uint64_t take_time_stamp();
 
     private:
-        boost::uint64_t start_time_;
+        std::uint64_t start_time_;
     };
 }} // namespace hpx::util
 

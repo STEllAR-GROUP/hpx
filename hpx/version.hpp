@@ -11,30 +11,29 @@
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     // Returns the major HPX version.
-    HPX_EXPORT boost::uint8_t major_version();
+    HPX_EXPORT std::uint8_t major_version();
 
     // Returns the minor HPX version.
-    HPX_EXPORT boost::uint8_t minor_version();
+    HPX_EXPORT std::uint8_t minor_version();
 
     // Returns the sub-minor/patch-level HPX version.
-    HPX_EXPORT boost::uint8_t subminor_version();
+    HPX_EXPORT std::uint8_t subminor_version();
 
     // Returns the full HPX version.
-    HPX_EXPORT boost::uint32_t full_version();
+    HPX_EXPORT std::uint32_t full_version();
 
     // Returns the full HPX version.
     HPX_EXPORT std::string full_version_as_string();
 
     // Returns the AGAS subsystem version.
-    HPX_EXPORT boost::uint8_t agas_version();
+    HPX_EXPORT std::uint8_t agas_version();
 
     // Returns the tag.
     HPX_EXPORT std::string tag();

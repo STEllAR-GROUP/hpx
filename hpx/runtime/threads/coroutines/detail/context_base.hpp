@@ -49,10 +49,10 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <utility>
 
@@ -140,12 +140,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        boost::int64_t count() const
+        std::int64_t count() const
         {
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
             HPX_ASSERT(m_counter < static_cast<std::size_t>(
-                (std::numeric_limits<boost::int64_t>::max)()));
-            return static_cast<boost::int64_t>(m_counter);
+                (std::numeric_limits<std::int64_t>::max)()));
+            return static_cast<std::int64_t>(m_counter);
 #else
             return 1;
 #endif
@@ -476,9 +476,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return continuation_recursion_count_;
         }
 
-        static boost::uint64_t get_allocation_count_all(bool reset)
+        static std::uint64_t get_allocation_count_all(bool reset)
         {
-            boost::uint64_t count = 0;
+            std::uint64_t count = 0;
             for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i) {
                 count += m_allocation_counters.get(i).load();
                 if (reset)
@@ -486,16 +486,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
             return count;
         }
-        static boost::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
+        static std::uint64_t get_allocation_count(std::size_t heap_num, bool reset)
         {
-            boost::uint64_t result = m_allocation_counters.get(heap_num).load();
+            std::uint64_t result = m_allocation_counters.get(heap_num).load();
 
             if (reset)
                 m_allocation_counters.get(heap_num).store(0);
             return result;
         }
 
-        static boost::uint64_t increment_allocation_count(std::size_t heap_num)
+        static std::uint64_t increment_allocation_count(std::size_t heap_num)
         {
             return ++m_allocation_counters.get(heap_num);
         }

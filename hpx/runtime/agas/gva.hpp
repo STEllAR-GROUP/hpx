@@ -14,16 +14,17 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/io/ios_state.hpp>
+
+#include <cstdint>
 
 namespace hpx { namespace agas
 {
 
 struct gva
 {
-    typedef boost::int32_t component_type;
-    typedef boost::uint64_t lva_type;
+    typedef std::int32_t component_type;
+    typedef std::uint64_t lva_type;
 
     gva()
       : type(components::component_invalid),
@@ -32,16 +33,16 @@ struct gva
         offset(0) {}
 
     explicit gva(naming::gid_type const& p,
-        component_type t = components::component_invalid, boost::uint64_t c = 1,
-        lva_type a = 0, boost::uint64_t o = 0)
+        component_type t = components::component_invalid, std::uint64_t c = 1,
+        lva_type a = 0, std::uint64_t o = 0)
       : prefix(p),
         type(t),
         count(c),
         lva_(a),
         offset(o) {}
 
-    gva(naming::gid_type const& p, component_type t, boost::uint64_t c, void* a,
-        boost::uint64_t o = 0)
+    gva(naming::gid_type const& p, component_type t, std::uint64_t c, void* a,
+        std::uint64_t o = 0)
       : prefix(p),
         type(t),
         count(c),
@@ -126,13 +127,13 @@ struct gva
 
     naming::gid_type prefix;
     component_type type;
-    boost::uint64_t count;
+    std::uint64_t count;
 
   private:
     lva_type lva_;
 
   public:
-    boost::uint64_t offset;
+    std::uint64_t offset;
 
   private:
     friend class hpx::serialization::access;

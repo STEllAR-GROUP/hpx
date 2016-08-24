@@ -8,6 +8,7 @@
 #include <H5Cpp.h>
 
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 using namespace H5;

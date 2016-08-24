@@ -123,8 +123,8 @@ dispatched_work(hpx::lcos::channel<int> jobs, hpx::lcos::channel<> done)
         }
         else
         {
-            done.set();
             was_closed = true;
+            done.set();
             break;
         }
     }

@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#include <cstdlib>
+#include <cstddef>
 
 namespace hpx
 {

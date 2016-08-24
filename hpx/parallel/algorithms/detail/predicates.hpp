@@ -14,6 +14,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <type_traits>
 

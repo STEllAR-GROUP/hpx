@@ -11,6 +11,8 @@
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////

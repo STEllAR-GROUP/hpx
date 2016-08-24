@@ -147,6 +147,7 @@ namespace hpx { namespace lcos
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <string>
 #include <type_traits>
@@ -244,7 +245,14 @@ namespace hpx { namespace lcos
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::get_result_action action_type;
-            return async(action_type(), f.get(), site, result.get());
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            return async(action_type(), id, site, result.get()).then(
+                [id](hpx::future<std::vector<T> > && f)
+                {
+                    return f.get();
+                });
         }
 
         template <typename T>

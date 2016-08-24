@@ -9,6 +9,7 @@
 
 #include "row.hpp"
 
+#include <cstddef>
 #include <vector>
 
 namespace jacobi
