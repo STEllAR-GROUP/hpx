@@ -12,6 +12,8 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
+
 namespace hpx
 {
     /// The function report_error reports the given exception to the console

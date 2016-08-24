@@ -11,6 +11,8 @@
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/traits/is_executor_parameters.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace compute { namespace cuda
 {
     struct concurrent_executor_parameters : parallel::executor_parameters_tag

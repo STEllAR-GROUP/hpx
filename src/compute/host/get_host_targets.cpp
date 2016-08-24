@@ -17,6 +17,7 @@
 
 #include <hpx/compute/host/target.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host

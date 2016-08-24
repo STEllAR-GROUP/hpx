@@ -15,6 +15,7 @@
 
 #include <hpx/compute/cuda/target.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 

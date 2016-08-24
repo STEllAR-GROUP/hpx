@@ -12,6 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <utility>
 #include <vector>

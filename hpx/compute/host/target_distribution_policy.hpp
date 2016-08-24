@@ -21,6 +21,7 @@
 #include <hpx/compute/host/target.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <type_traits>
 #include <utility>

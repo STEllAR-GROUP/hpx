@@ -22,6 +22,7 @@
 
 #include <cuda_runtime.h>
 
+#include <cstddef>
 #include <mutex>
 #include <string>
 #include <utility>

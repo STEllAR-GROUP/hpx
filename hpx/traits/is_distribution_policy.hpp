@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx { namespace traits

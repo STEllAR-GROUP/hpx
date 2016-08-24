@@ -230,8 +230,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
-        FwdIter last = begin;
-        std::advance(last, count);
+        FwdIter last = parallel::v1::detail::next(begin, count);
 
         Stride stride = parallel::v1::detail::abs(s);
         std::size_t base_idx = 0;
