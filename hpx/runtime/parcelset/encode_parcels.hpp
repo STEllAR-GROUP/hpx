@@ -197,7 +197,7 @@ namespace hpx
                         {
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                             std::size_t archive_pos = archive.current_pos();
-                            boost::int64_t serialize_time =
+                            std::int64_t serialize_time =
                                 timer.elapsed_nanoseconds();
 #endif
 

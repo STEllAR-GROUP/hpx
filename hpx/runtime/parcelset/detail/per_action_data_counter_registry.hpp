@@ -18,6 +18,7 @@
 #include <boost/atomic.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <vector>

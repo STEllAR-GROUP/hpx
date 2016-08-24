@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/registry.hpp>
 
+#include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <utility>
