@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 
+#include <iostream>
 #include <string>
 
 #include "interpolate1d/interpolate1d.hpp"

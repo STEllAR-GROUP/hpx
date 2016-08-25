@@ -11,6 +11,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <iostream>
 #include <utility>
 
 struct counter

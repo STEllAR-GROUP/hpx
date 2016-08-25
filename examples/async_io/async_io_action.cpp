@@ -15,6 +15,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>

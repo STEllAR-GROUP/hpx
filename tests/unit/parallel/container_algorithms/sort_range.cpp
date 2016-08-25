@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <string>
 #include <vector>
 

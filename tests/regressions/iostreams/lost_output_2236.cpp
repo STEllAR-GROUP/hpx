@@ -9,7 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
-#include <strstream>
+#include <sstream>
 #include <utility>
 #include <vector>
 

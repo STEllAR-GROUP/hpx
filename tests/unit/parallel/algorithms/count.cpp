@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>

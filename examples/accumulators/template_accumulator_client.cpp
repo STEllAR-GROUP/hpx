@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 

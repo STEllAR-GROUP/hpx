@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 

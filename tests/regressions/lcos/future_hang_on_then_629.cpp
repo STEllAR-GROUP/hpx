@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 using boost::program_options::variables_map;

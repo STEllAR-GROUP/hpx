@@ -22,6 +22,7 @@
 #include <boost/throw_exception.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>

@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <utility>
 #include <vector>

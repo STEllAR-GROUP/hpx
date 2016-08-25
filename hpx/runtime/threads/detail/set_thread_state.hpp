@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <sstream>
 
 namespace hpx { namespace threads { namespace detail
 {

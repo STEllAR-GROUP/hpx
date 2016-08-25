@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>

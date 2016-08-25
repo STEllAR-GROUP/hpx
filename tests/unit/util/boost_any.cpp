@@ -12,6 +12,7 @@
 #include "small_big_object.hpp"
 
 #include <cstdlib>
+#include <iostream>
 #include <string>
 #include <utility>
 

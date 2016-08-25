@@ -9,6 +9,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <utility>
 #include <vector>
 

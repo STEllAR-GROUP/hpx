@@ -15,6 +15,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 
 template <typename BaseClock = std::chrono::steady_clock>
 struct payload_functor : tbb::task

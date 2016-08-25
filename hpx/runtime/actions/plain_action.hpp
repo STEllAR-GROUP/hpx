@@ -23,6 +23,7 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #if defined(__NVCC__)

@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
