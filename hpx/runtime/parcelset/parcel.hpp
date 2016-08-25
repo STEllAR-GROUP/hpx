@@ -27,6 +27,8 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -263,7 +265,7 @@ namespace hpx { namespace parcelset
             return data_.addr_;
         }
 
-        boost::uint32_t destination_locality_id() const
+        std::uint32_t destination_locality_id() const
         {
             return naming::get_locality_id_from_gid(destination_locality());
         }

@@ -10,6 +10,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 

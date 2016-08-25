@@ -27,8 +27,7 @@
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -57,7 +56,7 @@ namespace hpx { namespace server
               : locality_id_(naming::invalid_locality_id)
             {}
 
-            partition_data(id_type const& part, boost::uint32_t locality_id)
+            partition_data(id_type const& part, std::uint32_t locality_id)
               : partition_(make_ready_future(part).share()),
                 locality_id_(locality_id)
             {}
@@ -68,7 +67,7 @@ namespace hpx { namespace server
             }
 
             hpx::shared_future<id_type> partition_;
-            boost::uint32_t locality_id_;
+            std::uint32_t locality_id_;
 
         private:
             friend class hpx::serialization::access;
@@ -266,7 +265,7 @@ namespace hpx
         {
             typedef server::unordered_map_config_data::partition_data base_type;
 
-            partition_data(id_type const& part, boost::uint32_t locality_id)
+            partition_data(id_type const& part, std::uint32_t locality_id)
               : base_type(part, locality_id)
             {}
 
@@ -361,14 +360,14 @@ namespace hpx
 
         void init(std::vector<bulk_locality_result> const& ids)
         {
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             std::size_t l = 0;
             for (bulk_locality_result const& r: ids)
             {
                 using naming::get_locality_id_from_id;
-                boost::uint32_t locality = get_locality_id_from_id(r.first);
+                std::uint32_t locality = get_locality_id_from_id(r.first);
 
                 for (hpx::id_type const& id: r.second)
                 {
@@ -445,14 +444,14 @@ namespace hpx
             }
             wait_all(objs);
 
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             partitions_vector_type partitions;
             partitions.reserve(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
-                boost::uint32_t locality = rhs.partitions_[i].locality_id_;
+                std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
                 partitions.push_back(partition_data(objs[i].get(), locality));
 

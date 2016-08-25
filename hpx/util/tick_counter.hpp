@@ -9,7 +9,7 @@
 
 #include <hpx/util/hardware/timestamp.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util
 {
@@ -21,7 +21,7 @@ namespace hpx { namespace util
     class tick_counter
     {
     public:
-        tick_counter(boost::uint64_t& output)
+        tick_counter(std::uint64_t& output)
           : start_time_(take_time_stamp())
           , output_(output)
         {}
@@ -32,14 +32,14 @@ namespace hpx { namespace util
         }
 
     protected:
-        static boost::uint64_t take_time_stamp()
+        static std::uint64_t take_time_stamp()
         {
             return hpx::util::hardware::timestamp();
         }
 
     private:
-        boost::uint64_t const start_time_;
-        boost::uint64_t& output_;
+        std::uint64_t const start_time_;
+        std::uint64_t& output_;
     };
 }} // namespace hpx::util
 

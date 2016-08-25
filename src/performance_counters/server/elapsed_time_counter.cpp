@@ -13,6 +13,8 @@
 
 #include <boost/version.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<
     hpx::performance_counters::server::elapsed_time_counter
@@ -48,7 +50,7 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
         // gather the current value
-        boost::int64_t now = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        std::int64_t now = static_cast<std::int64_t>(hpx::get_system_uptime());
         hpx::performance_counters::counter_value value;
         value.value_ = now;
         value.scaling_ = 1000000000LL;      // coefficient to get seconds

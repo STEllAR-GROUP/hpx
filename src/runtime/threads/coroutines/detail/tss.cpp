@@ -16,6 +16,7 @@
 
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <cstddef>
 #include <map>
 #include <memory>
 

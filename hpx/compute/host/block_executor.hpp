@@ -19,6 +19,7 @@
 #include <boost/atomic.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <utility>
 #include <vector>

@@ -13,11 +13,11 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <boost/format.hpp>
+
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
-
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -41,13 +41,13 @@ using hpx::flush;
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
-boost::uint64_t num_iterations = 0;
+std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 double null_function()
 {
     double d = 0.;
-    for (boost::uint64_t i = 0; i < num_iterations; ++i)
+    for (std::uint64_t i = 0; i < num_iterations; ++i)
         d += 1. / (2. * i + 1.);
     return d;
 }
@@ -62,7 +62,7 @@ struct scratcher
     }
 };
 
-void measure_action_futures(boost::uint64_t count, bool csv)
+void measure_action_futures(std::uint64_t count, bool csv)
 {
     const id_type here = find_here();
 
@@ -72,7 +72,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
     // start the clock
     high_resolution_timer walltime;
 
-    for (boost::uint64_t i = 0; i < count; ++i)
+    for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
 
     wait_each(scratcher(), futures);
@@ -92,7 +92,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
               << flush;
 }
 
-void measure_function_futures(boost::uint64_t count, bool csv)
+void measure_function_futures(std::uint64_t count, bool csv)
 {
     std::vector<future<double> > futures;
 
@@ -101,7 +101,7 @@ void measure_function_futures(boost::uint64_t count, bool csv)
     // start the clock
     high_resolution_timer walltime;
 
-    for (boost::uint64_t i = 0; i < count; ++i)
+    for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
 
     wait_each(scratcher(), futures);
@@ -127,9 +127,9 @@ int hpx_main(
     )
 {
     {
-        num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
+        num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const boost::uint64_t count = vm["futures"].as<boost::uint64_t>();
+        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
 
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
@@ -153,11 +153,11 @@ int main(
 
     cmdline.add_options()
         ( "futures"
-        , value<boost::uint64_t>()->default_value(500000)
+        , value<std::uint64_t>()->default_value(500000)
         , "number of futures to invoke")
 
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<std::uint64_t>()->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "csv"

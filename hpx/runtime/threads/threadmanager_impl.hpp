@@ -25,6 +25,8 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -150,9 +152,14 @@ namespace hpx { namespace threads
         /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the thread manager
-        boost::int64_t get_thread_count(thread_state_enum state = unknown,
+        std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false) const;
+
+        // Enumerate all matching threads
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -183,12 +190,12 @@ namespace hpx { namespace threads
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
         /// Get percent maintenance time in main thread-manager loop.
-        boost::int64_t avg_idle_rate(bool reset);
-        boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+        std::int64_t avg_idle_rate(bool reset);
+        std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        boost::int64_t avg_creation_idle_rate(bool reset);
-        boost::int64_t avg_cleanup_idle_rate(bool reset);
+        std::int64_t avg_creation_idle_rate(bool reset);
+        std::int64_t avg_cleanup_idle_rate(bool reset);
 #endif
 
     public:
@@ -213,28 +220,28 @@ namespace hpx { namespace threads
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        boost::int64_t get_executed_threads(
+        std::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_executed_thread_phases(
+        std::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false);
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        boost::int64_t get_thread_phase_duration(
+        std::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_thread_duration(
+        std::int64_t get_thread_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_thread_phase_overhead(
+        std::int64_t get_thread_phase_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_thread_overhead(
+        std::int64_t get_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_cumulative_thread_duration(
+        std::int64_t get_cumulative_thread_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
-        boost::int64_t get_cumulative_thread_overhead(
+        std::int64_t get_cumulative_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif
 
-        boost::int64_t get_cumulative_duration(
+        std::int64_t get_cumulative_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
 
     protected:

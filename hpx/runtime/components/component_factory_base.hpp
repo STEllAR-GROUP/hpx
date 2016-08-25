@@ -22,6 +22,7 @@
 #include <hpx/components/security/capability.hpp>
 #endif
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

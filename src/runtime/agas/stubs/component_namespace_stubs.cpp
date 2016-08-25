@@ -15,6 +15,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -48,8 +49,8 @@ template lcos::future<response> component_namespace::service_async<response>(
   , threads::thread_priority priority
     );
 
-template lcos::future<boost::uint32_t>
-component_namespace::service_async<boost::uint32_t>(
+template lcos::future<std::uint32_t>
+component_namespace::service_async<std::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority

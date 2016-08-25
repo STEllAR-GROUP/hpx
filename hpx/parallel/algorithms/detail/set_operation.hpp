@@ -19,6 +19,7 @@
 
 #include <boost/shared_array.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <vector>
 

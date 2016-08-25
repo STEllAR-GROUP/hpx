@@ -19,6 +19,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -71,7 +73,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             typedef typename base_type::thread_queue_type thread_queue_type;
 
@@ -97,7 +99,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count)
         {
             std::size_t queues_size = this->queues_.size();
             HPX_ASSERT(num_thread < queues_size);

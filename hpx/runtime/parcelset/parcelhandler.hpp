@@ -27,6 +27,8 @@
 #include <boost/atomic.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -301,62 +303,62 @@ namespace hpx { namespace parcelset
         // Performance counter data
 
         // number of parcels sent
-        boost::int64_t get_parcel_send_count(std::string const&, bool) const;
+        std::int64_t get_parcel_send_count(std::string const&, bool) const;
 
         // number of messages sent
-        boost::int64_t get_message_send_count(std::string const&, bool) const;
+        std::int64_t get_message_send_count(std::string const&, bool) const;
 
         // number of parcels routed
-        boost::int64_t get_parcel_routed_count(bool);
+        std::int64_t get_parcel_routed_count(bool);
 
         // number of parcels received
-        boost::int64_t get_parcel_receive_count(std::string const&, bool) const;
+        std::int64_t get_parcel_receive_count(std::string const&, bool) const;
 
         // number of messages received
-        boost::int64_t get_message_receive_count(std::string const&, bool) const;
+        std::int64_t get_message_receive_count(std::string const&, bool) const;
 
         // the total time it took for all sends, from async_write to the
         // completion handler (nanoseconds)
-        boost::int64_t get_sending_time(std::string const&, bool) const;
+        std::int64_t get_sending_time(std::string const&, bool) const;
 
         // the total time it took for all receives, from async_read to the
         // completion handler (nanoseconds)
-        boost::int64_t get_receiving_time(std::string const&, bool) const;
+        std::int64_t get_receiving_time(std::string const&, bool) const;
 
         // the total time it took for all sender-side serialization operations
         // (nanoseconds)
-        boost::int64_t get_sending_serialization_time(std::string const&, bool) const;
+        std::int64_t get_sending_serialization_time(std::string const&, bool) const;
 
         // the total time it took for all receiver-side serialization
         // operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time(std::string const&, bool) const;
+        std::int64_t get_receiving_serialization_time(std::string const&, bool) const;
 
 #if defined(HPX_HAVE_SECURITY)
         // the total time it took for all sender-side security operations
         // (nanoseconds)
-        boost::int64_t get_sending_security_time(std::string const&, bool) const;
+        std::int64_t get_sending_security_time(std::string const&, bool) const;
 
         // the total time it took for all receiver-side security
         // operations (nanoseconds)
-        boost::int64_t get_receiving_security_time(std::string const&, bool) const;
+        std::int64_t get_receiving_security_time(std::string const&, bool) const;
 #endif
 
         // total data sent (bytes)
-        boost::int64_t get_data_sent(std::string const&, bool) const;
+        std::int64_t get_data_sent(std::string const&, bool) const;
 
         // total data (uncompressed) sent (bytes)
-        boost::int64_t get_raw_data_sent(std::string const&, bool) const;
+        std::int64_t get_raw_data_sent(std::string const&, bool) const;
 
         // total data received (bytes)
-        boost::int64_t get_data_received(std::string const&, bool) const;
+        std::int64_t get_data_received(std::string const&, bool) const;
 
         // total data (uncompressed) received (bytes)
-        boost::int64_t get_raw_data_received(std::string const&, bool) const;
+        std::int64_t get_raw_data_received(std::string const&, bool) const;
 
-        boost::int64_t get_buffer_allocate_time_sent(std::string const&, bool) const;
-        boost::int64_t get_buffer_allocate_time_received(std::string const&, bool) const;
+        std::int64_t get_buffer_allocate_time_sent(std::string const&, bool) const;
+        std::int64_t get_buffer_allocate_time_received(std::string const&, bool) const;
 
-        boost::int64_t get_connection_cache_statistics(std::string const& pp_type,
+        std::int64_t get_connection_cache_statistics(std::string const& pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
 
         void list_parcelports(std::ostringstream& strm) const;
@@ -383,12 +385,12 @@ namespace hpx { namespace parcelset
         }
 
     protected:
-        boost::int64_t get_incoming_queue_length(bool /*reset*/) const
+        std::int64_t get_incoming_queue_length(bool /*reset*/) const
         {
             return 0;
         }
 
-        boost::int64_t get_outgoing_queue_length(bool reset) const;
+        std::int64_t get_outgoing_queue_length(bool reset) const;
 
         std::pair<std::shared_ptr<parcelport>, locality>
         find_appropriate_destination(naming::gid_type const & dest_gid);
@@ -443,7 +445,7 @@ namespace hpx { namespace parcelset
         bool const load_message_handlers_;
 
         /// Count number of (outbound) parcels routed
-        boost::atomic<boost::int64_t> count_routed_;
+        boost::atomic<std::int64_t> count_routed_;
 
         /// global exception handler for unhandled exceptions thrown from the
         /// parcel layer

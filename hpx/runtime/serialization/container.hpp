@@ -14,6 +14,8 @@
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace serialization
 {
     struct erased_output_container

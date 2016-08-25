@@ -13,6 +13,8 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <cstddef>
+
 namespace jacobi
 {
     struct row

@@ -28,12 +28,12 @@
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace util
@@ -172,7 +172,7 @@ namespace hpx { namespace util
                     boost::algorithm::is_any_of(":"),
                     boost::algorithm::token_compress_on);
 
-                for (boost::uint64_t i = 0; i < path_dirs.size(); ++i)
+                for (std::uint64_t i = 0; i < path_dirs.size(); ++i)
                 {
                     r = path_dirs[i];
                     r += '/';
@@ -203,7 +203,7 @@ namespace hpx { namespace util
         HPX_UNUSED(argv0);
 
         char exe_path[PATH_MAX + 1];
-        boost::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
+        std::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
 
         if (0 != _NSGetExecutablePath(exe_path, &len))
         {

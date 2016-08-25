@@ -9,6 +9,8 @@
 
 #include <boost/range.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 std::ptrdiff_t const N1 = 3;
 std::ptrdiff_t const N2 = 7;

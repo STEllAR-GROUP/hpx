@@ -16,6 +16,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
@@ -35,7 +37,7 @@ struct data_buffer
     template <typename Archive>
     void save(Archive& ar, unsigned) const
     {
-        boost::uint64_t size = data_.size();
+        std::uint64_t size = data_.size();
         ar & size;
         ar & hpx::serialization::make_array(data_.data(), size);
         ar & flag_;
@@ -44,7 +46,7 @@ struct data_buffer
     template <typename Archive>
     void load(Archive& ar, unsigned)
     {
-        boost::uint64_t size = 0;
+        std::uint64_t size = 0;
         ar & size;
         data_.resize(size);
         ar & hpx::serialization::make_array(data_.data(), size);
@@ -84,7 +86,7 @@ int test_function4(data_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function4, test_action4)
 
 std::size_t get_archive_size(hpx::parcelset::parcel const& p,
-    boost::uint32_t flags,
+    std::uint32_t flags,
     std::vector<hpx::serialization::serialization_chunk>* chunks)
 {
     // gather the required size for the archive
@@ -103,7 +105,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     std::size_t arg_size = get_archive_size(outp, out_archive_flags,
         zero_copy ? &out_chunks : nullptr);
     std::vector<char> out_buffer;
-    boost::uint32_t dest_locality_id = outp.destination_locality_id();
+    std::uint32_t dest_locality_id = outp.destination_locality_id();
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
@@ -168,7 +170,7 @@ void test_normal_serialization(T& arg)
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function1));
+        reinterpret_cast<std::uint64_t>(&test_function1));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
@@ -199,7 +201,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function2));
+        reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
@@ -231,7 +233,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function2));
+        reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
@@ -264,7 +266,7 @@ void test_zero_copy_serialization(T& arg)
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function1));
+        reinterpret_cast<std::uint64_t>(&test_function1));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
@@ -295,7 +297,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function2));
+        reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;
@@ -327,7 +329,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function2));
+        reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
     unsigned out_archive_flags = 0U;

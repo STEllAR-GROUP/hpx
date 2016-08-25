@@ -18,6 +18,8 @@
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/compute/detail/get_proxy_type.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace compute { namespace cuda
 {
     template <typename T>

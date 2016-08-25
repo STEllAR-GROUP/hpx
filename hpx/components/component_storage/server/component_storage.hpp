@@ -18,6 +18,7 @@
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

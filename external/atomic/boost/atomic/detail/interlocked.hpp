@@ -14,6 +14,8 @@
 #include <boost/atomic/detail/base.hpp>
 #include <boost/atomic/detail/builder.hpp>
 
+#include <cstdint>
+
 namespace boost { namespace detail { namespace atomic {
 
 static inline void full_fence(void)
@@ -113,12 +115,12 @@ private:
 
 #else
 
-extern "C" boost::int64_t __cdecl _InterlockedExchangeAdd64(boost::int64_t volatile *,
-    boost::int64_t);
-extern "C" boost::int64_t __cdecl _InterlockedExchange64(boost::int64_t volatile *,
-    boost::int64_t);
-extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(
-    boost::int64_t volatile *, boost::int64_t, boost::int64_t);
+extern "C" std::int64_t __cdecl _InterlockedExchangeAdd64(std::int64_t volatile *,
+    std::int64_t);
+extern "C" std::int64_t __cdecl _InterlockedExchange64(std::int64_t volatile *,
+    std::int64_t);
+extern "C" std::int64_t __cdecl _InterlockedCompareExchange64(
+    std::int64_t volatile *, std::int64_t, std::int64_t);
 
 # pragma intrinsic( _InterlockedExchangeAdd64 )
 # pragma intrinsic( _InterlockedExchange64 )
@@ -158,8 +160,8 @@ public:
         memory_order failure_order) volatile
     {
         T prev=expected;
-        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE64((boost::int64_t *)(&i),
-            (boost::int64_t)desired, (boost::int64_t)expected);
+        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE64((std::int64_t *)(&i),
+            (std::int64_t)desired, (std::int64_t)expected);
         bool success=(prev==expected);
         return success;
     }
@@ -173,11 +175,11 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        return (T)BOOST_INTERLOCKED_EXCHANGE64((boost::int64_t *)&i, (boost::int64_t)r);
+        return (T)BOOST_INTERLOCKED_EXCHANGE64((std::int64_t *)&i, (std::int64_t)r);
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-      return (T)BOOST_INTERLOCKED_EXCHANGE_ADD64((boost::int64_t *)&i, c);
+      return (T)BOOST_INTERLOCKED_EXCHANGE_ADD64((std::int64_t *)&i, c);
     }
 
     bool is_lock_free(void) const volatile {return true;}
@@ -195,9 +197,9 @@ private:
 # include <emmintrin.h>
 
 extern "C" unsigned char __cdecl _InterlockedCompareExchange128(
-    boost::int64_t volatile *Destination,
-    boost::int64_t ExchangeHigh, boost::int64_t ExchangeLow,
-    boost::int64_t *Comparand);
+    std::int64_t volatile *Destination,
+    std::int64_t ExchangeHigh, std::int64_t ExchangeLow,
+    std::int64_t *Comparand);
 extern "C" __m128i _mm_load_si128(__m128i const*_P);
 extern "C" void _mm_store_si128(__m128i *_P, __m128i _B);
 
@@ -241,11 +243,11 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        boost::int64_t* desired_raw = (boost::int64_t*)&desired;
+        std::int64_t* desired_raw = (std::int64_t*)&desired;
         T prev = *(__m128i*)(&i);
         bool success = BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
-            (boost::int64_t volatile *)(&i),
-            desired_raw[1], desired_raw[0], (boost::int64_t*)&expected) != 0;
+            (std::int64_t volatile *)(&i),
+            desired_raw[1], desired_raw[0], (std::int64_t*)&expected) != 0;
         if (!success)
             expected = prev;
         return success;
@@ -260,12 +262,12 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        boost::int64_t* desired_raw = (boost::int64_t*)&r;
+        std::int64_t* desired_raw = (std::int64_t*)&r;
         T prev = i;
 
         while (!BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
-                  (boost::int64_t volatile*)&i, desired_raw[1], desired_raw[0],
-                  (boost::int64_t*)&i))
+                  (std::int64_t volatile*)&i, desired_raw[1], desired_raw[0],
+                  (std::int64_t*)&i))
         {}
 
         return prev;

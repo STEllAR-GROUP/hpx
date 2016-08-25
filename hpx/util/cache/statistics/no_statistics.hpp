@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace statistics
@@ -55,56 +55,56 @@ namespace hpx { namespace util { namespace cache { namespace statistics
 
         /// The function \a get_get_entry_count returns the number of
         /// invocations of the get_entry() API function of the cache.
-        boost::int64_t get_get_entry_count(bool)
+        std::int64_t get_get_entry_count(bool)
         {
             return 0;
         }
 
         /// The function \a get_insert_entry_count returns the number of
         /// invocations of the insert_entry() API function of the cache.
-        boost::int64_t get_insert_entry_count(bool)
+        std::int64_t get_insert_entry_count(bool)
         {
             return 0;
         }
 
         /// The function \a get_update_entry_count returns the number of
         /// invocations of the update_entry() API function of the cache.
-        boost::int64_t get_update_entry_count(bool)
+        std::int64_t get_update_entry_count(bool)
         {
             return 0;
         }
 
         /// The function \a get_erase_entry_count returns the number of
         /// invocations of the erase() API function of the cache.
-        boost::int64_t get_erase_entry_count(bool)
+        std::int64_t get_erase_entry_count(bool)
         {
             return 0;
         }
 
         /// The function \a get_get_entry_time returns the overall time spent
         /// executing of the get_entry() API function of the cache.
-        boost::int64_t get_get_entry_time(bool)
+        std::int64_t get_get_entry_time(bool)
         {
             return 0;
         }
 
         /// The function \a get_insert_entry_time returns the overall time
         /// spent executing of the insert_entry() API function of the cache.
-        boost::int64_t get_insert_entry_time(bool)
+        std::int64_t get_insert_entry_time(bool)
         {
             return 0;
         }
 
         /// The function \a get_update_entry_time returns the overall time
         /// spent executing of the update_entry() API function of the cache.
-        boost::int64_t get_update_entry_time(bool)
+        std::int64_t get_update_entry_time(bool)
         {
             return 0;
         }
 
         /// The function \a get_erase_entry_time returns the overall time spent
         /// executing of the erase() API function of the cache.
-        boost::int64_t get_erase_entry_time(bool)
+        std::int64_t get_erase_entry_time(bool)
         {
             return 0;
         }

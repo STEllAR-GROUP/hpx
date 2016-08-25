@@ -10,6 +10,8 @@
 #include <boost/version.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
@@ -27,9 +29,9 @@ namespace hpx { namespace serialization
         int err_value = hpx::success;
         std::string err_message;
 
-        boost::uint32_t throw_locality_ = 0;
+        std::uint32_t throw_locality_ = 0;
         std::string throw_hostname_;
-        boost::int64_t throw_pid_ = -1;
+        std::int64_t throw_pid_ = -1;
         std::size_t throw_shepherd_ = 0;
         std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;
@@ -76,7 +78,7 @@ namespace hpx { namespace serialization
             if (line)
                 throw_line_ = *line;
 
-            boost::uint32_t const* locality =
+            std::uint32_t const* locality =
                 boost::get_error_info<hpx::detail::throw_locality>(e);
             if (locality)
                 throw_locality_ = *locality;
@@ -86,7 +88,7 @@ namespace hpx { namespace serialization
             if (hostname_)
                 throw_hostname_ = *hostname_;
 
-            boost::int64_t const* pid_ =
+            std::int64_t const* pid_ =
                 boost::get_error_info<hpx::detail::throw_pid>(e);
             if (pid_)
                 throw_pid_ = *pid_;
@@ -220,9 +222,9 @@ namespace hpx { namespace serialization
         int err_value = hpx::success;
         std::string err_message;
 
-        boost::uint32_t throw_locality_ = 0;
+        std::uint32_t throw_locality_ = 0;
         std::string throw_hostname_;
-        boost::int64_t throw_pid_ = -1;
+        std::int64_t throw_pid_ = -1;
         std::size_t throw_shepherd_ = 0;
         std::size_t throw_thread_id_ = 0;
         std::string throw_thread_name_;

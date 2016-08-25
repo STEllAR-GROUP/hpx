@@ -13,6 +13,7 @@ set(example_programs
     composable_guard
     customize_async
     data_actions
+    enumerate_threads
     error_handling
     event_synchronization
     factorial
@@ -53,6 +54,7 @@ set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)

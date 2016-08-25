@@ -13,12 +13,13 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/util/function.hpp>
 
-#include <memory>
-#include <vector>
-
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
+
+#include <cstddef>
+#include <memory>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 

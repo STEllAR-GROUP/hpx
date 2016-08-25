@@ -25,12 +25,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    /// \cond NOINTERNAL
     class thread_init_data;
 
     namespace executors
     {
         struct HPX_EXPORT current_executor;
     }
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
@@ -202,11 +204,13 @@ namespace hpx { namespace threads
         thread_id_type const& id, char const* bt = nullptr,
         error_code& ec = throws);
 #else
+#if !defined(DOXYGEN)
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
         thread_id_type const& id, util::backtrace const* bt = nullptr,
         error_code& ec = throws);
+#endif
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -398,6 +402,7 @@ namespace hpx { namespace threads
         thread_id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
     HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
@@ -418,6 +423,7 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT std::size_t& get_continuation_recursion_count();
     HPX_API_EXPORT void reset_continuation_recursion_count();
+    /// \endcond
 
     /// Returns a reference to the executor which was used to create
     /// the given thread.
@@ -435,11 +441,13 @@ namespace hpx { namespace threads
     HPX_API_EXPORT threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec = throws);
 
+    /// \cond NOINTERNAL
     /// Reset internal (round robin) thread distribution scheme
     HPX_API_EXPORT void reset_thread_distribution();
 
     /// Set the new scheduler mode
     HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
+    /// \endcond
 }}
 
 namespace hpx { namespace this_thread
@@ -636,6 +644,7 @@ namespace hpx { namespace this_thread
     HPX_EXPORT threads::executors::current_executor
         get_executor(error_code& ec = throws);
 
+    /// \cond NOINTERNAL
     // returns the remaining available stack space
     HPX_EXPORT std::ptrdiff_t get_available_stack_space();
 
@@ -643,7 +652,10 @@ namespace hpx { namespace this_thread
     // requested
     HPX_EXPORT bool has_sufficient_stack_space(
         std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
+    /// \endcond
 }}
+
+/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIXME: the API function below belong into the namespace hpx::threads
@@ -918,5 +930,7 @@ namespace hpx { namespace threads
     using applier::register_work;
     using applier::register_work_nullary;
 }}
+
+/// \endcond
 
 #endif /*HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP*/

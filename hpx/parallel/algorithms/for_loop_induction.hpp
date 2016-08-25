@@ -14,6 +14,7 @@
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <type_traits>
 #include <utility>

@@ -20,6 +20,8 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -85,9 +87,9 @@ namespace hpx { namespace components { namespace stubs
     }
 
     template lcos::future<naming::id_type>
-    HPX_EXPORT runtime_support::create_memory_block_async<boost::uint8_t, void>(
+    HPX_EXPORT runtime_support::create_memory_block_async<std::uint8_t, void>(
         naming::id_type const& id, std::size_t count,
-        hpx::actions::manage_object_action<boost::uint8_t, void> const& act);
+        hpx::actions::manage_object_action<std::uint8_t, void> const& act);
 
     lcos::future<int>
     runtime_support::load_components_async(naming::id_type const& gid)
@@ -116,7 +118,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     void runtime_support::free_component_sync(agas::gva const& g,
-        naming::gid_type const& gid, boost::uint64_t count)
+        naming::gid_type const& gid, std::uint64_t count)
     {
         typedef server::runtime_support::free_component_action action_type;
 
@@ -260,8 +262,8 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////
     void runtime_support::update_agas_cache_entry(
         naming::id_type const& targetgid, naming::gid_type const& gid,
-        naming::address const& g, boost::uint64_t count,
-        boost::uint64_t offset)
+        naming::address const& g, std::uint64_t count,
+        std::uint64_t offset)
     {
         typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
@@ -270,8 +272,8 @@ namespace hpx { namespace components { namespace stubs
 
     void runtime_support::update_agas_cache_entry_colocated(
         naming::id_type const& targetgid, naming::gid_type const& gid,
-        naming::address const& g, boost::uint64_t count,
-        boost::uint64_t offset)
+        naming::address const& g, std::uint64_t count,
+        std::uint64_t offset)
     {
         typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
@@ -352,7 +354,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve instance count for given component type
-    lcos::future<boost::int32_t> runtime_support::get_instance_count_async(
+    lcos::future<std::int32_t> runtime_support::get_instance_count_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
@@ -363,7 +365,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
-    boost::int32_t runtime_support::get_instance_count(
+    std::int32_t runtime_support::get_instance_count(
         naming::id_type const& targetgid, components::component_type type)
     {
         // The following get yields control while the action above

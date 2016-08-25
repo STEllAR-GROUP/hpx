@@ -12,6 +12,8 @@
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace lcos
 {
     template <typename ValueType>
@@ -34,31 +36,31 @@ namespace hpx { namespace lcos
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future<void> signal(launch::async_policy,
-            ValueType const& val, boost::uint64_t count = 1)
+            ValueType const& val, std::uint64_t count = 1)
         {
             HPX_ASSERT(this->get_id());
             typedef typename server_type::signal_action action_type;
             return hpx::async<action_type>(this->get_id(), val, count);
         }
         void signal(launch::sync_policy,
-            ValueType const& val, boost::uint64_t count = 1)
+            ValueType const& val, std::uint64_t count = 1)
         {
             signal(hpx::async, val, count).get();
         }
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         lcos::future<void> signal_async(ValueType const& val,
-            boost::uint64_t count = 1)
+            std::uint64_t count = 1)
         {
             return signal(launch::async, val, count);
         }
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void signal_sync(ValueType const& val, boost::uint64_t count = 1)
+        void signal_sync(ValueType const& val, std::uint64_t count = 1)
         {
             signal(launch::sync, val, count);
         }
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void signal(ValueType const& val, boost::uint64_t count = 1)
+        void signal(ValueType const& val, std::uint64_t count = 1)
         {
             signal(launch::sync, val, count);
         }

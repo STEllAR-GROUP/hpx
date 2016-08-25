@@ -11,6 +11,8 @@
 #include <hpx/async.hpp>
 #include <hpx/include/client.hpp>
 
+#include <cstdint>
+
 #include <tests/unit/agas/components/server/simple_mobile_object.hpp>
 
 namespace hpx { namespace test
@@ -36,7 +38,7 @@ struct simple_mobile_object
     {
     }
 
-    boost::uint64_t get_lva()
+    std::uint64_t get_lva()
     {
         typedef server_type::get_lva_action action_type;
         return hpx::async<action_type>(this->get_id()).get();

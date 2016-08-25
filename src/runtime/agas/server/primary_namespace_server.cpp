@@ -24,6 +24,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <memory>
@@ -182,7 +183,7 @@ response primary_namespace::service(
               , boost::str(boost::format(
                     "invalid action code encountered in request, "
                     "action_code(%x)")
-                    % boost::uint16_t(req.get_action_code())));
+                    % std::uint16_t(req.get_action_code())));
             return response();
         }
     };
@@ -280,7 +281,7 @@ void primary_namespace::register_global_counter_types(
 
 void primary_namespace::register_server_instance(
     char const* servicename
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
   , error_code& ec
     )
 {
@@ -679,7 +680,7 @@ response primary_namespace::unbind_gid(
     )
 { // {{{ unbind_gid implementation
     // parameters
-    boost::uint64_t count = req.get_count();
+    std::uint64_t count = req.get_count();
     naming::gid_type id = req.get_gid();
     naming::detail::strip_internal_bits_from_gid(id);
 
@@ -809,8 +810,8 @@ response primary_namespace::allocate(
   , error_code& ec
     )
 { // {{{ allocate implementation
-    boost::uint64_t const count = req.get_count();
-    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
+    std::uint64_t const count = req.get_count();
+    std::uint64_t const real_count = (count) ? (count - 1) : (0);
 
     // Just return the prefix
     // REVIEW: Should this be an error?
@@ -858,8 +859,8 @@ response primary_namespace::allocate(
     next_id_ = upper;
 
     // Set the initial credit count.
-    naming::detail::set_credit_for_gid(lower, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
-    naming::detail::set_credit_for_gid(upper, boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
+    naming::detail::set_credit_for_gid(lower, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+    naming::detail::set_credit_for_gid(upper, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::allocate, count(%1%), "
@@ -1401,7 +1402,7 @@ response primary_namespace::statistics_counter(
     typedef primary_namespace::counter_data cd;
 
     using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
@@ -1514,52 +1515,52 @@ response primary_namespace::statistics_counter(
 }
 
 // access current counter values
-boost::int64_t primary_namespace::counter_data::get_route_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_route_count(bool reset)
 {
     return util::get_and_reset_value(route_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
 {
     return util::get_and_reset_value(bind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
 {
     return util::get_and_reset_value(resolve_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
 {
     return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
 {
     return util::get_and_reset_value(increment_credit_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
 {
     return util::get_and_reset_value(decrement_credit_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
 {
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
 {
     return util::get_and_reset_value(begin_migration_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
 {
     return util::get_and_reset_value(end_migration_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
+std::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
 {
     return util::get_and_reset_value(route_.count_, reset) +
         util::get_and_reset_value(bind_gid_.count_, reset) +
@@ -1573,52 +1574,52 @@ boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
 }
 
 // access execution time counters
-boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_route_time(bool reset)
 {
     return util::get_and_reset_value(route_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
 {
     return util::get_and_reset_value(bind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
 {
     return util::get_and_reset_value(resolve_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
 {
     return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
 {
     return util::get_and_reset_value(increment_credit_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
 {
     return util::get_and_reset_value(decrement_credit_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
 {
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
 {
     return util::get_and_reset_value(begin_migration_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
 {
     return util::get_and_reset_value(end_migration_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
+std::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
 {
     return util::get_and_reset_value(route_.time_, reset) +
         util::get_and_reset_value(bind_gid_.time_, reset) +

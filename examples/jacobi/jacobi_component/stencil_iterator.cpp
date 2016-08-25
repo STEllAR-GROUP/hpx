@@ -8,6 +8,8 @@
 #include "stencil_iterator.hpp"
 #include "server/stencil_iterator.hpp"
 
+#include <cstddef>
+
 namespace jacobi
 {
     hpx::lcos::future<void> stencil_iterator::init(

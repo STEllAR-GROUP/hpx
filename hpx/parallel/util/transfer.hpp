@@ -10,6 +10,7 @@
 #include <hpx/traits/pointer_category.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring> // for std::memmove
 #include <iterator>
 #include <memory>

@@ -18,6 +18,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>

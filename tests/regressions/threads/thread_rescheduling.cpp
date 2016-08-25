@@ -15,6 +15,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstdint>
 #include <chrono>
 #include <vector>
 
@@ -48,19 +49,19 @@ using hpx::find_here;
 namespace detail
 {
     template <typename T1>
-    boost::uint64_t wait(
+    std::uint64_t wait(
         std::vector<future<T1> > const& lazy_values
-      , boost::int32_t suspend_for = 10
+      , std::int32_t suspend_for = 10
         )
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
-        boost::uint64_t handled_count = 0;
+        std::uint64_t handled_count = 0;
 
         while (handled_count < lazy_values.size())
         {
             bool suspended = false;
 
-            for (boost::uint64_t i = 0; i < lazy_values.size(); ++i)
+            for (std::uint64_t i = 0; i < lazy_values.size(); ++i)
             {
                 // loop over all lazy_values, executing the next as soon as its
                 // value gets available
@@ -95,8 +96,8 @@ void change_thread_state(
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
-    boost::uint64_t count
-  , boost::uint64_t grain_size
+    std::uint64_t count
+  , std::uint64_t grain_size
   , thread_id_type thread
     )
 {
@@ -105,10 +106,10 @@ void tree_boot(
 
     std::vector<future<void> > promises;
 
-    boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
+    std::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
-    boost::uint64_t child_count = 0;
-    boost::uint64_t children = 0;
+    std::uint64_t child_count = 0;
+    std::uint64_t children = 0;
 
     if (count > grain_size)
     {
@@ -125,10 +126,10 @@ void tree_boot(
     else
         promises.reserve(count);
 
-    for (boost::uint64_t i = 0; i < children; ++i)
+    for (std::uint64_t i = 0; i < children; ++i)
         promises.push_back(async(&tree_boot, child_count, grain_size, thread));
 
-    for (boost::uint64_t i = 0; i < actors; ++i)
+    for (std::uint64_t i = 0; i < actors; ++i)
         promises.push_back(async(&change_thread_state, thread));
 
     detail::wait(promises);
@@ -136,7 +137,7 @@ void tree_boot(
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_dummy_thread(
-    boost::uint64_t
+    std::uint64_t
     )
 {
     bool woken = false;
@@ -158,8 +159,8 @@ void test_dummy_thread(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    boost::uint64_t const futures = vm["futures"].as<boost::uint64_t>();
-    boost::uint64_t const grain_size = vm["grain-size"].as<boost::uint64_t>();
+    std::uint64_t const futures = vm["futures"].as<std::uint64_t>();
+    std::uint64_t const grain_size = vm["grain-size"].as<std::uint64_t>();
 
     {
         thread_id_type thread_id = register_thread_nullary(
@@ -195,11 +196,11 @@ int main(int argc, char* argv[])
 
     cmdline.add_options()
         ( "futures"
-        , value<boost::uint64_t>()->default_value(64)
+        , value<std::uint64_t>()->default_value(64)
         , "number of futures to invoke before and after the rescheduling")
 
         ( "grain-size"
-        , value<boost::uint64_t>()->default_value(4)
+        , value<std::uint64_t>()->default_value(4)
         , "grain size of the future tree")
     ;
 

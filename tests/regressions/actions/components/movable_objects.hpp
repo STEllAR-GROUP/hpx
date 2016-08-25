@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace test
 {
     // This base class is there to void the is_pod optimization

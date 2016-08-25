@@ -10,6 +10,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
+#include <cstdint>
 #include <mutex>
 
 #include "sine.hpp"
@@ -47,14 +48,14 @@ namespace performance_counters { namespace sine { namespace server
     hpx::performance_counters::counter_value
         sine_counter::get_counter_value(bool reset)
     {
-        boost::int64_t const scaling = 100000;
+        std::int64_t const scaling = 100000;
 
         hpx::performance_counters::counter_value value;
 
         // gather the current value
         {
             std::lock_guard<mutex_type> mtx(mtx_);
-            value.value_ = boost::int64_t(current_value_ * scaling);
+            value.value_ = std::int64_t(current_value_ * scaling);
             if (reset)
                 current_value_ = 0;
             value.time_ = evaluated_at_;
@@ -77,7 +78,7 @@ namespace performance_counters { namespace sine { namespace server
     bool sine_counter::evaluate()
     {
         std::lock_guard<mutex_type> mtx(mtx_);
-        evaluated_at_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
+        evaluated_at_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         current_value_ = std::sin(evaluated_at_ / 1e10);
         return true;
     }

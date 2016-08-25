@@ -17,6 +17,8 @@
 #include <hpx/components/security/capability.hpp>
 #include <hpx/components/security/public_key.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace components { namespace security
 {
 #if defined(HPX_MSVC)

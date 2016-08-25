@@ -13,6 +13,8 @@
 
 #include <boost/system/error_code.hpp>
 
+#include <cstddef>
+
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \namespace parcelset

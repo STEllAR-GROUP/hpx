@@ -29,6 +29,8 @@
 #include <boost/exception_ptr.hpp>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -328,7 +330,7 @@ namespace hpx { namespace parcelset
 
         ////////////////////////////////////////////////////////////////////////
         // Return the given connection cache statistic
-        boost::int64_t get_connection_cache_statistics(
+        std::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset)
         {
             switch (t) {

@@ -17,6 +17,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
+#include <cstdint>
 #include <cstring> // for memcpy
 #include <vector>
 
@@ -75,7 +76,7 @@ namespace hpx { namespace serialization
             (*chunks_)[chunk].size_ = size;
         }
 
-        boost::uint8_t get_chunk_type(std::size_t chunk) const
+        std::uint8_t get_chunk_type(std::size_t chunk) const
         {
             return (*chunks_)[chunk].type_;
         }

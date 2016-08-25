@@ -8,12 +8,13 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
-boost::uint32_t locality_id = boost::uint32_t(-1);
+std::uint32_t locality_id = std::uint32_t(-1);
 
 void worker()
 {
@@ -58,7 +59,7 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
 
-    HPX_TEST_NEQ(boost::uint32_t(-1), locality_id);
+    HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
     HPX_TEST(on_shutdown_executed || 0 != locality_id);
 
     return hpx::util::report_errors();

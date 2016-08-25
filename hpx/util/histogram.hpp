@@ -22,6 +22,7 @@
 #include <boost/accumulators/statistics/min.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <limits>
 #include <utility>

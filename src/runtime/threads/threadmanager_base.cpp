@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,5 +36,12 @@ namespace hpx { namespace threads
         thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state, priority);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state)
+    {
+        return get_thread_manager().enumerate_threads(f, state);
     }
 }}

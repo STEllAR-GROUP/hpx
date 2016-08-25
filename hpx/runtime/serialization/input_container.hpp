@@ -15,6 +15,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
+#include <cstdint>
 #include <cstring> // for memcpy
 #include <memory>
 #include <vector>
@@ -30,7 +31,7 @@ namespace hpx { namespace serialization
             return (*chunks_)[chunk].size_;
         }
 
-        boost::uint8_t get_chunk_type(std::size_t chunk) const
+        std::uint8_t get_chunk_type(std::size_t chunk) const
         {
             return (*chunks_)[chunk].type_;
         }
@@ -127,7 +128,7 @@ namespace hpx { namespace serialization
 
         void load_binary_chunk(void* address, std::size_t count) // override
         {
-            HPX_ASSERT((boost::int64_t)count >= 0);
+            HPX_ASSERT((std::int64_t)count >= 0);
 
             if (filter_.get() || chunks_ == nullptr ||
                 count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {

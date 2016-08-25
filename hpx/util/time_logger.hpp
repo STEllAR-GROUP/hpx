@@ -9,17 +9,17 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/version.hpp>
+#include <cstdint>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #if defined(HPX_WINDOWS)
 #  include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
-#include <fstream>
-#include <string>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INITIAL_TIMES_SIZE 64000
@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    inline boost::uint64_t hrtimer_ticks()
+    inline std::uint64_t hrtimer_ticks()
     {
         return 0;   // FIXME!
     }
@@ -41,7 +41,7 @@ namespace hpx { namespace util
             {
                 start_ = hrtimer_ticks();
             }
-            boost::uint64_t start_;
+            std::uint64_t start_;
         };
 
         time_logger_ref_time const time_logger_ref_time_;
@@ -80,11 +80,11 @@ namespace hpx { namespace util
             std::ofstream out(name.c_str());
 
             int i = 0;
-            std::vector<boost::uint64_t>::iterator eit = times_.end();
-            std::vector<boost::uint64_t>::iterator bit = times_.begin();
-            for (std::vector<boost::uint64_t>::iterator it = bit; it != eit; ++it, ++i)
+            std::vector<std::uint64_t>::iterator eit = times_.end();
+            std::vector<std::uint64_t>::iterator bit = times_.begin();
+            for (std::vector<std::uint64_t>::iterator it = bit; it != eit; ++it, ++i)
             {
-                boost::uint64_t t = *it - detail::time_logger_ref_time_.start_;
+                std::uint64_t t = *it - detail::time_logger_ref_time_.start_;
                 out << t << "," << 2*thread_num_ + ((i % 2) ? 1 : 0) << std::endl;
                 out << t+1 << "," << 2*thread_num_ + ((i % 2) ? 0 : 1) << std::endl;
             }
@@ -105,7 +105,7 @@ namespace hpx { namespace util
     private:
         char const* const description_;
         int thread_num_;
-        std::vector<boost::uint64_t> times_;
+        std::vector<std::uint64_t> times_;
         bool enabled_;
     };
 

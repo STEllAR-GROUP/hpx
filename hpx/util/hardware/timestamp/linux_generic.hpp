@@ -10,14 +10,14 @@
 
 #if defined(__unix__)
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include <time.h>
 
 namespace hpx { namespace util { namespace hardware
 {
 
-inline boost::uint64_t timestamp()
+inline std::uint64_t timestamp()
 {
     struct timespec res;
     clock_gettime(CLOCK_MONOTONIC, &res);

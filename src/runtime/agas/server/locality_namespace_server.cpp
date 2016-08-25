@@ -19,6 +19,8 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <mutex>
@@ -165,7 +167,7 @@ response locality_namespace::service(
               , boost::str(boost::format(
                     "invalid action code encountered in request, "
                     "action_code(%x)")
-                    % boost::uint16_t(req.get_action_code())));
+                    % std::uint16_t(req.get_action_code())));
             return response();
         }
     };
@@ -322,8 +324,8 @@ response locality_namespace::allocate(
 
     // parameters
     parcelset::endpoints_type endpoints = req.get_endpoints();
-    boost::uint64_t const count = req.get_count();
-    boost::uint32_t const num_threads = req.get_num_threads();
+    std::uint64_t const count = req.get_count();
+    std::uint32_t const num_threads = req.get_num_threads();
     naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
     std::unique_lock<mutex_type> l(mutex_);
@@ -346,11 +348,11 @@ response locality_namespace::allocate(
     }
 
     // Compute the locality's prefix.
-    boost::uint32_t prefix = naming::invalid_locality_id;
+    std::uint32_t prefix = naming::invalid_locality_id;
 
     // check if the suggested prefix can be used instead of the next
     // free one
-    boost::uint32_t suggested_locality_id =
+    std::uint32_t suggested_locality_id =
         naming::get_locality_id_from_gid(suggested_prefix);
 
     partition_table_type::iterator it = partitions_.end();
@@ -426,7 +428,7 @@ response locality_namespace::resolve_locality(
 { // {{{ resolve_locality implementation
 
     using hpx::util::get;
-    boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
+    std::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
 
     std::lock_guard<mutex_type> l(mutex_);
     partition_table_type::iterator it = partitions_.find(prefix);
@@ -449,7 +451,7 @@ response locality_namespace::free(
 
     // parameters
     naming::gid_type locality = req.get_gid();
-    boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
+    std::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -474,7 +476,7 @@ response locality_namespace::free(
         {
             l.unlock();
 
-            boost::uint32_t locality_id =
+            std::uint32_t locality_id =
                 naming::get_locality_id_from_gid(locality);
 
             // remove primary namespace
@@ -540,7 +542,7 @@ response locality_namespace::localities(
 
     std::lock_guard<mutex_type> l(mutex_);
 
-    std::vector<boost::uint32_t> p;
+    std::vector<std::uint32_t> p;
 
     partition_table_type::const_iterator it = partitions_.begin()
                                        , end = partitions_.end();
@@ -599,8 +601,8 @@ response locality_namespace::get_num_localities(
 { // {{{ get_num_localities implementation
     std::lock_guard<mutex_type> l(mutex_);
 
-    boost::uint32_t num_localities =
-        static_cast<boost::uint32_t>(partitions_.size());
+    std::uint32_t num_localities =
+        static_cast<std::uint32_t>(partitions_.size());
 
     LAGAS_(info) << (boost::format(
         "locality_namespace::get_num_localities, localities(%1%)")
@@ -619,7 +621,7 @@ response locality_namespace::get_num_threads(
 { // {{{ get_num_threads implementation
     std::lock_guard<mutex_type> l(mutex_);
 
-    std::vector<boost::uint32_t> num_threads;
+    std::vector<std::uint32_t> num_threads;
 
     partition_table_type::iterator end = partitions_.end();
     for (partition_table_type::iterator it = partitions_.begin();
@@ -685,7 +687,7 @@ response locality_namespace::statistics_counter(
     typedef locality_namespace::counter_data cd;
 
     using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
@@ -785,43 +787,43 @@ response locality_namespace::statistics_counter(
 }
 
 // access current counter values
-boost::int64_t locality_namespace::counter_data::get_allocate_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_allocate_count(bool reset)
 {
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolve_locality_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_resolve_locality_count(bool reset)
 {
     return util::get_and_reset_value(resolve_locality_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_free_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_free_count(bool reset)
 {
     return util::get_and_reset_value(free_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_localities_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_localities_count(bool reset)
 {
     return util::get_and_reset_value(localities_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_localities_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_localities_count(bool reset)
 {
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_threads_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_threads_count(bool reset)
 {
     return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data
+std::int64_t locality_namespace::counter_data
         ::get_resolved_localities_count(bool reset)
 {
     return util::get_and_reset_value(resolved_localities_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
 {
     return util::get_and_reset_value(allocate_.count_, reset) +
         util::get_and_reset_value(resolve_locality_.count_, reset) +
@@ -833,42 +835,42 @@ boost::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
 }
 
 // access execution time counters
-boost::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
 {
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolve_locality_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_resolve_locality_time(bool reset)
 {
     return util::get_and_reset_value(resolve_locality_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_free_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_free_time(bool reset)
 {
     return util::get_and_reset_value(free_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_localities_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_localities_time(bool reset)
 {
     return util::get_and_reset_value(localities_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_localities_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_localities_time(bool reset)
 {
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_threads_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_threads_time(bool reset)
 {
     return util::get_and_reset_value(num_threads_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolved_localities_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_resolved_localities_time(bool reset)
 {
     return util::get_and_reset_value(resolved_localities_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 {
     return util::get_and_reset_value(allocate_.time_, reset) +
         util::get_and_reset_value(resolve_locality_.time_, reset) +

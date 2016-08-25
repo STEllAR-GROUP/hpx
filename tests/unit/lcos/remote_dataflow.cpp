@@ -11,11 +11,12 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::uint32_t> void_f_count;
+boost::atomic<std::uint32_t> void_f_count;
 
 void void_f(hpx::future<int> &&) { ++void_f_count; }
 HPX_PLAIN_ACTION(void_f);

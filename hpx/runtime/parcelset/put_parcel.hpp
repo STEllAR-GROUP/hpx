@@ -23,6 +23,7 @@
 #include <hpx/util/protect.hpp>
 #include <hpx/util/detail/pack.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>

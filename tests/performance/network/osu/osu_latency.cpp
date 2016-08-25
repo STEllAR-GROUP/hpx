@@ -14,6 +14,8 @@
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -85,7 +87,7 @@ double receive_double(
 
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
-            [&](boost::uint64_t j)
+            [&](std::uint64_t j)
             {
                 double d = 0.0;
                 msg(dest, d);
@@ -123,7 +125,7 @@ double receive(
 
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
-            [&](boost::uint64_t j)
+            [&](std::uint64_t j)
             {
                 msg(dest,
                     buffer_type(send_buffer, size, buffer_type::reference));

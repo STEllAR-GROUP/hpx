@@ -15,6 +15,8 @@
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <numeric>
 #include <vector>
@@ -92,7 +94,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
-            [&](boost::uint64_t j)
+            [&](std::uint64_t j)
             {
                 send(dest, buffer_type(aligned_send_buffer, size,
                         buffer_type::reference));
@@ -123,7 +125,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
     {
         std::vector<hpx::future<double> > benchmarks;
 
-        for (boost::uint32_t locality_id = 0; locality_id !=
+        for (std::uint32_t locality_id = 0; locality_id !=
             localities.size(); ++locality_id)
         {
             ireceive_action receive;

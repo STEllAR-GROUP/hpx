@@ -40,11 +40,12 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
 
+#include <cstddef>
+#include <cstdint>
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) throw();
@@ -237,7 +238,7 @@ namespace hpx { namespace threads { namespace coroutines
                 increment_stack_recycle_count();
             }
 
-            typedef boost::atomic<boost::int64_t> counter_type;
+            typedef boost::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_recycle_counter()
             {
@@ -245,12 +246,12 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static boost::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t get_stack_recycle_count(bool reset)
             {
                 return util::get_and_reset_value(get_stack_recycle_counter(), reset);
             }
 
-            static boost::uint64_t increment_stack_recycle_count()
+            static std::uint64_t increment_stack_recycle_count()
             {
                 return ++get_stack_recycle_counter();
             }

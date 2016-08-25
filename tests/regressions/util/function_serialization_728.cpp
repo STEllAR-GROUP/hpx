@@ -15,6 +15,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <vector>
 
 using boost::program_options::variables_map;

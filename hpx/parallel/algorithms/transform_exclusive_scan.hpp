@@ -21,6 +21,7 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <type_traits>

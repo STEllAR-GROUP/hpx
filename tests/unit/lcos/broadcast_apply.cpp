@@ -9,6 +9,8 @@
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 void f1()
@@ -19,7 +21,7 @@ HPX_PLAIN_ACTION(f1);
 HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(f1_action)
 HPX_REGISTER_BROADCAST_APPLY_ACTION(f1_action)
 
-void f2(boost::uint32_t i)
+void f2(std::uint32_t i)
 {
 }
 HPX_PLAIN_ACTION(f2);
@@ -35,7 +37,7 @@ HPX_PLAIN_ACTION(f1_idx);
 HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION(f1_idx_action)
 HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION(f1_idx_action)
 
-void f2_idx(boost::uint32_t i, std::size_t)
+void f2_idx(std::uint32_t i, std::size_t)
 {
 }
 HPX_PLAIN_ACTION(f2_idx);

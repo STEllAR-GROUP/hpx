@@ -17,6 +17,7 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <cstdint>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -97,7 +98,7 @@ namespace hpx { namespace components
                 });
         }
 
-        boost::uint32_t pin_count() const
+        std::uint32_t pin_count() const
         {
             std::lock_guard<mutex_type> l(mtx_);
             return pin_count_;
@@ -190,7 +191,7 @@ namespace hpx { namespace components
 
     private:
         mutable mutex_type mtx_;
-        boost::uint32_t pin_count_;
+        std::uint32_t pin_count_;
         hpx::lcos::local::promise<void> trigger_migration_;
         bool was_marked_for_migration_;
     };

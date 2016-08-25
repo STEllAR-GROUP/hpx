@@ -17,14 +17,15 @@
 #include <boost/atomic.hpp>
 #include <boost/scoped_array.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
-    boost::atomic<boost::uint64_t>* entered
-  , boost::atomic<boost::uint64_t>* started
-  , boost::scoped_array<boost::atomic<boost::uint64_t> >* blocked_threads
+    boost::atomic<std::uint64_t>* entered
+  , boost::atomic<std::uint64_t>* started
+  , boost::scoped_array<boost::atomic<std::uint64_t> >* blocked_threads
     )
 {
     (*blocked_threads)[hpx::get_worker_thread_num()].fetch_add(1);
@@ -37,26 +38,26 @@ void blocker(
 
 ///////////////////////////////////////////////////////////////////////////////
 volatile int i = 0;
-boost::uint64_t delay = 100;
+std::uint64_t delay = 100;
 
 int hpx_main()
 {
     {
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
-        boost::atomic<boost::uint64_t> entered(0);
-        boost::atomic<boost::uint64_t> started(0);
+        boost::atomic<std::uint64_t> entered(0);
+        boost::atomic<std::uint64_t> started(0);
 
-        boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+        std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-        boost::scoped_array<boost::atomic<boost::uint64_t> >
+        boost::scoped_array<boost::atomic<std::uint64_t> >
             blocked_threads(
-                new boost::atomic<boost::uint64_t>[os_thread_count]);
+                new boost::atomic<std::uint64_t>[os_thread_count]);
 
-        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+        for (std::uint64_t i = 0; i < os_thread_count; ++i)
             blocked_threads[i].store(0);
 
-        for (boost::uint64_t i = 0; i < (os_thread_count - 1); ++i)
+        for (std::uint64_t i = 0; i < (os_thread_count - 1); ++i)
         {
             hpx::threads::register_work(
                 hpx::util::bind(&blocker, &entered, &started, &blocked_threads),
@@ -82,7 +83,7 @@ int hpx_main()
 
         started.fetch_add(1);
 
-        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+        for (std::uint64_t i = 0; i < os_thread_count; ++i)
             HPX_TEST(blocked_threads[i].load() <= 1);
     }
 
@@ -102,7 +103,7 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(100)
+        , value<std::uint64_t>(&delay)->default_value(100)
         , "time in micro-seconds for the delay loop")
         ;
 

@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/mpl/or.hpp>
 
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 
 namespace htts2
@@ -112,9 +112,9 @@ struct driver
 
   protected:
     // Reads from the command line.
-    boost::uint64_t osthreads_;
-    boost::uint64_t tasks_;
-    boost::uint64_t payload_duration_;
+    std::uint64_t osthreads_;
+    std::uint64_t tasks_;
+    std::uint64_t payload_duration_;
     io_type         io_;
 
     // hold on to command line

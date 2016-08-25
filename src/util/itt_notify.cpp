@@ -11,6 +11,8 @@
 #include <legacy/ittnotify.h>
 #include <hpx/util/internal/ittnotify.h>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 bool use_ittnotify_api = false;

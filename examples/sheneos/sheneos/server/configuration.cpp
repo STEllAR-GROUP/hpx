@@ -9,6 +9,7 @@
 
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <string>
 
 #include "configuration.hpp"

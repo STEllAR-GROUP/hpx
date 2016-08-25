@@ -22,6 +22,7 @@
 #include <boost/type_traits/is_pod.hpp>
 
 #include <algorithm>            /* for std::min */
+#include <cstddef>
 
 namespace boost
 {

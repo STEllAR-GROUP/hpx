@@ -16,6 +16,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {

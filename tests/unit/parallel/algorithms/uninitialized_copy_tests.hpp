@@ -14,6 +14,7 @@
 #include <boost/atomic.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <numeric>
 #include <utility>
 #include <vector>

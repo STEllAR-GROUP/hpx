@@ -11,6 +11,8 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::migration_support<

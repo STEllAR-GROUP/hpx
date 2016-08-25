@@ -21,12 +21,12 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <sys/param.h>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #if defined(HPX_HAVE_VALGRIND)
@@ -243,7 +243,7 @@ namespace hpx { namespace threads { namespace coroutines
                     context_size;
             }
 
-            typedef boost::atomic<boost::int64_t> counter_type;
+            typedef boost::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_unbind_counter()
             {
@@ -251,12 +251,12 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static boost::uint64_t get_stack_unbind_count(bool reset)
+            static std::uint64_t get_stack_unbind_count(bool reset)
             {
                 return util::get_and_reset_value(get_stack_unbind_counter(), reset);
             }
 
-            static boost::uint64_t increment_stack_unbind_count()
+            static std::uint64_t increment_stack_unbind_count()
             {
                 return ++get_stack_unbind_counter();
             }
@@ -267,12 +267,12 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static boost::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t get_stack_recycle_count(bool reset)
             {
                 return util::get_and_reset_value(get_stack_recycle_counter(), reset);
             }
 
-            static boost::uint64_t increment_stack_recycle_count()
+            static std::uint64_t increment_stack_recycle_count()
             {
                 return ++get_stack_recycle_counter();
             }

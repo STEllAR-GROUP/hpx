@@ -23,6 +23,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

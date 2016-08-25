@@ -27,6 +27,7 @@
 #include <boost/throw_exception.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iosfwd>
 #include <stdexcept>
 #include <type_traits>

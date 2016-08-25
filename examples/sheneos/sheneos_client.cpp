@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

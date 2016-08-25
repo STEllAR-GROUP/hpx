@@ -16,6 +16,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <ctime>
 #include <mutex>
 #include <vector>
@@ -38,7 +39,7 @@ int main()
             [&ready, &stm, i]
             {
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(nullptr)));
+                    static_cast<std::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
@@ -65,7 +66,7 @@ int main()
             [&ready, &stm, k, i]
             {
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(nullptr)));
+                    static_cast<std::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }

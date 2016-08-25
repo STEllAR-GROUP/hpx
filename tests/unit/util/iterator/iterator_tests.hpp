@@ -15,6 +15,7 @@
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
