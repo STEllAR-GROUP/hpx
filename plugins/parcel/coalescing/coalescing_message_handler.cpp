@@ -149,7 +149,7 @@ namespace hpx { namespace plugins { namespace parcel
         // empty and time since last parcel is larger than coalescing interval.
         if (stopped_ ||
             (buffer_.empty() &&
-                std::chrono::microseconds(time_since_last_parcel) > interval
+                std::chrono::nanoseconds(time_since_last_parcel) > interval
            ))
         {
             ++num_messages_;
