@@ -400,8 +400,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param params   [in] The executor parameters object to use for
         ///                 determining the chunk size for the given number of
         ///                 tasks \a num_tasks.
-        /// \param exec     [in] The executor object which will be used used
-        ///                 for scheduling of the the loop iterations.
+        /// \param exec     [in] The executor object which will be used
+        ///                 for scheduling of the loop iterations.
         /// \param f        [in] The function which will be optionally scheduled
         ///                 using the given executor.
         /// \param num_tasks [in] The number of tasks the chunk size should be
@@ -426,8 +426,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param params   [in] The executor parameters object to use for
         ///                 determining the number of chunks for the given
         ///                 number of \a cores.
-        /// \param exec     [in] The executor object which will be used used
-        ///                 for scheduling of the the loop iterations.
+        /// \param exec     [in] The executor object which will be used
+        ///                 for scheduling of the loop iterations.
         /// \param cores    [in] The number of cores the number of chunks
         ///                 should be determined for.
         ///

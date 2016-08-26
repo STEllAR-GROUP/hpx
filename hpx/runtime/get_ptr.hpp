@@ -119,7 +119,7 @@ namespace hpx
     }
     /// \endcond
 
-    /// \brief Returns a future referring to a the pointer to the
+    /// \brief Returns a future referring to the pointer to the
     ///  underlying memory of a component
     ///
     /// The function hpx::get_ptr can be used to extract a future
@@ -136,7 +136,7 @@ namespace hpx
     ///            given \a id.
     ///
     /// \note      This function will successfully return the requested result
-    ///            only if the given component is currently located on the the
+    ///            only if the given component is currently located on the
     ///            calling locality. Otherwise the function will raise an
     ///            error.
     ///
@@ -169,7 +169,7 @@ namespace hpx
     ///            for the component instance with the given \a id.
     ///
     /// \note      This function will successfully return the requested result
-    ///            only if the given component is currently located on the the
+    ///            only if the given component is currently located on the
     ///            requesting locality. Otherwise the function will raise and
     ///            error.
     ///
@@ -207,7 +207,7 @@ namespace hpx
     ///            for the component instance with the given \a id.
     ///
     /// \note      This function will successfully return the requested result
-    ///            only if the given component is currently located on the the
+    ///            only if the given component is currently located on the
     ///            requesting locality. Otherwise the function will raise and
     ///            error.
     ///

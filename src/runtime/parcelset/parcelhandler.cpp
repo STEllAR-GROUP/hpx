@@ -692,7 +692,7 @@ namespace hpx { namespace parcelset
 
             it = handlers_.find(key);
             if (it != handlers_.end()) {
-                // if some other thread has created the entry in the mean time
+                // if some other thread has created the entry in the meantime
                 l.unlock();
                 if (&ec != &throws) {
                     if ((*it).second.get())

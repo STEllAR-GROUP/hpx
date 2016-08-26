@@ -227,7 +227,7 @@ hpx::future<std::uint64_t> fibonacci_future_all_when_all(std::uint64_t n)
 
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on
-    // its completion and which calculates the the final result
+    // its completion and which calculates the final result
     return hpx::when_all(f1, f2).then(when_all_wrapper());
 }
 

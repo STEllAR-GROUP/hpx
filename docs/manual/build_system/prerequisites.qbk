@@ -111,8 +111,8 @@ Depending on the options you chose while building and installing __hpx__,
 you will find that __hpx__ may depend on several other libraries such as those
 listed below.
 
-[note In order to use a high speed parcelport, we currently recommend to
-      configure HPX to use MPI so that MPI can be used for communication
+[note In order to use a high speed parcelport, we currently recommend
+      configuring HPX to use MPI so that MPI can be used for communication
       between different localities. Please set the CMake Variable MPI_CXX_COMPILER
       to your MPI C++ Compiler wrapper if not detected automatically.]
 

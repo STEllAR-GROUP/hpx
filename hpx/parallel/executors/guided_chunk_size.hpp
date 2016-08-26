@@ -31,7 +31,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// chunk size parameter defines the minimum block size. The default chunk
     /// size is 1.
     ///
-    /// \note This executor parameters type is equivalent to OpenMPs GUIDED
+    /// \note This executor parameters type is equivalent to OpenMP's GUIDED
     ///       scheduling directive.
     ///
     struct guided_chunk_size : executor_parameters_tag

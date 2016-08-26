@@ -13,7 +13,7 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
-    /// The function \a wait_each is a operator allowing to join on the results
+    /// The function \a wait_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     /// Additionally, the supplied function is called for each of the passed
@@ -37,7 +37,7 @@ namespace hpx
     template <typename F, typename Future>
     void wait_each(F&& f, std::vector<Future>&& futures);
 
-    /// The function \a wait_each is a operator allowing to join on the results
+    /// The function \a wait_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     /// Additionally, the supplied function is called for each of the passed
@@ -64,7 +64,7 @@ namespace hpx
     template <typename F, typename Iterator>
     void wait_each(F&& f, Iterator begin, Iterator end);
 
-    /// The function \a wait_each is a operator allowing to join on the results
+    /// The function \a wait_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     /// Additionally, the supplied function is called for each of the passed
@@ -88,7 +88,7 @@ namespace hpx
     template <typename F, typename ...T>
     void wait_each(F&& f, T&&... futures);
 
-    /// The function \a wait_each is a operator allowing to join on the result
+    /// The function \a wait_each is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     /// Additionally, the supplied function is called for each of the passed

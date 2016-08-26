@@ -39,7 +39,7 @@ base class.
 
             // This will define the action type 'some_member_action' which
             // represents the member function 'some_member_function' of the
-            // obect type 'some_component'.
+            // object type 'some_component'.
             ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(some_component, some_member_function, some_member_action);
         };
     }
@@ -48,14 +48,14 @@ base class.
     // it to be invoked remotely. This declaration macro has to be placed in the
     // header file defining the component itself.
     //
-    // Note: The second arguments to the macro below have to be systemwide-unique
+    // Note: The second argument to the macro below has to be systemwide-unique
     //       C++ identifiers
     //
     ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action, some_component_some_action);
 
 There is more boiler plate code which has to be placed into a
 source file in order for the component to be usable. Every component type
-requires to have macros placed into its source file, one for each component type
+is required to have macros placed into its source file, one for each component type
 and one macro for each of the actions defined by the component type.
 
 For instance:

@@ -99,14 +99,14 @@ namespace hpx
     ///          where <code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
+    ///          each of the items in this vector is a global address of one
     ///          of the newly created components.
     ///          * If the explicit template argument \a Component
     ///          represents an array of a client side object type (i.e. \a Component[],
     ///          where <code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
+    ///          each of the items in this vector is a client side instance of
     ///          the given type, each representing one of the newly created
     ///          components.
     ///
@@ -185,14 +185,14 @@ namespace hpx
     ///          where <code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
+    ///          each of the items in this vector is a global address of one
     ///          of the newly created components.\n
     ///          * If the explicit template argument \a Component
     ///          represents an array of a client side object type (i.e. \a Component[],
     ///          where <code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
+    ///          each of the items in this vector is a client side instance of
     ///          the given type, each representing one of the newly created
     ///          components.
     ///

@@ -35,7 +35,7 @@ set(CMAKE_CROSSCOMPILING ON)
 # Set our platform name
 set(HPX_PLATFORM "XeonPhi")
 
-# Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
+# Always disable the ibverbs parcelport as it is non-functional on the BGQ.
 set(HPX_WITH_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
 
 # We have a bunch of cores on the MIC ... increase the default

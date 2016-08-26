@@ -852,7 +852,7 @@ namespace hpx { namespace components { namespace server
                       "passed second termination detection (count: "
                    << count << ").";
 
-        // Shut down all localities except the the local one, we can't use
+        // Shut down all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
@@ -889,7 +889,7 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
-        // Terminate all localities except the the local one, we can't use
+        // Terminate all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         {
