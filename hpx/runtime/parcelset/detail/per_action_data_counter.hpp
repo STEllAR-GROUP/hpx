@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace detail
 
     private:
         typedef std::unordered_map<
-                char const*, performance_counters::parcels::gatherer_nolock,
+                std::string, performance_counters::parcels::gatherer_nolock,
                 hpx::util::jenkins_hash
             > counter_data_map;
 

@@ -22,7 +22,7 @@ namespace hpx { namespace parcelset { namespace detail
         performance_counters::parcels::data_point const& data)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        data_[action].add_data(data);
+        data_[std::string(action)].add_data(data);
     }
 
     // retrieve counter data
@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset { namespace detail
         std::string const& action, bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        return data_[action.c_str()].num_parcels(reset);
+        return data_[action].num_parcels(reset);
     }
 
     // the total time serialization took (nanoseconds)
@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset { namespace detail
         std::string const& action, bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        return data_[action.c_str()].total_serialization_time(reset);
+        return data_[action].total_serialization_time(reset);
     }
 
     // total data managed (bytes)
@@ -48,7 +48,7 @@ namespace hpx { namespace parcelset { namespace detail
         std::string const& action, bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        return data_[action.c_str()].total_bytes(reset);
+        return data_[action].total_bytes(reset);
     }
 }}}
 
