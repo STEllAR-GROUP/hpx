@@ -48,6 +48,7 @@ set(tests
     remote_latch
     run_guarded
     shared_future
+    sliding_semaphore
     unwrapped
     when_all
     when_any
@@ -93,6 +94,7 @@ set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
+set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_latch_PARAMETERS LOCALITIES 2)
