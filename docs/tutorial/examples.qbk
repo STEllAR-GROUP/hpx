@@ -166,7 +166,7 @@ creating.
 This picture should now start making sense. The function `fibonacci()` is
 wrapped in an action `fibonacci_action`, which was run synchronously but
 created asynchronous work, then returns a `boost::uint64_t`
-representing the result of the function `fibonacci()`. Now, lets look at the
+representing the result of the function `fibonacci()`. Now, let's look at the
 function `fibonacci()`:
 
 [fib_func]
@@ -251,7 +251,7 @@ section __using_pbs__.
 
 [c++]
 
-Now that you have compiled and run the code, lets look at how the code works,
+Now that you have compiled and run the code, let's look at how the code works,
 beginning with `main()`:
 
 [import ../../examples/quickstart/hello_world.cpp]
@@ -640,7 +640,7 @@ will be initialized to `init_principal` and `init_rate` when
 those initial values. These shared futures then enter the for loop and are
 passed to `interest`. Next `principal` and `interest` are passed to the
 reassignment of `principal` using a [classref dataflow]. A dataflow will
-first wait for it's arguments to be ready before launching any callbacks,
+first wait for its arguments to be ready before launching any callbacks,
 so `add` in this case will not begin until both `principal` and `interest` are ready.
 This loop continues for each compound period that must be calculated. To
 see how `interest` and `principal` are calculated in the loop let us look
@@ -656,7 +656,7 @@ following statement:
 ``
 
 This statement calls [memberref hpx::future::get]`()` on the shared future principal
-which had it's value calculated by our for loop. The program will wait here until the
+which had its value calculated by our for loop. The program will wait here until the
 entire dataflow tree has been calculated and the value assigned to result. The program
 then prints out the final value of the investment and the amount of interest made by subtracting
 the final value of the investment from the initial value of the investment.

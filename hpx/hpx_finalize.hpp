@@ -14,7 +14,7 @@
 /// \namespace hpx
 namespace hpx
 {
-    /// \brief Main function to gracefully terminate the the HPX runtime system.
+    /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
     /// The function \a hpx::finalize is the main way to (gracefully) exit any
     /// HPX application. It should be called from one locality only (usually
@@ -69,7 +69,7 @@ namespace hpx
     HPX_EXPORT int finalize(double shutdown_timeout,
         double localwait = -1.0, error_code& ec = throws);
 
-    /// \brief Main function to gracefully terminate the the HPX runtime system.
+    /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
     /// The function \a hpx::finalize is the main way to (gracefully) exit any
     /// HPX application. It should be called from one locality only (usually

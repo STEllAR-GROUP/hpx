@@ -94,19 +94,19 @@ demonstrating this. The first snippet has to go into the header file:
 
             // This will define the action type 'some_member_action' which
             // represents the member function 'some_member_function' of the
-            // obect type 'some_component'.
+            // object type 'some_component'.
             ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(some_component, some_member_function,
                 some_member_action);
         };
     }
 
-    // Note: The second arguments to the macro below have to be systemwide-unique
+    // Note: The second argument to the macro below has to be systemwide-unique
     //       C++ identifiers
     ``[macroref HPX_REGISTER_ACTION_DECLARATION
     `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action, some_component_some_action);
 
 The next snippet belongs into a source file (e.g. the main application source
-file) in the most simple case:
+file) in the simplest case:
 
     typedef hpx::components::simple_component<app::some_component> component_type;
     typedef app::some_component some_component;
@@ -229,7 +229,7 @@ the local locality:
     //
     // ... other code can be executed here
     //
-    f.get();    // this will possibly wait for the asyncronous operation to 'return'
+    f.get();    // this will possibly wait for the asynchronous operation to 'return'
 
 (as before, the function `hpx::find_here()` returns the id of the local
 locality (the locality this code is executed on).
@@ -253,7 +253,7 @@ created earlier, this invocation looks like:
     //
     // ... other code can be executed here
     //
-    cout << f.get();    // this will possibly wait for the asyncronous operation to 'return' 42
+    cout << f.get();    // this will possibly wait for the asynchronous operation to 'return' 42
 
 [note The invocation of `f.get()` will return the result immediately (without
       suspending the calling thread) if the result from the asynchronous operation
@@ -386,7 +386,7 @@ the continuation should be executed, the code above has to be written as:
             hpx::make_continuation(act2, hpx::find_here()));
     hpx::cout << f.get() << "\n";   // will print: 86 ((42 + 1) * 2)
 
-Similarily, it is possible to chain more than 2 operations:
+Similarly, it is possible to chain more than 2 operations:
 
     action1_type act1;     // define an instance of 'action1_type'
     action2_type act2;     // define an instance of 'action2_type'

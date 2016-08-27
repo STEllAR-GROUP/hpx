@@ -114,7 +114,7 @@ namespace hpx { namespace threads
         thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally stack size
     };
 
-    /// Get the readable string representing the the given stack size
+    /// Get the readable string representing the given stack size
     /// constant.
     HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
 }}

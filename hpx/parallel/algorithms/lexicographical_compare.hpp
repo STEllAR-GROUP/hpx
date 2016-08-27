@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to comapre
+    /// the second range [first2, last2). uses a provided predicate to compare
     /// elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparision is an operation with the
+    /// \note     Lexicographical comparison is an operation with the
     ///           following properties
     ///             - Two ranges are compared element by element
     ///             - The first mismatching element defines which range

@@ -63,7 +63,7 @@ described in section __loading_ini__.
 In this section we assume to have a simple application component which exposes
 one member function as a component action. The header file `app_server.hpp`
 declares the C++ type to be exposed as a component. This type has a member
-function `print_greating()` which is exposed as an action (`print_greating_action`).
+function `print_greeting()` which is exposed as an action (`print_greeting_action`).
 We assume the source files for this example are located in a directory
 referenced by [teletype]`$APP_ROOT`[c++]:
 
@@ -73,23 +73,23 @@ referenced by [teletype]`$APP_ROOT`[c++]:
 
     namespace app
     {
-        // Define a simple component exposing one action 'print_greating'
+        // Define a simple component exposing one action 'print_greeting'
         class HPX_COMPONENT_EXPORT server
           : public hpx::components::simple_component_base<server>
         {
-            void print_greating ()
+            void print_greeting ()
             {
                 hpx::cout << "Hey, how are you?\n" << hpx::flush;
             }
 
             // Component actions need to be declared, this also defines the
-            // type 'print_greating_action' representing the action.
-            ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(server, print_greating, print_greating_action);
+            // type 'print_greeting_action' representing the action.
+            ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(server, print_greeting, print_greeting_action);
         };
     }
 
     // Declare boilerplate code required for each of the component actions.
-    ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::server::print_greating_action);
+    ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::server::print_greeting_action);
 
 The corresponding source file contains mainly macro invocations which define
 boilerplate code needed for __hpx__ to function properly:
@@ -105,11 +105,11 @@ boilerplate code needed for __hpx__ to function properly:
 
     // Define boilerplate code required for each of the component actions. Use the
     // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
-    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::server::print_greating_action);
+    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::server::print_greeting_action);
 
 The following gives an example of how the component can be used. We create one
 instance of the `app::server` component on the current locality and invoke the
-exposed action `print_greating_action` using the global id of the newly created
+exposed action `print_greeting_action` using the global id of the newly created
 instance. Note, that no special code is required to delete the component
 instance after it is not needed anymore. It will be deleted automatically when
 its last reference goes out of scope, here at the closing brace of the block
@@ -126,11 +126,11 @@ surrounding the code.
             hpx::naming:id_type app_server_instance =
                 hpx::create_component<app::server>(``[funcref hpx::find_here `hpx::find_here`]``());
 
-            // Create an instance of the action 'print_greating_action'.
-            app::server::print_greating_action print_greating;
+            // Create an instance of the action 'print_greeting_action'.
+            app::server::print_greeting_action print_greeting;
 
-            // Invoke the action 'print_greating' on the newly created component.
-            print_greating(app_server_instance);
+            // Invoke the action 'print_greeting' on the newly created component.
+            print_greeting(app_server_instance);
         }
         return ``[funcref hpx::finalize `hpx::finalize`]``();
     }

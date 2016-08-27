@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// assigned to threads. If \a chunk_size is not specified, the iterations
     /// are evenly (if possible) divided contiguously among the threads.
     ///
-    /// \note This executor parameters type is equivalent to OpenMPs STATIC
+    /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
     struct static_chunk_size : executor_parameters_tag

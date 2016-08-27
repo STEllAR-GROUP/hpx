@@ -126,7 +126,7 @@ hpx_option(HPX_WITH_MALLOC
 
 hpx_option(HPX_WITH_HWLOC
   BOOL
-  "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced."
+  "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
 
 hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
@@ -157,7 +157,7 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   OFF CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
-  "The HPX documentation should be build as a single page HTML (default OFF)."
+  "The HPX documentation should be built as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
 if(MSVC)

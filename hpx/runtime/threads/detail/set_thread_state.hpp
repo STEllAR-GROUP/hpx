@@ -53,7 +53,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // make sure that the thread has not been suspended and set active again
-        // in the mean time
+        // in the meantime
         thread_state current_state = thrd->get_state();
 
         if (current_state.state() == previous_state.state() &&

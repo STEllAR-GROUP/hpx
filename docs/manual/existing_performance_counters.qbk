@@ -183,7 +183,7 @@ system and application performance.
           locality.
         ]
         [None]
-        [Returns the the overall time spent executing of the specified API
+        [Returns the overall time spent executing of the specified API
          function of the AGAS cache.]
     ]
 ]
@@ -980,7 +980,7 @@ system and application performance.
     [   [`/threads/count/stack-recycles`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the recylcling
+          where:[br] `*` is the locality id of the locality the recycling
           operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
@@ -1234,7 +1234,7 @@ system and application performance.
     [   [`/runtime/memory/resident`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the the allocated
+          where:[br] `*` is the locality id of the locality the allocated
           resident memory should be queried. The locality id is a (zero based)
           number identifying the locality.
         ]
@@ -1505,7 +1505,7 @@ system and application performance.
           where:[br] `*` is the locality id of the locality the number of
           messages for the given action should be queried for. The
           locality id is a (zero based) number identifying the locality.]
-        [Returns the average number of of parcels sent in a message generated
+        [Returns the average number of parcels sent in a message generated
          by the message handler associated with the action which is given by
          the counter parameter.]
         [The action type. This is the string which has been used
@@ -1545,7 +1545,7 @@ system and application performance.
 
          The first unit of measure displayed for this counter (`[ns]`) refers to
          the lower and upper boundary values in the returned histogram data only.
-         The second unit of mesure displayed (`[0.1%]`) refers to the actual
+         The second unit of measure displayed (`[0.1%]`) refers to the actual
          histogram data.
 
          For each bucket the counter shows a value between `0` and `1000`,
@@ -1557,7 +1557,7 @@ system and application performance.
          [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
          [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
 
-         The action type may be follwowed by a comma separated list of up-to
+         The action type may be followed by a comma separated list of up-to
          three numbers: the lower and upper boundaries for the collected
          histogram, and the number of buckets for the histogram to generate.
          By default these three numbers will be assumed to be `0` (`[ns]`,

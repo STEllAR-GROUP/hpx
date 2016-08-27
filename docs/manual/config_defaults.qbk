@@ -540,8 +540,8 @@ to `ON`).
     [[`hpx.parcel.mpi.multithreaded`]
      [This property is used to determine what threading mode to use when
       initializing MPI. If this setting is `0`, __hpx__ will initialize MPI
-      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will
-      will initialize MPI with `MPI_THREAD_MULTI`.]]
+      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will 
+      initialize MPI with `MPI_THREAD_MULTI`.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]]
     [[`hpx.parcel.mpi.processor_name`]

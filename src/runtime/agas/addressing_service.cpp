@@ -2739,7 +2739,7 @@ void addressing_service::register_counter_types()
           ""
         },
         { "/agas/time/cache/get_entry", performance_counters::counter_raw,
-          "returns the the overall time spent executing of the get_entry API "
+          "returns the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2748,7 +2748,7 @@ void addressing_service::register_counter_types()
           "ns"
         },
         { "/agas/time/cache/insert_entry", performance_counters::counter_raw,
-          "returns the the overall time spent executing of the insert_entry API "
+          "returns the overall time spent executing of the insert_entry API "
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2757,7 +2757,7 @@ void addressing_service::register_counter_types()
           ""
         },
         { "/agas/time/cache/update_entry", performance_counters::counter_raw,
-          "returns the the overall time spent executing of the update_entry API "
+          "returns the overall time spent executing of the update_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2766,7 +2766,7 @@ void addressing_service::register_counter_types()
           "ns"
         },
         { "/agas/time/cache/erase_entry", performance_counters::counter_raw,
-          "returns the the overall time spent executing of the erase_entry API "
+          "returns the overall time spent executing of the erase_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,

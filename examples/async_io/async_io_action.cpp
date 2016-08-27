@@ -81,7 +81,7 @@ int hpx_main()
         // wait for it to complete without blocking any of the HPX
         // thread-manager threads. This will suspend the current HPX
         // thread until the IO operation is finished. Other work could
-        // be executed in the mean time.
+        // be executed in the meantime.
         int result = io(id, "Write this string to std::cout");
 
         // Print the returned result.

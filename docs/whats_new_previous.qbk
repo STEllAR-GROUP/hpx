@@ -1249,9 +1249,9 @@ runs. We believe to have achieved this goal as we now can reliably run __hpx__
 applications on up to ~24k cores. We have also shown that HPX can be used with
 success for symmetric runs (applications using both, host cores and Intel
 Xeon/Phi coprocessors). This is a huge step forward in terms of
-the usability of __hpx__. The main focus of this work involed isolating
+the usability of __hpx__. The main focus of this work involved isolating
 the causes of the segmentation faults at start up and shut down.  Many of
-these issues were discovered to be the result of the suspention of threads
+these issues were discovered to be the result of the suspension of threads
 which hold locks.
 
 A very important improvement introduced with this release is the
@@ -1286,7 +1286,7 @@ a documentation of our progress).
 
 With this release we put a lot of effort into changing the code base to be more
 compatible to C++11. These changes have caused the following issues for
-backward compatiblility:
+backward compatibility:
 
 * Move to Variadics- All of the API now uses variadic templates. However, this
 change required to modify the argument sequence for some of the exiting API
@@ -1513,7 +1513,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1295] - building issue
 * [issue 1293] - Transpose example
 * [issue 1292] - Wrong abs() function used in example
-* [issue 1291] - non-syncronized shift operators have been removed
+* [issue 1291] - non-synchronized shift operators have been removed
 * [issue 1290] - RDTSCP is defined as true for Xeon Phi build
 * [issue 1289] - Fixing 1288
 * [issue 1288] - Add new performance counters
