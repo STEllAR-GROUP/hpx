@@ -427,7 +427,7 @@ The following code is from:
 All __hpx__ component server classes must inherit publicly from the __hpx__ component
 base class: [classref hpx::components::component_base]`<>`
 
-The accumulator component inherits from [classref hpx::components::locking_hock]`<>`.
+The accumulator component inherits from [classref hpx::components::locking_hook]`<>`.
 This allows the runtime system to ensure that all action invocations are
 serialized. That means that the system ensures that no two actions are invoked
 at the same time on a given component instance. This makes the component thread
