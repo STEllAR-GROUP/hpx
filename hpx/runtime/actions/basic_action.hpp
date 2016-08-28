@@ -16,7 +16,8 @@
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -751,6 +752,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
         template struct transfer_action<action>;                              \
     }}                                                                        \

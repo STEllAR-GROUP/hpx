@@ -753,7 +753,7 @@ namespace hpx { namespace parcelset
             sender_connection->set_state(parcelport_connection::state_send_pending);
 #endif
             // encode the parcels
-            std::size_t num_parcels = encode_parcels(&p, 1,
+            std::size_t num_parcels = encode_parcels(*this, &p, 1,
                     sender_connection->buffer_,
                     archive_flags_,
                     this->get_max_outbound_message_size(),
@@ -924,7 +924,7 @@ namespace hpx { namespace parcelset
             sender_connection->verify(parcel_locality_id);
 #endif
             // encode the parcels
-            std::size_t num_parcels = encode_parcels(&parcels[0],
+            std::size_t num_parcels = encode_parcels(*this, &parcels[0],
                     parcels.size(), sender_connection->buffer_,
                     archive_flags_,
                     this->get_max_outbound_message_size(),

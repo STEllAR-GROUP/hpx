@@ -18,7 +18,7 @@ namespace hpx { namespace parcelset {
     template <typename ConnectionHandler>
     class parcelport_impl;
 
-    std::uint64_t get_max_inbound_size(parcelport&);
+    std::int64_t HPX_EXPORT get_max_inbound_size(parcelport&);
 
     template <typename Connection, typename BufferType,
         typename ChunkType = serialization::serialization_chunk>

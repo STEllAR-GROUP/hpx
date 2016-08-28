@@ -117,11 +117,27 @@ namespace hpx { namespace parcelset
                         archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                        std::size_t archive_pos = archive.current_pos();
+                        std::int64_t serialize_time = timer.elapsed_nanoseconds();
+#endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;
-                        // make sure this parcel ended up on the right locality
 
+                        std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                        performance_counters::parcels::data_point action_data;
+                        action_data.bytes_ = archive.current_pos() - archive_pos;
+                        action_data.serialization_time_ =
+                            add_parcel_time - serialize_time;
+                        action_data.num_parcels_ = 1;
+                        pp.add_received_data(p.get_action()->get_action_name(),
+                            action_data);
+#endif
+
+                        // make sure this parcel ended up on the right locality
                         naming::gid_type const& here = hpx::get_locality();
                         if (hpx::get_runtime_ptr() && here &&
                             (naming::get_locality_id_from_gid(
@@ -139,7 +155,6 @@ namespace hpx { namespace parcelset
                         }
 
                         // be sure not to measure add_parcel as serialization time
-                        std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         pp.add_received_parcel(std::move(p), num_thread);
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;

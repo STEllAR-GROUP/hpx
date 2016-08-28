@@ -13,6 +13,9 @@
 
 #include <cstdint>
 
+#include <cstdint>
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
@@ -108,6 +111,22 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT bool remote_action_invocation_counter_discoverer(
         counter_info const&, discover_counter_func const&,
         discover_counters_mode, error_code&);
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+    ///////////////////////////////////////////////////////////////////////////
+    // Creation function for per-action parcel data counters
+    HPX_API_EXPORT naming::gid_type per_action_data_counter_creator(
+        counter_info const& info,
+        hpx::util::function_nonser<
+            std::int64_t(std::string const&, bool)
+        > const& f,
+        error_code& ec);
+
+    // Discoverer function for per-action parcel data counters
+    HPX_API_EXPORT bool per_action_data_counter_discoverer(
+        counter_info const& info, discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec);
+#endif
 }}
 
 #endif
