@@ -62,25 +62,29 @@ namespace lcos {
         {
             template <typename SharedState>
             HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                SharedState const& shared_state, id_type const& id)
+                SharedState const& shared_state, id_type const& id,
+                bool& id_retrieved)
             {
                 // by default, do nothing
             }
 
             template <typename SharedState>
             HPX_FORCEINLINE static auto call(int,
-                    SharedState const& shared_state, id_type const& id)
+                    SharedState const& shared_state, id_type const& id,
+                    bool& id_retrieved)
             ->  decltype(shared_state->set_id(id))
             {
                 shared_state->set_id(id);
+                id_retrieved = true;
             }
         };
 
         template <typename SharedState>
         HPX_FORCEINLINE
-        void call_set_id(SharedState const& shared_state, id_type const& id)
+        void call_set_id(SharedState const& shared_state, id_type const& id,
+            bool& id_retrieved)
         {
-            set_id_helper::call(0, shared_state, id);
+            set_id_helper::call(0, shared_state, id, id_retrieved);
         }
 
         // Promise base contains the actual implementation for the remotely
@@ -133,7 +137,7 @@ namespace lcos {
                     lco_ptr.get());
 
                 // Pass id to shared state if it exposes the set_id() function
-                detail::call_set_id(this->shared_state_, id_);
+                detail::call_set_id(this->shared_state_, id_, id_retrieved_);
 
                 // This helper is used to keep the component alive until the
                 // completion handler has been called. We need to manually free
