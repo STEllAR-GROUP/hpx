@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +21,7 @@
 // test failures, which is expected.
 // The bit masks in the tests below are assuming a 12 core system (with
 // hyper threading), with 2 NUMA nodes (2 sockets), 6 cores each.
-//#define VERIFY_AFFINITY_MASKS
+#define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_HWLOC)
@@ -967,13 +967,13 @@ namespace test
 #if defined(VERIFY_AFFINITY_MASKS)
         std::vector<hpx::threads::mask_type> affinities;
         affinities.resize(hpx::get_os_thread_count(), 0);
-        hpx::threads::parse_affinity_options(t->option_, affinities, ec);
+        hpx::threads::parse_affinity_options(options, affinities, ec);
         HPX_TEST(!ec);
         HPX_TEST_EQ(affinities.size(), 2u);
         HPX_TEST_EQ(std::count(affinities.begin(), affinities.end(), 0), 0);
 
         i = 0;
-        for (hpx::threads::mask_type m : affinities)
+        for (hpx::threads::mask_type const& m : affinities)
         {
             HPX_TEST_EQ(t->masks[i], m);
             ++i;

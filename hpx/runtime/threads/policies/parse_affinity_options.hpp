@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace detail
     typedef std::vector<full_mapping_type> mappings_spec_type;
     typedef boost::variant<distribution_type, mappings_spec_type> mappings_type;
 
-    HPX_API_EXPORT bounds_type extract_bounds(spec_type& m,
+    HPX_API_EXPORT bounds_type extract_bounds(spec_type const& m,
         std::size_t default_last, error_code& ec);
 
     HPX_API_EXPORT void parse_mappings(std::string const& spec,
