@@ -38,7 +38,7 @@ namespace hpx { namespace plugins { namespace parcel
         if (name.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "invocation_count_registry::register_class",
+                "coalescing_counter_registry::register_action",
                 "Cannot register an action with an empty name");
         }
 
@@ -82,7 +82,7 @@ namespace hpx { namespace plugins { namespace parcel
         if (name.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "invocation_count_registry::register_class",
+                "coalescing_counter_registry::register_action",
                 "Cannot register an action with an empty name");
         }
 

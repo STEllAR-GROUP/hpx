@@ -36,9 +36,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#if defined(_POSIX_VERSION)
 #include <iostream>
-#endif
 #include <memory>
 #include <sstream>
 #include <stdexcept>

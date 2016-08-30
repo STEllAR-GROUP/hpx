@@ -17,9 +17,10 @@
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -539,10 +540,28 @@ namespace hpx { namespace actions
 
 namespace hpx { namespace traits
 {
+    /// \cond NOINTERNAL
     template <typename Action>
     struct needs_automatic_registration<hpx::actions::transfer_action<Action> >
       : needs_automatic_registration<Action>
     {};
+    /// \endcond
 }}
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+namespace hpx { namespace parcelset { namespace detail
+{
+    /// \cond NOINTERNAL
+    template <typename Action>
+    void register_per_action_data_counter_types(
+        per_action_data_counter_registry& registry)
+    {
+        registry.register_class(
+            hpx::actions::detail::get_action_name<Action>()
+        );
+    }
+    /// \endcond
+}}}
+#endif
 
 #endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

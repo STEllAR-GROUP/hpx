@@ -550,7 +550,7 @@ thread-safe access to an instance of this clas (used internally).
             if ( to_write->empty() )
                 to_write->push_back( write_once() );
 
-            // we need to add it a the end; if there are any destinations,
+            // we need to add it at the end; if there are any destinations,
             // we need to add it after those
             bool can_append_to_back = to_write->back().destinations.empty();
             if ( !can_append_to_back)

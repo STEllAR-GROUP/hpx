@@ -73,7 +73,7 @@
   [fig cmake_settings2.png..Example CMake Adding Entry..win32_cmake_settings2]
 
   Alternatively you could provide `BOOST_LIBRARYDIR` instead of `BOOST_ROOT`
-  with a difference that `BOOST_LIBRARYDIR` should point to the sudbirectory
+  with a difference that `BOOST_LIBRARYDIR` should point to the subdirectory
   inside Boost root where all the compiled DLLs/LIBs are. I myself have used
   `BOOST_LIBRARYDIR` which pointed to the `bin.v2` subdirectory under the Boost
   rootdir.

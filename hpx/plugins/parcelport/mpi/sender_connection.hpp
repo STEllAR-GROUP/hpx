@@ -13,6 +13,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -63,7 +64,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         sender_connection(
             sender_type * s
           , int dst
-          , performance_counters::parcels::gatherer & parcels_sent
+          , parcelset::parcelport* pp
         )
           : state_(initialized)
           , sender_(s)
@@ -72,7 +73,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , request_ptr_(nullptr)
           , chunks_idx_(0)
           , ack_(0)
-          , parcels_sent_(parcels_sent)
+          , pp_(pp)
           , there_(
                 parcelset::locality(
                     locality(
@@ -262,7 +263,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             handler_(ec);
             buffer_.data_point_.time_ =
                 util::high_resolution_clock::now() - buffer_.data_point_.time_;
-            parcels_sent_.add_data(buffer_.data_point_);
+            pp_->add_sent_data(buffer_.data_point_);
             buffer_.clear();
 
             return true;
@@ -312,7 +313,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         std::size_t chunks_idx_;
         char ack_;
 
-        performance_counters::parcels::gatherer & parcels_sent_;
+        parcelset::parcelport* pp_;
 
         parcelset::locality there_;
     };

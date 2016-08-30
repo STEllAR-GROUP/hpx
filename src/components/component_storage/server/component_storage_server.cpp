@@ -7,6 +7,7 @@
 #include <hpx/components/component_storage/server/component_storage.hpp>
 #include <hpx/runtime/find_localities.hpp>
 
+#include <sstream>
 #include <vector>
 
 namespace hpx { namespace components { namespace server

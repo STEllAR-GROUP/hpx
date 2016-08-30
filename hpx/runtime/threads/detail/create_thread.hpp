@@ -14,6 +14,7 @@
 #include <hpx/util/logging.hpp>
 
 #include <cstddef>
+#include <sstream>
 
 namespace hpx { namespace threads { namespace detail
 {

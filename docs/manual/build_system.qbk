@@ -10,7 +10,7 @@
 
 The buildsystem for __hpx__ is based on __cmake__. CMake is a cross-platform
 build-generator tool. CMake does not build the project, it generates the files
-needed by your build tool (GNU make, Visual Studio, etc) for building __hpx__.
+needed by your build tool (GNU make, Visual Studio, etc.) for building __hpx__.
 
 This section gives an introduction on how to use our build system to build __hpx__
 and how to use __hpx__ in your own projects.

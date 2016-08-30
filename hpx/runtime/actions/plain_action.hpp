@@ -23,6 +23,7 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #if defined(__NVCC__)
@@ -121,9 +122,9 @@ namespace hpx { namespace traits
 ///       }
 /// \endcode
 ///
-/// \note Usually this macro will not be used in user code unless the intend is
+/// \note Usually this macro will not be used in user code unless the intent is
 /// to avoid defining the action_type in global namespace. Normally, the use of
-/// the macro \a HPX_PLAIN_ACTION is recommend.
+/// the macro \a HPX_PLAIN_ACTION is recommended.
 ///
 /// \note The macro \a HPX_DEFINE_PLAIN_ACTION can be used with 1 or 2
 /// arguments. The second argument is optional. The default value for the

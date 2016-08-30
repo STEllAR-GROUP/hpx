@@ -77,10 +77,10 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     # Set our platform name
     set(HPX_PLATFORM "native")
     # Disable generic coroutines (and use posix version)
-    set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "diable generic coroutines")
+    set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "disable generic coroutines")
     # BGAS nodes support ibverbs
     set(HPX_WITH_PARCELPORT_IBVERBS ON CACHE BOOL "")
-    # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
+    # Always disable the tcp parcelport as it is non-functional on the BGQ.
     set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
     # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
     set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
@@ -154,9 +154,9 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(CMAKE_CROSSCOMPILING ON)
     # Set our platform name
     set(HPX_PLATFORM "BlueGeneQ")
-    # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
+    # Always disable the ibverbs parcelport as it is non-functional on the BGQ.
     set(HPX_WITH_IBVERBS_PARCELPORT OFF)
-    # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
+    # Always disable the tcp parcelport as it is non-functional on the BGQ.
     set(HPX_WITH_TCP_PARCELPORT OFF)
     # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
     set(HPX_WITH_MPI_PARCELPORT ON)
@@ -259,7 +259,7 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(CMAKE_CROSSCOMPILING ON)
     # Set our platform name
     set(HPX_PLATFORM "XeonPhi")
-    # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
+    # Always disable the ibverbs parcelport as it is non-functional on the BGQ.
     set(HPX_WITH_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
     # We have a bunch of cores on the MIC ... increase the default
     set(HPX_WITH_MAX_CPU_COUNT "256" CACHE STRING "")

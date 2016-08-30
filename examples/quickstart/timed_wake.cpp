@@ -10,6 +10,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <chrono>
+#include <iostream>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

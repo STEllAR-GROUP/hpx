@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <sstream>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>

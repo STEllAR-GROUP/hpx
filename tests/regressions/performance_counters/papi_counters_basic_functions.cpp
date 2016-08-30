@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 
 #include <cstdint>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool close_enough(double m, double ex, double perc)

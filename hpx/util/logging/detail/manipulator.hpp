@@ -59,9 +59,9 @@ Same goes for destinations.
 
 Remember:
 - formatter - allows formatting the message before writing it
-(like, prepending extra information - an index, the time, thread id, etc)
+(like, prepending extra information - an index, the time, thread id, etc.)
 - destination - is a place where the message is to be written to
-(like, the console, a file, a socket, etc)
+(like, the console, a file, a socket, etc.)
 
 In your @ref hpx::util::logging::writer::format_write "format_write" object,
 you can have several formatters and destinations.
@@ -71,9 +71,9 @@ Each formatter and destination classes implement
 <tt>operator()(arg_type msg);</tt>, which
 processes the message:
 - for a formatter, this formats the msg
-  (like, prepends time to it, appends an enter, etc)
+  (like, prepends time to it, appends an enter, etc.)
 - for a destination, this writes the message to a destination (like,
-to console, a file, etc)
+to console, a file, etc.)
 
 
 

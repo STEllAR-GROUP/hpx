@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 
 #include <omp.h>
 

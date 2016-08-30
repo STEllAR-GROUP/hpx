@@ -227,7 +227,7 @@ the HPX application is started with one locality per node and uses all available
 cores on a node. You can change the number of localities started per node (for
 example to account for NUMA effects) by specifying the `-n` option of srun. The
 number of cores per locality can be set by `-c`. The `<application-arguments>`
-are any application specific arguments which need to passed on to the
+are any application specific arguments which need to be passed on to the
 application.
 
 [note There is no need to use any of the __hpx__ command line options related to
@@ -255,7 +255,7 @@ following command:
 
 After the shell has been opened, you can run your HPX application. By default,
 it uses all available cores. Note that if you requested one node, you don't
-need to do `srun` again. However, if you requested more than one nodes, and want
+need to do `srun` again. However, if you requested more than one node, and want
 to run your distributed application, you can use `srun` again to start up the
 distributed HPX application. It will use the resources that have been requested
 for the interactive shell.

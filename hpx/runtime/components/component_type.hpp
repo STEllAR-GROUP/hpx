@@ -29,7 +29,7 @@ namespace hpx { namespace components
         component_invalid = -1,
 
         // Runtime support component (provides system services such as
-        // component creation, etc). One per locality.
+        // component creation, etc.). One per locality.
         component_runtime_support = 0,
 
         // Pseudo-component to be used for plain actions

@@ -17,6 +17,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 std::vector<boost::lockfree::queue<std::uint64_t>*> queues;

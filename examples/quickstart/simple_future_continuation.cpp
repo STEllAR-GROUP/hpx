@@ -8,6 +8,8 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <iostream>
+
 int get_id(int i)
 {
     return i;

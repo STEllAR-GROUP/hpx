@@ -111,7 +111,7 @@ For more information please refer to the documentation of
 
 Sometimes it is not desirable to collect all the ambient information about the
 error at the point where it happened as this might impose too much overhead for
-simple scenarious. In this case, __hpx__ provides a lightweight error code
+simple scenarios. In this case, __hpx__ provides a lightweight error code
 facility which will hold the error code only. The following snippet demonstrates
 its use:
 

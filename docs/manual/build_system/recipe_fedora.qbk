@@ -21,7 +21,7 @@ HPX on Fedora 22].]
      fop boost-devel boost-openmpi-devel boost-mpich-devel
 ``
 
-* Get the developmet branch of HPX
+* Get the development branch of HPX
 ``
    git clone https://github.com/STEllAR-GROUP/hpx.git
 ``

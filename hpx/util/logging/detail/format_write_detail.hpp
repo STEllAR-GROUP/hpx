@@ -53,7 +53,7 @@ it's time to write it.
 The current class defines the following concepts:
 - formatter - allows formatting the message before writing it
 - destination - is a place where the message is to be written to (like, the console,
-a file, a socket, etc)
+a file, a socket, etc.)
 
 You can add several formatters and destinations. Note that each formatter class and
 each destination class is a @c %manipulator.

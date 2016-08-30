@@ -10,7 +10,7 @@
 
 __cmake__ is a cross-platform build-generator tool. CMake does not build the
 project, it generates the files needed by your build tool (GNU make, Visual
-Studio, etc) for building __hpx__.
+Studio, etc.) for building __hpx__.
 
 In general, the HPX __cmake__ scripts try to adhere to the general cmake policies on
 how to write __cmake__ based projects.
@@ -26,7 +26,7 @@ CMake comes with extensive documentation in the form of html files and on the
 cmake executable itself. Execute `cmake --help` for further help options.
 
 CMake requires to know for which build tool it shall generate files (GNU make,
-Visual Studio, Xcode, etc). If not specified on the command line, it tries to
+Visual Studio, Xcode, etc.). If not specified on the command line, it tries to
 guess it based on you environment. Once identified the build tool, CMake uses
 the corresponding Generator for creating files for your build tool. You can
 explicitly specify the generator with the command line option

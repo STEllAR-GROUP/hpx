@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///////////////////////////////////////////////////////////////////////////
     /// The timed_executor_traits type is used to request execution agents from
     /// an executor. It is analogous to the interaction between containers and
-    /// allocator_traits. The generated generated execution agents support
+    /// allocator_traits. The generated execution agents support
     /// timed scheduling functionality (in addition to what is supported
     /// execution agents generated using execution_traits type).
     ///

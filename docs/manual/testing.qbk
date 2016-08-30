@@ -12,13 +12,13 @@ The tests are driven by the __ctest__ tool and are executed automatically by bui
 (see __stellar_hpx_buildbot__) on each commit to the __hpx__ __stellar_hpx_github__
 repository.
 In addition, it is encouraged to run the test suite manually to ensure proper operation on
-your target system. If a test fails for your platform, we highly recommend to submit an issue
+your target system. If a test fails for your platform, we highly recommend submitting an issue
 on our __stellar_hpx_github_issues__ tracker with detailed information about the target system.
 
 [section:running_tests Running tests manually]
 
 Running the tests manually is as easy as typing ``make tests``. This will build all tests and
-run them once the tests are build successfully. After the tests have been built, you can
+run them once the tests are builtsuccessfully. After the tests have been built, you can
 invoke separate tests with the help of the ``ctest`` command. Please see the __ctest_doc__ for
 further details.
 

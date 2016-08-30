@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 
 template <typename BaseClock = std::chrono::steady_clock>
 struct payload_precision_tracker : htts2::clocksource<BaseClock>

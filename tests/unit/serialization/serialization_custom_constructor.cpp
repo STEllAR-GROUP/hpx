@@ -13,6 +13,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <iostream>
 #include <memory>
 #include <vector>
 

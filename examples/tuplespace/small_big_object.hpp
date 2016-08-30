@@ -11,6 +11,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <cstdint>
+#include <iostream>
 
 #define ENABLE_DEBUG false
 

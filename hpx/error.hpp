@@ -33,7 +33,7 @@ namespace hpx
         not_implemented = 2,
         ///< The operation is not implemented
         out_of_memory = 3,
-        ///< The operation caused a out of memory condition
+        ///< The operation caused an out of memory condition
         bad_action_code = 4,
         ///<
         bad_component_type = 5,

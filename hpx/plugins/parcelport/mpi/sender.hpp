@@ -46,12 +46,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             get_next_free_tag();
         }
 
-        connection_ptr create_connection(int dest,
-            performance_counters::parcels::gatherer & parcels_sent)
+        connection_ptr create_connection(int dest, parcelset::parcelport* pp)
         {
-            return
-                std::make_shared<connection_type>(
-                    this, dest, parcels_sent);
+            return std::make_shared<connection_type>(this, dest, pp);
         }
 
         void add(connection_ptr const & ptr)

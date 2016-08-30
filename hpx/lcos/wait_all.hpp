@@ -12,7 +12,7 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
-    /// The function \a wait_all is a operator allowing to join on the result
+    /// The function \a wait_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     ///
@@ -30,7 +30,7 @@ namespace hpx
     template <typename InputIter>
     void wait_all(InputIter first, InputIter last);
 
-    /// The function \a wait_all is a operator allowing to join on the result
+    /// The function \a wait_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     ///
@@ -45,7 +45,7 @@ namespace hpx
     template <typename R>
     void wait_all(std::vector<future<R>>&& futures);
 
-    /// The function \a wait_all is a operator allowing to join on the result
+    /// The function \a wait_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     ///
@@ -60,7 +60,7 @@ namespace hpx
     template <typename ...T>
     void wait_all(T &&... futures);
 
-    /// The function \a wait_all_n is a operator allowing to join on the result
+    /// The function \a wait_all_n is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     ///

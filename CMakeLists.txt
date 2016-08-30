@@ -126,7 +126,7 @@ hpx_option(HPX_WITH_MALLOC
 
 hpx_option(HPX_WITH_HWLOC
   BOOL
-  "Use Hwloc for hardware topolgy information and thread pinning. If disabled, performance might be reduced."
+  "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
 
 hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
@@ -157,7 +157,7 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   OFF CATEGORY "Build Targets")
 
 hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
-  "The HPX documentation should be build as a single page HTML (default OFF)."
+  "The HPX documentation should be built as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
 if(MSVC)
@@ -486,6 +486,12 @@ hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
 hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
   "Enable the TCP based parcelport."
   ON CATEGORY "Parcelport")
+hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
+  "Enable performance counters reporting parcelport statistics on a per-action basis."
+  OFF CATEGORY "Parcelport")
+if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+endif()
 
 ## ibverbs parcelport settings
 hpx_option(HPX_WITH_PARCELPORT_IBVERBS_IFNAME STRING

@@ -392,7 +392,7 @@ work is performed, thus abstracting the (potentially platform-specific)
 mechanisms for launching work. To accommodate the goals of the Parallelism TS,
 whose algorithms aim to support the broadest range of possible platforms, the
 requirements that all executors are expected to fulfill are small. They are
-also be consistent with a broad range of execution semantics, including
+also consistent with a broad range of execution semantics, including
 preemptive threads, cooperative fibers, GPU threads, and SIMD vector
 units, among others.
 

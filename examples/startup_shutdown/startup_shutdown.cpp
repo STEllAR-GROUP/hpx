@@ -29,6 +29,8 @@
 
 #include <boost/program_options.hpp>
 
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
