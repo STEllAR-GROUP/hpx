@@ -91,6 +91,7 @@ namespace hpx { namespace serialization { namespace detail
 
         void reset()
         {
+            size_ = 0;
             done_ = false;
             num_futures_ = 0;
             triggered_futures_ = 0;

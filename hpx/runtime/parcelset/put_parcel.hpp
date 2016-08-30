@@ -14,13 +14,10 @@
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/serialization/detail/preprocess.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/protect.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <cstddef>
@@ -105,87 +102,30 @@ namespace hpx { namespace parcelset {
             }
         };
 
-        template <typename PutParcel>
-        struct parcel_await
-          : std::enable_shared_from_this<parcel_await<PutParcel>>
-        {
-            template <typename PutParcel_, typename... Args>
-            parcel_await(PutParcel_&& pp,
-                naming::address&& addr, Args&&... args)
-              : put_parcel_(std::forward<PutParcel_>(pp)),
-                p_(
-                    create_parcel::call(
-                        // is the first parameter of args a continuation?
-                        std::integral_constant<bool,
-                            traits::is_continuation<
-                                typename util::detail::at_index<0, Args...>::type
-                            >::value &&
-                            // we need to treat unique pointers to continuations
-                            // differently
-                            !std::is_same<
-                                std::unique_ptr<actions::continuation>,
-                                typename util::detail::at_index<0, Args...>::type
-                            >::value
-                        >(),
-                        // is the second parameter of args a action?
-                        traits::is_action<
-                            typename util::detail::at_index<1, Args...>::type
-                        >(),
-                        naming::gid_type(), std::move(addr),
-                        std::forward<Args>(args)...
-                    )
-                ),
-                size_(0)
-            {
-            }
-
-            void apply(naming::gid_type&& gid)
-            {
-                p_.set_destination_id(std::move(gid));
-                (*this)();
-            }
-
-            void operator()()
-            {
-                preprocess_.reset();
-                typedef hpx::serialization::output_archive archive_type;
-                std::shared_ptr<archive_type> archive(new archive_type(preprocess_));
-                (*archive) << p_;
-
-                // We are doing a fixed point iteration until we are sure that the
-                // serialization process requires nothing more to wait on ...
-                // Things where we need waiting:
-                //  - (shared_)future<id_type>: when the future wasn't ready yet, we
-                //      need to do another await round for the id splitting
-                //  - id_type: we need to await, if and only if, the credit of the
-                //      needs to split.
-                if(preprocess_.has_futures())
-                {
-                    auto this_ = this->shared_from_this();
-                    preprocess_([this_, archive](){ (*this_)(); });
-                    return;
-                }
-                HPX_ASSERT(preprocess_.size() == archive->bytes_written());
-                p_.size() = preprocess_.size();
-                p_.set_splitted_gids(std::move(preprocess_.splitted_gids_));
-                put_parcel_(std::move(p_));
-            }
-
-            typename hpx::util::decay<PutParcel>::type put_parcel_;
-            parcel p_;
-            hpx::serialization::detail::preprocess preprocess_;
-            std::size_t size_;
-        };
 
         template <typename PutParcel, typename... Args>
         void put_parcel_impl(PutParcel&& pp,
             naming::id_type dest, naming::address&& addr, Args&&... args)
         {
-            typedef parcel_await<PutParcel> parcel_awaiter_type;
-            std::shared_ptr<parcel_awaiter_type> parcel_awaiter(
-                new parcel_awaiter_type(
-                    std::forward<PutParcel>(pp), std::move(addr),
-                    std::forward<Args>(args)...));
+            typedef
+                typename util::detail::at_index<0, Args...>::type
+                arg0_type;
+            typedef
+                typename util::detail::at_index<1, Args...>::type
+                arg1_type;
+
+            // Is the first argument a continuation?
+            std::integral_constant<bool,
+                traits::is_continuation<arg0_type>::value &&
+                // We need to tread unique pointers to continuations
+                // differently
+                !std::is_same<
+                    std::unique_ptr<actions::continuation>, arg0_type
+                >::value
+            > is_continuation;
+
+            // Is the second paramter a action?
+            traits::is_action<arg1_type> is_action;
 
             if (dest.get_management_type() == naming::id_type::unmanaged)
             {
@@ -193,13 +133,22 @@ namespace hpx { namespace parcelset {
                 naming::detail::strip_credits_from_gid(gid);
                 HPX_ASSERT(gid);
 
-                parcel_awaiter->apply(std::move(gid));
+                pp(detail::create_parcel::call(
+                    is_continuation, is_action,
+                    std::move(gid), std::move(addr),
+                    std::forward<Args>(args)...
+                ));
             }
             else if (dest.get_management_type() == naming::id_type::managed_move_credit)
             {
                 naming::gid_type gid = naming::detail::move_gid(dest.get_gid());
                 HPX_ASSERT(gid);
-                parcel_awaiter->apply(std::move(gid));
+
+                pp(detail::create_parcel::call(
+                    is_continuation, is_action,
+                    std::move(gid), std::move(addr),
+                    std::forward<Args>(args)...
+                ));
             }
             else
             {
@@ -207,16 +156,34 @@ namespace hpx { namespace parcelset {
                     naming::detail::split_gid_if_needed(dest.get_gid());
                 if (splitted_gid.is_ready())
                 {
-                    parcel_awaiter->apply(splitted_gid.get());
+                    pp(detail::create_parcel::call(
+                        is_continuation, is_action,
+                        splitted_gid.get(), std::move(addr),
+                        std::forward<Args>(args)...
+                    ));
                 }
                 else
                 {
                     splitted_gid.then(
-                        [dest, parcel_awaiter]
-                        (hpx::future<naming::gid_type> f)
-                        {
-                            parcel_awaiter->apply(f.get());
-                        }
+                        hpx::util::bind(
+                            hpx::util::one_shot(
+                                [is_continuation, is_action, dest]
+                                (hpx::future<naming::gid_type> f,
+                                 typename util::decay<PutParcel>::type&& pp_,
+                                 naming::address&& addr_,
+                                 typename util::decay<Args>::type&&... args_)
+                                {
+                                    pp_(detail::create_parcel::call(
+                                        is_continuation, is_action,
+                                        f.get(), std::move(addr_),
+                                        std::move(args_)...
+                                    ));
+                                }
+                            ),
+                            hpx::util::placeholders::_1,
+                            std::forward<PutParcel>(pp), std::move(addr),
+                            std::forward<Args>(args)...
+                        )
                     );
                 }
             }

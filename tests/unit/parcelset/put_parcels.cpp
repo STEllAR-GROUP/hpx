@@ -55,19 +55,16 @@ void test_plain_argument(hpx::id_type const& id)
     results.reserve(numparcels_default);
 
     // create parcels
-    std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::promise<hpx::id_type> p;
         auto f = p.get_future();
-        parcels.push_back(
+        // send parcel
+        hpx::get_runtime().get_parcel_handler().put_parcel(
             generate_parcel<test1_action>(id, p.get_id(), data)
         );
         results.push_back(std::move(f));
     }
-
-    // send parcels
-    hpx::get_runtime().get_parcel_handler().put_parcels(std::move(parcels));
 
     // verify all messages got actually sent to the correct locality
     hpx::wait_all(results);
@@ -94,14 +91,14 @@ void test_future_argument(hpx::id_type const& id)
     results.reserve(numparcels_default);
 
     // create parcels
-    std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::local::promise<double> p_arg;
         hpx::lcos::promise<hpx::id_type> p_cont;
         auto f_cont = p_cont.get_future();
 
-        parcels.push_back(
+        // send parcel
+        hpx::get_runtime().get_parcel_handler().put_parcel(
             generate_parcel<test2_action>(id, p_cont.get_id(),
                 p_arg.get_future())
         );
@@ -109,9 +106,6 @@ void test_future_argument(hpx::id_type const& id)
         args.push_back(std::move(p_arg));
         results.push_back(std::move(f_cont));
     }
-
-    // send parcels
-    hpx::get_runtime().get_parcel_handler().put_parcels(std::move(parcels));
 
     // now make the futures ready
     for (hpx::lcos::local::promise<double>& arg : args)
@@ -140,7 +134,6 @@ void test_mixed_arguments(hpx::id_type const& id)
     results.reserve(numparcels_default);
 
     // create parcels
-    std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
         hpx::lcos::promise<hpx::id_type> p_cont;
@@ -148,7 +141,8 @@ void test_mixed_arguments(hpx::id_type const& id)
 
         if (std::rand() % 2)
         {
-            parcels.push_back(
+            // send parcel
+            hpx::get_runtime().get_parcel_handler().put_parcel(
                 generate_parcel<test1_action>(id, p_cont.get_id(), data)
             );
         }
@@ -156,7 +150,8 @@ void test_mixed_arguments(hpx::id_type const& id)
         {
             hpx::lcos::local::promise<double> p_arg;
 
-            parcels.push_back(
+            // send parcel
+            hpx::get_runtime().get_parcel_handler().put_parcel(
                 generate_parcel<test2_action>(id, p_cont.get_id(),
                     p_arg.get_future())
             );
@@ -166,9 +161,6 @@ void test_mixed_arguments(hpx::id_type const& id)
 
         results.push_back(std::move(f_cont));
     }
-
-    // send parcels
-    hpx::get_runtime().get_parcel_handler().put_parcels(std::move(parcels));
 
     // now make the futures ready
     for (hpx::lcos::local::promise<double>& arg : args)
