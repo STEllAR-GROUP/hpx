@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>

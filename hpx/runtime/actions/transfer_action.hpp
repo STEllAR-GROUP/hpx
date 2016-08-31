@@ -18,6 +18,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
@@ -270,107 +271,105 @@ namespace hpx { namespace actions
             return traits::action_does_termination_detection<derived_type>::call();
         }
 
-        /// Return all data needed for thread initialization
-        threads::thread_init_data&
-        get_thread_init_data(naming::id_type&& target,
-            naming::address::address_type lva, threads::thread_init_data& data)
+//         /// Return all data needed for thread initialization
+//         threads::thread_init_data&
+//         get_thread_init_data(naming::id_type&& target,
+//             naming::address::address_type lva, threads::thread_init_data& data)
+//         {
+//             data.func = get_thread_function(std::move(target), lva);
+// #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
+//             data.lva = lva;
+// #endif
+// #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+//             data.description = detail::get_action_name<derived_type>();
+// #endif
+// #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+//             data.parent_id =
+//                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+//             data.parent_locality_id = parent_locality_;
+// #endif
+//             data.priority = priority_;
+//             data.stacksize = threads::get_stack_size(stacksize_);
+//
+//             return data;
+//         }
+//
+//         threads::thread_init_data&
+//         get_thread_init_data(std::unique_ptr<continuation> cont,
+//             naming::id_type&& target,
+//             naming::address::address_type lva, threads::thread_init_data& data)
+//         {
+//             data.func = get_thread_function(std::move(target), std::move(cont), lva);
+// #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
+//             data.lva = lva;
+// #endif
+// #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+//             data.description = detail::get_action_name<derived_type>();
+// #endif
+// #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+//             data.parent_id =
+//                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+//             data.parent_locality_id = parent_locality_;
+// #endif
+//             data.priority = priority_;
+//             data.stacksize = threads::get_stack_size(stacksize_);
+//
+//             return data;
+//         }
+
+        template <std::size_t ...Is>
+        void
+        schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+            naming::gid_type const& target_gid,
+            naming::address::address_type lva,
+            std::size_t num_thread)
         {
-            data.func = get_thread_function(std::move(target), lva);
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            data.lva = lva;
-#endif
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            data.description = detail::get_action_name<derived_type>();
-#endif
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
-            data.parent_locality_id = parent_locality_;
-#endif
-            data.priority = priority_;
-            data.stacksize = threads::get_stack_size(stacksize_);
-
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(std::unique_ptr<continuation> cont,
-            naming::id_type&& target,
-            naming::address::address_type lva, threads::thread_init_data& data)
-        {
-            data.func = get_thread_function(std::move(target), std::move(cont), lva);
-#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-            data.lva = lva;
-#endif
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            data.description = detail::get_action_name<derived_type>();
-#endif
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
-            data.parent_locality_id = parent_locality_;
-#endif
-            data.priority = priority_;
-            data.stacksize = threads::get_stack_size(stacksize_);
-
-            return data;
+            naming::id_type target;
+            if (naming::detail::has_credits(target_gid))
+            {
+                target = naming::id_type(target_gid, naming::id_type::managed);
+            }
+            applier::detail::apply_helper<derived_type>::call(target, lva, priority_,
+                util::get<Is>(std::move(arguments_))...);
         }
 
         // schedule a new thread
         void schedule_thread(naming::gid_type const& target_gid,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state,
             std::size_t num_thread)
         {
-            std::unique_ptr<continuation> cont;
-            threads::thread_init_data data;
-            data.num_os_thread = num_thread;
-
-            naming::id_type target;
-            if (naming::detail::has_credits(target_gid))
-            {
-                target = naming::id_type(target_gid, naming::id_type::managed);
-            }
-
-            if (traits::action_decorate_continuation<derived_type>::call(cont))
-            {
-                traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(cont), std::move(target), lva, data),
-                    initial_state);
-
-            }
-            else
-            {
-                traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(target), lva, data), initial_state);
-            }
+            schedule_thread(
+                typename util::detail::make_index_pack<Action::arity>::type(),
+                target_gid, lva, num_thread);
 
             // keep track of number of invocations
             increment_invocation_count();
         }
 
-        void schedule_thread(std::unique_ptr<continuation> cont,
-            naming::gid_type const& target_gid, naming::address::address_type lva,
-            threads::thread_state_enum initial_state,
+        template <std::size_t ...Is>
+        void
+        schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+            std::unique_ptr<continuation> cont,
+            naming::gid_type const& target_gid,
+            naming::address::address_type lva,
             std::size_t num_thread)
         {
-            // first decorate the continuation
-            traits::action_decorate_continuation<derived_type>::call(cont);
-
-            // now, schedule the thread
-            threads::thread_init_data data;
-            data.num_os_thread = num_thread;
-
             naming::id_type target;
             if (naming::detail::has_credits(target_gid))
             {
                 target = naming::id_type(target_gid, naming::id_type::managed);
             }
+            applier::detail::apply_helper<derived_type>::call(std::move(cont), target,
+                lva, priority_, util::get<Is>(std::move(arguments_))...);
+        }
 
-            traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(std::move(cont), std::move(target), lva, data),
-                initial_state);
-
+        void schedule_thread(std::unique_ptr<continuation> cont,
+            naming::gid_type const& target_gid, naming::address::address_type lva,
+            std::size_t num_thread)
+        {
+            schedule_thread(
+                typename util::detail::make_index_pack<Action::arity>::type(),
+                std::move(cont), target_gid, lva, num_thread);
 
             // keep track of number of invocations
             increment_invocation_count();

@@ -520,15 +520,14 @@ namespace hpx { namespace applier
         if (!cont) {
             // No continuation is to be executed, register the plain
             // action and the local-virtual address.
-            act->schedule_thread(gid, lva, threads::pending, num_thread);
+            act->schedule_thread(gid, lva, num_thread);
         }
         else {
             // This parcel carries a continuation, register a wrapper
             // which first executes the original thread function as
             // required by the action and triggers the continuations
             // afterwards.
-            act->schedule_thread(std::move(cont), gid, lva,
-                threads::pending, num_thread);
+            act->schedule_thread(std::move(cont), gid, lva, num_thread);
         }
     }
 
