@@ -19,7 +19,7 @@
 #endif
 
 #if !defined(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
-#  define HPX_ZERO_COPY_SERIALIZATION_THRESHOLD     256
+#  define HPX_ZERO_COPY_SERIALIZATION_THRESHOLD     4096
 #endif
 
 namespace hpx { namespace serialization
