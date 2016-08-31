@@ -127,7 +127,7 @@ namespace hpx { namespace parcelset {
             if (ini.has_section("hpx.agas")) {
                 util::section const* sec = ini.get_section("hpx.agas");
                 if (NULL != sec) {
-                    LOG_DEBUG_MSG("hpx.agas port number " << hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT));
+                    LOG_DEBUG_MSG("hpx.agas port number " << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)));
                     _port = hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT);
                 }
             }
@@ -268,11 +268,67 @@ namespace hpx { namespace parcelset {
             FUNC_END_DEBUG_MSG;
         }
 
+        void io_service_work()
+        {
+            // We only execute work on the IO service while HPX is starting
+            while (hpx::is_starting())
+            {
+                OS_background_work();
+//                LOG_TRACE_MSG("OS background work");
+            }
+        }
+
+
         // Start the handling of connections.
         bool do_run()
         {
+            FUNC_START_DEBUG_MSG;
+
+            _rdmaController->startup();
+
+            LOG_DEBUG_MSG("Fetching memory pool");
+            chunk_pool_ = _rdmaController->getMemoryPool();
+
+            LOG_DEBUG_MSG("Setting Pre-Connection function");
+            auto preConnection_function = std::bind( &parcelport::handle_verbs_preconnection, this);
+            _rdmaController->setPreConnectionFunction(preConnection_function);
+
+            LOG_DEBUG_MSG("Setting Connection function");
+            auto connection_function = std::bind( &parcelport::handle_verbs_connection, this, std::placeholders::_1, std::placeholders::_2);
+            _rdmaController->setConnectionFunction(connection_function);
+
+            LOG_DEBUG_MSG("Setting Completion function");
+            // need to use std:bind here as rdmahelper lib uses it too
+            auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
+            _rdmaController->setCompletionFunction(completion_function);
+
+            for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
+            {
+                io_service_pool_.get_io_service(int(i)).post(
+                    hpx::util::bind(
+                        &parcelport::io_service_work, this
+                    )
+                );
+            }
+
+#ifdef USE_SPECIALIZED_SCHEDULER
+            // initialize our custom scheduler
+            parcelport_scheduler.init();
+
+            //
+            hpx::error_code ec(hpx::lightweight);
+            parcelport_scheduler.register_thread_nullary(
+                    util::bind(&parcelport::hpx_background_work_thread, this),
+                    "hpx_background_work_thread",
+                    threads::pending, true, threads::thread_priority_critical,
+                    std::size_t(-1), threads::thread_stacksize_default, ec);
+
+            FUNC_END_DEBUG_MSG;
+            return ec ? false : true;
+#else
             return true;
-        }
+#endif
+       }
 
         // --------------------------------------------------------------------
         //  return a sender_connection object back to the parcelport_impl
@@ -832,7 +888,7 @@ namespace hpx { namespace parcelset {
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
-            return false;
+            return true;
         }
 
         /// Return the name of this locality
@@ -849,13 +905,16 @@ namespace hpx { namespace parcelset {
             // load all components as described in the configuration information
             if (ini.has_section("hpx.agas")) {
                 util::section const* sec = ini.get_section("hpx.agas");
-                if (NULL != sec) {
-                    LOG_DEBUG_MSG("Returning some made up agas locality");
-                    return parcelset::locality(locality(_ibv_ip));
+                if (nullptr != sec) {
+                    struct in_addr buf;
+                    std::string addr = sec->get_entry("address", HPX_INITIAL_IP_ADDRESS);
+                    LOG_DEBUG_MSG("Got AGAS addr " << addr.c_str();)
+                    inet_pton(AF_INET, &addr[0], &buf);
+                    return
+                        parcelset::locality(locality(buf.s_addr));
                 }
             }
             FUNC_END_DEBUG_MSG;
-            // ibverbs can't be used for bootstrapping
             LOG_DEBUG_MSG("Returning NULL agas locality")
             return parcelset::locality(locality(0xFFFF));
         }
@@ -882,45 +941,13 @@ namespace hpx { namespace parcelset {
         }
 */
         // This should start the receiving side of your PP
+/*
         bool run(bool blocking = true) {
             FUNC_START_DEBUG_MSG;
-            _rdmaController->startup();
-            LOG_DEBUG_MSG("Fetching memory pool");
-            chunk_pool_ = _rdmaController->getMemoryPool();
-
-            LOG_DEBUG_MSG("Setting Pre-Connection function");
-            auto preConnection_function = std::bind( &parcelport::handle_verbs_preconnection, this);
-            _rdmaController->setPreConnectionFunction(preConnection_function);
-
-            LOG_DEBUG_MSG("Setting Connection function");
-            auto connection_function = std::bind( &parcelport::handle_verbs_connection, this, std::placeholders::_1, std::placeholders::_2);
-            _rdmaController->setConnectionFunction(connection_function);
-
-            LOG_DEBUG_MSG("Setting Completion function");
-            // need to use std:bind here as rdmahelper lib uses it too
-            auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
-            _rdmaController->setCompletionFunction(completion_function);
-
-#ifdef USE_SPECIALIZED_SCHEDULER
-            // initialize our custom scheduler
-            parcelport_scheduler.init();
-
-            //
-            hpx::error_code ec(hpx::lightweight);
-            parcelport_scheduler.register_thread_nullary(
-                    util::bind(&parcelport::hpx_background_work_thread, this),
-                    "hpx_background_work_thread",
-                    threads::pending, true, threads::thread_priority_critical,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
-
             FUNC_END_DEBUG_MSG;
-            return ec ? false : true;
-#else
             return true;
-#endif
-
         }
-
+*/
         void do_stop() {
             LOG_DEBUG_MSG("Entering verbs stop ");
             FUNC_START_DEBUG_MSG;
@@ -1219,7 +1246,7 @@ namespace hpx { namespace parcelset {
 
                 // send the header/main_chunk to the destination, wr_id is header_region (entry 0 in region_list)
                 LOG_TRACE_MSG("num regions to send " << num_regions
-                    << "\nBlock header_region"
+                    << "Block header_region"
                     << " buffer "    << hexpointer(send_data.header_region->getAddress())
                     << " region "    << hexpointer(send_data.header_region));
                 if (num_regions>1) {
@@ -1265,10 +1292,9 @@ namespace hpx { namespace parcelset {
         // OS thread, but we do want to suspend hpx threads when necessary.
         // ----------------------------------------------------------------------------------------------
         bool hpx_background_work() {
-//            if(hpx::is_stopped()) return true;
             bool done = false;
             // this must be called on an HPX thread
-            HPX_ASSERT(threads::get_self_ptr() != 0);
+//            HPX_ASSERT(threads::get_self_ptr() != 0);
             //
             do {
                 // if an event comes in, we may spend time processing/handling it and another may arrive

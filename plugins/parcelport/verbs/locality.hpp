@@ -24,9 +24,15 @@ namespace hpx { namespace parcelset {
       }
 
       explicit locality(boost::uint32_t ip) :
-            ip_(ip), qp_(0xFFFF) {}
+            ip_(ip), qp_(0xFFFF)
+      {
+          LOG_DEBUG_MSG("constructing locality from " << hexuint32(ip))
+      }
 
-      locality() : ip_(0xFFFF), qp_(0xFFFF) {}
+      locality() : ip_(0xFFFF), qp_(0xFFFF)
+      {
+          LOG_DEBUG_MSG("constructing locality from " << hexuint32(0xFFFF))
+      }
 
       // some condition marking this locality as valid
       explicit operator bool() const {
@@ -53,8 +59,7 @@ namespace hpx { namespace parcelset {
       }
 
       friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
-        boost::io::ios_flags_saver
-        ifs(os);
+        boost::io::ios_flags_saver ifs(os);
         os << loc.ip_ << " : " << loc.qp_;
         return os;
       }
