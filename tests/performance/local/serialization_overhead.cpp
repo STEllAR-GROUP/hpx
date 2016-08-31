@@ -38,7 +38,7 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
     // gather the required size for the archive
     hpx::serialization::detail::preprocess gather_size;
     hpx::serialization::output_archive archive(
-        gather_size, flags, 0, chunks);
+        gather_size, flags, chunks);
     archive << p;
     return gather_size.size();
 }
@@ -132,7 +132,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an output archive and serialize the parcel
             hpx::serialization::output_archive archive(
-                out_buffer, out_archive_flags, dest_locality_id, chunks);
+                out_buffer, out_archive_flags, chunks);
             archive << outp;
             arg_size = archive.bytes_written();
         }

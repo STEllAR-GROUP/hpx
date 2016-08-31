@@ -129,12 +129,9 @@ namespace hpx
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
+            std::size_t num_chunks = 0;
             std::size_t arg_size = 0;
-            std::uint32_t dest_locality_id =
-                ps[0].destination_locality_id();
-
             std::size_t parcels_sent = 0;
-
             std::size_t parcels_size = 1;
 
             if(num_parcels != std::size_t(-1))
@@ -160,9 +157,12 @@ namespace hpx
                         if (arg_size >= max_outbound_size)
                             break;
                         arg_size += ps[parcels_sent].size();
+                        num_chunks += ps[parcels_sent].num_chunks();
                     }
 
                     buffer.data_.reserve(arg_size);
+
+                    buffer.chunks_.reserve(num_chunks);
 
                     // mark start of serialization
                     util::high_resolution_timer timer;
@@ -175,7 +175,6 @@ namespace hpx
                         serialization::output_archive archive(
                             buffer.data_
                           , archive_flags
-                          , dest_locality_id
                           , &buffer.chunks_
                           , filter.get());
 
@@ -205,8 +204,6 @@ namespace hpx
                                 action_data);
 #endif
                         }
-
-                        HPX_ASSERT(arg_size >= archive.bytes_written());
                         arg_size = archive.bytes_written();
                     }
 

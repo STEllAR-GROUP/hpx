@@ -121,6 +121,11 @@ namespace hpx { namespace serialization
             static_cast<Archive*>(this)->load_binary(address, count);
         }
 
+        void reset()
+        {
+            size_ = 0;
+        }
+
     protected:
         std::uint32_t flags_;
         std::size_t size_;

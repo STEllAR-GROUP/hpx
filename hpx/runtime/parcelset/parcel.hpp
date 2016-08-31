@@ -172,12 +172,14 @@ namespace hpx { namespace parcelset
             naming::gid_type&& dest,
             naming::address&& addr,
             std::unique_ptr<actions::continuation> cont,
-            std::unique_ptr<actions::base_action> act
+            std::unique_ptr<actions::base_action> act,
+            bool action_args_bitwise = false
         )
           : data_(std::move(dest), std::move(addr)),
             cont_(std::move(cont)),
             action_(std::move(act)),
-            size_(0)
+            size_(0),
+            action_args_bitwise_(action_args_bitwise)
         {
 //             HPX_ASSERT(is_valid());
         }
@@ -189,7 +191,9 @@ namespace hpx { namespace parcelset
             cont_(std::move(other.cont_)),
             action_(std::move(other.action_)),
             splitted_gids_(std::move(other.splitted_gids_)),
-            size_(other.size_)
+            size_(other.size_),
+            num_chunks_(other.num_chunks_),
+            action_args_bitwise_(other.action_args_bitwise_)
         {
             HPX_ASSERT(is_valid());
         }
@@ -201,6 +205,8 @@ namespace hpx { namespace parcelset
             action_ = std::move(other.action_);
             splitted_gids_ = std::move(other.splitted_gids_);
             size_ = other.size_;
+            num_chunks_ = other.num_chunks_;
+            action_args_bitwise_ = other.action_args_bitwise_;
 
             other.reset();
 
@@ -321,6 +327,21 @@ namespace hpx { namespace parcelset
             splitted_gids_ = std::move(splitted_gids);
         }
 
+        std::size_t const& num_chunks() const
+        {
+            return num_chunks_;
+        }
+
+        std::size_t & num_chunks()
+        {
+            return num_chunks_;
+        }
+
+        bool action_args_bitwise() const
+        {
+            return action_args_bitwise_;
+        }
+
         std::size_t const& size() const
         {
             return size_;
@@ -346,6 +367,8 @@ namespace hpx { namespace parcelset
 
         splitted_gids_type splitted_gids_;
         std::size_t size_;
+        std::size_t num_chunks_;
+        bool action_args_bitwise_;
     };
 
     HPX_EXPORT std::string dump_parcel(parcel const& p);

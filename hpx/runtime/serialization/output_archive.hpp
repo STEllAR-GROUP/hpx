@@ -44,12 +44,10 @@ namespace hpx { namespace serialization
         template <typename Container>
         output_archive(Container & buffer,
             std::uint32_t flags = 0U,
-            std::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = nullptr,
             binary_filter* filter = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
-            , dest_locality_id_(dest_locality_id)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -89,11 +87,6 @@ namespace hpx { namespace serialization
                 *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
-        std::uint32_t get_dest_locality_id() const
-        {
-            return dest_locality_id_;
-        }
-
         std::size_t bytes_written() const
         {
             return size_;
@@ -110,6 +103,13 @@ namespace hpx { namespace serialization
         std::size_t current_pos() const
         {
             return basic_archive<output_archive>::current_pos();
+        }
+
+        void reset()
+        {
+            buffer_->reset();
+            pointer_tracker_.clear();
+            basic_archive<output_archive>::reset();
         }
 
     private:
@@ -298,7 +298,6 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        std::uint32_t dest_locality_id_;
         splitted_gids_type * splitted_gids_;
     };
 }}

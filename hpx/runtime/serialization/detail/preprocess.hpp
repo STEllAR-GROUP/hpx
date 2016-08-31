@@ -173,6 +173,11 @@ namespace hpx { namespace serialization { namespace detail
         {
             return true;
         }
+
+        static void reset(preprocess& cont)
+        {
+            cont.reset();
+        }
     };
 }}}
 

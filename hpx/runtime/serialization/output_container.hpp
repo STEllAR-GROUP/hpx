@@ -59,6 +59,9 @@ namespace hpx { namespace serialization
             {
                 return filter->flush(&cont[current], size, written);
             }
+
+            static void reset(Container& cont)
+            {}
         };
     }
 
@@ -100,11 +103,7 @@ namespace hpx { namespace serialization
         {
             if (chunks_)
             {
-                // reuse chunks, if possible
-                if (chunks->empty())
-                    chunks_->push_back(create_index_chunk(0, 0));
-                else
-                    (*chunks_)[0] = create_index_chunk(0, 0);
+                chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
         }
@@ -173,6 +172,11 @@ namespace hpx { namespace serialization
             return detail::access_data<Container>::has_gid(cont_, gid);
         }
 
+        void reset()
+        {
+            return detail::access_data<Container>::reset(cont_);
+        }
+
         void set_filter(binary_filter* filter) // override
         {
             HPX_ASSERT(nullptr == filter_);
@@ -201,20 +205,11 @@ namespace hpx { namespace serialization
                         if (get_chunk_type(current_chunk_) == chunk_type_pointer ||
                             get_chunk_size(current_chunk_) != 0)
                         {
-                            // add a new serialization_chunk, reuse chunks,
-                            // if possible
+                            // add a new serialization_chunk,
                             // the chunk size will be set at the end
-                            if (chunks_->size() <= current_chunk_ + 1)
-                            {
-                                chunks_->push_back(
-                                    create_index_chunk(current_, 0));
-                                ++current_chunk_;
-                            }
-                            else
-                            {
-                                (*chunks_)[++current_chunk_] =
-                                    create_index_chunk(current_, 0);
-                            }
+                            chunks_->push_back(
+                                create_index_chunk(current_, 0));
+                            ++current_chunk_;
                         }
                     }
 
@@ -252,17 +247,9 @@ namespace hpx { namespace serialization
                 }
 
                 // add a new serialization_chunk referring to the external
-                // buffer, reuse chunks, if possible
-                if (chunks_->size() <= current_chunk_ + 1)
-                {
-                    chunks_->push_back(create_pointer_chunk(address, count));
-                    ++current_chunk_;
-                }
-                else
-                {
-                    (*chunks_)[++current_chunk_] =
-                        create_pointer_chunk(address, count);
-                }
+                // buffer
+                chunks_->push_back(create_pointer_chunk(address, count));
+                ++current_chunk_;
             }
         }
 
