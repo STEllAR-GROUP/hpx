@@ -109,6 +109,9 @@
 // Compiler instruction reordering barrier
 #define barrier() asm volatile("": : :"memory")
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
 namespace hpx {
 namespace lcos {
 namespace local {
@@ -126,60 +129,50 @@ namespace local {
                 uint16_t writers;   // Now serving for writers
                 uint16_t readers;   // Now serving for readers
                 uint16_t next;      // Next available ticket number
-                uint16_t __notused; // Padding
+                uint16_t notused;   // Padding to 8 bytes
             } s;
         } readwrite_ticket;
 
         readwrite_ticket ticket;
 
     public:
-        readers_writer_mutex() : ticket{0} {
-            std::cout << "sizeof rwticket is " << sizeof(readwrite_ticket) << std::endl;
-            ticket.s.readers = 0;
-            ticket.s.writers = 0;
-            ticket.s.next = 0;
-        };
+        readers_writer_mutex() : ticket{0} {};
 
-        inline void lock()
+        //
+        // acquire lock for a unique writer
+        //
+        void lock()
         {
-            /*
-             * Possibly wrap: if we have more than 64K lockers waiting, the ticket
-             * value will wrap and two lockers will simultaneously be granted the
-             * lock.
-             */
+            // memory ordering barrier
+            barrier();
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.writers) {
-                hpx::util::detail::yield_k(8, nullptr);
+                // std::cout << "rw lock sleep write " << val << " " << ticket.s.next << " \n";
+                hpx::util::detail::yield_k(4, nullptr);
             }
 
-            /*
-             * Applications depend on a barrier here so that operations holding the
-             * lock see consistent data.
-             */
+            // memory ordering barrier
             barrier();
         }
 
+        //
         // unlock writer
-        inline void unlock()
+        //
+        void unlock()
         {
+            // only one writer can enter unlock at a time, so we do not need atomic ops
             readwrite_ticket new_ticket = ticket;
-
-            barrier();
-
-            /*
-             * We're the only writer of the writers/readers fields, so the update
-             * does not need to be atomic; we have to update both values at the
-             * same time though, otherwise we'd potentially race with the thread
-             * next granted the lock.
-             */
+            //
             ++new_ticket.s.writers;
             ++new_ticket.s.readers;
             ticket.i.wr = new_ticket.i.wr;
         }
 
-        // try to obtain writer lock
-        inline bool try_lock()
+        //
+        // try to obtain unique writer lock
+        //
+        bool try_lock()
         {
             readwrite_ticket new_ticket, old_ticket;
             new_ticket = old_ticket = ticket;
@@ -194,45 +187,45 @@ namespace local {
             if (old_ticket.s.writers != old_ticket.s.next)
                 return false;
 
-            /* The replacement lock value is a result of allocating a new ticket. */
+            // The replacement lock value is a result of allocating a new ticket.
             ++new_ticket.s.next;
+
             return (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
         }
 
-        // obtain a reader lock
-        inline void lock_shared()
+        //
+        // obtain a reader lock, many readers may have the lock simultaneously
+        //
+        void lock_shared()
         {
-            /*
-             * Possibly wrap: if we have more than 64K lockers waiting, the ticket
-             * value will wrap and two lockers will simultaneously be granted the
-             * lock.
-             */
+            // memory ordering barrier
+            barrier();
+
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.readers) {
-                hpx::util::detail::yield_k(8, nullptr);
+                // std::cout << "rw lock sleep read " << val << " " << ticket.s.readers << "\n";
+                hpx::util::detail::yield_k(0, nullptr);
             }
 
-            /*
-             * We're the only writer of the readers field, so the update does not
-             * need to be atomic.
-             */
+            // only one writer can lock, so no need for atomic increment
             ++ticket.s.readers;
 
-            /*
-             * Applications depend on a barrier here so that operations holding the
-             * lock see consistent data.
-             */
+            // memory ordering barrier
             barrier();
         }
 
-        // unlock a reader
-        inline void unlock_shared()
+        //
+        // unlock one reader
+        //
+        void unlock_shared()
         {
             atomic_inc(&ticket.s.writers);
         }
 
+        //
         // try to obtain a reader lock
-        inline bool try_lock_shared()
+        //
+        bool try_lock_shared()
         {
             readwrite_ticket new_ticket, old_ticket;
             new_ticket = old_ticket = ticket;
@@ -255,19 +248,17 @@ namespace local {
             return (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
         }
 
-        // return true if a writer has the lock
+        // return true if a reader or writer has the lock
         bool owns_lock()
         {
-            return (ticket.s.writers != ticket.s.next);
-        }
-        
-        // return true if a reader has the lock
-        bool owns_lock_shared()
-        {
-            return (ticket.s.readers != ticket.s.next);
+            return ((ticket.s.writers != ticket.s.next)
+                || (ticket.s.readers != ticket.s.next));
         }
     };
 }
 }
 }
+
+#pragma GCC pop_options
+
 #endif
