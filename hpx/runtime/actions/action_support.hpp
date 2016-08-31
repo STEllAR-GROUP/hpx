@@ -187,7 +187,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked without
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(naming::address::address_type lva) = 0;
+            get_thread_function(naming::id_type&& target, naming::address::address_type lva) = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality, the arguments, and
@@ -205,7 +205,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked with
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(std::unique_ptr<continuation> cont,
+            get_thread_function(naming::id_type&& target, std::unique_ptr<continuation> cont,
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread

@@ -248,32 +248,6 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        threads::thread_function_type && func, naming::id_type const& target,
-        util::thread_description const& desc, naming::address::address_type lva,
-        threads::thread_state_enum state, threads::thread_priority priority,
-        std::size_t os_thread, threads::thread_stacksize stacksize,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (nullptr == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_work_plain",
-                "global applier object is not accessible");
-            return;
-        }
-
-        util::thread_description d =
-            desc ? desc : util::thread_description(func, "register_work_plain");
-
-        threads::thread_init_data data(std::move(func),
-            d, lva, priority, os_thread, threads::get_stack_size(stacksize),
-            target);
-
-        app->get_thread_manager().register_work(data, state, ec);
-    }
-
-    void register_work_plain(
         threads::thread_init_data& data, threads::thread_state_enum state,
         error_code& ec)
     {

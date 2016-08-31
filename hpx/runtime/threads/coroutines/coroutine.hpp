@@ -32,7 +32,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
@@ -66,11 +65,11 @@ namespace hpx { namespace threads { namespace coroutines
 
         coroutine() : m_pimpl(nullptr) {}
 
-        coroutine(functor_type&& f, naming::id_type&& target,
+        coroutine(functor_type&& f,
                 thread_id_repr_type id = nullptr,
                 std::ptrdiff_t stack_size = detail::default_stack_size)
           : m_pimpl(impl_type::create(
-                std::move(f), std::move(target), id, stack_size))
+                std::move(f), id, stack_size))
         {
             HPX_ASSERT(m_pimpl->is_ready());
         }
@@ -122,12 +121,10 @@ namespace hpx { namespace threads { namespace coroutines
         }
 #endif
 
-        void rebind(functor_type&& f, naming::id_type&& target,
-            thread_id_repr_type id = nullptr)
+        void rebind(functor_type&& f, thread_id_repr_type id = nullptr)
         {
             HPX_ASSERT(exited());
-            impl_type::rebind(m_pimpl.get(), std::move(f),
-                std::move(target), id);
+            impl_type::rebind(m_pimpl.get(), std::move(f), id);
         }
 
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())

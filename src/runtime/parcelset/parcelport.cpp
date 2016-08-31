@@ -114,7 +114,7 @@ namespace hpx { namespace parcelset
             // We should not allow any exceptions to escape the execution of the
             // action as this would bring down the ASIO thread we execute in.
             try {
-                act->get_thread_function(0)(threads::wait_signaled);
+                act->get_thread_function(naming::id_type(), 0)(threads::wait_signaled);
             }
             catch (...) {
                 hpx::report_error(boost::current_exception());

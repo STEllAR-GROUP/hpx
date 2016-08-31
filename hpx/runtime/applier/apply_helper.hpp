@@ -50,12 +50,12 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_init_data data;
             if (traits::action_decorate_continuation<Action>::call(cont)) //-V614
             {
-                data.func = Action::construct_thread_function(std::move(cont),
+                data.func = Action::construct_thread_function(target, std::move(cont),
                     lva, std::forward<Ts>(vs)...);
             }
             else
             {
-                data.func = Action::construct_thread_function(lva,
+                data.func = Action::construct_thread_function(target, lva,
                     std::forward<Ts>(vs)...);
             }
 
@@ -69,7 +69,6 @@ namespace hpx { namespace applier { namespace detail
             data.stacksize = threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
-            data.target = target;
 
             traits::action_schedule_thread<Action>::call(
                 lva, data, threads::pending);
@@ -98,7 +97,7 @@ namespace hpx { namespace applier { namespace detail
 
             // now, schedule the thread
             threads::thread_init_data data;
-            data.func = Action::construct_thread_function(std::move(cont), lva,
+            data.func = Action::construct_thread_function(target, std::move(cont), lva,
                 std::forward<Ts>(vs)...);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;
@@ -110,7 +109,6 @@ namespace hpx { namespace applier { namespace detail
             data.stacksize = threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
-            data.target = target;
 
             traits::action_schedule_thread<Action>::call(
                 lva, data, threads::pending);

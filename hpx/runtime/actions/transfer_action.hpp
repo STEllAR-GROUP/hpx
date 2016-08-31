@@ -166,18 +166,18 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            naming::address::address_type lva)
+            naming::id_type&& target, naming::address::address_type lva)
         {
-            return derived_type::construct_thread_function(lva,
+            return derived_type::construct_thread_function(std::move(target), lva,
                 util::get<Is>(std::move(arguments_))...);
         }
 
         threads::thread_function_type
-        get_thread_function(naming::address::address_type lva)
+        get_thread_function(naming::id_type&& target, naming::address::address_type lva)
         {
             return get_thread_function(
                 typename util::detail::make_index_pack<Action::arity>::type(),
-                lva);
+                std::move(target), lva);
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -198,19 +198,20 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            std::unique_ptr<continuation> cont, naming::address::address_type lva)
+            naming::id_type&& target, std::unique_ptr<continuation> cont,
+            naming::address::address_type lva)
         {
-            return derived_type::construct_thread_function(std::move(cont), lva,
-                util::get<Is>(std::move(arguments_))...);
+            return derived_type::construct_thread_function(std::move(target),
+                std::move(cont), lva, util::get<Is>(std::move(arguments_))...);
         }
 
         threads::thread_function_type
-        get_thread_function(std::unique_ptr<continuation> cont,
+        get_thread_function(naming::id_type&& target, std::unique_ptr<continuation> cont,
             naming::address::address_type lva)
         {
             return get_thread_function(
                 typename util::detail::make_index_pack<Action::arity>::type(),
-                std::move(cont), lva);
+                std::move(target), std::move(cont), lva);
         }
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -274,7 +275,7 @@ namespace hpx { namespace actions
         get_thread_init_data(naming::id_type&& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
-            data.func = get_thread_function(lva);
+            data.func = get_thread_function(std::move(target), lva);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;
 #endif
@@ -289,7 +290,6 @@ namespace hpx { namespace actions
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
 
-            data.target = std::move(target);
             return data;
         }
 
@@ -298,7 +298,7 @@ namespace hpx { namespace actions
             naming::id_type&& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
-            data.func = get_thread_function(std::move(cont), lva);
+            data.func = get_thread_function(std::move(target), std::move(cont), lva);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;
 #endif
@@ -313,7 +313,6 @@ namespace hpx { namespace actions
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
 
-            data.target = std::move(target);
             return data;
         }
 
@@ -331,10 +330,6 @@ namespace hpx { namespace actions
             if (naming::detail::has_credits(target_gid))
             {
                 target = naming::id_type(target_gid, naming::id_type::managed);
-            }
-            else
-            {
-                target = naming::id_type(target_gid, naming::id_type::unmanaged);
             }
 
             if (traits::action_decorate_continuation<derived_type>::call(cont))
@@ -370,10 +365,6 @@ namespace hpx { namespace actions
             if (naming::detail::has_credits(target_gid))
             {
                 target = naming::id_type(target_gid, naming::id_type::managed);
-            }
-            else
-            {
-                target = naming::id_type(target_gid, naming::id_type::unmanaged);
             }
 
             traits::action_schedule_thread<derived_type>::call(lva,
