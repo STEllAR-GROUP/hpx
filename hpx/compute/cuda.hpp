@@ -10,9 +10,11 @@
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
+#include <hpx/compute/cuda/concurrent_executor.hpp>
 #include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/compute/cuda/serialization/value_proxy.hpp>
 #include <hpx/compute/cuda/target.hpp>
+#include <hpx/compute/cuda/target_distribution_policy.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
 #include <hpx/compute/cuda/transfer.hpp>

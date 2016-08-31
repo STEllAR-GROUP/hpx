@@ -83,6 +83,13 @@ public:
         return empty_mask;
     }
 
+    mask_type get_numa_node_affinity_mask_from_numa_node(
+        std::size_t numa_node
+        ) const
+    {
+        return empty_mask;
+    }
+
     mask_cref_type get_core_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive

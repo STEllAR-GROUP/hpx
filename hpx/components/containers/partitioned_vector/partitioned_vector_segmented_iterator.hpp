@@ -67,7 +67,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
             return local_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
@@ -75,7 +75,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -111,7 +111,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
@@ -119,7 +119,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -321,8 +321,14 @@ namespace hpx
         }
 
     public:
-        partitioned_vector_partition<T>& get_partition() { return partition_; }
-        partitioned_vector_partition<T> get_partition() const { return partition_; }
+        partitioned_vector_partition<T, Data>& get_partition()
+        {
+            return partition_;
+        }
+        partitioned_vector_partition<T, Data> get_partition() const
+        {
+            return partition_;
+        }
 
         size_type get_local_index() const { return local_index_; }
 
@@ -460,7 +466,7 @@ namespace hpx
         }
 
     public:
-        partitioned_vector_partition<T> const& get_partition() const
+        partitioned_vector_partition<T, Data> const& get_partition() const
         {
             return partition_;
         }

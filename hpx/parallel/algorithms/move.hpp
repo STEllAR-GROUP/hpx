@@ -66,8 +66,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](std::size_t, zip_iterator part_begin,
-                            std::size_t part_size)
+                        [](zip_iterator part_begin, std::size_t part_size,
+                            std::size_t)
                         {
                             using hpx::util::get;
 
