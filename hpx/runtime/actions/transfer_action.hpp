@@ -465,6 +465,25 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             transfer_action, detail::get_action_name<derived_type>())
 
+        void load_schedule(serialization::input_archive& ar,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread)
+        {
+            // First, serialize, then
+            ar >> *this;
+            schedule_thread(std::move(target), lva, num_thread);
+        }
+
+        void load_schedule(serialization::input_archive& ar,
+            std::unique_ptr<continuation> cont,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread)
+        {
+            // First, serialize, then
+            ar >> *this;
+            schedule_thread(std::move(cont), std::move(target), lva, num_thread);
+        }
+
         /// Extract the current invocation count for this action
         static std::int64_t get_invocation_count(bool reset)
         {

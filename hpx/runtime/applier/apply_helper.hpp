@@ -8,6 +8,7 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -125,7 +126,8 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space())
+            if (this_thread::has_sufficient_stack_space() ||
+                hpx::is_starting())
             {
                 Action::execute_function(lva, std::forward<Ts>(vs)...);
             }
@@ -156,7 +158,8 @@ namespace hpx { namespace applier { namespace detail
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space())
+            if (this_thread::has_sufficient_stack_space() ||
+                hpx::is_starting())
             {
                 try {
                     cont->trigger(Action::execute_function(lva,

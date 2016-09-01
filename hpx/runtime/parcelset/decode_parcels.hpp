@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
-                        archive >> p;
+                        p.load_schedule(archive, num_thread);
 
                         std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
 
@@ -155,7 +155,6 @@ namespace hpx { namespace parcelset
                         }
 
                         // be sure not to measure add_parcel as serialization time
-                        pp.add_received_parcel(std::move(p), num_thread);
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;
                     }

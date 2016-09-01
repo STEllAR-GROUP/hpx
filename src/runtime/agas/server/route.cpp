@@ -73,13 +73,12 @@ namespace hpx { namespace agas { namespace server
             addr.address_ = g.lva();
         }
 
-        naming::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (addr.locality_ == get_locality())
         {
             // destination is local
-            rt.get_applier().schedule_action(std::move(p));
+            p.schedule_action();
         }
         else
         {
@@ -89,6 +88,7 @@ namespace hpx { namespace agas { namespace server
 
         if (rt.get_state() < state_pre_shutdown)
         {
+            naming::id_type source = p.source_id();
             // asynchronously update cache on source locality
             // update remote cache if the id is not flagged otherwise
             naming::gid_type const& id = hpx::util::get<0>(cache_address);

@@ -275,6 +275,8 @@ namespace hpx { namespace actions
         template <typename Arg0>
         inline void trigger(Arg0 && arg0);
 
+        inline void trigger(hpx::util::unused_type);
+
         //
         virtual void trigger_error(boost::exception_ptr const& e);
         virtual void trigger_error(boost::exception_ptr && e);
@@ -965,6 +967,22 @@ namespace hpx { namespace actions
         static_cast<
                 typed_continuation<typename util::decay<Arg0>::type> *
             >(this)->trigger_value(std::forward<Arg0>(arg0));
+    }
+
+    void continuation::trigger(hpx::util::unused_type)
+    {
+        // The dynamic cast decays the argument type to avoid the assert firing
+        // for cases when Arg0 is a const&. This does not make the code invalid
+        // as trigger_value (which is a virtual function) takes its argument
+        // by && anyways.
+        HPX_ASSERT((nullptr != dynamic_cast<
+                typed_continuation<void, hpx::util::unused_type>*>(this)));
+
+        // The static_cast is safe as we know that Arg0 is the result type
+        // of the executed action (see apply.hpp).
+        static_cast<
+                typed_continuation<void, hpx::util::unused_type>*
+            >(this)->trigger_value(hpx::util::unused);
     }
 }}
 

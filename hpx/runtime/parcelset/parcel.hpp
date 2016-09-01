@@ -352,14 +352,20 @@ namespace hpx { namespace parcelset
             return size_;
         }
 
+        void schedule_action();
+
+        void load_schedule(serialization::input_archive & ar,
+            std::size_t num_thread);
+
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);
 
         // serialization support
         friend class hpx::serialization::access;
-
         void serialize(serialization::input_archive & ar, unsigned);
         void serialize(serialization::output_archive & ar, unsigned);
+
+        naming::address_type determine_lva();
 
         data data_;
         std::unique_ptr<actions::continuation> cont_;

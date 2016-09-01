@@ -263,6 +263,15 @@ namespace hpx { namespace actions
         {}
 
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
+
+        virtual void load_schedule(serialization::input_archive& ar,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread) = 0;
+
+        virtual void load_schedule(serialization::input_archive& ar,
+            std::unique_ptr<continuation> cont,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////

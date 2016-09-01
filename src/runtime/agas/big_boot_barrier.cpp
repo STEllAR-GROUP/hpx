@@ -319,12 +319,12 @@ void notify_worker(notification_header const& header);
 // }}}
 
 // {{{ early action types
-typedef actions::action<
+typedef actions::direct_action<
     void (*)(registration_header const&)
   , register_worker
 > register_worker_action;
 
-typedef actions::action<
+typedef actions::direct_action<
     void (*)(notification_header const&)
   , notify_worker
 > notify_worker_action;
