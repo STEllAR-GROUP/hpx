@@ -11,6 +11,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_priority.hpp>

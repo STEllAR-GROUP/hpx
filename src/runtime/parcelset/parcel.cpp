@@ -18,6 +18,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <string>
