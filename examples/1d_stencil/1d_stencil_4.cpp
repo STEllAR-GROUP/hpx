@@ -1,4 +1,3 @@
-#include <utility>
 //  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //
