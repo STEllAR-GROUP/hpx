@@ -21,10 +21,9 @@
 // Warning: not thread safe to use iterators whilst others are changing the set
 // and several other functions are unsafe.
 
-// #define HPX_CONCURRENT_UNORDEREDMAP_USE_SPINLOCK
+namespace hpx {
+namespace concurrent {
 
-namespace hpx { namespace concurrent
-{
     template<
         class Key,
         class Value,
@@ -36,17 +35,10 @@ namespace hpx { namespace concurrent
     {
     public:
 
-#ifdef HPX_CONCURRENT_UNORDEREDMAP_USE_SPINLOCK
-        typedef hpx::lcos::local::spinlock                rw_mutex_type;
-        typedef std::lock_guard<rw_mutex_type>            write_lock;
-        typedef std::unique_lock<rw_mutex_type>           read_lock;
-        typedef std::defer_lock_t                         defer_lock;
-#else
         typedef hpx::lcos::local::readers_writer_mutex    rw_mutex_type;
         typedef std::unique_lock<rw_mutex_type>           write_lock;
-        typedef std::shared_lock<rw_mutex_type>           read_lock;
-        typedef std::defer_lock_t                         defer_lock;
-#endif
+        typedef boost::shared_lock<rw_mutex_type>         read_lock;
+        typedef boost::defer_lock_t                       defer_lock;
 
     private:
         typedef std::unordered_map<Key, Value, Hash, KeyEqual, Allocator> base_map;
@@ -347,5 +339,5 @@ namespace hpx { namespace concurrent
 
     };
 
-#endif
 }}
+#endif
