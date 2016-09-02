@@ -838,8 +838,8 @@ if(NOT MSVC)
       set(CXX_FLAG -std=c++14)
     else()
       # ... otherwise try -std=c++1y
-      check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX0Y)
-      if(HPX_WITH_CXX0Y)
+      check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1Y)
+      if(HPX_WITH_CXX1Y)
         set(CXX_FLAG -std=c++1y)
       else()
         # ... otherwise try -std=c++11
