@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     }
 
     affinity_data::affinity_data(std::size_t num_threads)
-      : num_threads_(num_threads), pu_offset_(0), pu_step_(1),
+      : num_threads_(num_threads), pu_offset_(std::size_t(-1)), pu_step_(1),
         affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
         no_affinity_()
     {}
@@ -56,8 +56,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t num_system_pus = hardware_concurrency();
 
         // initialize from command line
-        if (data.pu_offset_ != std::size_t(-1))
+        if (data.pu_offset_ == std::size_t(-1))
+        {
+            pu_offset_ = 0;
+        }
+        else
+        {
             pu_offset_ = data.pu_offset_;
+        }
 
         if(num_system_pus > 1)
             pu_step_ = data.pu_step_ % num_system_pus;

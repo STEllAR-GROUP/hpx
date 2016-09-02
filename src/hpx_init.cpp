@@ -599,7 +599,7 @@ namespace hpx
             if (cfg.affinity_bind_.empty())
                 return cfg.numa_sensitive_;
 
-            if (cfg.pu_offset_ != 0 || cfg.pu_step_ != 1 ||
+            if (cfg.pu_offset_ != std::size_t(-1) || cfg.pu_step_ != 1 ||
                 cfg.affinity_domain_ != "pu")
             {
                 throw detail::command_line_error(
@@ -615,11 +615,13 @@ namespace hpx
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
         {
-            std::size_t pu_offset = static_cast<std::size_t>(-1);
+            std::size_t pu_offset = std::size_t(-1);
 #if defined(HPX_HAVE_HWLOC)
-            if (cfg.pu_offset_ != 0) {
+            if (cfg.pu_offset_ != std::size_t(-1))
+            {
                 pu_offset = cfg.pu_offset_;
-                if (pu_offset >= hpx::threads::hardware_concurrency()) {
+                if (pu_offset >= hpx::threads::hardware_concurrency())
+                {
                     throw detail::command_line_error(
                         "Invalid command line option "
                         "--hpx:pu-offset, value must be smaller than number of "

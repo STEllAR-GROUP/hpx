@@ -686,15 +686,19 @@ namespace hpx { namespace util
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
         ini_config += "hpx.pu_step=" + std::to_string(pu_step_);
 
-        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, 0);
-        ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
+        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
+        if (pu_offset_ != std::size_t(-1))
+            ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
+        else
+            ini_config += "hpx.pu_offset=0";
 
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
         ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
 
-        // default affinity mode is now 'balanced'
-        if (affinity_bind_.empty())
+        // default affinity mode is now 'balanced' (only if no pu-step or
+        // pu-offset is given)
+        if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) && affinity_bind_.empty())
         {
             affinity_bind_ = "balanced";
             ini_config += "hpx.bind!=" + affinity_bind_;
