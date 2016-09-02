@@ -88,12 +88,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         else if (!data.affinity_desc_.empty())
         {
             affinity_masks_.clear();
-            affinity_masks_.resize(num_threads_);
+            affinity_masks_.resize(num_threads_, 0);
+
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
             parse_affinity_options(data.affinity_desc_, affinity_masks_,
-                data.used_cores_, max_cores, pu_nums_);
+                data.used_cores_, max_cores, num_threads_, pu_nums_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {

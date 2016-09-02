@@ -215,16 +215,17 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities,
         std::size_t used_cores,
         std::size_t max_cores,
+        std::size_t num_threads,
         std::vector<std::size_t>& num_pus,
         error_code& ec = throws);
 
     // backwards compatibility helper
     inline void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities,
-        error_code& ec = throws)
+        std::vector<mask_type>& affinities, error_code& ec = throws)
     {
         std::vector<std::size_t> num_pus;
-        parse_affinity_options(spec, affinities, 1, 1, num_pus, ec);
+        parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
+            num_pus, ec);
     }
 #endif
 

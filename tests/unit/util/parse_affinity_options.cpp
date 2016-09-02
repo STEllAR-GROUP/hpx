@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -53,8 +53,9 @@ namespace test
     struct data_good
     {
         std::string option_;
-        data_good_thread t[2];
-        std::uint64_t masks[2];
+        std::size_t threads_;
+        data_good_thread t[4];
+        std::uint64_t masks[4];
     };
 
 //  Test cases implemented below:
@@ -91,7 +92,7 @@ namespace test
 
     data_good data[] =
     {
-        {   "thread:0=socket:0;thread:1=socket:0",
+        {   "thread:0=socket:0;thread:1=socket:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -107,7 +108,7 @@ namespace test
             },
             { 0x000fff, 0x000fff }
         },
-        {   "thread:0-1=socket:0",
+        {   "thread:0-1=socket:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -118,7 +119,7 @@ namespace test
             },
             { 0x000fff, 0x000fff }
         },
-        {   "thread:0,1=socket:0",
+        {   "thread:0,1=socket:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -130,7 +131,7 @@ namespace test
             { 0x000fff, 0x000fff }
         },
 
-        {   "thread:0=socket:0;thread:1=socket:1",
+        {   "thread:0=socket:0;thread:1=socket:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -146,7 +147,7 @@ namespace test
             },
             { 0x000fff, 0xfff000 }
         },
-        {   "thread:0-1=socket:0-1",
+        {   "thread:0-1=socket:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -157,7 +158,7 @@ namespace test
             },
             { 0x000fff, 0xfff000 }
         },
-        {   "thread:0,1=socket:0-1",
+        {   "thread:0,1=socket:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -169,7 +170,7 @@ namespace test
             { 0x000fff, 0xfff000 }
         },
 
-        {   "thread:0=numanode:0;thread:1=numanode:0",
+        {   "thread:0=numanode:0;thread:1=numanode:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -185,7 +186,7 @@ namespace test
             },
             { 0x000fff, 0x000fff }
         },
-        {   "thread:0-1=numanode:0",
+        {   "thread:0-1=numanode:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -196,7 +197,7 @@ namespace test
             },
             { 0x000fff, 0x000fff }
         },
-        {   "thread:0,1=numanode:0",
+        {   "thread:0,1=numanode:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -208,7 +209,7 @@ namespace test
             { 0x000fff, 0x000fff }
         },
 
-        {   "thread:0=numanode:0;thread:1=numanode:1",
+        {   "thread:0=numanode:0;thread:1=numanode:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -224,7 +225,7 @@ namespace test
             },
             { 0x000fff, 0xfff000 }
         },
-        {   "thread:0-1=numanode:0-1",
+        {   "thread:0-1=numanode:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -235,7 +236,7 @@ namespace test
             },
             { 0x000fff, 0xfff000 }
         },
-        {   "thread:0,1=numanode:0,1",
+        {   "thread:0,1=numanode:0,1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -247,7 +248,7 @@ namespace test
             { 0x000fff, 0xfff000 }
         },
 
-        {   "thread:0=core:0;thread:1=core:0",
+        {   "thread:0=core:0;thread:1=core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -263,7 +264,7 @@ namespace test
             },
             { 0x000003, 0x000003 }
         },
-        {   "thread:0-1=core:0",
+        {   "thread:0-1=core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -274,7 +275,7 @@ namespace test
             },
             { 0x000003, 0x000003 }
         },
-        {   "thread:0,1=core:0",
+        {   "thread:0,1=core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -286,7 +287,7 @@ namespace test
             { 0x000003, 0x000003 }
         },
 
-        {   "thread:0=core:0;thread:1=core:1",
+        {   "thread:0=core:0;thread:1=core:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -302,7 +303,7 @@ namespace test
             },
             { 0x000003, 0x00000c }
         },
-        {   "thread:0-1=core:0-1",
+        {   "thread:0-1=core:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -313,7 +314,7 @@ namespace test
             },
             { 0x000003, 0x00000c }
         },
-        {   "thread:0,1=core:0,1",
+        {   "thread:0,1=core:0,1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 1),
@@ -325,7 +326,7 @@ namespace test
             { 0x000003, 0x00000c }
         },
 
-        {   "thread:0=core:1.pu:0;thread:1=core:1.pu:0",
+        {   "thread:0=core:1.pu:0;thread:1=core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -341,7 +342,7 @@ namespace test
             },
             { 0x000004, 0x000004 }
         },
-        {   "thread:0-1=core:1.pu:0",
+        {   "thread:0-1=core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -353,7 +354,7 @@ namespace test
             { 0x000004, 0x000004 }
         },
 
-        {   "thread:0=core:1.pu:0;thread:1=core:1.pu:1",
+        {   "thread:0=core:1.pu:0;thread:1=core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -369,7 +370,7 @@ namespace test
             },
             { 0x000004, 0x000008 }
         },
-        {   "thread:0-1=core:1.pu:0-1",
+        {   "thread:0-1=core:1.pu:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -381,7 +382,7 @@ namespace test
             { 0x000004, 0x000008 }
         },
 
-        {   "thread:0=pu:0;thread:1=pu:0",
+        {   "thread:0=pu:0;thread:1=pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -397,7 +398,7 @@ namespace test
             },
             { 0x000001, 0x000001 }
         },
-        {   "thread:0-1=pu:0",
+        {   "thread:0-1=pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -409,7 +410,7 @@ namespace test
             { 0x000001, 0x000001 }
         },
 
-        {   "thread:0=pu:0;thread:1=pu:1",
+        {   "thread:0=pu:0;thread:1=pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -425,7 +426,7 @@ namespace test
             },
             { 0x000001, 0x000002 }
         },
-        {   "thread:0-1=pu:0-1",
+        {   "thread:0-1=pu:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -437,7 +438,7 @@ namespace test
             { 0x000001, 0x000002 }
         },
 
-        {   "thread:0=socket:0.core:0;thread:1=socket:0.core:0",
+        {   "thread:0=socket:0.core:0;thread:1=socket:0.core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -453,7 +454,7 @@ namespace test
             },
             { 0x000003, 0x000003 }
         },
-        {   "thread:0-1=socket:0.core:0",
+        {   "thread:0-1=socket:0.core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -465,7 +466,7 @@ namespace test
             { 0x000003, 0x000003 }
         },
 
-        {   "thread:0=socket:1.core:0;thread:1=socket:1.core:1",
+        {   "thread:0=socket:1.core:0;thread:1=socket:1.core:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -481,7 +482,7 @@ namespace test
             },
             { 0x003000, 0x00c000 }
         },
-        {   "thread:0-1=socket:1.core:0-1",
+        {   "thread:0-1=socket:1.core:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -493,7 +494,7 @@ namespace test
             { 0x003000, 0x00c000 }
         },
 
-        {   "thread:0=numanode:0.core:0;thread:1=numanode:0.core:0",
+        {   "thread:0=numanode:0.core:0;thread:1=numanode:0.core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -509,7 +510,7 @@ namespace test
             },
             { 0x000003, 0x000003 }
         },
-        {   "thread:0-1=numanode:0.core:0",
+        {   "thread:0-1=numanode:0.core:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -521,7 +522,7 @@ namespace test
             { 0x000003, 0x000003 }
         },
 
-        {   "thread:0=numanode:1.core:0;thread:1=numanode:1.core:1",
+        {   "thread:0=numanode:1.core:0;thread:1=numanode:1.core:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -537,7 +538,7 @@ namespace test
             },
             { 0x003000, 0x00c000 }
         },
-        {   "thread:0-1=numanode:1.core:0-1",
+        {   "thread:0-1=numanode:1.core:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -549,7 +550,7 @@ namespace test
             { 0x003000, 0x00c000 }
         },
 
-        {   "thread:0=socket:1.core:0.pu:1;thread:1=socket:1.core:1.pu:1",
+        {   "thread:0=socket:1.core:0.pu:1;thread:1=socket:1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -565,7 +566,7 @@ namespace test
             },
             { 0x002000, 0x008000 }
         },
-        {   "thread:0-1=socket:1.core:0-1.pu:1",
+        {   "thread:0-1=socket:1.core:0-1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -577,7 +578,7 @@ namespace test
             { 0x002000, 0x008000 }
         },
 
-        {   "thread:0=socket:1.core:1.pu:0;thread:1=socket:1.core:1.pu:0",
+        {   "thread:0=socket:1.core:1.pu:0;thread:1=socket:1.core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -593,7 +594,7 @@ namespace test
             },
             { 0x004000, 0x004000 }
         },
-        {   "thread:0-1=socket:1.core:1.pu:0",
+        {   "thread:0-1=socket:1.core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -605,7 +606,7 @@ namespace test
             { 0x004000, 0x004000 }
         },
 
-        {   "thread:0=socket:1.core:1.pu:0;thread:1=socket:1.core:1.pu:1",
+        {   "thread:0=socket:1.core:1.pu:0;thread:1=socket:1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -621,7 +622,7 @@ namespace test
             },
             { 0x004000, 0x008000 }
         },
-        {   "thread:0-1=socket:1.core:1.pu:0-1",
+        {   "thread:0-1=socket:1.core:1.pu:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -633,7 +634,7 @@ namespace test
             { 0x004000, 0x008000 }
         },
 
-        {   "thread:0=numanode:1.core:1.pu:0;thread:1=numanode:1.core:1.pu:0",
+        {   "thread:0=numanode:1.core:1.pu:0;thread:1=numanode:1.core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -649,7 +650,7 @@ namespace test
             },
             { 0x004000, 0x004000 }
         },
-        {   "thread:0-1=numanode:1.core:1.pu:0",
+        {   "thread:0-1=numanode:1.core:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -661,7 +662,7 @@ namespace test
             { 0x004000, 0x004000 }
         },
 
-        {   "thread:0=numanode:1.core:0.pu:1;thread:1=numanode:1.core:1.pu:1",
+        {   "thread:0=numanode:1.core:0.pu:1;thread:1=numanode:1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -677,7 +678,7 @@ namespace test
             },
             { 0x002000, 0x008000 }
         },
-        {   "thread:0-1=numanode:1.core:0-1.pu:1",
+        {   "thread:0-1=numanode:1.core:0-1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -689,7 +690,7 @@ namespace test
             { 0x002000, 0x008000 }
         },
 
-        {   "thread:0-1=socket:0.core:all.pu:0",
+        {   "thread:0-1=socket:0.core:all.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -701,7 +702,7 @@ namespace test
             { 0x000001, 0x000004 }
         },
 
-        {   "thread:0=socket:0.core:1.pu:1;thread:1=socket:1.core:1.pu:1",
+        {   "thread:0=socket:0.core:1.pu:1;thread:1=socket:1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -718,7 +719,7 @@ namespace test
             },
             { 0x000008, 0x008000 }
         },
-        {   "thread:0-1=socket:0-1.core:1.pu:1",
+        {   "thread:0-1=socket:0-1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -730,7 +731,7 @@ namespace test
             { 0x000008, 0x008000 }
         },
 
-        {   "thread:0=numanode:0.core:1.pu:1;thread:1=numanode:1.core:1.pu:1",
+        {   "thread:0=numanode:0.core:1.pu:1;thread:1=numanode:1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -747,7 +748,7 @@ namespace test
             },
             { 0x000008, 0x008000 }
         },
-        {   "thread:0-1=numanode:0-1.core:1.pu:1",
+        {   "thread:0-1=numanode:0-1.core:1.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -759,7 +760,7 @@ namespace test
             { 0x000008, 0x008000 }
         },
 
-        {   "thread:0=socket:0.pu:0;thread:1=socket:1.pu:0",
+        {   "thread:0=socket:0.pu:0;thread:1=socket:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -776,7 +777,7 @@ namespace test
             },
             { 0x000001, 0x001000 }
         },
-        {   "thread:0-1=socket:0-1.pu:0",
+        {   "thread:0-1=socket:0-1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -788,7 +789,7 @@ namespace test
             { 0x000001, 0x001000 }
         },
 
-        {   "thread:0=numanode:0.pu:0;thread:1=numanode:1.pu:0",
+        {   "thread:0=numanode:0.pu:0;thread:1=numanode:1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -805,7 +806,7 @@ namespace test
             },
             { 0x000001, 0x001000 }
         },
-        {   "thread:0-1=numanode:0-1.pu:0",
+        {   "thread:0-1=numanode:0-1.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -817,7 +818,7 @@ namespace test
             { 0x000001, 0x001000 }
         },
 
-        {   "thread:0=socket:0.pu:0;thread:1=socket:0.pu:0",
+        {   "thread:0=socket:0.pu:0;thread:1=socket:0.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -834,7 +835,7 @@ namespace test
             },
             { 0x000001, 0x000001 }
         },
-        {   "thread:0-1=socket:0.pu:0",
+        {   "thread:0-1=socket:0.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -846,7 +847,7 @@ namespace test
             { 0x000001, 0x000001 }
         },
 
-        {   "thread:0=socket:0.pu:0;thread:1=socket:0.pu:1",
+        {   "thread:0=socket:0.pu:0;thread:1=socket:0.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -863,7 +864,7 @@ namespace test
             },
             { 0x000001, 0x000002 }
         },
-        {   "thread:0-1=socket:0.pu:0-1",
+        {   "thread:0-1=socket:0.pu:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -875,7 +876,7 @@ namespace test
             { 0x000001, 0x000002 }
         },
 
-        {   "thread:0=numanode:0.pu:0;thread:1=numanode:0.pu:0",
+        {   "thread:0=numanode:0.pu:0;thread:1=numanode:0.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -892,7 +893,7 @@ namespace test
             },
             { 0x000001, 0x000001 }
         },
-        {   "thread:0-1=numanode:0.pu:0",
+        {   "thread:0-1=numanode:0.pu:0", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -904,7 +905,7 @@ namespace test
             { 0x000001, 0x000001 }
         },
 
-        {   "thread:0=numanode:0.pu:0;thread:1=numanode:0.pu:1",
+        {   "thread:0=numanode:0.pu:0;thread:1=numanode:0.pu:1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, 0),
@@ -921,7 +922,7 @@ namespace test
             },
             { 0x000001, 0x000002 }
         },
-        {   "thread:0-1=numanode:0.pu:0-1",
+        {   "thread:0-1=numanode:0.pu:0-1", 2,
             {
                 {
                     spec_type(spec_type::thread, 0, -1),
@@ -933,7 +934,42 @@ namespace test
             { 0x000001, 0x000002 }
         },
 
-        { "", {data_good_thread(), data_good_thread()}, {0,0} }
+        // test cases derived from #2312
+        {   "thread:0-3=core:0-1.pu:0-1", 4,
+            {
+                {
+                    spec_type(spec_type::thread, 0, -3),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::core, 0, -1),
+                    spec_type(spec_type::pu, 0, -1)
+                }, data_good_thread()
+            },
+            { 0x000001, 0x000002, 0x000004, 0x000008 }
+        },
+        {   "thread:0-3=core:0-3.pu:0", 4,
+            {
+                {
+                    spec_type(spec_type::thread, 0, -3),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::core, 0, -3),
+                    spec_type(spec_type::pu, 0, 0)
+                }, data_good_thread()
+            },
+            { 0x000001, 0x000004, 0x0000010, 0x000040 }
+        },
+        {   "thread:0-3=pu:0", 4,
+            {
+                {
+                    spec_type(spec_type::thread, 0, -3),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::unknown),
+                    spec_type(spec_type::pu, 0, 0)
+                }, data_good_thread()
+            },
+            { 0x000001, 0x000001, 0x000001, 0x000001 }
+        },
+
+        { "", 0,  {data_good_thread(), data_good_thread()}, {0,0} }
     };
 
     void good_testing(data_good const* t, char const* const options)
@@ -967,13 +1003,13 @@ namespace test
 #if defined(VERIFY_AFFINITY_MASKS)
         std::vector<hpx::threads::mask_type> affinities;
         affinities.resize(hpx::get_os_thread_count(), 0);
-        hpx::threads::parse_affinity_options(t->option_, affinities, ec);
+        hpx::threads::parse_affinity_options(options, affinities, ec);
         HPX_TEST(!ec);
-        HPX_TEST_EQ(affinities.size(), 2u);
+        HPX_TEST_EQ(affinities.size(), t->threads_);
         HPX_TEST_EQ(std::count(affinities.begin(), affinities.end(), 0), 0);
 
         i = 0;
-        for (hpx::threads::mask_type m : affinities)
+        for (hpx::threads::mask_type const& m : affinities)
         {
             HPX_TEST_EQ(t->masks[i], m);
             ++i;
@@ -1075,9 +1111,9 @@ int hpx_main()
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // We force this test to use 2 threads by default.
+    // We force this test to use 4 threads by default.
     std::vector<std::string> const cfg = {
-        "hpx.os_threads=2"
+        "hpx.os_threads=4"
     };
 
     // Initialize and run HPX
