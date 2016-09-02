@@ -39,7 +39,8 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         static void* get_vtable()
         {
-            return const_cast<VTable*>(detail::get_vtable<VTable, T>());
+            typedef serializable_function_vtable<VTable> vtable_type;
+            return const_cast<vtable_type*>(detail::get_vtable<vtable_type, T>());
         }
     };
 
