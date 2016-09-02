@@ -682,7 +682,7 @@ namespace hpx { namespace threads { namespace detail
         extract_core_affinities(t, m.second, socket_masks, affinities, ec);
 
         // special case, all threads share the same options
-        if (socket_masks.size() == 1 && num_threads > 1)
+        if (affinities.size() == 1 && num_threads > 1)
         {
             affinities.resize(num_threads, affinities[0]);
         }
