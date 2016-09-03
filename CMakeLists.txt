@@ -833,14 +833,30 @@ if(NOT MSVC)
     set(CXX_FLAG -std=c++11)
   else()
     # Try -std=c++14 first
-    check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+
+    # The Intel compiler has the C++14 flag, but doesn't have sufficient C++14
+    # support to compile Boost. If the user has explicitly asked for it, use it,
+    # otherwise don't run the check.
+    # FIXME: This should be replaced with a version-based check in the future
+    # when the Intel compiler is able to build Boost with -std=c++14.
+    if(HPX_WITH_CXX14 OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+      check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+    endif()
     if(HPX_WITH_CXX14)
+
       set(CXX_FLAG -std=c++14)
     else()
-      # ... otherwise try -std=c++0y
-      check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
-      if(HPX_WITH_CXX0Y)
-        set(CXX_FLAG -std=c++0y)
+      # ... otherwise try -std=c++1y
+
+      # See comment above.
+      # FIXME: This should be replaced with a version-based check in the future
+      # when the Intel compiler is able to build Boost with -std=c++14.
+      if(HPX_WITH_CXX1Y OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1Y)
+      endif()
+
+      if(HPX_WITH_CXX1Y)
+        set(CXX_FLAG -std=c++1y)
       else()
         # ... otherwise try -std=c++11
         check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
