@@ -17,8 +17,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -39,11 +38,11 @@ namespace hpx { namespace agas { namespace detail
         naming::id_type gid() const;
 
         components::component_type bind_prefix(
-            std::string const& key, boost::uint32_t prefix);
+            std::string const& key, std::uint32_t prefix);
 
         components::component_type bind_name(std::string const& name);
 
-        std::vector<boost::uint32_t> resolve_id(components::component_type key);
+        std::vector<std::uint32_t> resolve_id(components::component_type key);
 
         bool unbind(std::string const& key);
 
@@ -51,14 +50,14 @@ namespace hpx { namespace agas { namespace detail
 
         std::string get_component_type_name(components::component_type type);
 
-        lcos::future<boost::uint32_t> get_num_localities(
+        lcos::future<std::uint32_t> get_num_localities(
             components::component_type type);
 
         naming::gid_type statistics_counter(std::string const& name);
 
         void register_counter_types();
 
-        void register_server_instance(boost::uint32_t locality_id);
+        void register_server_instance(std::uint32_t locality_id);
 
         void unregister_server_instance(error_code& ec);
 

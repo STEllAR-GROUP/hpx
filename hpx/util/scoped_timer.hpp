@@ -10,6 +10,8 @@
 
 #include <hpx/util/high_resolution_clock.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace util
 {
     template <typename T>
@@ -25,7 +27,7 @@ namespace hpx { namespace util
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
-        boost::uint64_t started_at_;
+        std::uint64_t started_at_;
         T& t_;
     };
 }}

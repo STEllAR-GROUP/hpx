@@ -34,6 +34,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -290,23 +292,23 @@ struct HPX_EXPORT primary_namespace
     naming::id_type colocate(naming::gid_type id);
 
     naming::address unbind_gid(
-        boost::uint64_t count
+        std::uint64_t count
       , naming::gid_type id
         );
 
-    boost::int64_t increment_credit(
-        boost::int64_t credits
+    std::int64_t increment_credit(
+        std::int64_t credits
       , naming::gid_type lower
       , naming::gid_type upper
         );
 
-    std::vector<boost::int64_t> decrement_credit(
+    std::vector<std::int64_t> decrement_credit(
         std::vector<
-            hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+            hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
         > requests
         );
 
-    std::pair<naming::gid_type, naming::gid_type> allocate(boost::uint64_t count);
+    std::pair<naming::gid_type, naming::gid_type> allocate(std::uint64_t count);
 
     naming::gid_type statistics_counter(std::string const& name);
 
@@ -492,6 +494,8 @@ namespace hpx { namespace traits
         }
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

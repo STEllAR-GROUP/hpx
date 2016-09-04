@@ -27,6 +27,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -158,10 +160,10 @@ struct HPX_EXPORT locality_namespace
         error_code& ec = throws
         );
 
-    boost::uint32_t allocate(
+    std::uint32_t allocate(
         parcelset::endpoints_type const& endpoints
-      , boost::uint64_t count
-      , boost::uint32_t num_threads
+      , std::uint64_t count
+      , std::uint32_t num_threads
       , naming::gid_type suggested_prefix
         );
 
@@ -170,13 +172,13 @@ struct HPX_EXPORT locality_namespace
 
     void free(naming::gid_type locality);
 
-    std::vector<boost::uint32_t> localities();
+    std::vector<std::uint32_t> localities();
 
-    boost::uint32_t get_num_localities();
+    std::uint32_t get_num_localities();
 
-    std::vector<boost::uint32_t> get_num_threads();
+    std::vector<std::uint32_t> get_num_threads();
 
-    boost::uint32_t get_num_overall_threads();
+    std::uint32_t get_num_overall_threads();
 
     naming::gid_type statistics_counter(std::string name);
 
@@ -248,5 +250,8 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::locality_namespace::statistics_counter_action,
     locality_namespace_statistics_counter_action)
+
+#include <hpx/config/warnings_suffix.hpp>
+
 #endif
 

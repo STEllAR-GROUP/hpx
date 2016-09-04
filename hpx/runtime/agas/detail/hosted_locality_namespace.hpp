@@ -20,8 +20,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -44,27 +43,27 @@ namespace hpx { namespace agas { namespace detail
             return gid_;
         }
 
-        boost::uint32_t allocate(
+        std::uint32_t allocate(
             parcelset::endpoints_type const& endpoints
-          , boost::uint64_t count
-          , boost::uint32_t num_threads
+          , std::uint64_t count
+          , std::uint32_t num_threads
           , naming::gid_type suggested_prefix
             );
 
         void free(naming::gid_type locality);
 
-        std::vector<boost::uint32_t> localities();
+        std::vector<std::uint32_t> localities();
 
         parcelset::endpoints_type resolve_locality(naming::gid_type locality);
 
-        boost::uint32_t get_num_localities();
-        hpx::future<boost::uint32_t> get_num_localities_async();
+        std::uint32_t get_num_localities();
+        hpx::future<std::uint32_t> get_num_localities_async();
 
-        std::vector<boost::uint32_t> get_num_threads();
-        hpx::future<std::vector<boost::uint32_t> > get_num_threads_async();
+        std::vector<std::uint32_t> get_num_threads();
+        hpx::future<std::vector<std::uint32_t> > get_num_threads_async();
 
-        boost::uint32_t get_num_overall_threads();
-        hpx::future<boost::uint32_t> get_num_overall_threads_async();
+        std::uint32_t get_num_overall_threads();
+        hpx::future<std::uint32_t> get_num_overall_threads_async();
 
         naming::gid_type statistics_counter(std::string name);
 

@@ -16,11 +16,12 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
@@ -35,7 +36,7 @@ struct symbol_namespace
     > iterate_names_function_type;
     // }}}
 
-    static naming::gid_type get_service_instance(boost::uint32_t service_locality_id);
+    static naming::gid_type get_service_instance(std::uint32_t service_locality_id);
 
     static naming::gid_type get_service_instance(naming::gid_type const& dest,
         error_code& ec = throws);
@@ -77,7 +78,7 @@ struct symbol_namespace
         );
 
     void register_counter_types();
-    void register_server_instance(boost::uint32_t locality_id);
+    void register_server_instance(std::uint32_t locality_id);
     void unregister_server_instance(error_code& ec);
 
 private:
@@ -85,6 +86,8 @@ private:
 };
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 

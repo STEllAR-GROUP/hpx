@@ -16,6 +16,7 @@
 #include <boost/format.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <utility>
 #include <vector>
@@ -24,7 +25,7 @@ namespace hpx { namespace agas { namespace server
 {
     void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
-        util::scoped_timer<boost::atomic<boost::int64_t> > update(
+        util::scoped_timer<boost::atomic<std::int64_t> > update(
             counter_data_.route_.time_
         );
         counter_data_.increment_route_count();

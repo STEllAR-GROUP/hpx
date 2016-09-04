@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -29,7 +30,7 @@ namespace hpx { namespace agas { namespace detail
     }
 
     components::component_type bootstrap_component_namespace::bind_prefix(
-        std::string const& key, boost::uint32_t prefix)
+        std::string const& key, std::uint32_t prefix)
     {
         return server_.bind_prefix(key, prefix);
     }
@@ -40,7 +41,7 @@ namespace hpx { namespace agas { namespace detail
         return server_.bind_name(name);
     }
 
-    std::vector<boost::uint32_t>
+    std::vector<std::uint32_t>
     bootstrap_component_namespace::resolve_id(components::component_type key)
     {
         return server_.resolve_id(key);
@@ -65,7 +66,7 @@ namespace hpx { namespace agas { namespace detail
         return server_.get_component_type_name(type);
     }
 
-    lcos::future<boost::uint32_t> bootstrap_component_namespace::get_num_localities(
+    lcos::future<std::uint32_t> bootstrap_component_namespace::get_num_localities(
         components::component_type type)
     {
         return hpx::make_ready_future(server_.get_num_localities(type));
@@ -84,7 +85,7 @@ namespace hpx { namespace agas { namespace detail
     }
 
     void
-    bootstrap_component_namespace::register_server_instance(boost::uint32_t locality_id)
+    bootstrap_component_namespace::register_server_instance(std::uint32_t locality_id)
     {
         HPX_ASSERT(locality_id == 0);
         const char* servicename("locality#0/");

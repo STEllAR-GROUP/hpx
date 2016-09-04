@@ -28,6 +28,8 @@
 #include <boost/atomic.hpp>
 #include <boost/bimap.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -158,14 +160,14 @@ struct HPX_EXPORT component_namespace
 
     components::component_type bind_prefix(
         std::string const& key
-      , boost::uint32_t prefix
+      , std::uint32_t prefix
         );
 
     components::component_type bind_name(
         std::string const& name
         );
 
-    std::vector<boost::uint32_t> resolve_id(
+    std::vector<std::uint32_t> resolve_id(
         components::component_type key
         );
 
@@ -181,7 +183,7 @@ struct HPX_EXPORT component_namespace
         components::component_type type
         );
 
-    boost::uint32_t get_num_localities(
+    std::uint32_t get_num_localities(
         components::component_type type
         );
 
@@ -250,6 +252,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::component_namespace::statistics_counter_action,
     component_namespace_statistics_counter_action)
 
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

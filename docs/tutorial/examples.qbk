@@ -138,7 +138,7 @@ printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that we've created a `boost::uint64_t` to store the result of
+Upon a closer look we see that we've created a `std::uint64_t` to store the result of
 invoking our `fibonacci_action` ['fib]. This action will launch synchronously ( as the work
 done inside of the action will be asynchronous itself) and return the result of the fibonacci
 sequence. But wait, what is an action? And what
@@ -165,7 +165,7 @@ creating.
 
 This picture should now start making sense. The function `fibonacci()` is
 wrapped in an action `fibonacci_action`, which was run synchronously but
-created asynchronous work, then returns a `boost::uint64_t`
+created asynchronous work, then returns a `std::uint64_t`
 representing the result of the function `fibonacci()`. Now, let's look at the
 function `fibonacci()`:
 
@@ -491,7 +491,7 @@ are used to create components:
 and to invoke component actions:
 
 ``
-    c.add_sync(4);
+    c.add(hpx::launch::sync, 4);
 ``
 
 Clients, like servers, need to inherit from a base class, this time,

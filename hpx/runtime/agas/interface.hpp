@@ -76,13 +76,6 @@ HPX_API_EXPORT lcos::future<bool> register_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool unregister_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& gid
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type unregister_name(
     launch::sync_policy
   , std::string const& name
@@ -115,24 +108,14 @@ HPX_API_EXPORT lcos::future<naming::id_type> unregister_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::gid_type& gid
-  , error_code& ec = throws
-    );
-
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& id
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type resolve_name(
     launch::sync_policy
   , std::string const& name
   , error_code& ec = throws
+    );
+
+HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
+    std::string const& name
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
@@ -165,10 +148,6 @@ inline naming::id_type resolve_name_sync(
     return resolve_name(launch::sync, name, ec);
 }
 #endif
-
-HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
-    std::string const& name
-    );
 
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_API_EXPORT lcos::future<std::vector<naming::id_type> > get_localities(

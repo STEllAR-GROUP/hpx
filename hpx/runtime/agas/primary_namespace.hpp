@@ -16,9 +16,12 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
@@ -28,7 +31,7 @@ struct HPX_EXPORT primary_namespace
     typedef hpx::util::tuple<naming::gid_type, gva, naming::gid_type>
         resolved_type;
 
-    static naming::gid_type get_service_instance(boost::uint32_t service_locality_id);
+    static naming::gid_type get_service_instance(std::uint32_t service_locality_id);
 
     static naming::gid_type get_service_instance(naming::gid_type const& dest,
         error_code& ec = throws);
@@ -68,28 +71,31 @@ struct HPX_EXPORT primary_namespace
 
     future<id_type> colocate(naming::gid_type id);
 
-    naming::address unbind_gid(boost::uint64_t count, naming::gid_type id);
+    naming::address unbind_gid(std::uint64_t count, naming::gid_type id);
     future<naming::address>
-    unbind_gid_async(boost::uint64_t count, naming::gid_type id);
+    unbind_gid_async(std::uint64_t count, naming::gid_type id);
 
-    future<boost::int64_t> increment_credit(
-        boost::int64_t credits
+    future<std::int64_t> increment_credit(
+        std::int64_t credits
       , naming::gid_type lower
       , naming::gid_type upper
         );
 
-    std::pair<naming::gid_type, naming::gid_type> allocate(boost::uint64_t count);
+    std::pair<naming::gid_type, naming::gid_type> allocate(std::uint64_t count);
 
     void set_local_locality(naming::gid_type const& g);
 
     void register_counter_types();
-    void register_server_instance(boost::uint32_t locality_id);
+    void register_server_instance(std::uint32_t locality_id);
     void unregister_server_instance(error_code& ec);
+
 private:
     std::unique_ptr<server::primary_namespace> server_;
 };
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_389E034F_3BC6_4E6D_928B_B6E3088A54C6
 

@@ -483,7 +483,7 @@ bool addressing_service::get_localities(
     try {
         if (type != components::component_invalid)
         {
-            const std::vector<boost::uint32_t> p = component_ns_->resolve_id(type);
+            const std::vector<std::uint32_t> p = component_ns_->resolve_id(type);
 
             if (!p.size())
                 return false;
@@ -497,7 +497,7 @@ bool addressing_service::get_localities(
 
         else
         {
-            const std::vector<boost::uint32_t> p = locality_ns_->localities();
+            const std::vector<std::uint32_t> p = locality_ns_->localities();
 
             if (!p.size())
                 return false;
@@ -2456,7 +2456,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             std::map<
                 naming::id_type,
                 std::vector<
-                    hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+                    hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
                 >
             >
             requests_type;
@@ -2492,7 +2492,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
     }
 }
 
-std::vector<hpx::future<std::vector<boost::int64_t> > >
+std::vector<hpx::future<std::vector<std::int64_t> > >
 addressing_service::send_refcnt_requests_async(
     std::unique_lock<addressing_service::mutex_type>& l
     )
@@ -2502,7 +2502,7 @@ addressing_service::send_refcnt_requests_async(
     if (refcnt_requests_->empty())
     {
         l.unlock();
-        return std::vector<hpx::future<std::vector<boost::int64_t> > >();
+        return std::vector<hpx::future<std::vector<std::int64_t> > >();
     }
 
     std::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
@@ -2528,13 +2528,13 @@ addressing_service::send_refcnt_requests_async(
         std::map<
             naming::id_type,
             std::vector<
-                hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+                hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
             >
         >
         requests_type;
     requests_type requests;
 
-    std::vector<hpx::future<std::vector<boost::int64_t> > > lazy_results;
+    std::vector<hpx::future<std::vector<std::int64_t> > > lazy_results;
     for (refcnt_requests_type::const_reference e : *p)
     {
         HPX_ASSERT(e.second < 0);
@@ -2565,7 +2565,7 @@ void addressing_service::send_refcnt_requests_sync(
   , error_code& ec
     )
 {
-    std::vector<hpx::future<std::vector<boost::int64_t> > > lazy_results =
+    std::vector<hpx::future<std::vector<std::int64_t> > > lazy_results =
         send_refcnt_requests_async(l);
 
     // re throw possible errors

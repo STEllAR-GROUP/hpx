@@ -24,7 +24,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
-
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>
@@ -163,14 +163,14 @@ void locality_namespace::finalize()
     }
 }
 
-boost::uint32_t locality_namespace::allocate(
+std::uint32_t locality_namespace::allocate(
     parcelset::endpoints_type const& endpoints
-  , boost::uint64_t count
-  , boost::uint32_t num_threads
+  , std::uint64_t count
+  , std::uint32_t num_threads
   , naming::gid_type suggested_prefix
     )
 { // {{{ allocate implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.allocate_.time_
     );
     counter_data_.increment_allocate_count();
@@ -273,7 +273,7 @@ boost::uint32_t locality_namespace::allocate(
 parcelset::endpoints_type locality_namespace::resolve_locality(
     naming::gid_type locality)
 { // {{{ resolve_locality implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.resolve_locality_.time_
     );
     counter_data_.increment_resolve_locality_count();
@@ -294,7 +294,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
 
 void locality_namespace::free(naming::gid_type locality)
 { // {{{ free implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.free_.time_
     );
     counter_data_.increment_free_count();
@@ -367,9 +367,9 @@ void locality_namespace::free(naming::gid_type locality)
     */
 } // }}}
 
-std::vector<boost::uint32_t> locality_namespace::localities()
+std::vector<std::uint32_t> locality_namespace::localities()
 { // {{{ localities implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.localities_.time_
     );
     counter_data_.increment_localities_count();
@@ -391,9 +391,9 @@ std::vector<boost::uint32_t> locality_namespace::localities()
     return p;
 } // }}}
 
-boost::uint32_t locality_namespace::get_num_localities()
+std::uint32_t locality_namespace::get_num_localities()
 { // {{{ get_num_localities implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.num_localities_.time_
     );
     counter_data_.increment_num_localities_count();
@@ -409,7 +409,7 @@ boost::uint32_t locality_namespace::get_num_localities()
     return num_localities;
 } // }}}
 
-std::vector<boost::uint32_t> locality_namespace::get_num_threads()
+std::vector<std::uint32_t> locality_namespace::get_num_threads()
 { // {{{ get_num_threads implementation
     std::lock_guard<mutex_type> l(mutex_);
 
@@ -430,11 +430,11 @@ std::vector<boost::uint32_t> locality_namespace::get_num_threads()
     return num_threads;
 } // }}}
 
-boost::uint32_t locality_namespace::get_num_overall_threads()
+std::uint32_t locality_namespace::get_num_overall_threads()
 {
     std::lock_guard<mutex_type> l(mutex_);
 
-    boost::uint32_t num_threads = 0;
+    std::uint32_t num_threads = 0;
 
     partition_table_type::iterator end = partitions_.end();
     for (partition_table_type::iterator it = partitions_.begin();

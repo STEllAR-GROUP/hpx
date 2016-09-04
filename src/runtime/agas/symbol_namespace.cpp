@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -62,7 +63,7 @@ HPX_REGISTER_ACTION_ID(
 namespace hpx { namespace agas {
 
     naming::gid_type symbol_namespace::get_service_instance(
-        boost::uint32_t service_locality_id)
+        std::uint32_t service_locality_id)
     {
         naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB);
         return naming::replace_locality_id(service, service_locality_id);
@@ -71,7 +72,7 @@ namespace hpx { namespace agas {
     naming::gid_type symbol_namespace::get_service_instance(naming::gid_type const& dest,
         error_code& ec)
     {
-        boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
+        std::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -93,7 +94,7 @@ namespace hpx { namespace agas {
 
     naming::id_type symbol_namespace::symbol_namespace_locality(std::string const& key)
     {
-        boost::uint32_t hash_value = 0;
+        std::uint32_t hash_value = 0;
         if (key.size() < 2 || key[1] != '0' || key[0] != '/')
         {
             // keys starting with '/0' have to go to node 0
@@ -222,7 +223,7 @@ namespace hpx { namespace agas {
         server::symbol_namespace::register_global_counter_types();
     }
 
-    void symbol_namespace::register_server_instance(boost::uint32_t locality_id)
+    void symbol_namespace::register_server_instance(std::uint32_t locality_id)
     {
         std::string str("locality#" +
             std::to_string(locality_id) + "/");

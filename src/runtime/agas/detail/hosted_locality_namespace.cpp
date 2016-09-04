@@ -15,8 +15,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -29,10 +28,10 @@ namespace hpx { namespace agas { namespace detail
       , addr_(addr)
     {}
 
-    boost::uint32_t hosted_locality_namespace::allocate(
+    std::uint32_t hosted_locality_namespace::allocate(
         parcelset::endpoints_type const& endpoints
-      , boost::uint64_t count
-      , boost::uint32_t num_threads
+      , std::uint64_t count
+      , std::uint32_t num_threads
       , naming::gid_type suggested_prefix
         )
     {
@@ -45,7 +44,7 @@ namespace hpx { namespace agas { namespace detail
         action(gid_, locality);
     }
 
-    std::vector<boost::uint32_t> hosted_locality_namespace::localities()
+    std::vector<std::uint32_t> hosted_locality_namespace::localities()
     {
         server::locality_namespace::localities_action action;
         return action(gid_);
@@ -70,38 +69,38 @@ namespace hpx { namespace agas { namespace detail
         return endpoints_future.get();
     }
 
-    boost::uint32_t hosted_locality_namespace::get_num_localities()
+    std::uint32_t hosted_locality_namespace::get_num_localities()
     {
         server::locality_namespace::get_num_localities_action action;
         return action(gid_);
     }
 
-    hpx::future<boost::uint32_t> hosted_locality_namespace::get_num_localities_async()
+    hpx::future<std::uint32_t> hosted_locality_namespace::get_num_localities_async()
     {
         server::locality_namespace::get_num_localities_action action;
         return hpx::async(action, gid_);
     }
 
-    std::vector<boost::uint32_t> hosted_locality_namespace::get_num_threads()
+    std::vector<std::uint32_t> hosted_locality_namespace::get_num_threads()
     {
         server::locality_namespace::get_num_threads_action action;
         return action(gid_);
     }
 
-    hpx::future<std::vector<boost::uint32_t>>
+    hpx::future<std::vector<std::uint32_t>>
     hosted_locality_namespace::get_num_threads_async()
     {
         server::locality_namespace::get_num_threads_action action;
         return hpx::async(action, gid_);
     }
 
-    boost::uint32_t hosted_locality_namespace::get_num_overall_threads()
+    std::uint32_t hosted_locality_namespace::get_num_overall_threads()
     {
         server::locality_namespace::get_num_overall_threads_action action;
         return action(gid_);
     }
 
-    hpx::future<boost::uint32_t>
+    hpx::future<std::uint32_t>
     hosted_locality_namespace::get_num_overall_threads_async()
     {
         server::locality_namespace::get_num_overall_threads_action action;

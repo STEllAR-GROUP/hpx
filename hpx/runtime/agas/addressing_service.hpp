@@ -44,6 +44,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 struct request;
@@ -1406,6 +1408,8 @@ public:
 };
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 

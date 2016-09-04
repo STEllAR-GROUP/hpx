@@ -18,6 +18,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -89,7 +90,7 @@ HPX_REGISTER_ACTION_ID(
 namespace hpx { namespace agas {
 
     naming::gid_type primary_namespace::get_service_instance(
-        boost::uint32_t service_locality_id)
+        std::uint32_t service_locality_id)
     {
         naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
         return naming::replace_locality_id(service, service_locality_id);
@@ -98,7 +99,7 @@ namespace hpx { namespace agas {
     naming::gid_type primary_namespace::get_service_instance(naming::gid_type const& dest,
         error_code& ec)
     {
-        boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
+        std::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -244,7 +245,7 @@ namespace hpx { namespace agas {
     }
 
     future<naming::address>
-    primary_namespace::unbind_gid_async(boost::uint64_t count, naming::gid_type id)
+    primary_namespace::unbind_gid_async(std::uint64_t count, naming::gid_type id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -258,7 +259,7 @@ namespace hpx { namespace agas {
     }
 
     naming::address
-    primary_namespace::unbind_gid(boost::uint64_t count, naming::gid_type id)
+    primary_namespace::unbind_gid(std::uint64_t count, naming::gid_type id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -271,8 +272,8 @@ namespace hpx { namespace agas {
         return action(std::move(dest), count, stripped_id);
     }
 
-    future<boost::int64_t> primary_namespace::increment_credit(
-        boost::int64_t credits
+    future<std::int64_t> primary_namespace::increment_credit(
+        std::int64_t credits
       , naming::gid_type lower
       , naming::gid_type upper
         )
@@ -289,7 +290,7 @@ namespace hpx { namespace agas {
     }
 
     std::pair<naming::gid_type, naming::gid_type>
-    primary_namespace::allocate(boost::uint64_t count)
+    primary_namespace::allocate(std::uint64_t count)
     {
         return server_->allocate(count);
     }
@@ -305,7 +306,7 @@ namespace hpx { namespace agas {
         server::primary_namespace::register_global_counter_types();
     }
 
-    void primary_namespace::register_server_instance(boost::uint32_t locality_id)
+    void primary_namespace::register_server_instance(std::uint32_t locality_id)
     {
         std::string str("locality#" +
             std::to_string(locality_id) + "/");

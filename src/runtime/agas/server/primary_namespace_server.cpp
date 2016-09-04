@@ -26,9 +26,9 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/scoped_timer.hpp>
-
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
+
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
@@ -224,7 +224,7 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
 std::pair<naming::id_type, naming::address>
 primary_namespace::begin_migration(naming::gid_type id)
 {
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.begin_migration_.time_
     );
     counter_data_.increment_begin_migration_count();
@@ -266,7 +266,7 @@ primary_namespace::begin_migration(naming::gid_type id)
 // migration of the given object is complete
 bool primary_namespace::end_migration(naming::gid_type id)
 {
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.end_migration_.time_
     );
     counter_data_.increment_end_migration_count();
@@ -315,7 +315,7 @@ bool primary_namespace::bind_gid(
   , naming::gid_type locality
     )
 { // {{{ bind_gid implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.bind_gid_.time_
     );
     counter_data_.increment_bind_gid_count();
@@ -474,7 +474,7 @@ bool primary_namespace::bind_gid(
 
 primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type id)
 { // {{{ resolve_gid implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.resolve_gid_.time_
     );
     counter_data_.increment_resolve_gid_count();
@@ -516,7 +516,7 @@ naming::id_type primary_namespace::colocate(naming::gid_type id)
 }
 
 naming::address primary_namespace::unbind_gid(
-    boost::uint64_t count
+    std::uint64_t count
   , naming::gid_type id
     )
 { // {{{ unbind_gid implementation
@@ -567,13 +567,13 @@ naming::address primary_namespace::unbind_gid(
     return naming::address();
 } // }}}
 
-boost::int64_t primary_namespace::increment_credit(
-    boost::int64_t credits
+std::int64_t primary_namespace::increment_credit(
+    std::int64_t credits
   , naming::gid_type lower
   , naming::gid_type upper
     )
 { // increment_credit implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.increment_credit_.time_
     );
     counter_data_.increment_increment_credit_count();
@@ -601,13 +601,13 @@ boost::int64_t primary_namespace::increment_credit(
     return credits;
 }
 
-std::vector<boost::int64_t> primary_namespace::decrement_credit(
+std::vector<std::int64_t> primary_namespace::decrement_credit(
     std::vector<
-        hpx::util::tuple<boost::int64_t, naming::gid_type, naming::gid_type>
+        hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
     > requests
     )
 { // decrement_credit implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.decrement_credit_.time_
     );
     counter_data_.increment_decrement_credit_count();
@@ -617,7 +617,7 @@ std::vector<boost::int64_t> primary_namespace::decrement_credit(
 
     for(auto& req: requests)
     {
-        boost::int64_t credits = hpx::util::get<0>(req);
+        std::int64_t credits = hpx::util::get<0>(req);
         naming::gid_type lower = hpx::util::get<1>(req);
         naming::gid_type upper = hpx::util::get<1>(req);
 
@@ -648,7 +648,7 @@ std::vector<boost::int64_t> primary_namespace::decrement_credit(
 }
 
 std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
-    boost::uint64_t count
+    std::uint64_t count
     )
 { // {{{ allocate implementation
     util::scoped_timer<boost::atomic<std::int64_t> > update(
@@ -656,7 +656,7 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     );
     counter_data_.increment_allocate_count();
 
-    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
+    std::uint64_t const real_count = (count) ? (count - 1) : (0);
 
     // Just return the prefix
     // REVIEW: Should this be an error?

@@ -113,10 +113,10 @@ namespace examples
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        int write_sync(const tuple_type& tuple)
+        int write(hpx::launch::sync_policy, const tuple_type& tuple)
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::write_sync(this->get_id(), tuple);
+            return this->base_type::write(hpx::launch::sync, this->get_id(), tuple);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -136,10 +136,12 @@ namespace examples
         ///
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_client_read_sync
-        tuple_type read_sync(const tuple_type& tp, long const timeout)
+        tuple_type read(hpx::launch::sync_policy, const tuple_type& tp,
+            long const timeout)
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::read_sync(this->get_id(), tp, timeout);
+            return this->base_type::read(hpx::launch::sync, this->get_id(),
+                tp, timeout);
         }
         //]
 
@@ -156,17 +158,20 @@ namespace examples
             take_async(const tuple_type& tp, long const timeout)
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::take_async(this->get_id(), tp, timeout);
+            return this->base_type::take(hpx::launch::async, this->get_id(),
+                tp, timeout);
         }
         //]
 
         /// take matching tuple from tuplespace within \p timeout.
         ///
         /// \note This function is fully synchronous.
-        tuple_type take_sync(const tuple_type& tp, long const timeout)
+        tuple_type take(hpx::launch::sync_policy, const tuple_type& tp,
+            long const timeout)
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::take_sync(this->get_id(), tp, timeout);
+            return this->base_type::take(hpx::launch::sync, this->get_id(),
+                tp, timeout);
         }
 
     private:

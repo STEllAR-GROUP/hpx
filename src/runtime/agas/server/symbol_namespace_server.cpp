@@ -184,7 +184,7 @@ bool symbol_namespace::bind(
     )
 { // {{{ bind implementation
     // parameters
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.bind_.time_
     );
     counter_data_.increment_bind_count();
@@ -301,7 +301,7 @@ bool symbol_namespace::bind(
 naming::gid_type symbol_namespace::resolve(std::string const& key)
 { // {{{ resolve implementation
     // parameters
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.resolve_.time_
     );
     counter_data_.increment_resolve_count();
@@ -335,7 +335,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 
 naming::gid_type symbol_namespace::unbind(std::string const& key)
 { // {{{ unbind implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.unbind_.time_
     );
     counter_data_.increment_unbind_count();
@@ -370,7 +370,7 @@ void symbol_namespace::iterate(
     symbol_namespace::iterate_names_function_type const& f
     )
 { // {{{ iterate implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.iterate_names_.time_
     );
     counter_data_.increment_iterate_names_count();
@@ -399,7 +399,7 @@ bool symbol_namespace::on_event(
   , hpx::id_type lco
     )
 { // {{{ on_event implementation
-    util::scoped_timer<boost::atomic<boost::int64_t> > update(
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
         counter_data_.on_event_.time_
     );
     counter_data_.increment_on_event_count();

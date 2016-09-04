@@ -10,6 +10,7 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -23,7 +24,7 @@ namespace hpx { namespace agas { namespace detail
     }
 
     components::component_type hosted_component_namespace::bind_prefix(
-        std::string const& key, boost::uint32_t prefix)
+        std::string const& key, std::uint32_t prefix)
     {
         server::component_namespace::bind_prefix_action action;
         return action(gid_, key, prefix);
@@ -36,7 +37,7 @@ namespace hpx { namespace agas { namespace detail
         return action(gid_, name);
     }
 
-    std::vector<boost::uint32_t>
+    std::vector<std::uint32_t>
     hosted_component_namespace::resolve_id(components::component_type key)
     {
         server::component_namespace::resolve_id_action action;
@@ -64,7 +65,7 @@ namespace hpx { namespace agas { namespace detail
         return action(gid_, type);
     }
 
-    lcos::future<boost::uint32_t> hosted_component_namespace::get_num_localities(
+    lcos::future<std::uint32_t> hosted_component_namespace::get_num_localities(
         components::component_type type)
     {
         server::component_namespace::get_num_localities_action action;

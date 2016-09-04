@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -215,6 +217,8 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::symbol_namespace::statistics_counter_action,
     symbol_namespace_statistics_counter_action)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 

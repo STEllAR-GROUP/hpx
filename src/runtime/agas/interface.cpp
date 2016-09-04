@@ -60,29 +60,6 @@ lcos::future<bool> register_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool unregister_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& gid
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-
-    naming::gid_type raw_gid;
-
-    if (agas_.unregister_name(name, raw_gid, ec) && !ec)
-    {
-        gid = naming::id_type(raw_gid,
-            naming::detail::has_credits(raw_gid) ?
-                naming::id_type::managed :
-                naming::id_type::unmanaged);
-        return true;
-    }
-
-    return false;
-}
-
 naming::id_type unregister_name(
     launch::sync_policy
   , std::string const& name
@@ -102,40 +79,6 @@ lcos::future<naming::id_type> unregister_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-naming::id_type resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.resolve_name(name, ec);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& id
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-
-    naming::gid_type raw_gid;
-
-    if (agas_.resolve_name(name, raw_gid, ec) && !ec)
-    {
-        id = naming::id_type(raw_gid,
-            naming::detail::has_credits(raw_gid) ?
-                naming::id_type::managed :
-                naming::id_type::unmanaged);
-        return true;
-    }
-
-    return false;
-}
-
 lcos::future<naming::id_type> resolve_name(
     std::string const& name
     )
