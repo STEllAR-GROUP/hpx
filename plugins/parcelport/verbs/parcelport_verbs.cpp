@@ -389,6 +389,8 @@ namespace hpx { namespace parcelset {
             // erratum : the parcel destructor takes a lock even when empty, so better
             // to avoid the lock held detection by using util::ignore_while_checking
             {
+                LOG_DEBUG_MSG("Taking lock on active_send_mutex in delete_send_data " << hexnumber(active_send_count_) );
+                suspended_task_debug();
                 unique_lock lock(active_send_mutex);
 //                util::ignore_while_checking<unique_lock> il(&lock);
                 active_sends.erase(send);
@@ -396,6 +398,8 @@ namespace hpx { namespace parcelset {
                 LOG_DEBUG_MSG("Active send after erase size " << hexnumber(active_send_count_) );
                 lock.unlock();
                 active_send_condition.notify_one();
+                LOG_DEBUG_MSG("Active send notified one");
+                suspended_task_debug();
             }
         }
 
@@ -951,6 +955,25 @@ namespace hpx { namespace parcelset {
             FUNC_END_DEBUG_MSG;
             return parcelset::locality(locality());
         }
+
+        void suspended_task_debug() {
+#if defined(XXX_HPX_DEBUG)
+            scoped_lock lock(debug_mutex);
+            std::stringstream temp;
+            int count = 0;
+            hpx::threads::enumerate_threads(
+                [&temp, &count](hpx::threads::thread_id_type id) -> bool
+                {
+                    hpx::threads::thread_data *dummy = id.get();
+                    temp << hexpointer(dummy) << ", ";
+                    count++;
+                    return true;        // always continue enumeration
+                },
+                hpx::threads::suspended);
+
+            LOG_DEBUG_MSG("Suspended tasks " << decnumber(count) << " : " << temp.str().c_str());
+#endif
+        }
 /*
         // should not be used any more.
         void put_parcels(std::vector<parcelset::locality> dests,
@@ -1133,14 +1156,20 @@ namespace hpx { namespace parcelset {
                 // until all send operations have completed.
                 active_send_iterator current_send;
                 {
-                    unique_lock lock(active_send_mutex);
+                    LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write " << hexnumber(active_send_count_) );
+                    suspended_task_debug();
                     // if more than N parcels are currently queued, then yield
                     // otherwise we can fill the send queues with so many requests
                     // that memory buffers are exhausted.
-                    LOG_DEBUG_MSG("HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
+//                    LOG_TRACE_MSG("waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
+//                    if (active_sends.size()==HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
+//                        hpx_background_work();
+//                    }
+                    unique_lock lock(active_send_mutex);
                     active_send_condition.wait(lock, [this] {
                       return (active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
                     });
+                    LOG_TRACE_MSG("Done waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
 
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
