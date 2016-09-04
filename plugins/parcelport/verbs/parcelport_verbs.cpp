@@ -26,7 +26,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
-#include <hpx/runtime/serialization/detail/future_await_container.hpp>
+#include <plugins/parcelport/verbs/unordered_map.hpp>
 
 // Local parcelport plugin
 // #define USE_SPECIALIZED_SCHEDULER
@@ -151,11 +151,17 @@ namespace hpx { namespace parcelset {
         static std::string       _ibverbs_interface;
         static boost::uint32_t   _port;
         static boost::uint32_t   _ibv_ip;
+
         // to quickly lookup a que-pair (QP) from a destination ip address
-        typedef std::map<boost::uint32_t, boost::uint32_t> ip_map;
-        typedef ip_map::iterator                           ip_map_iterator;
-        //
+        typedef hpx::concurrent::unordered_map<boost::uint32_t, boost::uint32_t> ip_map;
+        typedef ip_map::iterator ip_map_iterator;
         ip_map ip_qp_map;
+
+        // a map that stores the ip address and a boolean to tell us if a connection
+        // to that address is currently being initiated. We need this to prevent two ends
+        // of a connection simultaneously initiating a connection to each other
+        typedef hpx::concurrent::unordered_map<boost::uint32_t, bool> connect_map;
+        connect_map connection_requests_;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a more consistent
         // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
@@ -168,7 +174,6 @@ namespace hpx { namespace parcelset {
 
         // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
-        mutex_type  connection_mutex;
         mutex_type  ReadCompletionMap_mutex;
         mutex_type  SendCompletionMap_mutex;
         mutex_type  TagSendCompletionMap_mutex;
@@ -186,7 +191,6 @@ namespace hpx { namespace parcelset {
         boost::atomic_uint        active_send_count_;
         memory_pool_ptr_type      chunk_pool_;
         verbs::tag_provider       tag_provider_;
-        std::atomic_flag          connection_started;
 
 #ifdef USE_SPECIALIZED_SCHEDULER
         custom_scheduler          parcelport_scheduler;
@@ -252,7 +256,6 @@ namespace hpx { namespace parcelset {
               : base_type(ini, here(ini), on_start_thread, on_stop_thread)
               , stopped_(false)
               , active_send_count_(0)
-              , connection_started(ATOMIC_FLAG_INIT)
               , total_receives(0)
               // , parcels_sent_(0)
 
@@ -264,7 +267,6 @@ namespace hpx { namespace parcelset {
             _rdmaController = std::make_shared<RdmaController>
                 (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
             //
-            connection_started.clear();
             FUNC_END_DEBUG_MSG;
         }
 
@@ -274,8 +276,8 @@ namespace hpx { namespace parcelset {
             while (hpx::is_starting())
             {
                 OS_background_work();
-//                LOG_TRACE_MSG("OS background work");
             }
+            LOG_DEBUG_MSG("io service task completed");
         }
 
 
@@ -290,8 +292,8 @@ namespace hpx { namespace parcelset {
             chunk_pool_ = _rdmaController->getMemoryPool();
 
             LOG_DEBUG_MSG("Setting Pre-Connection function");
-            auto preConnection_function = std::bind( &parcelport::handle_verbs_preconnection, this);
-            _rdmaController->setPreConnectionFunction(preConnection_function);
+            auto connectRequest_function = std::bind( &parcelport::handle_verbs_preconnection, this, std::placeholders::_1, std::placeholders::_2);
+            _rdmaController->setConnectRequestFunction(connectRequest_function);
 
             LOG_DEBUG_MSG("Setting Connection function");
             auto connection_function = std::bind( &parcelport::handle_verbs_connection, this, std::placeholders::_1, std::placeholders::_2);
@@ -339,7 +341,8 @@ namespace hpx { namespace parcelset {
             FUNC_START_DEBUG_MSG;
 
             boost::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " create_connection to " << ipaddress(dest_ip) );
+            LOG_DEBUG_MSG("Create connection from " << ipaddress(_ibv_ip)
+                << "to " << ipaddress(dest_ip) );
 
             RdmaClient *client = get_remote_connection(dest);
             std::shared_ptr<sender_connection> result = std::make_shared<sender_connection>(
@@ -418,10 +421,23 @@ namespace hpx { namespace parcelset {
             }
         }
 
-        int handle_verbs_preconnection() {
-            if (connection_started.test_and_set(std::memory_order_acquire)) {
-                LOG_ERROR_MSG("Got a connection request during race detection");
-                return 0;
+        int handle_verbs_preconnection(struct sockaddr_in *addr_src, struct sockaddr_in *addr_dst)
+        {
+            LOG_ERROR_MSG("Callback for connect request from "
+                << ipaddress(addr_src->sin_addr.s_addr) << "to "
+                << ipaddress(addr_dst->sin_addr.s_addr) << "we are " << ipaddress(_ibv_ip));
+
+            auto inserted = connection_requests_.insert(std::make_pair(addr_src->sin_addr.s_addr, true));
+            if (!inserted.second) {
+                LOG_ERROR_MSG("Connection detection in race from "
+                    << ipaddress(addr_src->sin_addr.s_addr) << "to "
+                    << ipaddress(addr_dst->sin_addr.s_addr) << "we are " << ipaddress(_ibv_ip));
+                if (addr_src->sin_addr.s_addr>addr_dst->sin_addr.s_addr) {
+                LOG_ERROR_MSG("Reject connection , priority from "
+                        << ipaddress(addr_src->sin_addr.s_addr) << "to "
+                        << ipaddress(addr_dst->sin_addr.s_addr) << "we are " << ipaddress(_ibv_ip));
+                    return 0;
+                }
             }
             return 1;
         }
@@ -434,12 +450,23 @@ namespace hpx { namespace parcelset {
         // ----------------------------------------------------------------------------------------------
         int handle_verbs_connection(std::pair<uint32_t,uint64_t> qpinfo, RdmaClientPtr client)
         {
-            scoped_lock lock(connection_mutex);
-            LOG_DEBUG_MSG("handle_verbs_connection callback triggered");
             boost::uint32_t dest_ip = client->getRemoteIPv4Address();
+            LOG_ERROR_MSG("Connection callback received from "
+                << ipaddress(_ibv_ip) << "to "
+                << ipaddress(dest_ip) << "we are " << ipaddress(_ibv_ip));
             ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
             if (ip_it==ip_qp_map.end()) {
                 ip_qp_map.insert(std::make_pair(dest_ip, qpinfo.first));
+                if (connection_requests_.is_in_map(dest_ip)) {
+                    LOG_ERROR_MSG("Completed connection request from "
+                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                        << "we are " << ipaddress(_ibv_ip));
+                    connection_requests_.erase(dest_ip);
+                }
+                else {
+                    LOG_ERROR_MSG("Connection not present in map " << ipaddress(dest_ip));
+                    std::terminate();
+                }
                 LOG_DEBUG_MSG("handle_verbs_connection OK adding " << ipaddress(dest_ip));
             }
             else {
@@ -988,27 +1015,43 @@ namespace hpx { namespace parcelset {
             {
                 // lock this region as we are creating a connection to a remote locality
                 // if two threads attempt to do this at the same time, we'll get duplicated clients
-                unique_lock lock(connection_mutex);
                 do {
                     ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
                     if (ip_it!=ip_qp_map.end()) {
-                        LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
+                        LOG_TRACE_MSG("Client found connection made from "
+                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                            << "with QP " << ip_it->second);
                         client = _rdmaController->getClient(ip_it->second);
                         return client.get();
                     }
                     else {
-                        if (connection_started.test_and_set(std::memory_order_acquire)) {
-                            lock.unlock();
-                            LOG_ERROR_MSG("A connection race has been detected, do not connect");
-                            hpx::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                            lock.lock();
+                        LOG_ERROR_MSG("Initiated connection request from "
+                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                            << "we are " << ipaddress(_ibv_ip));
+                        auto inserted = connection_requests_.insert(std::make_pair(dest_ip, true));
+                        if (inserted.second==false) {
+                            LOG_ERROR_MSG("Connection race (in request) from "
+                                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                                << "we are " << ipaddress(_ibv_ip));
+                            // pause for a moment to allow the existing connection to
+                            // complete - then retry to find the QP
+                            hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
                         }
                         else {
-                            LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
+                            LOG_ERROR_MSG("Making new server connection from "
+                                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                                << "we are " << ipaddress(_ibv_ip));
                             client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
-                            LOG_DEBUG_MSG("Setting qpnum in main client map");
-                            ip_qp_map[dest_ip] = client->getQpNum();
-                            return client.get();
+                            if (client) {
+                                LOG_DEBUG_MSG("Setting qpnum in main client map " << client->getQpNum());
+                                ip_qp_map[dest_ip] = client->getQpNum();
+                                return client.get();
+                            }
+                            else {
+                                LOG_ERROR_MSG("Failed new server connection from "
+                                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                                    << "we are " << ipaddress(_ibv_ip));
+                            }
                         }
                     }
                 } while (true);
