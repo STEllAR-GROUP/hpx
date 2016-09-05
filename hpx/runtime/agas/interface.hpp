@@ -13,7 +13,6 @@
 
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -77,13 +76,6 @@ HPX_API_EXPORT lcos::future<bool> register_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool unregister_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& gid
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type unregister_name(
     launch::sync_policy
   , std::string const& name
@@ -116,24 +108,14 @@ HPX_API_EXPORT lcos::future<naming::id_type> unregister_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::gid_type& gid
-  , error_code& ec = throws
-    );
-
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& id
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type resolve_name(
     launch::sync_policy
   , std::string const& name
   , error_code& ec = throws
+    );
+
+HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
+    std::string const& name
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
@@ -166,10 +148,6 @@ inline naming::id_type resolve_name_sync(
     return resolve_name(launch::sync, name, ec);
 }
 #endif
-
-HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
-    std::string const& name
-    );
 
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_API_EXPORT lcos::future<std::vector<naming::id_type> > get_localities(
@@ -497,8 +475,7 @@ inline naming::id_type get_colocation_id_sync(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
-    std::string const& name, agas::namespace_action_code evt,
-    bool call_for_past_events);
+    std::string const& name, bool call_for_past_events);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >

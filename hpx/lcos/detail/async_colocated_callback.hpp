@@ -6,6 +6,8 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM
 
+#include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/lcos/async_continue_callback.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
@@ -26,15 +28,14 @@ namespace hpx { namespace detail
     {
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
         naming::id_type service_target(
-            agas::stubs::primary_namespace::get_service_instance(gid.get_gid())
+            agas::primary_namespace::get_service_instance(gid.get_gid())
           , naming::id_type::unmanaged);
 
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::service_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(
@@ -43,7 +44,7 @@ namespace hpx { namespace detail
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
                 ),
-            service_target, std::forward<Callback>(cb), req);
+            service_target, std::forward<Callback>(cb), gid.get_gid());
     }
 
     template <
@@ -72,15 +73,14 @@ namespace hpx { namespace detail
     {
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
         naming::id_type service_target(
-            agas::stubs::primary_namespace::get_service_instance(gid.get_gid())
+            agas::primary_namespace::get_service_instance(gid.get_gid())
           , naming::id_type::unmanaged);
 
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
         remote_result_type;
-        typedef agas::server::primary_namespace::service_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(
@@ -89,7 +89,7 @@ namespace hpx { namespace detail
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
               , std::forward<Continuation>(cont)),
-            service_target, std::forward<Callback>(cb), req);
+            service_target, std::forward<Callback>(cb), gid.get_gid());
     }
 
     template <

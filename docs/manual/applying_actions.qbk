@@ -349,14 +349,14 @@ forwarded to the second action and the result of the second action is sent back
 to the original invocation site:
 
     // first action
-    boost::int32_t action1(boost::int32_t i)
+    std::int32_t action1(std::int32_t i)
     {
         return i+1;
     }
     HPX_PLAIN_ACTION(action1);    // defines action1_type
 
     // second action
-    boost::int32_t action2(boost::int32_t i)
+    std::int32_t action2(std::int32_t i)
     {
         return i*2;
     }

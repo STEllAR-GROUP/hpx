@@ -103,7 +103,8 @@ find_barrier(char const* symname)
     naming::id_type barrier_id;
     for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
     {
-        if (agas::resolve_name(launch::sync, symname, barrier_id))
+        barrier_id = agas::resolve_name(launch::sync, symname);
+        if (barrier_id != naming::invalid_id)
             break;
 
         boost::this_thread::sleep_for(

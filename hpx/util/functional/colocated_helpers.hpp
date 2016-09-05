@@ -7,8 +7,10 @@
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/throw_exception.hpp>
@@ -28,19 +30,19 @@ namespace hpx { namespace util { namespace functional
     {
         extract_locality() {}
 
-        naming::id_type operator()(agas::response const& rep,
+        naming::id_type operator()(naming::id_type const& locality_id,
             naming::id_type const& id) const
         {
-            if (rep.get_status() != success)
+            if(locality_id == naming::invalid_id)
             {
-                HPX_THROW_EXCEPTION(rep.get_status(),
+                HPX_THROW_EXCEPTION(hpx::no_success,
                     "extract_locality::operator()",
                     boost::str(boost::format(
                         "could not resolve colocated locality for id(%1%)"
                     ) % id));
                 return naming::invalid_id;
             }
-            return naming::get_id_from_locality_id(rep.get_locality_id());
+            return locality_id;
         }
     };
 

@@ -10,24 +10,25 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/scoped_timer.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace server
 {
-    response primary_namespace::route(parcelset::parcel && p)
+    void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
-        update_time_on_exit update(
+        util::scoped_timer<boost::atomic<std::int64_t> > update(
             counter_data_.route_.time_
         );
         counter_data_.increment_route_count();
-
-        error_code ec = throws;
 
         std::size_t size = p.size();
         naming::id_type const* ids = p.destinations();
@@ -47,23 +48,21 @@ namespace hpx { namespace agas { namespace server
                 naming::gid_type gid(ids[i].get_gid());
 
                 // wait for any migration to be completed
-                wait_for_migration_locked(l, gid, ec);
+                wait_for_migration_locked(l, gid, hpx::throws);
 
-                cache_addresses.push_back(resolve_gid_locked(l, gid, ec));
+                cache_addresses.push_back(resolve_gid_locked(l, gid, hpx::throws));
                 resolved_type& r = cache_addresses.back();
 
-                if (ec || hpx::util::get<0>(r) == naming::invalid_gid)
+                if (hpx::util::get<0>(r) == naming::invalid_gid)
                 {
                     id_type const id = ids[i];
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, no_success,
+                    HPX_THROW_EXCEPTION(no_success,
                         "primary_namespace::route",
                         boost::str(boost::format(
                                 "can't route parcel to unknown gid: %s"
                             ) % id));
-
-                    return response(primary_ns_route, no_success);
                 }
 
                 // retain don't store in cache flag
@@ -115,8 +114,6 @@ namespace hpx { namespace agas { namespace server
                 }
             }
         }
-
-        return response(primary_ns_route, success);
     } // }}}
 }}}
 

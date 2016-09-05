@@ -194,7 +194,7 @@ public:
         return hpx::async(act, this->get_id(), buff.size(), buffer_address)
             .then(hpx::util::bind(&zerocopy::transfer_data, buff, _1));
     }
-    void get_here_sync(general_buffer_type& buff) const
+    void get_here(hpx::launch::sync_policy, general_buffer_type& buff) const
     {
         get_here(buff).get();
     }
@@ -205,7 +205,7 @@ public:
         zerocopy_get_action act;
         return hpx::async(act, this->get_id(), size);
     }
-    general_buffer_type get_sync(std::size_t size) const
+    general_buffer_type get(hpx::launch::sync_policy, std::size_t size) const
     {
         return get(size).get();
     }
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
             hpx::util::high_resolution_timer t;
 
             for (int i = 0; i != 100; ++i)
-                zc.get_sync(ZEROCOPY_DATASIZE);
+                zc.get(hpx::launch::sync, ZEROCOPY_DATASIZE);
 
             double d = t.elapsed();
             std::cout << "Elapsed time 'get' (locality "
@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
             hpx::util::high_resolution_timer t;
 
             for (int i = 0; i != 100; ++i)
-                zc.get_here_sync(buffer);
+                zc.get_here(hpx::launch::sync, buffer);
 
             double d = t.elapsed();
             std::cout << "Elapsed time 'get_here' (locality "

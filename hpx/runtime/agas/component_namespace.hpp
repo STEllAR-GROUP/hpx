@@ -5,76 +5,60 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6)
-#define HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
+#if !defined(HPX_RUNTIME_AGAS_COMPONENT_NAMESPACE_HPP)
+#define HPX_RUNTIME_AGAS_COMPONENT_NAMESPACE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/stubs/component_namespace.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
+#include <cstdint>
+#include <string>
 #include <vector>
 
 namespace hpx { namespace agas
 {
-
-HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
-HPX_EXPORT naming::id_type bootstrap_component_namespace_id();
-
-struct component_namespace
-  : components::client_base<component_namespace, stubs::component_namespace>
-{
-    // {{{ nested types
-    typedef components::client_base<
-        component_namespace, stubs::component_namespace
-    > base_type;
-
-    typedef server::component_namespace server_type;
-
-    component_namespace()
-      : base_type(bootstrap_component_namespace_id())
-    {}
-
-    explicit component_namespace(naming::id_type const& id)
-      : base_type(id)
-    {}
-
-    response service(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
+    struct component_namespace
     {
-        return this->base_type::service(this->get_id(), req, priority, ec);
-    }
+        virtual ~component_namespace();
 
-    void service_non_blocking(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        this->base_type::service_non_blocking(this->get_id(), req, priority);
-    }
+        virtual naming::address::address_type ptr() const=0;
+        virtual naming::address addr() const=0;
+        virtual naming::id_type gid() const=0;
 
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::bulk_service(this->get_id(), reqs, priority, ec);
-    }
+        virtual components::component_type bind_prefix(
+            std::string const& key, std::uint32_t prefix)=0;
 
-    void bulk_service_non_blocking(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        this->base_type::bulk_service_non_blocking(this->get_id(), reqs, priority);
-    }
-};
+        virtual components::component_type bind_name(std::string const& name)=0;
+
+        virtual std::vector<std::uint32_t> resolve_id(components::component_type key)=0;
+
+        virtual bool unbind(std::string const& key)=0;
+
+        virtual void iterate_types(iterate_types_function_type const& f)=0;
+
+        virtual std::string get_component_type_name(components::component_type type)=0;
+
+        virtual lcos::future<std::uint32_t>
+        get_num_localities(components::component_type type)=0;
+
+        virtual naming::gid_type statistics_counter(std::string const& name)=0;;
+
+        virtual void register_counter_types()
+        {}
+
+        virtual void register_server_instance(std::uint32_t locality_id)
+        {}
+
+        virtual void unregister_server_instance(error_code& ec)
+        {}
+    };
 
 }}
 
-#endif // HPX_5ABE62AC_CDBC_4EAE_B01B_693CB5F2C0E6
+#endif
 
