@@ -27,6 +27,11 @@ particular order):
 * Added new performance counters reporting the amount of data handled by the
   networking layer on a action-by-action basis (please see [pr 2289] for more
   details).
+* Added a new facility `hpx::lcos::barrier`, replacing the equally named older
+  one. The new facility has a slightly changed API and is much more efficient.
+  Most notable, the new facility exposes a (global) function
+  `hpx::lcos::barrier::synchronize()` which represents a global barrier across
+  all localities.
 
 [heading Breaking Changes]
 

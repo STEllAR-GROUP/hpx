@@ -765,14 +765,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     delete_local_storage();
 
-    // release barrier object
-    unique_barrier = hpx::invalid_id;
-    DEBUG_OUTPUT(2,
-        std::cout << "Unregistering Barrier " << rank << std::endl;
-    );
-    if (0 == rank)
-        hpx::agas::unregister_name(hpx::launch::sync, "/0/DSM_barrier");
-
     DEBUG_OUTPUT(2,
         std::cout << "Calling finalize" << rank << std::endl;
     );
@@ -846,16 +838,6 @@ int main(int argc, char* argv[])
           "0 : random \n"
           "1 : block cyclic")
         ;
-
-    // make sure our barrier was already created before hpx_main runs
-    DEBUG_OUTPUT(2,
-        std::cout << "Registering create_barrier startup function " << std::endl;
-    );
-    hpx::register_pre_startup_function(&create_barrier_startup);
-    DEBUG_OUTPUT(2,
-        std::cout << "Registering find_barrier startup function " << std::endl;
-    );
-    hpx::register_startup_function(&find_barrier_startup);
 
     // Initialize and run HPX, this test requires to run hpx_main on all localities
     std::vector<std::string> const cfg = {

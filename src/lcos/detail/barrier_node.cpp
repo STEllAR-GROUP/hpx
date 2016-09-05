@@ -4,15 +4,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/async.hpp>
-#include <hpx/apply.hpp>
 #include <hpx/lcos/detail/barrier_node.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

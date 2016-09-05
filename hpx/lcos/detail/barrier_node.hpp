@@ -11,12 +11,17 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/atomic_count.hpp>
+#include <hpx/traits/managed_component_policies.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace lcos { namespace detail {
     struct HPX_EXPORT barrier_node;
@@ -35,7 +40,7 @@ namespace traits {
 }
 
 namespace hpx { namespace lcos { namespace detail {
-    struct HPX_EXPORT barrier_node : base_lco
+    struct barrier_node : base_lco
     {
         typedef components::managed_component<barrier_node> wrapping_type;
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -95,5 +100,7 @@ namespace hpx { namespace lcos { namespace detail {
 
 HPX_REGISTER_ACTION_DECLARATION(hpx::lcos::detail::barrier_node::gather_action,
     barrier_node_gather_action);
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

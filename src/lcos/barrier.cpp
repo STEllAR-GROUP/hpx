@@ -7,14 +7,17 @@
 #include <hpx/lcos/detail/barrier_node.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace hpx { namespace lcos {
-    barrier::barrier(std::string base_name)
+    barrier::barrier(std::string const& base_name)
       : node_(new wrapping_type(new wrapped_type(
-            base_name, hpx::get_num_localities_sync(), hpx::get_locality_id()
+            base_name, hpx::get_num_localities(hpx::launch::sync),
+            hpx::get_locality_id()
         )))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
@@ -22,7 +25,7 @@ namespace hpx { namespace lcos {
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
     }
 
-    barrier::barrier(std::string base_name, std::size_t num)
+    barrier::barrier(std::string const& base_name, std::size_t num)
       : node_(new wrapping_type(new wrapped_type(
             base_name, num, hpx::get_locality_id()
         )))
@@ -32,7 +35,7 @@ namespace hpx { namespace lcos {
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
     }
 
-    barrier::barrier(std::string base_name, std::size_t num, std::size_t rank)
+    barrier::barrier(std::string const& base_name, std::size_t num, std::size_t rank)
       : node_(new wrapping_type(new wrapped_type(base_name, num, rank)))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
@@ -50,7 +53,7 @@ namespace hpx { namespace lcos {
         (*node_)->wait(false).get();
     }
 
-    future<void> barrier::wait_async()
+    future<void> barrier::wait(hpx::launch::async_policy)
     {
         return (*node_)->wait(true);
     }
