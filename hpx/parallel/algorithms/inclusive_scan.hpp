@@ -75,10 +75,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T, typename Op>
             static OutIter
             sequential(ExPolicy, InIter first, InIter last,
-                OutIter dest, T && init, Op && op)
+                OutIter dest, T const& init, Op && op)
             {
                 return sequential_inclusive_scan(first, last, dest,
-                    std::forward<T>(init), std::forward<Op>(op));
+                    init, std::forward<Op>(op));
             }
 
             template <typename ExPolicy, typename FwdIter, typename T, typename Op>
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 ExPolicy, OutIter
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                 OutIter dest, T && init, Op && op)
+                 OutIter dest, T const& init, Op && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, OutIter>
                     result;
@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T init, Op && op, std::false_type) {
+            T const& init, Op && op, std::false_type) {
 
             typedef std::integral_constant<bool,
                     parallel::is_sequential_execution_policy<ExPolicy>::value ||
@@ -165,7 +165,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return inclusive_scan<OutIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, std::move(init), std::forward<Op>(op));
+                first, last, dest, init, std::forward<Op>(op));
         }
 
         // forward declare the segmented version of this algorithm
@@ -173,7 +173,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T init, Op && op, std::true_type);
+            T const& init, Op && op, std::true_type);
         /// \endcond
     }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::inclusive_scan_(
             std::forward<ExPolicy>(policy), first, last, dest,
-            std::move(init), std::forward<Op>(op),
+            init, std::forward<Op>(op),
             is_segmented());
     }
 
@@ -359,14 +359,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::inclusive_scan_(
             std::forward<ExPolicy>(policy), first, last, dest,
-            std::move(init), std::plus<T>(),
+            init, std::plus<T>(),
             is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, *first, ..., *(first + (i - result))).
+    /// gENERALIZED_NONCOMMUTATIVE_SUM(+, *first, ..., *(first + (i - result))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.

@@ -176,7 +176,6 @@ void inclusive_scan_algo_tests_segmented_out_with_policy_async(
         out_dist_policy.get_num_partitions(), out_dist_policy.get_localities().size());
     hpx::util::high_resolution_timer t1;
 
-    t1.restart();
     T val(0);
 
     double e1 = t1.elapsed();
@@ -334,19 +333,22 @@ void inclusive_scan_tests()
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3, localities));
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(localities));
- 
-    inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
 
     inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
 
+    // multiple localities needed for the following tests
     inclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(localities));
+
+    inclusive_scan_tests_segmented_out_with_policy<T>(length,
+        hpx::container_layout(localities), hpx::container_layout(3));
 
     inclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(10));
 
     inclusive_scan_tests_inplace_with_policy<T>(length,
         hpx::container_layout(localities));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

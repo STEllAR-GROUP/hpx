@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [&op](FwdIter part_begin, std::size_t part_size) -> T
+                    [op](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T ret = *part_begin;
                         if(part_size > 1)
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return ret;
                     },
                     hpx::util::unwrapped(
-                        [&op](std::vector<T>&& results)
+                        [op](std::vector<T>&& results)
                         {
                             T ret = *results.begin();
 
@@ -177,6 +177,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             segment_iterator_out sit_out = traits_out::segment(dest);
 
+            using hpx::naming::get_locality_from_id;
+
             if (sit_in == send_in)
             {
                 // all elements on the same partition
@@ -187,13 +189,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type_out end_out = traits_out::end(sit_out);
 
                 if(beg_in != end_in) {
-                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
-                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+                    id_type in_id = get_locality_from_id(
+                        traits_in::get_id(sit_in));
+                    id_type out_id = get_locality_from_id(
+                        traits_out::get_id(sit_out));
+
+                    if (in_id != out_id) {
+                        return false;
+                    }
 
                     std::size_t in_dist = std::distance(beg_in, end_in);
                     std::size_t out_dist = std::distance(beg_out, end_out);
 
-                    if (in_id != out_id || in_dist != out_dist) {
+                    if (in_dist != out_dist) {
                         return false;
                     }
                 }
@@ -209,13 +217,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type_out end_out = traits_out::end(sit_out);
 
                 if(beg_in != end_in) {
-                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
-                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+                    id_type in_id = get_locality_from_id(
+                        traits_in::get_id(sit_in));
+                    id_type out_id = get_locality_from_id(
+                        traits_out::get_id(sit_out));
+
+                    if (in_id != out_id) {
+                        return false;
+                    }
 
                     std::size_t in_dist = std::distance(beg_in, end_in);
                     std::size_t out_dist = std::distance(beg_out, end_out);
 
-                    if (in_id != out_id || in_dist != out_dist) {
+                    if (in_dist != out_dist) {
                         return false;
                     }
                 }
@@ -229,13 +243,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end_out = traits_out::end(sit_out);
 
                     if(beg_in != end_in) {
-                        std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
-                        std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+                        id_type in_id = get_locality_from_id(
+                            traits_in::get_id(sit_in));
+                        id_type out_id = get_locality_from_id(
+                            traits_out::get_id(sit_out));
+
+                        if (in_id != out_id) {
+                            return false;
+                        }
 
                         std::size_t in_dist = std::distance(beg_in, end_in);
                         std::size_t out_dist = std::distance(beg_out, end_out);
 
-                        if (in_id != out_id || in_dist != out_dist) {
+                        if (in_dist != out_dist) {
                             return false;
                         }
                     }
@@ -249,13 +269,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end_out = traits_out::end(sit_out);
 
                 if (beg_in != end_in) {
-                    std::uint64_t in_id = traits_in::get_id(sit_in).get_msb();
-                    std::uint64_t out_id = traits_in::get_id(sit_in).get_msb();
+                    id_type in_id = get_locality_from_id(
+                        traits_in::get_id(sit_in));
+                    id_type out_id = get_locality_from_id(
+                        traits_out::get_id(sit_out));
+
+                    if (in_id != out_id) {
+                        return false;
+                    }
 
                     std::size_t in_dist = std::distance(beg_in, end_in);
                     std::size_t out_dist = std::distance(beg_out, end_out);
 
-                    if (in_id != out_id || in_dist != out_dist) {
+                    if (in_dist != out_dist) {
                         return false;
                     }
                 }
@@ -272,7 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_seq(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -356,7 +382,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     out_iters.push_back(sit_out);
                 }
             }
- 
+
             // first init value is the given init value
             T last_value = init;
             for (std::size_t i = 0; i < results.size(); ++i) {
@@ -387,7 +413,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op, typename F1, typename F2>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_seq_non(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, F1 && f1, F2 && f2)
+            SegIter last, OutIter dest, T const& init, Op && op, F1 && f1, F2 && f2)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -470,7 +496,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_par(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -575,7 +601,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             finalitems.reserve(results.size());
 
             // first init value is the given init value
-            workitems.push_back(make_ready_future(std::forward<T>(init)));
+            workitems.push_back(make_ready_future(init));
 
             std::size_t i = 0;
 
@@ -641,7 +667,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op, typename F1, typename F2>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_par_non(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, F1 && f1, F2 && f2)
+            SegIter last, OutIter dest, T const& init, Op && op, F1 && f1, F2 && f2)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -733,7 +759,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::parallel::executor_traits<executor_type>
                 executor_traits;
 
-            workitems.push_back(make_ready_future(std::forward<T>(init)));
+            workitems.push_back(make_ready_future(init));
 
             std::size_t segment_index = 0;
 

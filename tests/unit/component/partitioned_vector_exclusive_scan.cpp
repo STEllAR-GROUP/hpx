@@ -337,8 +337,12 @@ void exclusive_scan_tests()
 
     exclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
 
+    // multiple localities needed for the following tests
     exclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(localities));
+
+    exclusive_scan_tests_segmented_out_with_policy<T>(length,
+        hpx::container_layout(localities), hpx::container_layout(3));
 
     exclusive_scan_tests_segmented_out_with_policy<T>(length,
         hpx::container_layout(localities), hpx::container_layout(10));

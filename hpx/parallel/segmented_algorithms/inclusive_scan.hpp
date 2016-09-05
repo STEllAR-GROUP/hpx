@@ -97,12 +97,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (res.size() != 0) {
                     res[0] = *first;
                 }
- 
+
                 return result::get(
-                    dataflow([=, &op](vector_type r) {
+                    dataflow([=](vector_type r) {
                         inclusive_scan<typename vector_type::iterator>().parallel(
                             hpx::parallel::par, first+1, last, r.begin()+1,
-                            std::forward<value_type>(*first), std::forward<Op>(op));
+                            std::forward<value_type>(*first), op);
                         return r;
                     }, std::move(res)));
             }
@@ -116,14 +116,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan_seq(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
 
             return segmented_scan_seq<
                 inclusive_scan<typename traits_out::local_raw_iterator>>(
                 std::forward<ExPolicy>(policy),
-                first, last, dest, std::move(init), std::forward<Op>(op),
+                first, last, dest, init, std::forward<Op>(op),
                 std::true_type());
         }
 
@@ -132,14 +132,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan_seq(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
         {
             typedef std::vector<T> vector_type;
 
             return segmented_scan_seq_non<
                 segmented_inclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     merge_inclusive_scan(),
                     // new init value is last element from
                     // segmented_incluisve_scan_vector + last init value
@@ -157,14 +157,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan_par(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
 
             return segmented_scan_par<
                 inclusive_scan<typename traits_out::local_raw_iterator>>(
                 std::forward<ExPolicy>(policy),
-                first, last, dest, std::move(init), std::forward<Op>(op),
+                first, last, dest, init, std::forward<Op>(op),
                 std::true_type());
         }
 
@@ -174,14 +174,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan_par(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
         {
             typedef std::vector<T> vector_type;
 
             return segmented_scan_par_non<
                 segmented_inclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     merge_inclusive_scan(),
                     // last T of scan is in the back
                     [] (vector_type v) {
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
         {
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
@@ -206,14 +206,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 return segmented_inclusive_scan_seq(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     is_out_seg());
             }
             else
             {
                 return segmented_inclusive_scan_seq(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     std::false_type());
             }
         }
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename T, typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_inclusive_scan(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
         {
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
@@ -234,14 +234,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 return segmented_inclusive_scan_par(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     is_out_seg());
             }
             else
             {
                 return segmented_inclusive_scan_par(
                     std::forward<ExPolicy>(policy),
-                    first, last, dest, std::move(init), std::forward<Op>(op),
+                    first, last, dest, init, std::forward<Op>(op),
                     std::false_type());
             }
         }
@@ -252,7 +252,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T init, Op && op, std::true_type)
+            T const& init, Op && op, std::true_type)
         {
             typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
 
@@ -262,7 +262,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             return segmented_inclusive_scan(
                 std::forward<ExPolicy>(policy),
-                first, last, dest, std::move(init), std::forward<Op>(op), is_seq());
+                first, last, dest, init, std::forward<Op>(op), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T init, Op && op, std::true_type);
+            T const& init, Op && op, std::true_type);
 
         /// \endcond
     }
