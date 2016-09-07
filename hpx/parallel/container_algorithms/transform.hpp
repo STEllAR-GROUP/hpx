@@ -341,7 +341,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <
         typename ExPolicy, typename Rng1, typename Rng2,
-        typename OutIter, typename F, typename Proj1 = util::projection_identity,
+        typename OutIter, typename F,
+        typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&

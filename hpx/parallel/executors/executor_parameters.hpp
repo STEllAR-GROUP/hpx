@@ -64,32 +64,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Wrapper, typename Enable = void>
-        struct variable_chunk_size_call_helper
-        {
-            variable_chunk_size_call_helper(Wrapper&) {}
-        };
-
-        template <typename T, typename Wrapper>
-        struct variable_chunk_size_call_helper<T, Wrapper,
-            typename std::enable_if<has_variable_chunk_size<T>::value>::type>
-        {
-            variable_chunk_size_call_helper(Wrapper& wrap)
-              : wrap_(wrap)
-            {}
-
-            template <typename Executor>
-            HPX_FORCEINLINE bool variable_chunk_size(Executor && exec)
-            {
-                return wrap_.get().variable_chunk_size(
-                    std::forward<Executor>(exec));
-            }
-
-        private:
-            Wrapper& wrap_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Wrapper, typename Enable = void>
         struct maximal_number_of_chunks_call_helper
         {
             maximal_number_of_chunks_call_helper(Wrapper&) {}
@@ -261,7 +235,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename T>
         struct unwrapper< ::boost::reference_wrapper<T> >
           : base_member_helper<boost::reference_wrapper<T> >
-          , variable_chunk_size_call_helper<T, boost::reference_wrapper<T> >
           , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T> >
           , get_chunk_size_call_helper<T, boost::reference_wrapper<T> >
           , mark_begin_execution_call_helper<T, boost::reference_wrapper<T> >
@@ -273,7 +246,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             unwrapper(wrapper_type wrapped_param)
               : base_member_helper<wrapper_type>(std::move(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
               , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
               , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
               , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
@@ -286,7 +258,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename T>
         struct unwrapper< ::std::reference_wrapper<T> >
           : base_member_helper<std::reference_wrapper<T> >
-          , variable_chunk_size_call_helper<T, std::reference_wrapper<T> >
           , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T> >
           , get_chunk_size_call_helper<T, std::reference_wrapper<T> >
           , mark_begin_execution_call_helper<T, std::reference_wrapper<T> >
@@ -298,7 +269,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             unwrapper(wrapper_type wrapped_param)
               : base_member_helper<wrapper_type>(std::move(wrapped_param))
-              , variable_chunk_size_call_helper<T, wrapper_type>(this->member_)
               , maximal_number_of_chunks_call_helper<T, wrapper_type>(this->member_)
               , get_chunk_size_call_helper<T, wrapper_type>(this->member_)
               , mark_begin_execution_call_helper<T, wrapper_type>(this->member_)
@@ -333,14 +303,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 hpx::util::detail::all_of<
                     hpx::traits::is_executor_parameters<Params>...
                 >::value,
-                "All passed parameters must be proper executor parameters "
+                "All passed parameters must be a proper executor parameters "
                 "objects"
             );
             static_assert(sizeof...(Params) >= 2,
                 "This type is meant to be used with at least 2 parameters "
                 "objects");
 
-            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(variable_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);

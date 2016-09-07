@@ -10,19 +10,22 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/scoped_timer.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <utility>
 #include <vector>
 
 namespace hpx { namespace agas { namespace server
 {
-    response primary_namespace::route(parcelset::parcel && p)
+    void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
-        update_time_on_exit update(
+        util::scoped_timer<boost::atomic<std::int64_t> > update(
             counter_data_.route_.time_
         );
         counter_data_.increment_route_count();
@@ -55,7 +58,7 @@ namespace hpx { namespace agas { namespace server
                             "can't route parcel to unknown gid: %s"
                         ) % gid));
 
-                return response(primary_ns_route, no_success);
+                return;
             }
 
             // retain don't store in cache flag
@@ -102,8 +105,6 @@ namespace hpx { namespace agas { namespace server
                     source, id, addr, g.count, g.offset);
             }
         }
-
-        return response(primary_ns_route, success);
     } // }}}
 }}}
 

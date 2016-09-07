@@ -9,7 +9,7 @@
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_lva.hpp>

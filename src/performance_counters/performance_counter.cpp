@@ -27,7 +27,7 @@ namespace hpx { namespace performance_counters
         HPX_ASSERT(naming::is_locality(locality));
 
         counter_path_elements p;
-        get_counter_type_path_elements(name, p);
+        get_counter_path_elements(name, p);
 
         std::string full_name;
         p.parentinstanceindex_ = naming::get_locality_id_from_id(locality);
@@ -102,7 +102,8 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     future<bool> performance_counter::start()
     {
-        return stubs::performance_counter::start(launch::async, get_id());
+        auto res = stubs::performance_counter::start(launch::async, get_id());
+        return res;
     }
     bool performance_counter::start(launch::sync_policy, error_code& ec)
     {

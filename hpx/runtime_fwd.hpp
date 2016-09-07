@@ -22,6 +22,7 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/report_error.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
@@ -30,7 +31,6 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -54,13 +54,6 @@ namespace hpx
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
-
-    /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(std::size_t num_thread,
-        boost::exception_ptr const& e);
-
-    /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);

@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/count_num_args.hpp>

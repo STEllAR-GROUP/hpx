@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,23 +11,18 @@
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
 #include <hpx/config.hpp>
-#include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/request.hpp>
-#include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -37,6 +33,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
@@ -209,7 +207,6 @@ struct HPX_EXPORT primary_namespace
         void increment_end_migration_count();
 
     private:
-        friend struct update_time_on_exit;
         friend struct primary_namespace;
 
         api_counter_data route_;                // primary_ns_
@@ -224,22 +221,6 @@ struct HPX_EXPORT primary_namespace
     };
     counter_data counter_data_;
 
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<std::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        std::uint64_t started_at_;
-        boost::atomic<std::int64_t>& t_;
-    };
-
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l
     /// is locked.
@@ -252,14 +233,6 @@ struct HPX_EXPORT primary_namespace
       , const char* func_name
         );
 #endif
-
-    // API
-    response begin_migration(
-        request const& req
-      , error_code& ec);
-    response end_migration(
-        request const& req
-      , error_code& ec);
 
     // helper function
     void wait_for_migration_locked(
@@ -284,32 +257,6 @@ struct HPX_EXPORT primary_namespace
         next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
     }
 
-    response remote_service(
-        request const& req
-        )
-    {
-        return service(req, throws);
-    }
-
-    response service(
-        request const& req
-      , error_code& ec
-        );
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> remote_bulk_service(
-        std::vector<request> const& reqs
-        )
-    {
-        return bulk_service(reqs, throws);
-    }
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , error_code& ec
-        );
-
     /// Register all performance counter types exposed by this component.
     static void register_counter_types(
         error_code& ec = throws
@@ -328,44 +275,42 @@ struct HPX_EXPORT primary_namespace
         error_code& ec = throws
         );
 
-    response route(
-        parcelset::parcel && p
+    void route(parcelset::parcel && p);
+
+    bool bind_gid(
+        gva g
+      , naming::gid_type id
+      , naming::gid_type locality
         );
 
-    response bind_gid(
-        request const& req
-      , error_code& ec = throws
+    // API
+    std::pair<naming::id_type, naming::address> begin_migration(naming::gid_type id);
+    bool end_migration(naming::gid_type id);
+
+    resolved_type resolve_gid(naming::gid_type id);
+
+    naming::id_type colocate(naming::gid_type id);
+
+    naming::address unbind_gid(
+        std::uint64_t count
+      , naming::gid_type id
         );
 
-    response resolve_gid(
-        request const& req
-      , error_code& ec = throws
+    std::int64_t increment_credit(
+        std::int64_t credits
+      , naming::gid_type lower
+      , naming::gid_type upper
         );
 
-    response unbind_gid(
-        request const& req
-      , error_code& ec = throws
+    std::vector<std::int64_t> decrement_credit(
+        std::vector<
+            hpx::util::tuple<std::int64_t, naming::gid_type, naming::gid_type>
+        > requests
         );
 
-    response increment_credit(
-        request const& req
-      , error_code& ec = throws
-        );
+    std::pair<naming::gid_type, naming::gid_type> allocate(std::uint64_t count);
 
-    response decrement_credit(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response allocate(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response statistics_counter(
-        request const& req
-      , error_code& ec = throws
-        );
+    naming::gid_type statistics_counter(std::string const& name);
 
   private:
     resolved_type resolve_gid_locked(
@@ -419,30 +364,17 @@ struct HPX_EXPORT primary_namespace
         );
 
   public:
-    enum actions
-    { // {{{ action enum
-        // Actual actions
-        namespace_service                       = primary_ns_service
-      , namespace_bulk_service                  = primary_ns_bulk_service
-
-        // Pseudo-actions
-      , namespace_route                         = primary_ns_route
-      , namespace_bind_gid                      = primary_ns_bind_gid
-      , namespace_resolve_gid                   = primary_ns_resolve_gid
-      , namespace_unbind_gid                    = primary_ns_unbind_gid
-      , namespace_increment_credit              = primary_ns_increment_credit
-      , namespace_decrement_credit              = primary_ns_decrement_credit
-      , namespace_allocate                      = primary_ns_allocate
-      , namespace_begin_migration               = primary_ns_begin_migration
-      , namespace_end_migration                 = primary_ns_end_migration
-      , namespace_statistics_counter            = primary_ns_statistics_counter
-    }; // }}}
-
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
-        bulk_service_action);
-
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, resolve_gid);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, unbind_gid);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, statistics_counter);
 
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
@@ -458,25 +390,81 @@ struct HPX_EXPORT primary_namespace
 }}}
 
 HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::service_action)
+    hpx::agas::server::primary_namespace::allocate_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::allocate_action,
+    primary_namespace_allocate_action)
 
 HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::bulk_service_action)
+    hpx::agas::server::primary_namespace::bind_gid_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::bind_gid_action,
+    primary_namespace_bind_gid_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::begin_migration_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::begin_migration_action,
+    primary_namespace_begin_migration_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::end_migration_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::end_migration_action,
+    primary_namespace_end_migration_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::decrement_credit_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::decrement_credit_action,
+    primary_namespace_decrement_credit_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::increment_credit_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::increment_credit_action,
+    primary_namespace_increment_credit_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::resolve_gid_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::resolve_gid_action,
+    primary_namespace_resolve_gid_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::colocate_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::colocate_action,
+    primary_namespace_colocate_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::unbind_gid_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::unbind_gid_action,
+    primary_namespace_unbind_gid_action)
 
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::agas::server::primary_namespace::route_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::service_action,
-    primary_namespace_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::bulk_service_action,
-    primary_namespace_bulk_service_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::route_action,
     primary_namespace_route_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::primary_namespace::statistics_counter_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::statistics_counter_action,
+    primary_namespace_statistics_counter_action)
 
 namespace hpx { namespace traits
 {
@@ -506,6 +494,8 @@ namespace hpx { namespace traits
         }
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

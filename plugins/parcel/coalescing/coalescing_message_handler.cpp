@@ -166,6 +166,7 @@ namespace hpx { namespace plugins { namespace parcel
         switch(s) {
         case detail::message_buffer::first_message:
             // start deadline timer to flush buffer
+            l.unlock();
             timer_.start(interval);
             break;
 
@@ -174,6 +175,7 @@ namespace hpx { namespace plugins { namespace parcel
                 break;
 
             // start deadline timer to flush buffer
+            l.unlock();
             timer_.start(interval);
             break;
 

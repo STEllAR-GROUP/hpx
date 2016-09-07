@@ -41,7 +41,7 @@ namespace hpx { namespace util
             num_cores_(1),
             num_localities_(1),
             pu_step_(1),
-            pu_offset_(0),
+            pu_offset_(std::size_t(-1)),
             numa_sensitive_(0)
         {}
 
@@ -71,7 +71,8 @@ namespace hpx { namespace util
     protected:
         bool handle_arguments(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm,
-            std::vector<std::string>& ini_config, std::size_t& node);
+            std::vector<std::string>& ini_config, std::size_t& node,
+            bool initial = false);
 
         void store_command_line(int argc, char** argv);
         void store_unregistered_options(std::string const& cmd_name,

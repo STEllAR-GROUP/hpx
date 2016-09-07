@@ -833,14 +833,30 @@ if(NOT MSVC)
     set(CXX_FLAG -std=c++11)
   else()
     # Try -std=c++14 first
-    check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+
+    # The Intel compiler has the C++14 flag, but doesn't have sufficient C++14
+    # support to compile Boost. If the user has explicitly asked for it, use it,
+    # otherwise don't run the check.
+    # FIXME: This should be replaced with a version-based check in the future
+    # when the Intel compiler is able to build Boost with -std=c++14.
+    if(HPX_WITH_CXX14 OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+      check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+    endif()
     if(HPX_WITH_CXX14)
+
       set(CXX_FLAG -std=c++14)
     else()
-      # ... otherwise try -std=c++0y
-      check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
-      if(HPX_WITH_CXX0Y)
-        set(CXX_FLAG -std=c++0y)
+      # ... otherwise try -std=c++1y
+
+      # See comment above.
+      # FIXME: This should be replaced with a version-based check in the future
+      # when the Intel compiler is able to build Boost with -std=c++14.
+      if(HPX_WITH_CXX1Y OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1Y)
+      endif()
+
+      if(HPX_WITH_CXX1Y)
+        set(CXX_FLAG -std=c++1y)
       else()
         # ... otherwise try -std=c++11
         check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
@@ -1020,10 +1036,10 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     set(CUDA_PROPAGATE_HOST_FLAGS OFF)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi)
-    set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi)
-    set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1)
-    set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox)
+    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi;-Xcompiler=-bigobj)
+    set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi;-Xcompiler=-bigobj)
+    set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1;-Xcompiler=-bigobj)
+    set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
   endif()
   set(CUDA_SEPARABLE_COMPILATION ON)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=sm_30)
@@ -1032,6 +1048,7 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=compute_35)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
 endif()

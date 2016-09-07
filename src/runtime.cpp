@@ -62,10 +62,13 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    void handle_termination(char const* reason)
+    HPX_ATTRIBUTE_NORETURN void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
             util::attach_debugger();
+        }
+
         std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
             << "{stack-trace}: " << hpx::util::trace() << "\n"
@@ -115,7 +118,7 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void termination_handler(int signum)
+    HPX_EXPORT HPX_ATTRIBUTE_NORETURN void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")

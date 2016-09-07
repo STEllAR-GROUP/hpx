@@ -94,7 +94,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Rng, typename F, typename Proj,
+    template <typename ExPolicy, typename Rng, typename F,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
@@ -105,31 +106,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_iterator<Rng>::type
     >::type
-    for_each(ExPolicy && policy, Rng && rng, F && f, Proj && proj)
+    for_each(ExPolicy && policy, Rng && rng, F && f, Proj && proj = Proj())
     {
         return for_each(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), std::forward<F>(f),
             std::forward<Proj>(proj));
     }
-
-    /// \cond NOINTERNAL
-    template <typename ExPolicy, typename Rng, typename F,
-    HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
-        traits::is_indirect_callable<
-            F, traits::projected_range<util::projection_identity, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_iterator<Rng>::type
-    >::type
-    for_each(ExPolicy && policy, Rng && rng, F && f)
-    {
-        return for_each(std::forward<ExPolicy>(policy),
-            std::forward<Rng>(rng), std::forward<F>(f),
-            util::projection_identity());
-    }
-    /// \endcond
 }}}
 
 #endif

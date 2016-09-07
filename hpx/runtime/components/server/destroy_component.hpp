@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

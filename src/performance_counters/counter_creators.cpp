@@ -5,11 +5,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/agas/stubs/component_namespace.hpp>
-#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
-#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
-#include <hpx/runtime/agas/stubs/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/util/function.hpp>
@@ -281,34 +283,37 @@ namespace hpx { namespace performance_counters
                 agas::detail::retrieve_action_service_code(name, ec);
             if (agas::invalid_request == service_code) return id;
 
-            // compose request
-            agas::request req(service_code, name);
-            agas::response rep;
-
             switch (service_code) {
-            case agas::component_ns_statistics_counter:
-                rep = agas::stubs::component_namespace::service(
-                    agas_id, req, threads::thread_priority_default, ec);
-                break;
-            case agas::primary_ns_statistics_counter:
-                rep = agas::stubs::primary_namespace::service(
-                    agas_id, req, threads::thread_priority_default, ec);
-                break;
-            case agas::symbol_ns_statistics_counter:
-                rep = agas::stubs::symbol_namespace::service(
-                    agas_id, req, threads::thread_priority_default, ec);
-                break;
-            case agas::locality_ns_statistics_counter:
-                rep = agas::stubs::locality_namespace::service(
-                    agas_id, req, threads::thread_priority_default, ec);
-                break;
-            default:
-                HPX_THROWS_IF(ec, bad_parameter, "retrieve_statistics_counter",
-                    "unknown counter agas counter name: " + name);
-                break;
+                case agas::component_ns_statistics_counter:
+                    {
+                        agas::server::component_namespace::statistics_counter_action
+                        action;
+                        return action(agas_id, name).get_gid();
+                    }
+                case agas::locality_ns_statistics_counter:
+                    {
+                        agas::server::locality_namespace::statistics_counter_action
+                        action;
+                        return action(agas_id, name).get_gid();
+                    }
+                case agas::symbol_ns_statistics_counter:
+                    {
+                        agas::server::symbol_namespace::statistics_counter_action
+                        action;
+                        return action(agas_id, name).get_gid();
+                    }
+                case agas::primary_ns_statistics_counter:
+                    {
+                        agas::server::primary_namespace::statistics_counter_action
+                        action;
+                        return action(agas_id, name).get_gid();
+                    }
+                default:
+                    HPX_THROWS_IF(ec, bad_parameter, "retrieve_statistics_counter",
+                        "unknown counter agas counter name: " + name);
+                    break;
             }
-            if (!ec)
-                id = rep.get_statistics_counter();
+
             return id;
         }
     }
@@ -358,9 +363,8 @@ namespace hpx { namespace performance_counters
             service += "/";
             service += service_name;
 
-            naming::id_type id;
-            bool result = agas::resolve_name(launch::sync, service, id, ec);
-            if (!result) {
+            naming::id_type id = agas::resolve_name(launch::sync, service, ec);
+            if (id == naming::invalid_id) {
                 HPX_THROWS_IF(ec, not_implemented,
                     "agas_raw_counter_creator",
                     "invalid counter name: " +

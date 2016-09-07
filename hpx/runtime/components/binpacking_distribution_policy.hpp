@@ -34,13 +34,13 @@
 namespace hpx { namespace components
 {
     static char const* const default_binpacking_counter_name =
-        "/runtime/count/component@";
+        "/runtime{locality/total}/count/component@";
 
     namespace detail
     {
         /// \cond NOINTERNAL
         inline std::vector<std::size_t>
-        get_items_count(std::size_t count, std::vector<std::uint64_t> && values)
+        get_items_count(std::size_t count, std::vector<std::uint64_t> const& values)
         {
             std::size_t maxcount = 0;
             std::size_t existing = 0;
@@ -56,52 +56,30 @@ namespace hpx { namespace components
             // approximately the same
             std::size_t num_localities = values.size();
 
-            HPX_ASSERT(maxcount * num_localities >= std::size_t(existing));
-            std::size_t missing = maxcount * num_localities - existing;
-            if (missing == 0) missing = 1;
-
-            double hole_ratio = (std::min)(count, missing) / double(missing);
-            HPX_ASSERT(hole_ratio <= 1.);
-
-            std::size_t overflow_count =
-                (count > missing) ? (count - missing) / num_localities : 0;
-            std::size_t excess = count - overflow_count * num_localities;
-
             // calculate the number of new instances to create on each of the
             // localities
-            std::vector<std::size_t> to_create;
-            to_create.reserve(num_localities);
+            std::vector<std::size_t> to_create(num_localities, 0);
 
-            std::size_t created_count = 0;
-            for (std::size_t i = 0; i != num_localities; ++i)
+            bool even_fill = true;
+            while (even_fill)
             {
-                std::uint64_t value = values[i];
-                std::size_t numcreate = overflow_count +
-                    std::size_t((maxcount - value) * hole_ratio);
+                even_fill = false;
+                for (std::size_t i = 0; i != num_localities; ++i)
+                {
+                    if(values[i] + to_create[i] >= maxcount) continue;
+                    even_fill = true;
 
-                if (excess != 0) {
-                    --excess;
-                    ++numcreate;
+                    ++to_create[i];
+                    --count;
+                    if (count == 0) break;
                 }
-
-                if (i == num_localities-1) {
-                    // last bin gets all the rest
-                    if (created_count + numcreate < count)
-                        numcreate = count - created_count;
-                }
-
-                if (created_count + numcreate > count)
-                    numcreate = count - created_count;
-
-                if (numcreate == 0)
-                    break;
-
-                // create all components  for each locality at a time
-                to_create.push_back(numcreate);
-
-                created_count += numcreate;
-                if (created_count >= count)
-                    break;
+            }
+            std::size_t i = 0;
+            while (count != 0)
+            {
+                ++to_create[i];
+                i = (i + 1) % num_localities;
+                --count;
             }
 
             return to_create;
@@ -142,6 +120,7 @@ namespace hpx { namespace components
             if (counter_name[counter_name.size()-1] == '@')
             {
                 std::string name(counter_name + component_name);
+
                 for (hpx::id_type const& id: localities)
                     counters.push_back(performance_counter(name, id));
             }

@@ -17,12 +17,16 @@ Here are some of the main highlights and changes for this release (in no
 particular order):
 
 * Added the facility `hpx::split_future` which allows to convert a
-  `future<tuple<Ts...>>` into a `tuple<future<Ts>...>`.
+  `future<tuple<Ts...>>` into a `tuple<future<Ts>...>`. This functionality is
+  not available when compiling __hpx__ with VS2012.
 * Added a new type of performance counter which allows to return a list of
   values for each invocation. We also added a first counter of this type which
   collects a histogram of the times between parcels being created.
 * Added new LCOs: `hpx::lcos::channel` and `hpx::lcos::local::channel` which
   are very similar to the well known channel constructs used in the Go language.
+* Added new performance counters reporting the amount of data handled by the
+  networking layer on a action-by-action basis (please see [pr 2289] for more
+  details).
 
 [heading Breaking Changes]
 
@@ -37,9 +41,26 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2318] - Improve handling of --hpx:bind=<bind-spec>
+* [pr    2317] - Making sure command line warnings are printed once only
+* [pr    2316] - Fixing command line handling for default bind mode
+* [pr    2315] - Set id_retrieved if set_id is present
+* [issue 2314] - Warning for requested/allocated thread discrepancy is printed
+                 twice
+* [issue 2313] - --hpx:print-bind doesn't work with --hpx:pu-step
+* [issue 2312] - --hpx:bind range specifier restrictions are overly restrictive
+* [issue 2311] - hpx_0.9.99 out of project build fails
+* [pr    2310] - Simplify function registration
+* [pr    2309] - Spelling and grammar revisions in documentation (and some code)
+* [pr    2306] - Correct minor typo in the documentation
+* [pr    2305] - Cleaning up and fixing parcel coalescing
+* [pr    2304] - Inspect checks for stream related includes
+* [pr    2303] - Add functionality allowing to enumerate threads of given state
 * [pr    2301] - Algorithm overloads fix for VS2013
+* [pr    2300] - Use <cstdint>, add inspect checks
 * [pr    2299] - Replace boost::[c]ref with std::[c]ref, add inspect checks
 * [pr    2297] - Fixing compilation with no hw_loc
+* [pr    2296] - Hpx compute
 * [pr    2295] - Making sure for_loop(par, 0, N, ...) is actually executed in
                  parallel
 * [pr    2294] - Throwing exceptions if the runtime is not up and running
@@ -47,6 +68,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2292] - Refactor function vtables
 * [pr    2291] - Fixing 2286
 * [pr    2290] - Simplify algorithm overloads
+* [pr    2289] - Adding performance counters reporting parcel related data on a
+                 per-action basis
 * [issue 2288] - Remove dormant parcelports
 * [issue 2286] - adjustments to parcel handling to support parcelports that do
                  not need a connection cache
@@ -94,6 +117,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2239] - Create a new facility lcos::split_all
 * [issue 2236] - hpx::cout vs. std::cout
 * [pr    2232] - Implement local-only primary namespace service
+* [issue 2147] - would like to know how much data is being routed by particular
+                 actions
 * [issue 1754] - Running with TCP parcelport causes immediate crash or freeze
 * [issue 1655] - Enable zip_iterator to be used with Boost traversal iterator
                  categories

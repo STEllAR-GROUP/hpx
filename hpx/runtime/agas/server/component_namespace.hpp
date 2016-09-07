@@ -10,19 +10,14 @@
 #define HPX_A16135FC_AA32_444F_BB46_549AD456A661
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/request.hpp>
-#include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <cstdint>
 #include <map>
@@ -32,7 +27,8 @@
 
 #include <boost/atomic.hpp>
 #include <boost/bimap.hpp>
-#include <boost/format.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
@@ -53,10 +49,6 @@ struct HPX_EXPORT component_namespace
     typedef lcos::local::spinlock mutex_type;
     typedef components::fixed_component_base<component_namespace> base_type;
 
-    typedef hpx::util::function<
-        void(std::string const&, components::component_type)
-    > iterate_types_function_type;
-
     typedef components::component_type component_id_type;
 
     typedef std::set<std::uint32_t> prefixes_type;
@@ -74,8 +66,6 @@ struct HPX_EXPORT component_namespace
     factory_table_type factories_;
     component_id_type type_counter;
     std::string instance_name_;
-
-    struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
@@ -124,13 +114,12 @@ struct HPX_EXPORT component_namespace
         void increment_bind_prefix_count();
         void increment_bind_name_count();
         void increment_resolve_id_count();
-        void increment_unbind_name_ount();
+        void increment_unbind_name_count();
         void increment_iterate_types_count();
         void increment_get_component_type_name_count();
         void increment_num_localities_count();
 
     private:
-        friend struct update_time_on_exit;
         friend struct component_namespace;
 
         api_counter_data bind_prefix_;          // component_ns_bind_prefix
@@ -144,22 +133,6 @@ struct HPX_EXPORT component_namespace
     };
     counter_data counter_data_;
 
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<std::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        std::uint64_t started_at_;
-        boost::atomic<std::int64_t>& t_;
-    };
-
   public:
     component_namespace()
       : base_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB)
@@ -167,32 +140,6 @@ struct HPX_EXPORT component_namespace
     {}
 
     void finalize();
-
-    response remote_service(
-        request const& req
-        )
-    {
-        return service(req, throws);
-    }
-
-    response service(
-        request const& req
-      , error_code& ec
-        );
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> remote_bulk_service(
-        std::vector<request> const& reqs
-        )
-    {
-        return bulk_service(reqs, throws);
-    }
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , error_code& ec
-        );
 
     // register all performance counter types exposed by this component
     static void register_counter_types(
@@ -211,83 +158,101 @@ struct HPX_EXPORT component_namespace
         error_code& ec = throws
         );
 
-    response bind_prefix(
-        request const& req
-      , error_code& ec = throws
+    components::component_type bind_prefix(
+        std::string const& key
+      , std::uint32_t prefix
         );
 
-    response bind_name(
-        request const& req
-      , error_code& ec = throws
+    components::component_type bind_name(
+        std::string const& name
         );
 
-    response resolve_id(
-        request const& req
-      , error_code& ec = throws
+    std::vector<std::uint32_t> resolve_id(
+        components::component_type key
         );
 
-    response unbind(
-        request const& req
-      , error_code& ec = throws
+    bool unbind(
+        std::string const& key
         );
 
-    response iterate_types(
-        request const& req
-      , error_code& ec = throws
+    void iterate_types(
+        iterate_types_function_type const& f
         );
 
-    response get_component_type_name(
-        request const& req
-      , error_code& ec = throws
+    std::string get_component_type_name(
+        components::component_type type
         );
 
-    response get_num_localities(
-        request const& req
-      , error_code& ec = throws
+    std::uint32_t get_num_localities(
+        components::component_type type
         );
 
-    response statistics_counter(
-        request const& req
-      , error_code& ec = throws
+    naming::gid_type statistics_counter(
+        std::string const& name
         );
 
-    enum actions
-    { // {{{ action enum
-        // Actual actions
-        namespace_service                 = component_ns_service
-      , namespace_bulk_service            = component_ns_bulk_service
+//     enum actions
+//     { // {{{ action enum
+//         // Actual actions
+//         namespace_service                 = component_ns_service
+//       , namespace_bulk_service            = component_ns_bulk_service
+//
+//         // Pseudo-actions
+//       , namespace_bind_prefix             = component_ns_bind_prefix
+//       , namespace_bind_name               = component_ns_bind_name
+//       , namespace_resolve_id              = component_ns_resolve_id
+//       , namespace_unbind_name             = component_ns_unbind_name
+//       , namespace_iterate_types           = component_ns_iterate_types
+//       , namespace_get_component_type_name = component_ns_get_component_type_name
+//       , namespace_num_localities     = component_ns_num_localities
+//       , namespace_statistics              = component_ns_statistics_counter
+//     }; // }}}
 
-        // Pseudo-actions
-      , namespace_bind_prefix             = component_ns_bind_prefix
-      , namespace_bind_name               = component_ns_bind_name
-      , namespace_resolve_id              = component_ns_resolve_id
-      , namespace_unbind_name             = component_ns_unbind_name
-      , namespace_iterate_types           = component_ns_iterate_types
-      , namespace_get_component_type_name = component_ns_get_component_type_name
-      , namespace_num_localities     = component_ns_num_localities
-      , namespace_statistics              = component_ns_statistics_counter
-    }; // }}}
-
-    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service,
-        bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_prefix);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_name);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, resolve_id);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, unbind);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, iterate_types);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, get_component_type_name);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, get_num_localities);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, statistics_counter);
 };
 
 }}}
 
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::component_namespace::service_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::component_namespace::bulk_service_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::bind_prefix_action,
+    component_namespace_bind_prefix_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::component_namespace::service_action,
-    component_namespace_service_action)
+    hpx::agas::server::component_namespace::bind_name_action,
+    component_namespace_bind_name_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::component_namespace::bulk_service_action,
-    component_namespace_bulk_service_action)
+    hpx::agas::server::component_namespace::resolve_id_action,
+    component_namespace_resolve_id_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::unbind_action,
+    component_namespace_unbind_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::iterate_types_action,
+    component_namespace_iterate_types_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::get_component_type_name_action,
+    component_namespace_get_component_type_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::get_num_localities_action,
+    component_namespace_get_num_localities_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::component_namespace::statistics_counter_action,
+    component_namespace_statistics_counter_action)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

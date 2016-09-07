@@ -52,6 +52,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         ///////////////////////////////////////////////////////////////////////
+        // If a parameters type exposes 'has_variable_chunk_size' aliased to
+        // std::true_type it is assumed that the number of loop iterations to
+        // combine is different for each of the generated chunks.
+        template <typename Parameters, typename Enable = void>
+        struct extract_has_variable_chunk_size
+        {
+            // by default, assume equally sized chunks
+            typedef std::false_type type;
+        };
+
+        template <typename Parameters>
+        struct extract_has_variable_chunk_size<Parameters,
+            typename hpx::util::always_void<
+                typename Parameters::has_variable_chunk_size
+            >::type>
+        {
+            typedef typename Parameters::has_variable_chunk_size type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
         struct processing_units_count_parameter_helper
         {
@@ -93,98 +113,57 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Parameters_>
-        struct variable_chunk_size_helper
-        {
-            template <typename Parameters, typename Executor>
-            static bool call(hpx::traits::detail::wrap_int, Parameters &&,
-                Executor &&)
-            {
-                return false;       // assume constant chunk sizes
-            }
-
-            template <typename Parameters, typename Executor>
-            static auto call(int, Parameters && params, Executor && exec)
-            ->  decltype(params.variable_chunk_size(exec))
-            {
-                return params.variable_chunk_size(std::forward<Executor>(exec));
-            }
-
-            template <typename Executor>
-            static bool call(Parameters_& params, Executor && exec)
-            {
-                return call(0, params, std::forward<Executor>(exec));
-            }
-
-            template <typename Parameters, typename Executor>
-            static bool call(Parameters params, Executor && exec)
-            {
-                return call(static_cast<Parameters_&>(params),
-                    std::forward<Executor>(exec));
-            }
-        };
-
-        template <typename Parameters, typename Executor>
-        bool call_variable_chunk_size(Parameters && params, Executor && exec)
-        {
-            return variable_chunk_size_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(std::forward<Parameters>(params),
-                    std::forward<Executor>(exec));
-        }
-
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(variable_chunk_size);
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Parameters_>
         struct get_chunk_size_helper
         {
             template <typename Parameters, typename Executor, typename F>
             static std::size_t
             call(hpx::traits::detail::wrap_int, Parameters &&, Executor &&,
-                F &&, std::size_t num_tasks)
+                F &&, std::size_t cores, std::size_t num_tasks)
             {
                 return num_tasks;       // assume sequential execution
             }
 
             template <typename Parameters, typename Executor, typename F>
             static auto call(int, Parameters && params, Executor && exec,
-                    F && f, std::size_t num_tasks)
+                    F && f, std::size_t cores, std::size_t num_tasks)
             ->  decltype(
                     params.get_chunk_size(std::forward<Executor>(exec),
-                        std::forward<F>(f), num_tasks)
+                        std::forward<F>(f), cores, num_tasks)
                 )
             {
                 return params.get_chunk_size(std::forward<Executor>(exec),
-                    std::forward<F>(f), num_tasks);
+                    std::forward<F>(f), cores, num_tasks);
             }
 
             template <typename Executor, typename F>
             static std::size_t
             call(Parameters_& params, Executor && exec, F && f,
-                std::size_t num_tasks)
+                std::size_t cores, std::size_t num_tasks)
             {
                 return call(0, params, std::forward<Executor>(exec),
-                    std::forward<F>(f), num_tasks);
+                    std::forward<F>(f), cores, num_tasks);
             }
 
             template <typename Parameters, typename Executor, typename F>
             static std::size_t
             call(Parameters params, Executor && exec, F && f,
-                std::size_t num_tasks)
+                std::size_t cores, std::size_t num_tasks)
             {
                 return call(static_cast<Parameters_&>(params),
-                    std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
+                    std::forward<Executor>(exec), std::forward<F>(f),
+                    cores, num_tasks);
             }
         };
 
         template <typename Parameters, typename Executor, typename F>
         std::size_t call_get_chunk_size(Parameters && params, Executor && exec,
-            F && f, std::size_t num_tasks)
+            F && f, std::size_t cores, std::size_t num_tasks)
         {
             return get_chunk_size_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(std::forward<Parameters>(params),
-                    std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
+                    std::forward<Executor>(exec), std::forward<F>(f),
+                    cores, num_tasks);
         }
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
@@ -196,47 +175,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Parameters, typename Executor>
             static std::size_t
             call(hpx::traits::detail::wrap_int, Parameters &&, Executor &&,
-                std::size_t cores)
+                std::size_t cores, std::size_t num_tasks)
             {
                 return 4 * cores;       // assume 4 times the number of cores
             }
 
             template <typename Parameters, typename Executor>
             static auto call(int, Parameters && params, Executor && exec,
-                    std::size_t cores)
+                    std::size_t cores, std::size_t num_tasks)
             ->  decltype(
                     params.maximal_number_of_chunks(
-                        std::forward<Executor>(exec), cores)
+                        std::forward<Executor>(exec), cores, num_tasks)
                 )
             {
                 return params.maximal_number_of_chunks(
-                    std::forward<Executor>(exec), cores);
+                    std::forward<Executor>(exec), cores, num_tasks);
             }
 
             template <typename Executor>
             static std::size_t
-            call(Parameters_& params, Executor && exec, std::size_t cores)
+            call(Parameters_& params, Executor && exec, std::size_t cores,
+                std::size_t num_tasks)
             {
-                return call(0, params, std::forward<Executor>(exec), cores);
+                return call(0, params, std::forward<Executor>(exec), cores,
+                    num_tasks);
             }
 
             template <typename Parameters, typename Executor>
             static std::size_t
-            call(Parameters params, Executor && exec, std::size_t cores)
+            call(Parameters params, Executor && exec, std::size_t cores,
+                std::size_t num_tasks)
             {
                 return call(static_cast<Parameters_&>(params),
-                    std::forward<Executor>(exec), cores);
+                    std::forward<Executor>(exec), cores, num_tasks);
             }
         };
 
         template <typename Parameters, typename Executor>
         std::size_t call_maximal_number_of_chunks(Parameters && params,
-            Executor && exec, std::size_t cores)
+            Executor && exec, std::size_t cores, std::size_t num_tasks)
         {
             return maximal_number_of_chunks_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(std::forward<Parameters>(params),
-                    std::forward<Executor>(exec), cores);
+                    std::forward<Executor>(exec), cores, num_tasks);
         }
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks);
@@ -375,24 +357,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \a executor_traits
         typedef Parameters executor_parameters_type;
 
-        /// Returns whether the number of loop iterations to combine is
-        /// different for each of the generated chunks.
+        /// The compile-time information about whether the number of loop
+        /// iterations to combine is different for each of the generated chunks.
         ///
-        /// \param params   [in] The executor parameters object to use for
-        ///                 determining whether the chunk size is variable.
-        /// \param exec     [in] The executor object which will be used for
-        ///                 scheduling of the tasks.
+        /// \note This calls extracts parameters_type::has_variable_chunk_size,
+        ///       if available, otherwise it returns std::false_type.
         ///
-        /// \note This calls params.variable_chunk_size(exec), if available,
-        ///       otherwise it returns false.
-        ///
-        template <typename Parameters_, typename Executor>
-        static bool variable_chunk_size(Parameters_ && params,
-            Executor && exec)
-        {
-            return detail::call_variable_chunk_size(
-                std::forward<Parameters_>(params), std::forward<Executor>(exec));
-        }
+        typedef typename detail::extract_has_variable_chunk_size<
+                executor_parameters_type
+            >::type has_variable_chunk_size;
 
         /// Return the number of invocations of the given function \a f which
         /// should be combined into a single task
@@ -404,6 +377,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                 for scheduling of the loop iterations.
         /// \param f        [in] The function which will be optionally scheduled
         ///                 using the given executor.
+        /// \param cores    [in] The number of cores the number of chunks
+        ///                 should be determined for.
         /// \param num_tasks [in] The number of tasks the chunk size should be
         ///                 determined for
         ///
@@ -414,10 +389,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         template <typename Parameters_, typename Executor, typename F>
         static std::size_t get_chunk_size(Parameters_ && params,
-            Executor && exec, F && f, std::size_t num_tasks)
+            Executor && exec, F && f, std::size_t cores, std::size_t num_tasks)
         {
             return detail::call_get_chunk_size(std::forward<Parameters_>(params),
-                std::forward<Executor>(exec), std::forward<F>(f), num_tasks);
+                std::forward<Executor>(exec), std::forward<F>(f), cores, num_tasks);
         }
 
         /// Return the largest reasonable number of chunks to create for a
@@ -430,14 +405,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                 for scheduling of the loop iterations.
         /// \param cores    [in] The number of cores the number of chunks
         ///                 should be determined for.
+        /// \param num_tasks [in] The number of tasks the chunk size should be
+        ///                 determined for
         ///
         template <typename Parameters_, typename Executor>
         static std::size_t maximal_number_of_chunks(
-            Parameters_ && params, Executor && exec, std::size_t cores)
+            Parameters_ && params, Executor && exec, std::size_t cores,
+            std::size_t num_tasks)
         {
             return detail::call_maximal_number_of_chunks(
                 std::forward<Parameters_>(params), std::forward<Executor>(exec),
-                cores);
+                cores, num_tasks);
         }
 
         /// Reset the internal round robin thread distribution scheme for the

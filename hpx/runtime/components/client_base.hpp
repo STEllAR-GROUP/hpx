@@ -552,8 +552,7 @@ namespace hpx { namespace components
         // initialize this client_base instance.
         void connect_to(std::string const& symbolic_name)
         {
-            *this = agas::on_symbol_namespace_event(symbolic_name,
-                agas::symbol_ns_bind, true);
+            *this = agas::on_symbol_namespace_event(symbolic_name, true);
         }
 
         // Make sure this instance does not manage the lifetime of the

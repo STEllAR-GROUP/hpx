@@ -10,6 +10,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -165,12 +166,8 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            std::uint32_t locality_id = naming::invalid_locality_id;
-            applier::applier* appl = applier::get_applier_ptr();
-            if (appl) {
-                error_code ec(lightweight);
-                locality_id = appl->get_locality_id(ec);
-            }
+
+            std::uint32_t locality_id = hpx::get_locality_id();
 
             if (naming::invalid_locality_id != locality_id) {
                 std::stringstream out;

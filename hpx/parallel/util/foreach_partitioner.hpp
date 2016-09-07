@@ -10,10 +10,8 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -23,6 +21,7 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -58,10 +57,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef hpx::util::tuple<
-                        std::size_t, FwdIter, std::size_t
-                    > tuple_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -74,18 +71,18 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
-                            policy, inititems, f1, first, count, 1);
+                            policy, inititems, f1, first, count, 1,
+                            has_variable_chunk_size());
 
-                    workitems.reserve(shape.size());
-
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        hpx::util::bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -127,12 +124,11 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
+
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
-
-                typedef hpx::util::tuple<
-                        std::size_t, FwdIter, std::size_t
-                    > tuple_type;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
@@ -147,19 +143,18 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
-                            policy, inititems, f1, first, count, 1);
+                            policy, inititems, f1, first, count, 1,
+                            has_variable_chunk_size());
 
-                    workitems.reserve(shape.size());
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(

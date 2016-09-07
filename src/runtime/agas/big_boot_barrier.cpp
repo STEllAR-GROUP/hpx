@@ -28,10 +28,13 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
-#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
+#include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
@@ -482,31 +485,33 @@ void register_worker(registration_header const& header)
     }
 
     naming::gid_type primary_ns_gid(
-        stubs::primary_namespace::get_service_instance(prefix));
+        primary_namespace::get_service_instance(prefix));
     naming::address primary_ns_address(prefix
       , components::get_component_type<agas::server::primary_namespace>()
       , header.primary_ns_ptr);
-    agas_client.bind_local(primary_ns_gid, primary_ns_address);
+//     agas_client.bind_local(primary_ns_gid, primary_ns_address);
 
     naming::gid_type symbol_ns_gid(
-        stubs::symbol_namespace::get_service_instance(prefix));
+        symbol_namespace::get_service_instance(prefix));
+
     naming::address symbol_ns_address(prefix
       , components::get_component_type<agas::server::symbol_namespace>()
       , header.symbol_ns_ptr);
-    agas_client.bind_local(symbol_ns_gid, symbol_ns_address);
+
+//     agas_client.bind_local(symbol_ns_gid, symbol_ns_address);
 
     naming::address locality_addr(hpx::get_locality(),
         server::locality_namespace::get_component_type(),
-            agas_client.get_bootstrap_locality_ns_ptr());
+            agas_client.locality_ns_->ptr());
     naming::address primary_addr(hpx::get_locality(),
         server::primary_namespace::get_component_type(),
-            agas_client.get_bootstrap_primary_ns_ptr());
+            agas_client.primary_ns_.ptr());
     naming::address component_addr(hpx::get_locality(),
         server::component_namespace::get_component_type(),
-            agas_client.get_bootstrap_component_ns_ptr());
+            agas_client.component_ns_->ptr());
     naming::address symbol_addr(hpx::get_locality(),
         server::symbol_namespace::get_component_type(),
-            agas_client.get_bootstrap_symbol_ns_ptr());
+            agas_client.symbol_ns_.ptr());
 
     // assign cores to the new locality
     std::uint32_t first_core = rt.assign_cores(header.hostname,
@@ -639,11 +644,10 @@ void notify_worker(notification_header const& header)
                   % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
-    agas_client.locality_ns_addr_ = header.locality_ns_address;
-    agas_client.primary_ns_addr_ = header.primary_ns_address;
-    agas_client.component_ns_addr_ = header.component_ns_address;
-    agas_client.symbol_ns_addr_ = header.symbol_ns_address;
-
+    agas_client.component_ns_.reset(
+        new detail::hosted_component_namespace(header.component_ns_address));
+    agas_client.locality_ns_.reset(
+        new detail::hosted_locality_namespace(header.locality_ns_address));
     naming::gid_type const& here = hpx::get_locality();
 
     // register runtime support component
@@ -663,24 +667,6 @@ void notify_worker(notification_header const& header)
       , components::get_component_type<components::server::memory>()
       , rt.get_memory_lva());
     agas_client.bind_local(memory_gid, memory_address);
-
-    // register local primary namespace component
-    naming::gid_type const primary_gid =
-        stubs::primary_namespace::get_service_instance(
-            agas_client.get_local_locality());
-    naming::address const primary_addr(here
-      , server::primary_namespace::get_component_type(),
-        agas_client.get_hosted_primary_ns_ptr());
-    agas_client.bind_local(primary_gid, primary_addr);
-
-    // register local symbol namespace component
-    naming::gid_type const symbol_gid =
-        stubs::symbol_namespace::get_service_instance(
-            agas_client.get_local_locality());
-    naming::address const symbol_addr(here
-      , server::symbol_namespace::get_component_type(),
-        agas_client.get_hosted_symbol_ns_ptr());
-    agas_client.bind_local(symbol_gid, symbol_addr);
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.

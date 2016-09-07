@@ -13,6 +13,7 @@
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/parallel/util/transfer.hpp>
+#include <hpx/runtime/report_error.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -139,11 +140,21 @@ namespace hpx { namespace compute
 
         ~vector()
         {
-            if(data_ != nullptr)
-            {
+            if(data_ == nullptr)
+                return;
+
+#if !defined(__CUDA_ARCH__)
+            try {
+#endif
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+#if !defined(__CUDA_ARCH__)
             }
+            catch(...) {
+                // make sure no exception escapes this destructor
+                hpx::report_error(boost::current_exception());
+            }
+#endif
         }
 
         vector& operator=(vector const& other)

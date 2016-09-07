@@ -15,33 +15,41 @@
 
 #include <hpx/compute/cuda/target.hpp>
 
+#include <cstddef>
 #include <string>
+#include <utility>
 
 #include <cuda_runtime.h>
+
+#include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace compute { namespace cuda
 {
     namespace detail
     {
-        runtime_registration_wrapper::runtime_registration_wrapper(
-                hpx::runtime* rt)
-          : rt_(rt)
+        struct runtime_registration_wrapper
         {
-            HPX_ASSERT(rt);
+            runtime_registration_wrapper(hpx::runtime* rt)
+              : rt_(rt)
+            {
+                HPX_ASSERT(rt);
 
-            // Register this thread with HPX, this should be done once for
-            // each external OS-thread intended to invoke HPX functionality.
-            // Calling this function more than once on the same thread will
-            // report an error.
-            hpx::error_code ec(hpx::lightweight);       // ignore errors
-            hpx::register_thread(rt_, "cuda", ec);
-        }
-        runtime_registration_wrapper::~runtime_registration_wrapper()
-        {
-            // Unregister the thread from HPX, this should be done once in
-            // the end before the external thread exists.
-            hpx::unregister_thread(rt_);
-        }
+                // Register this thread with HPX, this should be done once for
+                // each external OS-thread intended to invoke HPX functionality.
+                // Calling this function more than once on the same thread will
+                // report an error.
+                hpx::error_code ec(hpx::lightweight);       // ignore errors
+                hpx::register_thread(rt_, "cuda", ec);
+            }
+            ~runtime_registration_wrapper()
+            {
+                // Unregister the thread from HPX, this should be done once in
+                // the end before the external thread exists.
+                hpx::unregister_thread(rt_);
+            }
+
+            hpx::runtime* rt_;
+        };
 
         ///////////////////////////////////////////////////////////////////////
         struct future_data : lcos::detail::future_data<void>
@@ -51,7 +59,9 @@ namespace hpx { namespace compute { namespace cuda
                 cudaError_t error, void* user_data);
 
         public:
-            future_data(cudaStream_t stream);
+            future_data();
+
+            void init(cudaStream_t stream);
 
         private:
             hpx::runtime* rt_;
@@ -103,8 +113,11 @@ namespace hpx { namespace compute { namespace cuda
             );
         }
 
-        future_data::future_data(cudaStream_t stream)
-           : rt_(hpx::get_runtime_ptr())
+        future_data::future_data()
+          : rt_(hpx::get_runtime_ptr())
+        {}
+
+        void future_data::init(cudaStream_t stream)
         {
             // Hold on to the shared state on behalf of the cuda runtime
             // right away as the callback could be called immediately.
@@ -126,24 +139,89 @@ namespace hpx { namespace compute { namespace cuda
         }
     }
 
+    void target::native_handle_type::init_processing_units()
+    {
+        cudaDeviceProp props;
+        cudaError_t error = cudaGetDeviceProperties(&props, device_);
+        if (error != cudaSuccess)
+        {
+            // report error
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::default_executor::processing_units_count()",
+                std::string("cudaGetDeviceProperties failed: ") +
+                    cudaGetErrorString(error));
+        }
+
+        std::size_t mp = props.multiProcessorCount;
+        switch(props.major)
+        {
+            case 2:
+                if(props.minor == 1)
+                {
+                    mp = mp * 48;
+                }
+                else
+                {
+                    mp = mp * 32;
+                }
+                break;
+            case 3:
+                mp = mp * 192;
+                break;
+            case 5:
+                mp = mp * 128;
+                break;
+            default:
+                break;
+        }
+        processing_units_ = mp;
+    }
+
     target::native_handle_type::native_handle_type(int device)
-      : device_(device), stream_(0), locality_(hpx::find_here())
-    {}
+      : device_(device), stream_(0)
+    {
+        init_processing_units();
+    }
 
     target::native_handle_type::~native_handle_type()
+    {
+        reset();
+    }
+
+    void target::native_handle_type::reset() HPX_NOEXCEPT
     {
         if (stream_)
             cudaStreamDestroy(stream_);     // ignore error
     }
 
     target::native_handle_type::native_handle_type(
+            target::native_handle_type const& rhs) HPX_NOEXCEPT
+      : device_(rhs.device_),
+        processing_units_(rhs.processing_units_),
+        stream_(0)
+    {
+    }
+
+    target::native_handle_type::native_handle_type(
             target::native_handle_type && rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
-        stream_(rhs.stream_),
-        locality_(rhs.locality_)
+        processing_units_(rhs.processing_units_),
+        stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
+    }
+
+    target::native_handle_type& target::native_handle_type::operator=(
+        target::native_handle_type const& rhs) HPX_NOEXCEPT
+    {
+        if (this == &rhs)
+            return *this;
+
+        device_ = rhs.device_;
+        processing_units_ = rhs.processing_units_;
+        reset();
+
+        return *this;
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
@@ -153,10 +231,10 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
 
         device_ = rhs.device_;
+        processing_units_ = rhs.processing_units_;
         stream_ = rhs.stream_;
-        locality_ = rhs.locality_;
         rhs.stream_ = 0;
-        rhs.locality_ = hpx::invalid_id;
+
         return *this;
     }
 
@@ -190,14 +268,19 @@ namespace hpx { namespace compute { namespace cuda
     ///////////////////////////////////////////////////////////////////////////
     void target::synchronize() const
     {
-        if (handle_.stream_ == 0)
+        // FIXME: implement remote targets
+        HPX_ASSERT(hpx::find_here() == locality_);
+
+        cudaStream_t stream = handle_.get_stream();
+
+        if (stream == 0)
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "cuda::target::synchronize",
                 "no stream available");
         }
 
-        cudaError_t error = cudaStreamSynchronize(handle_.stream_);
+        cudaError_t error = cudaStreamSynchronize(stream);
         if(error != cudaSuccess)
         {
             HPX_THROW_EXCEPTION(kernel_error,
@@ -210,8 +293,13 @@ namespace hpx { namespace compute { namespace cuda
     hpx::future<void> target::get_future() const
     {
         typedef detail::future_data shared_state_type;
-        shared_state_type* p = new shared_state_type(handle_.stream_);
-        return hpx::traits::future_access<hpx::future<void> >::create(p);
+
+        // make sure shared state stays alive even if the callback is invoked
+        // during initialization
+        boost::intrusive_ptr<shared_state_type> p(new shared_state_type());
+        p->init(handle_.get_stream());
+        return hpx::traits::future_access<hpx::future<void> >::
+            create(std::move(p));
     }
 
     ///////////////////////////////////////////////////////////////////////////
