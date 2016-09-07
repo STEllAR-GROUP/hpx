@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
