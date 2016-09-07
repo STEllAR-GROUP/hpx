@@ -327,15 +327,12 @@ void locality_namespace::free(naming::gid_type locality)
         {
             l.unlock();
 
-            std::uint32_t locality_id =
-                naming::get_locality_id_from_gid(locality);
-
             // remove primary namespace
             {
                 naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB,
                     HPX_AGAS_PRIMARY_NS_LSB);
                 primary_->unbind_gid(
-                    1, naming::replace_locality_id(service, locality_id));
+                    1, naming::replace_locality_id(service, prefix));
             }
 
             // remove symbol namespace
@@ -343,7 +340,7 @@ void locality_namespace::free(naming::gid_type locality)
                 naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB,
                     HPX_AGAS_SYMBOL_NS_LSB);
                 primary_->unbind_gid(
-                    1, naming::replace_locality_id(service, locality_id));
+                    1, naming::replace_locality_id(service, prefix));
             }
 
             // remove locality itself

@@ -241,7 +241,7 @@ void addressing_service::launch_bootstrap(
 
     std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
         ini_, "hpx.os_threads", 1u);
-    locality_ns_->allocate(endpoints, 4, num_threads, naming::invalid_gid);
+    locality_ns_->allocate(endpoints, 0, num_threads, naming::invalid_gid);
 
     naming::gid_type runtime_support_gid1(here);
     runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
