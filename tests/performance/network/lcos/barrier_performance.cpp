@@ -7,6 +7,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/barrier.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -29,7 +31,6 @@ void global_barrier()
     {
         std::cout << "Barrier: " << elapsed/iterations << " (seconds)\n";
     }
-
 }
 
 int hpx_main()
