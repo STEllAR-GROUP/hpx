@@ -7,6 +7,9 @@
 #define HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_VC_DATAPAR)
+#include <hpx/parallel/datapar/loop.hpp>
+#endif
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -94,8 +97,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename Iter, typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, CancelToken& tok,
-                F && f)
+            static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
@@ -109,16 +111,16 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename F>
+    template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(Iter it, std::size_t count, F && f)
+    loop_n(ExPolicy &&, Iter it, std::size_t count, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
-    template <typename Iter, typename CancelToken, typename F>
+    template <typename ExPolicy, typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
+    loop_n(ExPolicy &&, Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
     }

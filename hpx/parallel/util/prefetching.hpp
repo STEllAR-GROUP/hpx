@@ -344,9 +344,9 @@ namespace hpx { namespace parallel { namespace util
                     sizeof...(Ts)
                 >::type index_pack_type;
 
-            template <typename F>
+            template <typename ExPolicy_, typename F>
             static iterator_type
-            call(iterator_type it, std::size_t count, F && f)
+            call(ExPolicy_&&, iterator_type it, std::size_t count, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
@@ -365,9 +365,10 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
 
-            template <typename CancelToken, typename F>
+            template <typename ExPolicy_, typename CancelToken, typename F>
             static iterator_type
-            call(iterator_type it, std::size_t count, CancelToken& tok, F && f)
+            call(ExPolicy_&&, iterator_type it, std::size_t count,
+                CancelToken& tok, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {

@@ -63,21 +63,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count)
-                        mutable -> bool
+                auto f1 =
+                    [op, tok, policy](
+                        FwdIter part_begin, std::size_t part_count
+                    ) mutable -> bool
                     {
                         util::loop_n(
-                            part_begin, part_count, tok,
+                            policy, part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (op(*curr))
                                     tok.cancel();
                             });
+
                         return !tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
@@ -204,21 +209,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count)
-                        mutable -> bool
+                auto f1 =
+                    [op, tok, policy](
+                        FwdIter part_begin, std::size_t part_count
+                    ) mutable -> bool
                     {
                         util::loop_n(
-                            part_begin, part_count, tok,
+                            policy, part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (op(*curr))
                                     tok.cancel();
                             });
+
                         return tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::any_of(
@@ -344,21 +354,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
-                    [op, tok](FwdIter part_begin, std::size_t part_count)
-                        mutable -> bool
+                auto f1 =
+                    [op, tok, policy](
+                        FwdIter part_begin, std::size_t part_count
+                    ) mutable -> bool
                     {
                         util::loop_n(
-                            part_begin, part_count, tok,
+                            policy, part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (!op(*curr))
                                     tok.cancel();
                             });
+
                         return !tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(

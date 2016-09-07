@@ -70,10 +70,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [value](Iter part_begin, std::size_t part_size) -> difference_type
+                    [value](ExPolicy && policy,
+                        Iter part_begin, std::size_t part_size
+                    ) -> difference_type
                     {
                         difference_type ret = 0;
-                        util::loop_n(part_begin, part_size,
+                        util::loop_n(
+                            std::forward<ExPolicy>(policy),
+                            part_begin, part_size,
                             [&value, &ret](Iter const& curr)
                             {
                                 if (value == *curr)
@@ -222,13 +226,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [op](Iter part_begin, std::size_t part_size)
-                    ->  difference_type
+                    [op](ExPolicy && policy,
+                        Iter part_begin, std::size_t part_size
+                    ) ->  difference_type
                     {
                         difference_type ret = 0;
 
                         // MSVC bails out if 'op' is captured by reference
-                        util::loop_n(part_begin, part_size,
+                        util::loop_n(
+                            std::forward<ExPolicy>(policy),
+                            part_begin, part_size,
                             [op, &ret](Iter const& curr)
                             {
                                 if (hpx::util::invoke(op, *curr))

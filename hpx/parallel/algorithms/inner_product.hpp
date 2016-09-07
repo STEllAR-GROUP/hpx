@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -72,11 +73,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 difference_type count = std::distance(first1, last1);
 
-                using hpx::util::make_zip_iterator;
-                return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count,
-                    [op1, op2](zip_iterator part_begin, std::size_t part_size) ->T
+                auto f1 =
+                    [op1, op2, policy](
+                        zip_iterator part_begin, std::size_t part_size
+                    ) -> T
                     {
                         using hpx::util::get;
                         T part_sum = op2(
@@ -84,14 +84,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ++part_begin;
 
                         // VS2015RC bails out when op is captured by ref
-                        util::loop_n(part_begin, part_size - 1,
+                        util::loop_n(
+                            policy, part_begin, part_size - 1,
                             [=, &part_sum](zip_iterator it)
                             {
-                                part_sum = op1(
-                                    part_sum, op2(get<0>(*it), get<1>(*it)));
+                                part_sum = hpx::util::invoke(op1,
+                                    part_sum, hpx::util::invoke(
+                                        op2, get<0>(*it), get<1>(*it)));
                             });
                         return part_sum;
-                    },
+                    };
+
+                using hpx::util::make_zip_iterator;
+                return util::partitioner<ExPolicy, T>::call(
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first1, first2), count,
+                    std::move(f1),
                     [init, op1](std::vector<hpx::future<T> > && results) -> T
                     {
                         T ret = init;
