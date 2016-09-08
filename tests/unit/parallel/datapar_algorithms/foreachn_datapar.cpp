@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "foreach_tests.hpp"
+#include "../algorithms/foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -19,21 +19,8 @@ void test_for_each_n()
 {
     using namespace hpx::parallel;
 
-    test_for_each_n(seq, IteratorTag());
-    test_for_each_n(par, IteratorTag());
-    test_for_each_n(par_vec, IteratorTag());
-
-    test_for_each_n_async(seq(task), IteratorTag());
-    test_for_each_n_async(par(task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_n(execution_policy(seq), IteratorTag());
-    test_for_each_n(execution_policy(par), IteratorTag());
-    test_for_each_n(execution_policy(par_vec), IteratorTag());
-
-    test_for_each_n(execution_policy(seq(task)), IteratorTag());
-    test_for_each_n(execution_policy(par(task)), IteratorTag());
-#endif
+    test_for_each_n(datapar_execution, IteratorTag());
+    test_for_each_n_async(datapar_execution(task), IteratorTag());
 }
 
 void for_each_n_test()

@@ -222,17 +222,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct equal_to
     {
         template <typename T1, typename T2>
-        bool operator()(T1 const& t1, T2 const& t2) const
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 == t2)
         {
             return t1 == t2;
         }
+    };
+
+    template <typename Value>
+    struct compare_to
+    {
+        compare_to(Value const& val)
+          : value_(val)
+        {}
+
+        template <typename T>
+        auto operator()(T const& t) const -> decltype(value_ == t)
+        {
+            return value_ == t;
+        }
+
+        Value value_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct less
     {
         template <typename T1, typename T2>
-        bool operator()(T1 const& t1, T2 const& t2) const
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 == t2)
         {
             return t1 < t2;
         }

@@ -7,7 +7,10 @@ set(tests)
 
 if(HPX_WITH_VC_DATAPAR)
   set(tests
+      count_datapar
+      countif_datapar
       foreach_datapar
+      foreachn_datapar
      )
 endif()
 
@@ -30,13 +33,13 @@ foreach(test ${tests})
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.parallel.algorithms.${test})
+  add_hpx_pseudo_target(tests.unit.parallel.datapar_algorithms.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.algorithms
-                              tests.unit.parallel.algorithms.${test})
+  add_hpx_pseudo_dependencies(tests.unit.parallel.datapar_algorithms
+                              tests.unit.parallel.datapar_algorithms.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.algorithms.${test}
+  add_hpx_pseudo_dependencies(tests.unit.parallel.datapar_algorithms.${test}
                               ${test}_test_exe)
 endforeach()

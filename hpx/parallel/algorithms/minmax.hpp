@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 auto f2 =
                     [f, proj, policy](std::vector<FwdIter> && positions)
                     {
-                        return min_element::sequential_min_element_ind(
+                        return sequential_min_element_ind(
                             policy, positions.begin(), positions.size(),
                             f, proj);
                     };
@@ -360,7 +360,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 auto f2 =
                     [f, proj, policy](std::vector<FwdIter> && positions)
                     {
-                        return max_element::sequential_max_element_ind(
+                        return sequential_max_element_ind(
                             policy, positions.begin(), positions.size(),
                             f, proj);
                     };

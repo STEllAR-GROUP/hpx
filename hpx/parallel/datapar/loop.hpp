@@ -50,9 +50,9 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t len = count;
 
                 for (/* */;
-                        (reinterpret_cast<std::uintptr_t>(std::addressof(*first)) &
-                            (V::MemoryAlignment - 1)) && len != 0;
-                        (void) --len, ++first)
+                     (reinterpret_cast<std::uintptr_t>(std::addressof(*first)) &
+                         (V::MemoryAlignment - 1)) && len != 0;
+                     (void) --len, ++first)
                 {
                     V1 tmp(std::addressof(*first), Vc::Aligned);
                     f(&tmp);
@@ -104,9 +104,9 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t len = count;
 
                 for (/* */;
-                        (reinterpret_cast<std::uintptr_t>(std::addressof(*first)) &
-                            (V::MemoryAlignment - 1)) && len != 0;
-                        (void) --len, ++first)
+                     (reinterpret_cast<std::uintptr_t>(std::addressof(*first)) &
+                         (V::MemoryAlignment - 1)) && len != 0;
+                     (void) --len, ++first)
                 {
                     V1 tmp(std::addressof(*first), Vc::Aligned);
                     f(&tmp);
@@ -151,6 +151,13 @@ namespace hpx { namespace parallel { namespace util
                     std::forward<F>(f));
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Abi>
+        inline std::size_t count_bits(Vc::Mask<T, Abi> const& mask)
+        {
+            return mask.count();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

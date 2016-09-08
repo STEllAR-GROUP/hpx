@@ -108,6 +108,12 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::size_t count_bits(bool value)
+        {
+            return value ? 1 : 0;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

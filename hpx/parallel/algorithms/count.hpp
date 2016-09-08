@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -24,6 +25,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -36,6 +38,63 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+        template <typename ExPolicy, typename Op>
+        struct count_iteration
+        {
+            typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
+            typedef typename hpx::util::decay<Op>::type op_type;
+
+            execution_policy_type policy_;
+            op_type op_;
+
+            template <typename ExPolicy_, typename Op_>
+            HPX_HOST_DEVICE count_iteration(ExPolicy_ && policy, Op_ && op)
+              : policy_(std::forward<ExPolicy_>(policy))
+              , op_(std::forward<Op_>(op))
+            {}
+
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
+            count_iteration(count_iteration const&) = default;
+            count_iteration(count_iteration&&) = default;
+#else
+            HPX_HOST_DEVICE count_iteration(count_iteration const& rhs)
+              : policy_(rhs.policy_)
+              , op_(rhs.op_)
+            {}
+
+            HPX_HOST_DEVICE count_iteration(count_iteration && rhs)
+              : policy_(std::move(rhs.policy_))
+              , op_(std::move(rhs.op_))
+            {}
+#endif
+
+            HPX_DELETE_COPY_ASSIGN(count_iteration);
+            HPX_DELETE_MOVE_ASSIGN(count_iteration);
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::iterator_traits<Iter>::difference_type
+            operator()(Iter part_begin, std::size_t part_size)
+            {
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                util::loop_n(
+                    policy_, part_begin, part_size,
+                    hpx::util::bind(*this, _1, std::ref(ret))
+                );
+                return ret;
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(Iter curr,
+                typename std::iterator_traits<Iter>::difference_type& ret)
+            {
+                ret += util::detail::count_bits(op_(*curr)); //util::detail::count_bits(hpx::util::invoke(op_, *curr));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Value>
         struct count
           : public detail::algorithm<count<Value>, Value>
@@ -68,20 +127,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
 
                 auto f1 =
-                    [value, policy](
-                        Iter part_begin, std::size_t part_size
-                    ) -> difference_type
-                    {
-                        difference_type ret = 0;
-                        util::loop_n(
-                            policy, part_begin, part_size,
-                            [&value, &ret](Iter const& curr)
-                            {
-                                if (value == *curr)
-                                    ++ret;
-                            });
-                        return ret;
-                    };
+                    count_iteration<ExPolicy, detail::compare_to<T> >(
+                        policy, detail::compare_to<T>(value));
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
@@ -225,24 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         >::get(0);
                 }
 
-                auto f1 =
-                    [op, policy](
-                        Iter part_begin, std::size_t part_size
-                    ) ->  difference_type
-                    {
-                        difference_type ret = 0;
-
-                        // MSVC bails out if 'op' is captured by reference
-                        util::loop_n(
-                            policy, part_begin, part_size,
-                            [op, &ret](Iter const& curr)
-                            {
-                                if (hpx::util::invoke(op, *curr))
-                                    ++ret;
-                            });
-
-                        return ret;
-                    };
+                auto f1 = count_iteration<ExPolicy, Pred>(policy, op);
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),

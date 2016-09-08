@@ -90,7 +90,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(Iter curr)
             {
                 hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
-                //f_(proj_(*curr));
             }
         };
 
