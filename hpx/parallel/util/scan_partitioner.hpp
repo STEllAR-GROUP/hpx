@@ -110,7 +110,9 @@ namespace hpx { namespace parallel { namespace util
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        // FIXME: this should really work with executors...
+                        finalitems.push_back(dataflow(hpx::launch::sync,
+                            //policy.executor(),
                             f3, first_, count_ - count, workitems[0], curr));
                     }
 
@@ -121,9 +123,11 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = hpx::launch::async;
-                        if (parts & 0x7)
-                            p = hpx::launch::sync;
+                        // FIXME: this should really work with executors or async
+                        // continuations in general
+                        hpx::launch p = hpx::launch::sync;
+//                         if (parts & 0x7)
+//                             p = hpx::launch::sync;
 
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
@@ -134,7 +138,7 @@ namespace hpx { namespace parallel { namespace util
 
                         workitems.push_back(dataflow(p, f2, prev, curr));
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(p, //olicy.executor(),
                             f3, it, size, prev, curr));
 
                         ++parts;
@@ -236,7 +240,9 @@ namespace hpx { namespace parallel { namespace util
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        // FIXME: this should really work with executors...
+                        finalitems.push_back(dataflow(hpx::launch::sync,
+                            //policy.executor(),
                             f3, first_, count_ - count, workitems[0], curr));
                     }
 
@@ -247,9 +253,11 @@ namespace hpx { namespace parallel { namespace util
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        hpx::launch p = hpx::launch::async;
-                        if (parts & 0x7)
-                            p = hpx::launch::sync;
+                        // FIXME: this should really work with executors or async
+                        // continuations in general
+                        hpx::launch p = hpx::launch::sync;
+//                         if (parts & 0x7)
+//                             p = hpx::launch::sync;
 
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
@@ -260,7 +268,7 @@ namespace hpx { namespace parallel { namespace util
 
                         workitems.push_back(dataflow(p, f2, prev, curr));
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(p, //olicy.executor(),
                             f3, it, size, prev, curr));
 
                         ++parts;
