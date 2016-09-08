@@ -23,6 +23,10 @@
 #include <memory>
 #include <utility>
 
+namespace hpx {
+    bool HPX_EXPORT is_pre_startup();
+}
+
 namespace hpx { namespace applier { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
@@ -128,8 +132,7 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space() ||
-                hpx::is_starting())
+            if (this_thread::has_sufficient_stack_space() || hpx::is_pre_startup())
             {
                 Action::execute_function(lva, std::forward<Ts>(vs)...);
             }
@@ -160,8 +163,7 @@ namespace hpx { namespace applier { namespace detail
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space() ||
-                hpx::is_starting())
+            if (this_thread::has_sufficient_stack_space())
             {
                 try {
                     cont->trigger(Action::execute_function(lva,

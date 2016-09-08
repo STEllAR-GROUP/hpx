@@ -1268,6 +1268,12 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() <= state_startup : true;
     }
+
+    bool HPX_EXPORT is_pre_startup()
+    {
+        runtime* rt = get_runtime_ptr();
+        return nullptr != rt ? rt->get_state() < state_startup : true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
