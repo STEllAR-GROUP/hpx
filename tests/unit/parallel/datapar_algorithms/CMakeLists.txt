@@ -1,11 +1,15 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2016 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    foreach_datapar
-   )
+set(tests)
+
+if(HPX_WITH_VC_DATAPAR)
+  set(tests
+      foreach_datapar
+     )
+endif()
 
 foreach(test ${tests})
   set(sources

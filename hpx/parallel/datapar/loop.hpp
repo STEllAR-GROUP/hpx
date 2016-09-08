@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Matthias Kretz
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -101,7 +102,6 @@ namespace hpx { namespace parallel { namespace util
             call(InIter first, std::size_t count, CancelToken& tok, F && f)
             {
                 std::size_t len = count;
-                bool was_cancelled = false;
 
                 for (/* */;
                         (reinterpret_cast<std::uintptr_t>(std::addressof(*first)) &
@@ -111,15 +111,9 @@ namespace hpx { namespace parallel { namespace util
                     V1 tmp(std::addressof(*first), Vc::Aligned);
                     f(&tmp);
                     if (tok.was_cancelled())
-                    {
-                        was_cancelled = true;
-                        break;
-                    }
+                        return first;
                     tmp.store(std::addressof(*first), Vc::Aligned);
                 }
-
-                if (was_cancelled)
-                    return first;
 
                 std::int64_t lenV = std::int64_t(count - (V::Size + 1));
                 for (/* */; lenV > 0;
@@ -128,25 +122,16 @@ namespace hpx { namespace parallel { namespace util
                     V tmp(std::addressof(*first), Vc::Aligned);
                     f(&tmp);
                     if (tok.was_cancelled())
-                    {
-                        was_cancelled = true;
-                        break;
-                    }
+                        return first;
                     tmp.store(std::addressof(*first), Vc::Aligned);
                 }
-
-                if (was_cancelled)
-                    return first;
 
                 for (/* */; len != 0; (void) --len, ++first)
                 {
                     V1 tmp(std::addressof(*first), Vc::Aligned);
                     f(&tmp);
                     if (tok.was_cancelled())
-                    {
-                        was_cancelled = true;
-                        break;
-                    }
+                        return first;
                     tmp.store(std::addressof(*first), Vc::Aligned);
                 }
 
@@ -171,7 +156,7 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy& policy, Iter it,
+    loop_n(parallel::v1::datapar_execution_policy&, Iter it,
         std::size_t count, F && f)
     {
         return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
@@ -179,7 +164,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy const& policy, Iter it,
+    loop_n(parallel::v1::datapar_execution_policy const&, Iter it,
         std::size_t count, F && f)
     {
         return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
@@ -187,44 +172,40 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy && policy, Iter it,
+    loop_n(parallel::v1::datapar_execution_policy &&, Iter it,
         std::size_t count, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(std::move(policy), it, count,
-            std::forward<F>(f));
+        return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy& policy, Iter it,
+    loop_n(parallel::v1::datapar_task_execution_policy&, Iter it,
         std::size_t count, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(policy, it, count,
-            std::forward<F>(f));
+        return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy const& policy, Iter it,
+    loop_n(parallel::v1::datapar_task_execution_policy const&, Iter it,
         std::size_t count, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(policy, it, count,
-            std::forward<F>(f));
+        return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     template <typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy && policy, Iter it,
+    loop_n(parallel::v1::datapar_task_execution_policy &&, Iter it,
         std::size_t count, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(std::move(policy), it, count,
-            std::forward<F>(f));
+        return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy& policy, Iter it,
+    loop_n(parallel::v1::datapar_execution_policy&, Iter it,
         std::size_t count, CancelToken& tok, F && f)
     {
         return detail::datapar_loop_n<Iter>::call(it, count, tok,
@@ -233,7 +214,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy const& policy, Iter it,
+    loop_n(parallel::v1::datapar_execution_policy const&, Iter it,
         std::size_t count, CancelToken& tok, F && f)
     {
         return detail::datapar_loop_n<Iter>::call(it, count, tok,
@@ -245,35 +226,35 @@ namespace hpx { namespace parallel { namespace util
     loop_n(parallel::v1::datapar_execution_policy && policy, Iter it,
         std::size_t count, CancelToken& tok, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(std::move(policy), it, count,
-            tok, std::forward<F>(f));
-    }
-
-    template <typename Iter, typename CancelToken, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy& policy, Iter it,
-        std::size_t count, CancelToken& tok, F && f)
-    {
-        return detail::datapar_loop_n<Iter>::call(policy, it, count, tok,
+        return detail::datapar_loop_n<Iter>::call(it, count, tok,
             std::forward<F>(f));
     }
 
     template <typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy const& policy, Iter it,
+    loop_n(parallel::v1::datapar_task_execution_policy&, Iter it,
         std::size_t count, CancelToken& tok, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(policy, it, count, tok,
+        return detail::datapar_loop_n<Iter>::call(it, count, tok,
             std::forward<F>(f));
     }
 
     template <typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy && policy, Iter it,
+    loop_n(parallel::v1::datapar_task_execution_policy const&, Iter it,
         std::size_t count, CancelToken& tok, F && f)
     {
-        return detail::datapar_loop_n<Iter>::call(std::move(policy), it, count,
-            tok, std::forward<F>(f));
+        return detail::datapar_loop_n<Iter>::call(it, count, tok,
+            std::forward<F>(f));
+    }
+
+    template <typename Iter, typename CancelToken, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
+    loop_n(parallel::v1::datapar_task_execution_policy &&, Iter it,
+        std::size_t count, CancelToken& tok, F && f)
+    {
+        return detail::datapar_loop_n<Iter>::call(it, count, tok,
+            std::forward<F>(f));
     }
 }}}
 

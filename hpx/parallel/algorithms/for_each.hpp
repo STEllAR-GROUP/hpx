@@ -120,8 +120,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy,
-                InIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, InIter
+            >::type
             parallel(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj/* = Proj()*/)
             {
@@ -286,8 +287,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy,
-                InIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, InIter
+            >::type
             parallel(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {

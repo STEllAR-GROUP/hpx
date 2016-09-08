@@ -112,6 +112,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : handle_exception_impl<parallel_task_execution_policy, Result>
         {};
 
+#if defined(HPX_HAVE_VC_DATAPAR)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct handle_exception_impl<datapar_task_execution_policy, Result>
+        {
+            typedef future<Result> type;
+
+            static future<Result> call()
+            {
+                try {
+                    try {
+                        throw; //-V667
+                    }
+                    catch(std::bad_alloc const& e) {
+                        boost::throw_exception(e);
+                    }
+                    catch (...) {
+                        boost::throw_exception(
+                            hpx::exception_list(boost::current_exception())
+                        );
+                    }
+                }
+                catch (...) {
+                    return hpx::make_exceptional_future<Result>(
+                        boost::current_exception());
+                }
+            }
+        };
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<parallel_vector_execution_policy, Result>
