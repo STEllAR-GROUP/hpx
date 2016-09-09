@@ -19,6 +19,7 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
+#include <type_traits>
 #include <utility>
 
 #include <Vc/Vc>

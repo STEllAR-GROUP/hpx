@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(Iter curr,
                 typename std::iterator_traits<Iter>::difference_type& ret)
             {
-                ret += util::detail::count_bits(op_(*curr)); //util::detail::count_bits(hpx::util::invoke(op_, *curr));
+                ret += util::detail::count_bits(hpx::util::invoke(op_, *curr));
             }
         };
 
@@ -107,9 +107,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static difference_type
-            sequential(ExPolicy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy && policy, Iter first, Iter last, T const& value)
             {
-                return std::count(first, last, value);
+                auto f1 =
+                    count_iteration<ExPolicy, detail::compare_to<T> >(
+                        std::forward<ExPolicy>(policy),
+                        detail::compare_to<T>(value));
+
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+
+                util::loop(
+                    policy, first, last,
+                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+
+                return ret;
             }
 
             template <typename ExPolicy, typename Iter, typename T>
@@ -254,9 +266,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename Pred>
             static difference_type
-            sequential(ExPolicy, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy && policy, Iter first, Iter last, Pred && op)
             {
-                return std::count_if(first, last, std::forward<Pred>(op));
+                auto f1 = count_iteration<ExPolicy, Pred>(
+                    std::forward<ExPolicy>(policy), op);
+
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+
+                util::loop(
+                    policy, first, last,
+                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+
+                return ret;
             }
 
             template <typename ExPolicy, typename Iter, typename Pred>

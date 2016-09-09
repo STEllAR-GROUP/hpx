@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "transform_binary_tests.hpp"
+#include "../algorithms/transform_binary_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -18,21 +18,8 @@ void test_transform_binary()
 {
     using namespace hpx::parallel;
 
-    test_transform_binary(seq, IteratorTag());
-    test_transform_binary(par, IteratorTag());
-    test_transform_binary(par_vec, IteratorTag());
-
-    test_transform_binary_async(seq(task), IteratorTag());
-    test_transform_binary_async(par(task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary(execution_policy(seq), IteratorTag());
-    test_transform_binary(execution_policy(par), IteratorTag());
-    test_transform_binary(execution_policy(par_vec), IteratorTag());
-
-    test_transform_binary(execution_policy(seq(task)), IteratorTag());
-    test_transform_binary(execution_policy(par(task)), IteratorTag());
-#endif
+    test_transform_binary(datapar_execution, IteratorTag());
+    test_transform_binary_async(datapar_execution(task), IteratorTag());
 }
 
 void transform_binary_test()
@@ -48,22 +35,8 @@ void test_transform_binary_exception()
 {
     using namespace hpx::parallel;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_transform_binary_exception(seq, IteratorTag());
-    test_transform_binary_exception(par, IteratorTag());
-
-    test_transform_binary_exception_async(seq(task), IteratorTag());
-    test_transform_binary_exception_async(par(task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary_exception(execution_policy(seq), IteratorTag());
-    test_transform_binary_exception(execution_policy(par), IteratorTag());
-
-    test_transform_binary_exception(execution_policy(seq(task)), IteratorTag());
-    test_transform_binary_exception(execution_policy(par(task)), IteratorTag());
-#endif
+    test_transform_binary_exception(datapar_execution, IteratorTag());
+    test_transform_binary_exception_async(datapar_execution(task), IteratorTag());
 }
 
 void transform_binary_exception_test()
@@ -79,22 +52,8 @@ void test_transform_binary_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_transform_binary_bad_alloc(seq, IteratorTag());
-    test_transform_binary_bad_alloc(par, IteratorTag());
-
-    test_transform_binary_bad_alloc_async(seq(task), IteratorTag());
-    test_transform_binary_bad_alloc_async(par(task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary_bad_alloc(execution_policy(seq), IteratorTag());
-    test_transform_binary_bad_alloc(execution_policy(par), IteratorTag());
-
-    test_transform_binary_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_transform_binary_bad_alloc(execution_policy(par(task)), IteratorTag());
-#endif
+    test_transform_binary_bad_alloc(datapar_execution, IteratorTag());
+    test_transform_binary_bad_alloc_async(datapar_execution(task), IteratorTag());
 }
 
 void transform_binary_bad_alloc_test()

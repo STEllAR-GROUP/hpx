@@ -30,8 +30,6 @@ namespace hpx { namespace parallel { namespace util
         template <typename Iterator>
         struct loop
         {
-            typedef Iterator type;
-
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -60,16 +58,17 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Begin, typename End, typename F>
+    template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(Begin begin, End end, F && f)
+    loop(ExPolicy&&, Begin begin, End end, F && f)
     {
         return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
-    template <typename Begin, typename End, typename CancelToken, typename F>
+    template <typename ExPolicy, typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(Begin begin, End end, CancelToken& tok, F && f)
+    loop(ExPolicy&&, Begin begin, End end, CancelToken& tok, F && f)
     {
         return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
     }
@@ -82,8 +81,6 @@ namespace hpx { namespace parallel { namespace util
         template <typename Iterator>
         struct loop_n
         {
-            typedef Iterator type;
-
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>

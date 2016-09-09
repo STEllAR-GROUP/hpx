@@ -11,6 +11,9 @@ if(HPX_WITH_VC_DATAPAR)
       countif_datapar
       foreach_datapar
       foreachn_datapar
+      transform_datapar
+      transform_binary_datapar
+      transform_binary2_datapar
      )
 endif()
 

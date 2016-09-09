@@ -1,37 +1,37 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414)
-#define HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414
+#if !defined(HPX_PARALLEL_TEST_TRANSFORM_SEP_08_2014_0927AM)
+#define HPX_PARALLEL_TEST_TRANSFORM_SEP_08_2014_0927AM
 
-#include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/parallel_transform.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <numeric>
-#include <utility>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
-struct set_42
+struct add_one
 {
     template <typename T>
-    void operator()(T& val)
+    T operator()(T const& v)
     {
-        val = 42;
+        return v + 1;
     }
 };
 
 struct throw_always
 {
     template <typename T>
-    void operator()(T& v)
+    T operator()(T)
     {
         throw std::runtime_error("test");
     }
@@ -40,15 +40,15 @@ struct throw_always
 struct throw_bad_alloc
 {
     template <typename T>
-    void operator()(T& v)
+    T operator()(T) const
     {
         throw std::bad_alloc();
     }
 };
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each(ExPolicy && policy, IteratorTag)
+void test_transform(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -58,55 +58,64 @@ void test_for_each(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    iterator result =
-        hpx::parallel::for_each(std::forward<ExPolicy>(policy),
+    auto result =
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            set_42());
+            boost::begin(d),
+            add_one());
 
-    HPX_TEST(result == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](int v) -> void {
-            HPX_TEST_EQ(v, int(42));
+    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
             ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_async(ExPolicy && p, IteratorTag)
+void test_transform_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<iterator> f =
-        hpx::parallel::for_each(std::forward<ExPolicy>(p),
+    auto f =
+        hpx::parallel::transform(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            set_42());
+            boost::begin(d),
+            add_one());
     f.wait();
 
-    HPX_TEST(f.get() == iterator(boost::end(c)));
+    hpx::util::tuple<iterator, base_iterator> result = f.get();
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](int v) -> void {
-            HPX_TEST_EQ(v, int(42));
+    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
             ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
 }
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception(ExPolicy policy, IteratorTag)
+void test_transform_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -116,12 +125,14 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
     try {
-        hpx::parallel::for_each(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
+            boost::begin(d),
             throw_always());
 
         HPX_TEST(false);
@@ -138,20 +149,22 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_async(ExPolicy p, IteratorTag)
+void test_transform_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<iterator> f =
-            hpx::parallel::for_each(p,
+        auto f =
+            hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d),
                 throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -170,53 +183,57 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
     HPX_TEST(returned_from_algorithm);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
+void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
+    typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<int> c(10007);
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    bool caught_exception = false;
+    bool caught_bad_alloc = false;
     try {
-        hpx::parallel::for_each(policy,
+        hpx::parallel::transform(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
+            boost::begin(d),
             throw_bad_alloc());
 
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
-        caught_exception = true;
+        caught_bad_alloc = true;
     }
     catch(...) {
         HPX_TEST(false);
     }
 
-    HPX_TEST(caught_exception);
+    HPX_TEST(caught_bad_alloc);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
+    typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<int> c(10007);
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    bool caught_exception = false;
+    bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<iterator> f =
-            hpx::parallel::for_each(p,
+        auto f =
+            hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d),
                 throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
@@ -224,69 +241,14 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
-        caught_exception = true;
+        caught_bad_alloc = true;
     }
     catch(...) {
         HPX_TEST(false);
     }
 
-    HPX_TEST(caught_exception);
+    HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n(ExPolicy policy, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    iterator result = hpx::parallel::for_each_n(policy,
-        iterator(boost::begin(c)), c.size(),
-        set_42());
-    iterator end = iterator(boost::end(c));
-    HPX_TEST(result == end);
-
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](int v) -> void {
-            HPX_TEST_EQ(v, int(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n_async(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    hpx::future<iterator> f =
-        hpx::parallel::for_each_n(p,
-            iterator(boost::begin(c)), c.size(),
-            set_42());
-    HPX_TEST(f.get() == iterator(boost::end(c)));
-
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](int v) -> void {
-            HPX_TEST_EQ(v, int(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
 }
 
 #endif

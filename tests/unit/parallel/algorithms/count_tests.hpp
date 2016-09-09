@@ -12,6 +12,7 @@
 #include <boost/range/functions.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -34,8 +35,8 @@ void test_count(ExPolicy policy, IteratorTag)
     // assure rand() does not evalulate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    int find_count = (std::rand() % 30) + 1; //-V101
-    for (int i = 0; i != find_count && i != c.size(); ++i)
+    std::size_t find_count = (std::rand() % 30) + 1; //-V101
+    for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
     }
@@ -57,8 +58,8 @@ void test_count_async(ExPolicy p, IteratorTag)
     // assure rand() does not evaluate to zero
     std::iota(boost::begin(c), boost::end(c), std::rand()+1);
 
-    int find_count = (std::rand() % 30) + 1; //-V101
-    for (int i = 0; i != find_count && i != c.size(); ++i)
+    std::size_t find_count = (std::rand() % 30) + 1; //-V101
+    for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
     }
