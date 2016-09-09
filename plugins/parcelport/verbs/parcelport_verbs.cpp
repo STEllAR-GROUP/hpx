@@ -53,6 +53,8 @@
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
 
+#define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS 1
+
 // Note HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED is set by CMake configuration
 // if the machine is a BlueGene active storage node which does not support immediate
 // data sends
@@ -174,9 +176,6 @@ namespace hpx { namespace parcelset {
 
         // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
-        mutex_type  ReadCompletionMap_mutex;
-        mutex_type  SendCompletionMap_mutex;
-        mutex_type  TagSendCompletionMap_mutex;
 
         typedef RdmaMemoryPool                                    memory_pool_type;
         typedef std::shared_ptr<memory_pool_type>                 memory_pool_ptr_type;
@@ -229,14 +228,22 @@ namespace hpx { namespace parcelset {
         typedef std::list<parcel_recv_data>      active_recv_list_type;
         typedef active_recv_list_type::iterator  active_recv_iterator;
 
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+        // map send/recv parcel wr_id to all info needed on completion
+        typedef hpx::concurrent::unordered_map<uint64_t, active_send_iterator> send_wr_map;
+        typedef hpx::concurrent::unordered_map<uint64_t, active_recv_iterator> recv_wr_map;
+#else
+        mutex_type  ReadCompletionMap_mutex;
+        mutex_type  SendCompletionMap_mutex;
+        mutex_type  TagSendCompletionMap_mutex;
+
         // map send/recv parcel wr_id to all info needed on completion
         typedef std::unordered_map<uint64_t, active_send_iterator> send_wr_map;
         typedef std::unordered_map<uint64_t, active_recv_iterator> recv_wr_map;
-
+#endif
         // store received objects using a map referenced by verbs work request ID
         send_wr_map SendCompletionMap;
         send_wr_map TagSendCompletionMap;
-
         recv_wr_map ReadCompletionMap;
 
         active_send_list_type   active_sends;
@@ -515,31 +522,43 @@ namespace hpx { namespace parcelset {
         // ----------------------------------------------------------------------------------------------
         void handle_send_completion(uint64_t wr_id)
         {
-            bool                 found_wr_id;
+            bool                 found_wr_id = false;
             active_send_iterator current_send;
             {
                 // we must be very careful here.
                 // if the lock is not obtained and this thread is waiting, then
                 // zero copy Gets might complete and another thread might receive a zero copy
                 // complete message then delete the current send data whilst we are still waiting
-                unique_lock lock(SendCompletionMap_mutex);
-                send_wr_map::iterator it = SendCompletionMap.find(wr_id);
-                found_wr_id = (it != SendCompletionMap.end());
-                if (found_wr_id) {
-                    current_send = it->second;
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
-                    SendCompletionMap.erase(it);
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+                auto is_present = SendCompletionMap.is_in_map(wr_id);
+                if (is_present.second) {
+                    found_wr_id = true;
+                    current_send = is_present.first->second;
+                    SendCompletionMap.erase(is_present.first);
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
+                        << "from SendCompletionMap : size before erase "
+                        << SendCompletionMap.size());
                 }
+#else
+                unique_lock lock(SendCompletionMap_mutex);
+                auto it = SendCompletionMap.find(wr_id);
+                if (it!=SendCompletionMap.end()) {
+                    found_wr_id = true;
+                    current_send = it->second;
+                    SendCompletionMap.erase(it);
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
+                        << "from SendCompletionMap : size before erase "
+                        << SendCompletionMap.size());
+                }
+#endif
                 else {
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
                     lock.unlock();
                     handle_tag_send_completion(wr_id);
                     return;
 #else
-                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
-                    // for (auto & pair : SendCompletionMap) {
-                    //     std::cout << hexpointer(pair.first) << "\n";
-                    // }
+                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
+                        << hexpointer(wr_id));
                     std::terminate();
 #endif
                 }
@@ -649,15 +668,18 @@ namespace hpx { namespace parcelset {
                             LOG_DEBUG_MSG("Zero copy regions size is (create) " << decnumber(recv_data.zero_copy_regions.size()));
                             // put region into map before posting read in case it completes whilst this thread is suspended
                             {
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+                                ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
+#else
                                 scoped_lock lock(ReadCompletionMap_mutex);
-                                ReadCompletionMap[(uint64_t)get_region] = current_recv;
+                                ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
+#endif
                             }
                             // overwrite the serialization data to account for the local pointers instead of remote ones
                             /// post the rdma read/get
                             const void *remoteAddr = c.data_.cpos_;
                             recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->getAddress(), c.size_, c.rkey_);
                             client->postRead(get_region, c.rkey_, remoteAddr, c.size_);
-//                            postRDMAGet(c.size_, c.data_.cpos_, c.rkey_, current_recv, recv_data.chunks[index], client);
                         }
                         index++;
                     }
@@ -689,8 +711,13 @@ namespace hpx { namespace parcelset {
                 recv_data.zero_copy_regions.push_back(get_region);
                 // put region into map before posting read in case it completes whilst this thread is suspended
                 {
+
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+                    ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
+#else
                     scoped_lock lock(ReadCompletionMap_mutex);
-                    ReadCompletionMap[(uint64_t)get_region] = current_recv;
+                    ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
+#endif
                 }
                 const void *remoteAddr = h->GetRdmaAddr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
@@ -737,15 +764,25 @@ namespace hpx { namespace parcelset {
             // now release any zero copy regions we were holding until parcel complete
             active_send_iterator current_send;
             {
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+                auto is_present = TagSendCompletionMap.is_in_map(tag);
+                if (is_present.second) {
+                    current_send = is_present.first->second;
+                    TagSendCompletionMap.erase(is_present.first);
+                }
+#else
                 scoped_lock lock(TagSendCompletionMap_mutex);
                 send_wr_map::iterator it = TagSendCompletionMap.find(tag);
-                if (it==TagSendCompletionMap.end()) {
+                if (it!=TagSendCompletionMap.end()) {
+                    current_send = it->second;
+                    TagSendCompletionMap.erase(it);
+                }
+#endif
+                else {
                     LOG_ERROR_MSG("Tag not present in Send map, FATAL");
                     std::terminate();
                 }
-                current_send = it->second;
-                TagSendCompletionMap.erase(it);
-            }
+           }
             // we cannot delete the send data until we are absolutely sure that
             // the initial send has been cleaned up
             if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
@@ -765,15 +802,29 @@ namespace hpx { namespace parcelset {
         {
             bool                 found_wr_id;
             active_recv_iterator current_recv;
-            {   // locked region : make sure map isn't modified whilst we are querying it
-                scoped_lock lock(ReadCompletionMap_mutex);
-                recv_wr_map::iterator it = ReadCompletionMap.find(wr_id);
-                found_wr_id = (it != ReadCompletionMap.end());
-                if (found_wr_id) {
+            {
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+                auto is_present = ReadCompletionMap.is_in_map(wr_id);
+                if (is_present.second) {
+                    found_wr_id = true;
+                    current_recv = is_present.first->second;
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
+                        << "from ReadCompletionMap : size before erase "
+                        << SendCompletionMap.size());
+                    ReadCompletionMap.erase(is_present.first);
+                }
+#else
+                unique_lock lock(ReadCompletionMap_mutex);
+                auto it = ReadCompletionMap.find(wr_id);
+                if (it!=ReadCompletionMap.end()) {
+                    found_wr_id = true;
                     current_recv = it->second;
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
+                        << "from ReadCompletionMap : size before erase "
+                        << SendCompletionMap.size());
                     ReadCompletionMap.erase(it);
                 }
+#endif
                 else {
                     LOG_ERROR_MSG("Fatal error as wr_id is not in completion map");
                     std::terminate();
@@ -1288,19 +1339,12 @@ namespace hpx { namespace parcelset {
                 uint64_t wr_id = (uint64_t)(send_data.header_region);
                 {
                     // add wr_id's to completion map
-                    unique_lock lock(SendCompletionMap_mutex);
-#ifdef HPX_DEBUG
-                    if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
-                        for (auto & pair : SendCompletionMap) {
-                            std::cout << hexpointer(pair.first) << "\n";
-                        }
-                        LOG_ERROR_MSG("FATAL : wr_id duplicated " << hexpointer(wr_id));
-                        std::terminate();
-                        throw std::runtime_error("wr_id duplicated in put_parcel : FATAL");
-                    }
-#endif
                     // put everything into map to be retrieved when send completes
-                    SendCompletionMap[wr_id] = current_send;
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#else
+                    unique_lock lock(SendCompletionMap_mutex);
+#endif
+                    SendCompletionMap.insert(std::make_pair(wr_id, current_send));
                     LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
                             << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
                 }
@@ -1309,10 +1353,13 @@ namespace hpx { namespace parcelset {
                     // we must hold onto the regions until the destination tells us
                     // it has completed all rdma Get operations
                     if (send_data.has_zero_copy) {
+#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#else
                         scoped_lock lock(TagSendCompletionMap_mutex);
+#endif
                         // put the data into a new map which is indexed by the Tag of the send
                         // zero copy blocks will be released when we are told this has completed
-                        TagSendCompletionMap[send_data.tag] = current_send;
+                        TagSendCompletionMap.insert(std::make_pair(send_data.tag, current_send));
                     }
                 }
 
