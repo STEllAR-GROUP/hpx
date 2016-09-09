@@ -43,6 +43,7 @@
 #define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
 #define RDMA_POOL_MAX_LARGE_CHUNKS  4
 
+#define RDMA_POOL_USE_LOCKFREE_STACK
 /*
 // if the HPX configuration has set a different value, use it
 #if defined(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE)
@@ -106,7 +107,7 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-    //
+    // A simple tag type we use for logging assistance (identification)
     struct pool_tiny   { static const char *desc() { return "Tiny ";   } };
     struct pool_small  { static const char *desc() { return "Small ";  } };
     struct pool_medium { static const char *desc() { return "Medium "; } };
@@ -119,15 +120,14 @@ namespace verbs
     template <typename pool_chunk_allocator, typename PoolType>
     struct pool_container
     {
-        typedef std::function<rdma_memory_region_ptr(std::size_t)> regionAllocFunction;
-        //
+#ifndef RDMA_POOL_USE_LOCKFREE_STACK
         typedef hpx::lcos::local::spinlock                mutex_type;
-        typedef std::lock_guard<mutex_type>               scoped_lock;
         typedef std::unique_lock<mutex_type>              unique_lock;
-        typedef hpx::lcos::local::condition_variable_any  condition_type;
+#endif
 
         // ------------------------------------------------------------------------
-        pool_container(rdma_protection_domain_ptr pd) :
+        pool_container(rdma_protection_domain_ptr pd, std::size_t chunk_size,
+            std::size_t chunks_per_block, std::size_t max_items) :
                 chunk_size_(chunk_size), max_chunks_(max_items), used_(0),
                 chunk_allocator(pd, chunk_size, chunks_per_block, chunks_per_block)
         {
@@ -179,6 +179,9 @@ namespace verbs
         // ------------------------------------------------------------------------
         inline void push(rdma_memory_region *region)
         {
+#ifndef RDMA_POOL_USE_LOCKFREE_STACK
+            unique_lock lock1(memBuffer_mutex_);
+#endif
             LOG_TRACE_MSG(PoolType::desc() << "Push block "
                 << hexpointer(region->get_address()) << hexlength(region->get_size())
                 << decnumber(used_-1));
@@ -197,10 +200,13 @@ namespace verbs
                 }
                 free_list_.push_back(region);
              */
+#ifdef RDMA_POOL_USE_LOCKFREE_STACK
             if (!free_list_.push(region)) {
                 LOG_ERROR_MSG(PoolType::desc() << "Error in memory pool push");
             }
-
+#else
+            free_list_.push(region);
+#endif
             // decrement one reference
             used_--;
         }
@@ -208,6 +214,9 @@ namespace verbs
         // ------------------------------------------------------------------------
         inline rdma_memory_region *pop()
         {
+#ifndef RDMA_POOL_USE_LOCKFREE_STACK
+            unique_lock lock1(memBuffer_mutex_);
+#endif
             // if we have not exceeded our max size, allocate a new block
             if (free_list_.empty()) {
                 //  LOG_TRACE_MSG("Creating new small Block as free list is empty but max chunks " << max_small_chunks_ << " not reached");
@@ -215,13 +224,16 @@ namespace verbs
                 //std::terminate();
                 return NULL;
             }
-
+#ifdef RDMA_POOL_USE_LOCKFREE_STACK
             // get a block
             rdma_memory_region *region = NULL;
             if (!free_list_.pop(region)) {
                 LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
             }
-
+#else
+            rdma_memory_region *region = free_list_.top();
+            free_list_.pop();
+#endif
             // Keep reference counts to self so that we can check
             // this pool is not deleted whilst blocks still exist
             used_++;
@@ -236,11 +248,14 @@ namespace verbs
         std::size_t                                 chunk_size_;
         std::size_t                                 max_chunks_;
         std::atomic<int>                            used_;
+#ifdef RDMA_POOL_USE_LOCKFREE_STACK
         boost::lockfree::stack<rdma_memory_region*, boost::lockfree::capacity<8192>> free_list_;
-        //            mutex_type                                  memBuffer_mutex_;
-        //            condition_type                              memBuffer_cond_;
+#else
+        std::stack<rdma_memory_region*> free_list_;
+        mutex_type                      memBuffer_mutex_;
+#endif
         //
-        pool_chunk_allocator chunk_allocator;
+        pool_chunk_allocator                           chunk_allocator;
         std::unordered_map<char *, rdma_memory_region> block_list_;
 };
 
@@ -260,8 +275,7 @@ namespace verbs
 
         //----------------------------------------------------------------------------
         // constructor
-        rdma_memory_pool(rdma_protection_domain_ptr pd, std::size_t chunk_size,
-            std::size_t init_chunks, std::size_t max_chunks) :
+        rdma_memory_pool(rdma_protection_domain_ptr pd) :
                 protection_domain_(pd),
                 tiny_  (pd, RDMA_POOL_1K_CHUNK,          256, RDMA_POOL_MAX_1K_CHUNKS),
                 small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 8192, RDMA_POOL_MAX_SMALL_CHUNKS),

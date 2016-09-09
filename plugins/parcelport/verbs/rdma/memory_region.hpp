@@ -118,7 +118,7 @@ namespace verbs {
             if (region_ != NULL) {
                 // get these before deleting/unregistering (for logging)
                 void *buffer = get_base_address();
-                LOG_SETUP_VAR(
+                LOG_EXCLUSIVE(
                     uint32_t length = get_length();
                 );
                 //

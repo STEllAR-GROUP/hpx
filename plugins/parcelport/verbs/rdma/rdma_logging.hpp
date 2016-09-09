@@ -54,8 +54,8 @@ namespace verbs {
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages
 // without enabling all of them
-//#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << THREAD_ID << " " << x;
-#define LOG_DEVEL_MSG(x)
+#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << THREAD_ID << " " << x;
+//#define LOG_DEVEL_MSG(x)
 
 //
 // Logging disabled, #define all macros to be empty
@@ -66,7 +66,7 @@ namespace verbs {
 #  define LOG_INFO_MSG(x)
 #  define LOG_WARN_MSG(x)
 #  define LOG_ERROR_MSG(x) std::cout << x << " " << __FILE__ << " " << __LINE__ << std::endl;
-#  define LOG_SETUP_VAR(x)
+#  define LOG_EXCLUSIVE(x)
 //
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
@@ -97,7 +97,7 @@ namespace verbs {
 #  define LOG_ERROR_MSG(x) BOOST_LOG_TRIVIAL(error)   << THREAD_ID << " " << x;
 #  define LOG_FATAL_MSG(x) BOOST_LOG_TRIVIAL(fatal)   << THREAD_ID << " " << x;
 //
-#  define LOG_SETUP_VAR(x) x
+#  define LOG_EXCLUSIVE(x) x
 //
 #  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("**************** Enter " << __func__);
 #  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("################ Exit  " << __func__);
