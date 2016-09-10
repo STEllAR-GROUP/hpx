@@ -119,9 +119,9 @@ namespace hpx { namespace serialization { namespace detail
             auto jt = typeinfo_map_.find(typeinfo.name());
 
             if(it == map_.end())
-                map_.emplace(class_name, bunch);
+                map_[class_name] = bunch;
             if(jt == typeinfo_map_.end())
-                typeinfo_map_.emplace(typeinfo.name(), class_name);
+                typeinfo_map_[typeinfo.name()] = class_name;
         }
 
         // the following templates are defined in *.ipp file
