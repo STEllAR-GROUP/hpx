@@ -293,10 +293,12 @@ namespace concurrent {
             return map_.find(k);
         }
 
-        bool is_in_map(const key_type& k) const
+        std::pair<const_iterator, bool> is_in_map(const key_type& k) const
         {
             read_lock lock(mutex_);
-            return (map_.find(k)!=map_.end());
+            const_iterator it = map_.find(k);
+            bool result = (it != map_.end());
+            return std::make_pair(it, result);;
         }
 
         size_type count(const key_type& k) const
@@ -325,10 +327,10 @@ namespace concurrent {
         // operator[] should only be used for reading, if writing, use insert
         // which will take a write_lock for safety
         //
-        mapped_type& operator[](const key_type& k)
+        const mapped_type& operator[](const key_type& k) const
         {
             read_lock lock(mutex_);
-            return map_[k];
+            return map_.at(k);
         };
 
         mapped_type& at( const key_type& k )
