@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 John Biddiscombe
+//  Copyright (c) 2015-2016 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,9 +16,6 @@
 #include <hpx/apply.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
-#include "RdmaMemoryPool.h"
-
-// parcelport main
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -26,10 +23,13 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
+//
 #include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 
 // Local parcelport plugin
-// #define USE_SPECIALIZED_SCHEDULER
+//#define USE_SPECIALIZED_SCHEDULER
+//
 #include "sender_connection.hpp"
 #include "connection_handler.hpp"
 #include "locality.hpp"
@@ -40,17 +40,17 @@
 #endif
 //
 // rdmahelper library
-#include "RdmaLogging.h"
-#include "RdmaController.h"
-#include "RdmaDevice.h"
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
+#include <plugins/parcelport/verbs/rdmahelper/include/RdmaDevice.h>
+#include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
 //
 #include <unordered_map>
 //
 #include <memory>
 #include <mutex>
-#include <condition_variable>
 
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_SMALL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
 
 #define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS 1
@@ -61,9 +61,11 @@
 
 using namespace hpx::parcelset::policies;
 
-namespace hpx { namespace parcelset {
-    namespace policies { namespace verbs
-    {
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs
+{
 
     // --------------------------------------------------------------------
     // simple atomic counter we use for tags
@@ -92,15 +94,14 @@ namespace hpx { namespace parcelset {
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
-    class HPX_EXPORT parcelport
-      : public parcelport_impl<parcelport>
+    class HPX_EXPORT parcelport : public parcelport_impl<parcelport>
     {
     private:
         typedef parcelport_impl<parcelport> base_type;
 
         static std::size_t max_connections(util::runtime_configuration const& ini)
         {
-            LOG_DEBUG_MSG("This should not be necessary as the parcelport_impl does it for us");
+            LOG_DEVEL_MSG("This should not be necessary as the parcelport_impl does it for us");
             return hpx::util::get_entry_as<std::size_t>(
                 // this uses the mpi value as we have not bothered to add a verbs one yet
                 ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
@@ -121,7 +122,7 @@ namespace hpx { namespace parcelset {
                         _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
-                        _ibv_ip = hpx::parcelset::policies::verbs::Get_rdma_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
+                        _ibv_ip = ::Get_rdma_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
                         LOG_DEBUG_MSG("here() got hostname of " << buff);
                     }
                 }
@@ -129,14 +130,19 @@ namespace hpx { namespace parcelset {
             if (ini.has_section("hpx.agas")) {
                 util::section const* sec = ini.get_section("hpx.agas");
                 if (NULL != sec) {
-                    LOG_DEBUG_MSG("hpx.agas port number " << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT)));
-                    _port = hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT);
+                    LOG_DEBUG_MSG("hpx.agas port number "
+                        << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                            "port", HPX_INITIAL_IP_PORT)));
+                    _port = hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                        "port", HPX_INITIAL_IP_PORT);
                 }
             }
             if (ini.has_section("hpx.parcel")) {
                 util::section const* sec = ini.get_section("hpx.parcel");
                 if (NULL != sec) {
-                    LOG_DEBUG_MSG("hpx.parcel port number " << hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT));
+                    LOG_DEBUG_MSG("hpx.parcel port number "
+                        << hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                            "port", HPX_INITIAL_IP_PORT));
                 }
             }
             FUNC_END_DEBUG_MSG;
@@ -154,7 +160,7 @@ namespace hpx { namespace parcelset {
         static boost::uint32_t   _port;
         static boost::uint32_t   _ibv_ip;
 
-        // to quickly lookup a que-pair (QP) from a destination ip address
+        // to quickly lookup a queue-pair (QP) from a destination ip address
         typedef hpx::concurrent::unordered_map<boost::uint32_t, boost::uint32_t> ip_map;
         typedef ip_map::iterator ip_map_iterator;
         ip_map ip_qp_map;
@@ -168,7 +174,7 @@ namespace hpx { namespace parcelset {
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a more consistent
         // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
         // needs reworking
-        typedef header<RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE>  header_type;
+        typedef header<RDMA_POOL_SMALL_CHUNK_SIZE>           header_type;
         typedef hpx::lcos::local::spinlock                   mutex_type;
         typedef std::lock_guard<mutex_type>                  scoped_lock;
         typedef hpx::lcos::local::condition_variable_any     condition_type;
@@ -177,7 +183,7 @@ namespace hpx { namespace parcelset {
         // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
 
-        typedef RdmaMemoryPool                                    memory_pool_type;
+        typedef rdma_memory_pool                                  memory_pool_type;
         typedef std::shared_ptr<memory_pool_type>                 memory_pool_ptr_type;
         typedef hpx::util::detail::memory_chunk_pool_allocator
                 <char, memory_pool_type, mutex_type>               allocator_type;
@@ -206,8 +212,8 @@ namespace hpx { namespace parcelset {
             bool                                             has_zero_copy;
             util::unique_function_nonser< void(error_code const&) > handler;
 
-            RdmaMemoryRegion *header_region, *chunk_region, *message_region;
-            std::vector<RdmaMemoryRegion*>                   zero_copy_regions;
+            rdma_memory_region *header_region, *chunk_region, *message_region;
+            std::vector<rdma_memory_region*>                   zero_copy_regions;
         } parcel_send_data;
 
         // --------------------------------------------------------------------
@@ -218,8 +224,8 @@ namespace hpx { namespace parcelset {
             std::atomic_uint                                 rdma_count;
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
-            RdmaMemoryRegion *header_region, *chunk_region, *message_region;
-            std::vector<RdmaMemoryRegion*>                   zero_copy_regions;
+            rdma_memory_region *header_region, *chunk_region, *message_region;
+            std::vector<rdma_memory_region*>                   zero_copy_regions;
         } parcel_recv_data;
 
         typedef std::list<parcel_send_data>      active_send_list_type;
@@ -393,7 +399,7 @@ namespace hpx { namespace parcelset {
                 send_data.message_region = NULL;
             }
             for (auto r : send_data.zero_copy_regions) {
-                LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                LOG_DEBUG_MSG("Deallocating zero_copy_regions " << hexpointer(r));
                 chunk_pool_->deallocate(r);
             }
             //
@@ -425,7 +431,6 @@ namespace hpx { namespace parcelset {
         {
             FUNC_START_DEBUG_MSG;
             parcel_recv_data &recv_data = *recv;
-
             chunk_pool_->deallocate(recv_data.header_region);
             LOG_DEBUG_MSG("Zero copy regions size is (delete) " << decnumber(recv_data.zero_copy_regions.size()));
             for (auto r : recv_data.zero_copy_regions) {
@@ -499,33 +504,6 @@ namespace hpx { namespace parcelset {
             return 0;
         }
 
-        RdmaMemoryRegion *getRdmaRegion(std::size_t size) {
-            if (size<=RDMA_DEFAULT_MEMORY_POOL_LARGE_CHUNK_SIZE) {
-                return chunk_pool_->allocateRegion(size);
-            }
-            return chunk_pool_->AllocateTemporaryBlock(size);
-        }
-/*
-        void postRDMAGet(std::size_t size, void const *pos, boost::uint32_t rkey, active_recv_iterator recv_data, serialization::serialization_chunk &chunk, RdmaClient *client) {
-            RdmaMemoryRegion *get_region = getRdmaRegion(size);
-            LOG_DEBUG_MSG("RDMA Get address " << hexpointer(pos)
-                    << " rkey " << decnumber(rkey) << " size " << hexnumber(size)
-                    << " tag " << hexuint32(recv_data->tag)
-                    << " local address " << get_region->getAddress() << " length " << size);
-            recv_data->zero_copy_regions.push_back(get_region);
-            LOG_DEBUG_MSG("Zero copy regions size is (create) " << decnumber(recv_data->zero_copy_regions.size()));
-            // put region into map before posting read in case it completes whilst this thread is suspended
-            {
-                scoped_lock lock(ReadCompletionMap_mutex);
-                ReadCompletionMap[(uint64_t)get_region] = recv_data;
-            }
-            // overwrite the serialization data to account for the local pointers instead of remote ones
-            /// post the rdma read/get
-            const void *remoteAddr = pos;
-            chunk = hpx::serialization::create_pointer_chunk(get_region->getAddress(), size, rkey);
-            client->postRead(get_region, rkey, remoteAddr, size);
-        }
-*/
         // ----------------------------------------------------------------------------------------------
         // When a send completes take one of two actions ...
         // if there are no zero copy chunks, we consider the parcel sending complete
@@ -619,8 +597,8 @@ namespace hpx { namespace parcelset {
             }
             parcel_recv_data &recv_data = *current_recv;
             // get the header of the new message/parcel
-            recv_data.header_region  = (RdmaMemoryRegion *)wr_id;
-            header_type *h = (header_type*)recv_data.header_region->getAddress();
+            recv_data.header_region  = (rdma_memory_region *)wr_id;
+            header_type *h = (header_type*)recv_data.header_region->get_address();
             recv_data.message_region = NULL;
             recv_data.chunk_region   = NULL;
             // zero copy chunks we have to GET from the source locality
@@ -662,6 +640,7 @@ namespace hpx { namespace parcelset {
                 if (recv_data.rdma_count>0) {
                     parcel_complete = false;
                     int index = 0;
+                    LOG_EXCLUSIVE(
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         LOG_DEBUG_MSG("recv : chunk : size " << hexnumber(c.size_)
                                 << " type " << decnumber((uint64_t)c.type_)
@@ -669,14 +648,14 @@ namespace hpx { namespace parcelset {
                                 << " cpos " << hexpointer(c.data_.cpos_)
                                 << " pos " << hexpointer(c.data_.pos_)
                                 << " index " << decnumber(c.data_.index_));
-                    }
+                    })
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         if (c.type_ == serialization::chunk_type_pointer) {
-                            RdmaMemoryRegion *get_region = getRdmaRegion(c.size_);
+                            rdma_memory_region *get_region = chunk_pool_->allocate_region(c.size_);
                             LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
                                     << " rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
                                     << " tag " << hexuint32(recv_data.tag)
-                                    << " local address " << get_region->getAddress() << " length " << c.size_);
+                                    << " local address " << get_region->get_address() << " length " << c.size_);
                             recv_data.zero_copy_regions.push_back(get_region);
                             LOG_DEBUG_MSG("Zero copy regions size is (create) " << decnumber(recv_data.zero_copy_regions.size()));
                             // put region into map before posting read in case it completes whilst this thread is suspended
@@ -691,7 +670,7 @@ namespace hpx { namespace parcelset {
                             // overwrite the serialization data to account for the local pointers instead of remote ones
                             /// post the rdma read/get
                             const void *remoteAddr = c.data_.cpos_;
-                            recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->getAddress(), c.size_, c.rkey_);
+                            recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->get_address(), c.size_, c.rkey_);
                             client->postRead(get_region, c.rkey_, remoteAddr, c.size_);
                         }
                         index++;
@@ -719,8 +698,8 @@ namespace hpx { namespace parcelset {
             }
             else {
                 std::size_t size = h->GetRdmaMessageLength();
-                RdmaMemoryRegion *get_region = getRdmaRegion(size);
-                get_region->setMessageLength(size);
+                rdma_memory_region *get_region = chunk_pool_->allocate_region(size);
+                get_region->set_message_length(size);
                 recv_data.zero_copy_regions.push_back(get_region);
                 // put region into map before posting read in case it completes whilst this thread is suspended
                 {
@@ -735,7 +714,7 @@ namespace hpx { namespace parcelset {
                 const void *remoteAddr = h->GetRdmaAddr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
                 recv_data.chunks.push_back(
-                    hpx::serialization::create_pointer_chunk(get_region->getAddress(), size, h->GetRdmaKey()));
+                    hpx::serialization::create_pointer_chunk(get_region->get_address(), size, h->GetRdmaKey()));
                 client->postRead(get_region, h->GetRdmaKey(), remoteAddr, h->GetRdmaMessageLength());
             }
 
@@ -751,8 +730,8 @@ namespace hpx { namespace parcelset {
         void handle_tag_send_completion(uint64_t wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
-            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
-            uint32_t tag = *(uint32_t*) (region->getAddress());
+            rdma_memory_region *region = (rdma_memory_region *)wr_id;
+            uint32_t tag = *(uint32_t*) (region->get_address());
             chunk_pool_->deallocate(region);
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag " << hexuint32(tag));
         }
@@ -761,11 +740,11 @@ namespace hpx { namespace parcelset {
         void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag, const RdmaClient *client)
         {
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
-            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
-            tag = *((uint32_t*) (region->getAddress()));
+            rdma_memory_region *region = (rdma_memory_region *)wr_id;
+            tag = *((uint32_t*) (region->get_address()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
 #else
-            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
+            rdma_memory_region *region = (rdma_memory_region *)wr_id;
             LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
 #endif
             // bookkeeping : decrement counter that keeps preposted queue full
@@ -803,7 +782,6 @@ namespace hpx { namespace parcelset {
                 delete_send_data(current_send);
             }
             //
-            _rdmaController->refill_client_receives();
 
             LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
                     << " total receives " << decnumber(++total_receives)
@@ -853,21 +831,21 @@ namespace hpx { namespace parcelset {
                 //
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting 4 byte ack to origin");
-                RdmaMemoryRegion *tag_region = chunk_pool_->allocateRegion(4); // space for a uint32_t
-                uint32_t *tag_memory = (uint32_t*)(tag_region->getAddress());
+                rdma_memory_region *tag_region = chunk_pool_->allocate_region(4); // space for a uint32_t
+                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
-                tag_region->setMessageLength(4);
+                tag_region->set_message_length(4);
                 client->postSend(tag_region, true, false, 0);
 #else
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting zero byte ack to origin");
                 // convert uint32 to uint64 so we can use it as a fake message region (wr_id only for 0 byte send)
                 uint64_t fake_region = recv_data.tag;
-                client->postSend_x0((RdmaMemoryRegion*)fake_region, false, true, recv_data.tag);
+                client->postSend_x0((rdma_memory_region*)fake_region, false, true, recv_data.tag);
 #endif
                 //
                 LOG_DEBUG_MSG("Zero copy regions size is (completion) " << decnumber(recv_data.zero_copy_regions.size()));
 
-                header_type *h = (header_type*)recv_data.header_region->getAddress();
+                header_type *h = (header_type*)recv_data.header_region->get_address();
                 LOG_DEBUG_MSG( "get completion " <<
                         "buffsize " << decnumber(h->size())
                         << "numbytes " << decnumber(h->numbytes())
@@ -885,10 +863,10 @@ namespace hpx { namespace parcelset {
                     message_length = h->size();
                 }
                 else {
-                    RdmaMemoryRegion *message_region = recv_data.zero_copy_regions.back();
+                    rdma_memory_region *message_region = recv_data.zero_copy_regions.back();
                     recv_data.zero_copy_regions.resize(recv_data.zero_copy_regions.size()-1);
-                    message = static_cast<char *>(message_region->getAddress());
-                    message_length = message_region->getMessageLength();
+                    message = static_cast<char *>(message_region->get_address());
+                    message_length = message_region->get_message_length();
                     LOG_DEBUG_MSG("No piggy_back message, RDMA GET : " << hexpointer(message_region) << " length " decnumber(message_length));
                     LOG_DEBUG_MSG("No piggy_back message, RDMA GET : " << hexpointer(recv_data.message_region) << " length " decnumber(message_length));
                 }
@@ -900,6 +878,7 @@ namespace hpx { namespace parcelset {
                 rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                 LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
 
+                LOG_EXCLUSIVE(
                 for (serialization::serialization_chunk &c : recv_data.chunks) {
                     LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
@@ -907,7 +886,7 @@ namespace hpx { namespace parcelset {
                             << " cpos " << hexpointer(c.data_.cpos_)
                             << " pos " << hexpointer(c.data_.pos_)
                             << " index " << decnumber(c.data_.index_));
-                }
+                })
 
                 buffer.num_chunks_ = h->num_chunks();
                 //buffer.data_.resize(static_cast<std::size_t>(h->size()));
@@ -983,7 +962,7 @@ namespace hpx { namespace parcelset {
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
-            return true;
+            return false;
         }
 
         /// Return the name of this locality
@@ -995,7 +974,8 @@ namespace hpx { namespace parcelset {
             return "verbs";
         }
 
-        parcelset::locality agas_locality(util::runtime_configuration const & ini) const {
+        parcelset::locality agas_locality(util::runtime_configuration const & ini) const
+        {
             FUNC_START_DEBUG_MSG;
             // load all components as described in the configuration information
             if (ini.has_section("hpx.agas")) {
@@ -1235,13 +1215,15 @@ namespace hpx { namespace parcelset {
             {
                 // create a tag, needs to be unique per client
                 uint32_t tag = tag_provider_.next(sender->dest_ip_);
-                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from " << hexuint32(sender->dest_ip_));
+                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from "
+                    << hexuint32(sender->dest_ip_));
 
                 // we must store details about this parcel so that all memory buffers can be kept
                 // until all send operations have completed.
                 active_send_iterator current_send;
                 {
-                    LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write " << hexnumber(active_send_count_) );
+                    LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write "
+                        << hexnumber(active_send_count_) );
                     suspended_task_debug();
                     // if more than N parcels are currently queued, then yield
                     // otherwise we can fill the send queues with so many requests
@@ -1254,7 +1236,8 @@ namespace hpx { namespace parcelset {
                     active_send_condition.wait(lock, [this] {
                       return (active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
                     });
-                    LOG_TRACE_MSG("Done waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
+                    LOG_TRACE_MSG("Done waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE "
+                        << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
 
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
@@ -1270,17 +1253,19 @@ namespace hpx { namespace parcelset {
                 send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
 
-                LOG_DEBUG_MSG("Generated unique dest " << hexnumber(sender->dest_ip_) << " coded tag " << hexuint32(send_data.tag));
+                LOG_DEBUG_MSG("Generated unique dest " << hexnumber(sender->dest_ip_)
+                    << " coded tag " << hexuint32(send_data.tag));
 
                 // for each zerocopy chunk, we must create a memory region for the data
-                for (serialization::serialization_chunk &c : buffer.chunks_) {
+                LOG_EXCLUSIVE(
+                    for (serialization::serialization_chunk &c : buffer.chunks_) {
                     LOG_DEBUG_MSG("write : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
                             << " rkey " << decnumber(c.rkey_)
                             << " cpos " << hexpointer(c.data_.cpos_)
                             << " pos " << hexpointer(c.data_.pos_)
                             << " index " << decnumber(c.data_.index_));
-                }
+                })
 
                 // for each zerocopy chunk, we must create a memory region for the data
                 int index = 0;
@@ -1289,10 +1274,10 @@ namespace hpx { namespace parcelset {
                         send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
                         util::high_resolution_timer regtimer;
-                        RdmaMemoryRegion *zero_copy_region;
+                        rdma_memory_region *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
-                            zero_copy_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE));
-                            char *zero_copy_memory = (char*)(zero_copy_region->getAddress());
+                            zero_copy_region = chunk_pool_->allocate_region(std::max(c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
+                            char *zero_copy_memory = (char*)(zero_copy_region->get_address());
                             std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
                             // the pointer in the chunk info must be changed
                             buffer.chunks_[index] = serialization::create_pointer_chunk(zero_copy_memory, c.size_);
@@ -1300,13 +1285,13 @@ namespace hpx { namespace parcelset {
                         }
                         else {
                             // create a memory region from the pointer
-                            zero_copy_region = new RdmaMemoryRegion(
-                                    _rdmaController->getProtectionDomain(), c.data_.cpos_, std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE));
+                            zero_copy_region = new rdma_memory_region(
+                                    _rdmaController->getProtectionDomain(), c.data_.cpos_, std::max(c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
 //                            LOG_DEBUG_MSG("Time to register memory (ns) " << decnumber(regtimer.elapsed_nanoseconds()));
                         }
-                        c.rkey_  = zero_copy_region->getRemoteKey();
+                        c.rkey_  = zero_copy_region->get_remote_key();
                         LOG_DEBUG_MSG("Zero-copy rdma Get region " << decnumber(index) << " created for address "
-                                << hexpointer(zero_copy_region->getAddress())
+                                << hexpointer(zero_copy_region->get_address())
                                 << " and rkey " << decnumber(c.rkey_));
                         send_data.zero_copy_regions.push_back(zero_copy_region);
                     }
@@ -1314,14 +1299,14 @@ namespace hpx { namespace parcelset {
                 }
 
                 // grab a memory block from the pinned pool to use for the header
-                send_data.header_region = chunk_pool_->allocateRegion(chunk_pool_->small_.chunk_size_);
-                char *header_memory = (char*)(send_data.header_region->getAddress());
+                send_data.header_region = chunk_pool_->allocate_region(chunk_pool_->small_.chunk_size_);
+                char *header_memory = (char*)(send_data.header_region->get_address());
 
                 // create the header in the pinned memory block
                 LOG_DEBUG_MSG("Placement new for the header with piggyback copy disabled");
                 header_type *h = new(header_memory) header_type(buffer, send_data.tag);
                 h->assert_valid();
-                send_data.header_region->setMessageLength(h->header_length());
+                send_data.header_region->set_message_length(h->header_length());
 
                 LOG_DEBUG_MSG(
                         "sending, buffsize " << decnumber(h->size())
@@ -1336,12 +1321,12 @@ namespace hpx { namespace parcelset {
 
                 // Get the block of pinned memory where the message was encoded during serialization
                 send_data.message_region = buffer.data_.m_region_;
-                send_data.message_region->setMessageLength(h->size());
+                send_data.message_region->set_message_length(h->size());
                 LOG_DEBUG_MSG("Found region allocated during encode_parcel : address " << hexpointer(buffer.data_.m_array_) << " region "<< hexpointer(send_data.message_region));
 
                 // header region is always sent, message region is usually piggybacked
                 int num_regions = 1;
-                RdmaMemoryRegion *region_list[2] = { send_data.header_region, send_data.message_region };
+                rdma_memory_region *region_list[2] = { send_data.header_region, send_data.message_region };
                 if (h->chunk_data()) {
                     LOG_DEBUG_MSG("Chunk info is piggybacked");
                     send_data.chunk_region = NULL;
@@ -1358,13 +1343,13 @@ namespace hpx { namespace parcelset {
                 else {
                     LOG_DEBUG_MSG("Main message NOT piggybacked ");
                     h->setRdmaMessageLength(h->size());
-                    h->setRdmaKey(send_data.message_region->getLocalKey());
-                    h->setRdmaAddr(send_data.message_region->getAddress());
+                    h->setRdmaKey(send_data.message_region->get_local_key());
+                    h->setRdmaAddr(send_data.message_region->get_address());
                     send_data.zero_copy_regions.push_back(send_data.message_region);
                     send_data.has_zero_copy  = true;
                     LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer.data_.size())
-                            << " rkey " << decnumber(send_data.message_region->getLocalKey())
-                            << " pos " << hexpointer(send_data.message_region->getAddress()));
+                            << " rkey " << decnumber(send_data.message_region->get_local_key())
+                            << " pos " << hexpointer(send_data.message_region->get_address()));
                     // do not delete twice, clear the message block pointer as it
                     // is also used in the zero_copy_regions list
                     send_data.message_region = NULL;
@@ -1400,12 +1385,12 @@ namespace hpx { namespace parcelset {
                 // send the header/main_chunk to the destination, wr_id is header_region (entry 0 in region_list)
                 LOG_TRACE_MSG("num regions to send " << num_regions
                     << "Block header_region"
-                    << " buffer "    << hexpointer(send_data.header_region->getAddress())
+                    << " buffer "    << hexpointer(send_data.header_region->get_address())
                     << " region "    << hexpointer(send_data.header_region));
                 if (num_regions>1) {
                     LOG_TRACE_MSG(
                     "Block message_region "
-                    << " buffer "    << hexpointer(send_data.message_region->getAddress())
+                    << " buffer "    << hexpointer(send_data.message_region->get_address())
                     << " region "    << hexpointer(send_data.message_region));
                 }
                 sender->client_->postSend_xN(region_list, num_regions, true, false, 0);
@@ -1450,8 +1435,9 @@ namespace hpx { namespace parcelset {
 //            HPX_ASSERT(threads::get_self_ptr() != 0);
             //
             do {
-                // if an event comes in, we may spend time processing/handling it and another may arrive
-                // during this handling, so keep checking until none are received
+                // if an event comes in, we may spend time processing/handling it
+                // and another may arrive during this handling,
+                // so keep checking until none are received
                 done = (_rdmaController->eventMonitor(0) == 0);
             } while (!done);
             return true;
@@ -1502,7 +1488,8 @@ namespace hpx { namespace parcelset {
 
 
     template <typename Handler, typename ParcelPostprocess>
-    void sender_connection::async_write(Handler && handler, ParcelPostprocess && parcel_postprocess)
+    void sender_connection::async_write(Handler && handler,
+        ParcelPostprocess && parcel_postprocess)
     {
         HPX_ASSERT(!buffer_.data_.empty());
         //
@@ -1556,48 +1543,36 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         return "100";
     }
 
-    // This is used to initialize your parcelport, for example check for availability of devices etc.
+    // This is used to initialize your parcelport,
+    // for example check for availability of devices etc.
     static void init(int *argc, char ***argv, util::command_line_handling &cfg) {
         FUNC_START_DEBUG_MSG;
 
         FUNC_END_DEBUG_MSG;
     }
 
-    static char const* call() {
+    static char const* call()
+    {
         FUNC_START_DEBUG_MSG;
         FUNC_END_DEBUG_MSG;
 
-        //      LOG_DEBUG_MSG("\n"
-        //          "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-        //          "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-        //          "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
-        //          "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-        //          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
-        //          "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-        //          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
-        //          "zero_copy_optimization = 0\n"
-        //          "io_pool_size = 2\n"
-        //          "use_io_pool = 1\n"
-        //          "enable = 0");
         return
-//                "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-                "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-                "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
-                "memory_chunk_size = ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
-        "max_memory_chunks = ${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS:"
-        BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
-        "zero_copy_optimization = 1\n"
-        "io_pool_size = 2\n"
-        "use_io_pool = 1\n"
-        "enable = 0"
-        ;
+            "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
+            "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:"
+            HPX_PARCELPORT_VERBS_INTERFACE "}\n"
+            "memory_chunk_size = ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE:"
+            BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+            "max_memory_chunks = ${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS:"
+            BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+            "zero_copy_optimization = 1\n"
+            "io_pool_size = 2\n"
+            "use_io_pool = 1\n"
+            "enable = 0";
     }
 };
 }
 }
 RdmaControllerPtr hpx::parcelset::policies::verbs::parcelport::_rdmaController;
-//std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_ifname;
 std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
 std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
 boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_ibv_ip;

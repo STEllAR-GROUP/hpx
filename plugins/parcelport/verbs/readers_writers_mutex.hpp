@@ -136,7 +136,7 @@ namespace local {
         readwrite_ticket ticket;
 
     public:
-        readers_writer_mutex() : ticket{0} {};
+        readers_writer_mutex() : ticket{0} {}
 
         //
         // acquire lock for a unique writer

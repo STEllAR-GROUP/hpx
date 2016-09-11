@@ -28,14 +28,13 @@ if(HPX_WITH_PARCELPORT_VERBS)
     hpx_add_config_define(BOOST_LOG_DYN_LINK)
   endif()
 
-## ibverbs parcelport settings
-#hpx_option(HPX_PARCELPORT_VERBS_IFNAME STRING
-#  "The interface name of the ibverbs capable network adapter (default: ib0)"
-#  "ib0" CATEGORY "Parcelport" ADVANCED)
-
-#hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
-#  "Number of bytes a chunk in the memory pool can hold (default: 64MB)"
-#  "67108864" CATEGORY "Parcelport" ADVANCED)
+#------------------------------------------------------------------------------
+# Logging
+#------------------------------------------------------------------------------
+option(HPX_PARCELPORT_VERBS_WITH_LOGGING "Enable logging" ON)
+if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_HAVE_LOGGING)
+endif()
 
 hpx_option(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD STRING
   "Size of the message payload not sent with RDMA (default: 512 byte)"
@@ -66,7 +65,6 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING
   "32" CATEGORY "Parcelport" ADVANCED)
 
   hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
-#  hpx_add_config_define(HPX_PARCELPORT_VERBS_IFNAME "\"${HPX_PARCELPORT_VERBS_IFNAME}\"")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_DEVICE "\"${HPX_PARCELPORT_VERBS_DEVICE}\"")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_INTERFACE "\"${HPX_PARCELPORT_VERBS_INTERFACE}\"")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
@@ -84,10 +82,10 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING
   message("Adding subproject")
   set(rdmahelper_EXPORTED_TARGETS HPXTargets)
  
-  if (RDMAHELPER_WITH_LOGGING)
+  if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
     set_source_files_properties(
       "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
-      PROPERTIES COMPILE_DEFINITIONS "RDMAHELPER_HAVE_LOGGING"
+      PROPERTIES COMPILE_DEFINITIONS "HPX_PARCELPORT_VERBS_HAVE_LOGGING"
     )
   endif()
 

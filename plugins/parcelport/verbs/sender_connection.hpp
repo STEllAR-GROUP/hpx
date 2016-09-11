@@ -13,8 +13,10 @@
 //
 #include <memory>
 //
-#include "RdmaClient.h"
+#include <plugins/parcelport/verbs/rdmahelper/include/RdmaClient.h>
 #include "pinned_memory_vector.hpp"
+
+using namespace bgcios;
 
 namespace hpx { namespace parcelset {
 namespace policies { namespace verbs
@@ -24,7 +26,7 @@ namespace policies { namespace verbs
 
     typedef lcos::local::spinlock                           mutex_type;
 
-    typedef RdmaMemoryPool                                  memory_pool_type;
+    typedef rdma_memory_pool                                  memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
     typedef hpx::util::detail::memory_chunk_pool_allocator
             <char, memory_pool_type, mutex_type>            allocator_type;

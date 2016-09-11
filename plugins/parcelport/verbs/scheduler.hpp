@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 //
 #undef RDMAHELPER_DISABLE_LOGGING
-#include "RdmaLogging.h"
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 //
 using namespace hpx;
 using namespace hpx::threads::policies;

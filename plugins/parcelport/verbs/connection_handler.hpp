@@ -12,9 +12,9 @@
 //
 #include <boost/shared_ptr.hpp>
 //
-#include <RdmaLogging.h>
-#include <RdmaError.h>
-#include <RdmaDevice.h>
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
+#include <plugins/parcelport/verbs/rdmahelper/include/RdmaDevice.h>
 
 namespace hpx { namespace parcelset
 {
@@ -52,19 +52,18 @@ namespace hpx { namespace parcelset
         uint32_t Get_rdma_device_address(const char *devicename, const char *iface, char *hostname)
         {
           FUNC_START_DEBUG_MSG
-        #ifndef __BGQ__
           // Find the address of the I/O link device.
           bgcios::RdmaDevicePtr linkDevice;
           try {
             linkDevice = bgcios::RdmaDevicePtr(new bgcios::RdmaDevice(devicename, iface));
           }
-          catch (bgcios::RdmaError& e) {
+          catch (rdma_error& e) {
             LOG_ERROR_MSG("error opening InfiniBand device: " << e.what());
           }
           LOG_DEBUG_MSG("Created InfiniBand device for " << linkDevice->getDeviceName() << " using interface " << linkDevice->getInterfaceName());
 
           std::stringstream temp;
-          in_addr_t addr = linkDevice->getAddress();
+          in_addr_t addr = linkDevice->get_address();
           temp
             << (int)((uint8_t*)&addr)[0] << "."
             << (int)((uint8_t*)&addr)[1] << "."
@@ -76,9 +75,6 @@ namespace hpx { namespace parcelset
 
           // print device info for debugging
         //  linkDevice->getDeviceInfo(true);
-        #else
-          strcpy(hostname,"");
-        #endif
           FUNC_END_DEBUG_MSG
           return (uint32_t)(addr);
         }
