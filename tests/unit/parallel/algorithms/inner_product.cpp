@@ -18,7 +18,6 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-
 template <typename ExPolicy, typename IteratorTag>
 void test_inner_product(ExPolicy policy, IteratorTag)
 {
