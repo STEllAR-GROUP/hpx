@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
+#include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
 #include <boost/array.hpp>
 #include <boost/assert.hpp>
@@ -86,7 +87,6 @@
 //
 //#define USE_CLEANING_THREAD
 //#define USE_PARCELPORT_THREAD
-//#define USE_ASYNC_CB
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
@@ -94,19 +94,21 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 9
+#define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
 // #include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
 // otherwise use this
-#define LOG_DEBUG_MSG(x) std::cout << x << std::endl
-
-//----------------------------------------------------------------------------
-#define DEBUG_OUTPUT(level,x)                                                \
+#if DEBUG_LEVEL>0
+# define LOG_DEBUG_MSG(x) std::cout << x << std::endl
+# define DEBUG_OUTPUT(level,x)                                                \
     if (DEBUG_LEVEL>=level) {                                                \
         LOG_DEBUG_MSG(x);                                                    \
     }
+#else
+# define DEBUG_OUTPUT(level,x)
+#endif
 
 //----------------------------------------------------------------------------
 #define TEST_FAIL    0
@@ -137,9 +139,10 @@ typedef struct {
     std::uint64_t global_storage_MB;
     std::uint64_t transfer_size_B;
     std::uint64_t threads;
-    std::string     network;
-    bool            all2all;
-    bool            distribution;
+    std::uint64_t semaphore;
+    std::string   network;
+    bool          all2all;
+    bool          distribution;
 } test_options;
 
 //----------------------------------------------------------------------------
@@ -277,6 +280,7 @@ typedef std::lock_guard<mutex_type>                               scoped_lock;
 //
 mutex_type keep_alive_mutex;
 alive_map  keep_alive_buffers;
+
 //
 void async_callback(const uint64_t index, boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
@@ -501,7 +505,11 @@ void test_write(
         //
         // Start main message sending loop
         //
-        for(uint64_t i = 0; i < num_transfer_slots; i++) {
+
+        // limit number of tasks we generate at a time so we don't oversubscribe resources
+        hpx::lcos::local::sliding_semaphore sem(options.semaphore);
+
+        for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::simple_profiler prof_setup(iteration, "Setup slots");
             int send_rank;
             if(options.distribution==0) {
@@ -511,7 +519,6 @@ void test_write(
             else {
               send_rank = static_cast<int>(i % nranks);
             }
-//            send_rank = rank;
 
             // get the pointer to the current packet send buffer
             char *buffer = &local_storage[i*options.transfer_size_B];
@@ -549,8 +556,8 @@ void test_write(
                     scoped_lock lock(keep_alive_mutex);
                     keep_alive_buffers[buffer_index] = temp_buffer;
                 }
-                ActiveFutures[send_rank].push_back(
-                    hpx::async_cb(actWrite, locality,
+                auto temp_future =
+                    hpx::async_cb(hpx::launch::fork, actWrite, locality,
                             hpx::util::bind(&async_callback, buffer_index, _1, _2),
                             *temp_buffer,
                             memory_offset, options.transfer_size_B
@@ -560,14 +567,30 @@ void test_write(
                             int result = fut.get();
                             --FuturesWaiting[send_rank];
                             return result;
-                        })
-                );
+                        });
                 buffer_index++;
+
+                // After every 10 actions complete, add another future to signal
+                // the semaphore with our state so that it doesn't wait too long
+                if (i % 2 == 0) {
+                    ActiveFutures[send_rank].push_back(
+                        std::move(temp_future.then(
+                            [&sem, i](hpx::future<int> &&result)
+                            {
+                                // inform semaphore about new lower limit
+                                sem.signal(i);
+                                return result.get();
+                            })));
+                }
+                else {
+                    ActiveFutures[send_rank].push_back(std::move(temp_future));
+                }
             }
+            sem.wait(i);
         }
 
-        int removed = 0;
 #ifdef USE_CLEANING_THREAD
+        int removed = 0;
         {
           hpx::util::simple_profiler prof_clean(iteration, "Cleaning Wait");
           // tell the cleaning thread it's time to stop
@@ -681,7 +704,7 @@ void test_read(
     hpx::util::high_resolution_timer timerRead;
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
-    for(std::uint64_t i = 0; active && i < options.iterations; i++) {
+    for (std::uint64_t i = 0; active && i < options.iterations; i++) {
       DEBUG_OUTPUT(1,
           "Starting iteration " << i << " on rank " << rank
       );
@@ -703,7 +726,10 @@ void test_read(
         //
         // Start main message sending loop
         //
-        for(uint64_t i = 0; i < num_transfer_slots; i++) {
+        // limit number of tasks we generate at a time so we don't oversubscribe resources
+        hpx::lcos::local::sliding_semaphore sem(options.semaphore);
+        //
+        for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::high_resolution_timer looptimer;
             int send_rank;
             if(options.distribution==0) {
@@ -744,9 +770,9 @@ void test_read(
                 std::size_t buffer_address =
                     reinterpret_cast<std::size_t>(general_buffer.data());
                 //
-                ActiveFutures[send_rank].push_back(
+                auto temp_future =
                     hpx::async(
-                        actRead, locality, memory_offset,
+                        hpx::launch::fork, actRead, locality, memory_offset,
                         options.transfer_size_B, buffer_address
                     ).then(
                         hpx::launch::sync,
@@ -763,9 +789,24 @@ void test_read(
                             fut.get();
                             --FuturesWaiting[send_rank];
                             return TEST_SUCCESS;
-                        })
+                        }
                     );
+
+                if (i % 2 == 0) {
+                    ActiveFutures[send_rank].push_back(
+                        std::move(temp_future.then(
+                            [&sem, i](hpx::future<int> &&result)
+                            {
+                                // inform semaphore about new lower limit
+                                sem.signal(i);
+                                return result.get();
+                            })));
+                }
+                else {
+                    ActiveFutures[send_rank].push_back(std::move(temp_future));
+                }
             }
+            sem.wait(i);
         }
 #ifdef USE_CLEANING_THREAD
         // tell the cleaning thread it's time to stop
@@ -776,8 +817,6 @@ void test_read(
         DEBUG_OUTPUT(2,
             "Cleaning thread rank " << rank << " removed " << removed
         );
-#else
-        int removed = 0;
 #endif
 
 #ifdef USE_PARCELPORT_THREAD
@@ -872,6 +911,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.network           = vm["parceltype"].as<std::string>();
     options.all2all           = vm["all-to-all"].as<bool>();
     options.distribution      = vm["distribution"].as<std::uint64_t>() ? true : false;
+    options.semaphore         = vm["semaphore"].as<std::uint64_t>();
+
 
     //
     if (options.global_storage_MB>0) {
@@ -941,6 +982,12 @@ int main(int argc, char* argv[])
           boost::program_options::value<std::uint64_t>()->default_value(64),
           "Sets the default block transfer size (in KB).\n"
           "Each put/get IOP will be this size")
+        ;
+
+    desc_commandline.add_options()
+        ( "semaphore",
+          boost::program_options::value<std::uint64_t>()->default_value(64),
+          "The max amount of simultaneous put/get operations to allow.\n")
         ;
 
     desc_commandline.add_options()
