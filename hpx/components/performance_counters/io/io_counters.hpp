@@ -8,25 +8,25 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace performance_counters { namespace io
 {
     // returns number of bytes passed as an argument to read I/O operations
-    boost::uint64_t get_pio_riss(bool);
+    std::uint64_t get_pio_riss(bool);
     // returns number of bytes passed as an argument to write I/O operations
-    boost::uint64_t get_pio_wiss(bool);
+    std::uint64_t get_pio_wiss(bool);
     // returns number of system calls resulting in read I/O operations
-    boost::uint64_t get_pio_rsysc(bool);
+    std::uint64_t get_pio_rsysc(bool);
     // returns number of system calls resulting in write I/O operations
-    boost::uint64_t get_pio_wsysc(bool);
+    std::uint64_t get_pio_wsysc(bool);
     // returns number of bytes transferred from storage
-    boost::uint64_t get_pio_rstor(bool);
+    std::uint64_t get_pio_rstor(bool);
     // returns number of bytes transferred to storage
-    boost::uint64_t get_pio_wstor(bool);
+    std::uint64_t get_pio_wstor(bool);
     // returns number of bytes transferred to storage that were later removed
     // due to truncation or deletion
-    boost::uint64_t get_pio_wcanc(bool);
+    std::uint64_t get_pio_wcanc(bool);
 }}}
 
 #endif // !defined(PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554)

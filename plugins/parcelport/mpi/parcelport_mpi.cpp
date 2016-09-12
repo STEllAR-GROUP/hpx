@@ -35,6 +35,7 @@
 #include <boost/archive/basic_archive.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -162,8 +163,7 @@ namespace hpx { namespace parcelset
                 parcelset::locality const& l, error_code& ec)
             {
                 int dest_rank = l.get<locality>().rank();
-                return sender_.create_connection(
-                    dest_rank, parcels_sent_);
+                return sender_.create_connection(dest_rank, this);
             }
 
             parcelset::locality agas_locality(

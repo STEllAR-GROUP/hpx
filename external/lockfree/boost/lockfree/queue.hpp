@@ -15,8 +15,6 @@
 #ifndef BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 #define BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 
-#include <memory>               /* std::auto_ptr */
-
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -27,7 +25,8 @@
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
-#include <memory>
+#include <cstddef>
+#include <memory>               /* std::auto_ptr */
 
 namespace boost {
 namespace lockfree {

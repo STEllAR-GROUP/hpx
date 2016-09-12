@@ -13,6 +13,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <iosfwd>
 #include <string>
 #include <type_traits>

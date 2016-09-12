@@ -12,7 +12,6 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
 #include <algorithm>
 #include <cstddef>

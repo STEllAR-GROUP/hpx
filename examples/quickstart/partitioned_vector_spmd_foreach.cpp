@@ -19,8 +19,10 @@
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 
-#include <ctime>
+#include <cstddef>
 #include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <vector>
 

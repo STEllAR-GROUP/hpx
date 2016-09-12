@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// chunk, it is dynamically assigned another If \a chunk_size is not
     /// specified, the default chunk size is 1.
     ///
-    /// \note This executor parameters type is equivalent to OpenMPs DYNAMIC
+    /// \note This executor parameters type is equivalent to OpenMP's DYNAMIC
     ///       scheduling directive.
     ///
     struct dynamic_chunk_size : executor_parameters_tag
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor&, F &&, std::size_t)
+        std::size_t get_chunk_size(Executor&, F &&, std::size_t, std::size_t)
         {
             return chunk_size_;
         }

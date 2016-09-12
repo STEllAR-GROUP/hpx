@@ -12,13 +12,13 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <cstddef>
-#include <type_traits>
-
 #include <boost/array.hpp>
+
 #ifdef HPX_HAVE_CXX11_STD_ARRAY
 #include <array>
 #endif
+#include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {

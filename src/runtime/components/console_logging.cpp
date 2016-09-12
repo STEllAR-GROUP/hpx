@@ -18,8 +18,8 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <cstddef>
 #include <mutex>
-
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,8 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <cstddef>
+
 void print_header();
 void run_benchmark(boost::program_options::variables_map & vm);
 

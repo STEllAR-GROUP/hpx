@@ -23,6 +23,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <fstream>
 #include <iostream>

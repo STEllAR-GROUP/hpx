@@ -46,10 +46,11 @@
 #endif
 #ifdef BOOST_HAVE_UNWIND
 #include <unwind.h>
-#include <boost/cstdint.hpp>
 #endif
-#include <cstring>
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
@@ -78,7 +79,7 @@ namespace hpx { namespace util {
 
             void **array_;      // storage for the stack trace
             std::size_t size_;  // number of frames
-            boost::uint64_t cfa_;  // canonical frame address
+            std::uint64_t cfa_;  // canonical frame address
             std::size_t count_;
         };
 
@@ -97,7 +98,7 @@ namespace hpx { namespace util {
                 d.array_[d.count_] = reinterpret_cast<void *>(_Unwind_GetIP(ctx));
 
                 // Get the CFA.
-                boost::uint64_t cfa = _Unwind_GetCFA(ctx);
+                std::uint64_t cfa = _Unwind_GetCFA(ctx);
 
                 // Check if we're at the end of the stack.
                 if ((0 < d.count_) &&

@@ -13,6 +13,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <map>

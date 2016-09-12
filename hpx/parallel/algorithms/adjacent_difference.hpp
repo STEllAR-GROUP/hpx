@@ -20,6 +20,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <type_traits>
@@ -183,7 +184,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     ////////////////////////////////////////////////////////////////////////////
     /// Assigns each value in the range given by result its corresponding
-    /// element in the range [first, last] and the one preceeding it except
+    /// element in the range [first, last] and the one preceding it except
     /// *result, which is assigned *first
     ///
     /// \note   Complexity: Exactly (last - first) - 1 application of the

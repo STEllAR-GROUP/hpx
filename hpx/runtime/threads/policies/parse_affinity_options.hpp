@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -16,10 +16,10 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/variant.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <string>
 #include <utility>
@@ -27,7 +27,7 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    typedef std::vector<boost::int64_t> bounds_type;
+    typedef std::vector<std::int64_t> bounds_type;
 
     enum distribution_type
     {
@@ -41,13 +41,13 @@ namespace hpx { namespace threads { namespace detail
         enum type { unknown, thread, socket, numanode, core, pu };
         HPX_API_EXPORT static char const* type_name(type t);
 
-        static boost::int64_t all_entities()
+        static std::int64_t all_entities()
         {
-            return (std::numeric_limits<boost::int64_t>::min)();
+            return (std::numeric_limits<std::int64_t>::min)();
         }
 
-        spec_type(type t = unknown, boost::int64_t min = all_entities(),
-                boost::int64_t max = all_entities())
+        spec_type(type t = unknown, std::int64_t min = all_entities(),
+                std::int64_t max = all_entities())
           : type_(t), index_bounds_()
         {
             if (t != unknown) {
@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace detail
     typedef std::vector<full_mapping_type> mappings_spec_type;
     typedef boost::variant<distribution_type, mappings_spec_type> mappings_type;
 
-    HPX_API_EXPORT bounds_type extract_bounds(spec_type& m,
+    HPX_API_EXPORT bounds_type extract_bounds(spec_type const& m,
         std::size_t default_last, error_code& ec);
 
     HPX_API_EXPORT void parse_mappings(std::string const& spec,

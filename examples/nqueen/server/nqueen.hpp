@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <vector>
 

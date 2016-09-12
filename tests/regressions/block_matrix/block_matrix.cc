@@ -13,6 +13,7 @@
 #include <hpx/include/components.hpp>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 
 

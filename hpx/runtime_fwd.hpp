@@ -22,6 +22,7 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/report_error.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
@@ -30,10 +31,9 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace hpx
@@ -54,13 +54,6 @@ namespace hpx
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
-
-    /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(std::size_t num_thread,
-        boost::exception_ptr const& e);
-
-    /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
@@ -148,7 +141,7 @@ namespace hpx
     /// This function returns the system uptime measured in nanoseconds for the
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
-    HPX_API_EXPORT boost::uint64_t get_system_uptime();
+    HPX_API_EXPORT std::uint64_t get_system_uptime();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the
@@ -276,7 +269,7 @@ namespace hpx
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
     HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
+        get_locality_certificate(std::uint32_t locality_id, error_code& ec = throws);
 
     /// \brief Add the given certificate to the certificate store of this locality.
     ///

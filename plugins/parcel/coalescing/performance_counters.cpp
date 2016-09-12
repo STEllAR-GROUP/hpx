@@ -20,6 +20,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -65,7 +66,7 @@ namespace hpx { namespace plugins { namespace parcel
           : parameters_(parameters)
         {}
 
-        boost::int64_t operator()(bool reset)
+        std::int64_t operator()(bool reset)
         {
             if (counter_.empty())
             {
@@ -79,7 +80,7 @@ namespace hpx { namespace plugins { namespace parcel
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<boost::int64_t(bool)> counter_;
+        hpx::util::function_nonser<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -111,7 +112,7 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 // ask registry
-                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                hpx::util::function_nonser<std::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
                         get_parcels_counter(paths.parameters_);
 
@@ -142,7 +143,7 @@ namespace hpx { namespace plugins { namespace parcel
           : parameters_(parameters)
         {}
 
-        boost::int64_t operator()(bool reset)
+        std::int64_t operator()(bool reset)
         {
             if (counter_.empty())
             {
@@ -156,7 +157,7 @@ namespace hpx { namespace plugins { namespace parcel
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<boost::int64_t(bool)> counter_;
+        hpx::util::function_nonser<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -188,7 +189,7 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 // ask registry
-                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                hpx::util::function_nonser<std::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
                         get_messages_counter(paths.parameters_);
 
@@ -219,7 +220,7 @@ namespace hpx { namespace plugins { namespace parcel
           : parameters_(parameters)
         {}
 
-        boost::int64_t operator()(bool reset)
+        std::int64_t operator()(bool reset)
         {
             if (counter_.empty())
             {
@@ -233,7 +234,7 @@ namespace hpx { namespace plugins { namespace parcel
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<boost::int64_t(bool)> counter_;
+        hpx::util::function_nonser<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -265,7 +266,7 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 // ask registry
-                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                hpx::util::function_nonser<std::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
                         get_parcels_per_message_counter(paths.parameters_);
 
@@ -298,7 +299,7 @@ namespace hpx { namespace plugins { namespace parcel
           : parameters_(parameters)
         {}
 
-        boost::int64_t operator()(bool reset)
+        std::int64_t operator()(bool reset)
         {
             if (counter_.empty())
             {
@@ -312,7 +313,7 @@ namespace hpx { namespace plugins { namespace parcel
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<boost::int64_t(bool)> counter_;
+        hpx::util::function_nonser<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -344,7 +345,7 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 // ask registry
-                hpx::util::function_nonser<boost::int64_t(bool)> f =
+                hpx::util::function_nonser<std::int64_t(bool)> f =
                     coalescing_counter_registry::instance().
                         get_average_time_between_parcels_counter(
                             paths.parameters_);
@@ -374,8 +375,8 @@ namespace hpx { namespace plugins { namespace parcel
     struct time_between_parcels_histogram_counter_surrogate
     {
         time_between_parcels_histogram_counter_surrogate(
-                std::string const& action_name, boost::int64_t min_boundary,
-            boost::int64_t max_boundary, boost::int64_t num_buckets)
+                std::string const& action_name, std::int64_t min_boundary,
+            std::int64_t max_boundary, std::int64_t num_buckets)
           : action_name_(action_name), min_boundary_(min_boundary),
             max_boundary_(max_boundary), num_buckets_(num_buckets)
         {}
@@ -386,7 +387,7 @@ namespace hpx { namespace plugins { namespace parcel
             max_boundary_(rhs.max_boundary_), num_buckets_(rhs.num_buckets_)
         {}
 
-        std::vector<boost::int64_t> operator()(bool reset)
+        std::vector<std::int64_t> operator()(bool reset)
         {
             {
                 std::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
@@ -407,11 +408,11 @@ namespace hpx { namespace plugins { namespace parcel
         }
 
         hpx::lcos::local::spinlock mtx_;
-        hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> counter_;
+        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> counter_;
         std::string action_name_;
-        boost::int64_t min_boundary_;
-        boost::int64_t max_boundary_;
-        boost::int64_t num_buckets_;
+        std::int64_t min_boundary_;
+        std::int64_t max_boundary_;
+        std::int64_t num_buckets_;
     };
 
     hpx::naming::gid_type time_between_parcels_histogram_counter_creator(
@@ -450,9 +451,9 @@ namespace hpx { namespace plugins { namespace parcel
                     boost::algorithm::is_any_of(","),
                     boost::algorithm::token_compress_off);
 
-                boost::int64_t min_boundary = 0;
-                boost::int64_t max_boundary = 1000000;  // 1ms
-                boost::int64_t num_buckets = 20;
+                std::int64_t min_boundary = 0;
+                std::int64_t max_boundary = 1000000;  // 1ms
+                std::int64_t num_buckets = 20;
 
                 if (params.empty() || params[0].empty())
                 {
@@ -465,14 +466,14 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 if (params.size() > 1 && !params[1].empty())
-                    min_boundary = util::safe_lexical_cast<boost::int64_t>(params[1]);
+                    min_boundary = util::safe_lexical_cast<std::int64_t>(params[1]);
                 if (params.size() > 2 && !params[2].empty())
-                    max_boundary = util::safe_lexical_cast<boost::int64_t>(params[2]);
+                    max_boundary = util::safe_lexical_cast<std::int64_t>(params[2]);
                 if (params.size() > 3 && !params[3].empty())
-                    num_buckets = util::safe_lexical_cast<boost::int64_t>(params[3]);
+                    num_buckets = util::safe_lexical_cast<std::int64_t>(params[3]);
 
                 // ask registry
-                hpx::util::function_nonser<std::vector<boost::int64_t>(bool)> f =
+                hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f =
                     coalescing_counter_registry::instance().
                         get_time_between_parcels_histogram_counter(params[0],
                             min_boundary, max_boundary, num_buckets);

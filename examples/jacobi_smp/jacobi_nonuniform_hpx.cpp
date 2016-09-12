@@ -10,7 +10,9 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <utility>
 #include <vector>

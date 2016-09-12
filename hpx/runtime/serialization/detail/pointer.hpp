@@ -20,6 +20,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -35,11 +36,11 @@ namespace hpx { namespace serialization
     }
 
     HPX_FORCEINLINE
-        void register_pointer(input_archive & ar, boost::uint64_t pos,
+        void register_pointer(input_archive & ar, std::uint64_t pos,
             detail::ptr_helper_ptr helper);
 
     template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);
+    Helper & tracked_pointer(input_archive & ar, std::uint64_t pos);
 
     namespace detail
     {
@@ -81,14 +82,14 @@ namespace hpx { namespace serialization
                 static Pointer call(input_archive& ar)
                 {
 #if !defined(HPX_DEBUG)
-                    boost::uint32_t id;
+                    std::uint32_t id;
                     ar >> id;
 
                     Pointer t(polymorphic_id_factory::create<referred_type>(id));
                     ar >> *t;
                     return t;
 #else
-                    boost::uint32_t id;
+                    std::uint32_t id;
                     std::string name;
                     ar >> name;
                     ar >> id;
@@ -155,14 +156,14 @@ namespace hpx { namespace serialization
                 static void call(output_archive& ar, const Pointer& ptr)
                 {
 #if !defined(HPX_DEBUG)
-                    const boost::uint32_t id =
+                    const std::uint32_t id =
                         polymorphic_id_factory::get_id(
                             access::get_name(ptr.get()));
                     ar << id;
                     ar << *ptr;
 #else
                     std::string const name(access::get_name(ptr.get()));
-                    const boost::uint32_t id =
+                    const std::uint32_t id =
                         polymorphic_id_factory::get_id(name);
                     ar << name;
                     ar << id;
@@ -199,10 +200,10 @@ namespace hpx { namespace serialization
             ar << valid;
             if(valid)
             {
-                boost::uint64_t cur_pos = current_pos(ar);
-                boost::uint64_t pos = track_pointer(ar, ptr.get());
+                std::uint64_t cur_pos = current_pos(ar);
+                std::uint64_t pos = track_pointer(ar, ptr.get());
                 ar << pos;
-                if(pos == boost::uint64_t(-1))
+                if(pos == std::uint64_t(-1))
                 {
                     ar << cur_pos;
                     detail::pointer_output_dispatcher<Pointer>::type::call(ar, ptr);
@@ -217,9 +218,9 @@ namespace hpx { namespace serialization
             ar >> valid;
             if(valid)
             {
-                boost::uint64_t pos = 0;
+                std::uint64_t pos = 0;
                 ar >> pos;
-                if(pos == boost::uint64_t(-1))
+                if(pos == std::uint64_t(-1))
                 {
                     pos = 0;
                     ar >> pos;

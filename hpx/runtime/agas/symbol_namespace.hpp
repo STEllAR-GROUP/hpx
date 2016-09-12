@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,73 +10,84 @@
 #define HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/util/function.hpp>
 
+#include <cstdint>
+#include <memory>
+#include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
 
 struct symbol_namespace
-  : components::client_base<symbol_namespace, stubs::symbol_namespace>
 {
     // {{{ nested types
-    typedef components::client_base<
-        symbol_namespace, stubs::symbol_namespace
-    > base_type;
-
     typedef server::symbol_namespace server_type;
 
-    typedef server_type::iterate_names_function_type
-        iterate_names_function_type;
+    typedef hpx::util::function<
+        void(std::string const&, naming::gid_type const&)
+    > iterate_names_function_type;
     // }}}
 
-    symbol_namespace()
-      : base_type(bootstrap_symbol_namespace_id())
-    {}
+    static naming::gid_type get_service_instance(std::uint32_t service_locality_id);
 
-    explicit symbol_namespace(naming::id_type const& id)
-      : base_type(id)
-    {}
+    static naming::gid_type get_service_instance(naming::gid_type const& dest,
+        error_code& ec = throws);
 
-    response service(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
+    static naming::gid_type get_service_instance(naming::id_type const& dest)
     {
-        return this->base_type::service(this->get_id(), req, priority, ec);
+        return get_service_instance(dest.get_gid());
     }
 
-    void service_non_blocking(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
+    static bool is_service_instance(naming::gid_type const& gid);
+
+    static bool is_service_instance(naming::id_type const& id)
     {
-        this->base_type::service_non_blocking(this->get_id(), req, priority);
+        return is_service_instance(id.get_gid());
     }
 
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::bulk_service(this->get_id(), reqs, priority, ec);
-    }
+    static naming::id_type symbol_namespace_locality(std::string const& key);
 
-    void bulk_service_non_blocking(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        this->base_type::bulk_service_non_blocking(this->get_id(), reqs, priority);
-    }
+    symbol_namespace();
+    ~symbol_namespace();
+
+    naming::address::address_type ptr() const;
+    naming::address addr() const;
+    naming::id_type gid() const;
+
+    hpx::future<bool> bind_async(std::string key, naming::gid_type gid);
+    bool bind(std::string key, naming::gid_type gid);
+
+    hpx::future<naming::id_type> resolve_async(std::string key);
+    naming::id_type resolve(std::string key);
+
+    hpx::future<naming::id_type> unbind_async(std::string key);
+    naming::id_type unbind(std::string key);
+
+    hpx::future<bool> on_event(
+        std::string const& name
+      , bool call_for_past_events
+      , hpx::id_type lco
+        );
+
+    void register_counter_types();
+    void register_server_instance(std::uint32_t locality_id);
+    void unregister_server_instance(error_code& ec);
+
+private:
+    std::unique_ptr<server_type> server_;
 };
 
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_2A00BD90_B331_44BC_AF02_06787ABC50E7
 

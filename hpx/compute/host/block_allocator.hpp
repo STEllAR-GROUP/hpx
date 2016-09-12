@@ -26,6 +26,7 @@
 
 #include <boost/range/iterator_range_core.hpp>
 
+#include <cstddef>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -87,7 +88,7 @@ namespace hpx { namespace compute { namespace host
           : executor_(alloc.executor_)
         {}
 
-        block_allocator(block_allocator&& alloc)
+        block_allocator(block_allocator && alloc)
           : executor_(std::move(alloc.executor_))
         {}
 
@@ -97,9 +98,20 @@ namespace hpx { namespace compute { namespace host
         {}
 
         template <typename U>
-        block_allocator(block_allocator<U>&& alloc)
+        block_allocator(block_allocator<U> && alloc)
           : executor_(std::move(alloc.executor_))
         {}
+
+        block_allocator& operator=(block_allocator const& rhs)
+        {
+            executor_ = rhs.executor_;
+            return *this;
+        }
+        block_allocator& operator=(block_allocator && rhs)
+        {
+            executor_ = std::move(rhs.executor_);
+            return *this;
+        }
 
         // Returns the actual address of x even in presence of overloaded
         // operator&

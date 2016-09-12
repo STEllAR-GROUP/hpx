@@ -10,6 +10,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
+
 int hpx_main(int argc, char ** argv)
 {
 #if defined(HPX_HAVE_PAPI)
@@ -20,8 +22,8 @@ int hpx_main(int argc, char ** argv)
     performance_counter cycles(
         "/papi{locality#0/worker-thread#0}/PAPI_TOT_CYC");
 
-    boost::int64_t val1 = total_cycles.get_value<boost::int64_t>(hpx::launch::sync);
-    boost::int64_t val2 = cycles.get_value<boost::int64_t>(hpx::launch::sync);
+    std::int64_t val1 = total_cycles.get_value<std::int64_t>(hpx::launch::sync);
+    std::int64_t val2 = cycles.get_value<std::int64_t>(hpx::launch::sync);
 
     HPX_TEST(val1 != 0);
     HPX_TEST(val2 != 0);

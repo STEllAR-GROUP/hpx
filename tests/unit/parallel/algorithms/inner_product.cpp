@@ -8,6 +8,7 @@
 #include <hpx/include/parallel_inner_product.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <numeric>

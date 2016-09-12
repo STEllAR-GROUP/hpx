@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <chrono>
+#include <iostream>
 
 int hpx_main()
 {

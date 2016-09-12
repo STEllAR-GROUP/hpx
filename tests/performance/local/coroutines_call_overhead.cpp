@@ -14,6 +14,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -28,10 +30,10 @@ using hpx::threads::coroutine_type;
 using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t payload    = 0;
-boost::uint64_t contexts   = 1000;
-boost::uint64_t iterations = 100000;
-boost::uint64_t seed       = 0;
+std::uint64_t payload    = 0;
+std::uint64_t contexts   = 1000;
+std::uint64_t iterations = 100000;
+std::uint64_t seed       = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,9 +80,9 @@ void print_results(
                 ;
 
 /*
-        boost::uint64_t const last_index = 5;
+        std::uint64_t const last_index = 5;
 
-        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
             cout << "## "
                  << (i + 1 + last_index) << ":"
@@ -95,7 +97,7 @@ void print_results(
 */
     }
 
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
     double w_T = iterations*payload*os_thread_count*1e-6;
 //     double E = w_T/w_M;
@@ -122,7 +124,7 @@ void print_results(
 /*
     if (ac)
     {
-        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
                     % counter_values[i].get_value<double>());
     }
@@ -147,43 +149,43 @@ struct kernel
 double perform_2n_iterations()
 {
     std::vector<coroutine_type*> coroutines;
-    std::vector<boost::uint64_t> indices;
+    std::vector<std::uint64_t> indices;
 
     coroutines.reserve(contexts);
     indices.reserve(iterations);
 
     boost::random::mt19937_64 prng(seed);
-    boost::random::uniform_int_distribution<boost::uint64_t>
+    boost::random::uniform_int_distribution<std::uint64_t>
         dist(0, contexts - 1);
 
     kernel k;
 
-    for (boost::uint64_t i = 0; i < contexts; ++i)
+    for (std::uint64_t i = 0; i < contexts; ++i)
     {
         coroutine_type* c = new coroutine_type(k, hpx::find_here());
         coroutines.push_back(c);
     }
 
-    for (boost::uint64_t i = 0; i < iterations; ++i)
+    for (std::uint64_t i = 0; i < iterations; ++i)
         indices.push_back(dist(prng));
 
     ///////////////////////////////////////////////////////////////////////
     // Warmup
-    for (boost::uint64_t i = 0; i < iterations; ++i)
+    for (std::uint64_t i = 0; i < iterations; ++i)
     {
         (*coroutines[indices[i]])(wait_signaled);
     }
 
     hpx::util::high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i < iterations; ++i)
+    for (std::uint64_t i = 0; i < iterations; ++i)
     {
         (*coroutines[indices[i]])(wait_signaled);
     }
 
     double elapsed = t.elapsed();
 
-    for (boost::uint64_t i = 0; i < contexts; ++i)
+    for (std::uint64_t i = 0; i < contexts; ++i)
     {
         delete coroutines[i];
     }
@@ -202,15 +204,15 @@ int hpx_main(
             header = false;
 
         if (!seed)
-            seed = boost::uint64_t(std::time(nullptr));
+            seed = std::uint64_t(std::time(nullptr));
 
-        boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+        std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
         std::vector<hpx::shared_future<double> > futures;
 
-        boost::uint64_t num_thread = hpx::get_worker_thread_num();
+        std::uint64_t num_thread = hpx::get_worker_thread_num();
 
-        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+        for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (num_thread == i) continue;
 
@@ -219,7 +221,7 @@ int hpx_main(
 
         double total_elapsed = perform_2n_iterations();
 
-        for (boost::uint64_t i = 0; i < futures.size(); ++i)
+        for (std::uint64_t i = 0; i < futures.size(); ++i)
             total_elapsed += futures[i].get();
 
         print_results(total_elapsed);
@@ -233,7 +235,7 @@ int hpx_main(
             std::vector<std::string> raw_counters =
                 vm["counter"].as<std::vector<std::string> >();
 
-            for (boost::uint64_t i = 0; i < raw_counters.size(); ++i)
+            for (std::uint64_t i = 0; i < raw_counters.size(); ++i)
             {
                 std::vector<std::string> entry;
                 boost::algorithm::split(entry, raw_counters[i],
@@ -267,20 +269,20 @@ int main(
 
     cmdline.add_options()
         ( "payload"
-        , value<boost::uint64_t>(&payload)->default_value(0)
+        , value<std::uint64_t>(&payload)->default_value(0)
         , "artificial delay of each coroutine")
 
         ( "contexts"
-        , value<boost::uint64_t>(&contexts)->default_value(100000)
+        , value<std::uint64_t>(&contexts)->default_value(100000)
         , "number of contexts use")
 
         ( "iterations"
-        , value<boost::uint64_t>(&iterations)->default_value(100000)
+        , value<std::uint64_t>(&iterations)->default_value(100000)
         , "number of iterations to invoke (2 * iterations context switches "
           "will occur)")
 
         ( "seed"
-        , value<boost::uint64_t>(&seed)->default_value(0)
+        , value<std::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
           "choosen based on the current system time)")
 

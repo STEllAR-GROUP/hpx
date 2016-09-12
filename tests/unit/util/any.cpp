@@ -13,6 +13,8 @@
 
 #include <boost/any.hpp>
 
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>

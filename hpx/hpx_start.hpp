@@ -56,7 +56,7 @@ namespace hpx
     /// This function (or one of its overloads below) should be called from
     /// the users `main()` function. It will set up the HPX runtime environment
     /// and schedule the function given by \p f as a HPX thread. It will return
-    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
@@ -119,7 +119,7 @@ namespace hpx
     /// This function (or one of its overloads below) should be called from the
     /// users `main()` function. It will set up the HPX runtime environment and
     /// schedule the function given by \p f as a HPX thread. It will return
-    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
@@ -175,7 +175,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will be
     /// set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
@@ -230,7 +230,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
@@ -291,7 +291,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
@@ -337,7 +337,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
@@ -382,7 +382,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// In console mode it will execute the user supplied function `hpx_main`,
@@ -434,7 +434,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param app_name     [in] The name of the application.
@@ -469,7 +469,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param argc         [in] The number of command line arguments passed
@@ -509,7 +509,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param cfg          A list of configuration settings which will be added
@@ -549,7 +549,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -586,7 +586,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -623,7 +623,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -658,7 +658,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -693,7 +693,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main

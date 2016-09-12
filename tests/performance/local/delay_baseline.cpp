@@ -11,11 +11,11 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
@@ -34,8 +34,8 @@ using hpx::util::high_resolution_timer;
 using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 5;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 5;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ int app_main(
     // Start the clock.
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i < tasks; ++i)
+    for (std::uint64_t i = 0; i < tasks; ++i)
     {
         worker_timed(delay * 1000);
     }
@@ -125,11 +125,11 @@ int main(
         , "print out program usage (this message)")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(100000)
+        , value<std::uint64_t>(&tasks)->default_value(100000)
         , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(5)
+        , value<std::uint64_t>(&delay)->default_value(5)
         , "duration of delay in microseconds")
 
         ( "no-header"

@@ -9,6 +9,9 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of
 // performance counters. It utilizes the sine component, which implements two
@@ -46,10 +49,10 @@
 // every 5 seconds, restarting it after a while.
 
 ///////////////////////////////////////////////////////////////////////////////
-int monitor(boost::uint64_t pause, boost::uint64_t values)
+int monitor(std::uint64_t pause, std::uint64_t values)
 {
     // Create the performances counters using their symbolic name.
-    boost::uint32_t const prefix = hpx::get_locality_id();
+    std::uint32_t const prefix = hpx::get_locality_id();
     boost::format sine_explicit_fmt(
         "/sine{locality#%d/instance#%d}/immediate/explicit");
     boost::format sine_implicit_fmt(
@@ -71,7 +74,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     sine_average.start();
 
     // retrieve the counter values
-    boost::uint64_t start_time = 0;
+    std::uint64_t start_time = 0;
     bool started = true;
     while (values-- > 0)
     {
@@ -121,8 +124,8 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // retrieve the command line arguments
-    boost::uint64_t const pause = vm["pause"].as<boost::uint64_t>();
-    boost::uint64_t const values = vm["values"].as<boost::uint64_t>();
+    std::uint64_t const pause = vm["pause"].as<std::uint64_t>();
+    std::uint64_t const values = vm["values"].as<std::uint64_t>();
 
     // do main work, i.e. query the performance counters
     std::cout << "starting sine monitoring..." << std::endl;
@@ -152,9 +155,9 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline("usage: sine_client [options]");
     desc_commandline.add_options()
-            ("pause", value<boost::uint64_t>()->default_value(500),
+            ("pause", value<std::uint64_t>()->default_value(500),
              "milliseconds between each performance counter query")
-            ("values", value<boost::uint64_t>()->default_value(100),
+            ("values", value<std::uint64_t>()->default_value(100),
              "number of performance counter queries to perform")
         ;
 

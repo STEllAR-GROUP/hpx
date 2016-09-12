@@ -9,8 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/agas/request.hpp>
-#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_continue_callback.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
@@ -37,12 +36,11 @@ namespace hpx { namespace detail
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
         naming::id_type service_target(
-            agas::stubs::primary_namespace::get_service_instance(gid.get_gid()),
+            agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-        typedef agas::server::primary_namespace::service_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return apply_continue_cb<action_type>(
@@ -50,7 +48,7 @@ namespace hpx { namespace detail
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)),
-            service_target, std::forward<Callback>(cb), req);
+            service_target, std::forward<Callback>(cb), gid.get_gid());
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -78,12 +76,11 @@ namespace hpx { namespace detail
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
         naming::id_type service_target(
-            agas::stubs::primary_namespace::get_service_instance(gid.get_gid()),
+            agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-        typedef agas::server::primary_namespace::service_action action_type;
+        typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;
         return apply_continue_cb<action_type>(
@@ -92,7 +89,7 @@ namespace hpx { namespace detail
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
               , std::forward<Continuation>(cont)),
-            service_target, std::forward<Callback>(cb), req);
+            service_target, std::forward<Callback>(cb), gid.get_gid());
     }
 
     template <typename Continuation,

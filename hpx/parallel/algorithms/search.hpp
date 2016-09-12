@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -78,8 +79,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [=](std::size_t base_idx, FwdIter it,
-                        std::size_t part_size) mutable
+                    [=](FwdIter it, std::size_t part_size,
+                        std::size_t base_idx) mutable
                     {
                         FwdIter curr = it;
 
@@ -261,8 +262,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [=](std::size_t base_idx, FwdIter it,
-                        std::size_t part_size) mutable
+                    [=](FwdIter it, std::size_t part_size,
+                        std::size_t base_idx) mutable
                     {
                         FwdIter curr = it;
 

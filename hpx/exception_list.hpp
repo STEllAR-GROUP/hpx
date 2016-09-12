@@ -14,6 +14,7 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <cstddef>
 #include <list>
 #include <mutex>
 #include <string>

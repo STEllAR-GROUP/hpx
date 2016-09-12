@@ -16,7 +16,8 @@
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -45,6 +46,7 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <memory>
 #include <sstream>
@@ -557,12 +559,18 @@ namespace hpx { namespace actions
         base_set_exception_action_id,
         broadcast_call_shutdown_functions_action_id,
         broadcast_call_startup_functions_action_id,
-        broadcast_symbol_namespace_service_action_id,
+        broadcast_symbol_namespace_on_event_action_id,
         bulk_create_components_action_id,
         call_shutdown_functions_action_id,
         call_startup_functions_action_id,
-        component_namespace_bulk_service_action_id,
-        component_namespace_service_action_id,
+        component_namespace_bind_prefix_action_id,
+        component_namespace_bind_name_action_id,
+        component_namespace_resolve_id_action_id,
+        component_namespace_unbind_action_id,
+        component_namespace_iterate_types_action_id,
+        component_namespace_get_component_type_action_id,
+        component_namespace_get_num_localities_action_id,
+        component_namespace_statistics_counter_action_id,
         console_error_sink_action_id,
         console_logging_action_id,
         console_print_action_id,
@@ -585,8 +593,14 @@ namespace hpx { namespace actions
         load64_action_id,
         load8_action_id,
         load_components_action_id,
-        locality_namespace_bulk_service_action_id,
-        locality_namespace_service_action_id,
+        locality_namespace_allocate_action_id,
+        locality_namespace_free_action_id,
+        locality_namespace_localities_action_id,
+        locality_namespace_resolve_locality_action_id,
+        locality_namespace_get_num_localities_action_id,
+        locality_namespace_get_num_threads_action_id,
+        locality_namespace_get_num_overall_threads_action_id,
+        locality_namespace_statistics_counter_action_id,
         memory_block_checkin_action_id,
         memory_block_checkout_action_id,
         memory_block_clone_action_id,
@@ -601,9 +615,17 @@ namespace hpx { namespace actions
         performance_counter_reset_counter_value_action_id,
         performance_counter_start_action_id,
         performance_counter_stop_action_id,
-        primary_namespace_bulk_service_action_id,
-        primary_namespace_service_action_id,
+        primary_namespace_allocate_action_id,
+        primary_namespace_begin_migration_action_id,
+        primary_namespace_bind_gid_action_id,
+        primary_namespace_colocate_action_id,
+        primary_namespace_decrement_credit_action_id,
+        primary_namespace_end_migration_action_id,
+        primary_namespace_increment_credit_action_id,
+        primary_namespace_resolve_gid_action_id,
         primary_namespace_route_action_id,
+        primary_namespace_unbind_gid_action_id,
+        primary_namespace_statistics_counter_action_id,
         remove_from_connection_cache_action_id,
         set_value_action_agas_bool_response_type_id,
         set_value_action_agas_id_type_response_type_id,
@@ -614,8 +636,12 @@ namespace hpx { namespace actions
         store32_action_id,
         store64_action_id,
         store8_action_id,
-        symbol_namespace_bulk_service_action_id,
-        symbol_namespace_service_action_id,
+        symbol_namespace_bind_action_id,
+        symbol_namespace_resolve_action_id,
+        symbol_namespace_unbind_action_id,
+        symbol_namespace_iterate_action_id,
+        symbol_namespace_on_event_action_id,
+        symbol_namespace_statistics_counter_action_id,
         terminate_action_id,
         terminate_all_action_id,
         update_agas_cache_entry_action_id,
@@ -750,6 +776,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
         template struct transfer_action<action>;                              \
     }}                                                                        \

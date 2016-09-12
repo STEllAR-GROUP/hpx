@@ -20,6 +20,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -75,8 +76,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     call_with_index(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, next), count-1, 1,
-                        [op, tok](std::size_t base_idx, zip_iterator it,
-                            std::size_t part_size) mutable
+                        [op, tok](zip_iterator it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,

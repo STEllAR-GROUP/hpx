@@ -12,6 +12,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <cstddef>
 #include <deque>
 #include <utility>
 

@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// assigned to threads. If \a chunk_size is not specified, the iterations
     /// are evenly (if possible) divided contiguously among the threads.
     ///
-    /// \note This executor parameters type is equivalent to OpenMPs STATIC
+    /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
     struct static_chunk_size : executor_parameters_tag
@@ -53,22 +53,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t num_tasks)
+        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,
+            std::size_t num_tasks)
         {
             // use the given chunk size if given
             if (chunk_size_ != 0)
                 return chunk_size_;
-
-            // by default use static work distribution over number of
-            // available compute resources
-            std::size_t const cores = executor_information_traits<Executor>::
-                processing_units_count(exec, *this);
 
             // Make sure the internal round robin counter of the executor is
             // reset
             typedef executor_parameter_traits<static_chunk_size> traits;
             traits::reset_thread_distribution(*this, exec);
 
+            // by default use static work distribution over number of
+            // available compute resources
             return (num_tasks + cores - 1) / cores;
         }
         /// \endcond

@@ -11,6 +11,7 @@
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <utility>
 #include <vector>
@@ -30,7 +31,7 @@ namespace hpx { namespace parallel { namespace util
 
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             static Begin call(Begin it, End end, F && f)
             {
                 for (/**/; it != end; ++it)
@@ -41,7 +42,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename Begin, typename End, typename CancelToken,
                 typename F>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             static Begin call(Begin it, End end, CancelToken& tok, F && func)
             {
                 for (/**/; it != end; ++it)
@@ -83,7 +84,7 @@ namespace hpx { namespace parallel { namespace util
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             static Iter call(Iter it, std::size_t count, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
@@ -92,7 +93,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             static Iter call(Iter it, std::size_t count, CancelToken& tok,
                 F && f)
             {

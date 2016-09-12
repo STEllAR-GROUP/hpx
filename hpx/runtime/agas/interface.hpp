@@ -13,7 +13,6 @@
 
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -22,6 +21,8 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -75,13 +76,6 @@ HPX_API_EXPORT lcos::future<bool> register_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool unregister_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& gid
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type unregister_name(
     launch::sync_policy
   , std::string const& name
@@ -114,24 +108,14 @@ HPX_API_EXPORT lcos::future<naming::id_type> unregister_name(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::gid_type& gid
-  , error_code& ec = throws
-    );
-
-HPX_API_EXPORT bool resolve_name(
-    launch::sync_policy
-  , std::string const& name
-  , naming::id_type& id
-  , error_code& ec = throws
-    );
-
 HPX_API_EXPORT naming::id_type resolve_name(
     launch::sync_policy
   , std::string const& name
   , error_code& ec = throws
+    );
+
+HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
+    std::string const& name
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
@@ -165,10 +149,6 @@ inline naming::id_type resolve_name_sync(
 }
 #endif
 
-HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
-    std::string const& name
-    );
-
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_API_EXPORT lcos::future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type = components::component_invalid
@@ -187,17 +167,17 @@ HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities(
+HPX_API_EXPORT lcos::future<std::uint32_t> get_num_localities(
     components::component_type type = components::component_invalid
     );
 
-HPX_API_EXPORT boost::uint32_t get_num_localities(
+HPX_API_EXPORT std::uint32_t get_num_localities(
     launch::sync_policy
   , components::component_type type
   , error_code& ec = throws
     );
 
-inline boost::uint32_t get_num_localities(
+inline std::uint32_t get_num_localities(
     launch::sync_policy
   , error_code& ec = throws
     )
@@ -207,7 +187,7 @@ inline boost::uint32_t get_num_localities(
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline boost::uint32_t get_num_localities_sync(
+inline std::uint32_t get_num_localities_sync(
     components::component_type type
   , error_code& ec = throws
     )
@@ -216,7 +196,7 @@ inline boost::uint32_t get_num_localities_sync(
 }
 
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline boost::uint32_t get_num_localities_sync(
+inline std::uint32_t get_num_localities_sync(
     error_code& ec = throws
     )
 {
@@ -225,16 +205,16 @@ inline boost::uint32_t get_num_localities_sync(
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT lcos::future<std::vector<boost::uint32_t> > get_num_threads();
+HPX_API_EXPORT lcos::future<std::vector<std::uint32_t> > get_num_threads();
 
-HPX_API_EXPORT std::vector<boost::uint32_t> get_num_threads(
+HPX_API_EXPORT std::vector<std::uint32_t> get_num_threads(
     launch::sync_policy
   , error_code& ec = throws
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline std::vector<boost::uint32_t> get_num_threads_sync(
+inline std::vector<std::uint32_t> get_num_threads_sync(
     error_code& ec = throws
     )
 {
@@ -243,16 +223,16 @@ inline std::vector<boost::uint32_t> get_num_threads_sync(
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_overall_threads();
+HPX_API_EXPORT lcos::future<std::uint32_t> get_num_overall_threads();
 
-HPX_API_EXPORT boost::uint32_t get_num_overall_threads(
+HPX_API_EXPORT std::uint32_t get_num_overall_threads(
     launch::sync_policy
   , error_code& ec = throws
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline boost::uint32_t get_num_overall_threads_sync(
+inline std::uint32_t get_num_overall_threads_sync(
     error_code& ec = throws
     )
 {
@@ -261,7 +241,7 @@ inline boost::uint32_t get_num_overall_threads_sync(
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+HPX_API_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT bool is_local_address_cached(
@@ -329,14 +309,14 @@ inline naming::address resolve_sync(
 HPX_API_EXPORT hpx::future<bool> bind(
     naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
     );
 
 HPX_API_EXPORT bool bind(
     launch::sync_policy
   , naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
   , error_code& ec = throws
     );
 
@@ -345,7 +325,7 @@ HPX_DEPRECATED(HPX_DEPRECATED_MSG)
 inline bool bind_sync(
     naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
   , error_code& ec = throws
     )
 {
@@ -382,13 +362,13 @@ inline bool bind_sync(
 
 HPX_API_EXPORT hpx::future<naming::address> unbind(
     naming::gid_type const& gid
-  , boost::uint64_t count = 1
+  , std::uint64_t count = 1
     );
 
 HPX_API_EXPORT naming::address unbind(
     launch::sync_policy
   , naming::gid_type const& gid
-  , boost::uint64_t count = 1
+  , std::uint64_t count = 1
   , error_code& ec = throws
     );
 
@@ -396,7 +376,7 @@ HPX_API_EXPORT naming::address unbind(
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
 inline naming::address unbind_sync(
     naming::gid_type const& gid
-  , boost::uint64_t count = 1
+  , std::uint64_t count = 1
   , error_code& ec = throws
     )
 {
@@ -443,30 +423,30 @@ HPX_API_EXPORT naming::gid_type get_next_id(
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void decref(
     naming::gid_type const& id
-  , boost::int64_t credits
+  , std::int64_t credits
   , error_code& ec = throws
   );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::future<boost::int64_t> incref(
+HPX_API_EXPORT hpx::future<std::int64_t> incref(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , naming::id_type const& keep_alive = naming::invalid_id
   );
 
-HPX_API_EXPORT boost::int64_t incref(
+HPX_API_EXPORT std::int64_t incref(
     launch::sync_policy
   , naming::gid_type const& gid
-  , boost::int64_t credits = 1
+  , std::int64_t credits = 1
   , naming::id_type const& keep_alive = naming::invalid_id
   , error_code& ec = throws
     );
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline hpx::future<boost::int64_t> incref_async(
+inline hpx::future<std::int64_t> incref_async(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , naming::id_type const& keep_alive = naming::invalid_id
   )
 {
@@ -495,8 +475,7 @@ inline naming::id_type get_colocation_id_sync(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
-    std::string const& name, agas::namespace_action_code evt,
-    bool call_for_past_events);
+    std::string const& name, bool call_for_past_events);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >

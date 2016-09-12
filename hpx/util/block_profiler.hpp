@@ -22,6 +22,7 @@
 #include <boost/accumulators/statistics/sum.hpp>
 #endif
 
+#include <cstddef>
 #include <string>
 #include <utility>
 

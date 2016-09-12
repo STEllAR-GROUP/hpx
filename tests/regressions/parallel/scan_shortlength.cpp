@@ -9,6 +9,8 @@
 #include <hpx/include/parallel_remove_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>

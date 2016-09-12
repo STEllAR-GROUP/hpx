@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host
@@ -39,7 +40,8 @@ namespace hpx { namespace compute { namespace host
             {
                 if(hpx::threads::test(mask, idx))
                 {
-                    hpx::threads::set(res[numa_node].native_handle(), idx);
+                    hpx::threads::set(
+                        res[numa_node].native_handle().get_device(), idx);
                 }
             }
 

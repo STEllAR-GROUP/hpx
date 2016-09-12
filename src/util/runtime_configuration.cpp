@@ -217,7 +217,7 @@ namespace hpx { namespace util
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
 
-            // allow for unknown options to passed through
+            // allow for unknown options to be passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
             // predefine command line aliases

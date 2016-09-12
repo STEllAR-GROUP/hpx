@@ -149,7 +149,7 @@ namespace hpx { namespace util
         std::size_t handle_num_localities(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist,
-            std::size_t num_localities)
+            std::size_t num_localities, bool initial)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
             if (num_localities == 1 && batch_localities != std::size_t(-1))
@@ -160,7 +160,7 @@ namespace hpx { namespace util
                     num_localities = cfg_num_localities;
             }
 
-            if (env.found_batch_environment() &&
+            if (!initial && env.found_batch_environment() &&
                 using_nodelist && (batch_localities != num_localities) &&
                 (num_localities != 1))
             {
@@ -177,7 +177,7 @@ namespace hpx { namespace util
                         "Number of --hpx:localities must be greater than 0");
                 }
 
-                if (env.found_batch_environment() &&
+                if (!initial && env.found_batch_environment() &&
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
                 {
@@ -280,7 +280,7 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm,
-            util::batch_environment& env, bool using_nodelist)
+            util::batch_environment& env, bool using_nodelist, bool initial)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
             std::size_t default_threads = 1;
@@ -338,7 +338,7 @@ namespace hpx { namespace util
 #endif
             }
 
-            if (env.found_batch_environment() &&
+            if (!initial && env.found_batch_environment() &&
                 using_nodelist && (threads > batch_threads))
             {
                 detail::report_thread_warning(env.get_batch_name(),
@@ -395,7 +395,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////
     bool command_line_handling::handle_arguments(util::manage_config& cfgmap,
         boost::program_options::variables_map& vm,
-        std::vector<std::string>& ini_config, std::size_t& node)
+        std::vector<std::string>& ini_config, std::size_t& node, bool initial)
     {
         using namespace boost::assign;
 
@@ -509,13 +509,14 @@ namespace hpx { namespace util
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
         // handle number of cores and threads
-        num_threads_ = detail::handle_num_threads(cfgmap, vm, env, using_nodelist);
+        num_threads_ = detail::handle_num_threads(
+            cfgmap, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
         // handling number of localities, those might have already been initialized
         // from MPI environment
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
-            using_nodelist, num_localities_);
+            using_nodelist, num_localities_, initial);
 
         // Determine our network port, use arbitrary port if running on one
         // locality.
@@ -686,15 +687,19 @@ namespace hpx { namespace util
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
         ini_config += "hpx.pu_step=" + std::to_string(pu_step_);
 
-        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, 0);
-        ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
+        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
+        if (pu_offset_ != std::size_t(-1))
+            ini_config += "hpx.pu_offset=" + std::to_string(pu_offset_);
+        else
+            ini_config += "hpx.pu_offset=0";
 
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
         ini_config += "hpx.numa_sensitive=" + std::to_string(numa_sensitive_);
 
-        // default affinity mode is now 'balanced'
-        if (affinity_bind_.empty())
+        // default affinity mode is now 'balanced' (only if no pu-step or
+        // pu-offset is given)
+        if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) && affinity_bind_.empty())
         {
             affinity_bind_ = "balanced";
             ini_config += "hpx.bind!=" + affinity_bind_;
@@ -1103,7 +1108,7 @@ namespace hpx { namespace util
 
             // handle all --hpx:foo options, determine node
             std::vector<std::string> ini_config;    // will be discarded
-            if (!handle_arguments(cfgmap, prevm, ini_config, node_))
+            if (!handle_arguments(cfgmap, prevm, ini_config, node_, true))
                 return -2;
 
             // re-initialize runtime configuration object

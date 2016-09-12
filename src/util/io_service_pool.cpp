@@ -18,6 +18,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <stdexcept>
 #include <utility>

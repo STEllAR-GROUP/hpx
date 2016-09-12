@@ -32,7 +32,6 @@
 #include <winsock2.h>
 #endif
 
-#include <boost/cstdint.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/thread/mutex.hpp>

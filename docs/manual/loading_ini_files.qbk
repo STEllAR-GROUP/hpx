@@ -43,7 +43,7 @@ __iniformat__.
   [hpx_cmdline `--hpx:ini`]. The properties will be added to the database in the
   same sequence as they are specified on the command line. The format for those
   options is for instance `--hpx:ini=hpx.default_stack_size=0x4000`. In
-  adddition to the explicit command line options, this will set the following
+  addition to the explicit command line options, this will set the following
   properties as implied from other settings:
     * `hpx.parcel.address` and `hpx.parcel.port` as set by
       [hpx_cmdline `--hpx:hpx`]

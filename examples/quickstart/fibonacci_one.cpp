@@ -14,15 +14,15 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
 
+#include <cstdint>
 #include <iostream>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //[fib_action
 // forward declaration of the Fibonacci function
-boost::uint64_t fibonacci(boost::uint64_t n);
+std::uint64_t fibonacci(std::uint64_t n);
 
 // This is to generate the required boilerplate we need for the remote
 // invocation to work.
@@ -31,7 +31,7 @@ HPX_PLAIN_ACTION(fibonacci, fibonacci_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 //[fib_func
-boost::uint64_t fibonacci(boost::uint64_t n)
+std::uint64_t fibonacci(std::uint64_t n)
 {
     if (n < 2)
         return n;
@@ -41,24 +41,24 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 
     // Run one branch of the Fibonacci calculation on this thread, while the
     // other branch is scheduled in a separate thread.
-    hpx::future<boost::uint64_t> n1 =
+    hpx::future<std::uint64_t> n1 =
         hpx::async<fibonacci_action>(locality_id, n-1);
-    boost::uint64_t n2 = fibonacci(n-2);
+    std::uint64_t n2 = fibonacci(n-2);
 
     return n1.get() + n2;   // wait for the Future to return its values
 }
 //]
 
-boost::uint64_t fibonacci_direct(boost::uint64_t n)
+std::uint64_t fibonacci_direct(std::uint64_t n)
 {
     if (n < 2)
         return n;
 
     // Run one branch of the Fibonacci calculation on this thread, while the
     // other branch is scheduled in a separate thread.
-    hpx::future<boost::uint64_t> n1 =
+    hpx::future<std::uint64_t> n1 =
         hpx::async(&fibonacci_direct, n-1);
-    boost::uint64_t n2 = fibonacci(n-2);
+    std::uint64_t n2 = fibonacci(n-2);
 
     return n1.get() + n2;   // wait for the Future to return its values
 }
@@ -68,7 +68,7 @@ boost::uint64_t fibonacci_direct(boost::uint64_t n)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
     {
         // Keep track of the time required to execute.
@@ -76,11 +76,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Create a Future for the whole calculation, execute it locally, and
         // wait for it.
-        hpx::future<boost::uint64_t> f =
+        hpx::future<std::uint64_t> f =
             hpx::async<fibonacci_action>(hpx::find_here(), n);
 
         // wait for future f to return value
-        boost::uint64_t r = f.get();
+        std::uint64_t r = f.get();
 
         char const* fmt = "fibonacci(%1%) == %2%, elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
@@ -90,7 +90,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
 
-        boost::uint64_t r = fibonacci_direct(n);;
+        std::uint64_t r = fibonacci_direct(n);;
 
         char const* fmt = "fibonacci_direct(%1%) == %2%, elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "n-value",
-          boost::program_options::value<boost::uint64_t>()->default_value(10),
+          boost::program_options::value<std::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")
         ;
 

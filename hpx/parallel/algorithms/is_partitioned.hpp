@@ -21,6 +21,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -164,7 +165,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a is_partitioned algorithm returns true if each element
     ///           in the sequence for which pred returns true precedes those for
     ///           which pred returns false. Otherwise is_partitioned returns
-    ///           false. If the range [first, last) containes less than two
+    ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
     template <typename ExPolicy, typename InIter, typename Pred>

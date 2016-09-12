@@ -64,6 +64,9 @@
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -354,7 +357,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        agas::gva const& g, naming::gid_type const& gid, boost::uint64_t count)
+        agas::gva const& g, naming::gid_type const& gid, std::uint64_t count)
     {
         // Special case: component_memory_block.
         if (g.type == components::component_memory_block) {
@@ -391,7 +394,7 @@ namespace hpx { namespace components { namespace server
         else if (naming::refers_to_virtual_memory(gid))
         {
             // simply delete the memory
-            delete [] reinterpret_cast<boost::uint8_t*>(gid.get_lsb());
+            delete [] reinterpret_cast<std::uint8_t*>(gid.get_lsb());
             return;
         }
 
@@ -612,8 +615,8 @@ namespace hpx { namespace components { namespace server
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
-        boost::uint32_t num_localities =
-            static_cast<boost::uint32_t>(locality_ids.size());
+        std::uint32_t num_localities =
+            static_cast<std::uint32_t>(locality_ids.size());
         if (num_localities == 1)
         {
             // While no real distributed termination detection has to be
@@ -665,9 +668,9 @@ namespace hpx { namespace components { namespace server
     }
 #else
     void runtime_support::send_dijkstra_termination_token(
-        boost::uint32_t target_locality_id,
-        boost::uint32_t initiating_locality_id,
-        boost::uint32_t num_localities, bool dijkstra_token)
+        std::uint32_t target_locality_id,
+        std::uint32_t initiating_locality_id,
+        std::uint32_t num_localities, bool dijkstra_token)
     {
         // First wait for this locality to become passive. We do this by
         // periodically checking the number of still running threads.
@@ -708,7 +711,7 @@ namespace hpx { namespace components { namespace server
 
     // invoked during termination detection
     void runtime_support::dijkstra_termination(
-        boost::uint32_t initiating_locality_id, boost::uint32_t num_localities,
+        std::uint32_t initiating_locality_id, std::uint32_t num_localities,
         bool dijkstra_token)
     {
         applier::applier& appl = hpx::applier::get_applier();
@@ -716,7 +719,7 @@ namespace hpx { namespace components { namespace server
 
         agas_client.start_shutdown();
 
-        boost::uint32_t locality_id = get_locality_id();
+        std::uint32_t locality_id = get_locality_id();
 
         if (initiating_locality_id == locality_id)
         {
@@ -742,8 +745,8 @@ namespace hpx { namespace components { namespace server
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
-        boost::uint32_t num_localities =
-            static_cast<boost::uint32_t>(locality_ids.size());
+        std::uint32_t num_localities =
+            static_cast<std::uint32_t>(locality_ids.size());
         if (num_localities == 1)
         {
             // While no real distributed termination detection has to be
@@ -757,12 +760,12 @@ namespace hpx { namespace components { namespace server
             return 0;
         }
 
-        boost::uint32_t initiating_locality_id = get_locality_id();
+        std::uint32_t initiating_locality_id = get_locality_id();
 
         // send token to previous node
-        boost::uint32_t target_id = initiating_locality_id;
+        std::uint32_t target_id = initiating_locality_id;
         if (0 == target_id)
-            target_id = static_cast<boost::uint32_t>(num_localities);
+            target_id = static_cast<std::uint32_t>(num_localities);
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -849,11 +852,11 @@ namespace hpx { namespace components { namespace server
                       "passed second termination detection (count: "
                    << count << ").";
 
-        // Shut down all localities except the the local one, we can't use
+        // Shut down all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
-        boost::uint32_t locality_id = get_locality_id();
+        std::uint32_t locality_id = get_locality_id();
         std::vector<lcos::future<void> > lazy_actions;
 
         for (naming::id_type const& id : locality_ids)
@@ -886,11 +889,11 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
-        // Terminate all localities except the the local one, we can't use
+        // Terminate all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         {
-            boost::uint32_t locality_id = get_locality_id();
+            std::uint32_t locality_id = get_locality_id();
             std::vector<lcos::future<void> > lazy_actions;
 
             for (naming::gid_type gid : locality_ids)
@@ -921,8 +924,8 @@ namespace hpx { namespace components { namespace server
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
     void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr, boost::uint64_t count,
-        boost::uint64_t offset)
+        naming::address const& addr, std::uint64_t count,
+        std::uint64_t offset)
     {
         naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
     }
@@ -982,7 +985,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::int32_t runtime_support::get_instance_count(components::component_type type)
+    std::int32_t runtime_support::get_instance_count(components::component_type type)
     {
         std::unique_lock<component_map_mutex_type> l(cm_mtx_);
 
@@ -998,7 +1001,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_instance_count",
                 strm.str());
-            return boost::int32_t(-1);
+            return std::int32_t(-1);
         }
 
         // ask for the factory's capabilities

@@ -25,6 +25,7 @@
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -35,22 +36,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    boost::uint8_t major_version()
+    std::uint8_t major_version()
     {
         return HPX_VERSION_MAJOR;
     }
 
-    boost::uint8_t minor_version()
+    std::uint8_t minor_version()
     {
         return HPX_VERSION_MINOR;
     }
 
-    boost::uint8_t subminor_version()
+    std::uint8_t subminor_version()
     {
         return HPX_VERSION_SUBMINOR;
     }
 
-    boost::uint32_t full_version()
+    std::uint32_t full_version()
     {
         return HPX_VERSION_FULL;
     }
@@ -63,7 +64,7 @@ namespace hpx
             HPX_VERSION_SUBMINOR);
     }
 
-    boost::uint8_t agas_version()
+    std::uint8_t agas_version()
     {
         return HPX_AGAS_VERSION;
     }

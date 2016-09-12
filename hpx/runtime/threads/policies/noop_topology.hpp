@@ -22,6 +22,8 @@
 #include <cpu-features.h>
 #endif
 
+#include <cstddef>
+
 namespace hpx { namespace threads
 {
 
@@ -78,6 +80,13 @@ public:
         if (&ec != &throws)
             ec = make_success_code();
 
+        return empty_mask;
+    }
+
+    mask_type get_numa_node_affinity_mask_from_numa_node(
+        std::size_t numa_node
+        ) const
+    {
         return empty_mask;
     }
 

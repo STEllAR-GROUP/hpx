@@ -24,6 +24,7 @@
 #if defined(HPX_HAVE_HWLOC)
 #include <hpx/error_code.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #endif
@@ -88,6 +89,15 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_numa_node_affinity_mask(std::size_t num_thread,
             bool numa_sensitive, error_code& ec = throws) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit associated with the given NUMA node.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_numa_node_affinity_mask_from_numa_node(
+            std::size_t num_node) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
@@ -205,16 +215,17 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities,
         std::size_t used_cores,
         std::size_t max_cores,
+        std::size_t num_threads,
         std::vector<std::size_t>& num_pus,
         error_code& ec = throws);
 
     // backwards compatibility helper
     inline void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities,
-        error_code& ec = throws)
+        std::vector<mask_type>& affinities, error_code& ec = throws)
     {
         std::vector<std::size_t> num_pus;
-        parse_affinity_options(spec, affinities, 1, 1, num_pus, ec);
+        parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
+            num_pus, ec);
     }
 #endif
 

@@ -11,9 +11,10 @@
 #ifndef BOOST_INSPECTOR_HPP
 #define BOOST_INSPECTOR_HPP
 
-#include <set>
+#include <cstddef>
 #include <iostream>
 #include <ostream>
+#include <set>
 #include <string>
 #include "boost/filesystem/path.hpp"
 

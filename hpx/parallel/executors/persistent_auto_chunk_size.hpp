@@ -19,8 +19,7 @@
 
 #include <algorithm>
 #include <cstddef>
-
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -70,15 +69,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F && f, std::size_t count)
+        std::size_t get_chunk_size(Executor& exec, F && f, std::size_t cores,
+            std::size_t count)
         {
-            std::size_t const cores = executor_information_traits<Executor>::
-                processing_units_count(exec, *this);
-
             if (count > 100*cores)
             {
                 using hpx::util::high_resolution_clock;
-                boost::uint64_t t = high_resolution_clock::now();
+                std::uint64_t t = high_resolution_clock::now();
 
                 std::size_t test_chunk_size = f();
                 if (test_chunk_size != 0)
@@ -93,7 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                         t = chunk_size_time_;
                     }
 
-                    if (t != 0)
+                    if (t != 0 && min_time_ >= t)
                     {
                         // return chunk size which will create the required
                         // amount of work
@@ -119,8 +116,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
     private:
         /// \cond NOINTERNAL
-        boost::uint64_t chunk_size_time_; // nanoseconds
-        boost::uint64_t min_time_;        // nanoseconds
+        std::uint64_t chunk_size_time_; // nanoseconds
+        std::uint64_t min_time_;        // nanoseconds
         /// \endcond
     };
 }}}

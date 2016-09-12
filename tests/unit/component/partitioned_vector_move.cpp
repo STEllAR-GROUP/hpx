@@ -10,9 +10,10 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <vector>
-#include <utility>
+#include <cstddef>
 #include <string>
+#include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

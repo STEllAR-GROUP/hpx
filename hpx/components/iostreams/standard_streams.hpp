@@ -10,6 +10,7 @@
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/ostream.hpp>
 
+#include <sstream>
 #include <string>
 
 namespace hpx

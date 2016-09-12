@@ -14,6 +14,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/smart_ptr/shared_array.hpp>
 
+#include <cstddef>
+
 namespace jacobi {
     namespace server
     {

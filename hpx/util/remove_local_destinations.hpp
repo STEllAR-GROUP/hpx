@@ -12,6 +12,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 

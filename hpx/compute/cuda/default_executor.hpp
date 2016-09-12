@@ -11,16 +11,21 @@
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
+#include <hpx/compute/cuda/default_executor_parameters.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/vector.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -28,11 +33,119 @@
 
 namespace hpx { namespace compute { namespace cuda
 {
+    namespace detail
+    {
+        // generic implementation which simply passes through the shape elements
+        template <typename Shape, typename Enable = void>
+        struct bulk_launch_helper
+        {
+            template <typename F, typename ... Ts>
+            static void call(cuda::target const& target, F && f,
+                Shape const& shape, Ts &&... ts)
+            {
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+                std::size_t count =
+                    std::distance(boost::begin(shape), boost::end(shape));
+#else
+                std::size_t count = boost::size(shape);
+#endif
+
+                int threads_per_block =
+                    (std::min)(1024, static_cast<int>(count));
+                int num_blocks = static_cast<int>(
+                    (count + threads_per_block - 1) / threads_per_block);
+
+                typedef typename boost::range_const_iterator<Shape>::type
+                    iterator_type;
+                typedef typename std::iterator_traits<iterator_type>::value_type
+                    value_type;
+                typedef cuda::allocator<value_type> alloc_type;
+
+                // transfer shape to the GPU
+                compute::vector<value_type, alloc_type> shape_container(
+                    boost::begin(shape), boost::end(shape), alloc_type(target));
+
+                detail::launch(
+                    target, num_blocks, threads_per_block,
+                    [] HPX_DEVICE
+                        (F f, value_type* p, std::size_t count, Ts&... ts)
+                    {
+                        int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                        if (idx < count)
+                        {
+                            hpx::util::invoke(f, *(p + idx), ts...);
+                        }
+                    },
+                    std::forward<F>(f), shape_container.data(), count,
+                    std::forward<Ts>(ts)...);
+            }
+        };
+
+        // specialization used by partitioner implementations
+        template <typename Iterator>
+        struct bulk_launch_helper<
+            hpx::util::tuple<Iterator, std::size_t, std::size_t>,
+            typename std::enable_if<
+                hpx::traits::is_iterator<Iterator>::value
+            >::type
+        >
+        {
+            template <typename F, typename Shape, typename ... Ts>
+            static void call(cuda::target const& target, F && f,
+                Shape const& shape, Ts &&... ts)
+            {
+                typedef typename boost::range_const_iterator<Shape>::type
+                    iterator_type;
+                typedef typename std::iterator_traits<iterator_type>::value_type
+                    value_type;
+
+                for (auto const& s: shape)
+                {
+                    auto begin = hpx::util::get<0>(s);
+                    std::size_t chunk_size = hpx::util::get<1>(s);
+                    std::size_t base_idx = hpx::util::get<2>(s);
+
+                    // FIXME: make the 1024 to be configurable...
+                    int threads_per_block =
+                        (std::min)(1024, static_cast<int>(chunk_size));
+                    int num_blocks = static_cast<int>(
+                        (chunk_size + threads_per_block - 1) / threads_per_block);
+
+                    detail::launch(
+                        target, num_blocks, threads_per_block,
+                        [begin, chunk_size]
+                        HPX_DEVICE (F f, Ts&... ts)
+                        {
+                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            if(idx < chunk_size)
+                            {
+                                hpx::util::invoke(f,
+                                    value_type(begin + idx, 1, idx), ts...);
+                            }
+                        },
+                        std::forward<F>(f), std::forward<Ts>(ts)...
+                    );
+                }
+            }
+        };
+    }
+
     struct default_executor : hpx::parallel::executor_tag
     {
-        default_executor(cuda::target& target)
+        // By default, this executor relies on a special executor parameters
+        // implementation which knows about the specifics of creating the
+        // bulk-shape ranges for the accelerator.
+        typedef default_executor_parameters executor_parameters_type;
+        default_executor(cuda::target const& target)
           : target_(target)
         {}
+
+        std::size_t processing_units_count() const
+        {
+            return target_.native_handle().processing_units();
+        }
 
         template <typename F, typename ... Ts>
         void apply_execute(F && f, Ts &&... ts) const
@@ -55,68 +168,11 @@ namespace hpx { namespace compute { namespace cuda
             target_.synchronize();
         }
 
-        std::size_t processing_units_count() const
-        {
-            cudaDeviceProp props;
-            cudaError_t error = cudaGetDeviceProperties(&props,
-                target_.native_handle().get_device());
-            if (error != cudaSuccess)
-            {
-                // report error
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::default_executor::processing_units_count()",
-                    std::string("cudaGetDeviceProperties failed: ") +
-                        cudaGetErrorString(error));
-            }
-
-            std::size_t mp = props.multiProcessorCount;
-            switch(props.major)
-            {
-                case 2:
-                    if(props.minor == 1) return mp * 48;
-                    return mp * 32;
-                case 3:
-                    return mp * 192;
-                case 5:
-                    return mp * 128;
-                default:
-                    break;
-            }
-            return mp;
-        }
-
         template <typename F, typename Shape, typename ... Ts>
         void bulk_launch(F && f, Shape const& shape, Ts &&... ts) const
         {
-            std::size_t count = boost::size(shape);
-
-            int threads_per_block = (std::min)(1024, int(count));
-            int num_blocks =
-                int((count + threads_per_block - 1) / threads_per_block);
-
-            typedef typename boost::range_const_iterator<Shape>::type
-                iterator_type;
-            typedef typename std::iterator_traits<iterator_type>::value_type
-                value_type;
-            typedef cuda::allocator<value_type> alloc_type;
-            typedef compute::vector<value_type, alloc_type> shape_container_type;
-
-            // transfer shape to the GPU
-            shape_container_type shape_container(
-                boost::begin(shape), boost::end(shape), alloc_type(target_));
-
-            detail::launch(
-                target_, num_blocks, threads_per_block,
-                [] HPX_DEVICE (F f, value_type* p, std::size_t count, Ts const&... ts)
-                {
-                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-                    if (idx < count)
-                    {
-                        hpx::util::invoke(f, *(p + idx), std::forward<Ts>(ts)...);
-                    }
-                },
-                std::forward<F>(f), shape_container.data(), count,
-                std::forward<Ts>(ts)...);
+            detail::bulk_launch_helper<Shape>::call(target_,
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Shape, typename ... Ts>
@@ -137,8 +193,18 @@ namespace hpx { namespace compute { namespace cuda
             target_.synchronize();
         }
 
+        cuda::target& target()
+        {
+            return target_;
+        }
+
+        cuda::target const& target() const
+        {
+            return target_;
+        }
+
     private:
-        cuda::target& target_;
+        cuda::target target_;
     };
 }}}
 

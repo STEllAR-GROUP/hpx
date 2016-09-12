@@ -11,6 +11,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -92,8 +93,18 @@ namespace test
         {
             ++instance_count;
         }
+        count_instances(count_instances && rhs)
+          : value_(rhs.value_)
+        {
+            ++instance_count;
+        }
 
         count_instances& operator=(count_instances const& rhs)
+        {
+            value_ = rhs.value_;
+            return *this;
+        }
+        count_instances& operator=(count_instances && rhs)
         {
             value_ = rhs.value_;
             return *this;

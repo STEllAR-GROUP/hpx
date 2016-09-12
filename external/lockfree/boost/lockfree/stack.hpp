@@ -19,6 +19,7 @@
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
+#include <cstddef>
 
 namespace boost {
 namespace lockfree {

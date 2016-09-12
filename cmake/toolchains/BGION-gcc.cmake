@@ -38,12 +38,12 @@ set(CMAKE_CROSSCOMPILING OFF)
 set(HPX_PLATFORM "native")
 
 # Disable generic coroutines (and use posix version)
-set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "diable generic coroutines")
+set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "disable generic coroutines")
 
 # BGAS nodes support ibverbs
 set(HPX_WITH_PARCELPORT_IBVERBS ON CACHE BOOL "")
 
-# Always disable the tcp parcelport as it is nonfunctional on the BGQ.
+# Always disable the tcp parcelport as it is non-functional on the BGQ.
 set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
 
 # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.

@@ -4,10 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/hpx.hpp>
 
 #include <boost/format.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -17,11 +18,8 @@ using boost::program_options::options_description;
 using hpx::init;
 using hpx::finalize;
 
-using hpx::naming::get_agas_client;
-
 using hpx::naming::address;
 using hpx::naming::id_type;
-using hpx::naming::resolver_client;
 using hpx::naming::get_locality_id_from_gid;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,9 @@
 #  endif
 #endif
 
+#include <cstddef>
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -37,7 +40,7 @@ namespace hpx { namespace lcos { namespace local
         HPX_NON_COPYABLE(spinlock_no_backoff);
 
     private:
-        boost::uint64_t v_;
+        std::uint64_t v_;
 
     public:
         spinlock_no_backoff() : v_(0)
@@ -67,10 +70,10 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_PREPARE(this);
 
 #if !defined( BOOST_SP_HAS_SYNC )
-            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
-            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
 
             if (r == 0) {
@@ -89,7 +92,7 @@ namespace hpx { namespace lcos { namespace local
 
 #if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
-            *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+            *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif

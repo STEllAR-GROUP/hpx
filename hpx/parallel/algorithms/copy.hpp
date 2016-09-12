@@ -32,6 +32,7 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -53,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            void operator()(std::size_t, Iter part_begin, std::size_t part_size)
+            void operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
                 using hpx::util::get;
                 auto const& iters = part_begin.get_iterator_tuple();
@@ -229,8 +230,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest), count,
-                        [](std::size_t, zip_iterator part_begin,
-                            std::size_t part_size)
+                        [](zip_iterator part_begin, std::size_t part_size,
+                            std::size_t)
                         {
                             using hpx::util::get;
 

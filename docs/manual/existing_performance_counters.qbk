@@ -183,7 +183,7 @@ system and application performance.
           locality.
         ]
         [None]
-        [Returns the the overall time spent executing of the specified API
+        [Returns the overall time spent executing of the specified API
          function of the AGAS cache.]
     ]
 ]
@@ -195,7 +195,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -207,18 +207,6 @@ system and application performance.
         [Returns the overall number of raw (uncompressed) bytes sent or received
          (see `<operation>`, e.g. `sent` or `received`) for the specified
          `<connection_type>`.
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -232,7 +220,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -246,18 +234,6 @@ system and application performance.
          operation for the specified `<connection_type>` the given locality
          (see `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
-
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
@@ -270,7 +246,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -278,22 +254,13 @@ system and application performance.
           transmitted bytes should be queried for. The locality id is a (zero
           based) number identifying the locality.
         ]
-        [None]
+        [If the configure-time option `-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On`
+         was specified, this counter allows to specify an optional action name
+         as its parameter. In this case the counter will report the number of
+         bytes transmitted for the given action only.]
         [Returns the overall number of bytes transferred (see `<operation>`,
          e.g. `sent` or `received`, possibly compressed) for the specified
          `<connection_type>` by the given locality.
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -307,7 +274,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -315,22 +282,13 @@ system and application performance.
           should be queried for. The locality id is a (zero based) number
           identifying the locality.
         ]
-        [None]
+        [If the configure-time option `-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On`
+         was specified, this counter allows to specify an optional action name
+         as its parameter. In this case the counter will report the serialization
+         time for the given action only.]
         [Returns the overall time spent performing outgoing data serialization
          for the specified `<connection_type>`on the given locality (see
          `<operation>`, e.g. `sent` or `received`).
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -344,7 +302,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -356,18 +314,6 @@ system and application performance.
         [Returns the overall time spent performing outgoing security operations
          for the specified `<connection_type>`on the given locality (see
          `<operation>`, e.g. `sent` or `received`).
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -390,7 +336,10 @@ system and application performance.
           routed parcels should be queried for. The locality id is a (zero
           based) number identifying the locality.
         ]
-        [None]
+        [If the configure-time option `-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On`
+         was specified, this counter allows to specify an optional action name
+         as its parameter. In this case the counter will report the number of
+         parcels for the given action only.]
         [Returns the overall number of routed (outbound) parcels transferred
          by the given locality.
 
@@ -405,7 +354,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -417,18 +366,6 @@ system and application performance.
         [Returns the overall number of parcels transferred using the specified
          `<connection_type>` by the given locality (see `<operation>`, e.g.
          `sent` or `received`).
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -442,7 +379,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -455,18 +392,6 @@ system and application performance.
          potentially consist of more than one parcel.] transferred using
          the specified `<connection_type>` by the given locality (see
          `<operation>`, e.g. `sent` or `received`).
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -481,7 +406,7 @@ system and application performance.
           where:[br] `<cache_statistics>` is one of the following:
           `cache/insertions`, `cache/evictions`, `cache/hits`, `cache/misses`,
           `cache/misses`[br]
-          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
+          `<connection_type>` is one of the following: `tcp`, `mpi`
         ]
         [`locality#*/total`
 
@@ -494,18 +419,6 @@ system and application performance.
          misses, and reclaims) for the connection cache of the given connection
          type on the given locality (see `<cache_statistics>`, e.g. `cache/insertions`,
          `cache/evictions`, `cache/hits`, `cache/misses`, or `cache/reclaims`).
-
-         The performance counters for the connection type `ipc` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IPC`).
-
-         The performance counters for the connection type `ibverbs` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_IBVERBS`).
 
          The performance counters for the connection type `mpi` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
@@ -980,7 +893,7 @@ system and application performance.
     [   [`/threads/count/stack-recycles`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the recylcling
+          where:[br] `*` is the locality id of the locality the recycling
           operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
@@ -1234,7 +1147,7 @@ system and application performance.
     [   [`/runtime/memory/resident`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the the allocated
+          where:[br] `*` is the locality id of the locality the allocated
           resident memory should be queried. The locality id is a (zero based)
           number identifying the locality.
         ]
@@ -1505,7 +1418,7 @@ system and application performance.
           where:[br] `*` is the locality id of the locality the number of
           messages for the given action should be queried for. The
           locality id is a (zero based) number identifying the locality.]
-        [Returns the average number of of parcels sent in a message generated
+        [Returns the average number of parcels sent in a message generated
          by the message handler associated with the action which is given by
          the counter parameter.]
         [The action type. This is the string which has been used
@@ -1545,7 +1458,7 @@ system and application performance.
 
          The first unit of measure displayed for this counter (`[ns]`) refers to
          the lower and upper boundary values in the returned histogram data only.
-         The second unit of mesure displayed (`[0.1%]`) refers to the actual
+         The second unit of measure displayed (`[0.1%]`) refers to the actual
          histogram data.
 
          For each bucket the counter shows a value between `0` and `1000`,
@@ -1557,7 +1470,7 @@ system and application performance.
          [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
          [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
 
-         The action type may be follwowed by a comma separated list of up-to
+         The action type may be followed by a comma separated list of up-to
          three numbers: the lower and upper boundaries for the collected
          histogram, and the number of buckets for the histogram to generate.
          By default these three numbers will be assumed to be `0` (`[ns]`,

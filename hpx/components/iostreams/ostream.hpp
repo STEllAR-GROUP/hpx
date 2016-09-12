@@ -19,10 +19,12 @@
 #include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <cstdint>
 #include <ios>
 #include <iostream>
 #include <iterator>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -166,7 +168,7 @@ namespace hpx { namespace iostreams
 
     private:
         mutex_type mtx_;
-        boost::atomic<boost::uint64_t> generational_count_;
+        boost::atomic<std::uint64_t> generational_count_;
 
         // Performs a lazy streaming operation.
         template <typename T>

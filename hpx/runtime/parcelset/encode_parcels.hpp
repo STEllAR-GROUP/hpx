@@ -14,6 +14,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -21,8 +22,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -46,7 +47,7 @@ namespace hpx
             }
 
             inline void
-            convert_byte(boost::uint8_t b, char* buffer, char const* end)
+            convert_byte(std::uint8_t b, char* buffer, char const* end)
             {
                 *buffer++ = to_digit((b & 0xF0) >> 4);
                 *buffer++ = to_digit(b & 0x0F);
@@ -59,7 +60,7 @@ namespace hpx
                 if (LPT_ENABLED(debug))
                 {
                     result.reserve(buffer.data_.size() * 2 + 1);
-                    for (boost::uint8_t byte: buffer.data_)
+                    for (std::uint8_t byte: buffer.data_)
                     {
                         char b[3] = { 0 };
                         convert_byte(byte, &b[0], &b[3]);
@@ -103,8 +104,8 @@ namespace hpx
                 }
 
                 buffer.num_chunks_ = count_chunks_type(
-                    static_cast<boost::uint32_t>(chunks.size()),
-                    static_cast<boost::uint32_t>(buffer.chunks_.size() - chunks.size())
+                    static_cast<std::uint32_t>(chunks.size()),
+                    static_cast<std::uint32_t>(buffer.chunks_.size() - chunks.size())
                 );
 
                 if (!chunks.empty()) {
@@ -120,8 +121,8 @@ namespace hpx
             }
 
             inline std::size_t
-            get_archive_size(parcel const& p, boost::uint32_t flags,
-                boost::uint32_t dest_locality_id,
+            get_archive_size(parcel const& p, std::uint32_t flags,
+                std::uint32_t dest_locality_id,
                 std::vector<serialization::serialization_chunk>* chunks)
             {
                 // gather the required size for the archive
@@ -135,13 +136,14 @@ namespace hpx
 
         template <typename Buffer, typename NewGids>
         std::size_t
-        encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, boost::uint64_t max_outbound_size, NewGids new_gids)
+        encode_parcels(parcelport& pp,
+            parcel const * ps, std::size_t num_parcels, Buffer & buffer,
+            int archive_flags_, std::uint64_t max_outbound_size, NewGids new_gids)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
-            boost::uint32_t dest_locality_id =
+            std::uint32_t dest_locality_id =
                 ps[0].destination_locality_id();
 
             std::size_t parcels_sent = 0;
@@ -193,8 +195,25 @@ namespace hpx
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            std::size_t archive_pos = archive.current_pos();
+                            std::int64_t serialize_time =
+                                timer.elapsed_nanoseconds();
+#endif
+
                             LPT_(debug) << ps[i];
                             archive << ps[i];
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            performance_counters::parcels::data_point action_data;
+                            action_data.bytes_ = archive.current_pos() - archive_pos;
+                            action_data.serialization_time_ =
+                                timer.elapsed_nanoseconds() - serialize_time;
+                            action_data.num_parcels_ = 1;
+                            pp.add_sent_data(
+                                ps[i].get_action()->get_action_name(),
+                                action_data);
+#endif
                         }
 
                         arg_size = archive.bytes_written();

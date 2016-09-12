@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/steady_clock.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -131,6 +132,10 @@ namespace hpx { namespace threads { namespace detail
 
         std::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread, bool reset) const;
+
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const;
 
         void reset_thread_distribution();
 

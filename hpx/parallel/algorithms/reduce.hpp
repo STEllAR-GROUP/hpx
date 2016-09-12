@@ -22,6 +22,7 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <type_traits>
@@ -282,7 +283,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns T otherwise (where T is the the value_type of
+    ///           returns T otherwise (where T is the value_type of
     ///           \a InIter).
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum (applying operator+()) over the elements given

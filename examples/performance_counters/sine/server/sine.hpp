@@ -11,6 +11,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 
+#include <cstdint>
+
 namespace performance_counters { namespace sine { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +45,7 @@ namespace performance_counters { namespace sine { namespace server
 
         mutable mutex_type mtx_;
         double current_value_;
-        boost::uint64_t evaluated_at_;
+        std::uint64_t evaluated_at_;
 
         hpx::util::interval_timer timer_;
     };

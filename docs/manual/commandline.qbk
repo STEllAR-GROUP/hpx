@@ -69,7 +69,7 @@ described in the table below:
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
-    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__ locality
+    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__ 
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,

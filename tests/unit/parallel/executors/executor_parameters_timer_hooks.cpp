@@ -11,7 +11,10 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -65,7 +68,7 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
     }
 
     std::string name_;
-    boost::uint64_t time_;
+    std::uint64_t time_;
     boost::atomic<std::size_t> count_;
 };
 

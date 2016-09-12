@@ -9,6 +9,7 @@
 
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/hpx_init.hpp>
 
@@ -25,6 +26,17 @@ typedef hpx::compute::vector<int, target_allocator> target_vector;
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector);
 
 ///////////////////////////////////////////////////////////////////////////////
+struct pfo
+{
+    template <typename T>
+    HPX_HOST_DEVICE void operator()(T& val) const
+    {
+        int v = val;
+        val = ++v;
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::time(nullptr);
@@ -33,6 +45,19 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
+
+    hpx::compute::cuda::target_distribution_policy policy =
+        hpx::compute::cuda::target_layout(hpx::compute::cuda::get_local_targets());
+
+    {
+        hpx::partitioned_vector<int, target_vector> v(1000, policy);
+        hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
+            v.begin(), v.end(), pfo()).get();
+        hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
+            v.begin(), v.end(), pfo()).get();
+    }
 
     // TODO: add more
 

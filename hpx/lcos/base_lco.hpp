@@ -18,6 +18,8 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace lcos
 {
     /// The \a base_lco class is the common base class for all LCO's

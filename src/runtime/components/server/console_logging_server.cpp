@@ -19,8 +19,8 @@
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
+#include <cstddef>
 #include <mutex>
-
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

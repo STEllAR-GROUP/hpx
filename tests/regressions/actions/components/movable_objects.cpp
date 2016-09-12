@@ -6,6 +6,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <cstddef>
+
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
 namespace hpx { namespace test

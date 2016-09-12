@@ -6,6 +6,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

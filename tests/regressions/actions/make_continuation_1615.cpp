@@ -11,15 +11,16 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <string>
 
-boost::int32_t times2(boost::int32_t i)
+std::int32_t times2(std::int32_t i)
 {
     return i * 2;
 }
 HPX_PLAIN_ACTION(times2);           // defines times2_action
 
-std::string to_string(boost::int32_t i)
+std::string to_string(std::int32_t i)
 {
     return std::to_string(i);
 }

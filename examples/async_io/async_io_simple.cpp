@@ -13,6 +13,7 @@
 #include <hpx/include/thread_executors.hpp>
 
 #include <functional>
+#include <iostream>
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write, int& result)

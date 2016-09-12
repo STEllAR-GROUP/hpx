@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename hpx::util::decay<Proj>::type proj_;
 
             template <typename Tuple>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             void operator()(Tuple && t)
             {
                 using hpx::util::get;

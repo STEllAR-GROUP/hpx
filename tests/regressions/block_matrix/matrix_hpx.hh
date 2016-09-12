@@ -12,6 +12,7 @@
 #include <hpx/include/components.hpp>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <initializer_list>
 #include <iostream>

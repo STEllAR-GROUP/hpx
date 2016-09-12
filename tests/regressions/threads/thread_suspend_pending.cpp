@@ -10,6 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>

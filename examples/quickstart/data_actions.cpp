@@ -6,6 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <iostream>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////

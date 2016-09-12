@@ -16,6 +16,7 @@
 #include <boost/format.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <cstddef>
 #include <list>
 #include <iostream>
 #include <set>

@@ -7,6 +7,8 @@
 #include <hpx/hpx.hpp>
 
 #include <algorithm>
+#include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -15,22 +17,22 @@
 
 bool verbose = false;
 
-double test_results(boost::uint64_t order, std::vector<double> const & trans);
+double test_results(std::uint64_t order, std::vector<double> const & trans);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t order = vm["matrix_size"].as<boost::uint64_t>();
-    boost::uint64_t iterations = vm["iterations"].as<boost::uint64_t>();
-    boost::uint64_t tile_size = order;
+    std::uint64_t order = vm["matrix_size"].as<std::uint64_t>();
+    std::uint64_t iterations = vm["iterations"].as<std::uint64_t>();
+    std::uint64_t tile_size = order;
 
     if(vm.count("tile_size"))
-        tile_size = vm["tile_size"].as<boost::uint64_t>();
+        tile_size = vm["tile_size"].as<std::uint64_t>();
 
     verbose = vm.count("verbose") ? true : false;
 
-    boost::uint64_t bytes =
-        static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
+    std::uint64_t bytes =
+        static_cast<std::uint64_t>(2.0 * sizeof(double) * order * order);
 
     std::vector<double> A(order * order);
     std::vector<double> B(order * order);
@@ -46,9 +48,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "Number of iterations  = " << iterations << "\n";
 
     // Fill the original matrix, set transpose to known garbage value.
-    for(boost::uint64_t i = 0; i < order; ++i)
+    for(std::uint64_t i = 0; i < order; ++i)
     {
-        for(boost::uint64_t j = 0; j < order; ++j)
+        for(std::uint64_t j = 0; j < order; ++j)
         {
             A[i * order + j] = COL_SHIFT * j + ROW_SHIFT * i;
             B[i * order + j] = -1.0;
@@ -60,21 +62,21 @@ int hpx_main(boost::program_options::variables_map& vm)
     double maxtime = 0.0;
     double mintime = 366.0 * 24.0*3600.0; // set the minimum time to a large value;
                                           // one leap year should be enough
-    for(boost::uint64_t iter = 0; iter < iterations; ++iter)
+    for(std::uint64_t iter = 0; iter < iterations; ++iter)
     {
         hpx::util::high_resolution_timer t;
 
         if(tile_size < order)
         {
-            for(boost::uint64_t i = 0; i < order; i += tile_size)
+            for(std::uint64_t i = 0; i < order; i += tile_size)
             {
-                for(boost::uint64_t j = 0; j < order; j += tile_size)
+                for(std::uint64_t j = 0; j < order; j += tile_size)
                 {
-                    boost::uint64_t i_max = (std::min)(order, i + tile_size);
-                    for(boost::uint64_t it = i; it < i_max; ++it)
+                    std::uint64_t i_max = (std::min)(order, i + tile_size);
+                    for(std::uint64_t it = i; it < i_max; ++it)
                     {
-                        boost::uint64_t j_max = (std::min)(order, j + tile_size);
-                        for(boost::uint64_t jt = j; jt < j_max; ++jt)
+                        std::uint64_t j_max = (std::min)(order, j + tile_size);
+                        for(std::uint64_t jt = j; jt < j_max; ++jt)
                         {
                             B[it + order * jt] = A[jt + order * it];
                         }
@@ -84,9 +86,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
         else
         {
-            for(boost::uint64_t i = 0; i < order; ++i)
+            for(std::uint64_t i = 0; i < order; ++i)
             {
-                for(boost::uint64_t j = 0; j < order; ++j)
+                for(std::uint64_t j = 0; j < order; ++j)
                 {
                     B[i + order * j] = A[j + order * i];
                 }
@@ -112,7 +114,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         std::cout << "Solution validates\n";
         avgtime = avgtime/static_cast<double>(
-            (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+            (std::max)(iterations-1, static_cast<std::uint64_t>(1)));
         std::cout
           << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
           << "Avg time (s): " << avgtime << ", "
@@ -139,11 +141,11 @@ int main(int argc, char* argv[])
 
     options_description desc_commandline;
     desc_commandline.add_options()
-        ("matrix_size", value<boost::uint64_t>()->default_value(1024),
+        ("matrix_size", value<std::uint64_t>()->default_value(1024),
          "Matrix Size")
-        ("iterations", value<boost::uint64_t>()->default_value(10),
+        ("iterations", value<std::uint64_t>()->default_value(10),
          "# iterations")
-        ("tile_size", value<boost::uint64_t>(),
+        ("tile_size", value<std::uint64_t>(),
          "Number of tiles to divide the individual matrix blocks for improved "
          "cache and TLB performance")
         ( "verbose", "Verbose output")
@@ -158,13 +160,13 @@ int main(int argc, char* argv[])
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
-double test_results(boost::uint64_t order, std::vector<double> const & trans)
+double test_results(std::uint64_t order, std::vector<double> const & trans)
 {
     double errsq = 0.0;
 
-    for(boost::uint64_t i = 0; i < order; ++i)
+    for(std::uint64_t i = 0; i < order; ++i)
     {
-        for(boost::uint64_t j = 0; j < order; ++j)
+        for(std::uint64_t j = 0; j < order; ++j)
         {
             double diff = trans[i * order + j] - (COL_SHIFT*i + ROW_SHIFT * j);
             errsq += diff * diff;

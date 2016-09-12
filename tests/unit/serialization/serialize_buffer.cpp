@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 

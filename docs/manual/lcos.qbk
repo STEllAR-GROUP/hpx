@@ -33,7 +33,7 @@ a sender to a receiver:
 
 Channels can be handed to another thread (or in case of channel components,
 to other localities), thus establishing a communication channel between two
-independed places in the program:
+independent places in the program:
 
     void do_something(
         hpx::lcos::local::receive_channel<int> c,
@@ -163,7 +163,7 @@ asynchronous operations to `hpx::future`, `hpx::shared_future`, and
     data to it. The current C++ standard does not allow one to register a
     continuation to a future. With `then`, instead of waiting for the result, a
     continuation is "attached" to the asynchronous operation, which is invoked
-    when the result is ready. Continuations registered using the then function
+    when the result is ready. Continuations registered using then function
     will help to avoid blocking waits or wasting threads on polling, greatly
     improving the responsiveness and scalability of an application.]]
  [[unwrapping constructor for `hpx::future`]

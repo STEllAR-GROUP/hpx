@@ -13,6 +13,7 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>

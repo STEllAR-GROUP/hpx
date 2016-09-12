@@ -95,6 +95,13 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
+        mask_type get_numa_node_affinity_mask_from_numa_node(
+            std::size_t numa_node
+            ) const
+        {
+            return init_numa_node_affinity_mask_from_numa_node(numa_node);
+        }
+
         mask_cref_type get_core_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
@@ -131,7 +138,7 @@ namespace hpx { namespace threads
             std::size_t num_numa_node
             ) const;
         mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_cref_type default_mask
+            std::size_t num_core, mask_cref_type default_mask = mask_type()
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
         mask_type init_thread_affinity_mask(

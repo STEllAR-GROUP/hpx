@@ -60,7 +60,7 @@ int hpx_main(variables_map & vm)
 
         init_rate/=100; //Rate is a % and must be converted
         t/=cp; //Determine how many times to iterate interest calculation:
-               //How many full compund periods can fit in the time invested
+               //How many full compound periods can fit in the time invested
 
         // In non-dataflow terms the implemented algorithm would look like:
         //

@@ -10,6 +10,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <vector>
 

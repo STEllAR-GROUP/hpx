@@ -27,7 +27,7 @@ Default logging can be enabled by using one of the following:
 * setting an environment variable `HPX_LOGLEVEL=<loglevel>` while running the __hpx__
   application. In this case `<loglevel>` should be a number between (or equal
   to) `1` and `5`, where `1` means minimal logging and `5` causes to log all available
-  messages. When setting a the environment variable the logs will be written to a file named
+  messages. When setting the environment variable the logs will be written to a file named
   `hpx.<PID>.log`in the current working directory, where `<PID>` is the process id 
   of the console instance of the application.
 
@@ -82,7 +82,7 @@ default.
 [tip The easiest way to enable logging output is to set the environment variable
      corresponding to the logging category to an integral value as described in
      the table above. For instance, setting `HPX_LOGLEVEL=5` will enable full
-     logging output for the general category. Please note, that the syntax and
+     logging output for the general category. Please note that the syntax and
      means of setting environment variables varies between operating systems.]
 
 [heading Configuration]

@@ -14,13 +14,15 @@
 #include <tbb/blocked_range.h>
 
 #include <chrono>
+#include <cstdint>
+#include <iostream>
 
 template <typename BaseClock = std::chrono::steady_clock>
 struct payload_functor : tbb::task
 {
-    boost::uint64_t const payload_duration_;
+    std::uint64_t const payload_duration_;
 
-    payload_functor(boost::uint64_t payload_duration)
+    payload_functor(std::uint64_t payload_duration)
       : payload_duration_(payload_duration)
     {}
 
@@ -41,9 +43,9 @@ struct stage_tasks_functor : public tbb::task
         stage_tasks_functor &outer;
 
       public:
-        void operator() (const tbb::blocked_range<boost::uint64_t>& r) const
+        void operator() (const tbb::blocked_range<std::uint64_t>& r) const
         {
-            for (boost::uint64_t i = r.begin(); i != r.end(); ++i)
+            for (std::uint64_t i = r.begin(); i != r.end(); ++i)
             {
                 payload_functor<BaseClock> &a
                     = *new (outer.allocate_child())
@@ -56,14 +58,14 @@ struct stage_tasks_functor : public tbb::task
     };
 
   public:
-    boost::uint64_t osthreads_;
-    boost::uint64_t tasks_;
-    boost::uint64_t payload_duration_;
+    std::uint64_t osthreads_;
+    std::uint64_t tasks_;
+    std::uint64_t payload_duration_;
 
     stage_tasks_functor(
-        boost::uint64_t osthreads
-      , boost::uint64_t tasks
-      , boost::uint64_t payload_duration
+        std::uint64_t osthreads
+      , std::uint64_t tasks
+      , std::uint64_t payload_duration
         )
       : osthreads_(osthreads)
       , tasks_(tasks)
@@ -75,7 +77,7 @@ struct stage_tasks_functor : public tbb::task
         set_ref_count(osthreads_ * tasks_); // Note the lack of a +1
 
         // Note the -2; this task counts as one of the ones we're spawning
-        parallel_for(tbb::blocked_range<boost::uint64_t>
+        parallel_for(tbb::blocked_range<std::uint64_t>
                         (0, (osthreads_ * tasks_) - 2),
                      range_spawner(*this),
                      tbb::auto_partitioner());

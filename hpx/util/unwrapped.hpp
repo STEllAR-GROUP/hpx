@@ -18,6 +18,7 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

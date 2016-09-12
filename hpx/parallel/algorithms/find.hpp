@@ -19,6 +19,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -66,8 +67,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [val, tok](std::size_t base_idx, InIter it,
-                            std::size_t part_size) mutable
+                        [val, tok](InIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -197,8 +198,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [f, tok](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -347,8 +348,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [f, tok](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -500,8 +501,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-                        [=](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [=](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             FwdIter curr = it;
 
@@ -695,8 +696,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
-                            std::size_t part_size) mutable
+                        [s_first, s_last, tok, op](InIter it,
+                            std::size_t part_size, std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,

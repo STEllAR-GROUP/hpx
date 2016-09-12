@@ -12,6 +12,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>
@@ -86,7 +87,7 @@ void remote_test_multiple(boost::program_options::variables_map& vm)
     else
     {
         hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                barrier_test_name, hpx::agas::symbol_ns_bind, true).get();
+                barrier_test_name, true).get();
         hpx::lcos::barrier b(id);
 
         for (std::size_t i = 0; i != iterations; ++i)
@@ -119,7 +120,7 @@ void remote_test_single(boost::program_options::variables_map& vm)
     else
     {
         hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                barrier_test_name_outer, hpx::agas::symbol_ns_bind, true).get();
+                barrier_test_name_outer, true).get();
         outer = barrier(id);
     }
 
@@ -141,7 +142,7 @@ void remote_test_single(boost::program_options::variables_map& vm)
         else
         {
             hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                    barrier_test_name, hpx::agas::symbol_ns_bind, true).get();
+                    barrier_test_name, true).get();
             hpx::lcos::barrier b(id);
             b.wait();
         }

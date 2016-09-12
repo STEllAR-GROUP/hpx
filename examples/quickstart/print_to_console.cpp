@@ -12,6 +12,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 
+#include <iostream>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////

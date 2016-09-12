@@ -46,7 +46,7 @@
     <para>The &lt;ulink&gt; element references a URL that is outside
     of the DocBook document. The <code>url</code> attribute contains
     the URL to link to, and the element data provides the link
-    text.For instance, we can link to the the Boost web site with
+    text.For instance, we can link to the Boost web site with
     <code>&lt;ulink
     url="http://www.boost.org"&gt;Boost&lt;/ulink&gt;,</code> which
     appears in the document like this: <ulink

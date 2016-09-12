@@ -8,9 +8,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstddef>
+#include <cstdint>
 
 #include <boost/config.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/memory_order.hpp>
 #include <boost/atomic/platform.hpp>
 #include <boost/atomic/detail/base.hpp>
@@ -185,20 +185,20 @@ public:
 typedef atomic<char> atomic_char;
 typedef atomic<unsigned char> atomic_uchar;
 typedef atomic<signed char> atomic_schar;
-typedef atomic<boost::uint8_t> atomic_uint8_t;
-typedef atomic<boost::int8_t> atomic_int8_t;
+typedef atomic<std::uint8_t> atomic_uint8_t;
+typedef atomic<std::int8_t> atomic_int8_t;
 typedef atomic<unsigned short> atomic_ushort;
 typedef atomic<short> atomic_short;
-typedef atomic<boost::uint16_t> atomic_uint16_t;
-typedef atomic<boost::int16_t> atomic_int16_t;
+typedef atomic<std::uint16_t> atomic_uint16_t;
+typedef atomic<std::int16_t> atomic_int16_t;
 typedef atomic<unsigned int> atomic_uint;
 typedef atomic<int> atomic_int;
-typedef atomic<boost::uint32_t> atomic_uint32_t;
-typedef atomic<boost::int32_t> atomic_int32_t;
+typedef atomic<std::uint32_t> atomic_uint32_t;
+typedef atomic<std::int32_t> atomic_int32_t;
 typedef atomic<unsigned long> atomic_ulong;
 typedef atomic<long> atomic_long;
-typedef atomic<boost::uint64_t> atomic_uint64_t;
-typedef atomic<boost::int64_t> atomic_int64_t;
+typedef atomic<std::uint64_t> atomic_uint64_t;
+typedef atomic<std::int64_t> atomic_int64_t;
 #ifdef BOOST_HAS_LONG_LONG
 typedef atomic<boost::ulong_long_type> atomic_ullong;
 typedef atomic<boost::long_long_type> atomic_llong;

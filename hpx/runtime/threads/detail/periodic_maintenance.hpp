@@ -16,7 +16,6 @@
 
 #include <boost/asio/basic_deadline_timer.hpp>
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
 #include <chrono>
 #include <functional>

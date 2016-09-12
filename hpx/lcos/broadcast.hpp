@@ -24,7 +24,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -119,7 +119,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -152,6 +152,7 @@ namespace hpx { namespace lcos
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -826,7 +827,7 @@ namespace hpx { namespace lcos
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::broadcast_apply",
-                "empty list of of targets for broadcast operation");
+                "empty list of targets for broadcast operation");
             return;
         }
 

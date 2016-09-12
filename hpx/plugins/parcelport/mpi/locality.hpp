@@ -17,6 +17,8 @@
 
 #include <boost/io/ios_state.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace parcelset
 {
     namespace policies { namespace mpi
@@ -28,11 +30,11 @@ namespace hpx { namespace parcelset
               : rank_(-1)
             {}
 
-            explicit locality(boost::int32_t rank)
+            explicit locality(std::int32_t rank)
               : rank_(rank)
             {}
 
-            boost::int32_t rank() const
+            std::int32_t rank() const
             {
                 return rank_;
             }
@@ -76,7 +78,7 @@ namespace hpx { namespace parcelset
                 return os;
             }
 
-            boost::int32_t rank_;
+            std::int32_t rank_;
         };
     }}
 }}

@@ -11,6 +11,8 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <vector>
 

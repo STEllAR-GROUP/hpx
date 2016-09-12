@@ -25,9 +25,11 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -46,7 +48,7 @@ hpx::naming::id_type counter_id;
 
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
-    boost::uint32_t const prefix = hpx::get_locality_id();
+    std::uint32_t const prefix = hpx::get_locality_id();
     boost::format active_threads(counter_name);
     id_type id = get_counter(boost::str(active_threads % prefix));
     return id;
@@ -244,9 +246,9 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -256,7 +258,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result = step.do_work(np, nx, nt);
@@ -264,7 +266,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper::space solution = result.get();
     hpx::wait_all(solution);
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     // Print the final solution
     if (vm.count("results"))
@@ -273,7 +275,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
     }
 
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    std::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
@@ -288,11 +290,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(100000),
+        ("nx", value<std::uint64_t>()->default_value(100000),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(450),
+        ("nt", value<std::uint64_t>()->default_value(450),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(1000),
+        ("np", value<std::uint64_t>()->default_value(1000),
          "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

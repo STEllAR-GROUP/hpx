@@ -23,18 +23,16 @@ namespace hpx { namespace traits
     struct trivially_copyable_pointer_tag : general_pointer_tag {};
 #endif
 
-    template <typename Source, typename Dest>
-    inline general_pointer_tag
-    get_pointer_category(Source const&, Dest const&)
+    template <typename Source, typename Dest, typename Enable = void>
+    struct pointer_category
     {
-        return general_pointer_tag();
-    }
+        typedef general_pointer_tag type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     namespace detail
     {
-
         template <typename Source, typename Dest>
         struct pointer_category
         {
@@ -66,7 +64,7 @@ namespace hpx { namespace traits
 
         // pointers are layout compatible
         template <typename T>
-        struct pointer_category<T*, T const*>
+        struct pointer_category<T const*, T*>
         {
             typedef trivially_copyable_pointer_tag type;
         };
@@ -75,26 +73,27 @@ namespace hpx { namespace traits
     // isolate iterators which are pointers and their value_types are
     // assignable
     template <typename Source, typename Dest>
-    inline typename std::conditional<
-        std::is_assignable<Dest&, Source&>::value,
-        typename detail::pointer_category<
-            typename std::remove_const<Source>::type, Dest
-        >::type,
-        general_pointer_tag
-    >::type
-    get_pointer_category(Source* const&, Dest* const&)
+    struct pointer_category<Source*, Dest*>
     {
-        typedef typename std::conditional<
+        typedef
+            typename std::conditional<
                 std::is_assignable<Dest&, Source&>::value,
                 typename detail::pointer_category<
                     typename std::remove_const<Source>::type, Dest
                 >::type,
                 general_pointer_tag
-            >::type category_type;
-
-        return category_type();
-    }
+            >::type
+            type;
+    };
 #endif
+
+    // Allow for matching of iterator<T const> to iterator<T> while calculating
+    // pointer category.
+    template <typename Iterator, typename Enable = void>
+    struct remove_const_iterator_value_type
+    {
+        typedef Iterator type;
+    };
 }}
 
 #endif

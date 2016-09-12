@@ -10,6 +10,8 @@
 #include <hpx/include/parallel_for_loop.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <utility>

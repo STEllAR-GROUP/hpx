@@ -15,6 +15,7 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <utility>

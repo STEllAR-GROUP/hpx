@@ -26,6 +26,7 @@
 #include <boost/program_options.hpp>
 
 #include <cctype>
+#include <cstdint>
 #include <functional>
 #include <set>
 #include <string>
@@ -72,7 +73,7 @@ namespace hpx { namespace performance_counters { namespace papi
 
         // validate thread label taken from counter name
         std::string label;
-        boost::uint32_t tix = util::get_counter_thread(paths, label);
+        std::uint32_t tix = util::get_counter_thread(paths, label);
         if (tix == thread_mapper::invalid_index)
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -108,7 +109,7 @@ namespace hpx { namespace performance_counters { namespace papi
     {
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
         std::string label;
-        boost::uint32_t tix = 0;
+        std::uint32_t tix = 0;
         while (!((label = tm.get_thread_label(tix++)).empty()))
         {
             if (mode == discover_counters_minimal)

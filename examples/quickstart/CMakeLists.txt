@@ -6,6 +6,7 @@
 
 set(example_programs
     allow_unknown_options
+    command_line_handling
     component_ctors
     component_in_executable
     component_inheritance
@@ -13,6 +14,7 @@ set(example_programs
     composable_guard
     customize_async
     data_actions
+    enumerate_threads
     error_handling
     event_synchronization
     factorial
@@ -48,11 +50,13 @@ set(example_programs
    )
 
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(command_line_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)

@@ -161,7 +161,7 @@ applications to scale as they should? In our opinion, the main objectives are:
   people are interested in
 * ['Fault tolerance]: the low expected mean time between failures
   ([@http://en.wikipedia.org/wiki/Mean_time_between_failures MTBF]) of
-  future systems requires to embrace faults, not trying to avoid them
+  future systems requires embracing faults, not trying to avoid them
 * ['Power]: minimizing energy consumption is a must as it is one of the major
   cost factors today, even more so in the future
 * ['Generality]: any system should be usable for a broad set of use cases
@@ -210,7 +210,7 @@ latencies intrinsic to the way we use
 [@http://en.wikipedia.org/wiki/GPGPU GPGPUs] today. It is important to note,
 that existing latencies are often tightly related to some resource having to
 wait for the operation to be completed. At the same time it would be perfectly
-fine to do some other, unrelated work in the meantime, allowing to hide the
+fine to do some other, unrelated work in the meantime, allowing the system to hide the
 latencies by filling the idle-time with useful work. Modern system already
 employ similar techniques (pipelined instruction execution in the processor
 cores, asynchronous input/output operations, and many more). What we propose
@@ -230,7 +230,7 @@ conventional systems however, the smaller the overhead of a context switch and
 the finer the granularity of the threading system, the better will be the
 overall system utilization and its efficiency. For today's architectures we
 already see a flurry of libraries providing exactly this type of functionality:
-non-preemptive, task-queue based parallelization solutions, such as
+non-pre-emptive, task-queue based parallelization solutions, such as
 __tbb__, __ppl__, __cilk_pp__, and many others. The possibility to suspend a
 current task if some preconditions for its execution are not met (such as
 waiting for I/O or the result of a different task), seamlessly switching to
@@ -330,7 +330,7 @@ Today's prevalently used programming model on parallel (multi-node) systems is
 __mpi__. It is based on message passing (as the name implies), which means that the
 receiver has to be aware of a message about to come in. Both codes, the sender
 and the receiver, have to synchronize in order to perform the communication
-step. Even the newer, asynchronous interfaces require to explicitly code the
+step. Even the newer, asynchronous interfaces require explicitly coding the
 algorithms around the required communication scheme. As a result, any more
 than trivial __mpi__ application spends a considerable amount of time waiting for
 incoming messages, thus causing starvation and latencies to impede full resource
@@ -339,12 +339,12 @@ algorithms become, the larger are the adverse effects. The community has
 discovered message-driven and (data-driven) methods of implementing algorithms
 a long time ago, and systems such as __charm_pp__ already have integrated active
 messages demonstrating the validity of the concept. Message driven computation
-allows to send messages without that the receiver has to actively wait for
+allows sending messages without requiring the receiver to actively wait for
 them. Any incoming message is handled asynchronously and triggers the encoded
 action by passing along arguments and - possibly - continuations. __hpx__ combines
-this scheme with work queue based scheduling as described above, which allows
-to almost completely overlap any communication with useful work, reducing
-latencies to a minimum.
+this scheme with work queue-based scheduling as described above, which allows
+the system to overlap almost completely any communication with useful work, thereby
+minimizing latencies.
 
 [endsect] [/ Governing Principles applied while Developing __hpx__]
 

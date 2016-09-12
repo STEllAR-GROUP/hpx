@@ -38,6 +38,14 @@ namespace boost
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
       { "(\\bstd\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper", "functional" },
       { "(\\bstd\\s*::\\s*(c?ref)\\b)", "std::\\2", "functional" },
+      { "(\\bstd\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2", "cstdint" },
+      { "(\\bstd\\s*::\\s*((i|o)?stringstream)\\b)", "std::\\2", "sstream" },
+      { "(\\bstd\\s*::\\s*((i|o)?fstream)\\b)", "std::\\2", "fstream" },
+      { "(\\bstd\\s*::\\s*(cin|cout|cerr|clog)\\b)", "std::\\2", "iostream" },
+      // cstddef
+      { "(\\bstd\\s*::\\s*size_t\\b)", "std::size_t", "cstddef" },
+      { "(\\bstd\\s*::\\s*ptrdiff_t\\b)", "std::ptrdiff_t", "cstddef" },
+      { "(\\bstd\\s*::\\s*nullptr_t\\b)", "std::nullptr_t", "cstddef" },
       // type_traits
       { "(\\bstd\\s*::\\s*true_type\\b)", "std::true_type", "type_traits" },
       { "(\\bstd\\s*::\\s*false_type\\b)", "std::false_type", "type_traits" },

@@ -14,6 +14,8 @@
 #include <qthread/qloop.h>
 
 #include <chrono>
+#include <cstdint>
+#include <iostream>
 
 typedef std::chrono::steady_clock BaseClock;
 
@@ -23,7 +25,7 @@ extern "C" void stage_tasks(
     void* payload_duration_
     )
 {
-    htts2::payload<BaseClock>(reinterpret_cast<boost::uint64_t>
+    htts2::payload<BaseClock>(reinterpret_cast<std::uint64_t>
         (payload_duration_ /* = p */));
 }
 

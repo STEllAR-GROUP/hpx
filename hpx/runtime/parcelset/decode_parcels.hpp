@@ -16,6 +16,8 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <sstream>
 #include <utility>
@@ -32,14 +34,14 @@ namespace hpx { namespace parcelset
 
         std::size_t num_zero_copy_chunks =
             static_cast<std::size_t>(
-                static_cast<boost::uint32_t>(buffer.num_chunks_.first));
+                static_cast<std::uint32_t>(buffer.num_chunks_.first));
 
         if (num_zero_copy_chunks != 0)
         {
             // decode chunk information
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(buffer.num_chunks_.second));
+                    static_cast<std::uint32_t>(buffer.num_chunks_.second));
 
             chunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
 
@@ -47,7 +49,7 @@ namespace hpx { namespace parcelset
             for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                boost::uint64_t first = c.first, second = c.second;
+                std::uint64_t first = c.first, second = c.second;
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
 
@@ -61,7 +63,7 @@ namespace hpx { namespace parcelset
                  ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                boost::uint64_t first = c.first, second = c.second;
+                std::uint64_t first = c.first, second = c.second;
 
                 // find next free entry
                 while (chunks[index].size_ != 0)
@@ -95,14 +97,14 @@ namespace hpx { namespace parcelset
       , std::size_t num_thread = -1
     )
     {
-        boost::uint64_t inbound_data_size = buffer.data_size_;
+        std::uint64_t inbound_data_size = buffer.data_size_;
 
         // protect from un-handled exceptions bubbling up
         try {
             try {
                 // mark start of serialization
                 util::high_resolution_timer timer;
-                boost::int64_t overall_add_parcel_time = 0;
+                std::int64_t overall_add_parcel_time = 0;
                 performance_counters::parcels::data_point& data =
                     buffer.data_point_;
 
@@ -115,11 +117,27 @@ namespace hpx { namespace parcelset
                         archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                        std::size_t archive_pos = archive.current_pos();
+                        std::int64_t serialize_time = timer.elapsed_nanoseconds();
+#endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;
-                        // make sure this parcel ended up on the right locality
 
+                        std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                        performance_counters::parcels::data_point action_data;
+                        action_data.bytes_ = archive.current_pos() - archive_pos;
+                        action_data.serialization_time_ =
+                            add_parcel_time - serialize_time;
+                        action_data.num_parcels_ = 1;
+                        pp.add_received_data(p.get_action()->get_action_name(),
+                            action_data);
+#endif
+
+                        // make sure this parcel ended up on the right locality
                         naming::gid_type const& here = hpx::get_locality();
                         if (hpx::get_runtime_ptr() && here &&
                             (naming::get_locality_id_from_gid(
@@ -137,7 +155,6 @@ namespace hpx { namespace parcelset
                         }
 
                         // be sure not to measure add_parcel as serialization time
-                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
                         pp.add_received_parcel(std::move(p), num_thread);
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;

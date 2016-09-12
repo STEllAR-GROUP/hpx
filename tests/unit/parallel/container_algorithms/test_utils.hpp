@@ -11,6 +11,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <utility>

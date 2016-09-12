@@ -15,6 +15,7 @@
 
 #include <hpx/components/security/signature.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx { namespace components { namespace security

@@ -13,6 +13,7 @@
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
 
+#include <cstddef>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail

@@ -8,6 +8,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {

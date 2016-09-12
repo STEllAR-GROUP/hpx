@@ -8,6 +8,7 @@
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <string>

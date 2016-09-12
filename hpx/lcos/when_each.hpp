@@ -13,7 +13,7 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -40,7 +40,7 @@ namespace hpx
     template <typename F, typename Future>
     future<void> when_each(F&& f, std::vector<Future>&& futures);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -69,7 +69,7 @@ namespace hpx
     template <typename F, typename Iterator>
     future<Iterator> when_each(F&& f, Iterator begin, Iterator end);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -95,7 +95,7 @@ namespace hpx
     template <typename F, typename... Ts>
     future<void> when_each(F&& f, Ts&&... futures);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback

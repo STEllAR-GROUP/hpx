@@ -12,6 +12,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static_reinit.hpp>
 
+#include <cstddef>
 #include <memory>   // for placement new
 #include <type_traits>
 

@@ -8,6 +8,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
+
 void dummy() {}
 
 int hpx_main()
@@ -26,9 +28,9 @@ int hpx_main()
 
         using hpx::naming::detail::strip_internal_bits_and_locality_from_gid;
 
-        boost::uint64_t msb1 =
+        std::uint64_t msb1 =
             strip_internal_bits_and_locality_from_gid(id1.get_msb());
-        boost::uint64_t msb2 =
+        std::uint64_t msb2 =
             strip_internal_bits_and_locality_from_gid(id2.get_msb());
 
         HPX_TEST_EQ(msb1, msb2);

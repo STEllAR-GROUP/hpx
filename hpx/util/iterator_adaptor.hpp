@@ -28,7 +28,8 @@ namespace hpx { namespace util
         // A meta-function which computes an iterator_adaptor's base class,
         // a specialization of iterator_facade.
         template <typename Derived, typename Base, typename Value,
-            typename Category, typename Reference, typename Difference>
+            typename Category, typename Reference, typename Difference,
+            typename Pointer>
         struct iterator_adaptor_base
         {
             typedef typename std::conditional<
@@ -65,7 +66,7 @@ namespace hpx { namespace util
 
             typedef iterator_facade<
                     Derived, value_type, iterator_category, reference_type,
-                    distance_type
+                    distance_type, Pointer
                 > type;
         };
     }
@@ -96,15 +97,15 @@ namespace hpx { namespace util
     template <
         typename Derived, typename Base, typename Value = void,
         typename Category = void, typename Reference = void,
-        typename Difference = void>
+        typename Difference = void, typename Pointer = void>
     class iterator_adaptor
       : public hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference
+                Derived, Base, Value, Category, Reference, Difference, Pointer
             >::type
     {
     protected:
         typedef typename hpx::util::detail::iterator_adaptor_base<
-                Derived, Base, Value, Category, Reference, Difference
+                Derived, Base, Value, Category, Reference, Difference, Pointer
             >::type base_adaptor_type;
 
         friend class hpx::util::iterator_core_access;
@@ -130,7 +131,7 @@ namespace hpx { namespace util
     protected:
         // for convenience in derived classes
         typedef iterator_adaptor<
-                Derived, Base, Value, Category, Reference, Difference
+                Derived, Base, Value, Category, Reference, Difference, Pointer
             > iterator_adaptor_;
 
         // lvalue access to the Base object for Derived
@@ -158,11 +159,11 @@ namespace hpx { namespace util
         }
 
         template <typename OtherDerived, typename OtherIterator, typename V,
-            typename C, typename R, typename D>
+            typename C, typename R, typename D, typename P>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        bool equal(
-            iterator_adaptor<OtherDerived, OtherIterator, V, C, R, D> const& x)
-            const
+        bool equal(iterator_adaptor<
+                OtherDerived, OtherIterator, V, C, R, D, P
+            > const& x) const
         {
             // Maybe re-add with same_distance
             //  static_assert(
@@ -190,12 +191,12 @@ namespace hpx { namespace util
         }
 
         template <typename OtherDerived, typename OtherIterator, typename V,
-            typename C, typename R, typename D>
+            typename C, typename R, typename D, typename P>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename base_adaptor_type::difference_type
         distance_to(
             iterator_adaptor<
-                OtherDerived, OtherIterator, V, C, R, D
+                OtherDerived, OtherIterator, V, C, R, D, P
             > const& y) const
         {
             // Maybe re-add with same_distance

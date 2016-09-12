@@ -18,6 +18,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -31,8 +32,8 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -45,13 +46,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
-            parcelset::locality const& locality_id,
-            performance_counters::parcels::gatherer& parcels_sent)
+                parcelset::locality const& locality_id,
+                parcelset::parcelport* pp)
           : socket_(io_service)
           , ack_(0)
           , there_(locality_id)
           , timer_()
-          , parcels_sent_(parcels_sent)
+          , pp_(pp)
         {
         }
 
@@ -174,7 +175,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // complete data point and push back onto gatherer
             buffer_.data_point_.time_ =
                 timer_.elapsed_nanoseconds() - buffer_.data_point_.time_;
-            parcels_sent_.add_data(buffer_.data_point_);
+            pp_->add_sent_data(buffer_.data_point_);
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
@@ -214,7 +215,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Counters and their data containers.
         util::high_resolution_timer timer_;
-        performance_counters::parcels::gatherer& parcels_sent_;
+        parcelset::parcelport* pp_;
 
         util::unique_function_nonser<
             void(
