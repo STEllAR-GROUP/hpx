@@ -323,11 +323,9 @@ void inclusive_scan_tests_inplace_with_policy(std::size_t size,
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void inclusive_scan_tests()
+void inclusive_scan_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 1000000;
-
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout(3));
@@ -355,9 +353,9 @@ void inclusive_scan_tests()
 
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    inclusive_scan_tests<int>();
-    inclusive_scan_tests<double>();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    inclusive_scan_tests<int>(localities);
+    inclusive_scan_tests<double>(localities);
 
     return hpx::util::report_errors();
 }
