@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "inner_product_tests.hpp"
+#include "../algorithms/inner_product_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -18,21 +18,8 @@ void test_inner_product()
 {
     using namespace hpx::parallel;
 
-    test_inner_product(seq, IteratorTag());
-    test_inner_product(par, IteratorTag());
-    test_inner_product(par_vec, IteratorTag());
-
-    test_inner_product_async(seq(task), IteratorTag());
-    test_inner_product_async(par(task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inner_product(execution_policy(seq), IteratorTag());
-    test_inner_product(execution_policy(par), IteratorTag());
-    test_inner_product(execution_policy(par_vec), IteratorTag());
-
-    test_inner_product(execution_policy(seq(task)), IteratorTag());
-    test_inner_product(execution_policy(par(task)), IteratorTag());
-#endif
+    test_inner_product(datapar_execution, IteratorTag());
+    test_inner_product_async(datapar_execution(task), IteratorTag());
 }
 
 void inner_product_test()

@@ -39,6 +39,10 @@ if(Vc_FOUND)
   link_directories(${Vc_LIB_DIR})
   hpx_libraries(${Vc_LIBRARIES})
 
+  foreach(_flag ${Vc_DEFINITIONS})
+    add_definitions(${_flag})
+  endforeach()
+
   hpx_add_config_define(HPX_HAVE_VC_DATAPAR)
 endif()
 

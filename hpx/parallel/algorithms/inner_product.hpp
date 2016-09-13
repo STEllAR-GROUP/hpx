@@ -312,7 +312,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::inner_product<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            std::move(init), std::plus<T>(), std::multiplies<T>());
+            std::move(init), detail::plus(), detail::multiplies());
     }
 
     ///////////////////////////////////////////////////////////////////////////

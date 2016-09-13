@@ -11,6 +11,7 @@ if(HPX_WITH_VC_DATAPAR)
       countif_datapar
       foreach_datapar
       foreachn_datapar
+      inner_product_datapar
       transform_datapar
       transform_binary_datapar
       transform_binary2_datapar
@@ -33,6 +34,16 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Parallel/DataParAlgorithms")
 
+  if(NOT MSVC)
+    foreach(_flag ${Vc_COMPILE_FLAGS})
+      set_target_properties(${test}_test_exe PROPERTIES COMPILE_FLAGS ${_flag})
+    endforeach()
+  endif()
+
+  foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
+    set_target_properties(${test}_test_exe PROPERTIES COMPILE_FLAGS ${_flag})
+  endforeach()
+
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
@@ -45,4 +56,5 @@ foreach(test ${tests})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.parallel.datapar_algorithms.${test}
                               ${test}_test_exe)
+
 endforeach()

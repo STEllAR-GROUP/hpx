@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { namespace util
     bool loop_optimization(parallel::v1::datapar_task_execution_policy,
         Iter const& first1, Iter const& last1)
     {
-        return detail::loop_optimization<Iter1>::call(first1, last1);
+        return detail::loop_optimization<Iter>::call(first1, last1);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -366,9 +366,9 @@ namespace hpx { namespace parallel { namespace util
                 !iterators_datapar_compatible<InIter1, InIter2>::value ||
                     !iterator_datapar_compatible<InIter1>::value ||
                     !iterator_datapar_compatible<InIter2>::value,
-                std::pair<Iter1, Iter2>
+                std::pair<InIter1, InIter2>
             >::type
-            call(Iter1 it1, Iter1 last1, Iter2 it2, F && f)
+            call(InIter1 it1, InIter1 last1, InIter2 it2, F && f)
             {
                 return std::make_pair(std::move(it1), std::move(it2));
             }
@@ -379,6 +379,15 @@ namespace hpx { namespace parallel { namespace util
     template <typename Iter1, typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
     loop2(parallel::v1::datapar_execution_policy, Iter1 first1, Iter1 last1,
+        Iter2 first2, F && f)
+    {
+        return detail::datapar_loop2<Iter1, Iter2>::call(first1, last1, first2,
+            std::forward<F>(f));
+    }
+
+    template <typename Iter1, typename Iter2, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
+    loop2(parallel::v1::datapar_task_execution_policy, Iter1 first1, Iter1 last1,
         Iter2 first2, F && f)
     {
         return detail::datapar_loop2<Iter1, Iter2>::call(first1, last1, first2,

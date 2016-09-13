@@ -138,7 +138,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::util::invoke(f, &tmp);
             }
 
-            template <typename F, typename Iter>
+            template <typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::result_of<F&&(V*)>::type
             callv(F && f, Iter& it)
@@ -169,8 +169,8 @@ namespace hpx { namespace parallel { namespace util
             {
                 V11 tmp1(std::addressof(*it1), Vc::Aligned);
                 V12 tmp2(std::addressof(*it2), Vc::Aligned);
-                it1 += V11::Size;
-                it2 += V12::Size;
+                std::advance(it1, V11::Size);
+                std::advance(it2, V12::Size);
                 return hpx::util::invoke(f, &tmp1, &tmp2);
             }
 
@@ -179,17 +179,19 @@ namespace hpx { namespace parallel { namespace util
             static typename std::result_of<F&&(V1*, V2*)>::type
             callv(F && f, Iter1& it1, Iter2& it2)
             {
-//                 if (data_alignment(it1) || data_alignment(it2))
-//                 {
-//                     V1 tmp1(std::addressof(*it1), Vc::Unaligned);
-//                     V2 tmp2(std::addressof(*it2), Vc::Unaligned);
-//                     return hpx::util::invoke(f, &tmp1, &tmp2);
-//                 }
+                if (data_alignment(it1) || data_alignment(it2))
+                {
+                    V1 tmp1(std::addressof(*it1), Vc::Unaligned);
+                    V2 tmp2(std::addressof(*it2), Vc::Unaligned);
+                    std::advance(it1, V1::Size);
+                    std::advance(it2, V2::Size);
+                    return hpx::util::invoke(f, &tmp1, &tmp2);
+                }
 
                 V1 tmp1(std::addressof(*it1), Vc::Aligned);
                 V2 tmp2(std::addressof(*it2), Vc::Aligned);
-                it1 += V1::Size;
-                it2 += V2::Size;
+                std::advance(it1, V1::Size);
+                std::advance(it2, V2::Size);
                 return hpx::util::invoke(f, &tmp1, &tmp2);
             }
         };
@@ -210,8 +212,8 @@ namespace hpx { namespace parallel { namespace util
                 auto ret = hpx::util::invoke(f, &tmp);
                 ret.store(std::addressof(*dest), Vc::Aligned);
 
-                it += V1::Size;
-                dest += ret.size();
+                std::advance(it, V1::Size);
+                std::advance(dest, ret.size());
             }
 
             template <typename F, typename InIter1, typename InIter2,
@@ -232,9 +234,9 @@ namespace hpx { namespace parallel { namespace util
                 auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
                 ret.store(std::addressof(*dest), Vc::Aligned);
 
-                it1 += V1::Size;
-                it2 += V2::Size;
-                dest += ret.size();
+                std::advance(it1, V1::Size);
+                std::advance(it2, V2::Size);
+                std::advance(dest, ret.size());
             }
 
             ///////////////////////////////////////////////////////////////////
@@ -247,19 +249,22 @@ namespace hpx { namespace parallel { namespace util
 
                 typedef Vc::Vector<value_type> V;
 
-//                 if (data_alignment(it) || data_alignment(dest))
-//                 {
-//                     V tmp(std::addressof(*it), Vc::Unaligned);
-//                     auto ret = hpx::util::invoke(f, &tmp);
-//                     ret.store(std::addressof(*dest), Vc::Unaligned);
-//                 }
+                if (data_alignment(it) || data_alignment(dest))
+                {
+                    V tmp(std::addressof(*it), Vc::Unaligned);
+                    auto ret = hpx::util::invoke(f, &tmp);
+                    ret.store(std::addressof(*dest), Vc::Unaligned);
+                    std::advance(dest, ret.size());
+                }
+                else
+                {
+                    V tmp(std::addressof(*it), Vc::Aligned);
+                    auto ret = hpx::util::invoke(f, &tmp);
+                    ret.store(std::addressof(*dest), Vc::Aligned);
+                    std::advance(dest, ret.size());
+                }
 
-                V tmp(std::addressof(*it), Vc::Aligned);
-                auto ret = hpx::util::invoke(f, &tmp);
-                ret.store(std::addressof(*dest), Vc::Aligned);
-
-                it += V::Size;
-                dest += ret.size();
+                std::advance(it, V::Size);
             }
 
             template <typename F, typename InIter1, typename InIter2,
@@ -275,23 +280,23 @@ namespace hpx { namespace parallel { namespace util
                 typedef Vc::Vector<value1_type> V1;
                 typedef Vc::Vector<value2_type> V2;
 
-//                 if (data_alignment(it1) || data_alignment(it2) ||
-//                     data_alignment(dest))
-//                 {
-//                     V1 tmp1(std::addressof(*it1), Vc::Unaligned);
-//                     V2 tmp2(std::addressof(*it2), Vc::Unaligned);
-//                     auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
-//                     ret.store(std::addressof(*dest), Vc::Unaligned);
-//                 }
+                if (data_alignment(it1) || data_alignment(it2) ||
+                    data_alignment(dest))
+                {
+                    V1 tmp1(std::addressof(*it1), Vc::Unaligned);
+                    V2 tmp2(std::addressof(*it2), Vc::Unaligned);
+                    auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+                    ret.store(std::addressof(*dest), Vc::Unaligned);
+                }
 
                 V1 tmp1(std::addressof(*it1), Vc::Aligned);
                 V2 tmp2(std::addressof(*it2), Vc::Aligned);
                 auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
                 ret.store(std::addressof(*dest), Vc::Aligned);
 
-                it1 += V1::Size;
-                it2 += V2::Size;
-                dest += ret.size();
+                std::advance(it1, V1::Size);
+                std::advance(it2, V2::Size);
+                std::advance(dest, ret.size());
             }
         };
     }
