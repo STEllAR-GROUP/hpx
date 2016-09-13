@@ -26,42 +26,58 @@ namespace hpx { namespace parcelset { namespace detail {
         template <typename PutParcel_>
         parcel_await(parcel&& p, int archive_flags, PutParcel_&& pp)
           : put_parcel_(std::forward<PutParcel_>(pp)),
-            p_(std::move(p)),
             archive_(preprocess_, archive_flags, &chunks_),
-            overhead_(archive_.bytes_written())
+            overhead_(archive_.bytes_written()),
+            idx_(0)
+        {
+            parcels_.push_back(std::move(p));
+        }
+
+        template <typename PutParcel_>
+        parcel_await(std::vector<parcel>&& parcels, int archive_flags, PutParcel_&& pp)
+          : put_parcel_(std::forward<PutParcel_>(pp)),
+            parcels_(std::move(parcels)),
+            archive_(preprocess_, archive_flags, &chunks_),
+            overhead_(archive_.bytes_written()),
+            idx_(0)
         {
         }
 
         void apply()
         {
-            archive_.reset();
-            archive_ << p_;
-
-            // We are doing a fixed point iteration until we are sure that the
-            // serialization process requires nothing more to wait on ...
-            // Things where we need waiting:
-            //  - (shared_)future<id_type>: when the future wasn't ready yet, we
-            //      need to do another await round for the id splitting
-            //  - id_type: we need to await, if and only if, the credit of the
-            //      needs to split.
-            if(preprocess_.has_futures())
+            for (/*idx_*/; idx_ != parcels_.size(); ++idx_)
             {
-                auto this_ = this->shared_from_this();
-                preprocess_([this_](){ this_->apply(); });
-                return;
+                chunks_.clear();
+                archive_.reset();
+                archive_ << parcels_[idx_];
+
+                // We are doing a fixed point iteration until we are sure that the
+                // serialization process requires nothing more to wait on ...
+                // Things where we need waiting:
+                //  - (shared_)future<id_type>: when the future wasn't ready yet, we
+                //      need to do another await round for the id splitting
+                //  - id_type: we need to await, if and only if, the credit of the
+                //      needs to split.
+                if(preprocess_.has_futures())
+                {
+                    auto this_ = this->shared_from_this();
+                    preprocess_([this_](){ this_->apply(); });
+                    return;
+                }
+                parcels_[idx_].size() = preprocess_.size() + overhead_;
+                parcels_[idx_].num_chunks() = chunks_.size();
+                parcels_[idx_].set_splitted_gids(std::move(preprocess_.splitted_gids_));
+                put_parcel_(std::move(parcels_[idx_]));
             }
-            p_.size() = preprocess_.size() + overhead_;
-            p_.num_chunks() = chunks_.size();
-            p_.set_splitted_gids(std::move(preprocess_.splitted_gids_));
-            put_parcel_(std::move(p_));
         }
 
         typename hpx::util::decay<PutParcel>::type put_parcel_;
-        parcel p_;
+        std::vector<parcel> parcels_;
         hpx::serialization::detail::preprocess preprocess_;
         std::vector<hpx::serialization::serialization_chunk> chunks_;
         hpx::serialization::output_archive archive_;
         std::size_t overhead_;
+        std::size_t idx_;
     };
 }}}
 

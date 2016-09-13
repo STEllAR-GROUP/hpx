@@ -221,6 +221,39 @@ namespace hpx { namespace parcelset
             }
         };
 
+        struct parcel_await_handlers
+        {
+            parcelport_impl& this_;
+            locality dest_;
+            std::vector<write_handler_type> handler_;
+            std::vector<parcel> parcels_;
+            std::size_t idx_;
+
+            void operator()(parcel p)
+            {
+                if (!connection_handler_traits<ConnectionHandler>::
+                    use_connection_cache::value)
+                {
+                    this_.send_parcel_immediate(
+                        dest_, std::move(p), std::move(handler_[idx_]));
+                    ++idx_;
+                }
+                else
+                {
+                    parcels_.push_back(std::move(p));
+                    // enqueue the outgoing parcels ...
+
+                    if (parcels_.size() == handler_.size())
+                    {
+                        this_.enqueue_parcels(
+                            dest_, std::move(parcels_), std::move(handler_));
+
+                        this_.get_connection_and_send_parcels(dest_);
+                    }
+                }
+            }
+        };
+
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
         {
             HPX_ASSERT(dest.type() == type());
@@ -253,11 +286,18 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
-            for (std::size_t i = 0; i != parcels.size(); ++i)
-            {
-                put_parcel(dest, std::move(parcels[i]),
-                    std::move(handlers[i]));
-            }
+            typedef
+                detail::parcel_await<parcel_await_handlers>
+                parcel_await;
+
+            parcel_await_handlers handler{
+                *this, dest, std::move(handlers), std::vector<parcel>(), 0};
+            if (connection_handler_traits<ConnectionHandler>::
+                use_connection_cache::value)
+                handler.parcels_.reserve(parcels.size());
+
+            std::make_shared<parcel_await>(
+                std::move(parcels), archive_flags_, std::move(handler))->apply();
         }
 
         void send_early_parcel(locality const & dest, parcel p)

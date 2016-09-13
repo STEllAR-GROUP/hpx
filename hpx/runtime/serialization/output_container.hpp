@@ -174,6 +174,11 @@ namespace hpx { namespace serialization
 
         void reset()
         {
+            if (chunks_)
+            {
+                chunks_->push_back(create_index_chunk(0, 0));
+                current_chunk_ = 0;
+            }
             return detail::access_data<Container>::reset(cont_);
         }
 
