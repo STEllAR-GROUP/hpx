@@ -1400,7 +1400,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v0.5
+    develop
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
@@ -1422,6 +1422,10 @@ if(HPX_WITH_APEX)
   if(APEX_WITH_ACTIVEHARMONY)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_OTF2)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
   endif()
   if(APEX_WITH_TAU OR HPX_WITH_TAU)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
