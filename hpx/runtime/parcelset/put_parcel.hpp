@@ -117,8 +117,9 @@ namespace hpx { namespace parcelset {
             // Is the first argument a continuation?
             std::integral_constant<bool,
                 traits::is_continuation<arg0_type>::value &&
-                // We need to tread unique pointers to continuations
-                // differently
+                // We need to treat unique pointers to continuations
+                // differently because it can be moved directly into
+                // the parcel.
                 !std::is_same<
                     std::unique_ptr<actions::continuation>, arg0_type
                 >::value

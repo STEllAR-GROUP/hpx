@@ -489,7 +489,7 @@ namespace hpx { namespace actions
             naming::gid_type&& target, naming::address_type lva,
             std::size_t num_thread)
         {
-            // First, serialize, then
+            // First, serialize, then schedule
             ar >> *this;
             schedule_thread(std::move(target), lva, num_thread);
         }
@@ -499,7 +499,7 @@ namespace hpx { namespace actions
             naming::gid_type&& target, naming::address_type lva,
             std::size_t num_thread)
         {
-            // First, serialize, then
+            // First, serialize, then schedule
             ar >> *this;
             schedule_thread(std::move(cont), std::move(target), lva, num_thread);
         }
