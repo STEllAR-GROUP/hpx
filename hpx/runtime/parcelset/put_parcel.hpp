@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset {
 
         struct put_parcel_handler
         {
-            void operator()(parcel&& p)
+            void operator()(parcel&& p) const
             {
                 parcelset::parcelhandler& ph =
                     hpx::get_runtime().get_parcel_handler();
