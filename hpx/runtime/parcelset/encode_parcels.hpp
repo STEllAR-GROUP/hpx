@@ -204,6 +204,7 @@ namespace hpx
                                 action_data);
 #endif
                         }
+                        archive.flush();
                         arg_size = archive.bytes_written();
                     }
 

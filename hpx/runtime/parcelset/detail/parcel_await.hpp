@@ -26,7 +26,7 @@ namespace hpx { namespace parcelset { namespace detail {
         template <typename PutParcel_>
         parcel_await(parcel&& p, int archive_flags, PutParcel_&& pp)
           : put_parcel_(std::forward<PutParcel_>(pp)),
-            archive_(preprocess_, archive_flags, &chunks_),
+            archive_(preprocess_, archive_flags),
             overhead_(archive_.bytes_written()),
             idx_(0)
         {
@@ -37,7 +37,7 @@ namespace hpx { namespace parcelset { namespace detail {
         parcel_await(std::vector<parcel>&& parcels, int archive_flags, PutParcel_&& pp)
           : put_parcel_(std::forward<PutParcel_>(pp)),
             parcels_(std::move(parcels)),
-            archive_(preprocess_, archive_flags, &chunks_),
+            archive_(preprocess_, archive_flags),
             overhead_(archive_.bytes_written()),
             idx_(0)
         {
@@ -47,7 +47,6 @@ namespace hpx { namespace parcelset { namespace detail {
         {
             for (/*idx_*/; idx_ != parcels_.size(); ++idx_)
             {
-                chunks_.clear();
                 archive_.reset();
                 archive_ << parcels_[idx_];
 
@@ -64,8 +63,9 @@ namespace hpx { namespace parcelset { namespace detail {
                     preprocess_([this_](){ this_->apply(); });
                     return;
                 }
+                archive_.flush();
                 parcels_[idx_].size() = preprocess_.size() + overhead_;
-                parcels_[idx_].num_chunks() = chunks_.size();
+                parcels_[idx_].num_chunks() = archive_.get_num_chunks();
                 parcels_[idx_].set_splitted_gids(std::move(preprocess_.splitted_gids_));
                 put_parcel_(std::move(parcels_[idx_]));
             }
@@ -74,7 +74,6 @@ namespace hpx { namespace parcelset { namespace detail {
         typename hpx::util::decay<PutParcel>::type put_parcel_;
         std::vector<parcel> parcels_;
         hpx::serialization::detail::preprocess preprocess_;
-        std::vector<hpx::serialization::serialization_chunk> chunks_;
         hpx::serialization::output_archive archive_;
         std::size_t overhead_;
         std::size_t idx_;

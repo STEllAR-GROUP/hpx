@@ -33,6 +33,8 @@ namespace hpx { namespace serialization
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;
         virtual void reset() = 0;
+        virtual std::size_t get_num_chunks() const = 0;
+        virtual void flush() = 0;
     };
 
     struct erased_input_container

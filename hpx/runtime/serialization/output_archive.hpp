@@ -99,6 +99,11 @@ namespace hpx { namespace serialization
 
         naming::gid_type get_new_gid(naming::gid_type const & gid);
 
+        std::size_t get_num_chunks() const
+        {
+            return buffer_->get_num_chunks();
+        }
+
         // this function is needed to avoid a MSVC linker error
         std::size_t current_pos() const
         {
@@ -110,6 +115,11 @@ namespace hpx { namespace serialization
             buffer_->reset();
             pointer_tracker_.clear();
             basic_archive<output_archive>::reset();
+        }
+
+        void flush()
+        {
+            buffer_->flush();
         }
 
     private:
