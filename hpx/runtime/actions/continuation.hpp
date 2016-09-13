@@ -971,10 +971,6 @@ namespace hpx { namespace actions
 
     void continuation::trigger(hpx::util::unused_type)
     {
-        // The dynamic cast decays the argument type to avoid the assert firing
-        // for cases when Arg0 is a const&. This does not make the code invalid
-        // as trigger_value (which is a virtual function) takes its argument
-        // by && anyways.
         HPX_ASSERT((nullptr != dynamic_cast<
                 typed_continuation<void, hpx::util::unused_type>*>(this)));
 
