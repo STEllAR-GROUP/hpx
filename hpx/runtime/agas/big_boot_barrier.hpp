@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
@@ -108,14 +109,17 @@ struct HPX_EXPORT big_boot_barrier
             parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
-        p.size() = 4096;
 #if defined(HPX_HAVE_PARCEL_PROFILING)
         if (!p.parcel_id())
         {
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-        pp->send_early_parcel(dest, std::move(p));
+        auto f = [this, dest](parcelset::parcel p){ pp->send_early_parcel(dest, std::move(p)); };
+        typedef
+            parcelset::detail::parcel_await<decltype(f)>
+            parcel_await;
+        parcel_await(std::move(p), 0, std::move(f)).apply();
     } // }}}
 
     template <typename Action, typename... Args>
@@ -127,18 +131,12 @@ struct HPX_EXPORT big_boot_barrier
       , Args &&... args
     ) { // {{{
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-        parcelset::parcel p(
-            parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
+
+        parcelset::put_parcel(
+            naming::id_type(
                 naming::get_gid_from_locality_id(target_locality_id),
-                std::move(addr), act, std::forward<Args>(args)...));
-        p.size() = 4096;
-#if defined(HPX_HAVE_PARCEL_PROFILING)
-        if (!p.parcel_id())
-        {
-            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
-        }
-#endif
-        get_runtime().get_parcel_handler().put_parcel(std::move(p));
+                naming::id_type::unmanaged),
+            std::move(addr), act, std::forward<Args>(args)...);
     } // }}}
 
     void wait_bootstrap();
