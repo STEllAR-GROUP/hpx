@@ -17,6 +17,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>

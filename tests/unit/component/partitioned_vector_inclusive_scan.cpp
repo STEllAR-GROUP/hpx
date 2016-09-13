@@ -11,6 +11,8 @@
 
 #include "partitioned_vector_scan.hpp"
 
+#include <cstddef>
+#include <iostream>
 #include <type_traits>
 #include <vector>
 
