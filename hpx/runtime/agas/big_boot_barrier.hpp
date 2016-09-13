@@ -109,6 +109,12 @@ struct HPX_EXPORT big_boot_barrier
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
         p.size() = 4096;
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        if (!p.parcel_id())
+        {
+            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
+        }
+#endif
         pp->send_early_parcel(dest, std::move(p));
     } // }}}
 
@@ -126,6 +132,12 @@ struct HPX_EXPORT big_boot_barrier
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
         p.size() = 4096;
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        if (!p.parcel_id())
+        {
+            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
+        }
+#endif
         get_runtime().get_parcel_handler().put_parcel(std::move(p));
     } // }}}
 

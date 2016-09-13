@@ -428,6 +428,13 @@ namespace hpx { namespace parcelset
             resolved_locally = resolver_->resolve_local(gid, addr);
         }
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        if (!p.parcel_id())
+        {
+            p.parcel_id() = parcelset::parcel::generate_unique_id();
+        }
+#endif
+
         using util::placeholders::_1;
         using util::placeholders::_2;
         write_handler_type wrapped_f =
@@ -536,6 +543,12 @@ namespace hpx { namespace parcelset
 
             // properly initialize parcel
             init_parcel(p);
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+            if (!p.parcel_id())
+            {
+                p.parcel_id() = parcelset::parcel::generate_unique_id();
+            }
+#endif
 
             bool resolved_locally = true;
             naming::address& addr = p.addr();

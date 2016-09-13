@@ -51,6 +51,23 @@ namespace hpx { namespace parcelset
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // generate unique parcel id
+    naming::gid_type parcel::generate_unique_id(
+        boost::uint32_t locality_id_default)
+    {
+        static boost::atomic<boost::uint64_t> id(0);
+
+        error_code ec(lightweight);        // ignore all errors
+        boost::uint32_t locality_id = hpx::get_locality_id(ec);
+        if (locality_id == naming::invalid_locality_id)
+            locality_id = locality_id_default;
+
+        naming::gid_type result = naming::get_gid_from_locality_id(locality_id);
+        result.set_lsb(++id);
+        return result;
+    }
+
     naming::address_type parcel::determine_lva()
     {
         naming::resolver_client& client = hpx::naming::get_agas_client();

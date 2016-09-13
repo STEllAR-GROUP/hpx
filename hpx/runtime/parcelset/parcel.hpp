@@ -63,8 +63,10 @@ namespace hpx { namespace parcelset
         bool is_valid() const
         {
             // empty parcels are always valid
-            if (0 == data_.creation_time_) //-V550
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+            if (0.0 == data_.creation_time_) //-V550
                 return true;
+#endif
 
             // verify target destination
             if (data_.dest_ && data_.addr_.locality_)
@@ -101,31 +103,40 @@ namespace hpx { namespace parcelset
             HPX_MOVABLE_ONLY(data);
 
         public:
-            data()
-              : start_time_(0),
+            data() :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                start_time_(0),
                 creation_time_(util::high_resolution_timer::now()),
+#endif
                 source_id_(naming::invalid_gid),
                 dest_(naming::invalid_gid)
             {}
 
-            data(naming::gid_type&& dest, naming::address&& addr)
-              : start_time_(0),
+            data(naming::gid_type&& dest, naming::address&& addr) :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                start_time_(0),
                 creation_time_(util::high_resolution_timer::now()),
+#endif
                 source_id_(naming::invalid_gid),
                 dest_(std::move(dest)),
                 addr_(std::move(addr))
             {}
 
-            data(data && rhs)
-              : start_time_(rhs.start_time_),
+            data(data && rhs) :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                parcel_id_(std::move(rhs.parcel_id_)),
+                start_time_(rhs.start_time_),
                 creation_time_(rhs.creation_time_),
+#endif
                 source_id_(std::move(rhs.source_id_)),
                 dest_(std::move(rhs.dest_)),
                 addr_(std::move(rhs.addr_))
             {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                rhs.parcel_id_ = naming::invalid_gid;
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
-                rhs.creation_time_ = 0;
+#endif
                 rhs.source_id_ = naming::invalid_gid;
                 rhs.dest_ = naming::invalid_gid;
                 rhs.addr_ = naming::address();
@@ -133,14 +144,20 @@ namespace hpx { namespace parcelset
 
             data& operator=(data && rhs)
             {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                parcel_id_ = std::move(rhs.parcel_id_);
                 start_time_ = rhs.start_time_;
                 creation_time_ = rhs.creation_time_;
+#endif
                 source_id_ = std::move(rhs.source_id_);
                 dest_ = std::move(rhs.dest_);
                 addr_ = std::move(rhs.addr_);
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                rhs.parcel_id_ = naming::invalid_gid;
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
+#endif
                 rhs.source_id_ = naming::invalid_gid;
                 rhs.dest_ = naming::invalid_gid;
                 rhs.addr_ = naming::address();
@@ -150,15 +167,21 @@ namespace hpx { namespace parcelset
             template <typename Archive>
             void serialize(Archive &ar, unsigned)
             {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                ar & parcel_id_;
                 ar & start_time_;
                 ar & creation_time_;
+#endif
                 ar & source_id_;
                 ar & dest_;
                 ar & addr_;
             }
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+            naming::gid_type parcel_id_;
             double start_time_;
             double creation_time_;
+#endif
 
             naming::gid_type source_id_;
             naming::gid_type dest_;
@@ -279,23 +302,45 @@ namespace hpx { namespace parcelset
 
         double start_time() const
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             return data_.start_time_;
+#else
+            return 0.0;
+#endif
         }
 
         void set_start_time(double time)
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             data_.start_time_ = time;
+#endif
         }
 
         double creation_time() const
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             return data_.creation_time_;
+#else
+            return 0.0;
+#endif
         }
 
         threads::thread_priority get_thread_priority() const
         {
             return action_->get_thread_priority();
         }
+
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        naming::gid_type const parcel_id() const
+        {
+            return data_.parcel_id_;
+        }
+
+        naming::gid_type & parcel_id()
+        {
+            return data_.parcel_id_;
+        }
+#endif
 
         serialization::binary_filter* get_serialization_filter() const
         {
@@ -347,6 +392,10 @@ namespace hpx { namespace parcelset
 
         void load_schedule(serialization::input_archive & ar,
             std::size_t num_thread);
+
+        // generate unique parcel id
+        static naming::gid_type generate_unique_id(
+            boost::uint32_t locality_id = naming::invalid_locality_id);
 
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);
