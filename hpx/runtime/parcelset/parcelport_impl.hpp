@@ -229,20 +229,9 @@ namespace hpx { namespace parcelset
                 detail::parcel_await<parcel_await_handler>
                 parcel_await;
 
-            if (p.action_args_bitwise())
-            {
-                // Since the action argument is bitwise, we know that we don't
-                // need any future awaiting ...
-                parcel_await(
-                    std::move(p), archive_flags_,
-                    parcel_await_handler{*this, dest, std::move(f)}).apply();
-            }
-            else
-            {
-                std::make_shared<parcel_await>(
-                    std::move(p), archive_flags_,
-                    parcel_await_handler{*this, dest, std::move(f)})->apply();
-            }
+            std::make_shared<parcel_await>(
+                std::move(p), archive_flags_,
+                parcel_await_handler{*this, dest, std::move(f)})->apply();
         }
 
         void put_parcels(locality const& dest, std::vector<parcel> parcels,

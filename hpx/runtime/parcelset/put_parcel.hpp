@@ -51,9 +51,7 @@ namespace hpx { namespace parcelset {
                         new actions::transfer_action<Action>(
                             std::forward<Args>(args)...
                         )
-                    ),
-                    util::detail::all_of<
-                        traits::is_bitwise_serializable<Args>...>::value
+                    )
                 );
             }
             template <typename Action, typename... Args>
@@ -76,9 +74,7 @@ namespace hpx { namespace parcelset {
                         new actions::transfer_action<Action>(
                             std::forward<Args>(args)...
                         )
-                    ),
-                    util::detail::all_of<
-                        traits::is_bitwise_serializable<Args>...>::value
+                    )
                 );
             }
 
@@ -101,9 +97,7 @@ namespace hpx { namespace parcelset {
                         new actions::transfer_action<Action>(
                             std::forward<Args>(args)...
                         )
-                    ),
-                    util::detail::all_of<
-                        traits::is_bitwise_serializable<Args>...>::value
+                    )
                 );
             }
         };

@@ -46,7 +46,6 @@ namespace hpx { namespace parcelset { namespace detail {
             //      needs to split.
             if(preprocess_.has_futures())
             {
-                HPX_ASSERT(!p_.action_args_bitwise());
                 auto this_ = this->shared_from_this();
                 preprocess_([this_](){ this_->apply(); });
                 return;
