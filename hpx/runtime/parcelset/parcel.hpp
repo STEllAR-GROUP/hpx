@@ -353,6 +353,7 @@ namespace hpx { namespace parcelset
 
         // serialization support
         friend class hpx::serialization::access;
+        void load_data(serialization::input_archive & ar);
         void serialize(serialization::input_archive & ar, unsigned);
         void serialize(serialization::output_archive & ar, unsigned);
 

@@ -109,21 +109,7 @@ namespace hpx { namespace parcelset
     void parcel::load_schedule(serialization::input_archive & ar,
         std::size_t num_thread)
     {
-        using hpx::serialization::detail::polymorphic_id_factory;
-
-        ar >> data_;
-        ar >> cont_;
-
-        std::uint32_t id;
-        ar >> id;
-#if !defined(HPX_DEBUG)
-        action_.reset(polymorphic_id_factory::create<actions::base_action>(id));
-#else
-        std::string name;
-        ar >> name;
-        action_.reset(
-            polymorphic_id_factory::create<actions::base_action>(id, &name));
-#endif
+        load_data(ar);
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
@@ -201,14 +187,14 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcel::serialize(serialization::input_archive & ar, unsigned)
+    void parcel::load_data(serialization::input_archive & ar)
     {
         using hpx::serialization::detail::polymorphic_id_factory;
-
         ar >> data_;
         ar >> cont_;
         std::uint32_t id;
         ar >> id;
+
 #if !defined(HPX_DEBUG)
         action_.reset(polymorphic_id_factory::create<actions::base_action>(id));
 #else
@@ -217,6 +203,11 @@ namespace hpx { namespace parcelset
         action_.reset(
             polymorphic_id_factory::create<actions::base_action>(id, &name));
 #endif
+    }
+
+    void parcel::serialize(serialization::input_archive & ar, unsigned)
+    {
+        load_data(ar);
         ar >> *action_;
     }
 
