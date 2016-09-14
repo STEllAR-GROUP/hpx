@@ -25,8 +25,6 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/intrusive_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -395,7 +393,7 @@ namespace hpx { namespace parcelset
 
         // generate unique parcel id
         static naming::gid_type generate_unique_id(
-            boost::uint32_t locality_id = naming::invalid_locality_id);
+            std::uint32_t locality_id = naming::invalid_locality_id);
 
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);

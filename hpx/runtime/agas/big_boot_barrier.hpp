@@ -115,7 +115,10 @@ struct HPX_EXPORT big_boot_barrier
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-        auto f = [this, dest](parcelset::parcel p){ pp->send_early_parcel(dest, std::move(p)); };
+        auto f = [this, dest](parcelset::parcel p)
+            {
+                pp->send_early_parcel(dest, std::move(p));
+            };
         typedef
             parcelset::detail::parcel_await<decltype(f)>
             parcel_await;

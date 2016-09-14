@@ -19,6 +19,7 @@
 #include <cstddef> // for size_t
 #include <cstdint>
 #include <cstring> // for memcpy
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace serialization
@@ -306,7 +307,8 @@ namespace hpx { namespace serialization
             filter_ = filter;
             start_compressing_at_ = current_;
 
-            HPX_ASSERT(chunker_->get_num_chunks() == 1 && chunker_->get_chunk_size() == 0);
+            HPX_ASSERT(chunker_->get_num_chunks() == 1 &&
+                chunker_->get_chunk_size() == 0);
             chunker_->reset();
         }
 

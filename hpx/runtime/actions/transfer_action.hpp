@@ -335,16 +335,19 @@ namespace hpx { namespace actions
 //             if (direct_execution::value || hpx::is_pre_startup())
             if (hpx::is_pre_startup())
             {
-                applier::detail::apply_helper<derived_type, true>::call(target, lva, priority_,
+                applier::detail::apply_helper<derived_type, true>::call(
+                    target, lva, priority_,
                     util::get<Is>(std::move(arguments_))...);
                 return;
             }
 //             else
 //             {
-//                 applier::detail::apply_helper<derived_type>::call(target, lva, priority_,
+//                 applier::detail::apply_helper<derived_type>::call(
+//                     target, lva, priority_,
 //                     util::get<Is>(std::move(arguments_))...);
 //             }
-            applier::detail::apply_helper<derived_type, false>::call(target, lva, priority_,
+            applier::detail::apply_helper<derived_type, false>::call(
+                target, lva, priority_,
                 util::get<Is>(std::move(arguments_))...);
         }
 
@@ -379,7 +382,8 @@ namespace hpx { namespace actions
 //             lockups due to code in direct actions that suspends
 //             applier::detail::apply_helper<derived_type>::call(std::move(cont), target,
 //                 lva, priority_, util::get<Is>(std::move(arguments_))...);
-            applier::detail::apply_helper<derived_type, false>::call(std::move(cont), target,
+            applier::detail::apply_helper<derived_type, false>::call(
+                std::move(cont), target,
                 lva, priority_, util::get<Is>(std::move(arguments_))...);
         }
 
