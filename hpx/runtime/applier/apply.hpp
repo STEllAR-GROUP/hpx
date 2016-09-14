@@ -60,7 +60,7 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel(id, std::move(complement_addr<action_type>(addr)),
+            parcelset::put_parcel(id, complement_addr<action_type>(addr),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -77,7 +77,7 @@ namespace hpx
                 action_type;
             action_type act;
 
-            parcelset::put_parcel(id, std::move(complement_addr<action_type>(addr)),
+            parcelset::put_parcel(id, complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -96,7 +96,7 @@ namespace hpx
             action_type act;
 
             parcelset::put_parcel_cb(cb, id,
-                std::move(complement_addr<action_type>(addr)),
+                complement_addr<action_type>(addr),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -114,7 +114,7 @@ namespace hpx
             action_type act;
 
             parcelset::put_parcel_cb(std::move(cb), id,
-                std::move(complement_addr<action_type>(addr)),
+                complement_addr<action_type>(addr),
                 act, priority, std::forward<Ts>(vs)...);
 
             return false;     // destinations are remote
@@ -133,7 +133,7 @@ namespace hpx
             action_type act;
 
             parcelset::put_parcel_cb(cb, id,
-                std::move(complement_addr<action_type>(addr)),
+                complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -153,7 +153,7 @@ namespace hpx
             action_type act;
 
             parcelset::put_parcel_cb(std::move(cb), id,
-                std::move(complement_addr<action_type>(addr)),
+                complement_addr<action_type>(addr),
                 std::forward<Continuation>(cont),
                 act, priority, std::forward<Ts>(vs)...);
 
@@ -401,7 +401,7 @@ namespace hpx
             parcelset::parcel p =
                 parcelset::detail::create_parcel::call(
                     std::false_type(), std::false_type(),
-                    std::move(gid), std::move(complement_addr<action_type_>(addr)),
+                    std::move(gid), complement_addr<action_type_>(addr),
                     action_type_(), priority
                 );
             p.size() = 4096;
