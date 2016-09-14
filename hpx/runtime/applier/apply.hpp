@@ -193,8 +193,9 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
 
-            apply_helper<action_type>::call(target, addr.address_, priority,
-                std::forward<Ts>(vs)...);
+            threads::thread_init_data data;
+            apply_helper<action_type>::call(std::move(data), target, addr.address_,
+                priority, std::forward<Ts>(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -209,8 +210,9 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
 
-            apply_helper<action_type>::call(target, addr.address_, priority,
-                std::move(vs)...);
+            threads::thread_init_data data;
+            apply_helper<action_type>::call(std::move(data), target, addr.address_,
+                priority, std::move(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -430,7 +432,8 @@ namespace hpx
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
 
-            apply_helper<action_type>::call(
+            threads::thread_init_data data;
+            apply_helper<action_type>::call(std::move(data),
                 std::forward<Continuation>(cont), target, addr.address_, priority,
                 std::forward<Ts>(vs)...);
             return true;     // no parcel has been sent (dest is local)

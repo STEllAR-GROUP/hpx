@@ -50,11 +50,11 @@ namespace hpx { namespace applier { namespace detail
     {
         template <typename ...Ts>
         static void
-        call (naming::id_type const& target, naming::address::address_type lva,
+        call (threads::thread_init_data&& data, naming::id_type const& target,
+            naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
             std::unique_ptr<actions::continuation> cont;
-            threads::thread_init_data data;
             if (traits::action_decorate_continuation<Action>::call(cont)) //-V614
             {
                 data.func = Action::construct_thread_function(target, std::move(cont),
@@ -83,19 +83,20 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename Continuation, typename ...Ts>
         static void
-        call (Continuation && cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
-            Ts&&... vs)
+        call (threads::thread_init_data&& data, Continuation && cont,
+            naming::id_type const& target, naming::address::address_type lva,
+            threads::thread_priority priority, Ts&&... vs)
         {
             std::unique_ptr<actions::continuation> c(
                 new typename util::decay<Continuation>::type(
                     std::forward<Continuation>(cont)));
-            call(std::move(c), target, lva, priority, std::forward<Ts>(vs)...);
+            call(std::move(data), std::move(c), target, lva, priority,
+                std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         static void
-        call (std::unique_ptr<actions::continuation> cont,
+        call (threads::thread_init_data&& data, std::unique_ptr<actions::continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -103,7 +104,6 @@ namespace hpx { namespace applier { namespace detail
             traits::action_decorate_continuation<Action>::call(cont);
 
             // now, schedule the thread
-            threads::thread_init_data data;
             data.func = Action::construct_thread_function(target, std::move(cont), lva,
                 std::forward<Ts>(vs)...);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
@@ -129,7 +129,8 @@ namespace hpx { namespace applier { namespace detail
         // If local and to be directly executed, just call the function
         template <typename ...Ts>
         HPX_FORCEINLINE static void
-        call (naming::id_type const& target, naming::address::address_type lva,
+        call (threads::thread_init_data&& data, naming::id_type const& target,
+            naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
             if (this_thread::has_sufficient_stack_space() || hpx::is_pre_startup())
@@ -138,28 +139,28 @@ namespace hpx { namespace applier { namespace detail
             }
             else
             {
-                apply_helper<Action, false>::call(target, lva, priority,
-                    std::forward<Ts>(vs)...);
+                apply_helper<Action, false>::call(std::move(data), target, lva,
+                    priority, std::forward<Ts>(vs)...);
             }
         }
 
         template <typename Continuation, typename ...Ts>
         HPX_FORCEINLINE static void
-        call (Continuation && c, naming::id_type const& target,
-            naming::address::address_type lva,
+        call (threads::thread_init_data&& data, Continuation && c,
+            naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
             std::unique_ptr<actions::continuation> cont(
                 new typename util::decay<Continuation>::type(
                     std::forward<Continuation>(c)));
 
-            call(std::move(cont), target, lva, priority,
+            call(std::move(data), std::move(cont), target, lva, priority,
                 std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE static void
-        call (std::unique_ptr<actions::continuation> cont,
+        call (threads::thread_init_data&& data, std::unique_ptr<actions::continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
@@ -177,8 +178,8 @@ namespace hpx { namespace applier { namespace detail
             }
             else
             {
-                apply_helper<Action, false>::call(std::move(cont), target,
-                    lva, priority, std::forward<Ts>(vs)...);
+                apply_helper<Action, false>::call(std::move(data), std::move(cont),
+                    target, lva, priority, std::forward<Ts>(vs)...);
             }
         }
     };

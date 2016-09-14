@@ -271,52 +271,6 @@ namespace hpx { namespace actions
             return traits::action_does_termination_detection<derived_type>::call();
         }
 
-//         /// Return all data needed for thread initialization
-//         threads::thread_init_data&
-//         get_thread_init_data(naming::id_type&& target,
-//             naming::address::address_type lva, threads::thread_init_data& data)
-//         {
-//             data.func = get_thread_function(std::move(target), lva);
-// #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-//             data.lva = lva;
-// #endif
-// #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-//             data.description = detail::get_action_name<derived_type>();
-// #endif
-// #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-//             data.parent_id =
-//                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
-//             data.parent_locality_id = parent_locality_;
-// #endif
-//             data.priority = priority_;
-//             data.stacksize = threads::get_stack_size(stacksize_);
-//
-//             return data;
-//         }
-//
-//         threads::thread_init_data&
-//         get_thread_init_data(std::unique_ptr<continuation> cont,
-//             naming::id_type&& target,
-//             naming::address::address_type lva, threads::thread_init_data& data)
-//         {
-//             data.func = get_thread_function(std::move(target), std::move(cont), lva);
-// #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-//             data.lva = lva;
-// #endif
-// #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-//             data.description = detail::get_action_name<derived_type>();
-// #endif
-// #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-//             data.parent_id =
-//                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
-//             data.parent_locality_id = parent_locality_;
-// #endif
-//             data.priority = priority_;
-//             data.stacksize = threads::get_stack_size(stacksize_);
-//
-//             return data;
-//         }
-
         template <std::size_t ...Is>
         void
         schedule_thread(util::detail::pack_c<std::size_t, Is...>,
@@ -329,6 +283,13 @@ namespace hpx { namespace actions
             {
                 target = naming::id_type(target_gid, naming::id_type::managed);
             }
+
+            threads::thread_init_data data;
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+            data.parent_locality_id = parent_locality_;
+#endif
 //             FIXME: The commented code should really just work. If we execute
 //             direct action directly, we run into the situation of possible
 //             lockups due to code in direct actions that suspends
@@ -336,18 +297,18 @@ namespace hpx { namespace actions
             if (hpx::is_pre_startup())
             {
                 applier::detail::apply_helper<derived_type, true>::call(
-                    target, lva, priority_,
+                    std::move(data), target, lva, priority_,
                     util::get<Is>(std::move(arguments_))...);
                 return;
             }
 //             else
 //             {
 //                 applier::detail::apply_helper<derived_type>::call(
-//                     target, lva, priority_,
+//                     std::move(data), target, lva, priority_,
 //                     util::get<Is>(std::move(arguments_))...);
 //             }
             applier::detail::apply_helper<derived_type, false>::call(
-                target, lva, priority_,
+                std::move(data), target, lva, priority_,
                 util::get<Is>(std::move(arguments_))...);
         }
 
@@ -377,13 +338,20 @@ namespace hpx { namespace actions
             {
                 target = naming::id_type(target_gid, naming::id_type::managed);
             }
+            threads::thread_init_data data;
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+            data.parent_locality_id = parent_locality_;
+#endif
 //             FIXME: The commented code should really just work. If we execute
 //             direct action directly, we run into the situation of possible
 //             lockups due to code in direct actions that suspends
-//             applier::detail::apply_helper<derived_type>::call(std::move(cont), target,
+//             applier::detail::apply_helper<derived_type>::call(
+//                 std::move(data), std::move(cont), target,
 //                 lva, priority_, util::get<Is>(std::move(arguments_))...);
             applier::detail::apply_helper<derived_type, false>::call(
-                std::move(cont), target,
+                std::move(data), std::move(cont), target,
                 lva, priority_, util::get<Is>(std::move(arguments_))...);
         }
 
