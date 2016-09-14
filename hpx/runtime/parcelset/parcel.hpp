@@ -22,7 +22,6 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <cstddef>
@@ -388,7 +387,8 @@ namespace hpx { namespace parcelset
 
         void schedule_action();
 
-        void load_schedule(serialization::input_archive & ar,
+        // returns true if parcel was migrated, false if scheduled locally
+        bool load_schedule(serialization::input_archive & ar,
             std::size_t num_thread);
 
         // generate unique parcel id

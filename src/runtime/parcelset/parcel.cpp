@@ -11,12 +11,13 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 
-#include <boost/atomic.hpp>
+#include <hpx/util/atomic_count.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,39 +26,14 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
-    void dijkstra_make_black();     // forward declaration only
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    namespace detail
-    {
-        // The original parcel-sent handler is wrapped to keep the parcel alive
-        // until after the data has been reliably sent (which is needed for zero
-        // copy serialization).
-        void parcel_sent_handler(
-            boost::system::error_code const& ec,
-            parcelset::parcel const& p)
-        {
-            parcelhandler& ph = hpx::get_runtime().get_parcel_handler();
-            // invoke the original handler
-            ph.invoke_write_handler(ec, p);
-
-            // inform termination detection of a sent message
-            if (!p.does_termination_detection())
-                hpx::detail::dijkstra_make_black();
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // generate unique parcel id
     naming::gid_type parcel::generate_unique_id(
         std::uint32_t locality_id_default)
     {
-        static boost::atomic<std::uint64_t> id(0);
+        static hpx::util::atomic_count id(0);
 
         error_code ec(lightweight);        // ignore all errors
         std::uint32_t locality_id = hpx::get_locality_id(ec);
@@ -124,7 +100,7 @@ namespace hpx { namespace parcelset
         return lva;
     }
 
-    void parcel::load_schedule(serialization::input_archive & ar,
+    bool parcel::load_schedule(serialization::input_archive & ar,
         std::size_t num_thread)
     {
         load_data(ar);
@@ -137,14 +113,9 @@ namespace hpx { namespace parcelset
         auto r = action_->was_object_migrated(data_.dest_, lva);
         if (r.first)
         {
-            naming::resolver_client& client = hpx::naming::get_agas_client();
-            // If the object was migrated, just load the action and route.
+            // If the object was migrated, just load the action and return.
             ar >> *action_;
-            client.route(
-                std::move(*this),
-                &detail::parcel_sent_handler,
-                threads::thread_priority_normal);
-            return;
+            return true;
         }
 
         // dispatch action, register work item either with or without
@@ -164,6 +135,7 @@ namespace hpx { namespace parcelset
             // afterwards.
             action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread);
         }
+        return false;
     }
 
     void parcel::schedule_action()
@@ -181,7 +153,7 @@ namespace hpx { namespace parcelset
             // If the object was migrated, just route.
             client.route(
                 std::move(*this),
-                &detail::parcel_sent_handler,
+                &detail::parcel_route_handler,
                 threads::thread_priority_normal);
             return;
         }
