@@ -105,7 +105,6 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     std::size_t arg_size = get_archive_size(outp, out_archive_flags,
         zero_copy ? &out_chunks : nullptr);
     std::vector<char> out_buffer;
-    std::uint32_t dest_locality_id = outp.destination_locality_id();
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
@@ -173,7 +172,7 @@ void test_normal_serialization(T& arg)
         reinterpret_cast<std::uint64_t>(&test_function1));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
 #ifdef BOOST_BIG_ENDIAN
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -204,7 +203,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
 #ifdef BOOST_BIG_ENDIAN
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -236,7 +235,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
 #ifdef BOOST_BIG_ENDIAN
     out_archive_flags |= hpx::serialization::endian_big;
 #else

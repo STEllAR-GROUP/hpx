@@ -96,7 +96,8 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename ...Ts>
         static void
-        call (threads::thread_init_data&& data, std::unique_ptr<actions::continuation> cont,
+        call (threads::thread_init_data&& data,
+            std::unique_ptr<actions::continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -160,7 +161,8 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename ...Ts>
         HPX_FORCEINLINE static void
-        call (threads::thread_init_data&& data, std::unique_ptr<actions::continuation> cont,
+        call (threads::thread_init_data&& data,
+            std::unique_ptr<actions::continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
