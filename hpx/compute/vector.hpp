@@ -88,7 +88,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, size_))
         {
-            hpx::parallel::util::copy_helper(first, last, begin());
+            hpx::parallel::util::copy(first, last, begin());
         }
 
         vector(vector const& other)
@@ -97,7 +97,7 @@ namespace hpx { namespace compute
           , alloc_(other.alloc_)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
+            hpx::parallel::util::copy(other.begin(), other.end(), begin());
         }
 
         vector(vector const& other, Allocator const& alloc)
@@ -106,7 +106,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            hpx::parallel::util::copy_helper(other.begin(), other.end(), begin());
+            hpx::parallel::util::copy(other.begin(), other.end(), begin());
         }
 
         vector(vector && other)
@@ -137,7 +137,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, capacity_))
         {
-            hpx::parallel::util::copy_helper(init.begin(), init.end(), begin());
+            hpx::parallel::util::copy(init.begin(), init.end(), begin());
         }
 
         ~vector()
@@ -165,7 +165,7 @@ namespace hpx { namespace compute
                 return *this;
 
             pointer data = alloc_traits::allocate(other.alloc_, other.capacity_);
-            hpx::parallel::util::copy_helper(other.begin(), other.end(),
+            hpx::parallel::util::copy(other.begin(), other.end(),
                 iterator(data, 0, alloc_traits::target(other.alloc_)));
 
             if(data_ != nullptr)
