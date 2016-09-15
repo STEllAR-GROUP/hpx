@@ -21,22 +21,6 @@
 
 namespace hpx { namespace parallel { namespace util
 {
-    template <typename ExPolicy, typename F, typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    void transform_loop_step(ExPolicy&&, F && f, InIter it, OutIter dest)
-    {
-        *dest = hpx::util::invoke(std::forward<F>(f), it);
-    }
-
-    template <typename ExPolicy, typename F, typename InIter1,
-        typename InIter2, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    void transform_loop_step(ExPolicy&&, F && f, InIter1 it1, InIter2 it2,
-        OutIter dest)
-    {
-        *dest = hpx::util::invoke(std::forward<F>(f), it1, it2);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {

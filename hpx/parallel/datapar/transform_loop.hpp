@@ -29,42 +29,6 @@
 
 namespace hpx { namespace parallel { namespace util
 {
-    template <typename F, typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void
-    transform_loop_step(parallel::v1::datapar_execution_policy, F && f,
-        InIter it, OutIter dest)
-    {
-        detail::datapar_transform_loop_step::call1(std::forward<F>(f),
-            it, dest, Vc::Unaligned);
-    }
-
-    template <typename F, typename InIter1, typename InIter2, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void
-    transform_loop_step(parallel::v1::datapar_execution_policy, F && f,
-        InIter1 it1, InIter2 it2, OutIter dest)
-    {
-        detail::datapar_transform_loop_step::call1(std::forward<F>(f),
-            it1, it2, dest, Vc::Unaligned);
-    }
-
-    template <typename F, typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void
-    transform_loop_step(parallel::v1::datapar_task_execution_policy, F && f,
-        InIter it, OutIter dest)
-    {
-        detail::datapar_transform_loop_step::call1(std::forward<F>(f),
-            it, dest, Vc::Unaligned);
-    }
-
-    template <typename F, typename InIter1, typename InIter2, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void
-    transform_loop_step(parallel::v1::datapar_task_execution_policy, F && f,
-        InIter1 it1, InIter2 it2, OutIter dest)
-    {
-        detail::datapar_transform_loop_step::call1(std::forward<F>(f),
-            it1, it2, dest, Vc::Unaligned);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -77,70 +41,40 @@ namespace hpx { namespace parallel { namespace util
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-                std::is_arithmetic<typename InIter::value_type>::value &&
-                    hpx::traits::is_random_access_iterator<InIter>::value &&
-                    hpx::traits::is_random_access_iterator<OutIter>::value &&
-                    iterators_datapar_compatible<InIter, OutIter>::value,
+                iterators_datapar_compatible<InIter, OutIter>::value &&
+                    iterator_datapar_compatible<InIter>::value &&
+                    iterator_datapar_compatible<OutIter>::value,
                 std::pair<InIter, OutIter>
             >::type
             call(InIter first, std::size_t count, OutIter dest, F && f)
             {
                 std::size_t len = count;
 
-                // fall back to unaligned execution if input and output types
-                // are not compatible
-                if (data_alignment(first) != data_alignment(dest))
+                for (/* */; data_alignment(first) && len != 0; --len)
                 {
-                    for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-                            lenV > 0;
-                            lenV -= V::Size, len -= V::Size, first += V::Size,
-                                dest += V::Size)
-                    {
-                        datapar_transform_loop_step::callv(f, first, dest,
-                            Vc::Unaligned);
-                    }
-
-                    for (/* */; len != 0; (void) --len, ++first, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first, dest,
-                            Vc::Unaligned);
-                    }
+                    datapar_transform_loop_step::call1(f, first, dest);
                 }
-                else
+
+                for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
+                        lenV > 0; lenV -= V::Size, len -= V::Size)
                 {
-                    for (/* */; data_alignment(first) && len != 0;
-                         (void) --len, ++first, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first, dest,
-                            Vc::Aligned);
-                    }
-
-                    for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-                            lenV > 0;
-                            lenV -= V::Size, len -= V::Size, first += V::Size,
-                                dest += V::Size)
-                    {
-                        datapar_transform_loop_step::callv(f, first, dest,
-                            Vc::Aligned);
-                    }
-
-                    for (/* */; len != 0; (void) --len, ++first, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first, dest,
-                            Vc::Aligned);
-                    }
+                    datapar_transform_loop_step::callv(f, first, dest);
                 }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_transform_loop_step::call1(f, first, dest);
+                }
+
                 return std::make_pair(std::move(first), std::move(dest));
             }
 
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-               !std::is_arithmetic<typename InIter::value_type>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter>::value ||
-                   !hpx::traits::is_random_access_iterator<OutIter>::value ||
-                   !iterators_datapar_compatible<InIter, OutIter>::value ||
-                   !iterators_datapar_compatible<InIter, OutIter>::value,
+                !iterators_datapar_compatible<InIter, OutIter>::value ||
+                   !iterator_datapar_compatible<InIter>::value ||
+                   !iterator_datapar_compatible<OutIter>::value,
                 std::pair<InIter, OutIter>
             >::type
             call(InIter first, std::size_t count, OutIter dest, F && f)
@@ -185,10 +119,9 @@ namespace hpx { namespace parallel { namespace util
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-                std::is_arithmetic<typename InIter::value_type>::value &&
-                    hpx::traits::is_random_access_iterator<InIter>::value &&
-                    hpx::traits::is_random_access_iterator<OutIter>::value &&
-                    iterators_datapar_compatible<InIter, OutIter>::value,
+                iterators_datapar_compatible<InIter, OutIter>::value &&
+                    iterator_datapar_compatible<InIter>::value &&
+                    iterator_datapar_compatible<OutIter>::value,
                 std::pair<InIter, OutIter>
             >::type
             call(InIter first, InIter last, OutIter dest, F && f)
@@ -200,10 +133,9 @@ namespace hpx { namespace parallel { namespace util
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-               !std::is_arithmetic<typename InIter::value_type>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter>::value ||
-                   !hpx::traits::is_random_access_iterator<OutIter>::value ||
-                   !iterators_datapar_compatible<InIter, OutIter>::value,
+                !iterators_datapar_compatible<InIter, OutIter>::value ||
+                   !iterator_datapar_compatible<InIter>::value ||
+                   !iterator_datapar_compatible<OutIter>::value,
                 std::pair<InIter, OutIter>
             >::type
             call(InIter first, InIter last, OutIter dest, F && f)
@@ -247,13 +179,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-                std::is_arithmetic<typename InIter1::value_type>::value &&
-                    std::is_arithmetic<typename InIter2::value_type>::value &&
-                    hpx::traits::is_random_access_iterator<InIter1>::value &&
-                    hpx::traits::is_random_access_iterator<InIter2>::value &&
-                    hpx::traits::is_random_access_iterator<OutIter>::value &&
-                    iterators_datapar_compatible<InIter1, OutIter>::value &&
-                    iterators_datapar_compatible<InIter2, OutIter>::value,
+                iterators_datapar_compatible<InIter1, OutIter>::value &&
+                    iterators_datapar_compatible<InIter2, OutIter>::value &&
+                    iterator_datapar_compatible<InIter1>::value &&
+                    iterator_datapar_compatible<InIter2>::value &&
+                    iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, std::size_t count, InIter2 first2,
@@ -261,54 +191,22 @@ namespace hpx { namespace parallel { namespace util
             {
                 std::size_t len = count;
 
-                // fall back to unaligned execution if input and output types
-                // are not compatible
-                if (data_alignment(first1) != data_alignment(dest) ||
-                    data_alignment(first2) != data_alignment(dest))
+                for (/* */; data_alignment(first1) && len != 0; --len)
                 {
-                    for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-                            lenV > 0;
-                            lenV -= V::Size, len -= V::Size,
-                                first1 += V::Size, first2 += V::Size,
-                                dest += V::Size)
-                    {
-                        datapar_transform_loop_step::callv(f, first1, first2,
-                            dest, Vc::Unaligned);
-                    }
-
-                    for (/* */; len != 0;
-                            (void) --len, ++first1, ++first2, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first1, first2,
-                            dest, Vc::Unaligned);
-                    }
+                    datapar_transform_loop_step::call1(f, first1, first2, dest);
                 }
-                else
+
+                for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
+                        lenV > 0; lenV -= V::Size, len -= V::Size)
                 {
-                    for (/* */; data_alignment(first1) && len != 0;
-                            (void) --len, ++first1, ++first2, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first1, first2,
-                            dest, Vc::Aligned);
-                    }
-
-                    for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-                            lenV > 0;
-                            lenV -= V::Size, len -= V::Size,
-                                first1 += V::Size, first2 += V::Size,
-                                dest += V::Size)
-                    {
-                        datapar_transform_loop_step::callv(f, first1, first2,
-                            dest, Vc::Aligned);
-                    }
-
-                    for (/* */; len != 0;
-                            (void) --len, ++first1, ++first2, ++dest)
-                    {
-                        datapar_transform_loop_step::call1(f, first1, first2,
-                            dest, Vc::Aligned);
-                    }
+                    datapar_transform_loop_step::callv(f, first1, first2, dest);
                 }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_transform_loop_step::call1(f, first1, first2, dest);
+                }
+
                 return hpx::util::make_tuple(std::move(first1),
                     std::move(first2), std::move(dest));
             }
@@ -317,13 +215,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-               !std::is_arithmetic<typename InIter1::value_type>::value ||
-                   !std::is_arithmetic<typename InIter2::value_type>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter1>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter2>::value ||
-                   !hpx::traits::is_random_access_iterator<OutIter>::value ||
-                   !iterators_datapar_compatible<InIter1, OutIter>::value ||
-                   !iterators_datapar_compatible<InIter2, OutIter>::value,
+               !iterators_datapar_compatible<InIter1, OutIter>::value ||
+                   !iterators_datapar_compatible<InIter2, OutIter>::value ||
+                   !iterator_datapar_compatible<InIter1>::value ||
+                   !iterator_datapar_compatible<InIter2>::value ||
+                   !iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, std::size_t count, InIter2 first2,
@@ -374,13 +270,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-                std::is_arithmetic<typename InIter1::value_type>::value &&
-                    std::is_arithmetic<typename InIter2::value_type>::value &&
-                    hpx::traits::is_random_access_iterator<InIter1>::value &&
-                    hpx::traits::is_random_access_iterator<InIter2>::value &&
-                    hpx::traits::is_random_access_iterator<OutIter>::value &&
-                    iterators_datapar_compatible<InIter1, OutIter>::value &&
-                    iterators_datapar_compatible<InIter2, OutIter>::value,
+                iterators_datapar_compatible<InIter1, OutIter>::value &&
+                    iterators_datapar_compatible<InIter2, OutIter>::value &&
+                    iterator_datapar_compatible<InIter1>::value &&
+                    iterator_datapar_compatible<InIter2>::value &&
+                    iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
@@ -396,13 +290,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-               !std::is_arithmetic<typename InIter1::value_type>::value ||
-                   !std::is_arithmetic<typename InIter2::value_type>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter1>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter2>::value ||
-                   !hpx::traits::is_random_access_iterator<OutIter>::value ||
-                   !iterators_datapar_compatible<InIter1, OutIter>::value ||
-                   !iterators_datapar_compatible<InIter2, OutIter>::value,
+               !iterators_datapar_compatible<InIter1, OutIter>::value ||
+                   !iterators_datapar_compatible<InIter2, OutIter>::value ||
+                   !iterator_datapar_compatible<InIter1>::value ||
+                   !iterator_datapar_compatible<InIter2>::value ||
+                   !iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
@@ -416,13 +308,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-                std::is_arithmetic<typename InIter1::value_type>::value &&
-                    std::is_arithmetic<typename InIter2::value_type>::value &&
-                    hpx::traits::is_random_access_iterator<InIter1>::value &&
-                    hpx::traits::is_random_access_iterator<InIter2>::value &&
-                    hpx::traits::is_random_access_iterator<OutIter>::value &&
-                    iterators_datapar_compatible<InIter1, OutIter>::value &&
-                    iterators_datapar_compatible<InIter2, OutIter>::value,
+                iterators_datapar_compatible<InIter1, OutIter>::value &&
+                    iterators_datapar_compatible<InIter2, OutIter>::value &&
+                    iterator_datapar_compatible<InIter1>::value &&
+                    iterator_datapar_compatible<InIter2>::value &&
+                    iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
@@ -440,13 +330,11 @@ namespace hpx { namespace parallel { namespace util
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static typename std::enable_if<
-               !std::is_arithmetic<typename InIter1::value_type>::value ||
-                   !std::is_arithmetic<typename InIter2::value_type>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter1>::value ||
-                   !hpx::traits::is_random_access_iterator<InIter2>::value ||
-                   !hpx::traits::is_random_access_iterator<OutIter>::value ||
-                   !iterators_datapar_compatible<InIter1, OutIter>::value ||
-                   !iterators_datapar_compatible<InIter2, OutIter>::value,
+               !iterators_datapar_compatible<InIter1, OutIter>::value ||
+                   !iterators_datapar_compatible<InIter2, OutIter>::value ||
+                   !iterator_datapar_compatible<InIter1>::value ||
+                   !iterator_datapar_compatible<InIter2>::value ||
+                   !iterator_datapar_compatible<OutIter>::value,
                 hpx::util::tuple<InIter1, InIter2, OutIter>
             >::type
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,

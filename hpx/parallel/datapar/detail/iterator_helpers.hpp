@@ -58,22 +58,24 @@ namespace hpx { namespace parallel { namespace util
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter>
+        template <typename Iter, typename Enable = void>
         struct iterator_datapar_compatible_impl
-        {
-            typedef typename hpx::util::decay<Iter>::type iterator_type;
-            typedef typename std::iterator_traits<iterator_type>::value_type
-                value_type;
+          : std::false_type
+        {};
 
-            typedef std::integral_constant<bool,
-                    hpx::traits::is_random_access_iterator<iterator_type>::value &&
-                        std::is_arithmetic<value_type>::value
-                > type;
-        };
+        template <typename Iter>
+        struct iterator_datapar_compatible_impl<Iter,
+                typename std::enable_if<
+                    hpx::traits::is_random_access_iterator<Iter>::value
+                >::type>
+          : std::is_arithmetic<typename std::iterator_traits<Iter>::value_type>
+        {};
 
         template <typename Iter>
         struct iterator_datapar_compatible
-          : iterator_datapar_compatible_impl<Iter>::type
+          : iterator_datapar_compatible_impl<
+                typename hpx::util::decay<Iter>::type
+            >::type
         {};
     }
 
@@ -287,16 +289,19 @@ namespace hpx { namespace parallel { namespace util
                     V2 tmp2(std::addressof(*it2), Vc::Unaligned);
                     auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
                     ret.store(std::addressof(*dest), Vc::Unaligned);
+                    std::advance(dest, ret.size());
                 }
-
-                V1 tmp1(std::addressof(*it1), Vc::Aligned);
-                V2 tmp2(std::addressof(*it2), Vc::Aligned);
-                auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
-                ret.store(std::addressof(*dest), Vc::Aligned);
+                else
+                {
+                    V1 tmp1(std::addressof(*it1), Vc::Aligned);
+                    V2 tmp2(std::addressof(*it2), Vc::Aligned);
+                    auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+                    ret.store(std::addressof(*dest), Vc::Aligned);
+                    std::advance(dest, ret.size());
+                }
 
                 std::advance(it1, V1::Size);
                 std::advance(it2, V2::Size);
-                std::advance(dest, ret.size());
             }
         };
     }
