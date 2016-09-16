@@ -14,6 +14,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/atomic_count.hpp>
@@ -350,15 +351,15 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
-
-#if defined(HPX_WINDOWS)
-            bool recurse_asynchronously = false;
-#elif defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            bool recurse_asynchronously =
+            // We need to run the completion on a new thread if we are on a
+            // non HPX thread.
+            bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            recurse_asynchronously =
                 !this_thread::has_sufficient_stack_space();
 #else
             handle_continuation_recursion_count cnt;
-            bool recurse_asynchronously =
+            recurse_asynchronously = recurse_asynchronously ||
                 cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
 #endif
             if (!recurse_asynchronously)
@@ -368,15 +369,6 @@ namespace detail
             }
             else
             {
-                // We need to run the completion asynchronously if we aren't on a
-                // HPX thread
-                if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
-                {
-                    HPX_THROW_EXCEPTION(null_thread_id,
-                            "future_data::handle_on_completed",
-                            "null thread id encountered");
-                }
-
                 // re-spawn continuation on a new thread
                 boost::intrusive_ptr<future_data> this_(this);
 

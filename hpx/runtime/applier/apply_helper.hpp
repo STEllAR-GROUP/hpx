@@ -18,6 +18,7 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/action_direct_execution.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <memory>
@@ -42,7 +43,7 @@ namespace hpx { namespace applier { namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Action,
-        bool DirectExecute = Action::direct_execution::value>
+        bool DirectExecute = traits::action_direct_execution<Action>::value>
     struct apply_helper;
 
     template <typename Action>
@@ -134,7 +135,10 @@ namespace hpx { namespace applier { namespace detail
             naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space() || hpx::is_pre_startup())
+            // Direct actions should be able to be executed from a non-HPX thread
+            // as well
+            if (this_thread::has_sufficient_stack_space() ||
+                hpx::threads::get_self_ptr() == nullptr)
             {
                 Action::execute_function(lva, std::forward<Ts>(vs)...);
             }
@@ -166,7 +170,10 @@ namespace hpx { namespace applier { namespace detail
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
-            if (this_thread::has_sufficient_stack_space())
+            // Direct actions should be able to be executed from a non-HPX thread
+            // as well
+            if (this_thread::has_sufficient_stack_space() ||
+                hpx::threads::get_self_ptr() == nullptr)
             {
                 try {
                     cont->trigger(Action::execute_function(lva,

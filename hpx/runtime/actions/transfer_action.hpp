@@ -290,24 +290,7 @@ namespace hpx { namespace actions
                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
-//             FIXME: The commented code should really just work. If we execute
-//             direct action directly, we run into the situation of possible
-//             lockups due to code in direct actions that suspends
-//             if (direct_execution::value || hpx::is_pre_startup())
-            if (hpx::is_pre_startup())
-            {
-                applier::detail::apply_helper<derived_type, true>::call(
-                    std::move(data), target, lva, priority_,
-                    util::get<Is>(std::move(arguments_))...);
-                return;
-            }
-//             else
-//             {
-//                 applier::detail::apply_helper<derived_type>::call(
-//                     std::move(data), target, lva, priority_,
-//                     util::get<Is>(std::move(arguments_))...);
-//             }
-            applier::detail::apply_helper<derived_type, false>::call(
+            applier::detail::apply_helper<derived_type>::call(
                 std::move(data), target, lva, priority_,
                 util::get<Is>(std::move(arguments_))...);
         }
@@ -344,13 +327,7 @@ namespace hpx { namespace actions
                 reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
-//             FIXME: The commented code should really just work. If we execute
-//             direct action directly, we run into the situation of possible
-//             lockups due to code in direct actions that suspends
-//             applier::detail::apply_helper<derived_type>::call(
-//                 std::move(data), std::move(cont), target,
-//                 lva, priority_, util::get<Is>(std::move(arguments_))...);
-            applier::detail::apply_helper<derived_type, false>::call(
+            applier::detail::apply_helper<derived_type>::call(
                 std::move(data), std::move(cont), target,
                 lva, priority_, util::get<Is>(std::move(arguments_))...);
         }
