@@ -49,7 +49,7 @@ message(hpx::serialization::serialize_buffer<char> const& receive_buffer)
 {
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(message);
+HPX_PLAIN_DIRECT_ACTION(message);
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
@@ -61,7 +61,7 @@ message_double(double d)
 {
     return d;
 }
-HPX_PLAIN_ACTION(message_double);
+HPX_PLAIN_DIRECT_ACTION(message_double);
 
 ///////////////////////////////////////////////////////////////////////////////
 double receive_double(
