@@ -161,18 +161,6 @@ if(HPX_WITH_EXAMPLES_OPENMP)
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 
-if(HPX_WITH_VC_DATAPAR)
-  if(NOT MSVC)
-    foreach(_flag ${Vc_COMPILE_FLAGS})
-      set_target_properties(inner_product_exe PROPERTIES COMPILE_FLAGS ${_flag})
-    endforeach()
-  endif()
-
-  foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
-    set_target_properties(inner_product_exe PROPERTIES COMPILE_FLAGS ${_flag})
-  endforeach()
-endif()
-
 add_hpx_pseudo_target(tests.performance.local.htts_v2)
 add_subdirectory(htts_v2)
 add_hpx_pseudo_dependencies(tests.performance tests.performance.local.htts_v2)

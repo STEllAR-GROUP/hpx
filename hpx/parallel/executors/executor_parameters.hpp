@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             // default constructor is needed for serialization purposes
             unwrapper() : T() {}
 
-            // generic poor-mans forwarding constructor
+            // generic poor-man's forwarding constructor
             template <typename U>
             unwrapper(U && u) : T(std::forward<U>(u)) {}
         };

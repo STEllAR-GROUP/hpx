@@ -248,10 +248,6 @@ hpx_option(HPX_WITH_VC_DATAPAR BOOL
 if(HPX_WITH_VC_DATAPAR)
   include(HPX_SetupVc)
 endif()
-if(NOT Vc_FOUND AND HPX_WITH_VC_DATAPAR)
-  hpx_warn("Vc was not found while datapar support was requested, forcing HPX_WITH_VC_DATAPAR=OFF. Set Vc_ROOT to installation path of Vc")
-  set(HPX_WITH_VC_DATAPAR OFF CACHE BOOL "" FORCE)
-endif()
 
 ################################################################################
 # Native TLS configuration

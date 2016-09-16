@@ -49,15 +49,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename ExPolicy, typename Op1, typename Op2, typename T>
+        template <typename Op1, typename Op2, typename T>
         struct inner_product_partition
         {
-            typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
             typedef typename hpx::util::decay<Op1>::type op1_type;
             typedef typename hpx::util::decay<Op2>::type op2_type;
             typedef typename hpx::util::decay<T>::type value_type;
 
-            execution_policy_type const& policy_;
             op1_type& op1_;
             op2_type& op2_;
             value_type& part_sum_;
@@ -92,29 +90,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (!util::loop_optimization(policy, first1, last1))
                 {
                     util::loop2(
-                        parallel::v1::seq, first1, last1, first2,
-                        inner_product_partition<
-                            parallel::v1::sequential_execution_policy,
-                            Op1, Op2, T
-                        >{parallel::v1::seq, op1, op2, init});
+                        policy, std::false_type(), first1, last1, first2,
+                        inner_product_partition<Op1, Op2, T>{op1, op2, init});
 
                     return init;
                 }
 
                 // loop_step properly advances the iterators
-                auto part_sum = util::loop_step(policy,
+                auto part_sum = util::loop_step(policy, std::true_type(),
                     inner_product_indirect<Op2>{op2}, first1, first2);
 
                 std::pair<InIter1, InIter2> p = util::loop2(
-                    policy, first1, last1, first2,
-                    inner_product_partition<
-                            ExPolicy, Op1, Op2, decltype(part_sum)
-                        >{policy, op1, op2, part_sum}
-                );
+                    policy, std::true_type(), first1, last1, first2,
+                    inner_product_partition<Op1, Op2, decltype(part_sum)>{
+                        op1, op2, part_sum
+                    });
 
                 // this is to support vectorization, it will call op1 for each
                 // of the elements of a value-pack
-                T result =
+                auto result =
                     util::detail::accumulate_values(policy,
                         [&op1](T const& sum, T const& val)
                         {
@@ -128,14 +122,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (p.first != last1)
                 {
                     util::loop2(
-                        parallel::v1::seq, p.first, last1, p.second,
-                        inner_product_partition<
-                            parallel::v1::sequential_execution_policy,
-                            Op1, Op2, T
-                        >{parallel::v1::seq, op1, op2, result});
+                        policy, std::false_type(), p.first, last1, p.second,
+                        inner_product_partition<Op1, Op2, decltype(result)>{
+                            op1, op2, result
+                        });
                 }
 
-                return result;
+                return util::detail::extract_value(policy, result);
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -172,33 +165,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         if (!util::loop_optimization(policy, it1, last1))
                         {
                             // loop_step properly advances the iterators
-                            T result = util::loop_step(parallel::v1::seq,
+                            auto result = util::loop_step(
+                                policy, std::false_type(),
                                 inner_product_indirect<Op2>{op2}, it1, it2);
 
                             util::loop2(
-                                parallel::v1::seq, it1, last1, it2,
+                                policy, std::false_type(), it1, last1, it2,
                                 inner_product_partition<
-                                    parallel::v1::sequential_execution_policy,
-                                    Op1, Op2, T
-                                >{parallel::v1::seq, op1, op2, result});
+                                        Op1, Op2, decltype(result)
+                                    >{op1, op2, result});
 
-                            return result;
+                            return util::detail::extract_value(
+                                policy, result);
                         }
 
                         // loop_step properly advances the iterators
-                        auto part_sum = util::loop_step(policy,
+                        auto part_sum = util::loop_step(
+                            policy, std::true_type(),
                             inner_product_indirect<Op2>{op2}, it1, it2);
 
                         std::pair<FwdIter1, FwdIter2> p = util::loop2(
-                            policy, it1, last1, it2,
+                            policy, std::true_type(), it1, last1, it2,
                             inner_product_partition<
-                                    ExPolicy, Op1, Op2, decltype(part_sum)
-                                >{policy, op1, op2, part_sum}
-                        );
+                                    Op1, Op2, decltype(part_sum)
+                                >{op1, op2, part_sum});
 
                         // this is to support vectorization, it will call op1
                         // for each of the elements of a value-pack
-                        T result = util::detail::accumulate_values(policy,
+                        auto result = util::detail::accumulate_values(policy,
                             [&op1](T const& sum, T const& val)
                             {
                                 return hpx::util::invoke(op1, sum, val);
@@ -210,14 +204,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         if (p.first != last1)
                         {
                             util::loop2(
-                                parallel::v1::seq, p.first, last1, p.second,
+                                policy, std::false_type(),
+                                p.first, last1, p.second,
                                 inner_product_partition<
-                                    parallel::v1::sequential_execution_policy,
-                                    Op1, Op2, T
-                                >{parallel::v1::seq, op1, op2, result});
+                                        Op1, Op2, decltype(result)
+                                    >{op1, op2, result});
                         }
 
-                        return result;
+                        return util::detail::extract_value(policy, result);
                     };
 
                 using hpx::util::make_zip_iterator;

@@ -27,37 +27,119 @@
 namespace hpx { namespace parallel { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-//     template <typename F, typename Iter>
-//     HPX_HOST_DEVICE HPX_FORCEINLINE
-//     auto loop_step(parallel::v1::datapar_execution_policy, F && f,
-//             Iter& it)
-//     ->  decltype(
-//             detail::datapar_loop_step<Iter>::callv(
-//                 std::forward<F>(f), it)
-//         )
-//     {
-//         return detail::datapar_loop_step<Iter>::callv(
-//             std::forward<F>(f), it);
-//     }
-//
-//     template <typename F, typename Iter>
-//     HPX_HOST_DEVICE HPX_FORCEINLINE
-//     auto loop_step(parallel::v1::datapar_task_execution_policy, F && f,
-//             Iter& it)
-//     ->  decltype(
-//             detail::datapar_loop_step<Iter>::callv(
-//                 std::forward<F>(f), it)
-//             )
-//     {
-//         return detail::datapar_loop_step<Iter>::callv(
-//             std::forward<F>(f), it);
-//     }
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Abi>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        std::size_t count_bits(Vc::Mask<T, Abi> const& mask)
+        {
+            return mask.count();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Vector>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename Vector::value_type
+        extract_value(parallel::v1::datapar_execution_policy,
+            Vector const& value)
+        {
+            static_assert(Vector::Size == 1,
+                "this should be called with a scalar only");
+            return value[0];
+        }
+
+        template <typename Vector>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename Vector::value_type
+        extract_value(parallel::v1::datapar_task_execution_policy,
+            Vector const& value)
+        {
+            static_assert(Vector::Size == 1,
+                "this should be called with a scalar only");
+            return value[0];
+        }
+
+        template <typename F, typename Vector>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        Vc::Scalar::Vector<typename hpx::util::decay<Vector>::type::EntryType>
+        accumulate_values(parallel::v1::datapar_execution_policy,
+            F && f, Vector const& value)
+        {
+            typedef typename hpx::util::decay<Vector>::type vector_type;
+            typedef typename vector_type::EntryType entry_type;
+
+            entry_type accum = value[0];
+            for(size_t i = 1; i != value.size(); ++i)
+            {
+                accum = f(accum, entry_type(value[i]));
+            }
+            return Vc::Scalar::Vector<entry_type>(accum);
+        }
+
+        template <typename F, typename Vector>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        Vc::Scalar::Vector<typename hpx::util::decay<Vector>::type::EntryType>
+        accumulate_values(parallel::v1::datapar_task_execution_policy,
+            F && f, Vector const& value)
+        {
+            typedef typename hpx::util::decay<Vector>::type vector_type;
+            typedef typename vector_type::EntryType entry_type;
+
+            entry_type accum = value[0];
+            for(size_t i = 1; i != value.size(); ++i)
+            {
+                accum = f(accum, entry_type(value[i]));
+            }
+            return Vc::Scalar::Vector<entry_type>(accum);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Vector, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        Vc::Scalar::Vector<T>
+        accumulate_values(parallel::v1::datapar_execution_policy,
+            F && f, Vector const& value, T accum)
+        {
+            for(size_t i = 0; i != value.size(); ++i)
+            {
+                accum = f(accum, T(value[i]));
+            }
+            return Vc::Scalar::Vector<T>(accum);
+        }
+
+        template <typename F, typename Vector, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        Vc::Scalar::Vector<T>
+        accumulate_values(parallel::v1::datapar_task_execution_policy,
+            F && f, Vector const& value, T accum)
+        {
+            for(size_t i = 0; i != value.size(); ++i)
+            {
+                accum = f(accum, T(value[i]));
+            }
+            return Vc::Scalar::Vector<T>(accum);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Iter1, typename Iter2>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_execution_policy, F && f,
-            Iter1& it1, Iter2& it2)
+    auto loop_step(parallel::v1::datapar_execution_policy, std::false_type,
+            F && f, Iter1& it1, Iter2& it2)
+    ->  decltype(
+            detail::datapar_loop_step2<Iter1, Iter2>::call1(
+                std::forward<F>(f), it1, it2)
+            )
+    {
+        return detail::datapar_loop_step2<Iter1, Iter2>::call1(
+            std::forward<F>(f), it1, it2);
+    }
+
+    template <typename F, typename Iter1, typename Iter2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    auto loop_step(parallel::v1::datapar_execution_policy, std::true_type,
+            F && f, Iter1& it1, Iter2& it2)
     ->  decltype(
             detail::datapar_loop_step2<Iter1, Iter2>::callv(
                 std::forward<F>(f), it1, it2)
@@ -69,8 +151,21 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename F, typename Iter1, typename Iter2>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_task_execution_policy, F && f,
-            Iter1& it1, Iter2& it2)
+    auto loop_step(parallel::v1::datapar_task_execution_policy, std::false_type,
+            F && f, Iter1& it1, Iter2& it2)
+    ->  decltype(
+            detail::datapar_loop_step2<Iter1, Iter2>::call1(
+                std::forward<F>(f), it1, it2)
+            )
+    {
+        return detail::datapar_loop_step2<Iter1, Iter2>::call1(
+            std::forward<F>(f), it1, it2);
+    }
+
+    template <typename F, typename Iter1, typename Iter2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    auto loop_step(parallel::v1::datapar_task_execution_policy, std::true_type,
+            F && f, Iter1& it1, Iter2& it2)
     ->  decltype(
             detail::datapar_loop_step2<Iter1, Iter2>::callv(
                 std::forward<F>(f), it1, it2)
@@ -131,81 +226,6 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Abi>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        std::size_t count_bits(Vc::Mask<T, Abi> const& mask)
-        {
-            return mask.count();
-        }
-
-        template <typename F, typename Vector>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::util::decay<Vector>::type::EntryType
-        accumulate_values(parallel::v1::datapar_execution_policy,
-            F && f, Vector && value)
-        {
-            typedef typename hpx::util::decay<Vector>::type vector_type;
-            typedef typename vector_type::EntryType entry_type;
-
-            entry_type accum = value[0];
-            for(size_t i = 1; i != value.size(); ++i)
-            {
-                accum = f(accum, entry_type(value[i]));
-            }
-            return accum;
-        }
-
-        template <typename F, typename Vector>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::util::decay<Vector>::type::EntryType
-        accumulate_values(parallel::v1::datapar_task_execution_policy,
-            F && f, Vector && value)
-        {
-            typedef typename hpx::util::decay<Vector>::type vector_type;
-            typedef typename vector_type::EntryType entry_type;
-
-            entry_type accum = value[0];
-            for(size_t i = 1; i != value.size(); ++i)
-            {
-                accum = f(accum, entry_type(value[i]));
-            }
-            return accum;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Vector, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        T accumulate_values(parallel::v1::datapar_execution_policy,
-            F && f, Vector && value, T accum)
-        {
-            for(size_t i = 0; i != value.size(); ++i)
-            {
-                accum = f(accum, T(value[i]));
-            }
-            return accum;
-        }
-
-        template <typename F, typename Vector, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        T accumulate_values(parallel::v1::datapar_task_execution_policy,
-            F && f, Vector && value, T accum)
-        {
-            for(size_t i = 0; i != value.size(); ++i)
-            {
-                accum = f(accum, T(value[i]));
-            }
-            return accum;
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(ExPolicy&&, Begin begin, End end, F && f);
-
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iterator>
@@ -250,53 +270,12 @@ namespace hpx { namespace parallel { namespace util
             >::type
             call(Begin it, End end, F && f)
             {
-                return util::loop(parallel::v1::seq, it, end, std::forward<F>(f));
+                while (it != end)
+                {
+                    datapar_loop_step<Begin>::call1(f, it);
+                }
+                return it;
             }
-
-//             template <typename Begin, typename End, typename CancelToken,
-//                 typename F>
-//             HPX_HOST_DEVICE HPX_FORCEINLINE
-//             static typename std::enable_if<
-//                 iterator_datapar_compatible<Begin>::value, Begin
-//             >::type
-//             call(Begin first, End last, CancelToken& tok, F && f)
-//             {
-//                 while (data_alignment(first) && first != last)
-//                 {
-//                     if (tok.was_cancelled())
-//                         return first;
-//                     datapar_loop_step<Begin>::call1(f, first);
-//                 }
-//
-//                 End const lastV = last - (V::Size + 1);
-//                 while (first < lastV)
-//                 {
-//                     if (tok.was_cancelled())
-//                         return first;
-//                     datapar_loop_step<Begin>::callv(f, first);
-//                 }
-//
-//                 while (first != last)
-//                 {
-//                     if (tok.was_cancelled())
-//                         break;
-//                     datapar_loop_step<Begin>::call1(f, first);
-//                 }
-//
-//                 return first;
-//             }
-//
-//             template <typename Begin, typename End, typename CancelToken,
-//                 typename F>
-//             HPX_HOST_DEVICE HPX_FORCEINLINE
-//             static typename std::enable_if<
-//                !iterator_datapar_compatible<Begin>::value, Begin
-//             >::type
-//             call(Begin it, End end, CancelToken& tok, F && f)
-//             {
-//                 return util::loop(parallel::v1::seq, it, end, tok,
-//                     std::forward<F>(f));
-//             }
         };
     }
 
@@ -308,27 +287,24 @@ namespace hpx { namespace parallel { namespace util
         return detail::datapar_loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
-//     template <typename Begin, typename End, typename CancelToken, typename F>
-//     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-//     loop(parallel::v1::datapar_execution_policy, Begin begin, End end,
-//         CancelToken& tok, F && f)
-//     {
-//         return detail::datapar_loop<Begin>::call(begin, end, tok,
-//             std::forward<F>(f));
-//     }
+    template <typename Begin, typename End, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin
+    loop(parallel::v1::datapar_task_execution_policy, Begin begin, End end, F && f)
+    {
+        return detail::datapar_loop<Begin>::call(begin, end, std::forward<F>(f));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(ExPolicy&&, Begin begin, End end, F && f);
-
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
+        template <typename VecOnly, typename Iter1, typename Iter2>
+        struct datapar_loop2;
+
         template <typename Iter1, typename Iter2>
-        struct datapar_loop2
+        struct datapar_loop2<std::true_type, Iter1, Iter2>
         {
             ///////////////////////////////////////////////////////////////////
             template <typename InIter1, typename InIter2, typename F>
@@ -373,32 +349,44 @@ namespace hpx { namespace parallel { namespace util
                 return std::make_pair(std::move(it1), std::move(it2));
             }
         };
+
+        template <typename Iter1, typename Iter2>
+        struct datapar_loop2<std::false_type, Iter1, Iter2>
+        {
+            template <typename InIter1, typename InIter2, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<InIter1, InIter2>
+            call(InIter1 it1, InIter1 last1, InIter2 it2, F && f)
+            {
+                while(it1 != last1)
+                {
+                    datapar_loop_step2<InIter1, InIter2>::call1(f, it1, it2);
+                }
+                return std::make_pair(std::move(it1), std::move(it2));
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter1, typename Iter2, typename F>
+    template <typename VecOnly, typename Iter1, typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
-    loop2(parallel::v1::datapar_execution_policy, Iter1 first1, Iter1 last1,
-        Iter2 first2, F && f)
+    loop2(parallel::v1::datapar_execution_policy, VecOnly,
+        Iter1 first1, Iter1 last1, Iter2 first2, F && f)
     {
-        return detail::datapar_loop2<Iter1, Iter2>::call(first1, last1, first2,
-            std::forward<F>(f));
+        return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
+            first1, last1, first2, std::forward<F>(f));
     }
 
-    template <typename Iter1, typename Iter2, typename F>
+    template <typename VecOnly, typename Iter1, typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
-    loop2(parallel::v1::datapar_task_execution_policy, Iter1 first1, Iter1 last1,
-        Iter2 first2, F && f)
+    loop2(parallel::v1::datapar_task_execution_policy, VecOnly,
+        Iter1 first1, Iter1 last1, Iter2 first2, F && f)
     {
-        return detail::datapar_loop2<Iter1, Iter2>::call(first1, last1, first2,
-            std::forward<F>(f));
+        return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
+            first1, last1, first2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(ExPolicy &&, Iter it, std::size_t count, F && f);
-
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -446,57 +434,11 @@ namespace hpx { namespace parallel { namespace util
             >::type
             call(InIter first, std::size_t count, F && f)
             {
-                return util::loop_n(parallel::v1::seq, first, count,
-                    std::forward<F>(f));
-            }
-
-            ///////////////////////////////////////////////////////////////
-            template <typename InIter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
-                iterator_datapar_compatible<InIter>::value, InIter
-            >::type
-            call(InIter first, std::size_t count, CancelToken& tok, F && f)
-            {
-                std::size_t len = count;
-
-                for (/* */; detail::data_alignment(first) && len != 0; --len)
+                for (/* */; count != 0; --count)
                 {
-                    if (tok.was_cancelled())
-                        return first;
-
                     datapar_loop_step<InIter>::call1(f, first);
                 }
-
-                for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-                        lenV > 0; lenV -= V::Size, len -= V::Size)
-                {
-                    if (tok.was_cancelled())
-                        return first;
-
-                    datapar_loop_step<InIter>::callv(f, first);
-                }
-
-                for (/* */; len != 0; --len)
-                {
-                    if (tok.was_cancelled())
-                        return first;
-
-                    datapar_loop_step<InIter>::call1(f, first);
-                }
-
                 return first;
-            }
-
-            template <typename InIter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            static typename std::enable_if<
-                !iterator_datapar_compatible<InIter>::value, InIter
-            >::type
-            call(InIter first, std::size_t count, CancelToken& tok, F && f)
-            {
-                return util::loop_n(parallel::v1::seq, first, count, tok,
-                    std::forward<F>(f));
             }
         };
     }
@@ -517,97 +459,6 @@ namespace hpx { namespace parallel { namespace util
     {
         return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename CancelToken, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy, Iter it,
-        std::size_t count, CancelToken& tok, F && f)
-    {
-        return detail::datapar_loop_n<Iter>::call(it, count, tok,
-            std::forward<F>(f));
-    }
-
-    template <typename Iter, typename CancelToken, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy, Iter it,
-        std::size_t count, CancelToken& tok, F && f)
-    {
-        return detail::datapar_loop_n<Iter>::call(it, count, tok,
-            std::forward<F>(f));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-//     namespace detail
-//     {
-//         ///////////////////////////////////////////////////////////////////////
-//         // Helper class to repeatedly call a function starting from a given
-//         // iterator position.
-//         template <typename Iter1, typename Iter2>
-//         struct datapar_loop2_n
-//         {
-//             ///////////////////////////////////////////////////////////////
-//             template <typename InIter1, typename InIter2, typename F>
-//             HPX_HOST_DEVICE HPX_FORCEINLINE
-//             static typename std::enable_if<
-//                 iterators_datapar_compatible<InIter1, InIter2>::value &&
-//                     iterator_datapar_compatible<InIter1>::value &&
-//                     iterator_datapar_compatible<InIter2>::value,
-//                 std::pair<InIter1, InIter2>
-//             >::type
-//             call(InIter1 it1, std::size_t count, InIter2 it2, F && f)
-//             {
-//                 typedef typename hpx::util::decay<InIter1>::type iterator_type;
-//                 typedef typename std::iterator_traits<iterator_type>::value_type
-//                     value_type;
-//                 typedef Vc::Vector<value_type> V;
-//
-//                 if (detail::data_alignment(it1) || detail::data_alignment(it2))
-//                 {
-//                     return std::make_pair(std::move(it1), std::move(it2));
-//                 }
-//
-//                 for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
-//                         lenV > 0; lenV -= V::Size)
-//                 {
-//                     datapar_loop_step2<InIter1, InIter2>::callv(f, it1, it2);
-//                 }
-//
-//                 return std::make_pair(std::move(it1), std::move(it2));
-//             }
-//
-//             template <typename InIter1, typename InIter2, typename F>
-//             HPX_HOST_DEVICE HPX_FORCEINLINE
-//             static typename std::enable_if<
-//                 !iterators_datapar_compatible<InIter1, InIter2>::value ||
-//                     !iterator_datapar_compatible<InIter1>::value ||
-//                     !iterator_datapar_compatible<InIter2>::value,
-//                 std::pair<InIter1, InIter2>
-//             >::type
-//             call(InIter1 it1, std::size_t count, InIter2 it2, F && f)
-//             {
-//                 return std::make_pair(std::move(it1), std::move(it2));
-//             }
-//         };
-//     }
-//
-//     template <typename Begin1, typename Begin2, typename F>
-//     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
-//     loop2_n(parallel::v1::datapar_execution_policy,
-//         Begin1 begin1, std::size_t count, Begin2 begin2, F && f)
-//     {
-//         return detail::datapar_loop2_n<Begin1, Begin2>::call(begin1, count,
-//             begin2, std::forward<F>(f));
-//     }
-//
-//     template <typename Begin1, typename Begin2, typename F>
-//     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
-//     loop2_n(parallel::v1::datapar_task_execution_policy,
-//         Begin1 begin1, std::size_t count, Begin2 begin2, F && f)
-//     {
-//         return detail::datapar_loop2_n<Begin1, Begin2>::call(begin1, count,
-//             begin2, std::forward<F>(f));
-//     }
 }}}
 
 #endif

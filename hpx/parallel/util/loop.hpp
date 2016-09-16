@@ -25,10 +25,10 @@
 namespace hpx { namespace parallel { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename F, typename ... Iters>
+    template <typename ExPolicy, typename VecOnly, typename F, typename ... Iters>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::result_of<F&&(Iters...)>::type
-    loop_step(ExPolicy&&, F && f, Iters& ... its)
+    loop_step(ExPolicy&&, VecOnly, F && f, Iters& ... its)
     {
         return hpx::util::invoke(std::forward<F>(f), (its++)...);
     }
@@ -114,10 +114,10 @@ namespace hpx { namespace parallel { namespace util
         };
     }
 
-    template <typename ExPolicy, typename Begin1, typename End1,
-        typename Begin2, typename F>
+    template <typename ExPolicy, typename VecOnly,
+        typename Begin1, typename End1, typename Begin2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
-    loop2(ExPolicy&&, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
+    loop2(ExPolicy&&, VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
     {
         return detail::loop2<Begin1, Begin2>::call(begin1, end1, begin2,
             std::forward<F>(f));
@@ -163,11 +163,18 @@ namespace hpx { namespace parallel { namespace util
             return value ? 1 : 0;
         }
 
+        template <typename ExPolicy, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        T const& extract_value(ExPolicy&&, T const& v)
+        {
+            return v;
+        }
+
         template <typename ExPolicy, typename F, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        T && accumulate_values(ExPolicy&&, F &&, T && v)
+        T const& accumulate_values(ExPolicy&&, F &&, T const& v)
         {
-            return std::forward<T>(v);
+            return v;
         }
 
         template <typename ExPolicy, typename F, typename T, typename T1>

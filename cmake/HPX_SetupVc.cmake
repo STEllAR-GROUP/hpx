@@ -33,15 +33,38 @@
 # Vc_AVX_INTRINSICS_BROKEN
 
 find_package(Vc ${Vc_FIND_VERSION} QUIET NO_MODULE PATHS ${Vc_ROOT})
+if(NOT Vc_FOUND)
+  hpx_error("Vc was not found while datapar support was requested. Set Vc_ROOT to the installation path of Vc")
+endif()
 
 if(Vc_FOUND)
   include_directories(SYSTEM ${Vc_INCLUDE_DIR})
   link_directories(${Vc_LIB_DIR})
+
+  hpx_library_dir(${Vc_LIB_DIR})
   hpx_libraries(${Vc_LIBRARIES})
 
   foreach(_flag ${Vc_DEFINITIONS})
-    add_definitions(${_flag})
+    # remove leading '-D'
+    string(STRIP ${_flag} _flag)
+    string(FIND ${_flag} "-D" _flagpos)
+    if(${_flagpos} EQUAL 0)
+      string(SUBSTRING ${_flag} 2 -1 _flag)
+    endif()
+    hpx_add_target_compile_definition(${_flag})
   endforeach()
+
+  # do not include Vc build flags for MSVC builds as this breaks building the
+  # core HPX libraries itself
+  if(NOT MSVC)
+    foreach(_flag ${Vc_COMPILE_FLAGS})
+      hpx_add_compile_flag(${_flag})
+    endforeach()
+
+    foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
+      hpx_add_compile_flag(${_flag})
+    endforeach()
+  endif()
 
   hpx_add_config_define(HPX_HAVE_VC_DATAPAR)
 endif()
