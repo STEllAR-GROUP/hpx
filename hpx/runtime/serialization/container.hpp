@@ -28,7 +28,7 @@ namespace hpx { namespace serialization
         virtual bool has_gid(naming::gid_type const & gid) = 0;
         virtual void add_gid(
             naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid) = 0;
+            naming::gid_type const & split_gid) = 0;
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;

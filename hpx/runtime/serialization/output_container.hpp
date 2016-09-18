@@ -38,7 +38,7 @@ namespace hpx { namespace serialization
 
             static void add_gid(Container& cont,
                     naming::gid_type const & gid,
-                    naming::gid_type const & splitted_gid)
+                    naming::gid_type const & split_gid)
             {}
 
             static bool has_gid(Container& cont, naming::gid_type const& gid)
@@ -280,9 +280,9 @@ namespace hpx { namespace serialization
 
         void add_gid(
             naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid)
+            naming::gid_type const & split_gid)
         {
-            detail::access_data<Container>::add_gid(cont_, gid, splitted_gid);
+            detail::access_data<Container>::add_gid(cont_, gid, split_gid);
         }
 
         bool has_gid(naming::gid_type const & gid)

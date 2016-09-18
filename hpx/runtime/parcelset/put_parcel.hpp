@@ -153,19 +153,19 @@ namespace hpx { namespace parcelset {
             }
             else
             {
-                future<naming::gid_type> splitted_gid =
+                future<naming::gid_type> split_gid =
                     naming::detail::split_gid_if_needed(dest.get_gid());
-                if (splitted_gid.is_ready())
+                if (split_gid.is_ready())
                 {
                     pp(detail::create_parcel::call(
                         is_continuation, is_action,
-                        splitted_gid.get(), std::move(addr),
+                        split_gid.get(), std::move(addr),
                         std::forward<Args>(args)...
                     ));
                 }
                 else
                 {
-                    splitted_gid.then(
+                    split_gid.then(
                         hpx::util::bind(
                             hpx::util::one_shot(
                                 [is_continuation, is_action, dest]

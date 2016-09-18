@@ -31,7 +31,7 @@ namespace hpx { namespace serialization { namespace detail
     class preprocess
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::unordered_map<naming::gid_type, naming::gid_type> splitted_gids_map;
+        typedef std::unordered_map<naming::gid_type, naming::gid_type> split_gids_map;
     public:
         preprocess()
           : size_(0)
@@ -76,17 +76,17 @@ namespace hpx { namespace serialization { namespace detail
 
         void add_gid(
             naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid)
+            naming::gid_type const & split_gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            HPX_ASSERT(splitted_gids_[gid] == naming::invalid_gid);
-            splitted_gids_[gid] = splitted_gid;
+            HPX_ASSERT(split_gids_[gid] == naming::invalid_gid);
+            split_gids_[gid] = split_gid;
         }
 
         bool has_gid(naming::gid_type const & gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            return splitted_gids_.find(gid) != splitted_gids_.end();
+            return split_gids_.find(gid) != split_gids_.end();
         }
 
         void reset()
@@ -125,7 +125,7 @@ namespace hpx { namespace serialization { namespace detail
             shared_state_->set_on_completed(std::move(f));
         }
 
-        splitted_gids_map splitted_gids_;
+        split_gids_map split_gids_;
 
     private:
         std::size_t size_;
@@ -151,9 +151,9 @@ namespace hpx { namespace serialization { namespace detail
 
         static void add_gid(preprocess& cont,
                 naming::gid_type const & gid,
-                naming::gid_type const & splitted_gid)
+                naming::gid_type const & split_gid)
         {
-            cont.add_gid(gid, splitted_gid);
+            cont.add_gid(gid, split_gid);
         }
 
         static bool has_gid(preprocess& cont, naming::gid_type const& gid)

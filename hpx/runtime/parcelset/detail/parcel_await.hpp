@@ -66,7 +66,7 @@ namespace hpx { namespace parcelset { namespace detail {
                 archive_.flush();
                 parcels_[idx_].size() = preprocess_.size() + overhead_;
                 parcels_[idx_].num_chunks() = archive_.get_num_chunks();
-                parcels_[idx_].set_splitted_gids(std::move(preprocess_.splitted_gids_));
+                parcels_[idx_].set_split_gids(std::move(preprocess_.split_gids_));
                 put_parcel_(std::move(parcels_[idx_]));
             }
         }

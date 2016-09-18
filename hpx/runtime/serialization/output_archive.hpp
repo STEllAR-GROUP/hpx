@@ -39,7 +39,7 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::unordered_map<naming::gid_type, naming::gid_type> splitted_gids_type;
+        typedef std::unordered_map<naming::gid_type, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
@@ -70,9 +70,9 @@ namespace hpx { namespace serialization
             }
         }
 
-        void set_splitted_gids(splitted_gids_type& splitted_gids)
+        void set_split_gids(split_gids_type& split_gids)
         {
-            splitted_gids_ = &splitted_gids;
+            split_gids_ = &split_gids;
         }
 
         bool is_preprocessing() const
@@ -93,7 +93,7 @@ namespace hpx { namespace serialization
         }
 
         void add_gid(naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid);
+            naming::gid_type const & split_gid);
 
         bool has_gid(naming::gid_type const & gid);
 
@@ -308,7 +308,7 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        splitted_gids_type * splitted_gids_;
+        split_gids_type * split_gids_;
     };
 }}
 

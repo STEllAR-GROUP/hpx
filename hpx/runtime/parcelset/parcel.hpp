@@ -54,7 +54,7 @@ namespace hpx { namespace parcelset
 
         typedef
             std::unordered_map<naming::gid_type, naming::gid_type>
-            splitted_gids_type;
+            split_gids_type;
 
 #if defined(HPX_DEBUG)
         bool is_valid() const
@@ -208,7 +208,7 @@ namespace hpx { namespace parcelset
           : data_(std::move(other.data_)),
             cont_(std::move(other.cont_)),
             action_(std::move(other.action_)),
-            splitted_gids_(std::move(other.splitted_gids_)),
+            split_gids_(std::move(other.split_gids_)),
             size_(other.size_),
             num_chunks_(other.num_chunks_)
         {
@@ -220,7 +220,7 @@ namespace hpx { namespace parcelset
             data_ = std::move(other.data_);
             cont_ = std::move(other.cont_);
             action_ = std::move(other.action_);
-            splitted_gids_ = std::move(other.splitted_gids_);
+            split_gids_ = std::move(other.split_gids_);
             size_ = other.size_;
             num_chunks_ = other.num_chunks_;
 
@@ -355,14 +355,14 @@ namespace hpx { namespace parcelset
             return action_ ? action_->does_termination_detection() : false;
         }
 
-        splitted_gids_type& splitted_gids() const
+        split_gids_type& split_gids() const
         {
-            return const_cast<splitted_gids_type&>(splitted_gids_);
+            return const_cast<split_gids_type&>(split_gids_);
         }
 
-        void set_splitted_gids(splitted_gids_type&& splitted_gids)
+        void set_split_gids(split_gids_type&& split_gids)
         {
-            splitted_gids_ = std::move(splitted_gids);
+            split_gids_ = std::move(split_gids);
         }
 
         std::size_t const& num_chunks() const
@@ -410,7 +410,7 @@ namespace hpx { namespace parcelset
         std::unique_ptr<actions::continuation> cont_;
         std::unique_ptr<actions::base_action> action_;
 
-        splitted_gids_type splitted_gids_;
+        split_gids_type split_gids_;
         std::size_t size_;
         std::size_t num_chunks_;
     };

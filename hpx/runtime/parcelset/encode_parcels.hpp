@@ -190,7 +190,7 @@ namespace hpx
 #endif
 
                             LPT_(debug) << ps[i];
-                            archive.set_splitted_gids(ps[i].splitted_gids());
+                            archive.set_split_gids(ps[i].split_gids());
                             archive << ps[i];
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
