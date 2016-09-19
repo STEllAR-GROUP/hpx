@@ -29,7 +29,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
@@ -70,7 +69,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     coroutine_impl::~coroutine_impl()
     {
         HPX_ASSERT(!m_fun);   // functor should have been reset by now
-        HPX_ASSERT(!target_);
     }
 #endif
 

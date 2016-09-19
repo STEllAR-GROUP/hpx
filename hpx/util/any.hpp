@@ -1042,7 +1042,7 @@ namespace hpx { namespace util
             {
                 std::vector<char> data;
                 serialization::output_archive ar (
-                        data, 0U, ~0U, nullptr, &hasher);
+                        data, 0U, nullptr, &hasher);
                 ar << elem;
             }  // let archive go out of scope
 

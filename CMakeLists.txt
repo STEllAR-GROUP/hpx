@@ -473,6 +473,14 @@ if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
+hpx_option(HPX_WITH_PARCEL_PROFILING BOOL
+  "Enable profiling data for parcels"
+  OFF CATEGORY "Parcelport" ADVANCED)
+
+if(HPX_WITH_PARCEL_PROFILING)
+  hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
+endif()
+
 ## Parcelport related build options
 hpx_option(HPX_WITH_PARCELPORT_IBVERBS BOOL
   "Enable the ibverbs based parcelport. This is currently an experimental feature"

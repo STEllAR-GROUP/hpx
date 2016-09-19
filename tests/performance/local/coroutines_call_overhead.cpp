@@ -162,7 +162,7 @@ double perform_2n_iterations()
 
     for (std::uint64_t i = 0; i < contexts; ++i)
     {
-        coroutine_type* c = new coroutine_type(k, hpx::find_here());
+        coroutine_type* c = new coroutine_type(k);
         coroutines.push_back(c);
     }
 

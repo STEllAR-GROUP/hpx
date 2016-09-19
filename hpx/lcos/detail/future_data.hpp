@@ -350,14 +350,6 @@ namespace detail
         // allowed
         void handle_on_completed(completed_callback_type && on_completed)
         {
-            // We need to run the completion asynchronously if we aren't on a
-            // HPX thread
-            if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
-            {
-                HPX_THROW_EXCEPTION(null_thread_id,
-                        "future_data::handle_on_completed",
-                        "null thread id encountered");
-            }
 
 #if defined(HPX_WINDOWS)
             bool recurse_asynchronously = false;
@@ -376,6 +368,15 @@ namespace detail
             }
             else
             {
+                // We need to run the completion asynchronously if we aren't on a
+                // HPX thread
+                if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
+                {
+                    HPX_THROW_EXCEPTION(null_thread_id,
+                            "future_data::handle_on_completed",
+                            "null thread id encountered");
+                }
+
                 // re-spawn continuation on a new thread
                 boost::intrusive_ptr<future_data> this_(this);
 

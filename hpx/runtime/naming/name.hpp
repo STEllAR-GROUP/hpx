@@ -867,7 +867,8 @@ namespace std
         result_type operator()(argument_type const& gid) const
         {
             result_type const h1 (std::hash<std::uint64_t>()(gid.get_lsb()));
-            result_type const h2 (std::hash<std::uint64_t>()(gid.get_msb()));
+            result_type const h2 (std::hash<std::uint64_t>()(
+                hpx::naming::detail::strip_internal_bits_from_gid(gid.get_msb())));
             return h1 ^ (h2 << 1);
         }
     };

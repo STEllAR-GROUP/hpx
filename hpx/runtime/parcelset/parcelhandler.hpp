@@ -67,8 +67,10 @@ namespace hpx { namespace parcelset
                 p.set_source_id(naming::id_type(get_locality(),
                     naming::id_type::unmanaged));
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             // set the current local time for this locality
             p.set_start_time(get_current_time());
+#endif
         }
 
         typedef lcos::local::spinlock mutex_type;

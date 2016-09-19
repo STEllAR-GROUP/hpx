@@ -75,6 +75,16 @@ namespace hpx { namespace actions
               , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
             {}
 
+            explicit continuation_thread_function(
+                naming::id_type target,
+                std::unique_ptr<continuation> cont,
+                naming::address::address_type lva, F&& f, Ts&&... vs)
+              : target_(std::move(target))
+              , cont_(std::move(cont))
+              , lva_(lva)
+              , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
+            {}
+
             continuation_thread_function(continuation_thread_function && other)
               : cont_(std::move(other.cont_)), lva_(std::move(other.lva_))
               , f_(std::move(other.f_))
@@ -93,6 +103,8 @@ namespace hpx { namespace actions
             }
 
         private:
+            // This holds the target alive, if necessary.
+            naming::id_type target_;
             std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
             util::detail::deferred<F(Ts&&...)> f_;
@@ -198,6 +210,13 @@ namespace hpx { namespace actions
         /// original function (given by \a func).
         struct thread_function
         {
+            thread_function()
+            {}
+
+            thread_function(naming::id_type const& target)
+              : target_(target)
+            {}
+
             template <typename ...Ts>
             HPX_FORCEINLINE threads::thread_result_type
             operator()(naming::address::address_type lva, Ts&&... vs) const
@@ -235,6 +254,9 @@ namespace hpx { namespace actions
                 util::force_error_on_lock();
                 return threads::thread_result_type(threads::terminated, nullptr);
             }
+
+            // This holds the target alive, if necessary.
+            naming::id_type target_;
         };
 
     public:
@@ -244,12 +266,22 @@ namespace hpx { namespace actions
         // case no continuation has been supplied.
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(naming::address::address_type lva,
+        construct_thread_function(naming::id_type const& target,
+            naming::address::address_type lva,
             Ts&&... vs)
         {
-            return traits::action_decorate_function<Derived>::call(lva,
-                util::bind(util::one_shot(typename Derived::thread_function()),
-                    lva, std::forward<Ts>(vs)...));
+            if (target && target.get_management_type() == naming::id_type::unmanaged)
+            {
+                return traits::action_decorate_function<Derived>::call(lva,
+                    util::bind(util::one_shot(typename Derived::thread_function()),
+                        lva, std::forward<Ts>(vs)...));
+            }
+            else
+            {
+                return traits::action_decorate_function<Derived>::call(lva,
+                    util::bind(util::one_shot(typename Derived::thread_function(target)),
+                        lva, std::forward<Ts>(vs)...));
+            }
         }
 
         // This static construct_thread_function allows to construct
@@ -258,16 +290,26 @@ namespace hpx { namespace actions
         // case a continuation has been supplied
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(std::unique_ptr<continuation> cont,
+        construct_thread_function(naming::id_type const& target,
+            std::unique_ptr<continuation> cont,
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
                 Derived, invoker, naming::address::address_type&, Ts&&...
             > thread_function;
 
-            return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(std::move(cont), lva, invoker(),
-                    lva, std::forward<Ts>(vs)...));
+            if (target && target.get_management_type() == naming::id_type::unmanaged)
+            {
+                return traits::action_decorate_function<Derived>::call(lva,
+                    thread_function(std::move(cont), lva, invoker(),
+                        lva, std::forward<Ts>(vs)...));
+            }
+            else
+            {
+                return traits::action_decorate_function<Derived>::call(lva,
+                    thread_function(target, std::move(cont), lva, invoker(),
+                        lva, std::forward<Ts>(vs)...));
+            }
         }
 
         // direct execution
@@ -698,6 +740,9 @@ namespace hpx { namespace actions
         base_lco_with_value_std_string_set,
         base_lco_with_value_std_bool_ptrdiff_get,
         base_lco_with_value_std_bool_ptrdiff_set,
+
+        // typed continuations...
+        typed_continuation_hpx_agas_response,
 
         last_action_id
     };

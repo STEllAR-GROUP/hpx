@@ -11,7 +11,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -123,7 +125,7 @@ namespace hpx { namespace parcelset
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
-                        archive >> p;
+                        bool migrated = p.load_schedule(archive, num_thread);
 
                         std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
 
@@ -154,8 +156,17 @@ namespace hpx { namespace parcelset
                             return;
                         }
 
+                        if (migrated)
+                        {
+                            naming::resolver_client& client =
+                                hpx::naming::get_agas_client();
+                            client.route(
+                                std::move(p),
+                                &detail::parcel_route_handler,
+                                threads::thread_priority_normal);
+                        }
+
                         // be sure not to measure add_parcel as serialization time
-                        pp.add_received_parcel(std::move(p), num_thread);
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;
                     }

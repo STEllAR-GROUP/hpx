@@ -12,7 +12,6 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
@@ -1268,6 +1267,12 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() <= state_startup : true;
+    }
+
+    bool HPX_EXPORT is_pre_startup()
+    {
+        runtime* rt = get_runtime_ptr();
+        return nullptr != rt ? rt->get_state() < state_startup : true;
     }
 }
 
