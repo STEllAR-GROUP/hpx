@@ -4,10 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    create_remote_component_2334
     moveonly_constructor_arguments_1405
     partitioned_vector_2201
     returned_client_2150
    )
+
+set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources
