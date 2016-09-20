@@ -149,12 +149,6 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     HPX_TEST_EQ(int(outact->get_thread_stacksize()), int(inact->get_thread_stacksize()));
     HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
 
-    std::unique_ptr<hpx::actions::continuation> outcont = outp.get_continuation();
-    std::unique_ptr<hpx::actions::continuation> incont = inp.get_continuation();
-
-    HPX_TEST_EQ(outcont->get_continuation_name(), incont->get_continuation_name());
-    HPX_TEST_EQ(outcont->get_id(), incont->get_id());
-
     //// invoke action encapsulated in inp
     //naming::address const* inaddrs = pin.get_destination_addrs();
     //hpx::threads::thread_init_data data;
@@ -182,7 +176,7 @@ void test_normal_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
@@ -213,7 +207,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
@@ -245,7 +239,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(),
@@ -278,7 +272,7 @@ void test_zero_copy_serialization(T& arg)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             Action(), hpx::threads::thread_priority_normal, arg
@@ -309,7 +303,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action2(), hpx::threads::thread_priority_normal, arg1, arg2
@@ -341,7 +335,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
     // create a parcel with/without continuation
     hpx::naming::gid_type dest = here.get_gid();
     hpx::parcelset::parcel outp(
-        hpx::parcelset::detail::create_parcel::call(std::true_type(), std::true_type(),
+        hpx::parcelset::detail::create_parcel::call(std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action3(), hpx::threads::thread_priority_normal, d, arg1, s, i, arg2

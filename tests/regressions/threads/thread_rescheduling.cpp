@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>

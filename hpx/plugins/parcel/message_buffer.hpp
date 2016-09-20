@@ -12,6 +12,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/deferred_call.hpp>
 
 #include <cstddef>
 #include <utility>

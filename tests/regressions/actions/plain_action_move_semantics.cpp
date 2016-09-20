@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 

@@ -21,6 +21,7 @@
 #include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <cstddef>
 #include <cstdint>

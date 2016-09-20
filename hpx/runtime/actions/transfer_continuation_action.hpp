@@ -5,15 +5,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file transfer_action.hpp
+/// \file transfer_continuation_action.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP
-#define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP
+#ifndef HPX_RUNTIME_ACTIONS_TRANSFER_CONTINUATION_ACTION_HPP
+#define HPX_RUNTIME_ACTIONS_TRANSFER_CONTINUATION_ACTION_HPP
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
@@ -32,22 +33,24 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    struct transfer_action : transfer_base_action<Action>
+    struct transfer_continuation_action : transfer_base_action<Action>
     {
-        HPX_MOVABLE_ONLY(transfer_action);
+        HPX_MOVABLE_ONLY(transfer_continuation_action);
 
         typedef transfer_base_action<Action> base_type;
-
+        typedef typename base_type::continuation_type continuation_type;
     public:
-        // construct an empty transfer_action to avoid serialization overhead
-        transfer_action();
+        // construct an empty transfer_continuation_action to avoid serialization overhead
+        transfer_continuation_action();
 
         // construct an action from its arguments
         template <typename ...Ts>
-        explicit transfer_action(Ts&&... vs);
+        explicit transfer_continuation_action(continuation_type&& cont, Ts&&... vs);
 
         template <typename ...Ts>
-        transfer_action(threads::thread_priority priority, Ts&&... vs);
+        transfer_continuation_action(
+            threads::thread_priority priority, continuation_type&& cont,
+            Ts&&... vs);
 
         bool has_continuation() const;
 
@@ -94,44 +97,49 @@ namespace hpx { namespace actions
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
             std::size_t num_thread);
+
+    private:
+        continuation_type cont_;
     };
     /// \endcond
 
     template <typename Action>
-    transfer_action<Action>::transfer_action()
+    transfer_continuation_action<Action>::transfer_continuation_action()
     {}
 
     template <typename Action>
     template <typename ...Ts>
-    transfer_action<Action>::transfer_action(Ts&&... vs)
+    transfer_continuation_action<Action>::transfer_continuation_action(continuation_type&& cont, Ts&&... vs)
       : base_type(std::forward<Ts>(vs)...)
+      , cont_(std::move(cont))
     {}
 
     template <typename Action>
     template <typename ...Ts>
-    transfer_action<Action>::transfer_action(threads::thread_priority priority, Ts&&... vs)
+    transfer_continuation_action<Action>::transfer_continuation_action(threads::thread_priority priority, continuation_type&& cont, Ts&&... vs)
       : base_type(priority, std::forward<Ts>(vs)...)
+      , cont_(std::move(cont))
     {}
 
     template <typename Action>
-    bool transfer_action<Action>::has_continuation() const
+    bool transfer_continuation_action<Action>::has_continuation() const
     {
-        return false;
+        return true;
     }
 
     template <typename Action>
     template <std::size_t ...Is>
     threads::thread_function_type
-    transfer_action<Action>::get_thread_function(util::detail::pack_c<std::size_t, Is...>,
+    transfer_continuation_action<Action>::get_thread_function(util::detail::pack_c<std::size_t, Is...>,
     naming::id_type&& target, naming::address::address_type lva)
     {
-        return base_type::derived_type::construct_thread_function(std::move(target), lva,
-            util::get<Is>(std::move(this->arguments_))...);
+        return base_type::derived_type::construct_thread_function(std::move(target),
+            std::move(cont_), lva, util::get<Is>(std::move(this->arguments_))...);
     }
 
     template <typename Action>
     threads::thread_function_type
-    transfer_action<Action>::get_thread_function(naming::id_type&& target, naming::address::address_type lva)
+    transfer_continuation_action<Action>::get_thread_function(naming::id_type&& target, naming::address::address_type lva)
     {
         return get_thread_function(
             typename util::detail::make_index_pack<Action::arity>::type(),
@@ -141,7 +149,7 @@ namespace hpx { namespace actions
     template <typename Action>
     template <std::size_t ...Is>
     void
-    transfer_action<Action>::schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+    transfer_continuation_action<Action>::schedule_thread(util::detail::pack_c<std::size_t, Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
@@ -159,12 +167,12 @@ namespace hpx { namespace actions
         data.parent_locality_id = this->parent_locality_;
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
-            std::move(data), target, lva, this->priority_,
+            std::move(data), std::move(cont_), target, lva, this->priority_,
             util::get<Is>(std::move(this->arguments_))...);
     }
 
     template <typename Action>
-    void transfer_action<Action>::schedule_thread(naming::gid_type const& target_gid,
+    void transfer_continuation_action<Action>::schedule_thread(naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
     {
@@ -177,19 +185,21 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    void transfer_action<Action>::load(hpx::serialization::input_archive & ar)
+    void transfer_continuation_action<Action>::load(hpx::serialization::input_archive & ar)
     {
         this->load_base(ar);
+        ar >> cont_;
     }
 
     template <typename Action>
-    void transfer_action<Action>::save(hpx::serialization::output_archive & ar)
+    void transfer_continuation_action<Action>::save(hpx::serialization::output_archive & ar)
     {
         this->save_base(ar);
+        ar << cont_;
     }
 
     template <typename Action>
-    void transfer_action<Action>::load_schedule(serialization::input_archive& ar,
+    void transfer_continuation_action<Action>::load_schedule(serialization::input_archive& ar,
         naming::gid_type&& target, naming::address_type lva,
         std::size_t num_thread)
     {
@@ -203,7 +213,8 @@ namespace hpx { namespace traits
 {
     /// \cond NOINTERNAL
     template <typename Action>
-    struct needs_automatic_registration<hpx::actions::transfer_action<Action> >
+    struct needs_automatic_registration<
+        hpx::actions::transfer_continuation_action<Action> >
       : needs_automatic_registration<Action>
     {};
     /// \endcond

@@ -51,11 +51,11 @@ typedef
     hpx::lcos::detail::make_broadcast_action<call_startup_functions_action>::type
     call_startup_functions_broadcast_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action,
-    call_startup_functions_action)
-
 HPX_ACTION_USES_MEDIUM_STACK(
     call_startup_functions_broadcast_action)
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action,
+    call_startup_functions_action)
 
 HPX_REGISTER_BROADCAST_ACTION_ID(call_startup_functions_action,
     call_startup_functions_action,

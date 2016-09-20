@@ -8,7 +8,7 @@
 #if !defined(HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE)
 #define HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE
 
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/trigger_lco.hpp>
 
 #include <boost/exception_ptr.hpp>
 

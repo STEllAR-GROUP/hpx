@@ -14,14 +14,15 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -37,6 +38,7 @@
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
 
@@ -67,8 +69,11 @@ namespace hpx { namespace actions
             HPX_MOVABLE_ONLY(continuation_thread_function);
 
         public:
+            typedef typename Action::continuation_type
+                continuation_type;
+
             explicit continuation_thread_function(
-                std::unique_ptr<continuation> cont,
+                continuation_type&& cont,
                 naming::address::address_type lva, F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
@@ -77,7 +82,7 @@ namespace hpx { namespace actions
 
             explicit continuation_thread_function(
                 naming::id_type target,
-                std::unique_ptr<continuation> cont,
+                continuation_type&& cont,
                 naming::address::address_type lva, F&& f, Ts&&... vs)
               : target_(std::move(target))
               , cont_(std::move(cont))
@@ -94,18 +99,18 @@ namespace hpx { namespace actions
             operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
-                    << " with continuation(" << cont_->get_id() << ")";
+                    << " with continuation(" << cont_.get_id() << ")";
 
                 typedef typename Action::local_result_type local_result_type;
 
-                actions::trigger<local_result_type>(std::move(cont_), f_);
+                actions::trigger(std::move(cont_), f_);
                 return threads::thread_result_type(threads::terminated, nullptr);
             }
 
         private:
             // This holds the target alive, if necessary.
             naming::id_type target_;
-            std::unique_ptr<continuation> cont_;
+            continuation_type cont_;
             naming::address::address_type lva_;
             util::detail::deferred<F(Ts&&...)> f_;
         };
@@ -156,6 +161,12 @@ namespace hpx { namespace actions
             typename traits::promise_local_result<
                 remote_result_type
             >::type local_result_type;
+
+        typedef
+            hpx::actions::typed_continuation<
+                local_result_type,
+                remote_result_type
+            > continuation_type;
 
         static const std::size_t arity = sizeof...(Args);
         typedef util::tuple<typename std::decay<Args>::type...> arguments_type;
@@ -291,7 +302,7 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static threads::thread_function_type
         construct_thread_function(naming::id_type const& target,
-            std::unique_ptr<continuation> cont,
+            continuation_type&& cont,
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
@@ -825,8 +836,21 @@ namespace hpx { namespace serialization
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
         template struct transfer_action<action>;                              \
+        template struct transfer_continuation_action<action>;                 \
     }}                                                                        \
 /**/
+
+#if defined(HPX_MSVC)
+#define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
+/**/
+#else
+#define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
+    namespace hpx { namespace actions {                                       \
+        extern template struct HPX_EXPORT transfer_action<action>;            \
+        extern template struct HPX_EXPORT transfer_continuation_action<action>;\
+    }}                                                                        \
+/**/
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
@@ -834,6 +858,7 @@ namespace hpx { namespace serialization
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \
     }}}                                                                       \
+    HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                            \
                                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
@@ -1035,7 +1060,7 @@ namespace hpx { namespace serialization
 ///
 #define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
     HPX_REGISTER_ACTION_2(action, actionname)                                 \
-    HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(actionname, actionid)                \
+    HPX_REGISTER_ACTION_FACTORY_ID(actionname, actionid)                      \
 /**/
 
 #endif /*HPX_RUNTIME_ACTIONS_BASIC_ACTION_HPP*/

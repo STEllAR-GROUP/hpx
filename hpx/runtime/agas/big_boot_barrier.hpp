@@ -99,14 +99,14 @@ struct HPX_EXPORT big_boot_barrier
     void apply(
         std::uint32_t source_locality_id
       , std::uint32_t target_locality_id
-      , parcelset::locality const & dest
+      , parcelset::locality dest
       , Action act
       , Args &&... args
     ) { // {{{
         HPX_ASSERT(pp);
         naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(
-            parcelset::detail::create_parcel::call(std::false_type(), std::false_type(),
+            parcelset::detail::create_parcel::call(std::false_type(),
                 naming::get_gid_from_locality_id(target_locality_id),
                 std::move(addr), act, std::forward<Args>(args)...));
 #if defined(HPX_HAVE_PARCEL_PROFILING)
@@ -115,14 +115,11 @@ struct HPX_EXPORT big_boot_barrier
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-        auto f = [this, dest](parcelset::parcel p)
+        auto f = [this, dest](parcelset::parcel&& p)
             {
                 pp->send_early_parcel(dest, std::move(p));
             };
-        typedef
-            parcelset::detail::parcel_await<decltype(f)>
-            parcel_await;
-        parcel_await(std::move(p), 0, std::move(f)).apply();
+        parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
     } // }}}
 
     template <typename Action, typename... Args>

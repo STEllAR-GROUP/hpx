@@ -6,12 +6,11 @@
 #ifndef HPX_PARCELSET_PARCEL_AWAIT_HPP
 #define HPX_PARCELSET_PARCEL_AWAIT_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/detail/preprocess.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/runtime/serialization/output_container.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -19,59 +18,19 @@
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace detail {
-    template <typename PutParcel>
     struct parcel_await
-      : std::enable_shared_from_this<parcel_await<PutParcel>>
+      : std::enable_shared_from_this<parcel_await>
     {
-        template <typename PutParcel_>
-        parcel_await(parcel&& p, int archive_flags, PutParcel_&& pp)
-          : put_parcel_(std::forward<PutParcel_>(pp)),
-            archive_(preprocess_, archive_flags),
-            overhead_(archive_.bytes_written()),
-            idx_(0)
-        {
-            parcels_.push_back(std::move(p));
-        }
+        typedef hpx::util::unique_function_nonser<void(parcel&&)> put_parcel_type;
 
-        template <typename PutParcel_>
-        parcel_await(std::vector<parcel>&& parcels, int archive_flags, PutParcel_&& pp)
-          : put_parcel_(std::forward<PutParcel_>(pp)),
-            parcels_(std::move(parcels)),
-            archive_(preprocess_, archive_flags),
-            overhead_(archive_.bytes_written()),
-            idx_(0)
-        {
-        }
+        parcel_await(parcel&& p, int archive_flags, put_parcel_type pp);
 
-        void apply()
-        {
-            for (/*idx_*/; idx_ != parcels_.size(); ++idx_)
-            {
-                archive_.reset();
-                archive_ << parcels_[idx_];
+        parcel_await(std::vector<parcel>&& parcels, int archive_flags,
+            put_parcel_type pp);
 
-                // We are doing a fixed point iteration until we are sure that the
-                // serialization process requires nothing more to wait on ...
-                // Things where we need waiting:
-                //  - (shared_)future<id_type>: when the future wasn't ready yet, we
-                //      need to do another await round for the id splitting
-                //  - id_type: we need to await, if and only if, the credit of the
-                //      needs to split.
-                if(preprocess_.has_futures())
-                {
-                    auto this_ = this->shared_from_this();
-                    preprocess_([this_](){ this_->apply(); });
-                    return;
-                }
-                archive_.flush();
-                parcels_[idx_].size() = preprocess_.size() + overhead_;
-                parcels_[idx_].num_chunks() = archive_.get_num_chunks();
-                parcels_[idx_].set_split_gids(std::move(preprocess_.split_gids_));
-                put_parcel_(std::move(parcels_[idx_]));
-            }
-        }
+        HPX_EXPORT void apply();
 
-        typename hpx::util::decay<PutParcel>::type put_parcel_;
+        put_parcel_type put_parcel_;
         std::vector<parcel> parcels_;
         hpx::serialization::detail::preprocess preprocess_;
         hpx::serialization::output_archive archive_;

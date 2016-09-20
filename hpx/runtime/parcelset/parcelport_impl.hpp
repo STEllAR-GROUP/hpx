@@ -204,7 +204,7 @@ namespace hpx { namespace parcelset
             locality dest_;
             write_handler_type f_;
 
-            void operator()(parcel p)
+            void operator()(parcel&& p)
             {
                 if (!connection_handler_traits<ConnectionHandler>::
                     use_connection_cache::value)
@@ -229,7 +229,7 @@ namespace hpx { namespace parcelset
             std::vector<parcel> parcels_;
             std::size_t idx_;
 
-            void operator()(parcel p)
+            void operator()(parcel&& p)
             {
                 if (!connection_handler_traits<ConnectionHandler>::
                     use_connection_cache::value)
@@ -258,11 +258,7 @@ namespace hpx { namespace parcelset
         {
             HPX_ASSERT(dest.type() == type());
 
-            typedef
-                detail::parcel_await<parcel_await_handler>
-                parcel_await;
-
-            std::make_shared<parcel_await>(
+            std::make_shared<detail::parcel_await>(
                 std::move(p), archive_flags_,
                 parcel_await_handler{*this, dest, std::move(f)})->apply();
         }
@@ -286,17 +282,13 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
-            typedef
-                detail::parcel_await<parcel_await_handlers>
-                parcel_await;
-
             parcel_await_handlers handler{
                 *this, dest, std::move(handlers), std::vector<parcel>(), 0};
             if (connection_handler_traits<ConnectionHandler>::
                 use_connection_cache::value)
                 handler.parcels_.reserve(parcels.size());
 
-            std::make_shared<parcel_await>(
+            std::make_shared<detail::parcel_await>(
                 std::move(parcels), archive_flags_, std::move(handler))->apply();
         }
 

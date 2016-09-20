@@ -155,89 +155,92 @@ namespace hpx { namespace actions { namespace detail
         typedef typed_continuation<local_result_type, remote_result_type> base_type;
 
     public:
-        wrapped_continuation(std::unique_ptr<continuation> cont)
-          : cont_(std::move(cont))
-        {}
+//         wrapped_continuation(std::unique_ptr<continuation> cont)
+//           : cont_(std::move(cont))
+//         {}
 
         wrapped_continuation(wrapped_continuation && o)
-          : cont_(std::move(o.cont_))
+//           : cont_(std::move(o.cont_))
         {}
 
         void trigger()
         {
-            if (cont_) cont_->trigger();
+//             if (cont_) cont_->trigger();
             construct_semaphore_type::get_sem().signal();
         }
 
         void trigger_value(remote_result_type && result)
         {
-            if(cont_)
-            {
-                HPX_ASSERT(nullptr != dynamic_cast<base_type *>(cont_.get()));
-                static_cast<base_type *>(cont_.get())->
-                    trigger_value(std::move(result));
-            }
+//             if(cont_)
+//             {
+//                 HPX_ASSERT(nullptr != dynamic_cast<base_type *>(cont_.get()));
+//                 static_cast<base_type *>(cont_.get())->
+//                     trigger_value(std::move(result));
+//             }
             construct_semaphore_type::get_sem().signal();
         }
 
         void trigger_error(boost::exception_ptr const& e)
         {
-            if (cont_) cont_->trigger_error(e);
+//             if (cont_) cont_->trigger_error(e);
             construct_semaphore_type::get_sem().signal();
         }
         void trigger_error(boost::exception_ptr && e)
         {
-            if (cont_) cont_->trigger_error(std::move(e));
+//             if (cont_) cont_->trigger_error(std::move(e));
             construct_semaphore_type::get_sem().signal();
         }
 
     private:
-        std::unique_ptr<continuation> cont_;
+//         std::unique_ptr<continuation> cont_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, int N>
-    struct action_decorate_continuation
-    {
-        static_assert(
-            !Action::direct_execution::value,
-            "explicit decoration of direct actions is not supported");
-
-        typedef action_decorate_function_semaphore<Action, N>
-            construct_semaphore_type;
-
-        ///////////////////////////////////////////////////////////////////////
-        // If the action returns something which is not a future, we do nothing
-        // special.
-        template <typename Continuation>
-        static bool call(Continuation& cont, std::false_type)
-        {
-            return false;
-        }
-
-        // If the action returns a future we wrap the given continuation to
-        // be able to signal the semaphore after the wrapped action has
-        // returned.
-        template <typename Continuation>
-        static bool call(Continuation& c, std::true_type)
-        {
-            c = std::unique_ptr<continuation>(
-                new wrapped_continuation<Action, N>(std::move(c)));
-            return true;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        static bool call(std::unique_ptr<continuation>& cont)
-        {
-            typedef typename Action::result_type result_type;
-            typedef traits::is_future<result_type> is_future;
-            return call(cont, is_future());
-        }
-    };
+//     template <typename Action, int N>
+//     struct action_decorate_continuation
+//     {
+//         static_assert(
+//             !Action::direct_execution::value,
+//             "explicit decoration of direct actions is not supported");
+//
+//         typedef action_decorate_function_semaphore<Action, N>
+//             construct_semaphore_type;
+//
+//         typedef typename traits::action_continuation<Action>::type
+//             continuation_type;
+//
+//         ///////////////////////////////////////////////////////////////////////
+//         // If the action returns something which is not a future, we do nothing
+//         // special.
+//         static bool call(continuation_type& cont, std::false_type)
+//         {
+//             return false;
+//         }
+//
+//         // If the action returns a future we wrap the given continuation to
+//         // be able to signal the semaphore after the wrapped action has
+//         // returned.
+//         static bool call(continuation_type& c, std::true_type)
+//         {
+//             c = std::unique_ptr<continuation>(
+//                 new wrapped_continuation<Action, N>(std::move(c)));
+//             return true;
+//         }
+//
+//         ///////////////////////////////////////////////////////////////////////
+//         static bool call(continuation_type cont)
+//         {
+//             typedef typename Action::result_type result_type;
+//             typedef traits::is_future<result_type> is_future;
+//             return call(cont, is_future());
+//         }
+//     };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_INVOKE_NO_MORE_THAN(action, maxnum)                        \
+
+/*
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
@@ -250,6 +253,7 @@ namespace hpx { namespace actions { namespace detail
           : hpx::actions::detail::action_decorate_continuation<action, maxnum>\
         {};                                                                   \
     }}                                                                        \
+*/
 /**/
 
 #endif

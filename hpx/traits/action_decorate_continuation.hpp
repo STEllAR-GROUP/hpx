@@ -7,6 +7,7 @@
 #define HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM
 
 #include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/traits/action_continuation.hpp>
 
 #include <memory>
 
@@ -17,7 +18,10 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_decorate_continuation
     {
-        static bool call(std::unique_ptr<hpx::actions::continuation>& cont)
+        typedef typename traits::action_continuation<Action>::type
+            continuation_type;
+
+        static bool call(continuation_type& cont)
         {
             // by default we do nothing
             return false; // continuation has not been modified
