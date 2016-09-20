@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
@@ -110,6 +111,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
+
+                auto f3 =
+                    [op, policy](
+                        zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> curr, hpx::shared_future<T> next
+                    )
+                    {
+                        next.get();     // rethrow exceptions
+
+                        T val = curr.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+
+                        // MSVC 2015 fails if op is captured by reference
+                        util::loop_n(
+                            policy, dst, part_size,
+                            [=, &val](OutIter it)
+                            {
+                                *it = hpx::util::invoke(op, val, *it);
+                            });
+                    };
+
                 return util::scan_partitioner<ExPolicy, OutIter, T>::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
@@ -128,20 +150,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     // to right
                     hpx::util::unwrapped(op),
                     // step 3 runs final accumulation on each partition
-                    [op](zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<T> curr, hpx::shared_future<T> next)
-                    {
-                        next.get();     // rethrow exceptions
-
-                        T val = curr.get();
-                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
-                        // MSVC 2015 fails if op is captured by reference
-                        util::loop_n(dst, part_size,
-                            [=, &val](OutIter it)
-                            {
-                                *it = op(val, *it);
-                            });
-                    },
+                    std::move(f3),
                     // step 4 use this return value
                     [final_dest](std::vector<hpx::shared_future<T> > &&,
                         std::vector<hpx::future<void> > &&)

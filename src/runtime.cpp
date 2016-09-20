@@ -150,7 +150,7 @@ namespace hpx
         message_handler_registrations;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void new_handler()
+    HPX_EXPORT void HPX_CDECL new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
             "new allocator failed to allocate memory");

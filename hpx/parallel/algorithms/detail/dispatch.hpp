@@ -281,6 +281,41 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return call_sequential(policy, std::forward<Args>(args)...);
         }
 
+#if defined(HPX_HAVE_VC_DATAPAR)
+        template <typename Executor, typename Parameters, typename... Args>
+        typename parallel::util::detail::algorithm_result<
+            datapar_task_execution_policy_shim<Executor, Parameters>,
+            local_result_type
+        >::type
+        call(datapar_task_execution_policy_shim<Executor, Parameters>& policy,
+            std::true_type, Args&&... args) const
+        {
+            return call_sequential(policy, std::forward<Args>(args)...);
+        }
+
+        template <typename Executor, typename Parameters, typename... Args>
+        typename parallel::util::detail::algorithm_result<
+            datapar_task_execution_policy_shim<Executor, Parameters>,
+            local_result_type
+        >::type
+        call(datapar_task_execution_policy_shim<Executor, Parameters> && policy,
+            std::true_type, Args&&... args) const
+        {
+            return call_sequential(policy, std::forward<Args>(args)...);
+        }
+
+        template <typename Executor, typename Parameters, typename... Args>
+        typename parallel::util::detail::algorithm_result<
+            datapar_task_execution_policy_shim<Executor, Parameters>,
+            local_result_type
+        >::type
+        call(datapar_task_execution_policy_shim<Executor, Parameters> const& policy,
+            std::true_type, Args&&... args) const
+        {
+            return call_sequential(policy, std::forward<Args>(args)...);
+        }
+#endif
+
         template <typename ExPolicy, typename... Args>
         typename parallel::util::detail::algorithm_result<
             ExPolicy, local_result_type

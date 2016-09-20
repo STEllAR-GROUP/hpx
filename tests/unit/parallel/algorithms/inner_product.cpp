@@ -5,65 +5,14 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_inner_product.hpp>
-#include <hpx/util/lightweight_test.hpp>
 
-#include <cstddef>
-#include <ctime>
 #include <iostream>
-#include <numeric>
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "inner_product_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-
-template <typename ExPolicy, typename IteratorTag>
-void test_inner_product(ExPolicy policy, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c = test::random_iota(1007);
-    std::vector<std::size_t> d = test::random_iota(1007);
-    std::size_t init = std::rand() % 1007; //-V101
-
-    std::size_t r = hpx::parallel::inner_product(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), init);
-
-    HPX_TEST_EQ(r, std::inner_product(
-        boost::begin(c), boost::end(c), boost::begin(d), init));
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_inner_product_async(ExPolicy p, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c = test::random_iota(1007);
-    std::vector<std::size_t> d = test::random_iota(1007);
-    std::size_t init = std::rand() % 1007; //-V101
-
-    hpx::future<std::size_t> fut_r =
-        hpx::parallel::inner_product(p, iterator(boost::begin(c)),
-        iterator(boost::end(c)), boost::begin(d), init);
-
-    fut_r.wait();
-    HPX_TEST_EQ(fut_r.get(), std::inner_product(
-        boost::begin(c), boost::end(c), boost::begin(d), init));
-}
-
 template <typename IteratorTag>
 void test_inner_product()
 {

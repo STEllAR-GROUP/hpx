@@ -412,19 +412,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ExPolicy, std::pair<FwdIter, OutIter>, std::size_t
                     > scan_partitioner_type;
 
-                return scan_partitioner_type::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, flags.get()), count, init,
-                    // step 1 performs first part of scan algorithm
-                    [pred, proj, flags]
-                        (zip_iterator part_begin, std::size_t part_size)
-                        -> std::size_t
+                auto f1 =
+                    [pred, proj, flags, policy]
+                    (
+                       zip_iterator part_begin, std::size_t part_size
+                    )   -> std::size_t
                     {
                         std::size_t curr = 0;
 
                         // MSVC complains if proj is captured by ref below
                         util::loop_n(
-                            part_begin, part_size,
+                            policy, part_begin, part_size,
                             [&pred, proj, &curr](zip_iterator it) mutable
                             {
                                 using hpx::util::invoke;
@@ -435,26 +433,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             });
 
                         return curr;
-                    },
-                    // step 2 propagates the partition results from left
-                    // to right
-                    hpx::util::unwrapped(std::plus<std::size_t>()),
-                    // step 3 runs final accumulation on each partition
-                    [dest, flags](
+                    };
+                auto f3 =
+                    [dest, flags, policy](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next) mutable
+                        hpx::shared_future<std::size_t> next
+                    ) mutable
                     {
                         next.get();     // rethrow exceptions
 
                         std::advance(dest, curr.get());
-                        util::loop_n(part_begin, part_size,
+                        util::loop_n(
+                            policy, part_begin, part_size,
                             [&dest](zip_iterator it) mutable
                             {
                                 if(get<1>(*it))
                                     *dest++ = get<0>(*it);
                             });
-                    },
+                    };
+
+                return scan_partitioner_type::call(
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, flags.get()), count, init,
+                    // step 1 performs first part of scan algorithm
+                    std::move(f1),
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapped(std::plus<std::size_t>()),
+                    // step 3 runs final accumulation on each partition
+                    std::move(f3),
                     // step 4 use this return value
                     [last, dest, flags](
                         std::vector<hpx::shared_future<std::size_t> > && items,

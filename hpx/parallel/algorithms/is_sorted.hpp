@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -65,16 +66,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    [tok, pred, last](FwdIter part_begin,
-                    std::size_t part_size) mutable -> bool
+                auto f1 =
+                    [tok, pred, last, policy](
+                        FwdIter part_begin, std::size_t part_size
+                    ) mutable -> bool
                     {
                         FwdIter trail = part_begin++;
-                        util::loop_n(part_begin, part_size - 1,
+                        util::loop_n(
+                            policy, part_begin, part_size - 1,
                             [&trail, &tok, &pred](FwdIter it)
                             {
-                                if (pred(*it, *trail++))
+                                if (hpx::util::invoke(pred, *it, *trail++))
                                 {
                                     tok.cancel();
                                 }
@@ -89,7 +91,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             return !pred(*trail, *i);
                         }
                         return !tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy), first, count,
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
