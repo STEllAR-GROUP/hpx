@@ -34,6 +34,7 @@ set(tests
     shared_future_then_2166
     shared_mutex_1702
     shared_stated_leaked_1211
+    sliding_semaphore_2338
     wait_all_hang_1946
     wait_for_1751
     when_all_vectors_1623
@@ -61,6 +62,7 @@ set(multiple_gather_ops_2001_PARAMETERS LOCALITIES 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
+set(sliding_semaphore_2338_PARAMETERS LOCALITIES 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
 set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
