@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
+#include <vector>
 
 // ----------------------------------------------------------------------------
 double message_double(double d)
