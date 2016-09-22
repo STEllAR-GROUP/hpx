@@ -40,6 +40,8 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_COMPRESSION_ZLIB HPX_WITH_COMPRESSION_ZLIB]
 * [link build_system.cmake_variables.HPX_WITH_CUDA HPX_WITH_CUDA]
 * [link build_system.cmake_variables.HPX_WITH_CUDA_CLANG HPX_WITH_CUDA_CLANG]
+* [link build_system.cmake_variables.HPX_WITH_DATAPAR_BOOST_SIMD HPX_WITH_DATAPAR_BOOST_SIMD]
+* [link build_system.cmake_variables.HPX_WITH_DATAPAR_VC HPX_WITH_DATAPAR_VC]
 * [link build_system.cmake_variables.HPX_WITH_FORTRAN HPX_WITH_FORTRAN]
 * [link build_system.cmake_variables.HPX_WITH_FULL_RPATH HPX_WITH_FULL_RPATH]
 * [link build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK HPX_WITH_GCC_VERSION_CHECK]
@@ -57,7 +59,6 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
 * [link build_system.cmake_variables.HPX_WITH_STATIC_LINKING HPX_WITH_STATIC_LINKING]
 * [link build_system.cmake_variables.HPX_WITH_SYCL HPX_WITH_SYCL]
-* [link build_system.cmake_variables.HPX_WITH_VC_DATAPAR HPX_WITH_VC_DATAPAR]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY] `HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY:BOOL`][Enable old style ..._sync/..._async functions in API (default: OFF)]]
@@ -73,6 +74,8 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_COMPRESSION_ZLIB] `HPX_WITH_COMPRESSION_ZLIB:BOOL`][Enable zlib compression for parcel data (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_CUDA] `HPX_WITH_CUDA:BOOL`][Enable CUDA support (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_CUDA_CLANG] `HPX_WITH_CUDA_CLANG:BOOL`][Use clang to compile CUDA code (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_BOOST_SIMD] `HPX_WITH_DATAPAR_BOOST_SIMD:BOOL`][Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_VC] `HPX_WITH_DATAPAR_VC:BOOL`][Enable data parallel algorithm support using the external Vc library (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_FORTRAN] `HPX_WITH_FORTRAN:BOOL`][Enable or disable the compilation of Fortran examples using HPX]]
         [[[#build_system.cmake_variables.HPX_WITH_FULL_RPATH] `HPX_WITH_FULL_RPATH:BOOL`][Build and link HPX libraries and executables with full RPATHs (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK] `HPX_WITH_GCC_VERSION_CHECK:BOOL`][Don't ignore version reported by gcc (default: ON)]]
@@ -90,7 +93,6 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_SECURITY] `HPX_WITH_SECURITY:BOOL`][Enable security support via libsodium.]]
         [[[#build_system.cmake_variables.HPX_WITH_STATIC_LINKING] `HPX_WITH_STATIC_LINKING:BOOL`][Compile HPX statically linked libraries (Default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_SYCL] `HPX_WITH_SYCL:BOOL`][Enable sycl support (default: OFF)]]
-        [[[#build_system.cmake_variables.HPX_WITH_VC_DATAPAR] `HPX_WITH_VC_DATAPAR:BOOL`][Enable data parallel algorithm support (default: OFF)]]
 ] [/ Generic Options]
 
 [#build_system.cmake_variables.Build_Targets][h3 Build Targets Options]
@@ -186,6 +188,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_ENV HPX_WITH_PARCELPORT_MPI_ENV]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_MULTITHREADED HPX_WITH_PARCELPORT_MPI_MULTITHREADED]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_TCP HPX_WITH_PARCELPORT_TCP]
+* [link build_system.cmake_variables.HPX_WITH_PARCEL_PROFILING HPX_WITH_PARCEL_PROFILING]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_ACTION_COUNTERS] `HPX_WITH_PARCELPORT_ACTION_COUNTERS:BOOL`][Enable performance counters reporting parcelport statistics on a per-action basis.]]
@@ -199,6 +202,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_ENV] `HPX_WITH_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE).]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_MULTITHREADED] `HPX_WITH_PARCELPORT_MPI_MULTITHREADED:BOOL`][Turn on MPI multithreading support (default: ON).]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_TCP] `HPX_WITH_PARCELPORT_TCP:BOOL`][Enable the TCP based parcelport.]]
+        [[[#build_system.cmake_variables.HPX_WITH_PARCEL_PROFILING] `HPX_WITH_PARCEL_PROFILING:BOOL`][Enable profiling data for parcels]]
 ] [/ Parcelport Options]
 
 [#build_system.cmake_variables.Profiling][h3 Profiling Options]

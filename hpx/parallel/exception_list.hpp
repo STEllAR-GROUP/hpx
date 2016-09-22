@@ -105,7 +105,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::move(f);
             }
 
-            static hpx::future<Result> call(boost::exception_ptr const& e)
+#if defined(HPX_HAVE_DATAPAR)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct handle_exception_impl<datapar_task_execution_policy, Result>
+        {
+            typedef future<Result> type;
+
+            static future<Result> call(boost::exception_ptr const& outer)
             {
                 try {
                     boost::rethrow_exception(e);
@@ -118,7 +125,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 catch (...) {
                     // package up everything else as an exception_list
                     return hpx::make_exceptional_future<Result>(
-                        exception_list(e));
+                        exception_list(outer));
                 }
             }
         };
