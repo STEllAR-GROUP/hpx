@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
     };
 
-#if defined(HPX_HAVE_VC_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct algorithm_result_impl<datapar_task_execution_policy, T>

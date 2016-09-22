@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_VC_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -22,8 +22,6 @@
 
 #include <type_traits>
 #include <utility>
-
-#include <Vc/Vc>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

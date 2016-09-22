@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return call_sequential(policy, std::forward<Args>(args)...);
         }
 
-#if defined(HPX_HAVE_VC_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR)
         template <typename Executor, typename Parameters, typename... Args>
         typename parallel::util::detail::algorithm_result<
             datapar_task_execution_policy_shim<Executor, Parameters>,

@@ -5,7 +5,7 @@
 
 set(tests)
 
-if(HPX_WITH_VC_DATAPAR)
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(tests
       count_datapar
       countif_datapar

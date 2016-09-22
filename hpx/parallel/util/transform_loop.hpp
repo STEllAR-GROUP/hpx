@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_UTIL_TRANSFORM_LOOP_SEP_08_2016_0611PM
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_VC_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #endif
 #include <hpx/parallel/util/cancellation_token.hpp>

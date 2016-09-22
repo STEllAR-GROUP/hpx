@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-#if defined(HPX_HAVE_VC_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR)
         template <typename Result>
         struct foreach_partitioner<datapar_task_execution_policy, Result,
                 parallel::traits::static_partitioner_tag>
