@@ -53,10 +53,10 @@ void iota_vector(hpx::partitioned_vector<T>& v, T val)
         local_iterator_type end = traits::end(sit);
 
         hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
-                iota(), hpx::parallel::seq, std::true_type(), beg, end, temp_val
+            iota(), hpx::parallel::seq, std::true_type(), beg, end, temp_val
         );
 
-        temp_val += std::distance(beg, end);
+        temp_val = T(temp_val + std::distance(beg, end));
     }
 }
 
