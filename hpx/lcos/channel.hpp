@@ -182,7 +182,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit channel(hpx::shared_future<naming::id_type> const& id)
-          : base_type(std::move(id))
+          : base_type(id)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit receive_channel(hpx::shared_future<naming::id_type> const& id)
-          : base_type(std::move(id))
+          : base_type(id)
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -444,7 +444,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit send_channel(hpx::shared_future<naming::id_type> const& id)
-          : base_type(std::move(id))
+          : base_type(id)
         {}
 
         ///////////////////////////////////////////////////////////////////////

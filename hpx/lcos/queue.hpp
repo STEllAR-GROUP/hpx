@@ -39,6 +39,13 @@ namespace hpx { namespace lcos
           : base_type(std::move(gid))
         {}
 
+        queue(shared_future<id_type> const& id)
+          : base_type(id)
+        {}
+        queue(shared_future<id_type> && id)
+          : base_type(std::move(id))
+        {}
+
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         future<ValueType> get_value()
