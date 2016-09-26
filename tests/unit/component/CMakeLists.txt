@@ -112,13 +112,13 @@ set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_co
 
 set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_inclusive_scan_PARAMETERS
-    LOCALITIES 3
-    THREADS_PER_LOCALITY 3)
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 
 set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_exclusive_scan_PARAMETERS
-    LOCALITIES 3
-    THREADS_PER_LOCALITY 3)
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
