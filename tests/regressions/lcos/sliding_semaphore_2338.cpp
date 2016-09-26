@@ -48,7 +48,7 @@ int main()
             hpx::launch::sync,
             // when the message completes, increment our semaphore count
             // so that N are always in flight
-            [&,parcel_count](auto &&f) -> void
+            [&,parcel_count](hpx::future<double> &&f) -> void
             {
                 sem.signal(parcel_count);
                 ++signal_count;
