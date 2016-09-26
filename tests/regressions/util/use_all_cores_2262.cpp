@@ -26,7 +26,7 @@ int hpx_main(int argc, char* argv[])
 // runners.
 char* argv[] =
 {
-    "use_all_cores_2262", nullptr
+    (char*)"use_all_cores_2262", nullptr
 };
 
 int main()
