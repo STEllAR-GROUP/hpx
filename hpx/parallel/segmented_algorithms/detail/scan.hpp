@@ -786,7 +786,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     hpx::dataflow(
                         policy.executor(),
                         hpx::util::unwrapped(
-                            [&, dest](T last_value, vector_type && r)
+                            [&, dest](T last_value, vector_type r)
                             {
                                 // merge function
                                 f1(r.begin(), r.end(), dest, last_value, op);
