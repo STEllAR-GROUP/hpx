@@ -159,12 +159,30 @@ namespace hpx { namespace lcos
         static std::size_t default_generation = std::size_t(-1);
 
     public:
+        // FIXME: this typedef is currently needed for traits::is_future_range
+        // to work properly. This typedef is to workaround that defect in the
+        // trait implementation which expects the value_type typedef once begin
+        // and end members are present.
+        typedef T value_type;
+
         channel()
         {}
 
         // create a new instance of a channel component
         explicit channel(naming::id_type const& loc)
           : base_type(hpx::new_<lcos::server::channel<T> >(loc))
+        {}
+
+        explicit channel(hpx::future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit channel(hpx::shared_future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit channel(hpx::shared_future<naming::id_type> const& id)
+          : base_type(std::move(id))
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -320,11 +338,29 @@ namespace hpx { namespace lcos
         static std::size_t default_generation = std::size_t(-1);
 
     public:
+        // FIXME: this typedef is currently needed for traits::is_future_range
+        // to work properly. This typedef is to workaround that defect in the
+        // trait implementation which expects the value_type typedef once begin
+        // and end members are present.
+        typedef T value_type;
+
         receive_channel()
         {}
 
         receive_channel(channel<T> const& c)
           : base_type(c.get_id())
+        {}
+
+        explicit receive_channel(hpx::future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit receive_channel(hpx::shared_future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit receive_channel(hpx::shared_future<naming::id_type> const& id)
+          : base_type(std::move(id))
         {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -386,11 +422,29 @@ namespace hpx { namespace lcos
         static std::size_t default_generation = std::size_t(-1);
 
     public:
+        // FIXME: this typedef is currently needed for traits::is_future_range
+        // to work properly. This typedef is to workaround that defect in the
+        // trait implementation which expects the value_type typedef once begin
+        // and end members are present.
+        typedef T value_type;
+
         send_channel()
         {}
 
         send_channel(channel<T> const& c)
           : base_type(c.get_id())
+        {}
+
+        explicit send_channel(hpx::future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit send_channel(hpx::shared_future<naming::id_type>&& id)
+          : base_type(std::move(id))
+        {}
+
+        explicit send_channel(hpx::shared_future<naming::id_type> const& id)
+          : base_type(std::move(id))
         {}
 
         ///////////////////////////////////////////////////////////////////////
