@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/detail/transform_loop_vc.hpp>
-#include <hpx/parallel/datapar/detail/transform_loop_boost_simd.hpp>
+#include <hpx/parallel/datapar/detail/vc/transform_loop.hpp>
+#include <hpx/parallel/datapar/detail/boost_simd/transform_loop.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 
 #include <cstddef>

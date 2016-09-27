@@ -10,8 +10,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/parallel/traits/vector_pack_load_store.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -23,110 +25,6 @@
 
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter>
-    HPX_FORCEINLINE std::size_t data_alignment(Iter it)
-    {
-        typedef typename std::iterator_traits<Iter>::value_type value_type;
-        return reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
-            (Vc::Vector<value_type>::MemoryAlignment - 1);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter1, typename Iter2>
-    struct iterators_datapar_compatible_impl
-    {
-        typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-        typedef typename hpx::util::decay<Iter2>::type iterator2_type;
-
-        typedef Vc::Vector<
-                typename std::iterator_traits<iterator1_type>::value_type
-            > V1;
-        typedef Vc::Vector<
-                typename std::iterator_traits<iterator2_type>::value_type
-            > V2;
-
-        typedef std::integral_constant<bool,
-                V1::Size == V2::Size &&
-                    V1::MemoryAlignment == V2::MemoryAlignment
-            > type;
-    };
-
-    template <typename Iter1, typename Iter2>
-    struct iterators_datapar_compatible
-      : iterators_datapar_compatible_impl<Iter1, Iter2>::type
-    {};
-
-    ///////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
-    struct iterator_datapar_compatible_impl
-      : std::false_type
-    {};
-
-    template <typename Iter>
-    struct iterator_datapar_compatible_impl<Iter,
-            typename std::enable_if<
-                hpx::traits::is_random_access_iterator<Iter>::value
-            >::type>
-      : std::is_arithmetic<typename std::iterator_traits<Iter>::value_type>
-    {};
-
-    template <typename Iter>
-    struct iterator_datapar_compatible
-      : iterator_datapar_compatible_impl<
-            typename hpx::util::decay<Iter>::type
-        >::type
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename V, typename Enable = void>
-    struct store_on_exit
-    {
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        store_on_exit(Iter const& iter)
-            : value_(std::addressof(*iter), Vc::Aligned),
-            iter_(iter)
-        {
-        }
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        ~store_on_exit()
-        {
-            value_.store(std::addressof(*iter_), Vc::Aligned);
-        }
-
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        V* operator&() { return &value_; }
-
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        V const* operator&() const { return &value_; }
-
-        V value_;
-        Iter iter_;
-    };
-
-    template <typename Iter, typename V>
-    struct store_on_exit<Iter, V,
-        typename std::enable_if<
-            std::is_const<
-                typename std::iterator_traits<Iter>::value_type
-            >::value
-        >::type>
-    {
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        store_on_exit(Iter const& iter)
-          : value_(std::addressof(*iter), Vc::Aligned)
-        {
-        }
-
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        V* operator&() { return &value_; }
-
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        V const* operator&() const { return &value_; }
-
-        V value_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct datapar_loop_step
@@ -164,15 +62,29 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static_assert(V1::Size == V2::Size,
             "the sizes of the vector-packs should be equal");
 
-        template <typename F, typename Iter1, typename Iter2, typename AlignTag>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
+        template <typename F, typename Iter1, typename Iter2>
         static typename std::result_of<F&&(V1*, V2*)>::type
-        call(F && f, Iter1& it1, Iter2& it2, AlignTag align)
+        call_unaligned(F && f, Iter1& it1, Iter2& it2)
         {
-            V1 tmp1(std::addressof(*it1), align);
-            V2 tmp2(std::addressof(*it2), align);
-            std::advance(it1, V1::Size);
-            std::advance(it2, V2::Size);
+            V1 tmp1(traits::vector_pack_load<Iter1, V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<Iter2, V2>::aligned(it2));
+
+            std::advance(it1, std::size_t(V1::static_size));
+            std::advance(it2, std::size_t(V2::static_size));
+
+            return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
+        }
+
+        template <typename F, typename Iter1, typename Iter2>
+        static typename std::result_of<F&&(V1*, V2*)>::type
+        call_aligned(F && f, Iter1& it1, Iter2& it2)
+        {
+            V1 tmp1(traits::vector_pack_load<Iter1, V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<Iter2, V2>::unaligned(it2));
+
+            std::advance(it1, std::size_t(V1::static_size));
+            std::advance(it2, std::size_t(V2::static_size));
+
             return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
         }
     };
@@ -194,8 +106,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static typename std::result_of<F&&(V11*, V12*)>::type
         call1(F && f, Iter1& it1, Iter2& it2)
         {
-            return invoke_vectorized_in2<V11, V12>::call(
-                std::forward<F>(f), it1, it2, Vc::Aligned);
+            return invoke_vectorized_in2<V11, V12>::call_aligned(
+                std::forward<F>(f), it1, it2);
         }
 
         template <typename F>
@@ -205,12 +117,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         {
             if (data_alignment(it1) || data_alignment(it2))
             {
-                return invoke_vectorized_in2<V1, V2>::call(
-                    std::forward<F>(f), it1, it2, Vc::Unaligned);
+                return invoke_vectorized_in2<V1, V2>::call_unaligned(
+                    std::forward<F>(f), it1, it2);
             }
 
-            return invoke_vectorized_in2<V1, V2>::call(
-                std::forward<F>(f), it1, it2, Vc::Aligned);
+            return invoke_vectorized_in2<V1, V2>::call_aligned(
+                std::forward<F>(f), it1, it2);
         }
     };
 
@@ -218,14 +130,28 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename V>
     struct invoke_vectorized_inout1
     {
-        template <typename F, typename InIter, typename OutIter,
-            typename AlignTag>
+        template <typename F, typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static void call(F && f, InIter& it, OutIter& dest, AlignTag align)
+        static void call_aligned(F && f, InIter& it, OutIter& dest)
         {
-            V tmp(std::addressof(*it), align);
+            V tmp(traits::vector_pack_load<InIter, V>::aligned(it));
+
             auto ret = hpx::util::invoke(f, &tmp);
-            ret.store(std::addressof(*dest), align);
+            traits::vector_pack_store<InIter>::aligned(ret, dest);
+
+            std::advance(it, V::Size);
+            std::advance(dest, ret.size());
+        }
+
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call_unaligned(F && f, InIter& it, OutIter& dest)
+        {
+            V tmp(traits::vector_pack_load<InIter, V>::unaligned(it));
+
+            auto ret = hpx::util::invoke(f, &tmp);
+            traits::vector_pack_store<OutIter>::unaligned(ret, dest);
+
             std::advance(it, V::Size);
             std::advance(dest, ret.size());
         }
@@ -237,17 +163,30 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         static_assert(V1::Size == V2::Size,
             "the sizes of the vector-packs should be equal");
 
-        template <typename F, typename InIter1, typename InIter2,
-            typename OutIter, typename AlignTag>
+        template <typename F, typename InIter1, typename InIter2, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static void call(F && f, InIter1& it1, InIter2& it2,
-            OutIter& dest, AlignTag align)
+        static void call_aligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
         {
-            V1 tmp1(std::addressof(*it1), align);
-            V2 tmp2(std::addressof(*it2), align);
+            V1 tmp1(traits::vector_pack_load<InIter1, V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<InIter2, V2>::aligned(it2));
 
             auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
-            ret.store(std::addressof(*dest), align);
+            traits::vector_pack_store<OutIter>::aligned(ret, dest);
+
+            std::advance(it1, V1::Size);
+            std::advance(it2, V2::Size);
+            std::advance(dest, ret.size());
+        }
+
+        template <typename F, typename InIter1, typename InIter2, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call_unaligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
+        {
+            V1 tmp1(traits::vector_pack_load<InIter1, V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<InIter2, V2>::unaligned(it2));
+
+            auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+            traits::vector_pack_store<OutIter>::unaligned(ret, dest);
 
             std::advance(it1, V1::Size);
             std::advance(it2, V2::Size);
@@ -265,8 +204,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 value_type;
 
             typedef Vc::Scalar::Vector<value_type> V1;
-            invoke_vectorized_inout1<V1>::call(
-                std::forward<F>(f), it, dest, Vc::Aligned);
+            invoke_vectorized_inout1<V1>::call_aligned(
+                std::forward<F>(f), it, dest);
         }
 
         template <typename F, typename InIter1, typename InIter2,
@@ -282,8 +221,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             typedef Vc::Scalar::Vector<value1_type> V1;
             typedef Vc::Scalar::Vector<value2_type> V2;
 
-            invoke_vectorized_inout2<V1, V2>::call(
-                std::forward<F>(f), it1, it2, dest, Vc::Aligned);
+            invoke_vectorized_inout2<V1, V2>::call_aligned(
+                std::forward<F>(f), it1, it2, dest);
         }
 
         template <typename F, typename InIter, typename OutIter>
@@ -297,13 +236,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
             if (data_alignment(it) || data_alignment(dest))
             {
-                invoke_vectorized_inout1<V>::call(
-                    std::forward<F>(f), it, dest, Vc::Unaligned);
+                invoke_vectorized_inout1<V>::call_unaligned(
+                    std::forward<F>(f), it, dest);
             }
             else
             {
-                invoke_vectorized_inout1<V>::call(
-                    std::forward<F>(f), it, dest, Vc::Aligned);
+                invoke_vectorized_inout1<V>::call_aligned(
+                    std::forward<F>(f), it, dest);
             }
         }
 
@@ -323,15 +262,49 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             if (data_alignment(it1) || data_alignment(it2) ||
                 data_alignment(dest))
             {
-                invoke_vectorized_inout2<V1, V2>::call(
-                    std::forward<F>(f), it1, it2, dest, Vc::Unaligned);
+                invoke_vectorized_inout2<V1, V2>::call_unaligned(
+                    std::forward<F>(f), it1, it2, dest);
             }
             else
             {
-                invoke_vectorized_inout2<V1, V2>::call(
-                    std::forward<F>(f), it1, it2, dest, Vc::Aligned);
+                invoke_vectorized_inout2<V1, V2>::call_aligned(
+                    std::forward<F>(f), it1, it2, dest);
             }
         }
+    };
+}}}}
+
+namespace hpx { namespace parallel { namespace traits { namespace detail
+{
+//     template <typename T, typename ... Ts>
+//     struct is_same_size
+//       : hpx::util::detail::all_of<
+//             std::condition_variable<bool, sizeof(T) == sizeof(Ts)>...
+//         >
+//     {};
+//
+//     template <typename T>
+//     struct is_same_size<T>
+//       : std::true_type
+//     {};
+
+    template <typename Iter>
+    struct vector_pack_size_zip_iterator;
+
+    template <typename ... Iter>
+    struct vector_pack_size_zip_iterator<hpx::util::zip_iterator<Iter...> >
+    {
+//         static_assert(
+//             is_same_size<
+//                 typename std::iterator_traits<Iter>::value_type...
+//             >::value,
+//             "all iterator value types of the zip_iterator must have the same "
+//             "size");
+
+        static std::size_t const value =
+            Vc::Vector<typename hpx::util::detail::at_index<
+                    0, typename std::iterator_traits<Iter>::value_type...
+                >::type>::Size;
     };
 }}}}
 

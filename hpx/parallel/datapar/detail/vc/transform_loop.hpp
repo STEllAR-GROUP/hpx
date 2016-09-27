@@ -1,20 +1,21 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Matthias Kretz
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DATAPAR_BOOST_SIMD_TRANSFORM_LOOP_SEP_22_2016_0224PM)
-#define HPX_PARALLEL_DATAPAR_BOOST_SIMD_TRANSFORM_LOOP_SEP_22_2016_0224PM
+#if !defined(HPX_PARALLEL_DATAPAR_VC_TRANSFORM_LOOP_SEP_08_2016_0657PM)
+#define HPX_PARALLEL_DATAPAR_VC_TRANSFORM_LOOP_SEP_08_2016_0657PM
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
+#if defined(HPX_HAVE_DATAPAR_VC)
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <hpx/parallel/datapar/detail/iterator_helpers_boost_simd.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
+#include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/transform_loop_fwd.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/traits/is_iterator.hpp>
@@ -25,7 +26,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/simd.hpp>
+#include <Vc/Vc>
 
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
@@ -34,7 +35,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct datapar_transform_loop_n
     {
         typedef typename hpx::util::decay<Iterator>::type iterator_type;
-        typedef boost::simd::pack<typename iterator_type::value_type> V;
+        typedef Vc::Vector<typename iterator_type::value_type> V;
 
         template <typename InIter, typename OutIter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -53,8 +54,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 datapar_transform_loop_step::call1(f, first, dest);
             }
 
-            for (std::int64_t lenV = std::int64_t(count - (V::static_size + 1));
-                    lenV > 0; lenV -= V::static_size, len -= V::static_size)
+            for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
+                    lenV > 0; lenV -= V::Size, len -= V::Size)
             {
                 datapar_transform_loop_step::callv(f, first, dest);
             }
@@ -88,8 +89,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     {
         typedef typename hpx::util::decay<Iterator>::type iterator_type;
 
-        typedef boost::simd::pack<typename iterator_type::value_type> V;
-        typedef boost::simd::pack<typename iterator_type::value_type, 1> V1;
+        typedef Vc::Vector<typename iterator_type::value_type> V;
+        typedef Vc::Scalar::Vector<typename iterator_type::value_type> V1;
 
         template <typename InIter, typename OutIter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -125,7 +126,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct datapar_transform_binary_loop_n
     {
         typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-        typedef boost::simd::pack<typename iterator1_type::value_type> V;
+        typedef Vc::Vector<typename iterator1_type::value_type> V;
 
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F>
@@ -148,8 +149,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 datapar_transform_loop_step::call1(f, first1, first2, dest);
             }
 
-            for (std::int64_t lenV = std::int64_t(count - (V::static_size + 1));
-                    lenV > 0; lenV -= V::static_size, len -= V::static_size)
+            for (std::int64_t lenV = std::int64_t(count - (V::Size + 1));
+                    lenV > 0; lenV -= V::Size, len -= V::Size)
             {
                 datapar_transform_loop_step::callv(f, first1, first2, dest);
             }
@@ -187,13 +188,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct datapar_transform_binary_loop
     {
         typedef typename hpx::util::decay<Iter1>::type iterator1_type;
-        typedef boost::simd::pack<typename iterator1_type::value_type, 1> V11;
+        typedef Vc::Scalar::Vector<typename iterator1_type::value_type> V11;
 
         typedef typename hpx::util::decay<Iter2>::type iterator2_type;
-        typedef boost::simd::pack<typename iterator2_type::value_type, 1> V12;
+        typedef Vc::Scalar::Vector<typename iterator2_type::value_type> V12;
 
-        typedef boost::simd::pack<typename iterator1_type::value_type> V1;
-        typedef boost::simd::pack<typename iterator2_type::value_type> V2;
+        typedef Vc::Vector<typename iterator1_type::value_type> V1;
+        typedef Vc::Vector<typename iterator2_type::value_type> V2;
 
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F>

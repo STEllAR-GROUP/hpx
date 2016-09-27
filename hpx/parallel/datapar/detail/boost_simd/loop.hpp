@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/datapar/detail/iterator_helpers_boost_simd.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
+#include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -135,14 +135,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             iterator_datapar_compatible<Iter>::value
         >::type>
     {
-        template <typename Iter1>
-        static bool call(Iter1 const& first1, Iter1 const& last1)
+        template <typename Iter>
+        static bool call(Iter const& first, Iter const& last)
         {
-            typedef typename std::iterator_traits<Iter1>::value_type
+            typedef typename std::iterator_traits<Iter>::value_type
                 value_type;
             typedef boost::simd::pack<value_type> V;
 
-            return V::static_size <= std::distance(first1, last1);
+            return traits::vector_pack_size<Iter, V>::value <=
+                    std::distance(first, last);
         }
     };
 
@@ -169,7 +170,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 datapar_loop_step<Begin>::call1(f, first);
             }
 
-            End const lastV = last - (V::static_size + 1);
+            static std::size_t const size =
+                traits::vector_pack_size<Begin, V>::value;
+
+            End const lastV = last - (size + 1);
             while (first < lastV)
             {
                 datapar_loop_step<Begin>::callv(f, first);
@@ -227,7 +231,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 return std::make_pair(std::move(it1), std::move(it2));
             }
 
-            InIter1 const last1V = last1 - (V::static_size + 1);
+            static std::size_t const size =
+                traits::vector_pack_size<InIter1, V>::value;
+
+            InIter1 const last1V = last1 - (size + 1);
             while (it1 < last1V)
             {
                 datapar_loop_step2<InIter1, InIter2>::callv(f, it1, it2);
@@ -289,8 +296,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 datapar_loop_step<InIter>::call1(f, first);
             }
 
-            for (std::int64_t lenV = std::int64_t(count - (V::static_size + 1));
-                    lenV > 0; lenV -= V::static_size, len -= V::static_size)
+            static std::size_t const size =
+                traits::vector_pack_size<InIter, V>::value;
+
+            for (std::int64_t lenV = std::int64_t(count - (size + 1));
+                    lenV > 0; lenV -= size, len -= size)
             {
                 datapar_loop_step<InIter>::callv(f, first);
             }

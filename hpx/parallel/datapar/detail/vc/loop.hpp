@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_DATAPAR_VC)
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/datapar/detail/iterator_helpers_vc.hpp>
+#include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/util/decay.hpp>
