@@ -11,27 +11,24 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <cstdint>
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 struct matrix_multiply_multiplier
   : hpx::components::component_base<matrix_multiply_multiplier>
 {
-    size_t n_;
     std::vector<double> a_;
 
-    // why does this get called?
+    // shouldn't ever get called?
     matrix_multiply_multiplier()
-      : n_(0)
     {
         HPX_TEST(false);
     }
 
-    matrix_multiply_multiplier(std::size_t n, std::vector<double> && a)
-      : n_(n)
-      , a_(std::move(a))
-    {
-    }
+    matrix_multiply_multiplier(std::vector<double> && a)
+      : a_(std::move(a))
+    {}
 };
 
 HPX_REGISTER_COMPONENT(hpx::components::component<matrix_multiply_multiplier>,
@@ -49,8 +46,7 @@ int hpx_main()
     if (!remote_ids.empty())
     {
         hpx::components::client<matrix_multiply_multiplier> comp =
-            hpx::new_<matrix_multiply_multiplier>(
-                remote_ids[0], matrix_size, std::move(m));
+            hpx::new_<matrix_multiply_multiplier>(remote_ids[0], std::move(m));
     }
 
     return hpx::finalize();
