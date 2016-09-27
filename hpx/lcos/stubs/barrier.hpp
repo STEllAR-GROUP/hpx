@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace stubs
         static lcos::future<void>
         wait_async(naming::id_type const& gid)
         {
-            typedef lcos::base_lco::set_event_action action_type;
+            typedef lcos::server::barrier::set_event_non_direct_action action_type;
             return hpx::async<action_type>(gid);
         }
 
