@@ -25,7 +25,7 @@
 //
 // Note: this function is intentionally not marked as inline
 //
-int main(int argc, char** argv)
+int HPX_CDECL main(int argc, char** argv)
 {
     // allow for unknown options
     std::vector<std::string> const cfg = {

@@ -57,9 +57,9 @@ void setup_counters() {
         // We need to explicitly start all counters before we can use them. For
         // certain counters this could be a no-op, in which case start will return
         // 'false'.
-        performance_counter::start(id);
+        performance_counter::start(hpx::launch::sync, id);
         std::cout << "Counter " << counter_name << " initialized " << id << std::endl;
-        counter_value value = performance_counter::get_value(id);
+        counter_value value = performance_counter::get_value(hpx::launch::sync, id);
         std::cout << "Counter value " << value.get_value<std::int64_t>() << std::endl;
         counter_id = id;
         end_iteration_event = apex::register_custom_event("Repartition");
@@ -80,7 +80,8 @@ double get_counter_value() {
         return false;
     }
     try {
-        counter_value value1 = performance_counter::get_value(counter_id, true);
+        counter_value value1 =
+            performance_counter::get_value(hpx::launch::sync, counter_id, true);
         std::int64_t counter_value = value1.get_value<std::int64_t>();
         std::cerr << "counter_value " << counter_value << std::endl;
         return (double)(counter_value);

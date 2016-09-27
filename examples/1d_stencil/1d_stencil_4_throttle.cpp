@@ -60,9 +60,9 @@ void setup_counters() {
         // We need to explicitly start all counters before we can use them. For
         // certain counters this could be a no-op, in which case start will return
         // 'false'.
-        performance_counter::start(id);
+        performance_counter::start(hpx::launch::sync, id);
         std::cout << "Counters initialized! " << id << std::endl;
-        counter_value value = performance_counter::get_value(id);
+        counter_value value = performance_counter::get_value(hpx::launch::sync, id);
         std::cout << "Active threads " << value.get_value<int>() << std::endl;
         counter_id = id;
     }
@@ -77,7 +77,8 @@ void setup_counters() {
 bool test_function(apex_context const& context) {
     if (!counters_initialized) return false;
     try {
-        counter_value value1 = performance_counter::get_value(counter_id);
+        counter_value value1 =
+            performance_counter::get_value(hpx::launch::sync, counter_id);
         apex::sample_value("thread_queue_length", value1.get_value<int>());
         return APEX_NOERROR;
     }

@@ -93,9 +93,12 @@ namespace hpx { namespace threads { namespace detail
         // get_worker_thread_num returns the global thread number which might
         // be too large. This function might get called from within
         // background_work inside the os executors
-        std::size_t num_thread = get_worker_thread_num() % thread_count_;
-        if (num_thread != std::size_t(-1))
-            return get_state(num_thread);
+        if (thread_count_ != 0)
+        {
+            std::size_t num_thread = get_worker_thread_num() % thread_count_;
+            if (num_thread != std::size_t(-1))
+                return get_state(num_thread);
+        }
         return sched_.get_minmax_state().second;
     }
 

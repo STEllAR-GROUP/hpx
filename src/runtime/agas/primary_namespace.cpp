@@ -195,8 +195,8 @@ namespace hpx { namespace agas {
         parcelset::parcel const&)> && f)
     {
         // compose request
-        naming::id_type const* ids = p.destinations();
-        naming::id_type dest = naming::id_type(get_service_instance(ids[0]),
+        naming::gid_type const& id = p.destination();
+        naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
         if (naming::get_locality_from_gid(dest.get_gid()) == hpx::get_locality())
         {

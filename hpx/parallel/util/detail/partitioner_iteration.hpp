@@ -31,6 +31,19 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::util::invoke_fused(f_, std::forward<T>(t));
             }
         };
+
+        template <typename F>
+        struct partitioner_iteration<void, F>
+        {
+            typename hpx::util::decay<F>::type f_;
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(T && t)
+            {
+                hpx::util::invoke_fused(f_, std::forward<T>(t));
+            }
+        };
     }
 }}}
 

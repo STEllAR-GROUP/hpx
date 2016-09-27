@@ -275,6 +275,8 @@ namespace hpx { namespace actions
         template <typename Arg0>
         inline void trigger(Arg0 && arg0);
 
+        inline void trigger(hpx::util::unused_type);
+
         //
         virtual void trigger_error(boost::exception_ptr const& e);
         virtual void trigger_error(boost::exception_ptr && e);
@@ -310,7 +312,11 @@ namespace hpx { namespace actions
         naming::id_type gid_;
         naming::address addr_;
     };
+}}
 
+HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::continuation)
+
+namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -581,6 +587,7 @@ namespace hpx { namespace actions
     public:
 
         typedef Result result_type;
+        typedef void serialized_with_id;
 
         typed_continuation()
         {}
@@ -706,6 +713,8 @@ namespace hpx { namespace actions
             > function_type;
 
     public:
+        typedef void serialized_with_id;
+
         typed_continuation()
         {}
 
@@ -822,6 +831,7 @@ namespace hpx { namespace actions
 
     public:
         typedef void result_type;
+        typedef void serialized_with_id;
 
         typed_continuation()
         {}
@@ -958,6 +968,18 @@ namespace hpx { namespace actions
                 typed_continuation<typename util::decay<Arg0>::type> *
             >(this)->trigger_value(std::forward<Arg0>(arg0));
     }
+
+    void continuation::trigger(hpx::util::unused_type)
+    {
+        HPX_ASSERT((nullptr != dynamic_cast<
+                typed_continuation<void, hpx::util::unused_type>*>(this)));
+
+        // The static_cast is safe as we know that Arg0 is the result type
+        // of the executed action (see apply.hpp).
+        static_cast<
+                typed_continuation<void, hpx::util::unused_type>*
+            >(this)->trigger_value(hpx::util::unused);
+    }
 }}
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1069,6 +1091,10 @@ namespace hpx { namespace traits
 #define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                         \
     HPX_DEFINE_GET_CONTINUATION_NAME_(                                        \
         hpx::actions::typed_continuation<Result>, Name)                       \
+    namespace hpx { namespace actions {                                       \
+        template struct typed_continuation<                                   \
+            Result, typename hpx::traits::action_remote_result<Result>::type>;\
+    }}                                                                        \
 /**/
 
 #include <hpx/config/warnings_suffix.hpp>

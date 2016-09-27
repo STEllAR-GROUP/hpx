@@ -48,6 +48,7 @@ endforeach()
 set(subdirs
     algorithms
     container_algorithms
+    datapar_algorithms
     executors
    )
 

@@ -11,14 +11,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#if defined(HPX_HAVE_VC_DATAPAR)
+#include <hpx/parallel/datapar/execution_policy.hpp>
+#endif
 #include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors.hpp>
+#include <hpx/parallel/executors/executor_parameters.hpp>
+#include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/parallel/executors/executor_parameters.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -29,44 +34,6 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
-    ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
-    struct task_execution_policy_tag
-    {
-        task_execution_policy_tag() {}
-    };
-    /// \endcond
-
-    /// Rebind the type of executor used by an execution policy. The execution
-    /// category of Executor shall not be weaker than that of ExecutionPolicy.
-    template <typename ExecutionPolicy, typename Executor, typename Parameters>
-    struct rebind_executor
-    {
-        /// \cond NOINTERNAL
-        typedef typename hpx::util::decay<Executor>::type executor_type;
-        typedef typename hpx::util::decay<Parameters>::type parameters_type;
-
-        typedef typename ExecutionPolicy::execution_category category1;
-        typedef typename executor_traits<executor_type>::execution_category
-            category2;
-
-        static_assert(
-            (parallel::v3::detail::is_not_weaker<category2, category1>::value),
-            "parallel::v3::detail::is_not_weaker<category2, category1>::value"
-        );
-        /// \endcond
-
-        /// The type of the rebound execution policy
-        typedef typename ExecutionPolicy::template rebind<
-                executor_type, parameters_type
-            >::type type;
-    };
-
-    /// The execution policy tag \a task can be used to create a execution
-    /// policy which forces the given algorithm to be executed in an
-    /// asynchronous way.
-    static task_execution_policy_tag const task;
-
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequential_task_execution_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
@@ -1051,9 +1018,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// Default parallel execution policy object.
     static parallel_execution_policy const par;
 
-    /// The class parallel_execution_policy is an execution policy type used
-    /// as a unique type to disambiguate parallel algorithm overloading and
-    /// indicate that a parallel algorithm's execution may be parallelized.
+    /// The class parallel_execution_policy_shim is an execution policy type
+    /// used as a unique type to disambiguate parallel algorithm overloading
+    /// and indicate that a parallel algorithm's execution may be parallelized.
     template <typename Executor, typename Parameters>
     struct parallel_execution_policy_shim : parallel_execution_policy
     {
@@ -1262,11 +1229,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // policies.
     namespace detail
     {
-        template <typename Executor>
-        struct is_rebound_execution_policy
-          : std::false_type
-        {};
-
         template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
                 sequential_execution_policy_shim<Executor, Parameters> >
@@ -1291,11 +1253,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : std::true_type
         {};
     }
-
-    template <typename T>
-    struct is_rebound_execution_policy
-      : detail::is_rebound_execution_policy<typename hpx::util::decay<T>::type>
-    {};
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////
@@ -1358,11 +1315,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct is_execution_policy
-          : std::false_type
-        {};
-
         template <>
         struct is_execution_policy<parallel_execution_policy>
           : std::true_type
@@ -1423,30 +1375,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// 1. The type is_execution_policy can be used to detect execution
-    ///    policies for the purpose of excluding function signatures
-    ///    from otherwise ambiguous overload resolution participation.
-    /// 2. If T is the type of a standard or implementation-defined execution
-    ///    policy, is_execution_policy<T> shall be publicly derived from
-    ///    integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
-    /// 3. The behavior of a program that adds specializations for
-    ///    is_execution_policy is undefined.
-    ///
-    template <typename T>
-    struct is_execution_policy
-      : detail::is_execution_policy<typename hpx::util::decay<T>::type>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct is_parallel_execution_policy
-          : std::false_type
-        {};
-
         template <>
         struct is_parallel_execution_policy<parallel_execution_policy>
           : std::true_type
@@ -1477,32 +1408,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether given execution policy enables parallelization
-    ///
-    /// 1. The type is_parallel_execution_policy can be used to detect parallel
-    ///    execution policies for the purpose of excluding function signatures
-    ///    from otherwise ambiguous overload resolution participation.
-    /// 2. If T is the type of a standard or implementation-defined execution
-    ///    policy, is_parallel_execution_policy<T> shall be publicly derived
-    ///    from integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
-    /// 3. The behavior of a program that adds specializations for
-    ///    is_parallel_execution_policy is undefined.
-    ///
-    template <typename T>
-    struct is_parallel_execution_policy
-      : detail::is_parallel_execution_policy<typename hpx::util::decay<T>::type>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct is_sequential_execution_policy
-          : std::false_type
-        {};
-
         template <>
         struct is_sequential_execution_policy<sequential_task_execution_policy>
           : std::true_type
@@ -1528,35 +1436,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether given execution policy does not enable
-    ///            parallelization
-    ///
-    /// 1. The type is_sequential_execution_policy can be used to detect
-    ///    non-parallel execution policies for the purpose of excluding
-    ///    function signatures from otherwise ambiguous overload resolution
-    ///    participation.
-    /// 2. If T is the type of a standard or implementation-defined execution
-    ///    policy, is_sequential_execution_policy<T> shall be publicly derived
-    ///    from integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
-    /// 3. The behavior of a program that adds specializations for
-    ///    is_sequential_execution_policy is undefined.
-    ///
-    // extension:
-    template <typename T>
-    struct is_sequential_execution_policy
-      : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename T>
-        struct is_async_execution_policy
-          : std::false_type
-        {};
-
         template <>
         struct is_async_execution_policy<sequential_task_execution_policy>
           : std::true_type
@@ -1580,27 +1462,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {};
         /// \endcond
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Extension: Detect whether given execution policy makes algorithms
-    ///            asynchronous
-    ///
-    /// 1. The type is_async_execution_policy can be used to detect
-    ///    asynchronous execution policies for the purpose of excluding
-    ///    function signatures from otherwise ambiguous overload resolution
-    ///    participation.
-    /// 2. If T is the type of a standard or implementation-defined execution
-    ///    policy, is_async_execution_policy<T> shall be publicly derived
-    ///    from integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
-    /// 3. The behavior of a program that adds specializations for
-    ///    is_async_execution_policy is undefined.
-    ///
-    // extension:
-    template <typename T>
-    struct is_async_execution_policy
-      : detail::is_async_execution_policy<typename hpx::util::decay<T>::type>
-    {};
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////

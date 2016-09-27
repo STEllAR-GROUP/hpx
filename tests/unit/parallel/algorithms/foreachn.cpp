@@ -5,78 +5,15 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_for_each.hpp>
-#include <hpx/util/lightweight_test.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
-#include <numeric>
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n(ExPolicy policy, IteratorTag)
-{
-    static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    iterator result = hpx::parallel::for_each_n(policy,
-        iterator(boost::begin(c)), c.size(),
-        [](std::size_t& v) {
-            v = 42;
-        });
-    iterator end = iterator(boost::end(c));
-    HPX_TEST(result == end);
-
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n_async(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-
-    hpx::future<iterator> f =
-        hpx::parallel::for_each_n(p,
-            iterator(boost::begin(c)), c.size(),
-            [](std::size_t& v) {
-                v = 42;
-            });
-    HPX_TEST(f.get() == iterator(boost::end(c)));
-
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
-}
-
 template <typename IteratorTag>
 void test_for_each_n()
 {

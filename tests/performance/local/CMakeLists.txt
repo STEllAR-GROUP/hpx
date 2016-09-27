@@ -21,6 +21,14 @@ set(benchmarks
     timed_task_spawn
 )
 
+if(HPX_WITH_VC_DATAPAR)
+  set(benchmarks
+      ${benchmarks}
+      inner_product
+     )
+  set(inner_product_FLAGS DEPENDENCIES iostreams_component)
+endif()
+
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks
       ${benchmarks}
@@ -116,7 +124,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
     DEPENDENCIES iostreams_component partitioned_vector_component)
 
   if(HPX_WITH_CUDA)
-    set_source_files_properties( stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ )
+    set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
   endif()
 endif()
 
@@ -132,7 +140,7 @@ foreach(benchmark ${benchmarks})
                      ${${benchmark}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Local/${benchmark}")
+                     FOLDER "Benchmarks/Local")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.${benchmark})

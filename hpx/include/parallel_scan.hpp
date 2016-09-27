@@ -8,6 +8,8 @@
 
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
+#include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
 
 #endif
 

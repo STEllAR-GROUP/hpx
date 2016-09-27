@@ -57,6 +57,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
 * [link build_system.cmake_variables.HPX_WITH_STATIC_LINKING HPX_WITH_STATIC_LINKING]
 * [link build_system.cmake_variables.HPX_WITH_SYCL HPX_WITH_SYCL]
+* [link build_system.cmake_variables.HPX_WITH_VC_DATAPAR HPX_WITH_VC_DATAPAR]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY] `HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY:BOOL`][Enable old style ..._sync/..._async functions in API (default: OFF)]]
@@ -89,6 +90,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_SECURITY] `HPX_WITH_SECURITY:BOOL`][Enable security support via libsodium.]]
         [[[#build_system.cmake_variables.HPX_WITH_STATIC_LINKING] `HPX_WITH_STATIC_LINKING:BOOL`][Compile HPX statically linked libraries (Default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_SYCL] `HPX_WITH_SYCL:BOOL`][Enable sycl support (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_VC_DATAPAR] `HPX_WITH_VC_DATAPAR:BOOL`][Enable data parallel algorithm support (default: OFF)]]
 ] [/ Generic Options]
 
 [#build_system.cmake_variables.Build_Targets][h3 Build Targets Options]

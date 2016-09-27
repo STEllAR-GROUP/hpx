@@ -55,6 +55,9 @@ namespace hpx { namespace lcos
         latch(hpx::shared_future<naming::id_type> const& id)
           : base_type(id)
         {}
+        latch(hpx::shared_future<naming::id_type> && id)
+          : base_type(std::move(id))
+        {}
 
         ///////////////////////////////////////////////////////////////////////
 

@@ -583,6 +583,52 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_VC_DATAPAR)
+        template <typename R, typename Result>
+        struct partitioner<datapar_task_execution_policy, R, Result,
+            parallel::traits::static_partitioner_tag>
+        {
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
+            static hpx::future<R> call(ExPolicy && policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
+            {
+                return static_partitioner<
+                        parallel_task_execution_policy, R, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2, typename Data>
+            static hpx::future<R> call_with_data(ExPolicy && policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2,
+                std::vector<std::size_t> const& chunk_sizes, Data && data)
+            {
+                return static_partitioner<
+                        parallel_task_execution_policy, R, Result
+                    >::call_with_data(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        chunk_sizes, std::forward<Data>(data));
+            }
+
+            template <typename ExPolicy, typename FwdIter, typename Stride,
+                typename F1, typename F2>
+            static hpx::future<R> call_with_index(ExPolicy && policy,
+                FwdIter first, std::size_t count, Stride stride,
+                F1 && f1, F2 && f2)
+            {
+                return static_partitioner<
+                        parallel_task_execution_policy, R, Result
+                    >::call_with_index(
+                        std::forward<ExPolicy>(policy), first, count, stride,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
+            }
+        };
+#endif
+
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner<

@@ -287,9 +287,6 @@ namespace hpx { namespace parcelset
             applier_ = applier;
         }
 
-        void add_received_parcel(parcel p,
-            std::size_t num_thread = std::size_t(-1));
-
         /// Update performance counter data
         void add_received_data(
             performance_counters::parcels::data_point const& data);
@@ -345,19 +342,15 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
         typedef util::tuple<
             std::shared_ptr<std::vector<parcel> >
           , std::vector<write_handler_type>
-          , new_gids_map
         >
 #else
         typedef util::tuple<
             std::vector<parcel>
           , std::vector<write_handler_type>
-          , new_gids_map
         >
 #endif
             map_second_type;

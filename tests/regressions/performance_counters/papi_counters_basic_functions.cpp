@@ -34,7 +34,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     id_type id = get_counter(boost::str(cnt_name % prefix));
 
-    performance_counter::start(id);
+    performance_counter::start(hpx::launch::sync, id);
 
     // perform n ops, active counter
     volatile size_t i;
@@ -43,13 +43,13 @@ int hpx_main(boost::program_options::variables_map&)
 
     counter_value value1 = performance_counter::get_value(hpx::launch::sync, id);
     // stop the counter w/o resetting
-    performance_counter::stop(id);
+    performance_counter::stop(hpx::launch::sync,id);
 
     // perform n ops (should be uncounted)
     for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
     counter_value value2 = performance_counter::get_value(hpx::launch::sync, id, true);
-    performance_counter::start(id);
+    performance_counter::start(hpx::launch::sync, id);
 
     // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;

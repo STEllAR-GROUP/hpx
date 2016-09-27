@@ -121,7 +121,8 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename hpx::traits::future_traits<Future>::result_type value_type;
 
-        if(ar.is_future_awaiting())
+        int state = future_state::invalid;
+        if(ar.is_preprocessing())
         {
             if(!f.is_ready())
             {
@@ -134,12 +135,22 @@ namespace hpx { namespace lcos { namespace detail
             }
             else
             {
-                if(f.is_ready() && f.has_value())
+                if(f.is_ready())
                 {
-                    value_type const & value =
-                        *hpx::traits::future_access<Future>::
-                            get_shared_state(f)->get_result();
-                    ar << value; //-V128
+                    if (f.has_value())
+                    {
+                        value_type const & value =
+                            *hpx::traits::future_access<Future>::
+                                get_shared_state(f)->get_result();
+                        ar << state << value; //-V128
+                    } else if (f.has_exception()) {
+                        state = future_state::has_exception;
+                        boost::exception_ptr exception = f.get_exception_ptr();
+                        ar << state << exception;
+                    } else {
+                        state = future_state::invalid;
+                        ar << state;
+                    }
                 }
             }
             return;
@@ -152,22 +163,13 @@ namespace hpx { namespace lcos { namespace detail
         }
 #endif
 
-        int state = future_state::invalid;
         if (f.has_value())
         {
             state = future_state::has_value;
-            if(ar.is_saving())
-            {
-                value_type value = const_cast<Future &>(f).get();
-                ar << state << value; //-V128
-            }
-            else
-            {
-                value_type const & value =
-                    *hpx::traits::future_access<Future>::
-                        get_shared_state(f)->get_result();
-                ar << state << value; //-V128
-            }
+            value_type const & value =
+                *hpx::traits::future_access<Future>::
+                    get_shared_state(f)->get_result();
+            ar << state << value; //-V128
         } else if (f.has_exception()) {
             state = future_state::has_exception;
             boost::exception_ptr exception = f.get_exception_ptr();
@@ -183,7 +185,8 @@ namespace hpx { namespace lcos { namespace detail
         std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
-        if(ar.is_future_awaiting())
+        int state = future_state::invalid;
+        if(ar.is_preprocessing())
         {
             if(!f.is_ready())
             {
@@ -195,6 +198,25 @@ namespace hpx { namespace lcos { namespace detail
 
                 ar.await_future(f);
             }
+            else
+            {
+                if (f.has_value())
+                {
+                    state = future_state::has_value;
+                    ar << state;
+                }
+                else if (f.has_exception())
+                {
+                    state = future_state::has_exception;
+                    boost::exception_ptr exception = f.get_exception_ptr();
+                    ar << state << exception;
+                }
+                else
+                {
+                    state = future_state::invalid;
+                    ar << state;
+                }
+            }
             return;
         }
 
@@ -205,15 +227,19 @@ namespace hpx { namespace lcos { namespace detail
         }
 #endif
 
-        int state = future_state::invalid;
         if (f.has_value())
         {
             state = future_state::has_value;
-        } else if (f.has_exception()) {
+            ar << state;
+        }
+        else if (f.has_exception())
+        {
             state = future_state::has_exception;
             boost::exception_ptr exception = f.get_exception_ptr();
             ar << state << exception;
-        } else {
+        }
+        else
+        {
             state = future_state::invalid;
             ar << state;
         }

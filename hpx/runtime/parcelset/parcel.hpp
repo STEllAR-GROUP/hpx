@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c) 2015 Thomas Heller
+//  Copyright (c) 2015-2016 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -17,16 +17,12 @@
 #endif
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -34,7 +30,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
+#include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -55,82 +51,40 @@ namespace hpx { namespace parcelset
         HPX_MOVABLE_ONLY(parcel);
 
     private:
+
+        typedef
+            std::unordered_map<naming::gid_type, naming::gid_type>
+            split_gids_type;
+
 #if defined(HPX_DEBUG)
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         bool is_valid() const
         {
             // empty parcels are always valid
-            if (0 == data_.creation_time_) //-V550
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+            if (0.0 == data_.creation_time_) //-V550
                 return true;
-
-            if (data_.has_source_id_ && !source_id_)
-                return false;
-
-            if (dests_.size() != addrs_.size())
-                return false;
-
-            // verify target destinations
-            if (!dests_.empty() && addrs_[0].locality_)
-            {
-                // all destinations have to be on the same locality
-                naming::gid_type dest = destination_locality();
-                for (std::size_t i = 1; i != addrs_.size(); ++i)
-                {
-                    if (dest != addrs_[i].locality_)
-                        return false;
-                }
-
-                // if we have a destination we need an action as well
-                if (!action_)
-                    return false;
-            }
-
-            // verify that the action targets the correct type
-            if (action_ && addrs.type_ != components::component_invalid)
-            {
-                int type = action_->get_component_type();
-                for (std::size_t i = 0; i != addrs_.size(); ++i)
-                {
-                    if (!components::types_are_compatible(type, addrs[i].type_))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-#else
-        bool is_valid() const
-        {
-            // empty parcels are always valid
-            if (0 == data_.creation_time_) //-V550
-                return true;
-
-            if (data_.has_source_id_ && !source_id_)
-                return false;
-
-            // verify target destinations
-            if (dests_ && addrs_.locality_)
-            {
-                // if we have a destination we need an action as well
-                if (!action_)
-                    return false;
-            }
-
-            // verify that the action targets the correct type
-            if (action_ && addrs_.type_ != components::component_invalid)
-            {
-                int type = action_->get_component_type();
-                if (!components::types_are_compatible(type, addrs_.type_))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 #endif
+
+            // verify target destination
+            if (data_.dest_ && data_.addr_.locality_)
+            {
+                // if we have a destination we need an action as well
+                if (!action_)
+                    return false;
+            }
+
+            // verify that the action targets the correct type
+            if (action_ && data_.addr_.type_ != components::component_invalid)
+            {
+                int type = action_->get_component_type();
+                if (!components::types_are_compatible(type, data_.addr_.type_))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 #else
         // Only used in debug mode.
         bool is_valid() const
@@ -146,173 +100,117 @@ namespace hpx { namespace parcelset
             HPX_MOVABLE_ONLY(data);
 
         public:
-            data()
-              : start_time_(0),
+            data() :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                start_time_(0),
                 creation_time_(util::high_resolution_timer::now()),
-                has_source_id_(false)
+#endif
+                source_id_(naming::invalid_gid),
+                dest_(naming::invalid_gid)
             {}
 
-            data(data && rhs)
-              : parcel_id_(rhs.parcel_id_),
+            data(naming::gid_type&& dest, naming::address&& addr) :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                start_time_(0),
+                creation_time_(util::high_resolution_timer::now()),
+#endif
+                source_id_(naming::invalid_gid),
+                dest_(std::move(dest)),
+                addr_(std::move(addr))
+            {}
+
+            data(data && rhs) :
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                parcel_id_(std::move(rhs.parcel_id_)),
                 start_time_(rhs.start_time_),
                 creation_time_(rhs.creation_time_),
-                has_source_id_(rhs.has_source_id_)
+#endif
+                source_id_(std::move(rhs.source_id_)),
+                dest_(std::move(rhs.dest_)),
+                addr_(std::move(rhs.addr_))
             {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
                 rhs.parcel_id_ = naming::invalid_gid;
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
-                rhs.has_source_id_ = false;
+#endif
+                rhs.source_id_ = naming::invalid_gid;
+                rhs.dest_ = naming::invalid_gid;
+                rhs.addr_ = naming::address();
             }
 
             data& operator=(data && rhs)
             {
-                parcel_id_ = rhs.parcel_id_;
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+                parcel_id_ = std::move(rhs.parcel_id_);
                 start_time_ = rhs.start_time_;
                 creation_time_ = rhs.creation_time_;
-                has_source_id_ = rhs.has_source_id_;
+#endif
+                source_id_ = std::move(rhs.source_id_);
+                dest_ = std::move(rhs.dest_);
+                addr_ = std::move(rhs.addr_);
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
                 rhs.parcel_id_ = naming::invalid_gid;
                 rhs.start_time_ = 0;
                 rhs.creation_time_ = 0;
-                rhs.has_source_id_ = false;
+#endif
+                rhs.source_id_ = naming::invalid_gid;
+                rhs.dest_ = naming::invalid_gid;
+                rhs.addr_ = naming::address();
                 return *this;
             }
 
             template <typename Archive>
             void serialize(Archive &ar, unsigned)
             {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
                 ar & parcel_id_;
                 ar & start_time_;
                 ar & creation_time_;
-                ar & has_source_id_;
+#endif
+                ar & source_id_;
+                ar & dest_;
+                ar & addr_;
             }
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             naming::gid_type parcel_id_;
             double start_time_;
             double creation_time_;
+#endif
 
-            bool has_source_id_;
+            naming::gid_type source_id_;
+            naming::gid_type dest_;
+            naming::address addr_;
         };
 
         parcel() {}
 
-        template <
-            typename Action
-          , typename...Args
-          , typename Enable =
-                typename std::enable_if<traits::is_action<Action>::value>::type
-          >
+    private:
         parcel(
-            naming::id_type const& dests,
-            naming::address const& addrs,
-            Action,
-            Args &&... args
-        )
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-          : dests_(1, dests),
-            addrs_(1, addrs),
-#else
-          : dests_(dests),
-            addrs_(addrs),
-#endif
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
-        {
-            HPX_ASSERT(is_valid());
-        }
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        template <
-            typename Action
-          , typename...Args
-          , typename Enable =
-                typename std::enable_if<traits::is_action<Action>::value>::type
-          >
-        parcel(
-            std::vector<naming::id_type> const& dests,
-            std::vector<naming::address> const& addrs,
-            Action,
-            Args &&... args
-        )
-          : dests_(dests),
-            addrs_(addrs),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
-        {
-            HPX_ASSERT(is_valid());
-        }
-#endif
-
-        template <
-            typename Continuation
-          , typename Action
-          , typename...Args
-          , typename Enable
-                = typename std::enable_if<
-                    traits::is_action<Action>::value
-                 && traits::is_continuation<Continuation>::value
-                 && !std::is_same<
-                        Continuation
-                      , std::unique_ptr<actions::continuation>
-                    >::value
-                >::type
-          >
-        parcel(
-            naming::id_type const& dests,
-            naming::address const& addrs,
-            Continuation && cont,
-            Action,
-            Args &&... args
-        )
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-          : dests_(1, dests),
-            addrs_(1, addrs),
-#else
-          : dests_(dests),
-            addrs_(addrs),
-#endif
-            cont_(
-                new typename util::decay<Continuation>
-                    ::type(std::forward<Continuation>(cont))
-            ),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
-        {
-            HPX_ASSERT(is_valid());
-        }
-
-        template <
-            typename Action
-          , typename...Args
-          , typename Enable
-                = typename std::enable_if<
-                    traits::is_action<Action>::value
-                >::type
-          >
-        parcel(
-            naming::id_type const& dests,
-            naming::address const& addrs,
+            naming::gid_type&& dest,
+            naming::address&& addr,
             std::unique_ptr<actions::continuation> cont,
-            Action,
-            Args &&... args
+            std::unique_ptr<actions::base_action> act
         )
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-          : dests_(1, dests),
-            addrs_(1, addrs),
-#else
-          : dests_(dests),
-            addrs_(addrs),
-#endif
+          : data_(std::move(dest), std::move(addr)),
             cont_(std::move(cont)),
-            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
+            action_(std::move(act)),
+            size_(0)
         {
-            HPX_ASSERT(is_valid());
+//             HPX_ASSERT(is_valid());
         }
+        friend struct detail::create_parcel;
+    public:
 
         parcel(parcel && other)
           : data_(std::move(other.data_)),
-            source_id_(std::move(other.source_id_)),
-            dests_(std::move(other.dests_)),
-            addrs_(std::move(other.addrs_)),
             cont_(std::move(other.cont_)),
-            action_(std::move(other.action_))
+            action_(std::move(other.action_)),
+            split_gids_(std::move(other.split_gids_)),
+            size_(other.size_),
+            num_chunks_(other.num_chunks_)
         {
             HPX_ASSERT(is_valid());
         }
@@ -320,11 +218,11 @@ namespace hpx { namespace parcelset
         parcel &operator=(parcel && other)
         {
             data_ = std::move(other.data_);
-            source_id_ = std::move(other.source_id_);
-            dests_ = std::move(other.dests_);
-            addrs_ = std::move(other.addrs_);
             cont_ = std::move(other.cont_);
             action_ = std::move(other.action_);
+            split_gids_ = std::move(other.split_gids_);
+            size_ = other.size_;
+            num_chunks_ = other.num_chunks_;
 
             other.reset();
 
@@ -335,14 +233,6 @@ namespace hpx { namespace parcelset
         void reset()
         {
             data_ = data();
-            source_id_ = hpx::naming::invalid_id;
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            dests_.clear();
-            addrs_.clear();
-#else
-            dests_ = hpx::naming::invalid_id;
-            addrs_ = hpx::naming::address();
-#endif
             cont_.reset();
             action_.reset();
         }
@@ -362,80 +252,74 @@ namespace hpx { namespace parcelset
             cont_ = std::move(cont);
         }
 
-        naming::id_type const& source_id() const
+        naming::id_type source_id() const
         {
-            return source_id_;
+            return naming::id_type(data_.source_id_, naming::id_type::unmanaged);
         }
 
         void set_source_id(naming::id_type const & source_id)
         {
             if (source_id != naming::invalid_id)
             {
-                source_id_ = source_id;
-                data_.has_source_id_ = true;
+                data_.source_id_ = source_id.get_gid();
             }
         }
 
-        std::size_t size() const
+        void set_destination_id(naming::gid_type&& dest)
         {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            return dests_.size();
-#else
-            return 1ul;
-#endif
+            data_.dest_ = dest;
+            HPX_ASSERT(is_valid());
         }
 
-        naming::id_type const* destinations() const
+        naming::gid_type const& destination() const
         {
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            return dests_.data();
-#else
-            return &dests_;
-#endif
+            HPX_ASSERT(is_valid());
+            return data_.dest_;
         }
 
-        naming::address const* addrs() const
+        naming::address const& addr() const
         {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            return addrs_.data();
-#else
-            return &addrs_;
-#endif
+            return data_.addr_;
         }
 
-        naming::address* addrs()
+        naming::address& addr()
         {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            return addrs_.data();
-#else
-            return &addrs_;
-#endif
+            return data_.addr_;
         }
 
         std::uint32_t destination_locality_id() const
         {
-            return naming::get_locality_id_from_id(destinations()[0]);
+            return naming::get_locality_id_from_gid(destination_locality());
         }
 
         naming::gid_type const& destination_locality() const
         {
-            return addrs()[0].locality_;
+            return addr().locality_;
         }
 
         double start_time() const
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             return data_.start_time_;
+#else
+            return 0.0;
+#endif
         }
 
         void set_start_time(double time)
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             data_.start_time_ = time;
+#endif
         }
 
         double creation_time() const
         {
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             return data_.creation_time_;
+#else
+            return 0.0;
+#endif
         }
 
         threads::thread_priority get_thread_priority() const
@@ -443,6 +327,7 @@ namespace hpx { namespace parcelset
             return action_->get_thread_priority();
         }
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
         naming::gid_type const parcel_id() const
         {
             return data_.parcel_id_;
@@ -452,6 +337,7 @@ namespace hpx { namespace parcelset
         {
             return data_.parcel_id_;
         }
+#endif
 
         serialization::binary_filter* get_serialization_filter() const
         {
@@ -469,6 +355,42 @@ namespace hpx { namespace parcelset
             return action_ ? action_->does_termination_detection() : false;
         }
 
+        split_gids_type& split_gids() const
+        {
+            return const_cast<split_gids_type&>(split_gids_);
+        }
+
+        void set_split_gids(split_gids_type&& split_gids)
+        {
+            split_gids_ = std::move(split_gids);
+        }
+
+        std::size_t const& num_chunks() const
+        {
+            return num_chunks_;
+        }
+
+        std::size_t & num_chunks()
+        {
+            return num_chunks_;
+        }
+
+        std::size_t const& size() const
+        {
+            return size_;
+        }
+
+        std::size_t & size()
+        {
+            return size_;
+        }
+
+        void schedule_action();
+
+        // returns true if parcel was migrated, false if scheduled locally
+        bool load_schedule(serialization::input_archive & ar,
+            std::size_t num_thread);
+
         // generate unique parcel id
         static naming::gid_type generate_unique_id(
             std::uint32_t locality_id = naming::invalid_locality_id);
@@ -478,22 +400,19 @@ namespace hpx { namespace parcelset
 
         // serialization support
         friend class hpx::serialization::access;
-
+        void load_data(serialization::input_archive & ar);
         void serialize(serialization::input_archive & ar, unsigned);
         void serialize(serialization::output_archive & ar, unsigned);
 
-        data data_;
-        naming::id_type source_id_;
+        naming::address_type determine_lva();
 
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        std::vector<naming::id_type> dests_;
-        std::vector<naming::address> addrs_;
-#else
-        naming::id_type dests_;
-        naming::address addrs_;
-#endif
+        data data_;
         std::unique_ptr<actions::continuation> cont_;
         std::unique_ptr<actions::base_action> action_;
+
+        split_gids_type split_gids_;
+        std::size_t size_;
+        std::size_t num_chunks_;
     };
 
     HPX_EXPORT std::string dump_parcel(parcel const& p);
