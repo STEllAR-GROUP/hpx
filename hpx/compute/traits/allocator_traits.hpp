@@ -137,7 +137,8 @@ namespace hpx { namespace compute { namespace traits
                 Ts &&... vs)
             {
                 typedef typename Allocator::pointer pointer;
-                pointer init_value(std::forward<Ts>(vs)...);
+                typedef typename Allocator::value_type value_type;
+                value_type init_value(std::forward<Ts>(vs)...);
                 pointer end = p + count;
                 typename Allocator::size_type allocated = 0;
                 for(pointer it = p; it != end; ++it)
