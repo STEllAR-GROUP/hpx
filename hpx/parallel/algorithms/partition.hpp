@@ -20,6 +20,8 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -41,35 +43,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t size, F && f, Proj && proj, std::size_t chunks)
             {
                 typedef util::detail::algorithm_result<ExPolicy, RandIter> result;
-                if (chunks < 2)
-                {
-                    return result::get(std::stable_partition(
-                        first, last, std::forward<F>(f)));
+                try {
+                    if (chunks < 2)
+                    {
+                        return result::get(std::stable_partition(
+                            first, last,
+                            util::invoke_projected<F, Proj>(
+                                std::forward<F>(f), std::forward<Proj>(proj)
+                            )));
+                    }
+
+                    std::size_t mid_point = size / 2;
+                    chunks /= 2;
+
+                    RandIter mid = first;
+                    std::advance(mid, mid_point);
+
+                    hpx::future<RandIter> left = hpx::async(
+                        policy.executor(), *this, policy, first, mid, mid_point,
+                        f, proj, chunks);
+                    hpx::future<RandIter> right = hpx::async(
+                        policy.executor(), *this, policy, mid, last, size - mid_point,
+                        std::forward<F>(f), std::forward<Proj>(proj), chunks);
+
+                    return result::get(
+                        dataflow(
+                            policy.executor(),
+                            [mid](
+                                hpx::future<RandIter> && left,
+                                hpx::future<RandIter> && right)
+                            {
+                                return std::rotate(left.get(), mid, right.get());
+                            },
+                            std::move(left), std::move(right)));
                 }
-
-                std::size_t mid_point = size / 2;
-                chunks /= 2;
-
-                RandIter mid = first;
-                std::advance(mid, mid_point);
-
-                hpx::future<RandIter> left = hpx::async(
-                    policy.executor(), *this, policy, first, mid, mid_point,
-                    f, proj, chunks);
-                hpx::future<RandIter> right = hpx::async(
-                    policy.executor(), *this, policy, mid, last, size - mid_point,
-                    std::forward<F>(f), std::forward<Proj>(proj), chunks);
-
-                return result::get(
-                    dataflow(
-                        policy.executor(),
-                        [mid](
-                            hpx::future<RandIter> && left,
-                            hpx::future<RandIter> && right)
-                        {
-                            return std::rotate(left.get(), mid, right.get());
-                        },
-                        std::move(left), std::move(right)));
+                catch (...) {
+                    return result::get(detail::handle_exception<
+                                ExPolicy, RandIter
+                            >::call(boost::current_exception()));
+                }
             }
         };
 
@@ -87,7 +99,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy && policy, BidirIter first, BidirIter last,
                 F && f, Proj && proj)
             {
-                return std::stable_partition(first, last, std::forward<F>(f));
+                return std::stable_partition(first, last,
+                    util::invoke_projected<F, Proj>(
+                        std::forward<F>(f), std::forward<Proj>(proj)
+                    ));
             }
 
             template <typename ExPolicy, typename RandIter, typename F,
@@ -135,7 +150,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Permutes the elements in the range [first, last) such that there exists
-    /// and iterator i such that for every iterator j in the range [first, i)
+    /// an iterator i such that for every iterator j in the range [first, i)
     /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
     /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
     ///
