@@ -10,6 +10,8 @@
 #include <hpx/lcos/stubs/barrier.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
+#include <utility>
+
 #include <boost/exception_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,8 +31,16 @@ namespace hpx { namespace lcos
         barrier(naming::id_type gid)
           : base_type(gid)
         {}
-        barrier(lcos::shared_future<naming::id_type> gid)
-          : base_type(gid)
+
+        barrier(lcos::future<naming::id_type> && f)
+          : base_type(std::move(f))
+        {}
+
+        barrier(lcos::shared_future<naming::id_type> const& f)
+          : base_type(f)
+        {}
+        barrier(lcos::shared_future<naming::id_type> && f)
+          : base_type(std::move(f))
         {}
 
         ///////////////////////////////////////////////////////////////////////
