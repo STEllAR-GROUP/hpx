@@ -15,7 +15,10 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/throw_exception.hpp>
+
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

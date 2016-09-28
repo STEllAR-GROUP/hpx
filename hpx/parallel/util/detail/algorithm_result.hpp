@@ -31,12 +31,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return T();
         }
 
-        static type get(T && t)
+        template <typename T_>
+        static type get(T_ && t)
         {
             return t;
         }
 
-        static type get(hpx::future<T> && t)
+        template <typename T_>
+        static type get(hpx::future<T_> && t)
         {
             return t.get();
         }
@@ -53,13 +55,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         static void get(hpx::util::unused_type) {}
 
-        static type get(hpx::future<void> && t)
+        static void get(hpx::future<void> && t)
         {
             t.get();
         }
 
         template <typename T>
-        static type get(hpx::future<T> && t)
+        static void get(hpx::future<T> && t)
         {
             t.get();
         }

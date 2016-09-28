@@ -1159,6 +1159,11 @@ if(WIN32)
       # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
       # atomics
       hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+
+      # Update 3 allows to flag rvalue misuses and enforces strict string const-
+      # qualification conformance
+      hpx_add_target_compile_option(-Zc:rvalueCast)
+      hpx_add_target_compile_option(-Zc:strictStrings)
     endif()
 
     # Runtime type information

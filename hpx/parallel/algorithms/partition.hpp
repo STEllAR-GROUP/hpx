@@ -25,7 +25,9 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -71,9 +73,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             policy.executor(),
                             [mid](
                                 hpx::future<RandIter> && left,
-                                hpx::future<RandIter> && right)
+                                hpx::future<RandIter> && right
+                            ) -> RandIter
                             {
-                                return std::rotate(left.get(), mid, right.get());
+                                RandIter first = left.get();
+                                RandIter last = right.get();
+
+                                std::rotate(first, mid, last);
+
+                                // for some library implementations std::rotate
+                                // does not return the new middle point
+                                std::advance(first, std::distance(mid, last));
+                                return first;
                             },
                             std::move(left), std::move(right)));
                 }
