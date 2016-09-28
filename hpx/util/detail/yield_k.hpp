@@ -11,6 +11,8 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/runtime/threads/thread_helpers.hpp>
+
 #include <chrono>
 #include <cstddef>
 

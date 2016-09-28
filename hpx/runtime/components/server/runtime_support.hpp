@@ -253,7 +253,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, free_component,
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, free_component,
             free_component_action);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);

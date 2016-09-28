@@ -7,6 +7,7 @@
 #define HPX_SERIALIZATION_VECTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
@@ -53,7 +54,7 @@ namespace hpx { namespace serialization
                 if(size == 0) return;
 
                 v.resize(size);
-                load_binary(ar, &v[0], v.size() * sizeof(value_type));
+                ar >> hpx::serialization::make_array(v.data(), v.size());
             }
         }
     }
@@ -115,9 +116,8 @@ namespace hpx { namespace serialization
             }
             else
             {
-                // bitwise save ...
-                typedef typename std::vector<T, Allocator>::value_type value_type;
-                save_binary(ar, &v[0], v.size() * sizeof(value_type));
+                // bitwise (zero-copy) save ...
+                ar << hpx::serialization::make_array(v.data(), v.size());
             }
         }
     }

@@ -82,6 +82,8 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
+        HPX_DEFINE_COMPONENT_ACTION(barrier, set_event, set_event_non_direct_action);
+
         /// The \a function set_exception is called whenever a
         /// \a set_exception_action is applied on an instance of a LCO. This
         /// function just forwards to the virtual function \a set_exception, which
@@ -120,6 +122,11 @@ namespace hpx { namespace lcos { namespace server
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::server::barrier::create_component_action
   , hpx_lcos_server_barrier_create_component_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::lcos::server::barrier::set_event_non_direct_action
+  , hpx_lcos_server_barrier_set_event_non_direct_action
 )
 
 #endif

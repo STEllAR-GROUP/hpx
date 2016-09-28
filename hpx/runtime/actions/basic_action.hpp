@@ -625,6 +625,7 @@ namespace hpx { namespace actions
         get_instance_count_action_id,
         hpx_get_locality_name_action_id,
         hpx_lcos_server_barrier_create_component_action_id,
+        hpx_lcos_server_barrier_set_event_non_direct_action_id,
         hpx_lcos_server_latch_create_component_action_id,
         hpx_lcos_server_latch_wait_action_id,
         list_component_type_action_id,
