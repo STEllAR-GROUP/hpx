@@ -206,14 +206,12 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_GOOGLE_PERFTOOLS HPX_WITH_GOOGLE_PERFTOOLS]
 * [link build_system.cmake_variables.HPX_WITH_ITTNOTIFY HPX_WITH_ITTNOTIFY]
 * [link build_system.cmake_variables.HPX_WITH_PAPI HPX_WITH_PAPI]
-* [link build_system.cmake_variables.HPX_WITH_TAU HPX_WITH_TAU]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_APEX] `HPX_WITH_APEX:BOOL`][Enable APEX instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_GOOGLE_PERFTOOLS] `HPX_WITH_GOOGLE_PERFTOOLS:BOOL`][Enable Google Perftools instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_ITTNOTIFY] `HPX_WITH_ITTNOTIFY:BOOL`][Enable Amplifier (ITT) instrumentation support.]]
         [[[#build_system.cmake_variables.HPX_WITH_PAPI] `HPX_WITH_PAPI:BOOL`][Enable the PAPI based performance counter.]]
-        [[[#build_system.cmake_variables.HPX_WITH_TAU] `HPX_WITH_TAU:BOOL`][Enable TAU profiling support.]]
 ] [/ Profiling Options]
 
 [#build_system.cmake_variables.Debugging][h3 Debugging Options]
