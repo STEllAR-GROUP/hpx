@@ -16,6 +16,8 @@
 #include <climits>
 #include <cstddef>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -53,6 +55,8 @@ namespace hpx { namespace lcos { namespace local
         local::detail::condition_variable cond_;
     };
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 
