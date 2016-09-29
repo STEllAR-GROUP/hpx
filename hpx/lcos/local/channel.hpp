@@ -117,12 +117,12 @@ namespace hpx { namespace lcos { namespace local
 
                 if (closed_)
                 {
-                    l.unlock();
                     // the requested item must be available, otherwise this
                     // would create a deadlock
                     hpx::future<T> f;
                     if (!buffer_.try_receive(generation, &f))
                     {
+                        l.unlock();
                         return hpx::make_exceptional_future<T>(
                             HPX_GET_EXCEPTION(hpx::invalid_status,
                                 "hpx::lcos::local::channel::get",
@@ -137,16 +137,14 @@ namespace hpx { namespace lcos { namespace local
 
             bool try_get(std::size_t generation, hpx::future<T>* f = nullptr)
             {
-                {
-                    std::lock_guard<mutex_type> l(mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
 
-                    if (buffer_.empty() && closed_)
-                        return false;
+                if (buffer_.empty() && closed_)
+                    return false;
 
-                    ++get_generation_;
-                    if (generation == std::size_t(-1))
-                        generation = get_generation_;
-                }
+                ++get_generation_;
+                if (generation == std::size_t(-1))
+                    generation = get_generation_;
 
                 if (f != nullptr)
                     *f = buffer_.receive(generation);
@@ -156,50 +154,47 @@ namespace hpx { namespace lcos { namespace local
 
             void set(std::size_t generation, T && t)
             {
+                std::unique_lock<mutex_type> l(mtx_);
+                if(closed_)
                 {
-                    std::unique_lock<mutex_type> l(mtx_);
-                    if(closed_)
-                    {
-                        l.unlock();
-                        HPX_THROW_EXCEPTION(hpx::invalid_status,
-                            "hpx::lcos::local::channel::set",
-                            "attempting to write to a closed channel");
-                        return;
-                    }
-
-                    ++set_generation_;
-                    if (generation == std::size_t(-1))
-                        generation = set_generation_;
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                        "hpx::lcos::local::channel::set",
+                        "attempting to write to a closed channel");
+                    return;
                 }
+
+                ++set_generation_;
+                if (generation == std::size_t(-1))
+                    generation = set_generation_;
 
                 buffer_.store_received(generation, std::move(t));
             }
 
             void close()
             {
-                boost::exception_ptr e;
+                std::unique_lock<mutex_type> l(mtx_);
+                if(closed_)
                 {
-                    std::unique_lock<mutex_type> l(mtx_);
-                    if(closed_)
-                    {
-                        l.unlock();
-                        HPX_THROW_EXCEPTION(hpx::invalid_status,
-                            "hpx::lcos::local::channel::close",
-                            "attempting to close an already closed channel");
-                        return;
-                    }
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                        "hpx::lcos::local::channel::close",
+                        "attempting to close an already closed channel");
+                    return;
+                }
 
-                    closed_ = true;
+                closed_ = true;
 
-                    if (buffer_.empty())
-                        return;
+                if (buffer_.empty())
+                    return;
 
-                    {
-                        util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
-                        e = HPX_GET_EXCEPTION(hpx::future_cancelled,
-                                "hpx::lcos::local::close",
-                                "canceled waiting on this entry");
-                    }
+                boost::exception_ptr e;
+
+                {
+                    util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                    e = HPX_GET_EXCEPTION(hpx::future_cancelled,
+                            "hpx::lcos::local::close",
+                            "canceled waiting on this entry");
                 }
 
                 // all pending requests which can't be satisfied have to be
