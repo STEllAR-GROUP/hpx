@@ -21,11 +21,16 @@ namespace hpx { namespace util { namespace detail
     struct callable_vtable_base
     {
         template <typename T>
-        HPX_FORCEINLINE static std::size_t get_function_address(void** f)
+        HPX_FORCEINLINE static std::size_t _get_function_address(void** f)
         {
             return traits::get_function_address<T>::call(vtable::get<T>(f));
         }
-        typedef std::size_t (*get_function_address_t)(void**);
+        std::size_t (*get_function_address)(void**);
+
+        template <typename T>
+        HPX_CONSTEXPR callable_vtable_base(construct_vtable<T>) HPX_NOEXCEPT
+          : get_function_address(&callable_vtable_base::template _get_function_address<T>)
+        {}
     };
 
     template <typename Sig>
@@ -44,7 +49,8 @@ namespace hpx { namespace util { namespace detail
 
         template <typename T>
         HPX_CONSTEXPR callable_vtable(construct_vtable<T>) HPX_NOEXCEPT
-          : invoke(&callable_vtable::template _invoke<T>)
+          : callable_vtable_base(construct_vtable<T>())
+          , invoke(&callable_vtable::template _invoke<T>)
         {}
     };
 }}}
