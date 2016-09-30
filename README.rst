@@ -68,7 +68,7 @@ If you plan to use HPX we suggest to start with the latest released version
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
-our `contiguous integration results website <http://hermione.cct.lsu.edu/console>`_.
+our `contiguous integration results website <http://rostam.cct.lsu.edu/console>`_.
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
