@@ -554,28 +554,6 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
   "Turn on MPI multithreading support (default: ON)."
   ON CATEGORY "Parcelport" ADVANCED)
 
-## Profiling related build options
-hpx_option(HPX_WITH_APEX BOOL
-  "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
-if(HPX_WITH_APEX)
-  hpx_add_config_define(HPX_HAVE_APEX)
-endif()
-hpx_option(HPX_WITH_PAPI BOOL
-  "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
-if(HPX_WITH_PAPI)
-  hpx_add_config_define(HPX_HAVE_PAPI)
-endif()
-hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
-  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
-endif()
-hpx_option(HPX_WITH_ITTNOTIFY BOOL
-  "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-#if(HPX_WITH_ITTNOTIFY)
-  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-#endif()
-
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
