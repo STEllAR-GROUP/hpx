@@ -435,6 +435,33 @@ hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+## Profiling related build options
+hpx_option(HPX_WITH_APEX BOOL
+  "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)
+endif()
+hpx_option(HPX_WITH_PAPI BOOL
+  "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+if(HPX_WITH_PAPI)
+  hpx_add_config_define(HPX_HAVE_PAPI)
+endif()
+hpx_option(HPX_WITH_TAU BOOL
+  "Enable TAU profiling support." OFF CATEGORY "Profiling")
+if(HPX_WITH_TAU)
+  hpx_add_config_define(HPX_HAVE_TAU)
+endif()
+hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
+  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
+endif()
+hpx_option(HPX_WITH_ITTNOTIFY BOOL
+  "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+#if(HPX_WITH_ITTNOTIFY)
+  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+#endif()
+
 ################################################################################
 # Scheduler configuration
 ################################################################################
@@ -491,9 +518,15 @@ if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
+## Parcelport related build options
+set(_parcel_profiling_default OFF)
+if(HPX_WITH_APEX)
+  set(_parcel_profiling_default ON)
+endif()
+
 hpx_option(HPX_WITH_PARCEL_PROFILING BOOL
   "Enable profiling data for parcels"
-  OFF CATEGORY "Parcelport" ADVANCED)
+  ${_parcel_profiling_default} CATEGORY "Parcelport" ADVANCED)
 
 if(HPX_WITH_PARCEL_PROFILING)
   hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
@@ -605,7 +638,8 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
 endif()
 
 ## Debugging related build options
-hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
+hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support."
+  OFF CATEGORY "Debugging")
 
 hpx_option(HPX_WITH_VERIFY_LOCKS BOOL
   "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"

@@ -202,8 +202,8 @@ namespace hpx { namespace parcelset
 //             HPX_ASSERT(is_valid());
         }
         friend struct detail::create_parcel;
-    public:
 
+    public:
         parcel(parcel && other)
           : data_(std::move(other.data_)),
             cont_(std::move(other.cont_)),
@@ -265,9 +265,9 @@ namespace hpx { namespace parcelset
             }
         }
 
-        void set_destination_id(naming::gid_type&& dest)
+        void set_destination_id(naming::gid_type && dest)
         {
-            data_.dest_ = dest;
+            data_.dest_ = std::move(dest);
             HPX_ASSERT(is_valid());
         }
 
