@@ -28,11 +28,9 @@ struct spinlock
 
   public:
     spinlock(char const* /*desc*/ = nullptr)
+      : m{BOOST_DETAIL_SPINLOCK_INIT}
     {
         HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
-
-        boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
-        m = l;
     }
 
     ~spinlock()
