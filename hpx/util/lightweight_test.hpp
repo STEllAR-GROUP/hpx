@@ -48,7 +48,7 @@ struct fixture
   public:
     fixture(std::ostream& stream):
       stream_(stream), sanity_failures_(0), test_failures_(0),
-      mutex_{BOOST_DETAIL_SPINLOCK_INIT}
+      mutex_(BOOST_DETAIL_SPINLOCK_INIT)
     {
     }
 
