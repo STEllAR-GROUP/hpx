@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {
-                auto && iters = part_begin.get_iterator_tuple();
+                auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n(policy_,
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters),
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {
-                auto && iters = part_begin.get_iterator_tuple();
+                auto iters = part_begin.get_iterator_tuple();
                 return util::transform_binary_loop_n(policy_,
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters), hpx::util::get<2>(iters),
