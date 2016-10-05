@@ -822,13 +822,28 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if(MSVC14 AND CMAKE_CL_64)
+if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
-    hpx_add_target_compile_option(-await)
+
+    hpx_option(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
+        "Use hpx/util/await_traits.hpp instead of <experimental/coroutines>"
+        OFF ADVANCED CATEGORY "LCOs")
+
+    if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+      hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+    endif()
+
+    if(MSVC14 AND CMAKE_CL_64)
+      hpx_add_target_compile_option(-await)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      hpx_add_target_compile_option(-Xclang -fcoroutines-ts)
+    endif()
   endif()
 endif()
 
