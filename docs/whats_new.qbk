@@ -41,6 +41,37 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2354] - Adding serialization for mask_type if CPU_COUNT > 64
+* [issue 2352] - Compile errors when using intel 17 beta (for KNL) on edison
+* [pr    2351] - Fix function vtable get_function_address implementation
+* [issue 2350] - Build failure - master branch (4de09f5) with Intel Compiler v17
+* [pr    2349] - Enabling zero-copy serialization support for std::vector<>
+* [pr    2348] - Adding test to verify #2334 is fixed
+* [pr    2347] - Bug fixes for hpx.compute and hpx::lcos::channel
+* [pr    2346] - Removing cmake "find" files that are in the APEX cmake Modules
+* [pr    2344] - Making hpx::lcos::channel usable with basename registration
+* [pr    2343] - Fix a couple of examples that failed to compile after recent
+                 api changes
+* [issue 2342] - Enabling APEX causes link errors
+* [pr    2341] - Removing cmake "find" files that are in the APEX cmake Modules
+* [pr    2339] - Fixing 2338
+* [pr    2338] - Possible race in sliding semaphore
+* [pr    2335] - Making sure multiple components are properly initialized from
+                 arguments
+* [pr    2334] - Cannot construct component with large vector on a remote
+                 locality
+* [pr    2332] - Fixing hpx::lcos::local::barrier
+* [pr    2331] - Updating APEX support to include OTF2
+* [pr    2330] - Support for data-parallelism for parallel algorithms
+* [pr    2328] - fix LibGeoDecomp builds with HPX + GCC 5.3.0 + CUDA 8RC
+* [pr    2326] - Making scan_partitioner work (for now)
+* [issue 2323] - Constructing a vector of components only correctly initializes
+                 the first component
+* [pr    2322] - Fix problems that bubbled up after merging #2278
+* [pr    2320] - Std flag fixes
+* [issue 2319] - -std=c++14 and -std=c++1y with Intel can't build recent Boost
+                 builds due to insufficient C++14 support; don't enable these
+                 flags by default for Intel
 * [pr    2318] - Improve handling of --hpx:bind=<bind-spec>
 * [pr    2317] - Making sure command line warnings are printed once only
 * [pr    2316] - Fixing command line handling for default bind mode
