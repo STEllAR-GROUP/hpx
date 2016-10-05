@@ -21,9 +21,11 @@
 #    include <boost/detail/interlocked.hpp>
 #  endif
 #else
-#  include <boost/smart_ptr/detail/spinlock_sync.hpp>
-#  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
-#    include <ia64intrin.h>
+#  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
+#    include <boost/smart_ptr/detail/spinlock.hpp>
+#    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
+#      include <ia64intrin.h>
+#    endif
 #  endif
 #endif
 

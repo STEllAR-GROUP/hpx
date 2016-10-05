@@ -27,13 +27,7 @@
 #  endif
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
-#    if defined( BOOST_SP_USE_STD_ATOMIC ) && !defined( __clang__ )
-#      include <boost/smart_ptr/detail/spinlock_std_atomic.hpp>
-#    else
-     //  Clang (at least up to 3.4) can't compile spinlock_pool when
-     //  using std::atomic, so substitute the __sync implementation instead.
-#      include <boost/smart_ptr/detail/spinlock_sync.hpp>
-#    endif
+#    include <boost/smart_ptr/detail/spinlock.hpp>
 #    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
 #      include <ia64intrin.h>
 #    endif
