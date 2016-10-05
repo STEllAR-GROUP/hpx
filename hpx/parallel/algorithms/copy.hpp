@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(Iter part_begin, std::size_t part_size, std::size_t)
             {
                 using hpx::util::get;
-                auto const& iters = part_begin.get_iterator_tuple();
+                auto iters = part_begin.get_iterator_tuple();
                 util::copy_n_helper(get<0>(iters), part_size, get<1>(iters));
             }
         };
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [](zip_iterator && last) -> zip_iterator
                         {
                             using hpx::util::get;
-                            auto const& iters = last.get_iterator_tuple();
+                            auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(get<0>(iters), get<1>(iters));
                             return std::move(last);
                         }));
@@ -235,14 +235,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             using hpx::util::get;
 
-                            auto const& iters = part_begin.get_iterator_tuple();
+                            auto iters = part_begin.get_iterator_tuple();
                             util::copy_n_helper(get<0>(iters), part_size,
                                 get<1>(iters));
                         },
                         [](zip_iterator && last) -> zip_iterator
                         {
                             using hpx::util::get;
-                            auto const& iters = last.get_iterator_tuple();
+                            auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(get<0>(iters), get<1>(iters));
                             return std::move(last);
                         }));

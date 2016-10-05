@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             iVal val_start)
         {
             // the iterator we want is 'second' part of tagged_pair type (from copy_if)
-            auto const &t = zipiter.second.get_iterator_tuple();
+            auto t = zipiter.second.get_iterator_tuple();
             iKey key_end = hpx::util::get<0>(t);
             return std::make_pair(key_end,
                 std::next(val_start, std::distance(key_start, key_end)));
@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return lcos::make_future<result_type>(std::move(ziter),
                 [=](ZIter zipiter)
                 {
-                    auto const &t = zipiter.second.get_iterator_tuple();
+                    auto t = zipiter.second.get_iterator_tuple();
                     iKey key_end = hpx::util::get<0>(t);
                     return std::make_pair(key_end,
                         std::next(val_start, std::distance(key_start, key_end)));
