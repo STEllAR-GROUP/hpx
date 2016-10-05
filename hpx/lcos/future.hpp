@@ -33,6 +33,10 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/void_guard.hpp>
 
+#if defined(HPX_HAVE_AWAIT)
+    #include <hpx/lcos/detail/future_await_traits.hpp>
+#endif
+
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -719,6 +723,24 @@ namespace hpx { namespace lcos { namespace detail
         {
             return wait_until(rel_time.from_now(), ec);
         }
+
+#if defined(HPX_HAVE_AWAIT)
+        bool await_ready() const
+        {
+            return detail::await_ready(*static_cast<Derived const*>(this));
+        }
+
+        template <typename Promise>
+        void await_suspend(std::experimental::coroutine_handle<Promise> rh)
+        {
+            detail::await_suspend(*static_cast<Derived*>(this), rh);
+        }
+
+        R await_resume()
+        {
+            return detail::await_resume(*static_cast<Derived*>(this));
+        }
+#endif
 
     protected:
         boost::intrusive_ptr<shared_state_type> shared_state_;
