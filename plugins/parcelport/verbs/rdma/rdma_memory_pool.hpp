@@ -31,15 +31,11 @@
 #define RDMA_POOL_MEDIUM_CHUNK_SIZE 0x004000 // 16KB
 #define RDMA_POOL_LARGE_CHUNK_SIZE  0x100000 //  1MB
 
-// the default number of chunks we allocate with our pool
-#define RDMA_DEFAULT_CHUNKS_ALLOC 1024
-// the maximum number of chunks we can allocate with our pool
-#define RDMA_MAX_CHUNKS_ALLOC 2048
 // the maximum number of preposted receives (pre receive queue)
 #define RDMA_MAX_PREPOSTS 128
 
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
-#define RDMA_POOL_MAX_SMALL_CHUNKS  8192
+#define RDMA_POOL_MAX_SMALL_CHUNKS  1024
 #define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
 #define RDMA_POOL_MAX_LARGE_CHUNKS  4
 
@@ -49,24 +45,6 @@
 #if defined(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE)
 # undef RDMA_POOL_SMALL_CHUNK_SIZE
 # define RDMA_POOL_SMALL_CHUNK_SIZE HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE
-#endif
-
-// if the HPX configuration has set a different value, use it
-#if defined(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE)
-# undef RDMA_POOL_SMALL_CHUNK_SIZE
-# define RDMA_POOL_SMALL_CHUNK_SIZE HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE
-#endif
-
-// if the HPX configuration has set a different value, use it
-#if defined(HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS)
-# undef RDMA_DEFAULT_CHUNKS_ALLOC
-# define RDMA_DEFAULT_CHUNKS_ALLOC HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS
-#endif
-
-// if the HPX configuration has set a different value, use it
-#if defined(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS)
-# undef RDMA_MAX_CHUNKS_ALLOC
-# define RDMA_MAX_CHUNKS_ALLOC HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS
 #endif
 
 // if the HPX configuration has set a different value, use it
