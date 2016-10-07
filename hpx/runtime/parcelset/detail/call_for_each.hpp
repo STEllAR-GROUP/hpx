@@ -10,8 +10,10 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include <vector>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -21,31 +23,29 @@ namespace hpx { namespace parcelset
     {
         struct call_for_each
         {
-            HPX_MOVABLE_ONLY(call_for_each);
-
-        public:
             typedef std::vector<parcelport::write_handler_type> handlers_type;
             typedef std::vector<parcel> parcels_type;
             handlers_type handlers_;
             parcels_type parcels_;
 
-            call_for_each(handlers_type&& handlers, parcels_type && parcels)
+            call_for_each(handlers_type&& handlers, std::vector<parcel>&& parcels)
               : handlers_(std::move(handlers))
               , parcels_(std::move(parcels))
             {}
 
-            call_for_each(call_for_each &&other)
+            call_for_each(call_for_each&& other)
               : handlers_(std::move(other.handlers_))
               , parcels_(std::move(other.parcels_))
             {}
 
-            call_for_each& operator=(call_for_each &&other)
+            call_for_each& operator=(call_for_each&& other)
             {
                 handlers_ = std::move(other.handlers_);
                 parcels_ = std::move(other.parcels_);
 
                 return *this;
             }
+            HPX_MOVABLE_ONLY(call_for_each);
 
             void operator()(boost::system::error_code const& e) const
             {
