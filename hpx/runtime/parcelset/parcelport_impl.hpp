@@ -239,11 +239,37 @@ namespace hpx { namespace parcelset
         // of parcels rather than just a single one
         struct parcel_await_handlers
         {
-            parcelport_impl& this_;
+            parcelport_impl* this_;
             locality dest_;
             std::vector<write_handler_type> handler_;
             std::vector<parcel> parcels_;
-            std::size_t idx_;
+
+            parcel_await_handlers(
+                parcelport_impl& pp,
+                locality dest,
+                std::vector<write_handler_type>&& handler)
+              : this_(&pp),
+                dest_(std::move(dest)),
+                handler_(std::move(handler))
+            {}
+
+            parcel_await_handlers(parcel_await_handlers&& other)
+              : this_(other.this_),
+                dest_(std::move(other.dest_)),
+                handler_(std::move(other.handler_)),
+                parcels_(std::move(other.parcels_))
+            {}
+
+            parcel_await_handlers& operator=(parcel_await_handlers&& other)
+            {
+                this_ = other.this_;
+                dest_ = std::move(other.dest_);
+                handler_ = std::move(other.handler_);
+                parcels_ = std::move(other.parcels_);
+                return *this;
+            }
+
+            HPX_MOVABLE_ONLY(parcel_await_handlers);
 
             void operator()(parcel&& p)
             {
@@ -252,10 +278,10 @@ namespace hpx { namespace parcelset
 
                 if (parcels_.size() == handler_.size())
                 {
-                    this_.enqueue_parcels(
+                    this_->enqueue_parcels(
                         dest_, std::move(parcels_), std::move(handler_));
 
-                    this_.get_connection_and_send_parcels(dest_);
+                    this_->get_connection_and_send_parcels(dest_);
                 }
             }
         };
@@ -288,8 +314,8 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
-            parcel_await_handlers handler{
-                *this, dest, std::move(handlers), std::vector<parcel>(), 0};
+            parcel_await_handlers handler(
+                *this, dest, std::move(handlers));
             if (!connection_handler_traits<ConnectionHandler>::
                 send_immediate_parcels::value) {
                 handler.parcels_.reserve(parcels.size());
