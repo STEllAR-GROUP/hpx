@@ -42,7 +42,6 @@
 // rdmahelper library
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaDevice.h>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
 //
 #include <unordered_map>

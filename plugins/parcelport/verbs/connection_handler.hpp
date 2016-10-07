@@ -10,18 +10,17 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <boost/shared_ptr.hpp>
-//
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaDevice.h>
+#include <plugins/parcelport/verbs/rdma/rdma_device.hpp>
 
-namespace hpx { namespace parcelset
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs 
 {
-    namespace policies { namespace verbs
-    {
-        class HPX_EXPORT parcelport;
-    }}
+    class HPX_EXPORT parcelport;
+}}
 
     template <>
     struct connection_handler_traits<policies::verbs::parcelport>
@@ -47,20 +46,21 @@ namespace hpx { namespace parcelset
         }
     };
 
-    namespace policies { namespace verbs
-    {
+namespace policies {
+namespace verbs 
+{
         uint32_t Get_rdma_device_address(const char *devicename, const char *iface, char *hostname)
         {
           FUNC_START_DEBUG_MSG
           // Find the address of the I/O link device.
-          bgcios::RdmaDevicePtr linkDevice;
+          rdma_device_ptr linkDevice;
           try {
-            linkDevice = bgcios::RdmaDevicePtr(new bgcios::RdmaDevice(devicename, iface));
+            linkDevice = rdma_device_ptr(new rdma_device(devicename, iface));
           }
           catch (rdma_error& e) {
             LOG_ERROR_MSG("error opening InfiniBand device: " << e.what());
           }
-          LOG_DEBUG_MSG("Created InfiniBand device for " << linkDevice->getDeviceName() << " using interface " << linkDevice->getInterfaceName());
+          LOG_DEBUG_MSG("Created InfiniBand device for " << linkDevice->get_device_name() << " using interface " << linkDevice->get_interface_name());
 
           std::stringstream temp;
           in_addr_t addr = linkDevice->get_address();
@@ -79,9 +79,7 @@ namespace hpx { namespace parcelset
           return (uint32_t)(addr);
         }
 
-    }}
-
-}}
+}}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 
