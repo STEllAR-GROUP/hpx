@@ -716,8 +716,10 @@ namespace hpx { namespace components { namespace server
     {
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
+        parcelset::parcelhandler& ph = appl.get_parcel_handler();
 
         agas_client.start_shutdown();
+        ph.flush_parcels();
 
         std::uint32_t locality_id = get_locality_id();
 
@@ -755,7 +757,9 @@ namespace hpx { namespace components { namespace server
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
             while (tm.get_thread_count() > 1)
+            {
                 this_thread::yield();
+            }
 
             return 0;
         }

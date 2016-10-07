@@ -277,6 +277,18 @@ namespace hpx { namespace parcelset
         return did_some_work;
     }
 
+    void parcelhandler::flush_parcels()
+    {
+        // now flush all parcel ports to be shut down
+        for (pports_type::value_type& pp : pports_)
+        {
+            if(pp.first > 0)
+            {
+                pp.second->flush_parcels();
+            }
+        }
+    }
+
     void parcelhandler::stop(bool blocking)
     {
         // now stop all parcel ports

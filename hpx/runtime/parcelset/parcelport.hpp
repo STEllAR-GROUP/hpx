@@ -93,6 +93,8 @@ namespace hpx { namespace parcelset
         ///                 the routine returns immediately.
         virtual bool run(bool blocking = true) = 0;
 
+        virtual void flush_parcels() = 0;
+
         /// Stop the parcelport I/O thread pool.
         ///
         /// \param blocking [in] If blocking is set to \a false the routine will
