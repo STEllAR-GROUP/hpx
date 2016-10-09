@@ -183,6 +183,7 @@ namespace hpx { namespace parcelset
 
             while(operations_in_flight_ != 0 || get_pending_parcels_count(false) != 0)
             {
+                do_background_work(0);
                 if(threads::get_self_ptr())
                 {
                     hpx::this_thread::suspend(hpx::threads::pending,
