@@ -75,7 +75,7 @@ namespace hpx { namespace lcos { namespace server
         {
             std::unique_lock<mutex_type> l(mtx_);
             if (cond_.size(l) < number_of_threads_-1) {
-                cond_.wait(std::move(l), "barrier::set_event");
+                cond_.wait(l, "barrier::set_event");
             }
             else {
                 cond_.notify_all(std::move(l));
