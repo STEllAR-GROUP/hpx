@@ -207,7 +207,22 @@ namespace hpx { namespace parcelset
     std::int64_t parcelport::get_pending_parcels_count(bool /*reset*/)
     {
         std::lock_guard<lcos::local::spinlock> l(mtx_);
-        return pending_parcels_.size();
+        std::int64_t count = 0;
+        for (auto && p : pending_parcels_)
+        {
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
+            count += hpx::util::get<0>(p.second)->size();
+            HPX_ASSERT(
+                hpx::util::get<0>(p.second)->size() ==
+                hpx::util::get<1>(p.second).size());
+#else
+            count += hpx::util::get<0>(p.second).size();
+            HPX_ASSERT(
+                hpx::util::get<0>(p.second).size() ==
+                hpx::util::get<1>(p.second).size());
+#endif
+        }
+        return count;
     }
 
     ///////////////////////////////////////////////////////////////////////////
