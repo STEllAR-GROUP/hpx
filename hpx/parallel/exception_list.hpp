@@ -15,7 +15,10 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/throw_exception.hpp>
+
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -41,10 +44,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     );
                 }
             }
+
+            static hpx::future<Result> call(hpx::future<Result> f)
+            {
+                HPX_ASSERT(f.has_exception());
+
+                // Intel complains if this is not explicitly moved
+                return std::move(f);
+            }
+
+            static hpx::future<Result> call(boost::exception_ptr const& e)
+            {
+                try {
+                    boost::rethrow_exception(e);
+                }
+                catch (std::bad_alloc const&) {
+                    // rethrow bad_alloc
+                    return hpx::make_exceptional_future<Result>(
+                        boost::current_exception());
+                }
+                catch (...) {
+                    // package up everything else as an exception_list
+                    return hpx::make_exceptional_future<Result>(
+                        exception_list(e));
+                }
+            }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct handle_exception_impl<sequential_task_execution_policy, Result>
+        struct handle_exception_task_impl
         {
             typedef future<Result> type;
 
@@ -68,78 +97,63 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         boost::current_exception());
                 }
             }
+
+            static hpx::future<Result> call(hpx::future<Result> f)
+            {
+                HPX_ASSERT(f.has_exception());
+
+                // Intel complains if this is not explicitly moved
+                return std::move(f);
+            }
+
+            static hpx::future<Result> call(boost::exception_ptr const& e)
+            {
+                try {
+                    boost::rethrow_exception(e);
+                }
+                catch (std::bad_alloc const&) {
+                    // rethrow bad_alloc
+                    return hpx::make_exceptional_future<Result>(
+                        boost::current_exception());
+                }
+                catch (...) {
+                    // package up everything else as an exception_list
+                    return hpx::make_exceptional_future<Result>(
+                        exception_list(e));
+                }
+            }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct handle_exception_impl<sequential_task_execution_policy, Result>
+          : handle_exception_task_impl<Result>
+        {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-                sequential_task_execution_policy_shim<
-                    Executor, Parameters>, Result>
-          : handle_exception_impl<sequential_task_execution_policy, Result>
+                sequential_task_execution_policy_shim<Executor, Parameters>, Result>
+          : handle_exception_task_impl<Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<parallel_task_execution_policy, Result>
-        {
-            typedef future<Result> type;
-
-            static future<Result> call()
-            {
-                try {
-                    try {
-                        throw; //-V667
-                    }
-                    catch(std::bad_alloc const& e) {
-                        boost::throw_exception(e);
-                    }
-                    catch (...) {
-                        boost::throw_exception(
-                            hpx::exception_list(boost::current_exception())
-                        );
-                    }
-                }
-                catch (...) {
-                    return hpx::make_exceptional_future<Result>(
-                        boost::current_exception());
-                }
-            }
-        };
+          : handle_exception_task_impl<Result>
+        {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct handle_exception_impl<
-                parallel_task_execution_policy_shim<
-                    Executor, Parameters>, Result>
-          : handle_exception_impl<parallel_task_execution_policy, Result>
+                parallel_task_execution_policy_shim<Executor, Parameters>, Result>
+          : handle_exception_task_impl<Result>
         {};
 
 #if defined(HPX_HAVE_VC_DATAPAR)
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<datapar_task_execution_policy, Result>
-        {
-            typedef future<Result> type;
-
-            static future<Result> call()
-            {
-                try {
-                    try {
-                        throw; //-V667
-                    }
-                    catch(std::bad_alloc const& e) {
-                        boost::throw_exception(e);
-                    }
-                    catch (...) {
-                        boost::throw_exception(
-                            hpx::exception_list(boost::current_exception())
-                        );
-                    }
-                }
-                catch (...) {
-                    return hpx::make_exceptional_future<Result>(
-                        boost::current_exception());
-                }
-            }
-        };
+          : handle_exception_task_impl<Result>
+        {};
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -152,6 +166,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_vector_execution_policy are to call terminate.
+                hpx::terminate();
+            }
+
+            HPX_ATTRIBUTE_NORETURN
+            static hpx::future<Result> call(hpx::future<Result> &&)
+            {
+                hpx::terminate();
+            }
+
+            HPX_ATTRIBUTE_NORETURN
+            static hpx::future<Result> call(boost::exception_ptr const&)
+            {
                 hpx::terminate();
             }
         };
