@@ -612,7 +612,6 @@ namespace verbs
 
             LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
                     "buffsize " << decnumber(h->size())
-                    << "numbytes " << decnumber(h->numbytes())
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                     << ", chunk_flag " << decnumber(h->header_length())
                     << ", normal( " << decnumber(h->num_chunks().second) << ") "
@@ -640,7 +639,7 @@ namespace verbs
                     parcel_complete = false;
                     int index = 0;
                     LOG_EXCLUSIVE(
-                    for (serialization::serialization_chunk &c : recv_data.chunks) {
+                    for (const serialization::serialization_chunk &c : recv_data.chunks) {
                         LOG_DEBUG_MSG("recv : chunk : size " << hexnumber(c.size_)
                                 << " type " << decnumber((uint64_t)c.type_)
                                 << " rkey " << decnumber(c.rkey_)
@@ -696,7 +695,7 @@ namespace verbs
                 }
             }
             else {
-                std::size_t size = h->GetRdmaMessageLength();
+                std::size_t size = h->get_message_rdma_size();
                 rdma_memory_region *get_region = chunk_pool_->allocate_region(size);
                 get_region->set_message_length(size);
                 recv_data.zero_copy_regions.push_back(get_region);
@@ -710,11 +709,13 @@ namespace verbs
                     ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
 #endif
                 }
-                const void *remoteAddr = h->GetRdmaAddr();
+                const void *remoteAddr = h->get_message_rdma_addr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
                 recv_data.chunks.push_back(
-                    hpx::serialization::create_pointer_chunk(get_region->get_address(), size, h->GetRdmaKey()));
-                client->postRead(get_region, h->GetRdmaKey(), remoteAddr, h->GetRdmaMessageLength());
+                    hpx::serialization::create_pointer_chunk(get_region->get_address(),
+                        size, h->get_message_rdma_key()));
+                client->postRead(get_region, h->get_message_rdma_key(), remoteAddr,
+                    h->get_message_rdma_size());
             }
 
             // @TODO replace performance counter data
@@ -847,7 +848,6 @@ namespace verbs
                 header_type *h = (header_type*)recv_data.header_region->get_address();
                 LOG_DEBUG_MSG( "get completion " <<
                         "buffsize " << decnumber(h->size())
-                        << "numbytes " << decnumber(h->numbytes())
                         << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", chunk_flag " << decnumber(h->header_length())
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
@@ -1308,13 +1308,11 @@ namespace verbs
                 // create the header in the pinned memory block
                 LOG_DEBUG_MSG("Placement new for the header with piggyback copy disabled");
                 header_type *h = new(header_memory) header_type(buffer, send_data.tag);
-                h->assert_valid();
                 send_data.header_region->set_message_length(h->header_length());
 
                 LOG_DEBUG_MSG(
                         "sending, buffsize " << decnumber(h->size())
                         << "header_length " << decnumber(h->header_length())
-                        << "numbytes " << decnumber(h->numbytes())
                         << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", chunk_flag " << decnumber(h->header_length())
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
@@ -1345,9 +1343,9 @@ namespace verbs
                 }
                 else {
                     LOG_DEBUG_MSG("Main message NOT piggybacked ");
-                    h->setRdmaMessageLength(h->size());
-                    h->setRdmaKey(send_data.message_region->get_local_key());
-                    h->setRdmaAddr(send_data.message_region->get_address());
+                    h->set_message_rdma_size(h->size());
+                    h->set_message_rdma_key(send_data.message_region->get_local_key());
+                    h->set_message_rdma_addr(send_data.message_region->get_address());
                     send_data.zero_copy_regions.push_back(send_data.message_region);
                     send_data.has_zero_copy  = true;
                     LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer.data_.size())
