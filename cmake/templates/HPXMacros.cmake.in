@@ -16,8 +16,10 @@ function(hpx_check_compiler_compatibility)
     set(MESSAGE "Compilers do not match. In order to compile HPX application it is"
         " recommended to use the same compiler as you did for HPX. "
         "HPX_CXX_COMPILER=${HPX_CXX_COMPILER}, "
-        "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. To "
-        "disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
+        "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. "
+        "HPX_CXX_COMPILER_ID=${HPX_CXX_COMPILER_ID}, "
+        "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}. "
+        "To disable this message set HPX_IGNORE_COMPILER_COMPATIBILITY to On."
         )
     if (HPX_FIND_REQUIRED)
       hpx_error("${MESSAGE}")
