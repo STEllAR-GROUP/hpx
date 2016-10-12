@@ -51,6 +51,13 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
+// MSVC12 reports: warning C4520: 'hpx::actions::transfer_action<Action>' :
+// multiple default constructors specified
+#if defined(HPX_MSVC) && HPX_MSVC < 1900
+#pragma warning(push)
+#pragma warning (disable: 4520)
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct transfer_action : base_action
@@ -486,6 +493,10 @@ namespace hpx { namespace actions
             ++invocation_count_;
         }
     };
+
+#if defined(HPX_MSVC) && HPX_MSVC < 1900
+#pragma warning(pop)
+#endif
 
     template <typename Action>
     boost::atomic<std::int64_t>
