@@ -236,9 +236,18 @@ if(HPX_WITH_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
 endif()
 hpx_option(HPX_WITH_HCC BOOL
-  "Enable hcc support (default: OFF)" ADVANCED)
+  "Enable hcc support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_SYCL BOOL
-  "Enable sycl support (default: OFF)" ADVANCED)
+  "Enable sycl support (default: OFF)" OFF ADVANCED)
+
+################################################################################
+# HPX datapar configuration
+################################################################################
+hpx_option(HPX_WITH_VC_DATAPAR BOOL
+  "Enable data parallel algorithm support (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_VC_DATAPAR)
+  include(HPX_SetupVc)
+endif()
 
 ################################################################################
 # Native TLS configuration
@@ -471,6 +480,14 @@ hpx_option(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   OFF CATEGORY "AGAS" ADVANCED)
 if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
+endif()
+
+hpx_option(HPX_WITH_PARCEL_PROFILING BOOL
+  "Enable profiling data for parcels"
+  OFF CATEGORY "Parcelport" ADVANCED)
+
+if(HPX_WITH_PARCEL_PROFILING)
+  hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
 endif()
 
 ## Parcelport related build options
@@ -1142,6 +1159,11 @@ if(WIN32)
       # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
       # atomics
       hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+
+      # Update 3 allows to flag rvalue misuses and enforces strict string const-
+      # qualification conformance
+      hpx_add_target_compile_option(-Zc:rvalueCast)
+      hpx_add_target_compile_option(-Zc:strictStrings)
     endif()
 
     # Runtime type information
@@ -1400,7 +1422,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v0.5
+    develop
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
@@ -1422,6 +1444,10 @@ if(HPX_WITH_APEX)
   if(APEX_WITH_ACTIVEHARMONY)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_OTF2)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
   endif()
   if(APEX_WITH_TAU OR HPX_WITH_TAU)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES

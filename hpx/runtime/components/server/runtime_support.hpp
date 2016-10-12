@@ -253,7 +253,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, free_component,
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, free_component,
             free_component_action);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
@@ -606,7 +606,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component, typename T, typename ...Ts>
     std::vector<naming::gid_type>
-    runtime_support::bulk_create_component(std::size_t count, T v, Ts... vs)
+    runtime_support::bulk_create_component(std::size_t count, T v, Ts ... vs)
     {
         components::component_type const type =
             components::get_component_type<
@@ -651,9 +651,11 @@ namespace hpx { namespace components { namespace server
                 // Note, T and Ts can't be (non-const) references, and parameters
                 // should be moved to allow for move-only constructor argument
                 // types.
-                ids.push_back(factory->create_with_args(
-                    detail::construct_function<wrapping_type>(
-                        std::move(v), std::move(vs)...)));
+                ids.push_back(
+                    factory->create_with_args(
+                        detail::construct_function<wrapping_type>(v, vs...)
+                    )
+                );
             }
         }
         LRT_(info) << "successfully created " << count //-V128

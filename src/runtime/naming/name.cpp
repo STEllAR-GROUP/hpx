@@ -232,6 +232,11 @@ namespace hpx { namespace naming
                 return;
             }
 
+            if (ar.has_gid(*this))
+            {
+                return;
+            }
+
             HPX_ASSERT(has_credits(*this));
 
             // Request new credits from AGAS if needed (i.e. the remainder
@@ -498,43 +503,37 @@ namespace hpx { namespace naming
         // serialization
         void id_type_impl::save(serialization::output_archive& ar, unsigned) const
         {
-            if(ar.is_future_awaiting())
+            // Avoid performing side effects if the archive is not saving the
+            // data.
+            if(ar.is_preprocessing())
             {
                 preprocess_gid(ar);
+                gid_serialization_data data { *this, type_ };
+                ar << data;
                 return;
             }
 
-            // Avoid performing side effects if the archive is not saving the
-            // data.
-            if (ar.is_saving())
+            id_type_management type = type_;
+
+            gid_type new_gid;
+            if (unmanaged == type_)
             {
-                id_type_management type = type_;
-
-                gid_type new_gid;
-                if (unmanaged == type_)
-                {
-                    new_gid = *this;
-                }
-                else if(managed_move_credit == type_)
-                {
-                    // all credits will be moved to the returned gid
-                    new_gid = move_gid(const_cast<id_type_impl&>(*this));
-                    type = managed;
-                }
-                else
-                {
-                    new_gid = ar.get_new_gid(*this);
-                    HPX_ASSERT(new_gid != invalid_gid);
-                }
-
-                gid_serialization_data data { new_gid, type };
-                ar << data;
+                new_gid = *this;
+            }
+            else if(managed_move_credit == type_)
+            {
+                // all credits will be moved to the returned gid
+                new_gid = move_gid(const_cast<id_type_impl&>(*this));
+                type = managed;
             }
             else
             {
-                gid_serialization_data data { *this, type_ };
-                ar << data;
+                new_gid = ar.get_new_gid(*this);
+                HPX_ASSERT(new_gid != invalid_gid);
             }
+
+            gid_serialization_data data { new_gid, type };
+            ar << data;
         }
 
         void id_type_impl::load(serialization::input_archive& ar, unsigned)

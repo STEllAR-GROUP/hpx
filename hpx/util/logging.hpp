@@ -223,7 +223,7 @@ namespace hpx { namespace util { namespace detail
     HPX_EXPORT extern dummy_log_impl dummy_log;
 
     template <typename T>
-    inline dummy_log_impl& operator<<(dummy_log_impl& l, T) { return l; }
+    inline dummy_log_impl& operator<<(dummy_log_impl& l, T&&) { return l; }
 
     #define LAGAS_(lvl)           if(true) {} else hpx::util::detail::dummy_log
     #define LPT_(lvl)             if(true) {} else hpx::util::detail::dummy_log

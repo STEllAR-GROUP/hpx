@@ -212,6 +212,15 @@ namespace test
         return c;
     }
 
+    template <typename T>
+    inline std::vector<T> random_iota(std::size_t size)
+    {
+        std::vector<T> c(size);
+        std::iota(boost::begin(c), boost::end(c), 0);
+        std::random_shuffle(boost::begin(c), boost::end(c));
+        return c;
+    }
+
     inline std::vector<std::size_t> random_fill(std::size_t size)
     {
         std::vector<std::size_t> c(size);

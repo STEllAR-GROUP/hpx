@@ -7,17 +7,39 @@
 #define HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_VC_DATAPAR)
+#include <hpx/parallel/datapar/loop.hpp>
+#endif
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy, typename VecOnly, typename F, typename ... Iters>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::result_of<F&&(Iters...)>::type
+    loop_step(ExPolicy&&, VecOnly, F && f, Iters& ... its)
+    {
+        return hpx::util::invoke(std::forward<F>(f), (its++)...);
+    }
+
+    template <typename ExPolicy, typename Iter>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    HPX_CONSTEXPR bool loop_optimization(ExPolicy&&, Iter, Iter)
+    {
+        return false;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -27,8 +49,6 @@ namespace hpx { namespace parallel { namespace util
         template <typename Iterator>
         struct loop
         {
-            typedef Iterator type;
-
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -43,34 +63,67 @@ namespace hpx { namespace parallel { namespace util
             template <typename Begin, typename End, typename CancelToken,
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Begin call(Begin it, End end, CancelToken& tok, F && func)
+            static Begin call(Begin it, End end, CancelToken& tok, F && f)
             {
                 for (/**/; it != end; ++it)
                 {
                     if (tok.was_cancelled())
                         break;
-                    func(it);
+                    f(it);
                 }
                 return it;
             }
         };
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Begin, typename End, typename F>
+    template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(Begin begin, End end, F && f)
+    loop(ExPolicy&&, Begin begin, End end, F && f)
     {
         return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
-    template <typename Begin, typename End, typename CancelToken, typename F>
+    template <typename ExPolicy, typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(Begin begin, End end, CancelToken& tok, F && f)
+    loop(ExPolicy&&, Begin begin, End end, CancelToken& tok, F && f)
     {
         return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // Helper class to repeatedly call a function starting from a given
+        // iterator position.
+        template <typename Iter1, typename Iter2>
+        struct loop2
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename Begin1, typename End1, typename Begin2, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static std::pair<Begin1, Begin2>
+            call(Begin1 it1, End1 end1, Begin2 it2, F && f)
+            {
+                for (/**/; it1 != end1; (void) ++it1, ++it2)
+                    f(it1, it2);
+
+                return std::make_pair(std::move(it1), std::move(it2));
+            }
+        };
+    }
+
+    template <typename ExPolicy, typename VecOnly,
+        typename Begin1, typename End1, typename Begin2, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
+    loop2(ExPolicy&&, VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
+    {
+        return detail::loop2<Begin1, Begin2>::call(begin1, end1, begin2,
+            std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         // Helper class to repeatedly call a function a given number of times
@@ -79,8 +132,6 @@ namespace hpx { namespace parallel { namespace util
         template <typename Iterator>
         struct loop_n
         {
-            typedef Iterator type;
-
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
@@ -94,8 +145,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename Iter, typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            static Iter call(Iter it, std::size_t count, CancelToken& tok,
-                F && f)
+            static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
@@ -106,22 +156,79 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(bool value)
+        {
+            return value ? 1 : 0;
+        }
+
+        template <typename ExPolicy, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        T const& extract_value(ExPolicy&&, T const& v)
+        {
+            return v;
+        }
+
+        template <typename ExPolicy, typename F, typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        T const& accumulate_values(ExPolicy&&, F &&, T const& v)
+        {
+            return v;
+        }
+
+        template <typename ExPolicy, typename F, typename T, typename T1>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        T accumulate_values(ExPolicy&&, F && f, T && v, T1 && init)
+        {
+            return std::forward<F>(f)(std::forward<T1>(init), std::forward<T>(v));
+        }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename F>
+    template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(Iter it, std::size_t count, F && f)
+    loop_n(ExPolicy &&, Iter it, std::size_t count, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
-    template <typename Iter, typename CancelToken, typename F>
+    template <typename ExPolicy, typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
+    loop_n(ExPolicy &&, Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+//     namespace detail
+//     {
+//         ///////////////////////////////////////////////////////////////////////
+//         // Helper class to repeatedly call a function starting from a given
+//         // iterator position.
+//         template <typename Iter1, typename Iter2>
+//         struct loop2_n
+//         {
+//             ///////////////////////////////////////////////////////////////////
+//             template <typename Begin1, typename Begin2, typename F>
+//             HPX_HOST_DEVICE HPX_FORCEINLINE
+//             static std::pair<Begin1, Begin2>
+//             call(Begin1 it1, std::size_t count, Begin2 it2, F && f)
+//             {
+//                 for (/**/; count != 0; (void) ++it1, ++it2, --count)
+//                     f(it1, it2);
+//
+//                 return std::make_pair(it1, it2);
+//             }
+//         };
+//     }
+//
+//     template <typename ExPolicy, typename Begin1, typename Begin2, typename F>
+//     HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
+//     loop2_n(ExPolicy&&, Begin1 begin1, std::size_t count, Begin2 begin2, F && f)
+//     {
+//         return detail::loop2_n<Begin1, Begin2>::call(begin1, count, begin2,
+//             std::forward<F>(f));
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

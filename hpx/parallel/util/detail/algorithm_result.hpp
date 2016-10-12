@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unused.hpp>
@@ -31,12 +31,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return T();
         }
 
-        static type get(T && t)
+        template <typename T_>
+        static type get(T_ && t)
         {
             return t;
         }
 
-        static type get(hpx::future<T> && t)
+        template <typename T_>
+        static type get(hpx::future<T_> && t)
         {
             return t.get();
         }
@@ -53,13 +55,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         static void get(hpx::util::unused_type) {}
 
-        static type get(hpx::future<void> && t)
+        static void get(hpx::future<void> && t)
         {
             t.get();
         }
 
         template <typename T>
-        static type get(hpx::future<T> && t)
+        static void get(hpx::future<T> && t)
         {
             t.get();
         }
@@ -158,6 +160,56 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             return hpx::future<void>(std::move(t));
         }
     };
+
+#if defined(HPX_HAVE_VC_DATAPAR)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct algorithm_result_impl<datapar_task_execution_policy, T>
+    {
+        // The return type of the initiating function.
+        typedef hpx::future<T> type;
+
+        // Obtain initiating function's return type.
+        static type get(T && t)
+        {
+            return hpx::make_ready_future(std::move(t));
+        }
+
+        static type get(hpx::future<T> && t)
+        {
+            return std::move(t);
+        }
+    };
+
+    template <>
+    struct algorithm_result_impl<datapar_task_execution_policy, void>
+    {
+        // The return type of the initiating function.
+        typedef hpx::future<void> type;
+
+        // Obtain initiating function's return type.
+        static type get()
+        {
+            return hpx::make_ready_future();
+        }
+
+        static type get(hpx::util::unused_type)
+        {
+            return hpx::make_ready_future();
+        }
+
+        static type get(hpx::future<void> && t)
+        {
+            return std::move(t);
+        }
+
+        template <typename T>
+        static type get(hpx::future<T> && t)
+        {
+            return hpx::future<void>(std::move(t));
+        }
+    };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Parameters, typename T>

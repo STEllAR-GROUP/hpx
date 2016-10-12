@@ -64,6 +64,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             mutex_type* mtx = l.mutex();
 
+            lower_limit_ = (std::max)(lower_limit, lower_limit_);
+
             // touch upon all threads
             std::int64_t count = static_cast<std::int64_t>(cond_.size(l));
             for (/**/; count > 0; --count)
@@ -74,7 +76,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 l = std::unique_lock<mutex_type>(*mtx);
             }
-            lower_limit_ = (std::max)(lower_limit, lower_limit_);
         }
 
         std::int64_t signal_all(std::unique_lock<mutex_type> l)

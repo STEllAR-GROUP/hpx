@@ -110,14 +110,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first1, first2), count1,
-                    [f, tok](zip_iterator it, std::size_t part_count)
-                        mutable -> bool
+                auto f1 =
+                    [f, tok, policy](
+                        zip_iterator it, std::size_t part_count
+                    ) mutable -> bool
                     {
                         util::loop_n(
-                            it, part_count, tok,
+                            policy, it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
                                 using hpx::util::get;
@@ -126,7 +125,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first1, first2), count1,
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
@@ -281,14 +285,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first1, first2), count,
-                    [f, tok](zip_iterator it, std::size_t part_count)
-                        mutable -> bool
+                auto f1 =
+                    [f, tok, policy](
+                        zip_iterator it, std::size_t part_count
+                    ) mutable -> bool
                     {
                         util::loop_n(
-                            it, part_count, tok,
+                            policy, it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
                                 reference t = *curr;
@@ -297,7 +300,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     tok.cancel();
                             });
                         return !tok.was_cancelled();
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first1, first2), count,
+                    std::move(f1),
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(

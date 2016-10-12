@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

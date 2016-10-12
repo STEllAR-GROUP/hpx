@@ -313,11 +313,7 @@ namespace hpx { namespace util
 
             typedef IteratorTuple iterator_tuple_type;
 
-            HPX_HOST_DEVICE iterator_tuple_type get_iterator_tuple()
-            {
-                return iterators_;
-            }
-            HPX_HOST_DEVICE iterator_tuple_type const& get_iterator_tuple() const
+            HPX_HOST_DEVICE iterator_tuple_type get_iterator_tuple() const
             {
                 return iterators_;
             }

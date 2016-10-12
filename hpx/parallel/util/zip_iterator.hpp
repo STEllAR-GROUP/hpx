@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     {
         typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
 
-        iterator_tuple_type const& t = zipiter.get_iterator_tuple();
+        iterator_tuple_type t = zipiter.get_iterator_tuple();
         return std::make_pair(hpx::util::get<0>(t), hpx::util::get<1>(t));
     }
 

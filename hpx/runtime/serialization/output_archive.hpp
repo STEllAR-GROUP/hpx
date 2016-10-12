@@ -27,6 +27,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <unordered_map>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -38,20 +39,15 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+        typedef std::unordered_map<naming::gid_type, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
             std::uint32_t flags = 0U,
-            std::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr,
-            new_gids_map* new_gids = nullptr)
+            binary_filter* filter = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
-            , dest_locality_id_(dest_locality_id)
-            , new_gids_(new_gids)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -74,14 +70,14 @@ namespace hpx { namespace serialization
             }
         }
 
-        bool is_saving() const
+        void set_split_gids(split_gids_type& split_gids)
         {
-            return buffer_->is_saving();
+            split_gids_ = &split_gids;
         }
 
-        bool is_future_awaiting() const
+        bool is_preprocessing() const
         {
-            return buffer_->is_future_awaiting();
+            return buffer_->is_preprocessing();
         }
 
         template <typename Future>
@@ -91,25 +87,39 @@ namespace hpx { namespace serialization
                 *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
-        std::uint32_t get_dest_locality_id() const
-        {
-            return dest_locality_id_;
-        }
-
         std::size_t bytes_written() const
         {
             return size_;
         }
 
         void add_gid(naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid);
+            naming::gid_type const & split_gid);
+
+        bool has_gid(naming::gid_type const & gid);
 
         naming::gid_type get_new_gid(naming::gid_type const & gid);
+
+        std::size_t get_num_chunks() const
+        {
+            return buffer_->get_num_chunks();
+        }
 
         // this function is needed to avoid a MSVC linker error
         std::size_t current_pos() const
         {
             return basic_archive<output_archive>::current_pos();
+        }
+
+        void reset()
+        {
+            buffer_->reset();
+            pointer_tracker_.clear();
+            basic_archive<output_archive>::reset();
+        }
+
+        void flush()
+        {
+            buffer_->flush();
         }
 
     private:
@@ -298,8 +308,7 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        std::uint32_t dest_locality_id_;
-        new_gids_map * new_gids_;
+        split_gids_type * split_gids_;
     };
 }}
 

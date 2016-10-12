@@ -168,10 +168,10 @@ namespace hpx { namespace components
         // Return whether the given object was migrated, if it was not
         // migrated, it also returns a pinned pointer.
         static std::pair<bool, components::pinned_ptr>
-        was_object_migrated(hpx::id_type const& id,
+        was_object_migrated(hpx::naming::gid_type const& id,
             naming::address::address_type lva)
         {
-            return agas::was_object_migrated(id.get_gid(),
+            return agas::was_object_migrated(id,
                 [lva]() -> components::pinned_ptr
                 {
                     return components::pinned_ptr::create<this_component_type>(lva);

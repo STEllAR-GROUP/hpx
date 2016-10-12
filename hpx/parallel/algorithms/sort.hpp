@@ -19,7 +19,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/traits/projected.hpp>
@@ -46,52 +46,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R>
-        struct handle_sort_exception
-        {
-            static hpx::future<R> call(hpx::future<R> f)
-            {
-                HPX_ASSERT(f.has_exception());
-
-                // Intel complains if this is not explicitly moved
-                return std::move(f);
-            }
-
-            static hpx::future<R> call(boost::exception_ptr const& e)
-            {
-                try {
-                    boost::rethrow_exception(e);
-                }
-                catch (std::bad_alloc const&) {
-                    // rethrow bad_alloc
-                    return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
-                }
-                catch (...) {
-                    // package up everything else as an exception_list
-                    return hpx::make_exceptional_future<R>(
-                        exception_list(e));
-                }
-            }
-        };
-
-        template <typename R>
-        struct handle_sort_exception<parallel_vector_execution_policy, R>
-        {
-            HPX_ATTRIBUTE_NORETURN
-            static hpx::future<R> call(hpx::future<void> &&)
-            {
-                hpx::terminate();
-            }
-
-            HPX_ATTRIBUTE_NORETURN
-            static hpx::future<R> call(boost::exception_ptr const&)
-            {
-                hpx::terminate();
-            }
-        };
 
         ///////////////////////////////////////////////////////////////////////
         // std::is_sorted is not available on all supported platforms yet
@@ -263,13 +217,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::ref(policy), first, last, comp);
             }
             catch (...) {
-                return detail::handle_sort_exception<ExPolicy, RandomIt>::call(
+                return detail::handle_exception<ExPolicy, RandomIt>::call(
                     boost::current_exception());
             }
 
             if (result.has_exception())
             {
-                return detail::handle_sort_exception<ExPolicy, RandomIt>::call(
+                return detail::handle_exception<ExPolicy, RandomIt>::call(
                     std::move(result));
             }
 

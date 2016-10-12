@@ -8,6 +8,7 @@
 #if !defined(HPX_F646702C_6556_48FA_BF9D_3E7959983122)
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/current_function.hpp>
@@ -47,10 +48,9 @@ struct fixture
 
   public:
     fixture(std::ostream& stream):
-      stream_(stream), sanity_failures_(0), test_failures_(0)
+      stream_(stream), sanity_failures_(0), test_failures_(0),
+      mutex_(BOOST_DETAIL_SPINLOCK_INIT)
     {
-        mutex_type l = BOOST_DETAIL_SPINLOCK_INIT;
-        mutex_ = l;
     }
 
     void increment(counter_type c)

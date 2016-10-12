@@ -114,11 +114,15 @@ namespace hpx { namespace lcos
         ///               back to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco_with_value,
             set_value_nonvirt, set_value_action);
+        HPX_DEFINE_COMPONENT_ACTION(base_lco_with_value,
+            set_value_nonvirt, set_value_non_direct_action);
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco_with_value,
             get_value_nonvirt, get_value_action);
+        HPX_DEFINE_COMPONENT_ACTION(base_lco_with_value,
+            get_value_nonvirt, get_value_non_direct_action);
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action

@@ -22,23 +22,26 @@ namespace hpx { namespace serialization
     {
         virtual ~erased_output_container() {}
 
-        virtual bool is_saving() const { return false; }
-        virtual bool is_future_awaiting() const = 0;
+        virtual bool is_preprocessing() const { return false; }
         virtual void await_future(
             hpx::lcos::detail::future_data_refcnt_base & future_data) = 0;
+        virtual bool has_gid(naming::gid_type const & gid) = 0;
         virtual void add_gid(
             naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid) = 0;
+            naming::gid_type const & split_gid) = 0;
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;
+        virtual void reset() = 0;
+        virtual std::size_t get_num_chunks() const = 0;
+        virtual void flush() = 0;
     };
 
     struct erased_input_container
     {
         virtual ~erased_input_container() {}
 
-        virtual bool is_saving() const { return false; }
+        virtual bool is_preprocessing() const { return false; }
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void load_binary(void * address, std::size_t count) = 0;
         virtual void load_binary_chunk(void * address, std::size_t count) = 0;

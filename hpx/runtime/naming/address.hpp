@@ -32,34 +32,32 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         address()
-          : locality_(), type_(components::component_invalid), address_(0), offset_(0)
+          : locality_(), type_(components::component_invalid), address_(0)
         {}
 
-        address(gid_type const& l,
+        explicit address(gid_type const& l,
                 component_type t = components::component_invalid)
-          : locality_(l), type_(t), address_(0), offset_(0)
+          : locality_(l), type_(t), address_(0)
         {}
 
-        address(gid_type const& l, component_type t, void* lva,
-                std::uint64_t offset = 0)
+        address(gid_type const& l, component_type t, void* lva)
           : locality_(l), type_(t),
-            address_(reinterpret_cast<address_type>(lva)),
-            offset_(offset)
+            address_(reinterpret_cast<address_type>(lva))
         {}
 
         address(gid_type const& l, component_type t, address_type a)
-          : locality_(l), type_(t), address_(a), offset_(0)
+          : locality_(l), type_(t), address_(a)
         {}
 
         // local only addresses
         explicit address(void* lva,
                 component_type t = components::component_invalid)
           : type_(t),
-            address_(reinterpret_cast<address_type>(lva)), offset_(0)
+            address_(reinterpret_cast<address_type>(lva))
         {}
 
         explicit address(address_type a)
-          : type_(components::component_invalid), address_(a), offset_(0)
+          : type_(components::component_invalid), address_(a)
         {}
 
         explicit operator bool() const HPX_NOEXCEPT
@@ -74,30 +72,9 @@ namespace hpx { namespace naming
                    lhs.locality_ == rhs.locality_;
         }
 
-        address_type lva(naming::gid_type const& gid,
-                     naming::gid_type const& gidbase) const
-        {
-            address_type l = address_;
-            l += (gid.get_lsb() - gidbase.get_lsb()) * offset_;
-            return l;
-        }
-
-        address resolve(naming::gid_type const& gid,
-                    naming::gid_type const& gidbase) const
-        {
-            address a;
-            a.locality_ = locality_;
-            a.type_     = type_;
-            a.address_  = a.lva(gid, gidbase);
-            a.offset_   = 0;
-
-            return a;
-        }
-
         gid_type locality_;     /// locality: ip4 address/port number
         component_type type_;   /// component type this address is referring to
         address_type address_;  /// address (sequence number)
-        address_type offset_;   /// offset
 
     private:
         friend HPX_EXPORT std::ostream& operator<<(std::ostream&, address const&);

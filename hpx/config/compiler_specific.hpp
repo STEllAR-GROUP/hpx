@@ -60,11 +60,12 @@
 #endif
 
 #if defined(_MSC_VER)
-#   define HPX_MSVC _MSC_VER
-#   define HPX_WINDOWS
-#   if defined(__NVCC__)
-#       define HPX_SINGLE_INHERITANCE __single_inheritance
-#   endif
+#  define HPX_MSVC _MSC_VER
+#  define HPX_WINDOWS
+#  if defined(__NVCC__)
+#    define HPX_SINGLE_INHERITANCE __single_inheritance
+#  endif
+#  define HPX_CDECL __cdecl
 #endif
 
 #if defined(__MINGW32__)
@@ -82,6 +83,10 @@
 
 #if !defined(HPX_SINGLE_INHERITANCE)
 #define HPX_SINGLE_INHERITANCE /* empty */
+#endif
+
+#if !defined(HPX_CDECL)
+#define HPX_CDECL
 #endif
 
 #endif

@@ -80,14 +80,17 @@ void test(T min, T max)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        std::vector<hpx::serialization::serialization_chunk> chunks;
+        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<T> os;
         for(T c = min; c < max; ++c)
         {
             os.push_back(c);
         }
         oarchive << os;
-        hpx::serialization::input_archive iarchive(buffer);
+        std::size_t size = oarchive.bytes_written();
+
+        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
         std::vector<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
@@ -98,14 +101,17 @@ void test(T min, T max)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        std::vector<hpx::serialization::serialization_chunk> chunks;
+        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<A<T> > os;
         for(T c = min; c < max; ++c)
         {
             os.push_back(c);
         }
         oarchive << os;
-        hpx::serialization::input_archive iarchive(buffer);
+        std::size_t size = oarchive.bytes_written();
+
+        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
         std::vector<A<T> > is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
@@ -121,14 +127,17 @@ void test_fp(T min, T max)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        std::vector<hpx::serialization::serialization_chunk> chunks;
+        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<T> os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.push_back(c);
         }
         oarchive << os;
-        hpx::serialization::input_archive iarchive(buffer);
+        std::size_t size = oarchive.bytes_written();
+
+        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
         std::vector<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
@@ -139,14 +148,17 @@ void test_fp(T min, T max)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        std::vector<hpx::serialization::serialization_chunk> chunks;
+        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         std::vector<A<T> > os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.push_back(c);
         }
         oarchive << os;
-        hpx::serialization::input_archive iarchive(buffer);
+        std::size_t size = oarchive.bytes_written();
+
+        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
         std::vector<A<T> > is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());

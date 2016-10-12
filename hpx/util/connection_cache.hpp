@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <list>
 #include <map>
 #include <memory>

@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -122,8 +123,6 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-    struct HPX_API_EXPORT base_action;
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -188,7 +187,8 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked without
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(naming::address::address_type lva) = 0;
+            get_thread_function(naming::id_type&& target,
+                naming::address::address_type lva) = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality, the arguments, and
@@ -206,7 +206,8 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked with
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(std::unique_ptr<continuation> cont,
+            get_thread_function(naming::id_type&& target,
+                std::unique_ptr<continuation> cont,
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
@@ -228,17 +229,17 @@ namespace hpx { namespace actions
         virtual bool does_termination_detection() const = 0;
 
         /// Perform thread initialization
-        virtual void schedule_thread(naming::id_type const& target,
+        virtual void schedule_thread(naming::gid_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
+            std::size_t num_thread) = 0;
 
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
-            naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state, std::size_t num_thread) = 0;
+            naming::gid_type const& target, naming::address::address_type lva,
+            std::size_t num_thread) = 0;
 
         /// Return whether the given object was migrated
         virtual std::pair<bool, components::pinned_ptr>
-            was_object_migrated(hpx::id_type const&,
+            was_object_migrated(hpx::naming::gid_type const&,
                 naming::address::address_type) = 0;
 
         /// Return a pointer to the filter to be used while serializing an
@@ -262,6 +263,15 @@ namespace hpx { namespace actions
         {}
 
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
+
+        virtual void load_schedule(serialization::input_archive& ar,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread) = 0;
+
+        virtual void load_schedule(serialization::input_archive& ar,
+            std::unique_ptr<continuation> cont,
+            naming::gid_type&& target, naming::address_type lva,
+            std::size_t num_thread) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////

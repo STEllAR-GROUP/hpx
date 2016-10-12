@@ -88,15 +88,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    [pred, tok](Iter part_begin,
-                        std::size_t part_count) mutable -> bool
+                auto f1 =
+                    [pred, tok, policy](
+                        Iter part_begin, std::size_t part_count
+                    ) mutable -> bool
                     {
                         bool fst_bool = pred(*part_begin);
                         if (part_count == 1)
                             return fst_bool;
-                        util::loop_n(++part_begin, --part_count, tok,
+
+                        util::loop_n(
+                            policy, ++part_begin, --part_count, tok,
                             [&fst_bool, &pred, &tok](Iter const& a) {
                                 if (fst_bool != pred(*a))
                                 {
@@ -106,8 +108,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel();
                                 }
                             });
+
                         return fst_bool;
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy), first, count,
+                    std::move(f1),
                     [tok](std::vector<hpx::future<bool> > && results) -> bool
                     {
                         if (tok.was_cancelled()) return false;

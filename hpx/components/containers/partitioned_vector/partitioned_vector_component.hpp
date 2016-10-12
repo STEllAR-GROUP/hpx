@@ -42,7 +42,7 @@ namespace hpx { namespace server
     /// \brief This is the basic wrapper class for stl vector.
     ///
     /// This contain the implementation of the partitioned_vector_partition's
-    /// fcomponent unctionality.
+    /// component functionality.
     template <typename T, typename Data>
     class partitioned_vector
       : public components::locking_hook<

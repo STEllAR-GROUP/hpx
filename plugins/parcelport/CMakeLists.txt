@@ -63,7 +63,7 @@ macro(add_parcelport name)
       ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
       CACHE INTERNAL "" FORCE)
 
-    set(HPX_LIBRARIES ${HPX_LIBRARIES} ${${name}_DEPENDENCIES})
+    hpx_libraries(${${name}_DEPENDENCIES})
 
   else()
     hpx_debug("adding parcelport plugin: ${name}")

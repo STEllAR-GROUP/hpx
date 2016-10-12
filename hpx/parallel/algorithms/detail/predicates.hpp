@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -17,6 +18,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -222,17 +224,43 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct equal_to
     {
         template <typename T1, typename T2>
-        bool operator()(T1 const& t1, T2 const& t2) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 == t2)
         {
             return t1 == t2;
         }
+    };
+
+    template <typename Value>
+    struct compare_to
+    {
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        compare_to(Value && val)
+          : value_(std::move(val))
+        {}
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        compare_to(Value const& val)
+          : value_(val)
+        {}
+
+        template <typename T>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        auto operator()(T const& t) const
+        ->  decltype(std::declval<Value>() == t)
+        {
+            return value_ == t;
+        }
+
+        Value value_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct less
     {
         template <typename T1, typename T2>
-        bool operator()(T1 const& t1, T2 const& t2) const
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 < t2)
         {
             return t1 < t2;
         }
@@ -255,6 +283,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         T operator()(T const& t1, T const& t2) const
         {
             return (std::max)(t1, t2);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct plus
+    {
+        template <typename T1, typename T2>
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 + t2)
+        {
+            return t1 + t2;
+        }
+    };
+
+    struct minus
+    {
+        template <typename T1, typename T2>
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 - t2)
+        {
+            return t1 - t2;
+        }
+    };
+
+    struct multiplies
+    {
+        template <typename T1, typename T2>
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 * t2)
+        {
+            return t1 * t2;
+        }
+    };
+
+    struct divides
+    {
+        template <typename T1, typename T2>
+        auto operator()(T1 const& t1, T2 const& t2) const
+        ->  decltype(t1 / t2)
+        {
+            return t1 / t2;
         }
     };
 }}}}

@@ -20,9 +20,9 @@
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <bitset>
+#    include <bitset>
 #  else
-#include <boost/dynamic_bitset.hpp>
+#    include <boost/dynamic_bitset.hpp>
 #  endif
 #endif
 

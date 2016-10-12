@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
@@ -112,38 +113,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
+
+                auto f3 =
+                    [op, policy](
+                        zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> curr, hpx::shared_future<T> next
+                    )
+                    {
+                        next.get();     // rethrow exceptions
+
+                        T val = curr.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+
+                        util::loop_n(
+                            policy, dst, part_size,
+                            [&op, &val](OutIter it)
+                            {
+                                *it = hpx::util::invoke(op, *it, val);
+                            });
+                    };
+
                 return util::scan_partitioner<ExPolicy, OutIter, T>::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv](zip_iterator part_begin, std::size_t part_size)
-                        -> T
+                    [op, conv](
+                        zip_iterator part_begin, std::size_t part_size
+                    ) -> T
                     {
-                        T part_init = conv(get<0>(*part_begin));
+                        T part_init =
+                            hpx::util::invoke(conv, get<0>(*part_begin));
                         get<1>(*part_begin++) = part_init;
+
+                        auto iters = part_begin.get_iterator_tuple();
                         return sequential_transform_inclusive_scan_n(
-                            get<0>(part_begin.get_iterator_tuple()),
+                            get<0>(iters),
                             part_size-1,
-                            get<1>(part_begin.get_iterator_tuple()),
+                            get<1>(iters),
                             conv, part_init, op);
                     },
                     // step 2 propagates the partition results from left
                     // to right
                     hpx::util::unwrapped(op),
                     // step 3 runs final accumulation on each partition
-                    [op](zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<T> curr, hpx::shared_future<T> next)
-                    {
-                        next.get();     // rethrow exceptions
-
-                        T val = curr.get();
-                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
-                        util::loop_n(dst, part_size,
-                            [&op, &val](OutIter it)
-                            {
-                                *it = op(*it, val);
-                            });
-                    },
+                    std::move(f3),
                     // step 4 use this return value
                     [final_dest](std::vector<hpx::shared_future<T> > &&,
                         std::vector<hpx::future<void> > &&)

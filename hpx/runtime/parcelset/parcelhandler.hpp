@@ -67,8 +67,10 @@ namespace hpx { namespace parcelset
                 p.set_source_id(naming::id_type(get_locality(),
                     naming::id_type::unmanaged));
 
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             // set the current local time for this locality
             p.set_start_time(get_current_time());
+#endif
         }
 
         typedef lcos::local::spinlock mutex_type;
@@ -105,6 +107,8 @@ namespace hpx { namespace parcelset
         std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
         void initialize(naming::resolver_client &resolver, applier::applier *applier);
+
+        void flush_parcels();
 
         /// \brief Stop all parcel ports associated with this parcelhandler
         void stop(bool blocking = true);

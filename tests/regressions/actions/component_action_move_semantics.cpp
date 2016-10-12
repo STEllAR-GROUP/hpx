@@ -171,7 +171,7 @@ void test_actions()
                     action_move_semantics::return_test_non_movable_action,
                 non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }
@@ -237,14 +237,14 @@ void test_direct_actions()
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
 
             HPX_TEST_EQ((
                 move_object<
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
         }
 
         // test movable_object()
@@ -281,7 +281,7 @@ void test_direct_actions()
                     action_move_semantics::return_test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }

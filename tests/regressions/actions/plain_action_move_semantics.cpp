@@ -432,7 +432,7 @@ void test_object_actions()
                 return_object<
                     return_non_movable_object_action, non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }
@@ -483,12 +483,12 @@ void test_object_direct_actions()
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_direct_action,
                 non_movable_object>(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
 
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_direct_action,
                 non_movable_object>(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
         }
 
         // test std::size_t(movable_object)
@@ -527,12 +527,12 @@ void test_object_direct_actions()
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_value_direct_action,
                 non_movable_object>(id)
-            ), 4u); // transfer_action + bind + function + call
+            ), 2u); // transfer_action + call
 
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_value_direct_action,
                 non_movable_object>(id)
-            ), 4u); // transfer_action + bind + function + call
+            ), 2u); // transfer_action + call
         }
 
         // test movable_object()
@@ -565,7 +565,7 @@ void test_object_direct_actions()
                 return_object<
                     return_non_movable_object_direct_action, non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }

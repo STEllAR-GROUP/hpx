@@ -42,9 +42,7 @@ namespace hpx { namespace util
         data_type type_;
         data data_;
 
-#if !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
         HPX_EXPORT void init_from_alternative_name(char const* altname);
-#endif
 
     public:
         thread_description() HPX_NOEXCEPT
