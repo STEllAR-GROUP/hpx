@@ -44,6 +44,7 @@
 
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
+#include <hpx/lcos/detail/barrier_node.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif

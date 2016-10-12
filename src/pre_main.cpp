@@ -14,6 +14,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/detail/barrier_node.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
