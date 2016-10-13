@@ -26,8 +26,3 @@ HPX_REGISTER_ACTION_ID(
   , hpx::actions::hpx_lcos_server_barrier_create_component_action_id
 )
 
-HPX_REGISTER_ACTION_ID(
-    hpx::lcos::server::barrier::set_event_non_direct_action
-  , hpx_lcos_server_barrier_set_event_non_direct_action
-  , hpx::actions::hpx_lcos_server_barrier_set_event_non_direct_action_id
-)

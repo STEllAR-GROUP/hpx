@@ -122,10 +122,5 @@ HPX_REGISTER_ACTION_DECLARATION(
   , hpx_lcos_server_barrier_create_component_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::server::barrier::set_event_non_direct_action
-  , hpx_lcos_server_barrier_set_event_non_direct_action
-)
-
 #endif
 
