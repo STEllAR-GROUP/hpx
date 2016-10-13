@@ -124,7 +124,13 @@ namespace hpx { namespace lcos
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_event_action, base_set_event_action)
 HPX_REGISTER_ACTION_DECLARATION(
+    hpx::lcos::base_lco::set_event_non_direct_action,
+    base_set_event_non_direct_action)
+HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, base_set_exception_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::lcos::base_lco::set_exception_non_direct_action,
+    base_set_exception_non_direct_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::connect_action, base_connect_action)
 HPX_REGISTER_ACTION_DECLARATION(
@@ -135,7 +141,13 @@ HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
+    hpx::lcos::base_lco::set_event_non_direct_action, "lco_set_value_action",
+    std::size_t(-1), std::size_t(-1))
+HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
+    std::size_t(-1), std::size_t(-1))
+HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
+    hpx::lcos::base_lco::set_exception_non_direct_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 
 #endif

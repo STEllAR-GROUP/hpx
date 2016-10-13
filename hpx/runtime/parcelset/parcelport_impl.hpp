@@ -19,6 +19,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
@@ -173,18 +174,27 @@ namespace hpx { namespace parcelset
             return success;
         }
 
-        void stop(bool blocking = true)
+        void flush_parcels()
         {
             do_background_work(0);
 
             // make sure no more work is pending, wait for service pool to get
             // empty
-            while(operations_in_flight_ != 0)
+
+            while(operations_in_flight_ != 0 || get_pending_parcels_count(false) != 0)
             {
+                do_background_work(0);
                 if(threads::get_self_ptr())
+                {
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "parcelport_impl::stop");
+                }
             }
+        }
+
+        void stop(bool blocking = true)
+        {
+            flush_parcels();
 
             io_service_pool_.stop();
             if (blocking) {
@@ -934,7 +944,7 @@ namespace hpx { namespace parcelset
         typedef hpx::lcos::local::spinlock mutex_type;
 
         int archive_flags_;
-        boost::atomic<std::size_t> operations_in_flight_;
+        hpx::util::atomic_count operations_in_flight_;
 
         boost::atomic<std::size_t> num_thread_;
         std::size_t const max_background_thread_;

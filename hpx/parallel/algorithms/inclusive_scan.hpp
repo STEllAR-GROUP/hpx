@@ -141,10 +141,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         T part_init = get<0>(*part_begin);
                         get<1>(*part_begin++) = part_init;
+                        auto iters = part_begin.get_iterator_tuple();
                         return sequential_inclusive_scan_n(
-                            get<0>(part_begin.get_iterator_tuple()),
+                            get<0>(iters),
                             part_size-1,
-                            get<1>(part_begin.get_iterator_tuple()),
+                            get<1>(iters),
                             part_init, op);
                     },
                     // step 2 propagates the partition results from left

@@ -7,6 +7,7 @@
 #define HPX_ACTIONS_CONTINUATION_IMPL_HPP
 
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/util/decay.hpp>

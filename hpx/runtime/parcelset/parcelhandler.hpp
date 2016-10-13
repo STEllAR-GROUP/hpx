@@ -108,6 +108,8 @@ namespace hpx { namespace parcelset
 
         void initialize(naming::resolver_client &resolver, applier::applier *applier);
 
+        void flush_parcels();
+
         /// \brief Stop all parcel ports associated with this parcelhandler
         void stop(bool blocking = true);
 

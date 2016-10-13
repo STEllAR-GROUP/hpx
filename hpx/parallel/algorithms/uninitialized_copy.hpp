@@ -80,10 +80,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         mutable -> partition_result_type
                     {
                         using hpx::util::get;
-                        FwdIter const& dest = get<1>(t.get_iterator_tuple());
+                        auto iters = t.get_iterator_tuple();
+                        FwdIter dest = get<1>(iters);
                         return std::make_pair(dest,
                             sequential_uninitialized_copy_n(
-                                get<0>(t.get_iterator_tuple()), part_size,
+                                get<0>(iters), part_size,
                                 dest, tok));
                     },
                     // finalize, called once if no error occurred

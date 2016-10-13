@@ -17,6 +17,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <cstddef>
 #include <cstdint>

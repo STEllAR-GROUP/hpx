@@ -101,6 +101,7 @@ set(tests
     sort
     sort_by_key
     sort_exceptions
+    stable_partition
     swapranges
     transform
     transform_binary

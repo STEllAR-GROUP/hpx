@@ -146,10 +146,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     [op](zip_iterator part_begin, std::size_t part_size) -> T
                     {
                         T part_init = get<0>(*part_begin++);
+
+                        auto iters = part_begin.get_iterator_tuple();
                         return sequential_exclusive_scan_n(
-                            get<0>(part_begin.get_iterator_tuple()),
+                            get<0>(iters),
                             part_size - 1,
-                            get<1>(part_begin.get_iterator_tuple()),
+                            get<1>(iters),
                             part_init, op);
                     },
                     // step 2 propagates the partition results from left

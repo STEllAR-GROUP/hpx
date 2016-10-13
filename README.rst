@@ -7,24 +7,27 @@
  HPX
 *****
 
-HPX is a general purpose C++ runtime system for parallel and distributed
-applications of any scale. Even if that's quite a mouthful, we mean every
-word of it!
+HPX is a C++ Standards Library for Concurrency and Parallelism. It implements
+all of the corresponding facilities as defined by the C++ Standard.
+Additionally, in HPX we implement functionalities proposed as part of the
+ongoing C++ standardization process. We also extend the C++ Standard APIs to
+the distributed case.
 
 The goal of HPX is to create a high quality, freely available, open source
-implementation of the ParalleX model for conventional systems, such as
+implementation of a new programming model for conventional systems, such as
 classic Linux based Beowulf clusters or multi-socket highly parallel SMP
 nodes. At the same time, we want to have a very modular and well designed
 runtime system architecture which would allow us to port our implementation
 onto new computer system architectures. We want to use real world applications
 to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
-smooth migration path for developers. The API exposed by HPX is modelled
-after the interfaces defined by the C++11/14 ISO standard and adheres to the
-programming guidelines used by the Boost collection of C++ libraries. We
-aim improve the scalability of today's applications and to expose new
-levels of parallelism which are necessary to take advantage
-of the exascale systems of the future.
+smooth migration path for developers.
+
+The API exposed by HPX is not only modelled after the interfaces defined by the
+C++11/14 ISO standard, it also adheres to the programming guidelines used by the
+Boost collection of C++ libraries. We aim improve the scalability of today's
+applications and to expose new levels of parallelism which are necessary to
+take advantage of the exascale systems of the future.
 
 ****************************
 What's so special about HPX?
@@ -32,7 +35,7 @@ What's so special about HPX?
 
 * HPX exposes an uniform, standards-oriented API for ease of programming
   parallel and distributed applications.
-* It enables programmers to write fully asynchronous  code using hundreds
+* It enables programmers to write fully asynchronous code using hundreds
   of millions of threads.
 * HPX provides unified syntax and semantics for local and remote operations.
 * HPX makes concurrency manageable with dataflow and future based
@@ -61,10 +64,12 @@ In publications this release of HPX can be cited as: |zenodo_doi|.
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
 `here <http://stellar-group.github.io/hpx/docs/html/>`_. We also have a
-single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
+single-page version of the documentation
+`here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.99) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.99) which can be
+`downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
@@ -84,7 +89,8 @@ In any case, if you happen to run into problems we very much encourage and appre
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
-Also, if you have any questions feel free to ask it over at `stackoverflow <http://stackoverflow.com>`_
+Also, if you have any questions feel free to ask it over at
+`stackoverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
 ********************
@@ -227,15 +233,17 @@ Windows
    "Where to build the binaries:", enter the full path to the build folder you
    created in step 2.
 
-5) Add CMake variable definitions (if any) by clicking the "Add Entry" button and selecting type
-   "String". Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
-   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is
-   located as HWLOC_ROOT.
+5) Add CMake variable definitions (if any) by clicking the "Add Entry" button
+   and selecting type "String". Most probably you will need to at least add the
+   directories where `Boost <http://www.boost.org>`_ is located as BOOST_ROOT
+   and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is located as
+   HWLOC_ROOT.
 
 6) Press the "Configure" button. A window will pop up asking you which compiler
-   to use. Select the x64 Visual Studio 2012 compiler. Note that while it is possible to build HPX for x86
-   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
-   Windows system limitation affecting the number of HPX threads you can create.
+   to use. Select the x64 Visual Studio 2012 compiler. Note that while it is
+   possible to build HPX for x86 we don't recommend doing so as 32 bit runs are
+   severely restricted by a 32 bit Windows system limitation affecting the number
+   of HPX threads you can create.
 
 7) If the "Generate" button is not clickable, press "Configure" again. Repeat
    this step until the "Generate" button becomes clickable.
