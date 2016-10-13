@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace local
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
-            cond_.wait(std::move(l), ec);
+            cond_.wait(l, ec);
         }
 
         template <class Predicate>
@@ -83,7 +83,7 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
             threads::thread_state_ex_enum const reason =
-                cond_.wait_until(std::move(l), abs_time, ec);
+                cond_.wait_until(l, abs_time, ec);
 
             if (ec) return cv_status::error;
 
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
-            cond_.wait(std::move(l), ec);
+            cond_.wait(l, ec);
         }
 
         template <class Lock, class Predicate>
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
-                cond_.wait_until(std::move(l), abs_time, ec);
+                cond_.wait_until(l, abs_time, ec);
 
             if (ec) return cv_status::error;
 
