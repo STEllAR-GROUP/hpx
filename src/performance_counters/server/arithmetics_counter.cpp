@@ -85,14 +85,14 @@ namespace hpx { namespace performance_counters { namespace server
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
             {
                 // gather current base values
                 counter_value value;
                 if (!evaluate_base_counter(base_counter_ids_[i],
-                    base_counter_names_[i], value))
+                    base_counter_names_[i], value, l))
                 {
                     return value;
                 }
@@ -136,11 +136,11 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     bool arithmetics_counter<Operation>::start()
     {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&
-                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i], l))
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "arithmetics_counter<Operation>::start",
@@ -150,15 +150,18 @@ namespace hpx { namespace performance_counters { namespace server
                 return false;
             }
 
-            using performance_counters::stubs::performance_counter;
-            if (!performance_counter::start(launch::sync, base_counter_ids_[i]))
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "arithmetics_counter<Operation>::stop",
-                    boost::str(boost::format(
-                        "could not start performance counter: '%s'") %
-                            base_counter_names_[i]));
-                return false;
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                using performance_counters::stubs::performance_counter;
+                if (!performance_counter::start(launch::sync, base_counter_ids_[i]))
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "arithmetics_counter<Operation>::stop",
+                        boost::str(boost::format(
+                            "could not start performance counter: '%s'") %
+                                base_counter_names_[i]));
+                    return false;
+                }
             }
         }
         return true;
@@ -167,11 +170,11 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     bool arithmetics_counter<Operation>::stop()
     {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&
-                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i], l))
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "arithmetics_counter<Operation>::stop",
@@ -181,15 +184,18 @@ namespace hpx { namespace performance_counters { namespace server
                 return false;
             }
 
-            using performance_counters::stubs::performance_counter;
-            if (!performance_counter::stop(launch::sync, base_counter_ids_[i]))
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "arithmetics_counter<Operation>::stop",
-                    boost::str(boost::format(
-                        "could not stop performance counter: '%s'") %
-                            base_counter_names_[i]));
-                return false;
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                using performance_counters::stubs::performance_counter;
+                if (!performance_counter::stop(launch::sync, base_counter_ids_[i]))
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "arithmetics_counter<Operation>::stop",
+                        boost::str(boost::format(
+                            "could not stop performance counter: '%s'") %
+                                base_counter_names_[i]));
+                    return false;
+                }
             }
         }
         return true;
@@ -198,11 +204,11 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     void arithmetics_counter<Operation>::reset_counter_value()
     {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&
-                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i], l))
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "arithmetics_counter<Operation>::reset_counter_value",
@@ -220,12 +226,23 @@ namespace hpx { namespace performance_counters { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Operation>
     bool arithmetics_counter<Operation>::ensure_base_counter(
-        naming::id_type& base_counter_id, std::string const& base_counter_name)
+        naming::id_type& base_counter_id, std::string const& base_counter_name,
+        std::unique_lock<mutex_type>& l)
     {
         if (!base_counter_id) {
             // get or create the base counter
             error_code ec(lightweight);
-            base_counter_id = get_counter(base_counter_name, ec);
+            hpx::id_type counter_id;
+            {
+                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                counter_id = get_counter(base_counter_name, ec);
+            }
+            // Since we needed to unlock to retrieve the counter id, check if
+            // no other thread came first
+            if (!base_counter_id)
+            {
+                base_counter_id = counter_id;
+            }
             if (HPX_UNLIKELY(ec || !base_counter_id))
             {
                 // base counter could not be retrieved
@@ -243,13 +260,17 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     bool arithmetics_counter<Operation>::evaluate_base_counter(
         naming::id_type& base_counter_id, std::string const& name,
-        counter_value& value)
+        counter_value& value, std::unique_lock<mutex_type>& l)
     {
         // query the actual value
-        if (!base_counter_id && !ensure_base_counter(base_counter_id, name))
+        if (!base_counter_id && !ensure_base_counter(base_counter_id, name, l))
             return false;
 
-        value = stubs::performance_counter::get_value(launch::sync, base_counter_id);
+        hpx::id_type counter_id = base_counter_id;
+        {
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+            value = stubs::performance_counter::get_value(launch::sync, counter_id);
+        }
         return true;
     }
 }}}
