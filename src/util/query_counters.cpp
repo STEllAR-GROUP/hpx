@@ -14,7 +14,7 @@
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>

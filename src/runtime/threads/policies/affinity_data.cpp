@@ -5,7 +5,7 @@
 
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/util/assert.hpp>

@@ -5,7 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 
 #include <boost/program_options/parsers.hpp>
 

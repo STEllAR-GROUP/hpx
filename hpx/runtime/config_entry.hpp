@@ -15,12 +15,19 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Retrieve the string value of a configuration entry as given by \p key.
+    /// Retrieve the string value of a configuration entry given by \p key.
     HPX_API_EXPORT std::string get_config_entry(std::string const& key,
         std::string const& dflt);
-    /// Retrieve the integer value of a configuration entry as given by \p key.
+    /// Retrieve the integer value of a configuration entry given by \p key.
     HPX_API_EXPORT std::string get_config_entry(std::string const& key,
         std::size_t dflt);
+
+    /// Set the string value of a configuration entry given by \p key.
+    HPX_API_EXPORT void set_config_entry(std::string const& key,
+        std::string const& value);
+    /// Set the integer value of a configuration entry given by \p key.
+    HPX_API_EXPORT void set_config_entry(std::string const& key,
+        std::size_t value);
 }
 
 #endif

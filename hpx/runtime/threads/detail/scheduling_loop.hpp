@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
