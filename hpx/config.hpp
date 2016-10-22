@@ -413,22 +413,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Enable lock verification code which allows to check whether there are locks
-// held while HPX-threads are suspended and/or interrupted.
-#if !defined(HPX_HAVE_VERIFY_LOCKS)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS
-#  endif
-#endif
-
-#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALY)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS_GLOBALY
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-
 #if !defined(HPX_THREADS_STACK_OVERHEAD)
 #  if defined(HPX_DEBUG)
 #    if defined(HPX_GCC_VERSION)
