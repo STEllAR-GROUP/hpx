@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include <boost/atomic.hpp>
+
 void test_get_entry()
 {
     std::string val = hpx::get_config_entry("hpx.localities", "42");
@@ -18,6 +20,17 @@ void test_get_entry()
     val = hpx::get_config_entry("hpx.localities", 42);
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(boost::lexical_cast<int>(val), 1);
+}
+
+boost::atomic<bool> invoked_callback(false);
+
+void config_entry_callback(std::string const& key, std::string const& val)
+{
+    HPX_TEST_EQ(key, std::string("hpx.config.entry.test"));
+    HPX_TEST_EQ(val, std::string("test1"));
+
+    HPX_TEST(!invoked_callback.load());
+    invoked_callback = true;
 }
 
 void test_set_entry()
@@ -30,10 +43,15 @@ void test_set_entry()
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(val, std::string("test"));
 
+    hpx::set_config_entry_callback("hpx.config.entry.test",
+        &config_entry_callback);
+
     hpx::set_config_entry("hpx.config.entry.test", "test1");
     val = hpx::get_config_entry("hpx.config.entry.test", "");
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(val, std::string("test1"));
+
+    HPX_TEST(invoked_callback.load());
 }
 
 int main(int argc, char* argv[])

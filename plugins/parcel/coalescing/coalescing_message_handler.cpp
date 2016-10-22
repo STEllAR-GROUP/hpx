@@ -86,6 +86,19 @@ namespace hpx { namespace plugins { namespace parcel
         }
     }
 
+    void coalescing_message_handler::update_num_messages()
+    {
+        std::lock_guard<mutex_type> l(mtx_);
+        num_coalesced_parcels_ =
+            detail::get_num_messages(num_coalesced_parcels_);
+    }
+
+    void coalescing_message_handler::update_interval()
+    {
+        std::lock_guard<mutex_type> l(mtx_);
+        interval_ = detail::get_interval(interval_);
+    }
+
     coalescing_message_handler::coalescing_message_handler(
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
@@ -125,6 +138,14 @@ namespace hpx { namespace plugins { namespace parcel
                 get_average_time_between_parcels, this, _1),
             util::bind(&coalescing_message_handler::
                 get_time_between_parcels_histogram_creator, this, _1, _2, _3, _4));
+
+        // register parameter update callbacks
+        set_config_entry_callback(
+            "hpx.plugins.coalescing_message_handler.num_messages",
+            util::bind(&coalescing_message_handler::update_num_messages, this));
+        set_config_entry_callback(
+            "hpx.plugins.coalescing_message_handler.interval",
+            util::bind(&coalescing_message_handler::update_interval, this));
     }
 
     void coalescing_message_handler::put_parcel(
@@ -143,7 +164,7 @@ namespace hpx { namespace plugins { namespace parcel
         if (time_between_parcels_)
             (*time_between_parcels_)(time_since_last_parcel);
 
-        std::chrono::microseconds interval(detail::get_interval(interval_));
+        std::chrono::microseconds interval(interval_);
 
         // just send parcel if the coalescing was stopped or the buffer is
         // empty and time since last parcel is larger than coalescing interval.
@@ -251,8 +272,7 @@ namespace hpx { namespace plugins { namespace parcel
         if (buffer_.empty())
             return false;
 
-        detail::message_buffer buff (
-            detail::get_num_messages(num_coalesced_parcels_));
+        detail::message_buffer buff (num_coalesced_parcels_);
         std::swap(buff, buffer_);
 
         ++num_messages_;

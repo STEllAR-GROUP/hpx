@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
@@ -119,7 +120,7 @@ section& section::operator=(section const& rhs)
         entry_map const& e = rhs.get_entries();
         entry_map::const_iterator end = e.end();
         for (entry_map::const_iterator i = e.begin (); i != end; ++i)
-            add_entry(l, i->first, i->second);
+            add_entry(l, i->first, i->first, i->second);
 
         section_map s = rhs.get_sections();
         section_map::iterator send = s.end();
@@ -141,7 +142,7 @@ section& section::clone_from(section const& rhs, section* root)
         entry_map const& e = rhs.get_entries();
         entry_map::const_iterator end = e.end();
         for (entry_map::const_iterator i = e.begin (); i != end; ++i)
-            add_entry(l, i->first, i->second);
+            add_entry(l, i->first, i->first, i->second);
 
         section_map s = rhs.get_sections();
         section_map::iterator send = s.end();
@@ -274,7 +275,8 @@ void section::parse (std::string const& sourcename,
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
                     linenum, line);
             }
-            current->add_entry (l, key, what[3]);
+
+            current->add_entry (l, sec_name + "." + key, key, what[3]);
 
             // restore the old section
             current = s;
@@ -323,7 +325,7 @@ void section::parse (std::string const& sourcename,
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
                     linenum, line);
             }
-            current->add_entry (l, key, what[2]);
+            current->add_entry (l, key, key, what[2]);
         }
         else
         {
@@ -444,8 +446,8 @@ section const* section::get_section (std::lock_guard<mutex_type>& l,
     return nullptr;
 }
 
-void section::add_entry (std::lock_guard<mutex_type>& l, std::string const& key,
-    std::string val)
+void section::add_entry (std::lock_guard<mutex_type>& l,
+    std::string const& fullkey, std::string const& key, std::string val)
 {
     // first expand the full property name in the value (avoids infinite recursion)
     expand_only(l, val, std::string::size_type(-1), get_full_name() + "." + key);
@@ -470,12 +472,148 @@ void section::add_entry (std::lock_guard<mutex_type>& l, std::string const& key,
         current = current->add_section_if_new(l, sec_name.substr(pos));
 
         // now add this entry to the section
-        current->add_entry(l, key.substr(i+1), val);
+        current->add_entry(l, fullkey, key.substr(i+1), val);
     }
     else
     {
+        entry_map::iterator it = entries_.find(key);
+        if (it != entries_.end())
+        {
+            it->second.first = std::move(val);
+            if (!it->second.second.empty())
+                (it->second.second)(fullkey, it->second.first);
+        }
+        else
+        {
+            // just add this entry to the section
+            entries_[key] = entry_type(val, entry_changed_func());
+        }
+    }
+}
+
+void section::add_entry (std::lock_guard<mutex_type>& l,
+    std::string const& fullkey, std::string const& key, entry_type const& val)
+{
+    std::string::size_type i = key.find_last_of(".");
+    if (i != std::string::npos)
+    {
+        section* current = root_;
+
+        // make sure all sections in key exist
+        std::string sec_name = key.substr(0, i);
+
+        std::string::size_type pos = 0;
+        for (std::string::size_type pos1 = sec_name.find_first_of('.');
+             std::string::npos != pos1;
+             pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+        {
+            current = current->add_section_if_new(l,
+                sec_name.substr(pos, pos1 - pos));
+        }
+
+        current = current->add_section_if_new(l, sec_name.substr(pos));
+
         // now add this entry to the section
-        entries_[key] = val;
+        current->add_entry(l, fullkey, key.substr(i+1), val);
+    }
+    else
+    {
+        entry_map::iterator it = entries_.find(key);
+        if (it != entries_.end())
+        {
+            it->second = val;
+            if (!it->second.second.empty())
+                (it->second.second)(fullkey, it->second.first);
+        }
+        else
+        {
+            // just add this entry to the section
+            std::pair<entry_map::iterator, bool> p = entries_.insert(
+                entry_map::value_type(key, val));
+            HPX_ASSERT(p.second);
+
+            if (!p.first->second.second.empty())
+                (p.first->second.second)(p.first->first, p.first->second.first);
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename F1, typename F2>
+class compose_callback_impl
+{
+public:
+    template <typename A1, typename A2>
+    compose_callback_impl(A1 && f1, A2 && f2)
+      : f1_(std::forward<A1>(f1))
+      , f2_(std::forward<A2>(f2))
+    {}
+
+    void operator()(std::string const& k, std::string const& v) const
+    {
+        f1_(k, v);
+        f2_(k, v);
+    }
+
+private:
+    F1 f1_;
+    F2 f2_;
+};
+
+template <typename F1, typename F2>
+static HPX_FORCEINLINE
+util::function_nonser<void(std::string const&, std::string const&)>
+compose_callback(F1 && f1, F2 && f2)
+{
+    if (!f1)
+        return std::forward<F2>(f2);
+    else if (!f2)
+        return std::forward<F1>(f1);
+
+    // otherwise create a combined callback
+    typedef compose_callback_impl<
+        typename util::decay<F1>::type, typename util::decay<F2>::type
+    > result_type;
+    return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
+}
+
+void section::add_notification_callback(std::lock_guard<mutex_type>& l,
+    std::string const& key, entry_changed_func const& callback)
+{
+    std::string::size_type i = key.find_last_of(".");
+    if (i != std::string::npos)
+    {
+        section* current = root_;
+
+        // make sure all sections in key exist
+        std::string sec_name = key.substr(0, i);
+
+        std::string::size_type pos = 0;
+        for (std::string::size_type pos1 = sec_name.find_first_of('.');
+             std::string::npos != pos1;
+             pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+        {
+            current = current->add_section_if_new(l,
+                sec_name.substr(pos, pos1 - pos));
+        }
+
+        current = current->add_section_if_new(l, sec_name.substr(pos));
+
+        // now add this entry to the section
+        current->add_notification_callback(l, key.substr(i+1), callback);
+    }
+    else
+    {
+        // just add this entry to the section
+        entry_map::iterator it = entries_.find(key);
+        if (it != entries_.end())
+        {
+            it->second.second = compose_callback(callback, it->second.second);
+        }
+        else
+        {
+            entries_[key] = entry_type("", callback);
+        }
     }
 }
 
@@ -521,7 +659,7 @@ std::string section::get_entry (std::lock_guard<mutex_type>& l,
     {
         entry_map::const_iterator cit = entries_.find(key);
         HPX_ASSERT(cit != entries_.end());
-        return expand(l, (*cit).second);
+        return expand(l, (*cit).second.first);
     }
 
     HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
@@ -554,7 +692,7 @@ std::string section::get_entry (std::lock_guard<mutex_type>& l,
     if (cur_section->entries_.end() == entry)
         return expand(l, default_val);
 
-    return expand(l, entry->second);
+    return expand(l, entry->second.first);
 }
 
 inline void indent (int ind, std::ostream& strm)
@@ -588,16 +726,16 @@ void section::dump(int ind, std::ostream& strm) const
     {
         indent (ind, strm);
 
-        const std::string expansion = expand(l, i->second);
+        const std::string expansion = expand(l, i->second.first);
 
         // Check if the expanded entry is different from the actual entry.
-        if (expansion != i->second)
+        if (expansion != i->second.first)
             // If the expansion is different from the real entry, then print
             // it out.
-            strm << "'" << i->first << "' : '" << i->second << "' -> '"
+            strm << "'" << i->first << "' : '" << i->second.first << "' -> '"
                  << expansion << "'\n";
         else
-            strm << "'" << i->first << "' : '" << i->second << "'\n";
+            strm << "'" << i->first << "' : '" << i->second.first << "'\n";
     }
 
     section_map::const_iterator send = sections_.end();
@@ -831,6 +969,22 @@ std::string section::expand_only(std::lock_guard<mutex_type>& l,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// explicit instantiation for the correct archive types
+HPX_EXPORT void serialize(serialization::output_archive& ar,
+    section::entry_type const& data, unsigned int version)
+{
+    ar << data.first;
+    // do not handle callback function
+}
+
+HPX_EXPORT void serialize(serialization::input_archive& ar,
+    section::entry_type& data, unsigned int version)
+{
+    ar >> data.first;
+    // do not handle callback function
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Archive>
 void section::save(Archive& ar, const unsigned int version) const
 {
@@ -851,7 +1005,6 @@ void section::load(Archive& ar, const unsigned int version)
     set_root(this, true);     // make this the current root
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation for the correct archive types
 template HPX_EXPORT void
 section::save(serialization::output_archive&, const unsigned int version) const;
