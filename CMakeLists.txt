@@ -1068,8 +1068,11 @@ hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
 # check for experimental facilities
-hpx_check_for_cxx_experimental_std_optional(
-  DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+if(HPX_WITH_CXX1Y)
+  # check for experimenta/optional only of in C++14 mode
+  hpx_check_for_cxx_experimental_std_optional(
+    DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+endif()
 
 ################################################################################
 # CUDA features
