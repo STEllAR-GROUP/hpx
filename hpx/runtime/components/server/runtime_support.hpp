@@ -469,6 +469,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -481,6 +483,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -514,6 +518,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -526,6 +532,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -568,6 +576,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -580,6 +590,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -620,6 +632,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -632,6 +646,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -681,6 +697,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
@@ -693,6 +711,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
