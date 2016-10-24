@@ -41,6 +41,7 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2363] - Fix papi
 * [pr    2362] - Adding missing macros for new non-direct actions
 * [pr    2361] - Improve cmake output to help debug compiler incompatibility check
 * [pr    2360] - Fixing race condition in condition_variable
