@@ -93,9 +93,19 @@ namespace hpx { namespace util
             result += *it;
             result += suffix;
 
+#if defined(HPX_MSVC)
             result += HPX_INI_PATH_DELIMITER;
             result += *it;
+            result += "/bin";
+#endif
+
+            result += HPX_INI_PATH_DELIMITER;
+            result += *it;
+#if defined(HPX_MSVC)
+            result += "/bin";
+#else
             result += "/lib";
+#endif
             result += suffix;
         }
         return result;
