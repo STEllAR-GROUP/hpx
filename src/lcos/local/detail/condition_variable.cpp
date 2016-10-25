@@ -172,7 +172,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait(
-        std::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>& lock,
         char const* description, error_code& ec)
     {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
@@ -186,7 +186,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
             // yield this thread
-            lock.unlock();
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
             reason = this_thread::suspend(threads::suspended, description, ec);
             if (ec) return threads::wait_unknown;
         }
@@ -196,7 +196,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait_until(
-        std::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>& lock,
         util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
             // yield this thread
-            lock.unlock();
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
             reason = this_thread::suspend(abs_time, description, ec);
             if (ec) return threads::wait_unknown;
         }

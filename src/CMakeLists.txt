@@ -280,7 +280,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
 
-get_property(HPX_TARGET_COMPILE_DEFININTIONS_VAR
+get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
   GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
 foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
   target_compile_definitions(hpx INTERFACE ${_flag})

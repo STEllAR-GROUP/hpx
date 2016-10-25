@@ -564,7 +564,7 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                cond_.wait(std::move(l), "future_data::wait", ec);
+                cond_.wait(l, "future_data::wait", ec);
                 if (ec) return;
             }
 
@@ -581,7 +581,7 @@ namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(std::move(l), abs_time,
+                    cond_.wait_until(l, abs_time,
                         "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 

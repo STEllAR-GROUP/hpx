@@ -22,8 +22,8 @@ boost::atomic<int> count(0);
 
 void worker(hpx::lcos::local::counting_semaphore& sem)
 {
-    sem.signal();   // signal main thread
     ++count;
+    sem.signal();   // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ int hpx_main()
     // Wait for all threads to finish executing.
     sem.wait(10);
 
-    HPX_TEST(count == 10);
+    HPX_TEST_EQ(count, 10);
 
     return hpx::finalize();
 }
