@@ -41,6 +41,14 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2363] - Fix papi
+* [pr    2362] - Adding missing macros for new non-direct actions
+* [pr    2361] - Improve cmake output to help debug compiler incompatibility check
+* [pr    2360] - Fixing race condition in condition_variable
+* [pr    2359] - Fixing shutdown when parcels are still in flight
+* [issue 2357] - failed to insert console_print_action into typename_to_id_t registry
+* [pr    2356] - Fixing return type of get_iterator_tuple
+* [pr    2355] - Fixing compilation against Boost 1 62
 * [pr    2354] - Adding serialization for mask_type if CPU_COUNT > 64
 * [issue 2352] - Compile errors when using intel 17 beta (for KNL) on edison
 * [pr    2351] - Fix function vtable get_function_address implementation
@@ -49,6 +57,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2348] - Adding test to verify #2334 is fixed
 * [pr    2347] - Bug fixes for hpx.compute and hpx::lcos::channel
 * [pr    2346] - Removing cmake "find" files that are in the APEX cmake Modules
+* [pr    2345] - Implemented parallel::stable_partition
 * [pr    2344] - Making hpx::lcos::channel usable with basename registration
 * [pr    2343] - Fix a couple of examples that failed to compile after recent
                  api changes
@@ -56,6 +65,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2341] - Removing cmake "find" files that are in the APEX cmake Modules
 * [pr    2339] - Fixing 2338
 * [pr    2338] - Possible race in sliding semaphore
+* [pr    2337] - Adjust osu_latency test to measure window_size parcels in flight at once
+* [pr    2336] - Allowing remote direct actions to be executed without spawning a task
 * [pr    2335] - Making sure multiple components are properly initialized from
                  arguments
 * [pr    2334] - Cannot construct component with large vector on a remote

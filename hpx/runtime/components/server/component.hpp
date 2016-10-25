@@ -17,6 +17,7 @@ namespace hpx { namespace components {
     class component
       : public simple_component<Component>
     {
+    public:
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance
         template <typename ...Ts>
