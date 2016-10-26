@@ -19,6 +19,9 @@
 #include <string>
 #include <vector>
 
+#include <string>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
     hosted_locality_namespace::hosted_locality_namespace(naming::address addr)

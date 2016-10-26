@@ -19,6 +19,10 @@
 #include <utility>
 #include <vector>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace hpx { namespace agas { namespace detail
 {
     bootstrap_locality_namespace::bootstrap_locality_namespace(

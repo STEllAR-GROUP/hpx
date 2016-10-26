@@ -42,7 +42,9 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
+#include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
+#include <hpx/lcos/detail/barrier_node.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif
@@ -1339,6 +1341,7 @@ namespace hpx { namespace components { namespace server
                     rt.report_error(boost::current_exception());
                 }
             }
+            lcos::barrier::get_global_barrier().release();
         }
     }
 
