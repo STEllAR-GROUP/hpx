@@ -67,7 +67,7 @@ namespace hpx
     {}
 
     exception_list::exception_list(exception_list const& l)
-      : hpx::exception(l.size() ? hpx::get_error(l.exceptions_.front()) : success)
+      : hpx::exception(static_cast<hpx::exception const&>(l))
       , exceptions_(l.exceptions_)
     {}
 
@@ -80,8 +80,7 @@ namespace hpx
     {
         if (this != &l)
         {
-            *static_cast<hpx::exception*>(this) = hpx::exception(
-                l.size() ? hpx::get_error(l.exceptions_.front()) : success);
+            *static_cast<hpx::exception*>(this) = static_cast<hpx::exception const&>(l);
             exceptions_ = l.exceptions_;
         }
         return *this;
