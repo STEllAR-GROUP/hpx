@@ -21,6 +21,9 @@ namespace hpx { namespace actions
 
     template <typename Action>
     struct transfer_continuation_action;
+
+    template <typename Component, typename Signature, typename Derived>
+    struct basic_action;
 }}
 
 #endif
