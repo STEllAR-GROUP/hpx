@@ -25,20 +25,6 @@ namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // Overload when return type is "void" aka util::unused_type
-        template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
-            F&& f, Ts&&... vs)
-        {
-            try {
-                util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
-                cont.trigger();
-            }
-            catch (...) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
-            }
-        }
 
         // special handling of actions returning a future
         template <typename Result, typename RemoteResult, typename Future>
@@ -105,8 +91,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl_future(std::false_type,
-            typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs)
+        void trigger_impl(std::false_type, typed_continuation<Result, RemoteResult>&& cont,
+            F&& f, Ts&&... vs)
         {
             try {
                 cont.trigger_value(
@@ -118,15 +104,29 @@ namespace hpx { namespace actions {
             }
         }
 
+        // Overload when return type is "void" aka util::unused_type
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::false_type, typed_continuation<Result, RemoteResult>&& cont,
+        void trigger_impl(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
             F&& f, Ts&&... vs)
         {
-            typedef typename util::result_of<F(Ts...)>::type result_type;
-            typedef traits::is_future<result_type> is_future;
+            try {
+                util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
+                cont.trigger();
+            }
+            catch (...) {
+                // make sure hpx::exceptions are propagated back to the client
+                cont.trigger_error(boost::current_exception());
+            }
+        }
 
-            trigger_impl_future(is_future(),
-                std::move(cont), std::forward<F>(f), std::forward<Ts>(vs)...);
+        template <typename Result, typename RemoteResult, typename F, typename ...Ts>
+        void trigger_impl_future(std::false_type,
+            typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs)
+        {
+            typename std::is_same<RemoteResult, util::unused_type>::type is_void;
+
+            trigger_impl(is_void, std::move(cont), std::forward<F>(f),
+                std::forward<Ts>(vs)...);
         }
     }
 
@@ -134,9 +134,10 @@ namespace hpx { namespace actions {
     void trigger(typed_continuation<Result, RemoteResult>&& cont,
         F&& f, Ts&&... vs)
     {
-        typename std::is_same<RemoteResult, util::unused_type>::type is_void;
+        typedef typename util::result_of<F(Ts...)>::type result_type;
+        traits::is_future<result_type> is_future;
 
-        detail::trigger_impl(is_void, std::move(cont),
+        detail::trigger_impl_future(is_future, std::move(cont),
             std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 }}
