@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <thread>
+#include <chrono>
 //
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -31,9 +32,9 @@ namespace parcelset {
 namespace policies {
 namespace verbs {
 
-    struct RdmaThreadPrintHelper {};
+    struct rdma_thread_print_helper {};
 
-    inline std::ostream& operator<<(std::ostream& os, const RdmaThreadPrintHelper&)
+    inline std::ostream& operator<<(std::ostream& os, const rdma_thread_print_helper&)
     {
         if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
             os << "-------------- ";
@@ -49,13 +50,13 @@ namespace verbs {
 
 }}}}
 
-#define THREAD_ID "" << hpx::parcelset::policies::verbs::RdmaThreadPrintHelper()
+#define THREAD_ID "" << hpx::parcelset::policies::verbs::rdma_thread_print_helper()
 
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages
 // without enabling all of them
-#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << THREAD_ID << " " << x;
-//#define LOG_DEVEL_MSG(x)
+//#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << THREAD_ID << " " << x;
+#define LOG_DEVEL_MSG(x)
 
 //
 // Logging disabled, #define all macros to be empty
@@ -71,11 +72,36 @@ namespace verbs {
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
 
+#  define LOG_TIMED_INIT(name)                                                      \
+    using namespace std::chrono;                                                    \
+    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
+
+#  define LOG_TIMED_MSG(name, level, delay, x)             \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        LOG_DEVEL_MSG(x);                                  \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        x;                                                 \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+
 #else
 //
 // Logging enabled
 //
-/*
+
 #  include <boost/log/expressions/formatter.hpp>
 #  include <boost/log/expressions/formatters.hpp>
 #  include <boost/log/expressions/formatters/stream.hpp>
@@ -86,7 +112,7 @@ namespace verbs {
 #  include <boost/log/utility/manipulators/to_log.hpp>
 #  include <boost/log/utility/setup/console.hpp>
 #  include <boost/log/utility/setup/common_attributes.hpp>
-*/
+
 #  include <boost/preprocessor.hpp>
 
 
@@ -102,7 +128,31 @@ namespace verbs {
 #  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("**************** Enter " << __func__);
 #  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("################ Exit  " << __func__);
 
-#  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)    \
+#  define LOG_TIMED_INIT(name)                                                      \
+    using namespace std::chrono;                                                    \
+    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
+
+#  define LOG_TIMED_MSG(name, level, delay, x)             \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        LOG_DEVEL_MSG(x);                                  \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        x;                                                 \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+#  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \
     case elem : return BOOST_PP_STRINGIZE(elem);
 
 #  define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)              \
@@ -123,7 +173,8 @@ namespace verbs {
         }                                                                     \
     }
 
-   DEFINE_ENUM_WITH_STRING_CONVERSIONS(BGCIOS_type, (BGV_RDMADROP)(BGV_RDMA_REG)(BGV_RDMA_RMV)(BGV_WORK_CMP)(BGV_RECV_EVT))
+    // example of usage
+    // DEFINE_ENUM_WITH_STRING_CONVERSIONS(test_type, (test1)(test2)(test3))
 
 #endif
 

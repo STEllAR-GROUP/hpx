@@ -11,9 +11,9 @@
 //
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
 #include <rdma/rdma_cma.h>
 #include <poll.h>
@@ -21,13 +21,14 @@
 namespace hpx {
 namespace parcelset {
 namespace policies {
-namespace verbs {
+namespace verbs
+{
 
     struct event_channel {
         //
         typedef hpx::lcos::local::spinlock   mutex_type;
-        typedef std::unique_lock<mutex_type> unique_lock;
-        //
+        typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
+         //
         static mutex_type event_mutex_;
 
         // ----------------------------------------------------------------------------
@@ -36,7 +37,40 @@ namespace verbs {
             no_ack_event = false
         };
 
+        event_channel() {}
+
+        ~event_channel() {
+            // Destroy the event channel.
+            if (event_channel_ != nullptr) {
+                LOG_TRACE_MSG(tag_ << "destroying rdma event channel with fd "
+                    << hexnumber(event_channel_->fd));
+                rdma_destroy_event_channel(event_channel_.get()); // No return code
+            }
+            event_channel_ = nullptr;
+        }
+
         // ----------------------------------------------------------------------------
+        bool create_channel() {
+            auto t = rdma_create_event_channel();
+            event_channel_ = std::unique_ptr<struct rdma_event_channel>(t);
+            if (event_channel_ == nullptr) {
+                rdma_error e(EINVAL, "rdma_create_event_channel() failed");
+                LOG_ERROR_MSG(tag_ << "error creating rdma event channel: "
+                    << rdma_error::error_string(e.error_code()));
+                throw e;
+            }
+            LOG_DEBUG_MSG(tag_ << "created rdma event channel with fd "
+                << hexnumber(event_channel_->fd));
+            return true;
+        }
+
+        // ----------------------------------------------------------------------------
+        template<typename Func>
+        int poll_event_channel(Func &&f)
+        {
+            return poll_event_channel(get_file_descriptor(), std::forward<Func>(f));
+        }
+
         template<typename Func>
         static int poll_event_channel(int fd, Func &&f)
         {
@@ -90,6 +124,12 @@ namespace verbs {
         // even the wrong events so this is done too)
         // Communication event details are returned in the rdma_cm_event structure.
         // It is allocated by the rdma_cm and released by the rdma_ack_cm_event routine.
+        int get_event(event_ack_type ack,
+            rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
+        {
+            return get_event(event_channel_.get(), ack, event, cm_event);
+        }
+
         static int get_event(struct rdma_event_channel *channel, event_ack_type ack,
             rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
         {
@@ -140,6 +180,20 @@ namespace verbs {
             return 0;
         }
 
+        //! \brief  Get the descriptor representing the rdma event channel.
+        //! \return Event channel descriptor.
+
+        int get_file_descriptor(void) const { return event_channel_->fd; }
+
+        struct rdma_event_channel *get_event_channel(void) const {
+            return event_channel_.get();
+        }
+
+
+    private:
+        // Event channel for notification of RDMA connection management events.
+        std::unique_ptr<struct rdma_event_channel> event_channel_;
+        std::string tag_;
     };
 
 }}}}

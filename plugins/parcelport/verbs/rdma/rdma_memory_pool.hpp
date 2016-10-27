@@ -8,7 +8,6 @@
 //
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 //
@@ -21,6 +20,7 @@
 #include <boost/lockfree/stack.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/protection_domain.hpp>
 #include <plugins/parcelport/verbs/rdma/memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
@@ -32,14 +32,14 @@
 #define RDMA_POOL_LARGE_CHUNK_SIZE  0x100000 //  1MB
 
 // the maximum number of preposted receives (pre receive queue)
-#define RDMA_MAX_PREPOSTS 128
+#define RDMA_MAX_PREPOSTS 32
 
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
 #define RDMA_POOL_MAX_SMALL_CHUNKS  1024
 #define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
 #define RDMA_POOL_MAX_LARGE_CHUNKS  4
 
-#define RDMA_POOL_USE_LOCKFREE_STACK
+#define RDMA_POOL_USE_LOCKFREE_STACK 1
 /*
 // if the HPX configuration has set a different value, use it
 #if defined(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE)
@@ -99,8 +99,8 @@ namespace verbs
     struct pool_container
     {
 #ifndef RDMA_POOL_USE_LOCKFREE_STACK
-        typedef hpx::lcos::local::spinlock                mutex_type;
-        typedef std::unique_lock<mutex_type>              unique_lock;
+        typedef hpx::lcos::local::spinlock                               mutex_type;
+        typedef hpx::parcelset::policies::verbs::scoped_lock<mutex_type> scoped_lock;
 #endif
 
         // ------------------------------------------------------------------------
@@ -158,26 +158,12 @@ namespace verbs
         inline void push(rdma_memory_region *region)
         {
 #ifndef RDMA_POOL_USE_LOCKFREE_STACK
-            unique_lock lock1(memBuffer_mutex_);
+            scoped_lock lock(memBuffer_mutex_);
 #endif
             LOG_TRACE_MSG(PoolType::desc() << "Push block "
                 << hexpointer(region->get_address()) << hexlength(region->get_size())
                 << decnumber(used_-1));
 
-            /*
-             * debug code that checks if a block is pushed twice. No longer working as we
-             * use lockfree stack and need to redo iteration
-
-                auto it = free_list_.begin();
-                while (it != free_list_.end()) {
-                    if (*it == region) {
-                        LOG_ERROR_MSG("FATAL : Pushing an existing region back to the memory pool");
-                        std::terminate();
-                    }
-                    ++it;
-                }
-                free_list_.push_back(region);
-             */
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
             if (!free_list_.push(region)) {
                 LOG_ERROR_MSG(PoolType::desc() << "Error in memory pool push");
@@ -193,7 +179,7 @@ namespace verbs
         inline rdma_memory_region *pop()
         {
 #ifndef RDMA_POOL_USE_LOCKFREE_STACK
-            unique_lock lock1(memBuffer_mutex_);
+            scoped_lock lock(memBuffer_mutex_);
 #endif
             // if we have not exceeded our max size, allocate a new block
             if (free_list_.empty()) {
@@ -243,14 +229,6 @@ namespace verbs
     // ---------------------------------------------------------------------------
     struct rdma_memory_pool : boost::noncopyable
     {
-        typedef std::size_t size_type;
-        typedef char        value_type;
-
-        typedef hpx::lcos::local::mutex                   mutex_type;
-        typedef std::lock_guard<mutex_type>               scoped_lock;
-        typedef std::unique_lock<mutex_type>              unique_lock;
-        typedef hpx::lcos::local::condition_variable      condition_type;
-
         //----------------------------------------------------------------------------
         // constructor
         rdma_memory_pool(rdma_protection_domain_ptr pd) :
@@ -259,7 +237,8 @@ namespace verbs
                 small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 8192, RDMA_POOL_MAX_SMALL_CHUNKS),
                 medium_(pd, RDMA_POOL_MEDIUM_CHUNK_SIZE,  16, RDMA_POOL_MAX_MEDIUM_CHUNKS),
                 large_ (pd, RDMA_POOL_LARGE_CHUNK_SIZE,    4, RDMA_POOL_MAX_LARGE_CHUNKS),
-                temp_regions(0)
+                temp_regions(0),
+                user_regions(0)
         {
             tiny_.allocate_pool(RDMA_POOL_MAX_1K_CHUNKS);
             small_.allocate_pool(RDMA_POOL_MAX_SMALL_CHUNKS);
@@ -296,7 +275,7 @@ namespace verbs
         //----------------------------------------------------------------------------
         // query the pool for a chunk of a given size to see if one is available
         // this function is 'unsafe' because it is not thread safe and another
-        // thread my pop a block after this is called and invalidate the result.
+        // thread may pop a block after this is called and invalidate the result.
         inline bool can_allocate_unsafe(size_t length) const
         {
             if (length<=tiny_.chunk_size_) {
@@ -315,7 +294,7 @@ namespace verbs
         }
 
         //----------------------------------------------------------------------------
-        // allocate a region, if size=0 a small region is returned
+        // allocate a region, if size=0 a tiny region is returned
         inline rdma_memory_region *allocate_region(size_t length)
         {
             rdma_memory_region *region = NULL;
@@ -366,7 +345,11 @@ namespace verbs
                     LOG_TRACE_MSG("Deallocating temp registered block "
                         << hexpointer(region->get_address()) << decnumber(temp_regions));
                 }
-                LOG_DEBUG_MSG("Deleting (user region) " << hexpointer(region));
+                else if (region->get_user_region()) {
+                    user_regions--;
+                    LOG_TRACE_MSG("Deleting (user region) "
+                        << hexpointer(region->get_address()) << decnumber(user_regions));
+                }
                 delete region;
                 return;
             }
@@ -403,8 +386,6 @@ namespace verbs
         // when deallocted, it will be unregistered and deleted, not returned to the pool
         inline rdma_memory_region* allocate_temporary_region(std::size_t length)
         {
-            LOG_DEBUG_MSG("allocate_temporary_region with this pointer "
-                << hexpointer(this) << " size " << hexlength(length));
             rdma_memory_region *region = new rdma_memory_region();
             region->set_temp_region();
             region->allocate(protection_domain_, length);
@@ -460,6 +441,7 @@ namespace verbs
         //
         // a counter
         std::atomic<int> temp_regions;
+        std::atomic<int> user_regions;
     };
 
     typedef std::shared_ptr<rdma_memory_pool> rdma_memory_pool_ptr;

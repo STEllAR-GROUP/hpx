@@ -4,7 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-// This is a cut down version of boost pool, adapted to handled pinned memory blocks
+// This is a cut down version of boost pool, adapted to handle pinned memory blocks
 // we are not concerned with high performance during malloc because we use this pool
 // as a simple way of pinning a large block and dividing it up into smaller blocks
 // which will then be stored in a threadsafe lockfree::stack so that they can be
@@ -13,7 +13,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_PINNED_MEMORY_POOL
 #define HPX_PARCELSET_POLICIES_VERBS_PINNED_MEMORY_POOL
 
-#define BOOST_POOL_INSTRUMENT 1
+#undef BOOST_POOL_INSTRUMENT
 
 #include <hpx/config.hpp>
 #include "memory_region.hpp"
@@ -43,8 +43,8 @@
 #include <boost/assert.hpp>
 
 #ifdef BOOST_POOL_INSTRUMENT
-#include <iostream>
-#include <iomanip>
+# include <iostream>
+# include <iomanip>
 #endif
 
 // There are a few places in this file where the expression "this->m" is used.
