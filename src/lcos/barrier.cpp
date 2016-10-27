@@ -65,12 +65,15 @@ namespace hpx { namespace lcos {
     {
         if (node_)
         {
-            if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-                hpx::unregister_with_basename(
-                    (*node_)->base_name_, (*node_)->rank_).get();
+            if (hpx::get_runtime_ptr() != nullptr)
+            {
+                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                    hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_).get();
 
-            // we need to wait on everyone to have its name unregistered...
-            wait();
+                // we need to wait on everyone to have its name unregistered...
+                wait();
+            }
             node_.reset();
         }
     }
