@@ -164,7 +164,6 @@ namespace hpx { namespace threads
         return id->interruption_requested();
     }
 
-#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_data(thread_id_type const& id, error_code& ec)
     {
@@ -190,7 +189,6 @@ namespace hpx { namespace threads
 
         return id->set_thread_data(data);
     }
-#endif
 
     ////////////////////////////////////////////////////////////////////////////
     struct continuation_recursion_count_tag {};
