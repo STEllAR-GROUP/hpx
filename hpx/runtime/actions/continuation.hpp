@@ -59,8 +59,8 @@ namespace hpx { namespace actions
         void trigger_error(boost::exception_ptr && e);
 
         // serialization support
-        template <typename Archive>
-        void serialize(Archive & ar, unsigned);
+        void serialize(hpx::serialization::input_archive& ar, unsigned);
+        void serialize(hpx::serialization::output_archive& ar, unsigned);
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type const& get_gid() const

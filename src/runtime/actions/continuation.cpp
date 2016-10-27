@@ -80,13 +80,14 @@ namespace hpx { namespace actions
         set_lco_error(gid_, this->get_addr(), std::move(e));
     }
 
-    template <typename Archive>
-    void continuation::serialize(Archive & ar, unsigned)
+    void continuation::serialize(hpx::serialization::input_archive& ar, unsigned)
     {
         ar & gid_ & addr_;
     }
 
-    template void continuation::serialize(hpx::serialization::input_archive&, unsigned);
-    template void continuation::serialize(hpx::serialization::output_archive&, unsigned);
+    void continuation::serialize(hpx::serialization::output_archive& ar, unsigned)
+    {
+        ar & gid_ & addr_;
+    }
 }}
 
