@@ -10,7 +10,7 @@
 #ifndef HPX_READERS_WRITERS_MUTEX_HPP
 #define HPX_READERS_WRITERS_MUTEX_HPP
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 //
 #include <boost/thread/locks.hpp>
@@ -106,8 +106,8 @@
 #define cmpxchg(P, O, N)  __sync_bool_compare_and_swap((P), (O), (N))
 #define atomic_inc(P)     __sync_add_and_fetch((P), 1)
 
-// Compiler instruction reordering barrier
-#define barrier() asm volatile("": : :"memory")
+// Compiler instruction reordering rwl_barrier_
+#define rwl_barrier_() asm volatile("": : :"memory")
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
@@ -144,7 +144,7 @@ namespace local {
         void lock()
         {
             // memory ordering barrier
-            barrier();
+            rwl_barrier_();
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.writers) {
@@ -152,8 +152,8 @@ namespace local {
                 hpx::util::detail::yield_k(4, nullptr);
             }
 
-            // memory ordering barrier
-            barrier();
+            // memory ordering rwl_barrier_
+            rwl_barrier_();
         }
 
         //
@@ -198,8 +198,8 @@ namespace local {
         //
         void lock_shared()
         {
-            // memory ordering barrier
-            barrier();
+            // memory ordering rwl_barrier_
+            rwl_barrier_();
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.readers) {
@@ -210,8 +210,8 @@ namespace local {
             // only one writer can lock, so no need for atomic increment
             ++ticket.s.readers;
 
-            // memory ordering barrier
-            barrier();
+            // memory ordering rwl_barrier_
+            rwl_barrier_();
         }
 
         //
