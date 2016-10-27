@@ -43,6 +43,9 @@ namespace hpx { namespace lcos {
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
     }
 
+    barrier::barrier()
+    {}
+
     barrier::~barrier()
     {
         release();
@@ -62,21 +65,29 @@ namespace hpx { namespace lcos {
     {
         if (node_)
         {
-            if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-                hpx::unregister_with_basename(
-                    (*node_)->base_name_, (*node_)->rank_).get();
+            if (hpx::get_runtime_ptr() != nullptr)
+            {
+                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                    hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_).get();
 
-            // we need to wait on everyone to have its name unregistered...
-            wait();
+                // we need to wait on everyone to have its name unregistered...
+                wait();
+            }
             node_.reset();
         }
     }
 
-    barrier& barrier::get_global_barrier()
+    barrier barrier::create_global_barrier()
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        static barrier b("/hpx/global_barrier", cfg.get_num_localities());
+        return barrier("/hpx/global_barrier", cfg.get_num_localities());
+    }
+
+    barrier& barrier::get_global_barrier()
+    {
+        static barrier b;
         return b;
     }
 

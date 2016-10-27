@@ -92,8 +92,10 @@ namespace hpx { namespace lcos {
         // Resets this barrier instance.
         void release();
 
+
         // Get the instance of the global barrier
         static barrier& get_global_barrier();
+        static barrier create_global_barrier();
         /// \endcond
 
         /// Perform a global synchronization using the default global barrier
@@ -106,6 +108,8 @@ namespace hpx { namespace lcos {
 
     private:
         /// \cond NOINTERNAL
+        barrier();
+
         boost::intrusive_ptr<wrapping_type> node_;
         /// \endcond
     };
