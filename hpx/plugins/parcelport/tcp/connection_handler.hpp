@@ -47,7 +47,7 @@ namespace hpx { namespace parcelset
         typedef policies::tcp::sender connection_type;
         typedef std::true_type  send_early_parcel;
         typedef std::false_type do_background_work;
-        typedef std::true_type  use_connection_cache;
+        typedef std::false_type send_immediate_parcels;
 
         static const char * type()
         {
