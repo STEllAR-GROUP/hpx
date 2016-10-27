@@ -43,6 +43,9 @@ namespace hpx { namespace lcos {
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
     }
 
+    barrier::barrier()
+    {}
+
     barrier::~barrier()
     {
         release();
@@ -72,11 +75,16 @@ namespace hpx { namespace lcos {
         }
     }
 
-    barrier& barrier::get_global_barrier()
+    barrier barrier::create_global_barrier()
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        static barrier b("/hpx/global_barrier", cfg.get_num_localities());
+        return barrier("/hpx/global_barrier", cfg.get_num_localities());
+    }
+
+    barrier& barrier::get_global_barrier()
+    {
+        static barrier b;
         return b;
     }
 
