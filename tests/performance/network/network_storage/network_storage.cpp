@@ -94,15 +94,15 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
 // #include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
 // otherwise use this
 #if DEBUG_LEVEL>0
-# define LOG_DEBUG_MSG(x) std::cout << x << std::endl
-# define DEBUG_OUTPUT(level,x)                                                \
+# define LOG_DEBUG_MSG(x) std::cout << "Network storage " << x << std::endl
+# define DEBUG_OUTPUT(level,x)                                               \
     if (DEBUG_LEVEL>=level) {                                                \
         LOG_DEBUG_MSG(x);                                                    \
     }
@@ -113,6 +113,8 @@
 //----------------------------------------------------------------------------
 #define TEST_FAIL    0
 #define TEST_SUCCESS 1
+
+#undef USE_SEMAPHORE
 
 //----------------------------------------------------------------------------
 // global vars
@@ -507,8 +509,9 @@ void test_write(
         //
 
         // limit number of tasks we generate at a time so we don't oversubscribe resources
+#ifdef USE_SEMAPHORE
         hpx::lcos::local::sliding_semaphore sem(options.semaphore);
-
+#endif
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::simple_profiler prof_setup(iteration, "Setup slots");
             int send_rank;
@@ -572,7 +575,8 @@ void test_write(
 
                 // After every 10 actions complete, add another future to signal
                 // the semaphore with our state so that it doesn't wait too long
-                if (i % 2 == 0) {
+#ifdef USE_SEMAPHORE
+                if (i % 1 == 0) {
                     ActiveFutures[send_rank].push_back(
                         std::move(temp_future.then(
                             [&sem, i](hpx::future<int> &&result)
@@ -585,9 +589,15 @@ void test_write(
                 else {
                     ActiveFutures[send_rank].push_back(std::move(temp_future));
                 }
+                sem.wait(i);
+#else
+                ActiveFutures[send_rank].push_back(std::move(temp_future));
+#endif
             }
-            sem.wait(i);
         }
+        DEBUG_OUTPUT(2,
+          "Exited transfer loop " << rank
+        );
 
 #ifdef USE_CLEANING_THREAD
         int removed = 0;
@@ -622,6 +632,7 @@ void test_write(
         //
         hpx::util::simple_profiler fwait(iteration, "Future wait");
         int numwait = static_cast<int>(final_list.size());
+
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
@@ -632,6 +643,10 @@ void test_write(
         );
         fwait.done();
     }
+    DEBUG_OUTPUT(2,
+      "Exited iterations loop " << rank
+    );
+
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
     hpx::lcos::barrier::synchronize();
     //
@@ -727,7 +742,9 @@ void test_read(
         // Start main message sending loop
         //
         // limit number of tasks we generate at a time so we don't oversubscribe resources
+#ifdef USE_SEMAPHORE
         hpx::lcos::local::sliding_semaphore sem(options.semaphore);
+#endif
         //
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::high_resolution_timer looptimer;
@@ -792,7 +809,8 @@ void test_read(
                         }
                     );
 
-                if (i % 2 == 0) {
+#ifdef USE_SEMAPHORE
+                if (i % 1 == 0) {
                     ActiveFutures[send_rank].push_back(
                         std::move(temp_future.then(
                             [&sem, i](hpx::future<int> &&result)
@@ -805,8 +823,11 @@ void test_read(
                 else {
                     ActiveFutures[send_rank].push_back(std::move(temp_future));
                 }
+                sem.wait(i);
+#else
+                ActiveFutures[send_rank].push_back(std::move(temp_future));
+#endif
             }
-            sem.wait(i);
         }
 #ifdef USE_CLEANING_THREAD
         // tell the cleaning thread it's time to stop
@@ -838,6 +859,7 @@ void test_read(
         //
         int numwait = static_cast<int>(final_list.size());
         hpx::util::high_resolution_timer futuretimer;
+
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
@@ -913,7 +935,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.distribution      = vm["distribution"].as<std::uint64_t>() ? true : false;
     options.semaphore         = vm["semaphore"].as<std::uint64_t>();
 
-
     //
     if (options.global_storage_MB>0) {
       options.local_storage_MB = options.global_storage_MB/nranks;
@@ -946,9 +967,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     delete_local_storage();
 
-    DEBUG_OUTPUT(2,
-        "Calling finalize" << rank
-    );
+    DEBUG_OUTPUT(2,"Calling finalize" << rank);
     if (rank==0)
       return hpx::finalize();
     else return 0;
@@ -986,7 +1005,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "semaphore",
-          boost::program_options::value<std::uint64_t>()->default_value(64),
+          boost::program_options::value<std::uint64_t>()->default_value(16),
           "The max amount of simultaneous put/get operations to allow.\n")
         ;
 
