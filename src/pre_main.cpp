@@ -91,10 +91,6 @@ static void register_message_handlers()
 int pre_main(runtime_mode mode);
 int pre_main(runtime_mode mode)
 {
-    // create our global barrier...
-    hpx::lcos::barrier::get_global_barrier() =
-        hpx::lcos::barrier::create_global_barrier();
-
     // Register pre-shutdown and shutdown functions to flush pending
     // reference counting operations.
     register_pre_shutdown_function(&::garbage_collect_non_blocking);
@@ -162,12 +158,17 @@ int pre_main(runtime_mode mode)
         }
         // }}}
 
+        // create our global barrier...
+        hpx::lcos::barrier::get_global_barrier() =
+            hpx::lcos::barrier::create_global_barrier();
+
         // Work on registration requests for message handler plugins
         register_message_handlers();
 
         // Register all counter types before the startup functions are being
         // executed.
         register_counter_types();
+
 
         // Second stage bootstrap synchronizes component loading across all
         // localities, ensuring that the component namespace tables are fully

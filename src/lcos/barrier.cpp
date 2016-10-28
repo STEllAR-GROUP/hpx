@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
@@ -45,6 +46,21 @@ namespace hpx { namespace lcos {
 
     barrier::barrier()
     {}
+
+    barrier::barrier(barrier&& other)
+      : node_(std::move(other.node_))
+    {
+        other.node_.reset();
+    }
+
+    barrier& barrier::operator=(barrier&& other)
+    {
+        release();
+        node_ = std::move(other.node_);
+        other.node_.reset();
+
+        return *this;
+    }
 
     barrier::~barrier()
     {
@@ -94,6 +110,7 @@ namespace hpx { namespace lcos {
     void barrier::synchronize()
     {
         static barrier& b = get_global_barrier();
+        HPX_ASSERT(b.node_);
         b.wait();
     }
 }}
