@@ -13,11 +13,11 @@
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_device.hpp>
-
+//
 namespace hpx {
 namespace parcelset {
 namespace policies {
-namespace verbs 
+namespace verbs
 {
     class HPX_EXPORT parcelport;
 }}
@@ -26,9 +26,9 @@ namespace verbs
     struct connection_handler_traits<policies::verbs::parcelport>
     {
         typedef policies::verbs::sender_connection connection_type;
-        typedef std::true_type  send_early_parcel;
-        typedef std::true_type   do_background_work;
-        typedef std::false_type  use_connection_cache;
+        typedef HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP send_early_parcel;
+        typedef std::true_type                        do_background_work;
+        typedef std::true_type                        send_immediate_parcels;
 
         static const char * type()
         {
@@ -47,7 +47,7 @@ namespace verbs
     };
 
 namespace policies {
-namespace verbs 
+namespace verbs
 {
         uint32_t Get_rdma_device_address(const char *devicename, const char *iface, char *hostname)
         {
