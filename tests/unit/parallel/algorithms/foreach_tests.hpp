@@ -24,7 +24,7 @@ struct set_42
     template <typename T>
     void operator()(T& val)
     {
-        val = 42;
+        val = T(42);
     }
 };
 
