@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // config
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 // util
 #include <hpx/util/command_line_handling.hpp>
@@ -12,6 +12,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 
 #include <hpx/apply.hpp>
 
@@ -24,45 +26,91 @@
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
+#include <hpx/util/debug/thread_stacktrace.hpp>
+//
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/unordered_map.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 //
 #include <boost/container/small_vector.hpp>
 
-// Local parcelport plugin
-//#define USE_SPECIALIZED_SCHEDULER
+// --------------------------------------------------------------------
+// The parcelport does not support HPX bootstrapping by default
+// it is a work in progress and may cause lockups on start if enabled
+// this value should be either std::true_type or std::false_type
+#define HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP  std::false_type
+
+// --------------------------------------------------------------------
+// Enable or disable the use of the parcelport connection cache that
+// will send multiple parcels at once when congestion is detected
+// this value should be either true or false
+#define HPX_PARCELPORT_VERBS_ENABLE_CONN_CACHE false
+
+// --------------------------------------------------------------------
+// This defines the standard size of messages that can be sent/received without
+// resorting to RDMA GET operations to fetch data. Chunks are still retrieved
+// using GET operations, this only affects the main message body/header size.
+#define HPX_PARCELPORT_VERBS_MESSAGE_HEADER_SIZE   RDMA_POOL_SMALL_CHUNK_SIZE
+
+// --------------------------------------------------------------------
+// This determines the lower size limit for messages that are copied into an
+// existing RDMA buffer. Messages larger than this will be registered on the fly
+// and sent without a memory copy
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_MEDIUM_CHUNK_SIZE
+
+// --------------------------------------------------------------------
+// The maximum number of sends that can be posted before we activate throttling
+#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        64
+
+// --------------------------------------------------------------------
+// Controls whether we are allowed to suspend threads that are sending
+// when we have maxed out the number of sends we can handle
+#define HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND 1
+#define HPX_PARCELPORT_VERBS_SUSPEND_WAKE         (HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE/2)
+
+// --------------------------------------------------------------------
+// When defined, we use a reader/writer lock on maps to squeeze a tiny performance
+// improvement from our code.
+#define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS 1
+
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR  true
+
+// --------------------------------------------------------------------
+// When enabled, the parcelport can create a custom scheduler to help
+// make progress on the network.
+// This is experimental and should not be used in general
+#undef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+
+// --------------------------------------------------------------------
+// HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED is set by CMake if the machine is a
+// BlueGene active storage node which does not support immediate data sends
+#undef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+
+// --------------------------------------------------------------------
+#include "plugins/parcelport/verbs/sender_connection.hpp"
+#include "plugins/parcelport/verbs/connection_handler.hpp"
+#include "plugins/parcelport/verbs/locality.hpp"
+#include "plugins/parcelport/verbs/header.hpp"
+#include "plugins/parcelport/verbs/pinned_memory_vector.hpp"
 //
-#include "sender_connection.hpp"
-#include "connection_handler.hpp"
-#include "locality.hpp"
-#include "header.hpp"
-#include "pinned_memory_vector.hpp"
-#ifdef USE_SPECIALIZED_SCHEDULER
-# include "scheduler.hpp"
+#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+# include "plugins/parcelport/verbs/scheduler.hpp"
 #endif
 //
 // rdmahelper library
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
+#include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
+#include <plugins/parcelport/verbs/rdma/memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
+#include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
 //
 #include <unordered_map>
 //
 #include <memory>
 #include <mutex>
-
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_SMALL_CHUNK_SIZE
-#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
-
-#define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS 1
-
-// Note HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED is set by CMake configuration
-// if the machine is a BlueGene active storage node which does not support immediate
-// data sends
 
 using namespace hpx::parcelset::policies;
 
@@ -71,7 +119,6 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-
     // --------------------------------------------------------------------
     // simple atomic counter we use for tags
     // when a parcel is sent to a remote locality, it may need to pull zero copy chunks from us.
@@ -89,7 +136,7 @@ namespace verbs
         uint32_t next(uint32_t ip_addr)
         {
             // @TODO track wrap around and collisions (how?)
-            return (next_tag_++ & 0x0000FFFF) + (ip_addr << 16);
+            return (next_tag_++ & 0x0000FFFF) + (ip_addr & 0xFFFF0000);
         }
 
         // using 16 bits currently.
@@ -103,14 +150,6 @@ namespace verbs
     {
     private:
         typedef parcelport_impl<parcelport> base_type;
-
-        static std::size_t max_connections(util::runtime_configuration const& ini)
-        {
-            LOG_DEVEL_MSG("This should not be necessary as the parcelport_impl does it for us");
-            return hpx::util::get_entry_as<std::size_t>(
-                // this uses the mpi value as we have not bothered to add a verbs one yet
-                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
-        }
 
         // --------------------------------------------------------------------
         // returns a locality object that represents 'this' locality
@@ -155,11 +194,18 @@ namespace verbs
         }
 
     public:
+        // These are the types used in the parcelport for locking etc
+        // Note that spinlock is the only supported mutex that works on HPX+OS threads
+        // and condition_variable_any can be used across HPX/OS threads
+        typedef hpx::lcos::local::spinlock                               mutex_type;
+        typedef hpx::parcelset::policies::verbs::scoped_lock<mutex_type> scoped_lock;
+        typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
+        typedef hpx::lcos::local::condition_variable_any                 condition_type;
+
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
         // --------------------------------------------------------------------
         static RdmaControllerPtr _rdmaController;
-        // static std::string       _ibverbs_ifname;
         static std::string       _ibverbs_device;
         static std::string       _ibverbs_interface;
         static boost::uint32_t   _port;
@@ -176,33 +222,32 @@ namespace verbs
         typedef hpx::concurrent::unordered_map<boost::uint32_t, bool> connect_map;
         connect_map connection_requests_;
 
-        // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a more consistent
-        // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
-        // needs reworking
-        typedef header<RDMA_POOL_SMALL_CHUNK_SIZE>           header_type;
-        typedef hpx::lcos::local::spinlock                   mutex_type;
-        typedef std::lock_guard<mutex_type>                  scoped_lock;
-        typedef hpx::lcos::local::condition_variable_any     condition_type;
-        typedef std::unique_lock<mutex_type>                 unique_lock;
+        // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
+        // more consistent reuse of classes/types.
+        // The use of pointer allocators etc is a dreadful hack and needs reworking
+        typedef header<HPX_PARCELPORT_VERBS_MESSAGE_HEADER_SIZE>   header_type;
 
-        // note use std::mutex in stop function as HPX is terminating
-        mutex_type  stop_mutex;
-
-        typedef rdma_memory_pool                                  memory_pool_type;
-        typedef std::shared_ptr<memory_pool_type>                 memory_pool_ptr_type;
+        typedef rdma_memory_pool                                   memory_pool_type;
+        typedef std::shared_ptr<memory_pool_type>                  memory_pool_ptr_type;
         typedef hpx::util::detail::memory_chunk_pool_allocator
                 <char, memory_pool_type, mutex_type>               allocator_type;
         typedef util::detail::pinned_memory_vector<char>           rcv_data_type;
         typedef parcel_buffer<rcv_data_type>                       snd_buffer_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>>    rcv_buffer_type;
 
+        // when terminating the parcelport, this is used to restrict access
+        mutex_type  stop_mutex;
         //
         boost::atomic<bool>       stopped_;
         boost::atomic_uint        active_send_count_;
+
+#ifdef HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND
+        boost::atomic<bool>       immediate_send_allowed_;
+#endif
         memory_pool_ptr_type      chunk_pool_;
         verbs::tag_provider       tag_provider_;
 
-#ifdef USE_SPECIALIZED_SCHEDULER
+#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
         custom_scheduler          parcelport_scheduler;
 #endif
         // performance_counters::parcels::gatherer& parcels_sent_;
@@ -214,29 +259,28 @@ namespace verbs
 #endif
 
         // --------------------------------------------------------------------
-        // struct we use to keep track of all memory regions used during a send, they must
-        // be held onto until all transfers of data are complete.
+        // struct we use to keep track of all memory regions used during a send,
+        // they must be held onto until all transfers of data are complete.
         // --------------------------------------------------------------------
-        typedef struct parcel_send_data_ {
-            uint32_t                                         tag;
-            std::atomic_flag                                 delete_flag;
-            bool                                             has_zero_copy;
+        typedef struct {
+            uint32_t                                                tag;
+            std::atomic_flag                                        delete_flag;
+            bool                                                    has_zero_copy;
             util::unique_function_nonser< void(error_code const&) > handler;
-
-            rdma_memory_region *header_region, *chunk_region, *message_region;
-            zero_copy_vector                                   zero_copy_regions;
+            rdma_memory_region                     *header_region, *message_region;
+            zero_copy_vector                                        zero_copy_regions;
         } parcel_send_data;
 
         // --------------------------------------------------------------------
-        // struct we use to keep track of all memory regions used during a recv, they must
-        // be held onto until all transfers of data are complete.
+        // struct we use to keep track of all memory regions used during a recv,
+        // they must be held onto until all transfers of data are complete.
         // --------------------------------------------------------------------
         typedef struct {
             std::atomic_uint                                 rdma_count;
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
-            rdma_memory_region *header_region, *chunk_region, *message_region;
-            zero_copy_vector                                        zero_copy_regions;
+            rdma_memory_region              *header_region, *message_region;
+            zero_copy_vector                                 zero_copy_regions;
         } parcel_recv_data;
 
         typedef std::list<parcel_send_data>      active_send_list_type;
@@ -247,8 +291,10 @@ namespace verbs
 
 #ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
         // map send/recv parcel wr_id to all info needed on completion
-        typedef hpx::concurrent::unordered_map<uint64_t, active_send_iterator> send_wr_map;
-        typedef hpx::concurrent::unordered_map<uint64_t, active_recv_iterator> recv_wr_map;
+        typedef hpx::concurrent::unordered_map<uint64_t, active_send_iterator>
+            send_wr_map;
+        typedef hpx::concurrent::unordered_map<uint64_t, active_recv_iterator>
+            recv_wr_map;
 #else
         mutex_type  ReadCompletionMap_mutex;
         mutex_type  SendCompletionMap_mutex;
@@ -263,16 +309,27 @@ namespace verbs
         send_wr_map TagSendCompletionMap;
         recv_wr_map ReadCompletionMap;
 
+        // keep track of all outgoing sends in a list, protected by a mutex
         active_send_list_type   active_sends;
         mutex_type              active_send_mutex;
-        condition_type          active_send_condition;
 
-        active_recv_list_type active_recvs;
-        mutex_type       active_recv_mutex;
-        std::atomic<int> total_receives;
+        // keep track of all active receive operations in a list, protected by a mutex
+        active_recv_list_type   active_recvs;
+        mutex_type              active_recv_mutex;
 
+        // a count of all receives, for debugging/performance measurement
+        boost::atomic_uint      sends_posted;
+        boost::atomic_uint      handled_receives;
+        boost::atomic_uint      completions_handled;
+        boost::atomic_uint      total_reads;
+
+        // Used to control incoming and outgoing connection requests
         mutex_type              new_connection_mutex;
         condition_type          new_connection_condition;
+
+        // used when suspending threads that flood us with parcels
+        mutex_type              suspend_mutex;
+        condition_type          suspend_condition;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -283,10 +340,31 @@ namespace verbs
               : base_type(ini, here(ini), on_start_thread, on_stop_thread)
               , stopped_(false)
               , active_send_count_(0)
-              , total_receives(0)
-              // , parcels_sent_(0)
+              , immediate_send_allowed_(true)
+              , sends_posted(0)
+              , handled_receives(0)
+              , completions_handled(0)
+              , total_reads(0)
 
         {
+#ifdef HPX_PARCELPORT_VERBS_HAVE_LOGGING
+            std::cout << "Initializing logging " << std::endl;
+            boost::log::add_console_log(
+            std::clog,
+            // This makes the sink to write log records that look like this:
+            // 1: <normal> A normal severity message
+            // 2: <error> An error severity message
+            boost::log::keywords::format =
+                (
+                    boost::log::expressions::stream
+                    //            << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
+                    << boost::log::expressions::attr< unsigned int >("LineID")
+                    << ": <" << boost::log::trivial::severity
+                    << "> " << boost::log::expressions::smessage
+                )
+            );
+            boost::log::add_common_attributes();
+#endif
             FUNC_START_DEBUG_MSG;
             // we need this for background OS threads to get 'this' pointer
             parcelport::_parcelport_instance = this;
@@ -302,11 +380,10 @@ namespace verbs
             // We only execute work on the IO service while HPX is starting
             while (hpx::is_starting())
             {
-                OS_background_work();
+                background_work(0);
             }
             LOG_DEBUG_MSG("io service task completed");
         }
-
 
         // Start the handling of connections.
         bool do_run()
@@ -344,15 +421,15 @@ namespace verbs
                 );
             }
 
-#ifdef USE_SPECIALIZED_SCHEDULER
+#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
             // initialize our custom scheduler
             parcelport_scheduler.init();
 
             //
             hpx::error_code ec(hpx::lightweight);
             parcelport_scheduler.register_thread_nullary(
-                    util::bind(&parcelport::hpx_background_work_thread, this),
-                    "hpx_background_work_thread",
+                    util::bind(&parcelport::background_work_scheduler_thread, this),
+                    "background_work_scheduler_thread",
                     threads::pending, true, threads::thread_priority_critical,
                     std::size_t(-1), threads::thread_stacksize_default, ec);
 
@@ -397,15 +474,16 @@ namespace verbs
             parcel_send_data &send_data = *send;
             // trigger the send complete handler for hpx internal cleanup
             LOG_DEBUG_MSG("Calling write_handler for completed send");
-//            send_data.handler.operator()(error_code(), send_data.parcel);
             send_data.handler.operator()(error_code());
             //
-            LOG_DEBUG_MSG("deallocating region 1 for completed send " << hexpointer(send_data.header_region));
+            LOG_DEBUG_MSG("deallocating region 1 for completed send "
+                << hexpointer(send_data.header_region));
             chunk_pool_->deallocate(send_data.header_region);
             send_data.header_region  = NULL;
             // if this message had multiple (2) SGEs then release other regions
             if (send_data.message_region) {
-                LOG_DEBUG_MSG("deallocating region 2 for completed send " << hexpointer(send_data.message_region));
+                LOG_DEBUG_MSG("deallocating region 2 for completed send "
+                    << hexpointer(send_data.message_region));
                 chunk_pool_->deallocate(send_data.message_region);
                 send_data.message_region = NULL;
             }
@@ -413,24 +491,22 @@ namespace verbs
                 LOG_DEBUG_MSG("Deallocating zero_copy_regions " << hexpointer(r));
                 chunk_pool_->deallocate(r);
             }
-            //
-            // when a parcel is deleted, it takes a lock, since we are locking before delete
-            // we must grab a reference to the parcel and keep it alive until we unlock
-            // parcelset::parcel parcel = std::move(send->parcel);
-            // erratum : the parcel destructor takes a lock even when empty, so better
-            // to avoid the lock held detection by using util::ignore_while_checking
+
             {
-                LOG_DEBUG_MSG("Taking lock on active_send_mutex in delete_send_data " << hexnumber(active_send_count_) );
-                suspended_task_debug();
-                unique_lock lock(active_send_mutex);
-//                util::ignore_while_checking<unique_lock> il(&lock);
+                LOG_DEBUG_MSG("Taking lock on active_send_mutex in delete_send_data "
+                    << hexnumber(active_send_count_) );
+                //
+                scoped_lock lock(active_send_mutex);
                 active_sends.erase(send);
-                --active_send_count_;
-                LOG_DEBUG_MSG("Active send after erase size " << hexnumber(active_send_count_) );
-                lock.unlock();
-                active_send_condition.notify_one();
-                LOG_DEBUG_MSG("Active send notified one");
-                suspended_task_debug();
+                if (--active_send_count_ < HPX_PARCELPORT_VERBS_SUSPEND_WAKE)
+                {
+                    if (!immediate_send_allowed_) {
+                        LOG_DEVEL_MSG("Enabling immediate send");
+                    }
+                    immediate_send_allowed_ = true;
+                }
+                LOG_DEBUG_MSG("Active send after erase size "
+                    << hexnumber(active_send_count_) );
             }
         }
 
@@ -443,7 +519,8 @@ namespace verbs
             FUNC_START_DEBUG_MSG;
             parcel_recv_data &recv_data = *recv;
             chunk_pool_->deallocate(recv_data.header_region);
-            LOG_DEBUG_MSG("Zero copy regions size is (delete) " << decnumber(recv_data.zero_copy_regions.size()));
+            LOG_DEBUG_MSG("Zero copy regions size is (delete) "
+                << decnumber(recv_data.zero_copy_regions.size()));
             for (auto r : recv_data.zero_copy_regions) {
                 LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
                 chunk_pool_->deallocate(r);
@@ -453,6 +530,7 @@ namespace verbs
                 active_recvs.erase(recv);
                 LOG_DEBUG_MSG("Active recv after erase size " << hexnumber(active_recvs.size()) );
             }
+            ++handled_receives;
         }
 
         int handle_verbs_preconnection(struct sockaddr_in *addr_src, struct sockaddr_in *addr_dst)
@@ -520,7 +598,7 @@ namespace verbs
         // if there are no zero copy chunks, we consider the parcel sending complete
         // so release memory and trigger write_handler.
         // If there are zero copy chunks to be RDMA GET from the remote end, then
-        // we hold onto data until the have completed.
+        // we hold onto data until they have completed.
         // ----------------------------------------------------------------------------------------------
         void handle_send_completion(uint64_t wr_id)
         {
@@ -568,12 +646,14 @@ namespace verbs
             if (found_wr_id) {
                 // if the send had no zero_copy regions, then it has completed
                 if (!current_send->has_zero_copy) {
-                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
+                    LOG_DEBUG_MSG("Deleting send data "
+                        << hexpointer(&(*current_send)) << "normal");
                     delete_send_data(current_send);
                 }
                 // if another thread signals to say zero-copy is complete, delete the data
                 else if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
-                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "after race detection");
+                    LOG_DEBUG_MSG("Deleting send data "
+                        << hexpointer(&(*current_send)) << "after race detection");
                     delete_send_data(current_send);
                 }
             }
@@ -594,7 +674,7 @@ namespace verbs
             util::high_resolution_timer timer;
 
             // bookkeeping : decrement counter that keeps preposted queue full
-            client->popReceive();
+            client->pop_receive_count();
             _rdmaController->refill_client_receives();
 
             // store details about this parcel so that all memory buffers can be kept
@@ -604,14 +684,14 @@ namespace verbs
                 scoped_lock lock(active_recv_mutex);
                 active_recvs.emplace_back();
                 current_recv = std::prev(active_recvs.end());
-                LOG_DEBUG_MSG("Active recv after insert size " << hexnumber(active_recvs.size()));
+                LOG_DEBUG_MSG("Active recv after insert size "
+                    << hexnumber(active_recvs.size()));
             }
             parcel_recv_data &recv_data = *current_recv;
             // get the header of the new message/parcel
             recv_data.header_region  = (rdma_memory_region *)wr_id;
             header_type *h = (header_type*)recv_data.header_region->get_address();
             recv_data.message_region = NULL;
-            recv_data.chunk_region   = NULL;
             // zero copy chunks we have to GET from the source locality
             if (h->piggy_back()) {
               recv_data.rdma_count        = h->num_chunks().first;
@@ -619,9 +699,10 @@ namespace verbs
             else {
                 recv_data.rdma_count      = 1 + h->num_chunks().first;
             }
-            // each parcel has a unique tag which we use to organize zero-copy data if we need any
+            // each parcel has a unique tag which we use to organize
+            // zero-copy data if we need any
             recv_data.tag            = h->tag();
-
+            //
             LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
                     "buffsize " << decnumber(h->size())
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
@@ -630,10 +711,11 @@ namespace verbs
                     << " chunkdata " << decnumber((h->chunk_data()!=NULL))
                     << " piggyback " << decnumber((h->piggy_back()!=NULL))
                     << " tag " << hexuint32(h->tag())
-                    << " total receives " << decnumber(++total_receives)
+                    << " total receives " << decnumber(handled_receives)
             );
 
-            // setting this flag to false - if more data is needed - disables final parcel receive call
+            // setting this flag to false - if more data is needed -
+            // disables final parcel receive call
             bool parcel_complete = true;
 
             // if message was not piggybacked
@@ -667,8 +749,10 @@ namespace verbs
                                     << " tag " << hexuint32(recv_data.tag)
                                     << " local address " << get_region->get_address() << " length " << c.size_);
                             recv_data.zero_copy_regions.push_back(get_region);
-                            LOG_DEBUG_MSG("Zero copy regions size is (create) " << decnumber(recv_data.zero_copy_regions.size()));
-                            // put region into map before posting read in case it completes whilst this thread is suspended
+                            LOG_DEBUG_MSG("Zero copy regions size is (create) "
+                                << decnumber(recv_data.zero_copy_regions.size()));
+                            // put region into map before posting read in case it
+                            // completes whilst this thread is suspended
                             {
 #ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                                 ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
@@ -681,13 +765,17 @@ namespace verbs
                             /// post the rdma read/get
                             const void *remoteAddr = c.data_.cpos_;
                             recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->get_address(), c.size_, c.rkey_);
-                            client->postRead(get_region, c.rkey_, remoteAddr, c.size_);
+                            ++total_reads;
+                            client->post_read(get_region, c.rkey_, remoteAddr, c.size_);
                         }
                         index++;
                     }
                 }
             }
             else {
+                // no chunk information was sent in this message, so we must GET it
+                parcel_complete = false;
+
                 LOG_ERROR_MSG("@TODO implement RDMA GET of mass chunk information when header too small");
                 std::terminate();
                 throw std::runtime_error("@TODO implement RDMA GET of mass chunk information when header too small");
@@ -726,7 +814,8 @@ namespace verbs
                 recv_data.chunks.push_back(
                     hpx::serialization::create_pointer_chunk(get_region->get_address(),
                         size, h->get_message_rdma_key()));
-                client->postRead(get_region, h->get_message_rdma_key(), remoteAddr,
+                ++total_reads;
+                client->post_read(get_region, h->get_message_rdma_key(), remoteAddr,
                     h->get_message_rdma_size());
             }
 
@@ -760,7 +849,7 @@ namespace verbs
             LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
 #endif
             // bookkeeping : decrement counter that keeps preposted queue full
-            client->popReceive();
+            client->pop_receive_count();
 
             // let go of this region (waste really as this was a zero byte message)
             chunk_pool_->deallocate(region);
@@ -794,9 +883,10 @@ namespace verbs
                 delete_send_data(current_send);
             }
             //
+            ++handled_receives;
 
             LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
-                    << " total receives " << decnumber(++total_receives)
+                    << " total receives " << decnumber(handled_receives)
             );
 
         }
@@ -813,18 +903,18 @@ namespace verbs
                     current_recv = is_present.first->second;
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
                         << "from ReadCompletionMap : size before erase "
-                        << SendCompletionMap.size());
+                        << ReadCompletionMap.size());
                     ReadCompletionMap.erase(is_present.first);
                 }
 #else
-                unique_lock lock(ReadCompletionMap_mutex);
+                scoped_lock lock(ReadCompletionMap_mutex);
                 auto it = ReadCompletionMap.find(wr_id);
                 if (it!=ReadCompletionMap.end()) {
                     found_wr_id = true;
                     current_recv = it->second;
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
                         << "from ReadCompletionMap : size before erase "
-                        << SendCompletionMap.size());
+                        << ReadCompletionMap.size());
                     ReadCompletionMap.erase(it);
                 }
 #endif
@@ -847,15 +937,19 @@ namespace verbs
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
-                client->postSend(tag_region, true, false, 0);
+                client->post_send(tag_region, true, false, 0);
 #else
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting zero byte ack to origin");
-                // convert uint32 to uint64 so we can use it as a fake message region (wr_id only for 0 byte send)
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting zero byte ack to origin");
+                // convert uint32 to uint64 so we can use it as a fake message region
+                // (wr_id only for 0 byte send)
                 uint64_t fake_region = recv_data.tag;
-                client->postSend_x0((rdma_memory_region*)fake_region, false, true, recv_data.tag);
+                client->post_send_x0((rdma_memory_region*)fake_region,
+                    false, true, recv_data.tag);
 #endif
                 //
-                LOG_DEBUG_MSG("Zero copy regions size is (completion) " << decnumber(recv_data.zero_copy_regions.size()));
+                LOG_DEBUG_MSG("Zero copy regions size is (completion) "
+                    << decnumber(recv_data.zero_copy_regions.size()));
 
                 header_type *h = (header_type*)recv_data.header_region->get_address();
                 LOG_DEBUG_MSG( "get completion " <<
@@ -921,6 +1015,34 @@ namespace verbs
             uint64_t wr_id = completion.wr_id;
             LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
 
+            completions_handled++;
+/*
+            _rdmaController->for_each_client(
+                [](std::pair<uint32_t, RdmaClientPtr> clientpair)
+                {
+                RdmaClient* client = clientpair.second.get();
+                LOG_TIMED_INIT(clientlog);
+                LOG_TIMED_MSG(clientlog, DEVEL, 0.1,
+                    "internal reported, \n"
+                    << "recv " << decnumber(client->get_total_posted_recv_count()) << "\n"
+                    << "send " << decnumber(client->get_total_posted_send_count()) << "\n"
+                    << "read " << decnumber(client->get_total_posted_read_count()) << "\n"
+                );
+                }
+            );
+
+            LOG_TIMED_INIT(background);
+            LOG_TIMED_MSG(background, DEVEL, 0.1,
+                "PP reported\n"
+                << "actv " << decnumber(active_send_count_) << "\n"
+                << "recv " << decnumber(handled_receives) << "\n"
+                << "send " << decnumber(sends_posted) << "\n"
+                << "read " << decnumber(total_reads) << "\n"
+                << "Total completions " << decnumber(completions_handled)
+                << decnumber(sends_posted+handled_receives+total_reads));
+*/
+
+
             if (completion.opcode==IBV_WC_SEND) {
                 LOG_DEBUG_MSG("Handle general completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
                 handle_send_completion(wr_id);
@@ -939,7 +1061,7 @@ namespace verbs
             //
             // A zero byte receive indicates we are being informed that remote GET operations are complete
             // we can release any data we were holding onto and signal a send as finished.
-            // On hardware that do not support immediate data, a 4 byte tag message is used.
+            // On hardware that does not support immediate data, a 4 byte tag message is used.
             //
 
             else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
@@ -958,8 +1080,9 @@ namespace verbs
                 return 0;
             }
 
-            throw std::runtime_error("Unexpected opcode in handle_verbs_completion ");
-            //        << RdmaConnection::wr_opcode_str((ibv_wr_opcode)(completion.opcode)).c_str());
+            throw std::runtime_error("Unexpected opcode in handle_verbs_completion "
+                + rdma_sender_receiver::
+                ibv_wc_opcode_string((ibv_wr_opcode)(completion.opcode)));
             return 0;
         }
 
@@ -1011,48 +1134,16 @@ namespace verbs
             return parcelset::locality(locality());
         }
 
-        void suspended_task_debug() {
-#if defined(XXX_HPX_DEBUG)
-            scoped_lock lock(debug_mutex);
-            std::stringstream temp;
-            int count = 0;
-            hpx::threads::enumerate_threads(
-                [&temp, &count](hpx::threads::thread_id_type id) -> bool
-                {
-                    hpx::threads::thread_data *dummy = id.get();
-                    temp << hexpointer(dummy) << ", ";
-                    count++;
-                    return true;        // always continue enumeration
-                },
-                hpx::threads::suspended);
-
-            LOG_DEBUG_MSG("Suspended tasks " << decnumber(count) << " : " << temp.str().c_str());
-#endif
-        }
-/*
-        // should not be used any more.
-        void put_parcels(std::vector<parcelset::locality> dests,
-                std::vector<parcel> parcels,
-                std::vector<write_handler_type> handlers)
+        static void suspended_task_debug(const std::string &match)
         {
-            FUNC_START_DEBUG_MSG;
-            HPX_ASSERT(dests.size() == parcels.size());
-            HPX_ASSERT(dests.size() == handlers.size());
-            for(std::size_t i = 0; i != dests.size(); ++i)
+            std::string temp = hpx::util::debug::suspended_task_backtraces();
+            if (match.size()==0 ||
+                temp.find(match)!=std::string::npos)
             {
-                put_parcel(dests[i], std::move(parcels[i]), handlers[i]);
+                LOG_DEVEL_MSG("Suspended threads " << temp);
             }
-            FUNC_END_DEBUG_MSG;
         }
-*/
-        // This should start the receiving side of your PP
-/*
-        bool run(bool blocking = true) {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            return true;
-        }
-*/
+
         void do_stop() {
             LOG_DEBUG_MSG("Entering verbs stop ");
             FUNC_START_DEBUG_MSG;
@@ -1066,7 +1157,7 @@ namespace verbs
                     }
                 } while (!finished && !hpx::is_stopped());
 
-                unique_lock(stop_mutex);
+                scoped_lock lock(stop_mutex);
                 LOG_DEBUG_MSG("Removing all initiated connections");
                 _rdmaController->removeAllInitiatedConnections();
 
@@ -1157,69 +1248,14 @@ namespace verbs
             }
             return NULL;
         }
-/*
-        // ----------------------------------------------------------------------------------------------
-        // called by hpx when an action is invoked on a remote locality.
-        // This must be thread safe in order to function as any thread may invoke an action
 
-        // not called any more : parcelport_impl?
-        // ----------------------------------------------------------------------------------------------
-        void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
-            FUNC_START_DEBUG_MSG;
-            //
-            // All the parcelport code should run on hpx threads and not OS threads
-            //
-            if (threads::get_self_ptr() == 0) {
-                // this is an OS thread, so call put_parcel on an hpx thread
-                hpx::apply(&parcelport::put_parcel, this, dest, std::move(p), f);
-                return;
+        bool can_send_immediate() {
+#ifdef HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND
+            while (!immediate_send_allowed_) {
+                background_work(0);
             }
-            {   // if we already have a lot of sends in the queue, process them first
-                while (active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
-//                    LOG_DEBUG_MSG("Extra HPX Background work");
-                    hpx_background_work();
-                }
-            }
-
-            {
-                LOG_DEBUG_MSG("Extracting futures from parcel");
-                std::shared_ptr<hpx::serialization::detail::future_await_container>
-                    future_await(new hpx::serialization::detail::future_await_container());
-                std::shared_ptr<hpx::serialization::output_archive>
-                    archive(
-                        new hpx::serialization::output_archive(
-                            *future_await, 0, 0, 0, 0, &future_await->new_gids_)
-                    );
-                (*archive) << p;
-
-                if(future_await->has_futures())
-                {
-                    void (parcelport::*awaiter)(
-                      parcelset::locality const &, parcel, write_handler_type, bool
-                      , std::shared_ptr<hpx::serialization::output_archive> const &
-                      , std::shared_ptr<
-                            hpx::serialization::detail::future_await_container> const &
-                    )
-                        = &parcelport::put_parcel_impl;
-                    (*future_await)(
-                        util::bind(
-                            util::one_shot(awaiter), this,
-                            dest, std::move(p), std::move(f), true,
-                            archive, future_await)
-                    );
-                    return;
-                }
-                else
-                {
-                    LOG_DEBUG_MSG("About to send parcel");
-                    put_parcel_impl(dest, std::move(p), std::move(f), true,
-                      archive, future_await);
-                }
-            }
-        }
-*/
-        bool can_send_immediate() const {
-            return (active_send_count_<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
+#endif
+            return true;
         }
 
         template <typename Handler>
@@ -1239,32 +1275,24 @@ namespace verbs
                 {
                     LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write "
                         << hexnumber(active_send_count_) );
-                    suspended_task_debug();
-                    // if more than N parcels are currently queued, then yield
-                    // otherwise we can fill the send queues with so many requests
-                    // that memory buffers are exhausted.
-//                    LOG_TRACE_MSG("waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE " << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
-//                    if (active_sends.size()==HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
-//                        hpx_background_work();
-//                    }
-                    unique_lock lock(active_send_mutex);
-                    active_send_condition.wait(lock, [this] {
-                      return (active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
-                    });
-                    LOG_TRACE_MSG("Done waiting HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE "
-                        << HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE << " sends " << hexnumber(active_sends.size()));
-
+                    //
+                    scoped_lock lock(active_send_mutex);
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
-                    ++active_send_count_;
-                    LOG_DEBUG_MSG("Active send after insert size " << hexnumber(active_send_count_));
+                    if (++active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
+                        if (immediate_send_allowed_) {
+                            LOG_DEVEL_MSG("Disabling immediate send");
+                        }
+                        immediate_send_allowed_ = false;
+                    }
+                    LOG_DEBUG_MSG("Active send after insert size "
+                        << hexnumber(active_send_count_));
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
                 send_data.handler        = std::move(handler);
                 send_data.header_region  = NULL;
                 send_data.message_region = NULL;
-                send_data.chunk_region   = NULL;
                 send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
 
@@ -1288,7 +1316,7 @@ namespace verbs
                     if (c.type_ == serialization::chunk_type_pointer) {
                         send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
-                        util::high_resolution_timer regtimer;
+//                        util::high_resolution_timer regtimer;
                         rdma_memory_region *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
                             zero_copy_region = chunk_pool_->allocate_region(std::max(c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
@@ -1342,7 +1370,6 @@ namespace verbs
                 rdma_memory_region *region_list[2] = { send_data.header_region, send_data.message_region };
                 if (h->chunk_data()) {
                     LOG_DEBUG_MSG("Chunk info is piggybacked");
-                    send_data.chunk_region = NULL;
                 }
                 else {
                     throw std::runtime_error(
@@ -1374,7 +1401,7 @@ namespace verbs
                     // put everything into map to be retrieved when send completes
 #ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
 #else
-                    unique_lock lock(SendCompletionMap_mutex);
+                    scoped_lock lock(SendCompletionMap_mutex);
 #endif
                     SendCompletionMap.insert(std::make_pair(wr_id, current_send));
                     LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
@@ -1396,7 +1423,7 @@ namespace verbs
                 }
 
                 // send the header/main_chunk to the destination, wr_id is header_region (entry 0 in region_list)
-                LOG_TRACE_MSG("num regions to send " << num_regions
+                LOG_DEBUG_MSG("num regions to send " << num_regions
                     << "Block header_region"
                     << " buffer "    << hexpointer(send_data.header_region->get_address())
                     << " region "    << hexpointer(send_data.header_region));
@@ -1406,31 +1433,18 @@ namespace verbs
                     << " buffer "    << hexpointer(send_data.message_region->get_address())
                     << " region "    << hexpointer(send_data.message_region));
                 }
-                sender->client_->postSend_xN(region_list, num_regions, true, false, 0);
+                ++sends_posted;
+                sender->client_->post_send_xN(region_list, num_regions, true, false, 0);
 
                 // log the time spent in performance counter
 //                buffer.data_point_.time_ =
 //                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
 
-                // parcels_sent_.add_data(buffer.data_point_);
+                // parcels_posted_.add_data(buffer.data_point_);
             }
             FUNC_END_DEBUG_MSG;
             return true;
         }
-/*
-        void put_parcel_impl(
-            parcelset::locality const & dest, parcel p, write_handler_type f, bool trigger
-          , std::shared_ptr<hpx::serialization::output_archive> const & archive
-          , std::shared_ptr<
-                hpx::serialization::detail::future_await_container
-            > const & future_await)
-        {
-            boost::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel_impl to " << ipaddress(dest_ip) );
-
-            FUNC_END_DEBUG_MSG;
-        }
-*/
 
         // ----------------------------------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages as well as complete
@@ -1442,52 +1456,87 @@ namespace verbs
         // care when dealing with mutexes and condition_variables since we do not want to suspend an
         // OS thread, but we do want to suspend hpx threads when necessary.
         // ----------------------------------------------------------------------------------------------
-        bool hpx_background_work() {
+        inline bool background_work_OS_thread() {
             bool done = false;
-            // this must be called on an HPX thread
-//            HPX_ASSERT(threads::get_self_ptr() != 0);
-            //
             do {
                 // if an event comes in, we may spend time processing/handling it
                 // and another may arrive during this handling,
                 // so keep checking until none are received
+                _rdmaController->refill_client_receives();
                 done = (_rdmaController->eventMonitor(0) == 0);
             } while (!done);
             return true;
         }
+
+        inline bool background_work_hpx_thread() {
+            // this must be called on an HPX thread
+            HPX_ASSERT(threads::get_self_ptr() != nullptr);
+            //
+            return background_work_OS_thread();
+        }
+
 
         // --------------------------------------------------------------------
         // Background work, HPX thread version, used on custom scheduler
         // to poll in an OS background thread which is pre-emtive and therefore
         // could help reduce latencies (when hpx threads are all doing work).
         // --------------------------------------------------------------------
-#ifdef USE_SPECIALIZED_SCHEDULER
-        void hpx_background_work_thread()
+#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+        void background_work_scheduler_thread()
         {
             // repeat until no more parcels are to be sent
             while (!stopped_ || !hpx::is_stopped()) {
-                hpx_background_work();
+                background_work_hpx_thread();
             }
             LOG_DEBUG_MSG("hpx background work thread stopped");
         }
 #endif
 
         // --------------------------------------------------------------------
-        // Background work, OS thread version
+        // Background work
+        //
+        // This is called whenever the main thread scheduler is idling,
+        // is used to poll for events, messages on the verbs connection
         // --------------------------------------------------------------------
-        static inline bool OS_background_work() {
-            return parcelport::get_singleton()->hpx_background_work();
-        }
 
-        // ----------------------------------------------------------------------------------------------
-        // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
-        // this should be thread safe as eventMonitor only polls and dispatches and is thread safe.
-        // ----------------------------------------------------------------------------------------------
         bool background_work(std::size_t num_thread) {
             if (stopped_ || hpx::is_stopped()) {
                 return false;
-			            }
-            return hpx::apply(&parcelport::OS_background_work);
+            }
+            LOG_TIMED_INIT(background_work);
+            LOG_TIMED_MSG(background_work, DEVEL, 5.0,
+                "active_send_count_ " << decnumber(active_send_count_)
+                << "active_send_size " << decnumber(active_sends.size())
+                << "Total sends " << decnumber(sends_posted)
+                << "Total recvs " << decnumber(handled_receives)
+                << "Total reads " << decnumber(total_reads)
+                << "Total completions " << decnumber(completions_handled)
+                << decnumber(sends_posted+handled_receives+total_reads));
+
+            LOG_TIMED_INIT(background_sends);
+            LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
+                for (const auto & as : active_sends) {
+                    LOG_DEVEL_MSG("active_send "
+                        << ", tag "     << hexnumber(as.tag)
+                        << ", ZC "      << as.has_zero_copy
+                        << ", ZC size " << as.zero_copy_regions.size());
+                }
+                for (const auto & as : active_recvs) {
+                    LOG_DEVEL_MSG("active_recvs "
+                        << ", tag "         << hexnumber(as.tag)
+                        << ", rdma_count "  << as.rdma_count
+                        << ", chunks "      << as.chunks.size()
+                        << ", ZC size "     << as.zero_copy_regions.size());
+                }
+                suspended_task_debug("");
+            )
+
+            if (threads::get_self_ptr() == nullptr) {
+                // this is an OS thread, we are still not 100% sure our code is
+                // safe on an OS thread, call this function to skip checks
+                return background_work_OS_thread();
+            }
+            return background_work_hpx_thread();
         }
 
         static parcelport *get_singleton()
@@ -1499,7 +1548,12 @@ namespace verbs
 
     };
 
-
+    // --------------------------------------------------------------------
+    // sender_connection functions
+    //
+    // could not be included in sender_connection.hpp because they
+    // need the full definition of the verbs PP to come first
+    // --------------------------------------------------------------------
     template <typename Handler, typename ParcelPostprocess>
     void sender_connection::async_write(Handler && handler,
         ParcelPostprocess && parcel_postprocess)
@@ -1527,13 +1581,12 @@ namespace verbs
             error_code ec;
             postprocess_handler_(ec, there_, shared_from_this());
         }
+        LOG_DEBUG_MSG("Leaving sender_connection::async_write");
     }
 
     bool sender_connection::can_send_immediate() const
     {
-        bool temp = parcelport_->can_send_immediate();
-        if (!temp) { std::cout << "returning false from immediate send request\n"; }
-        return temp;
+        return parcelport_->can_send_immediate();
     }
 
 
