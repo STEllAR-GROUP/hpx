@@ -26,9 +26,15 @@
 //
 #include <plugins/parcelport/verbs/unordered_map.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
+//
+#include <boost/container/small_vector.hpp>
 
 // Local parcelport plugin
 //#define USE_SPECIALIZED_SCHEDULER
+// --------------------------------------------------------------------
+// Enable the use of boost small_vector for certain short lived storage
+// elements within the parcelport. This can reduce some memory allocations
+#define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR  true
 //
 #include "sender_connection.hpp"
 #include "connection_handler.hpp"
@@ -201,6 +207,12 @@ namespace verbs
 #endif
         // performance_counters::parcels::gatherer& parcels_sent_;
 
+#ifdef HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
+        typedef boost::container::small_vector<rdma_memory_region*,4> zero_copy_vector;
+#else
+        typedef std::vector<rdma_memory_region*>                      zero_copy_vector;
+#endif
+
         // --------------------------------------------------------------------
         // struct we use to keep track of all memory regions used during a send, they must
         // be held onto until all transfers of data are complete.
@@ -212,7 +224,7 @@ namespace verbs
             util::unique_function_nonser< void(error_code const&) > handler;
 
             rdma_memory_region *header_region, *chunk_region, *message_region;
-            std::vector<rdma_memory_region*>                   zero_copy_regions;
+            zero_copy_vector                                   zero_copy_regions;
         } parcel_send_data;
 
         // --------------------------------------------------------------------
@@ -224,7 +236,7 @@ namespace verbs
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
             rdma_memory_region *header_region, *chunk_region, *message_region;
-            std::vector<rdma_memory_region*>                   zero_copy_regions;
+            zero_copy_vector                                        zero_copy_regions;
         } parcel_recv_data;
 
         typedef std::list<parcel_send_data>      active_send_list_type;
