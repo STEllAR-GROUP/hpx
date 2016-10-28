@@ -32,6 +32,14 @@ particular order):
   Most notable, the new facility exposes a (global) function
   `hpx::lcos::barrier::synchronize()` which represents a global barrier across
   all localities.
+* We have started to add support for vectorization to our parallel algorithm
+  implementations. This support depends on using an external library, currently
+  either __vc__ or __boost_simd__. Please see [issue 2333] for a list of
+  currently supported algorithms. This is an experimental feature and its
+  implementation and/or API might change in the future. Please see this
+  [@http://stellar-group.org/2016/09/vectorized-cpp-parallel-algorithms-with-hpx/ blog-post]
+  for more information.
+
 
 [heading Breaking Changes]
 
@@ -46,6 +54,10 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2372] - Barrier Fixes
+* [issue 2370] - Can't wait on a wrapped future
+* [pr    2369] - Fixing stable_partition
+* [pr    2367] - Fixing find_prefixes for Windows platforms
 * [pr    2363] - Fix papi
 * [pr    2362] - Adding missing macros for new non-direct actions
 * [pr    2361] - Improve cmake output to help debug compiler incompatibility check
@@ -68,13 +80,14 @@ Here is a list of the important tickets we closed for this release.
                  api changes
 * [issue 2342] - Enabling APEX causes link errors
 * [pr    2341] - Removing cmake "find" files that are in the APEX cmake Modules
+* [pr    2340] - Implemented all existing datapar algorithms using Boost.SIMD
 * [pr    2339] - Fixing 2338
 * [pr    2338] - Possible race in sliding semaphore
 * [pr    2337] - Adjust osu_latency test to measure window_size parcels in flight at once
 * [pr    2336] - Allowing remote direct actions to be executed without spawning a task
 * [pr    2335] - Making sure multiple components are properly initialized from
                  arguments
-* [pr    2334] - Cannot construct component with large vector on a remote
+* [issue 2334] - Cannot construct component with large vector on a remote
                  locality
 * [pr    2332] - Fixing hpx::lcos::local::barrier
 * [pr    2331] - Updating APEX support to include OTF2
@@ -84,6 +97,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2323] - Constructing a vector of components only correctly initializes
                  the first component
 * [pr    2322] - Fix problems that bubbled up after merging #2278
+* [pr    2321] - Scalable barrier
 * [pr    2320] - Std flag fixes
 * [issue 2319] - -std=c++14 and -std=c++1y with Intel can't build recent Boost
                  builds due to insufficient C++14 support; don't enable these
