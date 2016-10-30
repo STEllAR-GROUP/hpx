@@ -1206,6 +1206,10 @@ namespace verbs
             }
         }
 */
+        bool can_send_immediate() const {
+            return (active_send_count_<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE);
+        }
+
         template <typename Handler>
         bool async_write(Handler && handler, sender_connection *sender, snd_buffer_type &buffer)
         {
@@ -1514,6 +1518,14 @@ namespace verbs
             postprocess_handler_(ec, there_, shared_from_this());
         }
     }
+
+    bool sender_connection::can_send_immediate() const
+    {
+        bool temp = parcelport_->can_send_immediate();
+        if (!temp) { std::cout << "returning false from immediate send request\n"; }
+        return temp;
+    }
+
 
 }}}}
 

@@ -26,7 +26,7 @@ namespace policies { namespace verbs
 
     typedef lcos::local::spinlock                           mutex_type;
 
-    typedef rdma_memory_pool                                  memory_pool_type;
+    typedef rdma_memory_pool                                memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
     typedef hpx::util::detail::memory_chunk_pool_allocator
             <char, memory_pool_type, mutex_type>            allocator_type;
@@ -84,6 +84,8 @@ namespace policies { namespace verbs
             return there_;
         }
 
+        bool can_send_immediate() const;
+
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler && handler, ParcelPostprocess && parcel_postprocess);
 
@@ -96,11 +98,11 @@ namespace policies { namespace verbs
             )
         > postprocess_handler_;
 
-        parcelport_type * parcelport_;
-        boost::uint32_t dest_ip_;
-        parcelset::locality there_;
-        RdmaClient *client_;
-        memory_pool_type * chunk_pool_;
+        parcelport_type       * parcelport_;
+        boost::uint32_t         dest_ip_;
+        parcelset::locality     there_;
+        RdmaClient            * client_;
+        memory_pool_type      * chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;
     };
 }}}}
