@@ -532,11 +532,6 @@ hpx_option(HPX_WITH_PAPI BOOL
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
-hpx_option(HPX_WITH_TAU BOOL
-  "Enable TAU profiling support." OFF CATEGORY "Profiling")
-if(HPX_WITH_TAU)
-  hpx_add_config_define(HPX_HAVE_TAU)
-endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
   "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_GOOGLE_PERFTOOLS)
@@ -1394,15 +1389,6 @@ if(WITH_AMPLIFIER)
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
-if(HPX_WITH_TAU)
-  find_package(TAU)
-  if(NOT TAU_FOUND)
-    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
-  endif()
-  hpx_libraries(${TAU_LIBRARIES})
-  include_directories(${TAU_INCLUDE_DIR})
-endif()
-
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
@@ -1437,10 +1423,6 @@ if(HPX_WITH_APEX)
   if(APEX_WITH_OTF2)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
-  endif()
-  if(APEX_WITH_TAU OR HPX_WITH_TAU)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
   endif()
 
   # handle optional ITTNotify library
