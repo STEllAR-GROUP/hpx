@@ -8,6 +8,7 @@ set(tests
     any_serialization
     boost_any
     bind_action
+    config_entry
     function
     parse_slurm_nodelist
     tagged

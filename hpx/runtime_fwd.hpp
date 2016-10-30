@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/get_num_localities.hpp>

@@ -18,12 +18,14 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 
@@ -59,7 +61,7 @@ const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace
+namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     inline std::string
@@ -74,20 +76,6 @@ namespace
         size_type last = s.find_last_not_of (" \t\r\n");
         return s.substr (first, last - first + 1);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline section*
-    add_section_if_new(section* current, std::string const& sec_name)
-    {
-        // do we know this one?
-        if (!current->has_section(sec_name)) {
-            // no - add it!
-            section sec;
-            current->add_section (sec_name, sec, current->get_root());
-        }
-        return current->get_section (sec_name);
-    }
-
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,6 +110,8 @@ section::section (const section & in)
 section& section::operator=(section const& rhs)
 {
     if (this != &rhs) {
+        std::lock_guard<mutex_type> l(mtx_);
+
         root_ = this;
         parent_name_ = rhs.get_parent_name();
         name_ = rhs.get_name();
@@ -129,12 +119,12 @@ section& section::operator=(section const& rhs)
         entry_map const& e = rhs.get_entries();
         entry_map::const_iterator end = e.end();
         for (entry_map::const_iterator i = e.begin (); i != end; ++i)
-            add_entry(i->first, i->second);
+            add_entry(l, i->first, i->second);
 
         section_map s = rhs.get_sections();
         section_map::iterator send = s.end();
         for (section_map::iterator si = s.begin(); si != send; ++si)
-            add_section(si->first, si->second, get_root());
+            add_section(l, si->first, si->second, get_root());
     }
     return *this;
 }
@@ -142,6 +132,8 @@ section& section::operator=(section const& rhs)
 section& section::clone_from(section const& rhs, section* root)
 {
     if (this != &rhs) {
+        std::lock_guard<mutex_type> l(mtx_);
+
         root_ = root ? root : this;
         parent_name_ = rhs.get_parent_name();
         name_ = rhs.get_name();
@@ -149,12 +141,12 @@ section& section::clone_from(section const& rhs, section* root)
         entry_map const& e = rhs.get_entries();
         entry_map::const_iterator end = e.end();
         for (entry_map::const_iterator i = e.begin (); i != end; ++i)
-            add_entry(i->first, i->second);
+            add_entry(l, i->first, i->second);
 
         section_map s = rhs.get_sections();
         section_map::iterator send = s.end();
         for (section_map::iterator si = s.begin(); si != send; ++si)
-            add_section(si->first, si->second, get_root());
+            add_section(l, si->first, si->second, get_root());
     }
     return *this;
 }
@@ -225,7 +217,7 @@ void section::parse (std::string const& sourcename,
         ++linenum;
 
         // remove trailing new lines and white spaces
-        std::string line(trim_whitespace (*it));
+        std::string line(detail::trim_whitespace (*it));
 
         // skip if empty line
         if (line.empty())
@@ -239,7 +231,7 @@ void section::parse (std::string const& sourcename,
             {
                 HPX_ASSERT(3 == what_comment.size());
 
-                line = trim_whitespace (what_comment[1]);
+                line = detail::trim_whitespace (what_comment[1]);
                 if (line.empty())
                     continue;
             }
@@ -267,19 +259,22 @@ void section::parse (std::string const& sourcename,
                  std::string::npos != pos1;
                  pos1 = sec_name.find_first_of ('.', pos = pos1 + 1))
             {
-                current = add_section_if_new(current, sec_name.substr(pos, pos1 - pos));
+                current = current->add_section_if_new(
+                    sec_name.substr(pos, pos1 - pos));
             }
 
-            current = add_section_if_new (current, sec_name.substr(pos));
+            current = current->add_section_if_new(sec_name.substr(pos));
 
             // add key/val to this section
+            std::lock_guard<mutex_type> l(current->mtx_);
+
             std::string key(what[2]);
-            if (!force_entry(key) && verify_existing && !current->has_entry(key))
+            if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
             {
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
                     linenum, line);
             }
-            current->add_entry (key, what[3]);
+            current->add_entry (l, key, what[3]);
 
             // restore the old section
             current = s;
@@ -303,10 +298,11 @@ void section::parse (std::string const& sourcename,
                  std::string::npos != pos1;
                  pos1 = sec_name.find_first_of ('.', pos = pos1 + 1))
             {
-                current = add_section_if_new(current, sec_name.substr(pos, pos1 - pos));
+                current = current->add_section_if_new(
+                    sec_name.substr(pos, pos1 - pos));
             }
 
-            current = add_section_if_new (current, sec_name.substr(pos));
+            current = current->add_section_if_new(sec_name.substr(pos));
         }
 
         // did not match section, so might be key/val entry
@@ -319,15 +315,18 @@ void section::parse (std::string const& sourcename,
             }
 
             // add key/val to current section
+            std::lock_guard<mutex_type> l(current->mtx_);
+
             std::string key(what[1]);
-            if (!force_entry(key) && verify_existing && !current->has_entry(key))
+            if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
             {
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
                     linenum, line);
             }
-            current->add_entry (key, what[2]);
+            current->add_entry (l, key, what[2]);
         }
-        else {
+        else
+        {
             // Hmm, is not a section, is not an entry, is not empty - must be
             // an error!
             line_msg ("Cannot parse line at: ", sourcename, linenum, line);
@@ -336,7 +335,8 @@ void section::parse (std::string const& sourcename,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::add_section (std::string const& sec_name, section& sec, section* root)
+void section::add_section (std::lock_guard<mutex_type>& l,
+    std::string const& sec_name, section& sec, section* root)
 {
     // setting name and root
     sec.name_ = sec_name;
@@ -346,7 +346,23 @@ void section::add_section (std::string const& sec_name, section& sec, section* r
     newsec.clone_from(sec, (nullptr != root) ? root : get_root());
 }
 
-bool section::has_section (std::string const& sec_name) const
+///////////////////////////////////////////////////////////////////////////
+section* section::add_section_if_new(std::lock_guard<mutex_type>& l,
+    std::string const& sec_name)
+{
+    // do we know this one?
+    if (!has_section(l, sec_name))
+    {
+        // no - add it!
+        section sec;
+        add_section(l, sec_name, sec, get_root());
+    }
+
+    return get_section(l, sec_name);
+}
+
+bool section::has_section (std::lock_guard<mutex_type>& l,
+    std::string const& sec_name) const
 {
     std::string::size_type i = sec_name.find(".");
     if (i != std::string::npos)
@@ -364,7 +380,8 @@ bool section::has_section (std::string const& sec_name) const
     return sections_.find(sec_name) != sections_.end();
 }
 
-section* section::get_section (std::string const& sec_name)
+section* section::get_section (std::lock_guard<mutex_type>& l,
+    std::string const& sec_name)
 {
     std::string::size_type i  = sec_name.find (".");
     if (i != std::string::npos)
@@ -395,7 +412,8 @@ section* section::get_section (std::string const& sec_name)
     return nullptr;
 }
 
-section const* section::get_section (std::string const& sec_name) const
+section const* section::get_section (std::lock_guard<mutex_type>& l,
+    std::string const& sec_name) const
 {
     std::string::size_type i  = sec_name.find (".");
     if (i != std::string::npos)
@@ -426,23 +444,49 @@ section const* section::get_section (std::string const& sec_name) const
     return nullptr;
 }
 
-void section::add_entry (std::string const& key, std::string val)
+void section::add_entry (std::lock_guard<mutex_type>& l, std::string const& key,
+    std::string val)
 {
     // first expand the full property name in the value (avoids infinite recursion)
-    this->expand_only(val, std::string::size_type(-1), get_full_name() + "." + key);
+    expand_only(l, val, std::string::size_type(-1), get_full_name() + "." + key);
 
-    // now add this entry to the section
-    entries_[key] = val;
+    std::string::size_type i = key.find_last_of(".");
+    if (i != std::string::npos)
+    {
+        section* current = root_;
+
+        // make sure all sections in key exist
+        std::string sec_name = key.substr(0, i);
+
+        std::string::size_type pos = 0;
+        for (std::string::size_type pos1 = sec_name.find_first_of('.');
+             std::string::npos != pos1;
+             pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+        {
+            current = current->add_section_if_new(l,
+                sec_name.substr(pos, pos1 - pos));
+        }
+
+        current = current->add_section_if_new(l, sec_name.substr(pos));
+
+        // now add this entry to the section
+        current->add_entry(l, key.substr(i+1), val);
+    }
+    else
+    {
+        // now add this entry to the section
+        entries_[key] = val;
+    }
 }
 
-bool section::has_entry (std::string const& key) const
+bool section::has_entry (std::lock_guard<mutex_type>& l, std::string const& key) const
 {
     std::string::size_type i = key.find (".");
     if (i != std::string::npos)
     {
         std::string sub_sec = key.substr(0, i);
         std::string sub_key = key.substr(i+1, key.size() - i);
-        if (has_section(sub_sec))
+        if (has_section(l, sub_sec))
         {
             section_map::const_iterator cit = sections_.find(sub_sec);
             HPX_ASSERT(cit != sections_.end());
@@ -453,14 +497,15 @@ bool section::has_entry (std::string const& key) const
     return entries_.find(key) != entries_.end();
 }
 
-std::string section::get_entry (std::string const& key) const
+std::string section::get_entry (std::lock_guard<mutex_type>& l,
+    std::string const& key) const
 {
     std::string::size_type i = key.find (".");
     if (i != std::string::npos)
     {
         std::string sub_sec = key.substr(0, i);
         std::string sub_key = key.substr(i+1, key.size() - i);
-        if (has_section(sub_sec))
+        if (has_section(l, sub_sec))
         {
             section_map::const_iterator cit = sections_.find(sub_sec);
             HPX_ASSERT(cit != sections_.end());
@@ -476,7 +521,7 @@ std::string section::get_entry (std::string const& key) const
     {
         entry_map::const_iterator cit = entries_.find(key);
         HPX_ASSERT(cit != entries_.end());
-        return this->expand((*cit).second);
+        return expand(l, (*cit).second);
     }
 
     HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
@@ -484,8 +529,8 @@ std::string section::get_entry (std::string const& key) const
     return "";
 }
 
-std::string
-section::get_entry (std::string const& key, std::string const& default_val) const
+std::string section::get_entry (std::lock_guard<mutex_type>& l,
+    std::string const& key, std::string const& default_val) const
 {
     typedef std::vector<std::string> string_vector;
 
@@ -501,15 +546,15 @@ section::get_entry (std::string const& key, std::string const& default_val) cons
     {
         section_map::const_iterator next = cur_section->sections_.find(*iter);
         if (cur_section->sections_.end() == next)
-            return this->expand(default_val);
+            return expand(l, default_val);
         cur_section = &next->second;
     }
 
     entry_map::const_iterator entry = cur_section->entries_.find(sk);
     if (cur_section->entries_.end() == entry)
-        return this->expand(default_val);
+        return expand(l, default_val);
 
-    return this->expand(entry->second);
+    return expand(l, entry->second);
 }
 
 inline void indent (int ind, std::ostream& strm)
@@ -520,6 +565,8 @@ inline void indent (int ind, std::ostream& strm)
 
 void section::dump(int ind, std::ostream& strm) const
 {
+    std::lock_guard<mutex_type> l(mtx_);
+
     bool header = false;
     if (0 == ind)
         header = true;
@@ -541,7 +588,7 @@ void section::dump(int ind, std::ostream& strm) const
     {
         indent (ind, strm);
 
-        const std::string expansion = this->expand(i->second);
+        const std::string expansion = expand(l, i->second);
 
         // Check if the expanded entry is different from the actual entry.
         if (expansion != i->second)
@@ -575,6 +622,8 @@ void section::merge(std::string const& filename)
 
 void section::merge(section& second)
 {
+    std::lock_guard<mutex_type> l(mtx_);
+
     // merge entries: keep own entries, and add other entries
     entry_map const& s_entries = second.get_entries();
     entry_map::const_iterator end = s_entries.end();
@@ -640,22 +689,25 @@ find_next(char const* ch, std::string& value,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::expand(std::string& value, std::string::size_type begin) const
+void section::expand(std::lock_guard<mutex_type>& l, std::string& value,
+    std::string::size_type begin) const
 {
     std::string::size_type p = value.find_first_of("$", begin+1);
-    while (p != std::string::npos && value.size()-1 != p) {
+    while (p != std::string::npos && value.size()-1 != p)
+    {
         if ('[' == value[p+1])
-            expand_bracket(value, p);
+            expand_bracket(l, value, p);
         else if ('{' == value[p+1])
-            expand_brace(value, p);
+            expand_brace(l, value, p);
         p = value.find_first_of("$", p+1);
     }
 }
 
-void section::expand_bracket(std::string& value, std::string::size_type begin) const
+void section::expand_bracket(std::lock_guard<mutex_type>& l, std::string& value,
+    std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
-    this->expand(value, begin);
+    expand(l, value, begin);
 
     // now expand the key itself
     std::string::size_type end = find_next("]", value, begin+1);
@@ -664,20 +716,22 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
-            value.replace(begin, end-begin+1, root_->get_entry(to_expand,
+            value.replace(begin, end-begin+1, root_->get_entry(l, to_expand,
                 std::string("")));
         }
         else {
             value.replace(begin, end-begin+1,
-                root_->get_entry(to_expand.substr(0, colon), to_expand.substr(colon+1)));
+                root_->get_entry(l, to_expand.substr(0, colon),
+                to_expand.substr(colon+1)));
         }
     }
 }
 
-void section::expand_brace(std::string& value, std::string::size_type begin) const
+void section::expand_brace(std::lock_guard<mutex_type>& l, std::string& value,
+    std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
-    this->expand(value, begin);
+    expand(l, value, begin);
 
     // now expand the key itself
     std::string::size_type end = find_next("}", value, begin+1);
@@ -697,31 +751,32 @@ void section::expand_brace(std::string& value, std::string::size_type begin) con
     }
 }
 
-std::string section::expand (std::string value) const
+std::string section::expand (std::lock_guard<mutex_type>& l, std::string value) const
 {
-    expand(value, std::string::size_type(-1));
+    expand(l, value, std::string::size_type(-1));
     return value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::expand_only(std::string& value, std::string::size_type begin,
-    std::string const& expand_this) const
+void section::expand_only(std::lock_guard<mutex_type>& l, std::string& value,
+    std::string::size_type begin, std::string const& expand_this) const
 {
     std::string::size_type p = value.find_first_of("$", begin+1);
     while (p != std::string::npos && value.size()-1 != p) {
         if ('[' == value[p+1])
-            expand_bracket_only(value, p, expand_this);
+            expand_bracket_only(l, value, p, expand_this);
         else if ('{' == value[p+1])
-            expand_brace_only(value, p, expand_this);
+            expand_brace_only(l, value, p, expand_this);
         p = value.find_first_of("$", p+1);
     }
 }
 
-void section::expand_bracket_only(std::string& value,
-    std::string::size_type begin, std::string const& expand_this) const
+void section::expand_bracket_only(std::lock_guard<mutex_type>& l,
+    std::string& value, std::string::size_type begin,
+    std::string const& expand_this) const
 {
     // expand all keys embedded inside this key
-    this->expand_only(value, begin, expand_this);
+    expand_only(l, value, begin, expand_this);
 
     // now expand the key itself
     std::string::size_type end = find_next("]", value, begin+1);
@@ -732,22 +787,23 @@ void section::expand_bracket_only(std::string& value,
         if (colon == std::string::npos) {
             if (to_expand == expand_this) {
                 value.replace(begin, end-begin+1,
-                    root_->get_entry(to_expand, std::string("")));
+                    root_->get_entry(l, to_expand, std::string("")));
             }
         }
         else if (to_expand.substr(0, colon) == expand_this) {
             value.replace(begin, end-begin+1,
-                root_->get_entry(to_expand.substr(0, colon),
+                root_->get_entry(l, to_expand.substr(0, colon),
                 to_expand.substr(colon+1)));
         }
     }
 }
 
-void section::expand_brace_only(std::string& value,
-    std::string::size_type begin, std::string const& expand_this) const
+void section::expand_brace_only(std::lock_guard<mutex_type>& l,
+    std::string& value, std::string::size_type begin,
+    std::string const& expand_this) const
 {
     // expand all keys embedded inside this key
-    this->expand_only(value, begin, expand_this);
+    expand_only(l, value, begin, expand_this);
 
     // now expand the key itself
     std::string::size_type end = find_next("}", value, begin+1);
@@ -767,10 +823,10 @@ void section::expand_brace_only(std::string& value,
     }
 }
 
-std::string section::expand_only(std::string value,
-    std::string const& expand_this) const
+std::string section::expand_only(std::lock_guard<mutex_type>& l,
+    std::string value, std::string const& expand_this) const
 {
-    expand_only(value, std::string::size_type(-1), expand_this);
+    expand_only(l, value, std::string::size_type(-1), expand_this);
     return value;
 }
 

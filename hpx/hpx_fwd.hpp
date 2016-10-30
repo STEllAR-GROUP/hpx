@@ -83,7 +83,7 @@ namespace hpx
 
 // Including declarations of various API function declarations
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
