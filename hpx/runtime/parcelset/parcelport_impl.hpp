@@ -217,7 +217,9 @@ namespace hpx { namespace parcelset
             void operator()(parcel p)
             {
                 if (!connection_handler_traits<ConnectionHandler>::
-                    use_connection_cache::value)
+                    use_connection_cache::value &&
+                    this_.can_send_immediate_impl<ConnectionHandler>()
+                    )
                 {
                     this_.send_parcel_immediate(dest_, std::move(p), std::move(f_));
                 }
@@ -500,6 +502,30 @@ namespace hpx { namespace parcelset
             bool
         >::type
         do_background_work_impl(std::size_t)
+        {
+            return false;
+        }
+
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            !connection_handler_traits<
+                ConnectionHandler_
+            >::use_connection_cache::value,
+            bool
+        >::type
+        can_send_immediate_impl()
+        {
+            return connection_handler().can_send_immediate();
+        }
+
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            connection_handler_traits<
+                ConnectionHandler_
+            >::use_connection_cache::value,
+            bool
+        >::type
+        can_send_immediate_impl()
         {
             return false;
         }
