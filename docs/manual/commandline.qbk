@@ -15,12 +15,12 @@ described in the table below:
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
-    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
-                                             values: 'full' (additionally prints options from components)]]
-    [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
-    [[`--hpx:info`]                         [print out __hpx__ configuration information]]
-    [[`--hpx:options-file arg`]             [specify a file containing command line options
-                                             (alternatively: @filepath)]]
+    [[`--hpx:help`, `-h`]       [print out program usage (default: this message), possible
+                                 values: 'full' (additionally prints options from components)]]
+    [[`--hpx:version`, `-v`]    [print out __hpx__ version and copyright information]]
+    [[`--hpx:info`]              [print out __hpx__ configuration information]]
+    [[`--hpx:options-file arg`] [specify a file containing command line options
+                                 (alternatively: @filepath)]]
 
     [[[*__hpx__ options (additionally allowed in an options file)]]]
     [[`--hpx:worker`]           [run this instance in worker mode]]
@@ -69,7 +69,7 @@ described in the table below:
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
-    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__ 
+    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
