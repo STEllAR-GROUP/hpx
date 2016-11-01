@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename InIter, typename OutIter>
     HPX_FORCEINLINE std::pair<InIter, OutIter>
-    copy_helper(InIter first, InIter last, OutIter dest)
+    copy(InIter first, InIter last, OutIter dest)
     {
         typedef
             typename hpx::traits::pointer_category<
@@ -138,11 +138,14 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename InIter, typename OutIter>
     HPX_FORCEINLINE std::pair<InIter, OutIter>
-    copy_n_helper(InIter first, std::size_t count, OutIter dest)
+    copy_n(InIter first, std::size_t count, OutIter dest)
     {
         typedef
             typename hpx::traits::pointer_category<
-                typename hpx::util::decay<InIter>::type,
+                typename hpx::util::decay<
+                    typename hpx::traits::remove_const_iterator_value_type<
+                        InIter
+                    >::type>::type,
                 typename hpx::util::decay<OutIter>::type
             >::type
             category;
@@ -211,7 +214,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename InIter, typename OutIter>
     HPX_FORCEINLINE std::pair<InIter, OutIter>
-    move_helper(InIter first, InIter last, OutIter dest)
+    move(InIter first, InIter last, OutIter dest)
     {
         typedef
             typename hpx::traits::pointer_category<
@@ -255,7 +258,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename InIter, typename OutIter>
     HPX_FORCEINLINE std::pair<InIter, OutIter>
-    move_n_helper(InIter first, std::size_t count, OutIter dest)
+    move_n(InIter first, std::size_t count, OutIter dest)
     {
         typedef
             typename hpx::traits::pointer_category<
