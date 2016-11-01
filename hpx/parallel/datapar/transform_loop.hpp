@@ -56,8 +56,11 @@ namespace hpx { namespace parallel { namespace util
                     datapar_transform_loop_step::call1(f, first, dest);
                 }
 
-                for (std::int64_t lenV = std::int64_t(count - (V::static_size + 1));
-                        lenV > 0; lenV -= V::static_size, len -= V::static_size)
+                static std::size_t HPX_CONSTEXPR_OR_CONST size =
+                    traits::vector_pack_size<InIter, V>::value;
+
+                for (std::int64_t lenV = std::int64_t(count - (size + 1));
+                        lenV > 0; lenV -= size, len -= size)
                 {
                     datapar_transform_loop_step::callv(f, first, dest);
                 }
@@ -156,8 +159,11 @@ namespace hpx { namespace parallel { namespace util
                     datapar_transform_loop_step::call1(f, first1, first2, dest);
                 }
 
-                for (std::int64_t lenV = std::int64_t(count - (V::static_size + 1));
-                        lenV > 0; lenV -= V::static_size, len -= V::static_size)
+                static std::size_t HPX_CONSTEXPR_OR_CONST size =
+                    traits::vector_pack_size<InIter1, V>::value;
+
+                for (std::int64_t lenV = std::int64_t(count - (size + 1));
+                        lenV > 0; lenV -= size, len -= size)
                 {
                     datapar_transform_loop_step::callv(f, first1, first2, dest);
                 }

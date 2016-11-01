@@ -18,7 +18,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
-    template <typename T, std::size_t N, typename Abi = Vc::VectorAbi::Best<T> >
+    template <typename T, std::size_t N = 0,
+        typename Abi = Vc::VectorAbi::Best<T> >
     struct vector_pack_type
     {
         typedef Vc::Vector<T, Abi> type;
@@ -27,7 +28,7 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, typename Abi>
     struct vector_pack_type<T, 1, Abi>
     {
-        typedef Vc::Scalar::Vector<T, Abi> type;
+        typedef Vc::Scalar::Vector<T> type;
     };
 }}}
 

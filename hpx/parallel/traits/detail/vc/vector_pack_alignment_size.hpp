@@ -32,11 +32,10 @@ namespace hpx { namespace parallel { namespace traits
         static std::size_t const value = Vc::Vector<T, Abi>::MemoryAlignment;
     };
 
-    template <typename Iter, typename T, typename Abi>
-    struct vector_pack_alignment<Iter, Vc::Scalar::Vector<T, Abi> >
+    template <typename Iter, typename T>
+    struct vector_pack_alignment<Iter, Vc::Scalar::Vector<T> >
     {
-        static std::size_t const value =
-            Vc::Scalar::Vector<T, Abi>::MemoryAlignment;
+        static std::size_t const value = Vc::Scalar::Vector<T>::MemoryAlignment;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -52,10 +51,10 @@ namespace hpx { namespace parallel { namespace traits
         static std::size_t const value = Vc::Vector<T, Abi>::Size;
     };
 
-    template <typename Iter, typename T, typename Abi>
-    struct vector_pack_size<Iter, Vc::Scalar::Vector<T, Abi> >
+    template <typename Iter, typename T>
+    struct vector_pack_size<Iter, Vc::Scalar::Vector<T> >
     {
-        static std::size_t const value = Vc::Scalar::Vector<T, Abi>::Size;
+        static std::size_t const value = Vc::Scalar::Vector<T>::Size;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -64,8 +63,8 @@ namespace hpx { namespace parallel { namespace traits
       : std::false_type
     {};
 
-    template <typename T, typename Abi>
-    struct vector_pack_is_scalar<Vc::Scalar::Vector<T, Abi> >
+    template <typename T>
+    struct vector_pack_is_scalar<Vc::Scalar::Vector<T> >
       : std::true_type
     {};
 }}}

@@ -33,11 +33,11 @@ namespace hpx { namespace parallel { namespace traits { namespace detail
         static std::size_t const value = rebound_pack_type::Size;
     };
 
-    template <typename ... Iter, typename T, typename Abi>
+    template <typename ... Iter, typename T>
     struct vector_pack_size<
-        hpx::util::zip_iterator<Iter...>, Vc::Scalar::Vector<T, Abi> >
+        hpx::util::zip_iterator<Iter...>, Vc::Scalar::Vector<T> >
     {
-        typedef Vc::Vector<
+        typedef Vc::Scalar::Vector<
                 typename hpx::util::detail::at_index<
                     0, typename std::iterator_traits<Iter>::value_type...
                 >::type

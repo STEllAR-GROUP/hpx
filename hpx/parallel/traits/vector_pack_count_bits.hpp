@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {

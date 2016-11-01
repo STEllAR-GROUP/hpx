@@ -30,18 +30,18 @@ namespace hpx { namespace parallel { namespace traits
         typedef boost::simd::pack<T> type;
     };
 
-    // handle packs of tuples (value_types of zip_iterators)
-    template <typename ... T, std::size_t N, typename Abi, typename NewT>
-    struct rebind_pack<boost::simd::pack<hpx::util::tuple<T...>, N, Abi>, NewT>
-    {
-        typedef boost::simd::pack<NewT> type;
-    };
-
     // handle non-tuple values
     template <typename T, std::size_t N, typename Abi, typename NewT>
     struct rebind_pack<boost::simd::pack<T, N, Abi>, NewT>
     {
         typedef boost::simd::pack<NewT, N> type;
+    };
+
+    // handle packs of tuples (value_types of zip_iterators)
+    template <typename ... T, std::size_t N, typename Abi, typename NewT>
+    struct rebind_pack<boost::simd::pack<hpx::util::tuple<T...>, N, Abi>, NewT>
+    {
+        typedef boost::simd::pack<NewT> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

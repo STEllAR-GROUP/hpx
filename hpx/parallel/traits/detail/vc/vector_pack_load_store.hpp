@@ -26,10 +26,30 @@ namespace hpx { namespace parallel { namespace traits
         typedef Vc::Vector<T> type;
     };
 
+    // handle non-tuple values
     template <typename T, typename Abi, typename NewT>
     struct rebind_pack<Vc::Vector<T, Abi>, NewT>
     {
         typedef Vc::Vector<NewT, Abi> type;
+    };
+
+    template <typename T, typename NewT>
+    struct rebind_pack<Vc::Scalar::Vector<T>, NewT>
+    {
+        typedef Vc::Scalar::Vector<NewT> type;
+    };
+
+    // handle packs of tuples (value_types of zip_iterators)
+    template <typename ... T, typename Abi, typename NewT>
+    struct rebind_pack<Vc::Vector<hpx::util::tuple<T...>, Abi>, NewT>
+    {
+        typedef Vc::Vector<NewT> type;
+    };
+
+    template <typename ... T, typename NewT>
+    struct rebind_pack<Vc::Scalar::Vector<hpx::util::tuple<T...> >, NewT>
+    {
+        typedef Vc::Scalar::Vector<NewT> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

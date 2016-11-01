@@ -175,7 +175,7 @@ namespace hpx { namespace parallel { namespace util
                     datapar_loop_step<Begin>::call1(f, first);
                 }
 
-                static std::size_t const size =
+                static std::size_t HPX_CONSTEXPR_OR_CONST size =
                     traits::vector_pack_size<Begin, V>::value;
 
                 End const lastV = last - (size + 1);
@@ -237,7 +237,7 @@ namespace hpx { namespace parallel { namespace util
                     return std::make_pair(std::move(it1), std::move(it2));
                 }
 
-                static std::size_t const size =
+                static std::size_t HPX_CONSTEXPR_OR_CONST size =
                     traits::vector_pack_size<InIter1, V>::value;
 
                 InIter1 const last1V = last1 - (size + 1);
@@ -300,7 +300,7 @@ namespace hpx { namespace parallel { namespace util
                     datapar_loop_step<InIter>::call1(f, first);
                 }
 
-                static std::size_t const size =
+                static std::size_t HPX_CONSTEXPR_OR_CONST size =
                     traits::vector_pack_size<InIter, V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
