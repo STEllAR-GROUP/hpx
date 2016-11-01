@@ -83,7 +83,9 @@ struct manage_global_runtime
             // make sure hpx_main is always executed
             "hpx.run_hpx_main!=1",
             // allow for unknown command line options
-            "hpx.commandline.allow_unknown!=1"
+            "hpx.commandline.allow_unknown!=1",
+            // disable HPX' short options
+            "hpx.commandline.aliasing!=0"
         };
 
         using hpx::util::placeholders::_1;
