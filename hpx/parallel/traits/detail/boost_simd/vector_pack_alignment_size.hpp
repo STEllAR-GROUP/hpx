@@ -11,12 +11,14 @@
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
 
 #include <cstddef>
+#include <type_traits>
 
 #include <boost/simd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename T, typename Enable>
     struct vector_pack_alignment
     {
@@ -41,6 +43,17 @@ namespace hpx { namespace parallel { namespace traits
     {
         static std::size_t const value = boost::simd::pack<T, N, Abi>::static_size;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, std::size_t N, typename Abi>
+    struct vector_pack_is_scalar<boost::simd::pack<T, N, Abi> >
+      : std::false_type
+    {};
+
+    template <typename T, typename Abi>
+    struct vector_pack_is_scalar<boost::simd::pack<T, 1, Abi> >
+      : std::true_type
+    {};
 }}}
 
 #endif

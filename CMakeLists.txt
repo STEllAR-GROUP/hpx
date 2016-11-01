@@ -1205,11 +1205,8 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # max symbol length exceeded
     hpx_add_compile_flag(-wd4503)
 
-    # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
-    # (performance warning)
-    if(MPI_FOUND OR HPX_WITH_APEX)
-      hpx_add_compile_flag(-wd4800)
-    endif()
+    # 'int': forcing value to bool 'true' or 'false' (performance warning)
+    hpx_add_compile_flag(-wd4800)
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)

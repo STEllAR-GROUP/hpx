@@ -5,10 +5,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/datapar.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <hpx/parallel/datapar/zip_iterator.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -55,16 +54,16 @@ void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
     auto result = hpx::parallel::for_each(std::forward<ExPolicy>(policy),
         begin, end, set_42());
 
-//     HPX_TEST(result == iterator(boost::end(c)));
-//
-//     // verify values
-//     std::size_t count = 0;
-//     std::for_each(boost::begin(c), boost::end(c),
-//         [&count](int v) -> void {
-//             HPX_TEST_EQ(v, int(42));
-//             ++count;
-//         });
-//     HPX_TEST_EQ(count, c.size());
+    HPX_TEST(result == end);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(boost::begin(c), boost::end(c),
+        [&count](int v) -> void {
+            HPX_TEST_EQ(v, int(42));
+            ++count;
+        });
+    HPX_TEST_EQ(count, c.size());
 }
 
 template <typename IteratorTag>
@@ -78,8 +77,8 @@ void for_each_zipiter_test()
 
 void for_each_zipiter_test()
 {
-    for_each_zipiter_test<std::random_access_iterator_tag>();
-//     for_each_zipiter_test<std::forward_iterator_tag>();
+//     for_each_zipiter_test<std::random_access_iterator_tag>();
+    for_each_zipiter_test<std::forward_iterator_tag>();
 //     for_each_zipiter_test<std::input_iterator_tag>();
 }
 

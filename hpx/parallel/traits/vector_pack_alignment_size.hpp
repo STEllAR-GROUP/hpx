@@ -10,6 +10,8 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
+#include <type_traits>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
@@ -18,6 +20,9 @@ namespace hpx { namespace parallel { namespace traits
 
     template <typename Iter, typename T, typename Enable = void>
     struct vector_pack_size;
+
+    template <typename T, typename Enable = void>
+    struct vector_pack_is_scalar : std::true_type {};
 }}}
 
 #include <hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp>

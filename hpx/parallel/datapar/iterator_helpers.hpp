@@ -9,13 +9,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-
-#include <hpx/parallel/datapar/detail/vc/iterator_helpers.hpp>
-#include <hpx/parallel/datapar/detail/boost_simd/iterator_helpers.hpp>
 #include <hpx/parallel/traits/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
+#include <hpx/parallel/traits/vector_pack_type.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,6 +129,316 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         pack_type const* operator&() const { return &value_; }
 
         pack_type value_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename V, typename Enable = void>
+    struct store_on_exit_unaligned
+    {
+        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
+            pack_type;
+
+        store_on_exit_unaligned(Iter const& iter)
+          : value_(traits::vector_pack_load<Iter, V>::unaligned(iter)),
+            iter_(iter)
+        {
+        }
+        ~store_on_exit_unaligned()
+        {
+            traits::vector_pack_store<Iter>::unaligned(value_, iter_);
+        }
+
+        pack_type* operator&() { return &value_; }
+        pack_type const* operator&() const { return &value_; }
+
+        pack_type value_;
+        Iter iter_;
+    };
+
+    template <typename Iter, typename V>
+    struct store_on_exit_unaligned<Iter, V,
+        typename std::enable_if<
+            std::is_const<
+                typename std::iterator_traits<Iter>::value_type
+            >::value
+        >::type>
+    {
+        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
+            pack_type;
+
+        store_on_exit_unaligned(Iter const& iter)
+          : value_(traits::vector_pack_load<Iter, V>::unaligned(iter))
+        {
+        }
+
+        pack_type* operator&() { return &value_; }
+        pack_type const* operator&() const { return &value_; }
+
+        pack_type value_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename Enable = void>
+    struct datapar_loop_step
+    {
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
+
+        typedef typename traits::vector_pack_type<value_type, 1>::type V1;
+        typedef typename traits::vector_pack_type<value_type>::type V;
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static typename std::result_of<F&&(V1*)>::type
+        call1(F && f, Iter& it)
+        {
+            store_on_exit_unaligned<Iter, V1> tmp(it);
+            ++it;
+            return hpx::util::invoke(f, &tmp);
+        }
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static typename std::result_of<F&&(V*)>::type
+        callv(F && f, Iter& it)
+        {
+            store_on_exit<Iter, V> tmp(it);
+            std::advance(it, traits::vector_pack_size<Iter, V>::value);
+            return hpx::util::invoke(f, &tmp);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename V1, typename V2>
+    struct invoke_vectorized_in2
+    {
+        template <typename F, typename Iter1, typename Iter2>
+        static typename std::result_of<F&&(V1*, V2*)>::type
+        call_aligned(F && f, Iter1& it1, Iter2& it2)
+        {
+            static_assert(
+                traits::vector_pack_size<Iter1, V1>::value ==
+                    traits::vector_pack_size<Iter2, V2>::value ,
+                "the sizes of the vector-packs should be equal");
+
+            V1 tmp1(traits::vector_pack_load<Iter1, V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<Iter2, V2>::aligned(it2));
+
+            std::advance(it1, traits::vector_pack_size<Iter1, V1>::value);
+            std::advance(it2, traits::vector_pack_size<Iter2, V2>::value);
+
+            return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
+        }
+
+        template <typename F, typename Iter1, typename Iter2>
+        static typename std::result_of<F&&(V1*, V2*)>::type
+        call_unaligned(F && f, Iter1& it1, Iter2& it2)
+        {
+            static_assert(
+                traits::vector_pack_size<Iter1, V1>::value ==
+                    traits::vector_pack_size<Iter2, V2>::value ,
+                "the sizes of the vector-packs should be equal");
+
+            V1 tmp1(traits::vector_pack_load<Iter1, V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<Iter2, V2>::unaligned(it2));
+
+            std::advance(it1, traits::vector_pack_size<Iter1, V1>::value);
+            std::advance(it2, traits::vector_pack_size<Iter2, V2>::value);
+
+            return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
+        }
+    };
+
+    template <typename Iter1, typename Iter2>
+    struct datapar_loop_step2
+    {
+        typedef typename std::iterator_traits<Iter1>::value_type value1_type;
+        typedef typename std::iterator_traits<Iter2>::value_type value2_type;
+
+        typedef typename traits::vector_pack_type<value1_type, 1>::type V11;
+        typedef typename traits::vector_pack_type<value2_type, 1>::type V12;
+
+        typedef typename traits::vector_pack_type<value1_type>::type V1;
+        typedef typename traits::vector_pack_type<value2_type>::type V2;
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static typename std::result_of<F&&(V11*, V12*)>::type
+        call1(F && f, Iter1& it1, Iter2& it2)
+        {
+            return invoke_vectorized_in2<V11, V12>::call_aligned(
+                std::forward<F>(f), it1, it2);
+        }
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static typename std::result_of<F&&(V1*, V2*)>::type
+        callv(F && f, Iter1& it1, Iter2& it2)
+        {
+            if (data_alignment(it1) || data_alignment(it2))
+            {
+                return invoke_vectorized_in2<V1, V2>::call_unaligned(
+                    std::forward<F>(f), it1, it2);
+            }
+
+            return invoke_vectorized_in2<V1, V2>::call_aligned(
+                std::forward<F>(f), it1, it2);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename V>
+    struct invoke_vectorized_inout1
+    {
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call_aligned(F && f, InIter& it, OutIter& dest)
+        {
+            V tmp(traits::vector_pack_load<InIter, V>::aligned(it));
+
+            auto ret = hpx::util::invoke(f, &tmp);
+            traits::vector_pack_store<InIter>::aligned(ret, dest);
+
+            std::advance(it, traits::vector_pack_size<InIter, V>::value);
+            std::advance(dest, ret.size());
+        }
+
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call_unaligned(F && f, InIter& it, OutIter& dest)
+        {
+            V tmp(traits::vector_pack_load<InIter, V>::unaligned(it));
+
+            auto ret = hpx::util::invoke(f, &tmp);
+            traits::vector_pack_store<InIter>::unaligned(ret, dest);
+
+            std::advance(it, traits::vector_pack_size<InIter, V>::value);
+            std::advance(dest, ret.size());
+        }
+    };
+
+    template <typename V1, typename V2>
+    struct invoke_vectorized_inout2
+    {
+        template <typename F, typename InIter1, typename InIter2, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void
+        call_aligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
+        {
+            static_assert(
+                traits::vector_pack_size<InIter1, V1>::value ==
+                    traits::vector_pack_size<InIter2, V2>::value ,
+                "the sizes of the vector-packs should be equal");
+
+            V1 tmp1(traits::vector_pack_load<InIter1, V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<InIter2, V2>::aligned(it2));
+
+            auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+            traits::vector_pack_store<OutIter>::aligned(ret, dest);
+
+            std::advance(it1, traits::vector_pack_size<InIter1, V1>::value);
+            std::advance(it2, traits::vector_pack_size<InIter2, V2>::value);
+            std::advance(dest, ret.size());
+        }
+
+        template <typename F, typename InIter1, typename InIter2, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void
+        call_unaligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
+        {
+            static_assert(
+                traits::vector_pack_size<InIter1, V1>::value ==
+                    traits::vector_pack_size<InIter2, V2>::value ,
+                "the sizes of the vector-packs should be equal");
+
+            V1 tmp1(traits::vector_pack_load<InIter1, V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<InIter2, V2>::unaligned(it2));
+
+            auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
+            traits::vector_pack_store<OutIter>::unaligned(ret, dest);
+
+            std::advance(it1, traits::vector_pack_size<InIter1, V1>::value);
+            std::advance(it2, traits::vector_pack_size<InIter2, V2>::value);
+            std::advance(dest, ret.size());
+        }
+    };
+
+    struct datapar_transform_loop_step
+    {
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call1(F && f, InIter& it, OutIter& dest)
+        {
+            typedef typename std::iterator_traits<InIter>::value_type
+                value_type;
+
+            typedef typename traits::vector_pack_type<value_type, 1>::type V1;
+
+            invoke_vectorized_inout1<V1>::call_aligned(
+                std::forward<F>(f), it, dest);
+        }
+
+        template <typename F, typename InIter1, typename InIter2,
+            typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void call1(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
+        {
+            typedef typename std::iterator_traits<InIter1>::value_type
+                value1_type;
+            typedef typename std::iterator_traits<InIter2>::value_type
+                value2_type;
+
+            typedef typename traits::vector_pack_type<value2_type, 1>::type V2;
+            typedef typename traits::vector_pack_type<value1_type, 1>::type V1;
+
+            invoke_vectorized_inout2<V1, V2>::call_aligned(
+                std::forward<F>(f), it1, it2, dest);
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        template <typename F, typename InIter, typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void callv(F && f, InIter& it, OutIter& dest)
+        {
+            typedef typename std::iterator_traits<InIter>::value_type
+                value_type;
+
+            typedef typename traits::vector_pack_type<value_type>::type V;
+
+            if (data_alignment(it) || data_alignment(dest))
+            {
+                invoke_vectorized_inout1<V>::call_unaligned(
+                    std::forward<F>(f), it, dest);
+            }
+            else
+            {
+                invoke_vectorized_inout1<V>::call_aligned(
+                    std::forward<F>(f), it, dest);
+            }
+        }
+
+        template <typename F, typename InIter1, typename InIter2,
+            typename OutIter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        static void callv(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
+        {
+            typedef typename std::iterator_traits<InIter1>::value_type
+                value1_type;
+            typedef typename std::iterator_traits<InIter2>::value_type
+                value2_type;
+
+            typedef typename traits::vector_pack_type<value1_type>::type V1;
+            typedef typename traits::vector_pack_type<value2_type>::type V2;
+
+            if (data_alignment(it1) || data_alignment(it2) ||
+                data_alignment(dest))
+            {
+                invoke_vectorized_inout2<V1, V2>::call_unaligned(
+                    std::forward<F>(f), it1, it2, dest);
+            }
+            else
+            {
+                invoke_vectorized_inout2<V1, V2>::call_aligned(
+                    std::forward<F>(f), it1, it2, dest);
+            }
+        }
     };
 }}}}
 

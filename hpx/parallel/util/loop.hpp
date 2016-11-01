@@ -158,11 +158,6 @@ namespace hpx { namespace parallel { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(bool value)
-        {
-            return value ? 1 : 0;
-        }
-
         template <typename ExPolicy, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         T const& extract_value(ExPolicy&&, T const& v)
