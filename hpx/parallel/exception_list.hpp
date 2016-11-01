@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::move(f);
             }
 
-            static future<Result> call(boost::exception_ptr const& outer)
+            static future<Result> call(boost::exception_ptr const& e)
             {
                 try {
                     boost::rethrow_exception(e);
@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 catch (...) {
                     // package up everything else as an exception_list
                     return hpx::make_exceptional_future<Result>(
-                        exception_list(outer));
+                        exception_list(e));
                 }
             }
         };

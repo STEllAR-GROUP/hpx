@@ -77,9 +77,9 @@ void for_each_zipiter_test()
 
 void for_each_zipiter_test()
 {
-//     for_each_zipiter_test<std::random_access_iterator_tag>();
+    for_each_zipiter_test<std::random_access_iterator_tag>();
     for_each_zipiter_test<std::forward_iterator_tag>();
-//     for_each_zipiter_test<std::input_iterator_tag>();
+    for_each_zipiter_test<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
