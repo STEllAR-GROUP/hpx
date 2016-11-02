@@ -227,7 +227,7 @@ namespace hpx { namespace util
         ///          true. If a connection could not be found and space could
         ///          not be returned, \a conn is unmodified and this function
         ///          returns false.
-        ///          If force_nsert is true, a new connection entry will be
+        ///          If force_insert is true, a new connection entry will be
         ///          created even if that means the cache limits will be
         ///          exceeded.
         ///

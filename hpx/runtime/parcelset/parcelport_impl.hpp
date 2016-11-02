@@ -208,6 +208,8 @@ namespace hpx { namespace parcelset
         }
 
     public:
+        // this is the handler used by put_parcel - it deals with a single parcel
+        // at a time
         struct parcel_await_handler
         {
             parcelport_impl& this_;
@@ -216,8 +218,10 @@ namespace hpx { namespace parcelset
 
             void operator()(parcel p)
             {
-                if (!connection_handler_traits<ConnectionHandler>::
-                    use_connection_cache::value)
+                if (connection_handler_traits<ConnectionHandler>::
+                    send_immediate_parcels::value &&
+                    this_.can_send_immediate_impl<ConnectionHandler>()
+                    )
                 {
                     this_.send_parcel_immediate(dest_, std::move(p), std::move(f_));
                 }
@@ -231,6 +235,8 @@ namespace hpx { namespace parcelset
             }
         };
 
+        // this is the handler used by put_parcels - this version handles a vector
+        // of parcels rather than just a single one
         struct parcel_await_handlers
         {
             parcelport_impl& this_;
@@ -241,25 +247,15 @@ namespace hpx { namespace parcelset
 
             void operator()(parcel p)
             {
-                if (!connection_handler_traits<ConnectionHandler>::
-                    use_connection_cache::value)
-                {
-                    this_.send_parcel_immediate(
-                        dest_, std::move(p), std::move(handler_[idx_]));
-                    ++idx_;
-                }
-                else
-                {
-                    parcels_.push_back(std::move(p));
-                    // enqueue the outgoing parcels ...
+                parcels_.push_back(std::move(p));
+                // enqueue the outgoing parcels ...
 
-                    if (parcels_.size() == handler_.size())
-                    {
-                        this_.enqueue_parcels(
-                            dest_, std::move(parcels_), std::move(handler_));
+                if (parcels_.size() == handler_.size())
+                {
+                    this_.enqueue_parcels(
+                        dest_, std::move(parcels_), std::move(handler_));
 
-                        this_.get_connection_and_send_parcels(dest_);
-                    }
+                    this_.get_connection_and_send_parcels(dest_);
                 }
             }
         };
@@ -302,9 +298,10 @@ namespace hpx { namespace parcelset
 
             parcel_await_handlers handler{
                 *this, dest, std::move(handlers), std::vector<parcel>(), 0};
-            if (connection_handler_traits<ConnectionHandler>::
-                use_connection_cache::value)
+            if (!connection_handler_traits<ConnectionHandler>::
+                send_immediate_parcels::value) {
                 handler.parcels_.reserve(parcels.size());
+            }
 
             std::make_shared<parcel_await>(
                 std::move(parcels), archive_flags_, std::move(handler))->apply();
@@ -504,6 +501,30 @@ namespace hpx { namespace parcelset
             return false;
         }
 
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            bool
+        >::type
+        can_send_immediate_impl()
+        {
+            return connection_handler().can_send_immediate();
+        }
+
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            !connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            bool
+        >::type
+        can_send_immediate_impl()
+        {
+            return false;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         std::shared_ptr<connection> get_connection(
             locality const& l, bool force, error_code& ec)
@@ -511,15 +532,22 @@ namespace hpx { namespace parcelset
             // Request new connection from connection cache.
             std::shared_ptr<connection> sender_connection;
 
-            // Get a connection or reserve space for a new connection.
-            if (!connection_cache_.get_or_reserve(l, sender_connection))
+            if (connection_handler_traits<ConnectionHandler>::
+                send_immediate_parcels::value)
             {
-                // If no slot is available it's not a problem as the parcel
-                // will be sent out whenever the next connection is returned
-                // to the cache.
-                if (&ec != &throws)
-                    ec = make_success_code();
-                return sender_connection;
+                std::terminate();
+            }
+            else {
+                // Get a connection or reserve space for a new connection.
+                if (!connection_cache_.get_or_reserve(l, sender_connection))
+                {
+                    // If no slot is available it's not a problem as the parcel
+                    // will be sent out whenever the next connection is returned
+                    // to the cache.
+                    if (&ec != &throws)
+                        ec = make_success_code();
+                    return sender_connection;
+                }
             }
 
             // Check if we need to create the new connection.
@@ -716,7 +744,6 @@ namespace hpx { namespace parcelset
                     archive_flags_,
                     this->get_max_outbound_message_size());
 
-            using hpx::parcelset::detail::call_for_each;
             using hpx::util::placeholders::_1;
             using hpx::util::placeholders::_2;
             using hpx::util::placeholders::_3;
