@@ -1085,8 +1085,6 @@ namespace hpx
                 util::command_line_handling cfg(
                     mode, f, std::move(ini_config), argv[0]);
 
-                util::apex_wrapper_init apex(argc, argv);
-
                 result = cfg.call(desc_cmdline, argc, argv);
 
                 if (result != 0) {
@@ -1094,6 +1092,8 @@ namespace hpx
                         result = 0;     // --hpx:help
                     return result;
                 }
+
+                util::apex_wrapper_init apex(argc, argv);
 
                 // Initialize and start the HPX runtime.
                 if (0 == std::string("local").find(cfg.queuing_))

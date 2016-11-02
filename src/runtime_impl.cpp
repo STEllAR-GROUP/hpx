@@ -382,7 +382,8 @@ namespace hpx {
         util::set_thread_name("main-thread#wait_helper");
 
 #if defined(HPX_HAVE_APEX)
-        apex::register_thread("main-thread#wait_helper");
+		// not registering helper threads - for now
+        //apex::register_thread("main-thread#wait_helper");
 #endif
         // wait for termination
         runtime_support_->wait();
@@ -659,7 +660,9 @@ namespace hpx {
             util::set_thread_name(name);
 
 #if defined(HPX_HAVE_APEX)
-            apex::register_thread(name);
+			if (strstr(name, "worker") != NULL) {
+            	apex::register_thread(name);
+			}
 #endif
         }
 
