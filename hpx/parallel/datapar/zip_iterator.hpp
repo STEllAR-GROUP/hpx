@@ -23,6 +23,7 @@
 #include <hpx/parallel/datapar/detail/vc/zip_iterator.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <memory>
 #include <type_traits>

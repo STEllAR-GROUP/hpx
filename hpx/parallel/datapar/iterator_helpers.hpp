@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail

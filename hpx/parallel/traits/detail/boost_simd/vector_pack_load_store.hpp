@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <memory>
 

@@ -10,6 +10,8 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
