@@ -18,10 +18,10 @@ namespace hpx { namespace parallel { namespace traits
     struct rebind_pack;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename V, typename Enable = void>
+    template <typename V, typename Enable = void>
     struct vector_pack_load;
 
-    template <typename Iter, typename Enable = void>
+    template <typename V, typename Enable = void>
     struct vector_pack_store;
 }}}
 

@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { namespace util
         extract_value(parallel::v1::datapar_execution_policy,
             Vector const& value)
         {
-            static_assert(traits::vector_pack_is_scalar<Vector>::value,
+            static_assert(traits::is_scalar_vector_pack<Vector>::value,
                 "this should be called with a scalar only");
             return value[0];
         }
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace util
         extract_value(parallel::v1::datapar_task_execution_policy,
             Vector const& value)
         {
-            static_assert(traits::vector_pack_is_scalar<Vector>::value,
+            static_assert(traits::is_scalar_vector_pack<Vector>::value,
                 "this should be called with a scalar only");
             return value[0];
         }
@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { namespace util
                     value_type;
                 typedef typename traits::vector_pack_type<value_type>::type V;
 
-                return traits::vector_pack_size<Iter, V>::value <=
+                return traits::vector_pack_size<V>::value <=
                         std::distance(first, last);
             }
         };
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 static std::size_t HPX_CONSTEXPR_OR_CONST size =
-                    traits::vector_pack_size<Begin, V>::value;
+                    traits::vector_pack_size<V>::value;
 
                 End const lastV = last - (size + 1);
                 while (first < lastV)
@@ -239,7 +239,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 static std::size_t HPX_CONSTEXPR_OR_CONST size =
-                    traits::vector_pack_size<InIter1, V>::value;
+                    traits::vector_pack_size<V>::value;
 
                 InIter1 const last1V = last1 - (size + 1);
                 while (it1 < last1V)
@@ -302,7 +302,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 static std::size_t HPX_CONSTEXPR_OR_CONST size =
-                    traits::vector_pack_size<InIter, V>::value;
+                    traits::vector_pack_size<V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
                         lenV > 0; lenV -= size, len -= size)

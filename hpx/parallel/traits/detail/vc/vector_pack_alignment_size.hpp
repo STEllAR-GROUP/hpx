@@ -10,6 +10,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
+#include <hpx/util/detail/pack.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -20,53 +22,101 @@
 namespace hpx { namespace parallel { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename T, typename Enable>
+    template <typename T, typename Abi>
+    struct is_vector_pack<Vc::Vector<T, Abi> >
+      : std::true_type
+    {};
+
+    template <typename T>
+    struct is_vector_pack<Vc::Scalar::Vector<T> >
+      : std::true_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    struct is_scalar_vector_pack<Vc::Vector<T, Abi> >
+      : std::false_type
+    {};
+
+    template <typename T>
+    struct is_scalar_vector_pack<Vc::Scalar::Vector<T> >
+      : std::true_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    struct is_non_scalar_vector_pack<Vc::Vector<T, Abi> >
+      : std::true_type
+    {};
+
+    template <typename T>
+    struct is_non_scalar_vector_pack<Vc::Scalar::Vector<T> >
+      : std::false_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable>
     struct vector_pack_alignment
     {
         static std::size_t const value = Vc::Vector<T>::MemoryAlignment;
     };
 
-    template <typename Iter, typename T, typename Abi>
-    struct vector_pack_alignment<Iter, Vc::Vector<T, Abi> >
+    template <typename T, typename Abi>
+    struct vector_pack_alignment<Vc::Vector<T, Abi> >
     {
         static std::size_t const value = Vc::Vector<T, Abi>::MemoryAlignment;
     };
 
-    template <typename Iter, typename T>
-    struct vector_pack_alignment<Iter, Vc::Scalar::Vector<T> >
+    template <typename T>
+    struct vector_pack_alignment<Vc::Scalar::Vector<T> >
     {
         static std::size_t const value = Vc::Scalar::Vector<T>::MemoryAlignment;
     };
 
+    template <typename ... Vector>
+    struct vector_pack_alignment<hpx::util::tuple<Vector...>,
+        typename std::enable_if<
+            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
+        >::type>
+    {
+        typedef typename hpx::util::tuple_element<
+                0, hpx::util::tuple<Vector...>
+            >::type pack_type;
+
+        static std::size_t const value = pack_type::MemoryAlignment;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename T, typename Enable>
+    template <typename T, typename Enable>
     struct vector_pack_size
     {
         static std::size_t const value = Vc::Vector<T>::Size;
     };
 
-    template <typename Iter, typename T, typename Abi>
-    struct vector_pack_size<Iter, Vc::Vector<T, Abi> >
+    template <typename T, typename Abi>
+    struct vector_pack_size<Vc::Vector<T, Abi> >
     {
         static std::size_t const value = Vc::Vector<T, Abi>::Size;
     };
 
-    template <typename Iter, typename T>
-    struct vector_pack_size<Iter, Vc::Scalar::Vector<T> >
+    template <typename T>
+    struct vector_pack_size<Vc::Scalar::Vector<T> >
     {
         static std::size_t const value = Vc::Scalar::Vector<T>::Size;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Abi>
-    struct vector_pack_is_scalar<Vc::Vector<T, Abi> >
-      : std::false_type
-    {};
+    template <typename ... Vector>
+    struct vector_pack_size<hpx::util::tuple<Vector...>,
+        typename std::enable_if<
+            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
+        >::type>
+    {
+        typedef typename hpx::util::tuple_element<
+                0, hpx::util::tuple<Vector...>
+            >::type pack_type;
 
-    template <typename T>
-    struct vector_pack_is_scalar<Vc::Scalar::Vector<T> >
-      : std::true_type
-    {};
+        static std::size_t const value = pack_type::Size;
+    };
 }}}
 
 #endif

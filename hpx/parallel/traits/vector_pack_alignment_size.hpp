@@ -15,14 +15,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
-    template <typename Iter, typename T, typename Enable = void>
+    template <typename T, typename Enable = void>
     struct vector_pack_alignment;
 
-    template <typename Iter, typename T, typename Enable = void>
+    template <typename T, typename Enable = void>
     struct vector_pack_size;
 
     template <typename T, typename Enable = void>
-    struct vector_pack_is_scalar : std::true_type {};
+    struct is_vector_pack : std::false_type {};
+
+    template <typename T, typename Enable = void>
+    struct is_scalar_vector_pack : std::false_type {};
+
+    template <typename T, typename Enable = void>
+    struct is_non_scalar_vector_pack : std::false_type {};
 }}}
 
 #include <hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp>

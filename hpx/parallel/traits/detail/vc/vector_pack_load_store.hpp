@@ -39,52 +39,49 @@ namespace hpx { namespace parallel { namespace traits
         typedef Vc::Scalar::Vector<NewT> type;
     };
 
-    // handle packs of tuples (value_types of zip_iterators)
-    template <typename ... T, typename Abi, typename NewT>
-    struct rebind_pack<Vc::Vector<hpx::util::tuple<T...>, Abi>, NewT>
-    {
-        typedef Vc::Vector<NewT> type;
-    };
-
-    template <typename ... T, typename NewT>
-    struct rebind_pack<Vc::Scalar::Vector<hpx::util::tuple<T...> >, NewT>
-    {
-        typedef Vc::Scalar::Vector<NewT> type;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename V, typename Enable>
+    template <typename V, typename Enable>
     struct vector_pack_load
     {
-        typedef typename rebind_pack<
-                V, typename std::iterator_traits<Iter>::value_type
-            >::type vector_pack_type;
-
-        template <typename Iter_>
-        static vector_pack_type aligned(Iter_ const& iter)
+        template <typename Iter>
+                static typename rebind_pack<
+            V, typename std::iterator_traits<Iter>::value_type
+        >::type
+        aligned(Iter const& iter)
         {
+            typedef typename rebind_pack<
+                    V, typename std::iterator_traits<Iter>::value_type
+                >::type vector_pack_type;
+
             return vector_pack_type(std::addressof(*iter), Vc::Aligned);
         }
 
-        template <typename Iter_>
-        static vector_pack_type unaligned(Iter_ const& iter)
+        template <typename Iter>
+        static typename rebind_pack<
+            V, typename std::iterator_traits<Iter>::value_type
+        >::type
+        unaligned(Iter const& iter)
         {
+            typedef typename rebind_pack<
+                    V, typename std::iterator_traits<Iter>::value_type
+                >::type vector_pack_type;
+
             return vector_pack_type(std::addressof(*iter), Vc::Unaligned);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable>
+    template <typename V, typename Enable>
     struct vector_pack_store
     {
-        template <typename V_, typename Iter_>
-        static void aligned(V_ const& value, Iter_ const& iter)
+        template <typename Iter_>
+        static void aligned(V const& value, Iter_ const& iter)
         {
             value.store(std::addressof(*iter), Vc::Aligned);
         }
 
-        template <typename V_, typename Iter_>
-        static void unaligned(V_ const& value, Iter_ const& iter)
+        template <typename Iter_>
+        static void unaligned(V const& value, Iter_ const& iter)
         {
             value.store(std::addressof(*iter), Vc::Unaligned);
         }

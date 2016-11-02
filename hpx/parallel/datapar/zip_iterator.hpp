@@ -19,9 +19,6 @@
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
 #include <hpx/parallel/traits/vector_pack_type.hpp>
 
-#include <hpx/parallel/datapar/detail/boost_simd/zip_iterator.hpp>
-#include <hpx/parallel/datapar/detail/vc/zip_iterator.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
@@ -76,67 +73,53 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename V, typename ... Iter, std::size_t ... Is>
-        hpx::util::tuple<
-            typename rebind_pack<
-                V, typename std::iterator_traits<Iter>::value_type
-            >::type ...
-        >
-        aligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
+        template <typename Tuple, typename ... Iter, std::size_t ... Is>
+        Tuple aligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(
                 vector_pack_load<
-                    Iter, typename std::iterator_traits<Iter>::value_type
+                    typename hpx::util::tuple_element<Is, Tuple>::type
                 >::aligned(hpx::util::get<Is>(t)) ...
             );
         }
 
-        template <typename V, typename ... Iter, std::size_t ... Is>
-        hpx::util::tuple<
-            typename rebind_pack<
-                V, typename std::iterator_traits<Iter>::value_type
-            >::type ...
-        >
-        unaligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
+        template <typename Tuple, typename ... Iter, std::size_t ... Is>
+        Tuple unaligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(
                 vector_pack_load<
-                    Iter, typename std::iterator_traits<Iter>::value_type
+                    typename hpx::util::tuple_element<Is, Tuple>::type
                 >::unaligned(hpx::util::get<Is>(t)) ...
             );
         }
     }
 
-    template <typename ... Iter, typename V>
-    struct vector_pack_load<hpx::util::zip_iterator<Iter...>, V>
+    template <typename ... Vector>
+    struct vector_pack_load<hpx::util::tuple<Vector...> >
     {
-        typedef hpx::util::tuple<
-                typename rebind_pack<
-                    V, typename std::iterator_traits<Iter>::value_type
-                >::type ...
-            > vector_pack_type;
+        typedef hpx::util::tuple<Vector...> tuple_type;
 
-        template <typename ... Iter_>
-        static vector_pack_type
-        aligned(hpx::util::zip_iterator<Iter_...> const& iter)
+        template <typename ... Iter>
+        static tuple_type
+        aligned(hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::aligned_pack<V>(iter,
+            return traits::detail::aligned_pack<tuple_type>(iter,
                 typename hpx::util::detail::make_index_pack<
-                        sizeof...(Iter_)
+                        sizeof...(Iter)
                     >::type());
         }
 
-        template <typename ... Iter_>
-        static vector_pack_type
-        unaligned(hpx::util::zip_iterator<Iter_...> const& iter)
+        template <typename ... Iter>
+        static tuple_type
+        unaligned(hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::unaligned_pack<V>(iter,
+            return traits::detail::unaligned_pack<tuple_type>(iter,
                 typename hpx::util::detail::make_index_pack<
-                        sizeof...(Iter_)
+                        sizeof...(Iter)
                     >::type());
         }
     };
@@ -144,15 +127,17 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename V_, typename ... Iter, std::size_t ... Is>
+        template <typename Tuple, typename ... Iter, std::size_t ... Is>
         void aligned_pack(
-            V_ const& value, hpx::util::zip_iterator<Iter...> const& iter,
+            Tuple const& value, hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {
                 0, (
-                    vector_pack_store<Iter>::aligned(
+                    vector_pack_store<
+                        typename hpx::util::tuple_element<Is, Tuple>::type
+                    >::aligned(
                         hpx::util::get<Is>(value), hpx::util::get<Is>(t)
                     ), 0
                 ) ...
@@ -160,15 +145,17 @@ namespace hpx { namespace parallel { namespace traits
             (void) sequencer;
         }
 
-        template <typename V_, typename ... Iter, std::size_t ... Is>
+        template <typename Tuple, typename ... Iter, std::size_t ... Is>
         void unaligned_pack(
-            V_ const& value, hpx::util::zip_iterator<Iter...> const& iter,
+            Tuple const& value, hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {
                 0, (
-                    vector_pack_store<Iter>::unaligned(
+                    vector_pack_store<
+                        typename hpx::util::tuple_element<Is, Tuple>::type
+                    >::unaligned(
                         hpx::util::get<Is>(value), hpx::util::get<Is>(t)
                     ), 0
                 ) ...
@@ -177,26 +164,26 @@ namespace hpx { namespace parallel { namespace traits
         }
     }
 
-    template <typename ... Iter>
-    struct vector_pack_store<hpx::util::zip_iterator<Iter...> >
+    template <typename ... Vector>
+    struct vector_pack_store<hpx::util::tuple<Vector...> >
     {
-        template <typename V, typename ... Iter_>
+        template <typename V, typename ... Iter>
         static void
-        aligned(V const& value, hpx::util::zip_iterator<Iter_...> const& iter)
+        aligned(V const& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
             traits::detail::aligned_pack(value, iter,
                 typename hpx::util::detail::make_index_pack<
-                        sizeof...(Iter_)
+                        sizeof...(Iter)
                     >::type());
         }
 
-        template <typename V, typename ... Iter_>
+        template <typename V, typename ... Iter>
         static void
-        unaligned(V const& value, hpx::util::zip_iterator<Iter_...> const& iter)
+        unaligned(V const& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
             traits::detail::unaligned_pack(value, iter,
                 typename hpx::util::detail::make_index_pack<
-                        sizeof...(Iter_)
+                        sizeof...(Iter)
                     >::type());
         }
     };

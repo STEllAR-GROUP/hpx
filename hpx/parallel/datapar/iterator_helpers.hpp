@@ -30,7 +30,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         {
             typedef typename std::iterator_traits<Iter>::value_type value_type;
             return reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
-                (traits::vector_pack_alignment<Iter, value_type>::value - 1);
+                (traits::vector_pack_alignment<value_type>::value - 1);
         }
     };
 
@@ -53,10 +53,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             value2_type;
 
         typedef std::integral_constant<bool,
-                traits::vector_pack_size<Iter1, value1_type>::value ==
-                    traits::vector_pack_size<Iter2, value2_type>::value &&
-                traits::vector_pack_alignment<Iter1, value1_type>::value ==
-                    traits::vector_pack_alignment<Iter2, value2_type>::value
+                traits::vector_pack_size<value1_type>::value ==
+                    traits::vector_pack_size<value2_type>::value &&
+                traits::vector_pack_alignment<value1_type>::value ==
+                    traits::vector_pack_alignment<value2_type>::value
             > type;
     };
 
@@ -90,17 +90,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename Iter, typename V, typename Enable = void>
     struct store_on_exit
     {
-        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
-            pack_type;
+        typedef V pack_type;
 
         store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<Iter, V>::aligned(iter)),
+          : value_(traits::vector_pack_load<V>::aligned(iter)),
             iter_(iter)
         {
         }
         ~store_on_exit()
         {
-            traits::vector_pack_store<Iter>::aligned(value_, iter_);
+            traits::vector_pack_store<pack_type>::aligned(value_, iter_);
         }
 
         pack_type* operator&() { return &value_; }
@@ -118,11 +117,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             >::value
         >::type>
     {
-        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
-            pack_type;
+        typedef V pack_type;
 
         store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<Iter, V>::aligned(iter))
+          : value_(traits::vector_pack_load<V>::aligned(iter))
         {
         }
 
@@ -136,17 +134,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename Iter, typename V, typename Enable = void>
     struct store_on_exit_unaligned
     {
-        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
-            pack_type;
+        typedef V pack_type;
 
         store_on_exit_unaligned(Iter const& iter)
-          : value_(traits::vector_pack_load<Iter, V>::unaligned(iter)),
+          : value_(traits::vector_pack_load<V>::unaligned(iter)),
             iter_(iter)
         {
         }
         ~store_on_exit_unaligned()
         {
-            traits::vector_pack_store<Iter>::unaligned(value_, iter_);
+            traits::vector_pack_store<pack_type>::unaligned(value_, iter_);
         }
 
         pack_type* operator&() { return &value_; }
@@ -164,11 +161,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             >::value
         >::type>
     {
-        typedef typename traits::vector_pack_load<Iter, V>::vector_pack_type
-            pack_type;
+        typedef V pack_type;
 
         store_on_exit_unaligned(Iter const& iter)
-          : value_(traits::vector_pack_load<Iter, V>::unaligned(iter))
+          : value_(traits::vector_pack_load<V>::unaligned(iter))
         {
         }
 
@@ -203,7 +199,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         callv(F && f, Iter& it)
         {
             store_on_exit<Iter, V> tmp(it);
-            std::advance(it, traits::vector_pack_size<Iter, V>::value);
+            std::advance(it, traits::vector_pack_size<V>::value);
             return hpx::util::invoke(f, &tmp);
         }
     };
@@ -217,15 +213,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         call_aligned(F && f, Iter1& it1, Iter2& it2)
         {
             static_assert(
-                traits::vector_pack_size<Iter1, V1>::value ==
-                    traits::vector_pack_size<Iter2, V2>::value ,
+                traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value ,
                 "the sizes of the vector-packs should be equal");
 
-            V1 tmp1(traits::vector_pack_load<Iter1, V1>::aligned(it1));
-            V2 tmp2(traits::vector_pack_load<Iter2, V2>::aligned(it2));
+            V1 tmp1(traits::vector_pack_load<V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2>::aligned(it2));
 
-            std::advance(it1, traits::vector_pack_size<Iter1, V1>::value);
-            std::advance(it2, traits::vector_pack_size<Iter2, V2>::value);
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
 
             return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
         }
@@ -235,15 +231,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         call_unaligned(F && f, Iter1& it1, Iter2& it2)
         {
             static_assert(
-                traits::vector_pack_size<Iter1, V1>::value ==
-                    traits::vector_pack_size<Iter2, V2>::value ,
+                traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value ,
                 "the sizes of the vector-packs should be equal");
 
-            V1 tmp1(traits::vector_pack_load<Iter1, V1>::unaligned(it1));
-            V2 tmp2(traits::vector_pack_load<Iter2, V2>::unaligned(it2));
+            V1 tmp1(traits::vector_pack_load<V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2>::unaligned(it2));
 
-            std::advance(it1, traits::vector_pack_size<Iter1, V1>::value);
-            std::advance(it2, traits::vector_pack_size<Iter2, V2>::value);
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
 
             return hpx::util::invoke(std::forward<F>(f), &tmp1, &tmp2);
         }
@@ -294,12 +290,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         HPX_HOST_DEVICE HPX_FORCEINLINE
         static void call_aligned(F && f, InIter& it, OutIter& dest)
         {
-            V tmp(traits::vector_pack_load<InIter, V>::aligned(it));
+            V tmp(traits::vector_pack_load<V>::aligned(it));
 
             auto ret = hpx::util::invoke(f, &tmp);
-            traits::vector_pack_store<InIter>::aligned(ret, dest);
+            traits::vector_pack_store<decltype(ret)>::aligned(ret, dest);
 
-            std::advance(it, traits::vector_pack_size<InIter, V>::value);
+            std::advance(it, traits::vector_pack_size<V>::value);
             std::advance(dest, ret.size());
         }
 
@@ -307,12 +303,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         HPX_HOST_DEVICE HPX_FORCEINLINE
         static void call_unaligned(F && f, InIter& it, OutIter& dest)
         {
-            V tmp(traits::vector_pack_load<InIter, V>::unaligned(it));
+            V tmp(traits::vector_pack_load<V>::unaligned(it));
 
             auto ret = hpx::util::invoke(f, &tmp);
-            traits::vector_pack_store<InIter>::unaligned(ret, dest);
+            traits::vector_pack_store<decltype(ret)>::unaligned(ret, dest);
 
-            std::advance(it, traits::vector_pack_size<InIter, V>::value);
+            std::advance(it, traits::vector_pack_size<V>::value);
             std::advance(dest, ret.size());
         }
     };
@@ -325,18 +321,18 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         call_aligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
         {
             static_assert(
-                traits::vector_pack_size<InIter1, V1>::value ==
-                    traits::vector_pack_size<InIter2, V2>::value ,
+                traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value ,
                 "the sizes of the vector-packs should be equal");
 
-            V1 tmp1(traits::vector_pack_load<InIter1, V1>::aligned(it1));
-            V2 tmp2(traits::vector_pack_load<InIter2, V2>::aligned(it2));
+            V1 tmp1(traits::vector_pack_load<V1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2>::aligned(it2));
 
             auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
-            traits::vector_pack_store<OutIter>::aligned(ret, dest);
+            traits::vector_pack_store<decltype(ret)>::aligned(ret, dest);
 
-            std::advance(it1, traits::vector_pack_size<InIter1, V1>::value);
-            std::advance(it2, traits::vector_pack_size<InIter2, V2>::value);
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
             std::advance(dest, ret.size());
         }
 
@@ -345,18 +341,18 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         call_unaligned(F && f, InIter1& it1, InIter2& it2, OutIter& dest)
         {
             static_assert(
-                traits::vector_pack_size<InIter1, V1>::value ==
-                    traits::vector_pack_size<InIter2, V2>::value ,
+                traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value ,
                 "the sizes of the vector-packs should be equal");
 
-            V1 tmp1(traits::vector_pack_load<InIter1, V1>::unaligned(it1));
-            V2 tmp2(traits::vector_pack_load<InIter2, V2>::unaligned(it2));
+            V1 tmp1(traits::vector_pack_load<V1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2>::unaligned(it2));
 
             auto ret = hpx::util::invoke(f, &tmp1, &tmp2);
-            traits::vector_pack_store<OutIter>::unaligned(ret, dest);
+            traits::vector_pack_store<decltype(ret)>::unaligned(ret, dest);
 
-            std::advance(it1, traits::vector_pack_size<InIter1, V1>::value);
-            std::advance(it2, traits::vector_pack_size<InIter2, V2>::value);
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
             std::advance(dest, ret.size());
         }
     };

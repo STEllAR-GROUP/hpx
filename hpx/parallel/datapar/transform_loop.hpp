@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 static std::size_t HPX_CONSTEXPR_OR_CONST size =
-                    traits::vector_pack_size<InIter, V>::value;
+                    traits::vector_pack_size<V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
                         lenV > 0; lenV -= size, len -= size)
@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 static std::size_t HPX_CONSTEXPR_OR_CONST size =
-                    traits::vector_pack_size<InIter1, V>::value;
+                    traits::vector_pack_size<V>::value;
 
                 for (std::int64_t lenV = std::int64_t(count - (size + 1));
                         lenV > 0; lenV -= size, len -= size)

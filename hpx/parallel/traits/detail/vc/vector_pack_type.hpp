@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
+#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 
@@ -18,6 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T, std::size_t N = 0,
         typename Abi = Vc::VectorAbi::Best<T> >
     struct vector_pack_type
@@ -29,6 +31,19 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_type<T, 1, Abi>
     {
         typedef Vc::Scalar::Vector<T> type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ... T, std::size_t N, typename Abi>
+    struct vector_pack_type<hpx::util::tuple<T...>, N, Abi>
+    {
+        typedef hpx::util::tuple<Vc::Vector<T, Abi>...> type;
+    };
+
+    template <typename ... T, typename Abi>
+    struct vector_pack_type<hpx::util::tuple<T...>, 1, Abi>
+    {
+        typedef hpx::util::tuple<Vc::Scalar::Vector<T>...> type;
     };
 }}}
 
