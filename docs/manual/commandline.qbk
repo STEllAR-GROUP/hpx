@@ -15,10 +15,10 @@ described in the table below:
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
-    [[`--hpx:help`, `-h`]       [print out program usage (default: this message), possible
+    [[`--hpx:help`]             [print out program usage (default: this message), possible
                                  values: 'full' (additionally prints options from components)]]
-    [[`--hpx:version`, `-v`]    [print out __hpx__ version and copyright information]]
-    [[`--hpx:info`]              [print out __hpx__ configuration information]]
+    [[`--hpx:version`]          [print out __hpx__ version and copyright information]]
+    [[`--hpx:info`]             [print out __hpx__ configuration information]]
     [[`--hpx:options-file arg`] [specify a file containing command line options
                                  (alternatively: @filepath)]]
 
@@ -196,7 +196,7 @@ every __hpx__ application.
 
 It is possible to define your own shortcut options. In fact, all of the shortcuts
 listed above are pre-defined using the technique described here.
-In fact, it is possible to redefine any of the pre-defined shortcuts to expand
+Also, it is possible to redefine any of the pre-defined shortcuts to expand
 differently as well.
 
 Shortcut options are obtained from the internal configuration database. They are
@@ -207,7 +207,7 @@ __configuration__. For instance, in order to define a command line shortcut
 `--pc` which should expand to `--hpx:print-counter`, the following configuration
 information needs to be added to one of the `ini` configuration files:
 ``
-    [hpx.commandline]
+    [hpx.commandline.aliases]
     --pc = --hpx:print-counter
 ``
 [teletype]
