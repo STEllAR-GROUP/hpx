@@ -21,7 +21,7 @@ namespace hpx { namespace parallel { namespace traits
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t
     count_bits(LibFlatArray::short_vec<T, N>::mask_type const& mask)
     {
-        return LibFlatArray::count_mask(mask);
+        return LibFlatArray::count_mask<T, N>(mask);
     }
 }}}
 
