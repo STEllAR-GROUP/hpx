@@ -4,7 +4,7 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
-# Copyright (c)      2014 Andreas Schaefer
+# Copyright (c) 2014-2016 Andreas Schaefer
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -243,6 +243,8 @@ hpx_option(HPX_WITH_SYCL BOOL
 ################################################################################
 # HPX datapar configuration
 ################################################################################
+hpx_option(HPX_WITH_DATAPAR_LIBFLATARRAY BOOL
+  "Enable data parallel algorithm support using the external LibFlatArray (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
@@ -251,6 +253,9 @@ if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
   hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
 endif()
 
+if(HPX_WITH_DATAPAR_LIBFLATARRAY)
+  include(HPX_SetupLibFlatArray)
+endif()
 if(HPX_WITH_DATAPAR_VC)
   include(HPX_SetupVc)
 endif()
