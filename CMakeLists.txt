@@ -439,17 +439,15 @@ hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
 hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
-  hpx_add_config_define(HPX_HAVE_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)   # tell HPX that we use APEX
+  hpx_add_config_define(APEX_HAVE_HPX)   # tell APEX that it runs withing HPX
+  hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
+    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
 endif()
 hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
-endif()
-hpx_option(HPX_WITH_TAU BOOL
-  "Enable TAU profiling support." OFF CATEGORY "Profiling")
-if(HPX_WITH_TAU)
-  hpx_add_config_define(HPX_HAVE_TAU)
 endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
   "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
@@ -1404,12 +1402,17 @@ endif()
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
+set(_hpx_apex_no_update)
+if(HPX_WITH_APEX_NO_UPDATE)
+  set(_hpx_apex_no_update NO_UPDATE)
+endif()
 if(HPX_WITH_APEX)
   # handle APEX library
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
     v1.0
+    ${_hpx_apex_no_update}
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
@@ -1422,19 +1425,19 @@ if(HPX_WITH_APEX)
   endif()
 
   include_directories(${APEX_SOURCE_DIR})
-  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
+  set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
+      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex_lib)
   if(APEX_WITH_MSR)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
   endif()
   if(APEX_WITH_ACTIVEHARMONY)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
   endif()
   if(APEX_WITH_OTF2)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
+    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
   endif()
 
   # handle optional ITTNotify library
@@ -1445,8 +1448,8 @@ if(HPX_WITH_APEX)
     endif()
     include_directories(${ITTNOTIFY_SOURCE_DIR})
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
+    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify_lib)
   endif()
 endif()
 

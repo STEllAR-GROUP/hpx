@@ -8,6 +8,8 @@
 #if !defined(HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093)
 #define HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093
 
+#include <hpx/config.hpp>
+
 #if defined(HPX_MSVC)
   #include <hpx/util/hardware/timestamp/msvc.hpp>
 #elif defined(__amd64__) || defined(__amd64)    \
