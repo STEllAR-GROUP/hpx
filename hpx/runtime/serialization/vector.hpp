@@ -47,7 +47,6 @@ namespace hpx { namespace serialization
             else
             {
                 // bitwise load ...
-                typedef typename std::vector<T, Allocator>::value_type value_type;
                 typedef typename std::vector<T, Allocator>::size_type size_type;
                 size_type size;
                 ar >> size; //-V128
