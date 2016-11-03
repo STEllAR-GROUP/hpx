@@ -7,6 +7,7 @@
 #define HPX_GET_CONFIG_ENTRY_SEP_01_2015_0638PM
 
 #include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -28,6 +29,12 @@ namespace hpx
     /// Set the integer value of a configuration entry given by \p key.
     HPX_API_EXPORT void set_config_entry(std::string const& key,
         std::size_t value);
+
+    /// Set the string value of a configuration entry given by \p key.
+    HPX_API_EXPORT void set_config_entry_callback(std::string const& key,
+        util::function_nonser<
+            void(std::string const&, std::string const&)
+        > const& callback);
 }
 
 #endif

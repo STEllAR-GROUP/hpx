@@ -76,6 +76,9 @@ namespace hpx { namespace plugins { namespace parcel
             parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering, bool cancel_timer);
 
+        void update_num_messages();
+        void update_interval();
+
     private:
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;

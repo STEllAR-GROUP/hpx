@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
-#include <hpx/util/register_locks.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -21,6 +21,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <utility>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(HPX_MSVC)
@@ -39,7 +40,11 @@ namespace hpx { namespace util
     class HPX_EXPORT section
     {
     public:
-        typedef std::map<std::string, std::string> entry_map;
+        typedef util::function_nonser<
+                void(std::string const&, std::string const&)
+            > entry_changed_func;
+        typedef std::pair<std::string, entry_changed_func> entry_type;
+        typedef std::map<std::string, entry_type> entry_map;
         typedef std::map<std::string, section> section_map;
 
     private:
@@ -88,14 +93,20 @@ namespace hpx { namespace util
         section* add_section_if_new(std::lock_guard<lcos::local::spinlock>& l,
             std::string const& sec_name);
 
-        void add_entry(std::lock_guard<mutex_type>& l, std::string const& key,
-            std::string val);
+        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+            std::string const& key, std::string val);
+        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+            std::string const& key, entry_type const& val);
+
         bool has_entry(std::lock_guard<mutex_type>& l,
             std::string const& key) const;
         std::string get_entry(std::lock_guard<mutex_type>& l,
             std::string const& key) const;
         std::string get_entry(std::lock_guard<mutex_type>& l,
             std::string const& key, std::string const& dflt) const;
+
+        void add_notification_callback(std::lock_guard<mutex_type>& l,
+            std::string const& key, entry_changed_func const& callback);
 
     public:
         section();
@@ -154,13 +165,18 @@ namespace hpx { namespace util
             return get_section(l, sec_name);
         }
 
-        section_map const& get_sections() const
-            { return sections_; }
+        section_map const& get_sections() const { return sections_; }
+
+        void add_entry(std::string const& key, entry_type const& val)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_entry(l, key, key, val);
+        }
 
         void add_entry(std::string const& key, std::string const& val)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            add_entry(l, key, val);
+            add_entry(l, key, key, val);
         }
 
         bool has_entry(std::string const& key) const
@@ -186,6 +202,13 @@ namespace hpx { namespace util
         {
             std::lock_guard<mutex_type> l(mtx_);
             return get_entry(l, key, boost::lexical_cast<std::string>(dflt));
+        }
+
+        void add_notification_callback(std::string const& key,
+            entry_changed_func const& callback)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_notification_callback(l, key, callback);
         }
 
         entry_map const& get_entries() const { return entries_; }

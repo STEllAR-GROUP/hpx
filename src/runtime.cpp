@@ -961,9 +961,21 @@ namespace hpx
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
-        if (nullptr == get_runtime_ptr())
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
             return;
-        return get_runtime().get_config().add_entry(key, std::to_string(value));
+        return rt->get_config().add_entry(key, std::to_string(value));
+    }
+
+    void set_config_entry_callback(std::string const& key,
+        util::function_nonser<
+            void(std::string const&, std::string const&)
+        > const& callback)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+            return;
+        return rt->get_config().add_notification_callback(key, callback);
     }
 
     ///////////////////////////////////////////////////////////////////////////
