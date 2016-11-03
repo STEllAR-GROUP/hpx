@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -660,9 +661,8 @@ namespace hpx {
             util::set_thread_name(name);
 
 #if defined(HPX_HAVE_APEX)
-			if (strstr(name, "worker") != NULL) {
-            	apex::register_thread(name);
-			}
+            if (std::strstr(name, "worker") != nullptr)
+                apex::register_thread(name);
 #endif
         }
 

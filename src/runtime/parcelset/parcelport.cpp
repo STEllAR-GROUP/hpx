@@ -18,12 +18,17 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <cstdint>
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>
+
+#include <boost/exception_ptr.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -290,5 +295,32 @@ namespace hpx { namespace parcelset
     {
         return pp.get_max_inbound_message_size();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the code below is needed to bootstrap the parcel layer
+    void parcelport::early_pending_parcel_handler(
+        boost::system::error_code const& ec, parcel const & p)
+    {
+        if (ec) {
+            // all errors during early parcel handling are fatal
+            boost::exception_ptr exception =
+                HPX_GET_EXCEPTION(ec,
+                    "early_pending_parcel_handler",
+                    "error while handling early parcel: " +
+                        ec.message() + "(" +
+                        std::to_string(ec.value()) +
+                        ")" + parcelset::dump_parcel(p));
+
+            hpx::report_error(exception);
+            return;
+        }
+
+#if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
+        // tell APEX about the sent parcel
+        apex::send(p.parcel_id().get_lsb(), p.size(),
+            p.destination_locality_id());
+#endif
+    }
+
 }}
 

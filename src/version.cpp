@@ -185,16 +185,6 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCELPORT_MPI=OFF\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC)
-        strm << "  HPX_HAVE_PARCELPORT_IPC=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_IPC=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
-#endif
 #if defined(HPX_HAVE_VERIFY_LOCKS)
         strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
 #else
