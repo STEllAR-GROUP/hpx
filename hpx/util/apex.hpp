@@ -15,17 +15,19 @@
 #include "apex_api.hpp"
 #endif
 
-static void hpx_util_apex_init_startup(void) {
-	apex::init(nullptr, hpx::get_locality_id(), hpx::get_initial_num_localities());
-}
-
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+    static void hpx_util_apex_init_startup(void)
+    {
+        apex::init(nullptr, hpx::get_locality_id(),
+            hpx::get_initial_num_localities());
+    }
+
     inline void apex_init()
     {
-	    hpx_util_apex_init_startup();
-		//hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
+        hpx_util_apex_init_startup();
+        //hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
     }
 
     inline void apex_finalize()
@@ -76,8 +78,9 @@ namespace hpx { namespace util
     {
         apex_wrapper_init(int argc, char **argv)
         {
-	    	//apex::init(nullptr, hpx::get_locality_id(), hpx::get_initial_num_localities());
-			hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
+            //apex::init(nullptr, hpx::get_locality_id(),
+            //    hpx::get_initial_num_localities());
+            hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
         }
         ~apex_wrapper_init()
         {
