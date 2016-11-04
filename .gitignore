@@ -10,3 +10,4 @@
 .ptp-sync-folder
 /Dockerfile
 /.dockerignore
+apex

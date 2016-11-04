@@ -243,10 +243,19 @@ hpx_option(HPX_WITH_SYCL BOOL
 ################################################################################
 # HPX datapar configuration
 ################################################################################
-hpx_option(HPX_WITH_VC_DATAPAR BOOL
-  "Enable data parallel algorithm support (default: OFF)" OFF ADVANCED)
-if(HPX_WITH_VC_DATAPAR)
+hpx_option(HPX_WITH_DATAPAR_VC BOOL
+  "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
+  "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
+  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
+endif()
+
+if(HPX_WITH_DATAPAR_VC)
   include(HPX_SetupVc)
+endif()
+if(HPX_WITH_DATAPAR_BOOST_SIMD)
+  include(HPX_SetupBoostSIMD)
 endif()
 
 ################################################################################
@@ -491,12 +500,6 @@ if(HPX_WITH_PARCEL_PROFILING)
 endif()
 
 ## Parcelport related build options
-hpx_option(HPX_WITH_PARCELPORT_IBVERBS BOOL
-  "Enable the ibverbs based parcelport. This is currently an experimental feature"
-  OFF CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_IPC BOOL
-  "Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature"
-  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
   "Enable the MPI based parcelport."
   OFF CATEGORY "Parcelport")
@@ -509,20 +512,6 @@ hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
 if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
   hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 endif()
-
-## ibverbs parcelport settings
-hpx_option(HPX_WITH_PARCELPORT_IBVERBS_IFNAME STRING
-  "The interface name of the ibverbs capable network adapter (default: ib0)"
-  "ib0" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD STRING
-  "Size of the message payload not sent with RDMA (default: 512 byte)"
-  "512" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE STRING
-  "Number of bytes a chunk in the memory pool can hold (default: 64MB)"
-  "67108864" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING
-  "Maximum number of chunks that can be allocated (default: 100)"
-  "100" CATEGORY "Parcelport" ADVANCED)
 
 ## mpi parcelport settings
 hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
@@ -542,11 +531,6 @@ hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
   hpx_add_config_define(HPX_HAVE_PAPI)
-endif()
-hpx_option(HPX_WITH_TAU BOOL
-  "Enable TAU profiling support." OFF CATEGORY "Profiling")
-if(HPX_WITH_TAU)
-  hpx_add_config_define(HPX_HAVE_TAU)
 endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
   "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
@@ -1405,15 +1389,6 @@ if(WITH_AMPLIFIER)
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
 endif()
 
-if(HPX_WITH_TAU)
-  find_package(TAU)
-  if(NOT TAU_FOUND)
-    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
-  endif()
-  hpx_libraries(${TAU_LIBRARIES})
-  include_directories(${TAU_INCLUDE_DIR})
-endif()
-
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
@@ -1448,10 +1423,6 @@ if(HPX_WITH_APEX)
   if(APEX_WITH_OTF2)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
-  endif()
-  if(APEX_WITH_TAU OR HPX_WITH_TAU)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
   endif()
 
   # handle optional ITTNotify library

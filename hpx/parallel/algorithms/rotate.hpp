@@ -215,9 +215,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             OutIter dest_first)
         {
             std::pair<FwdIter, OutIter> p1 =
-                util::copy_helper(new_first, last, dest_first);
+                util::copy(new_first, last, dest_first);
             std::pair<FwdIter, OutIter> p2 =
-                util::copy_helper(first, new_first, std::move(p1.second));
+                util::copy(first, new_first, std::move(p1.second));
             return std::make_pair(std::move(p1.first), std::move(p2.second));
         }
 

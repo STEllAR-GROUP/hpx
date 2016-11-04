@@ -79,9 +79,13 @@ struct manage_global_runtime
         hpx::detail::init_winsocket();
 #endif
 
-        // make sure hpx_main is always executed
         std::vector<std::string> const cfg = {
-            "hpx.run_hpx_main!=1"
+            // make sure hpx_main is always executed
+            "hpx.run_hpx_main!=1",
+            // allow for unknown command line options
+            "hpx.commandline.allow_unknown!=1",
+            // disable HPX' short options
+            "hpx.commandline.aliasing!=0"
         };
 
         using hpx::util::placeholders::_1;

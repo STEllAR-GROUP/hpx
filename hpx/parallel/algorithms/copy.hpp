@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 using hpx::util::get;
                 auto iters = part_begin.get_iterator_tuple();
-                util::copy_n_helper(get<0>(iters), part_size, get<1>(iters));
+                util::copy_n(get<0>(iters), part_size, get<1>(iters));
             }
         };
 
@@ -74,8 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                std::pair<InIter, OutIter> result =
-                    util::copy_helper(first, last, dest);
+                std::pair<InIter, OutIter> result = util::copy(first, last, dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -214,7 +213,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, std::size_t count, OutIter dest)
             {
-                return util::copy_n_helper(first, count, dest);
+                return util::copy_n(first, count, dest);
             }
 
             template <typename ExPolicy, typename FwdIter, typename OutIter>
@@ -236,8 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             using hpx::util::get;
 
                             auto iters = part_begin.get_iterator_tuple();
-                            util::copy_n_helper(get<0>(iters), part_size,
-                                get<1>(iters));
+                            util::copy_n(get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator && last) -> zip_iterator
                         {

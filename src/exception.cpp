@@ -11,7 +11,7 @@
 #include <hpx/state.hpp>
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming/name.hpp>

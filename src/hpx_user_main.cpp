@@ -5,7 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/throw_exception.hpp>
-//#include <hpx/runtime/get_config_entry.hpp>
 
 //#include <cstddef>
 //#include <string>

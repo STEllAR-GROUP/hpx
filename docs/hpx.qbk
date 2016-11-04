@@ -136,6 +136,8 @@
 [def __nt2__                    [@http://www.numscale.com/nt2/ NT2]]
 [def __lgd__                    [@http://www.libgeodecomp.org/ LibGeoDecomp]]
 [def __conan__                  [@https://www.conan.io/ Conan]]
+[def __boost_simd__             [@https://github.com/NumScale/boost.simd Boost.SIMD]]
+[def __vc__                     [@https://github.com/VcDevel/Vc Vc Library]]
 
 [def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
 [def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]

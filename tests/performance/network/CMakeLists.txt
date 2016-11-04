@@ -6,6 +6,7 @@
 set(subdirs
     algorithms
     osu
+    lcos
    )
 
 if(HPX_WITH_CXX11_LAMBDAS)

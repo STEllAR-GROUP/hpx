@@ -86,10 +86,6 @@ hpx::lcos::local::spinlock                 FuturesMutex;
 #endif
 
 //----------------------------------------------------------------------------
-// Used at start and end of each loop for synchronization
-hpx::lcos::barrier unique_barrier;
-
-//----------------------------------------------------------------------------
 //
 // Each locality allocates a buffer of memory which is used to host transfers
 //
@@ -375,26 +371,6 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 }
 
 //----------------------------------------------------------------------------
-// Create a new barrier and register its gid with the given symbolic name.
-hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symname)
-{
-    DEBUG_OUTPUT(2,
-        std::cout << "Creating barrier based on N localities "
-                  << num_localities << std::endl;
-    );
-
-    hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
-    hpx::agas::register_name(hpx::launch::sync, symname, b.get_id());
-    return b;
-}
-
-//----------------------------------------------------------------------------
-void barrier_wait()
-{
-    unique_barrier.wait();
-}
-
-//----------------------------------------------------------------------------
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
@@ -409,7 +385,7 @@ void test_write(
         std::cout << "Entering Barrier at start of write on rank " << rank << std::endl;
     );
     //
-    barrier_wait();
+    hpx::lcos::barrier::synchronize();
     //
     DEBUG_OUTPUT(1,
         std::cout << "Passed Barrier at start of write on rank " << rank << std::endl;
@@ -520,7 +496,7 @@ void test_write(
             << futuretimer.elapsed() << " Move time " << movetime << std::endl;
         );
     }
-    barrier_wait();
+    hpx::lcos::barrier::synchronize();
     //
     double writeMB   = static_cast<double>
         (nranks*options.local_storage_MB*options.iterations);
@@ -577,7 +553,7 @@ void test_read(
         std::cout << "Entering Barrier at start of read on rank " << rank << std::endl;
     );
     //
-    barrier_wait();
+    hpx::lcos::barrier::synchronize();
     //
     DEBUG_OUTPUT(1,
         std::cout << "Passed Barrier at start of read on rank " << rank << std::endl;
@@ -699,7 +675,7 @@ void test_read(
             << futuretimer.elapsed() << " Move time " << movetime << std::endl;
         );
     }
-    barrier_wait();
+    hpx::lcos::barrier::synchronize();
     //
     double readMB = static_cast<double>
         (nranks*options.local_storage_MB*options.iterations);
@@ -720,33 +696,6 @@ void test_read(
         std::cout << (boost::format(msg) % options.network % nranks
             % options.threads % readMB % options.transfer_size_B
           % IOPs_s % readBW ) << std::endl;
-    }
-}
-
-//----------------------------------------------------------------------------
-void create_barrier_startup()
-{
-    hpx::id_type here = hpx::find_here();
-    uint64_t rank = hpx::naming::get_locality_id_from_id(here);
-
-    // create a barrier we will use at the start and end of each run to
-    // synchronize
-    if(0 == rank) {
-        uint64_t nranks = hpx::get_num_localities().get();
-        unique_barrier = create_barrier(nranks, "/0/DSM_barrier");
-    }
-}
-
-//----------------------------------------------------------------------------
-void find_barrier_startup()
-{
-    hpx::id_type here = hpx::find_here();
-    uint64_t rank = hpx::naming::get_locality_id_from_id(here);
-
-    if (rank != 0) {
-        hpx::id_type id =
-            hpx::agas::resolve_name(hpx::launch::sync, "/0/DSM_barrier");
-        unique_barrier = hpx::lcos::barrier(id);
     }
 }
 
@@ -815,14 +764,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
     delete_local_storage();
-
-    // release barrier object
-    unique_barrier = hpx::invalid_id;
-    DEBUG_OUTPUT(2,
-        std::cout << "Unregistering Barrier " << rank << std::endl;
-    );
-    if (0 == rank)
-        hpx::agas::unregister_name(hpx::launch::sync, "/0/DSM_barrier");
 
     DEBUG_OUTPUT(2,
         std::cout << "Calling finalize" << rank << std::endl;
@@ -897,16 +838,6 @@ int main(int argc, char* argv[])
           "0 : random \n"
           "1 : block cyclic")
         ;
-
-    // make sure our barrier was already created before hpx_main runs
-    DEBUG_OUTPUT(2,
-        std::cout << "Registering create_barrier startup function " << std::endl;
-    );
-    hpx::register_pre_startup_function(&create_barrier_startup);
-    DEBUG_OUTPUT(2,
-        std::cout << "Registering find_barrier startup function " << std::endl;
-    );
-    hpx::register_startup_function(&find_barrier_startup);
 
     // Initialize and run HPX, this test requires to run hpx_main on all localities
     std::vector<std::string> const cfg = {

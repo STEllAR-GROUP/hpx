@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -934,18 +934,48 @@ namespace hpx
         return (nullptr == rt) ? 0 : rt->get_instance_number();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
         if (nullptr == get_runtime_ptr())
-            return "";
+            return dflt;
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
-        if (nullptr == get_runtime_ptr())
-            return "";
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+            return std::to_string(dflt);
         return get_runtime().get_config().get_entry(key, dflt);
+    }
+
+    // set entries
+    void set_config_entry(std::string const& key, std::string const& value)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+            return;
+        return rt->get_config().add_entry(key, value);
+    }
+
+    void set_config_entry(std::string const& key, std::size_t value)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+            return;
+        return rt->get_config().add_entry(key, std::to_string(value));
+    }
+
+    void set_config_entry_callback(std::string const& key,
+        util::function_nonser<
+            void(std::string const&, std::string const&)
+        > const& callback)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+            return;
+        return rt->get_config().add_notification_callback(key, callback);
     }
 
     ///////////////////////////////////////////////////////////////////////////

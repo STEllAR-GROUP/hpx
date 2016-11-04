@@ -24,9 +24,12 @@
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
+#include <boost/exception_ptr.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <list>
 #include <type_traits>
 #include <utility>
 
@@ -40,59 +43,76 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct stable_partition_helper
         {
             template <typename ExPolicy, typename RandIter, typename F, typename Proj>
-            typename util::detail::algorithm_result<ExPolicy, RandIter>::type
+            hpx::future<RandIter>
             operator()(ExPolicy && policy, RandIter first, RandIter last,
-                std::size_t size, F && f, Proj && proj, std::size_t chunks)
+                std::size_t size, F f, Proj proj, std::size_t chunks)
             {
-                typedef util::detail::algorithm_result<ExPolicy, RandIter> result;
-                try {
-                    if (chunks < 2)
-                    {
-                        return result::get(std::stable_partition(
-                            first, last,
-                            util::invoke_projected<F, Proj>(
-                                std::forward<F>(f), std::forward<Proj>(proj)
-                            )));
-                    }
+                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+                if (chunks < 2)
+                {
+                    return executor_traits::async_execute(
+                        policy.executor(),
+                        [first, last, f, proj]() -> RandIter
+                        {
+                            return std::stable_partition(
+                                first, last,
+                                util::invoke_projected<F, Proj>(f, proj));
+                        });
+                }
 
-                    std::size_t mid_point = size / 2;
-                    chunks /= 2;
+                std::size_t mid_point = size / 2;
+                chunks /= 2;
 
-                    RandIter mid = first;
-                    std::advance(mid, mid_point);
+                RandIter mid = first;
+                std::advance(mid, mid_point);
 
-                    hpx::future<RandIter> left = hpx::async(
-                        policy.executor(), *this, policy, first, mid, mid_point,
-                        f, proj, chunks);
-                    hpx::future<RandIter> right = hpx::async(
-                        policy.executor(), *this, policy, mid, last, size - mid_point,
-                        std::forward<F>(f), std::forward<Proj>(proj), chunks);
+                hpx::future<RandIter> left = executor_traits::async_execute(
+                    policy.executor(), *this, policy, first, mid, mid_point,
+                    f, proj, chunks);
+                hpx::future<RandIter> right = executor_traits::async_execute(
+                    policy.executor(), *this, policy, mid, last, size - mid_point,
+                    f, proj, chunks);
 
-                    return result::get(
-                        dataflow(
-                            policy.executor(),
-                            [mid](
-                                hpx::future<RandIter> && left,
-                                hpx::future<RandIter> && right
-                            ) -> RandIter
+                return
+                    dataflow(
+                        policy.executor(),
+                        [mid](
+                            hpx::future<RandIter> && left,
+                            hpx::future<RandIter> && right
+                        ) -> RandIter
+                        {
+                            if (left.has_exception() || right.has_exception())
                             {
-                                RandIter first = left.get();
-                                RandIter last = right.get();
+                                std::list<boost::exception_ptr> errors;
+                                if(left.has_exception())
+                                    hpx::parallel::util::detail::
+                                    handle_local_exceptions<ExPolicy>::call(
+                                        left.get_exception_ptr(), errors);
+                                if(right.has_exception())
+                                    hpx::parallel::util::detail::
+                                    handle_local_exceptions<ExPolicy>::call(
+                                        right.get_exception_ptr(), errors);
 
-                                std::rotate(first, mid, last);
+                                if (!errors.empty())
+                                {
+                                    boost::throw_exception(
+                                        exception_list(std::move(errors)));
+                                }
+                            }
+                            RandIter first = left.get();
+                            RandIter last = right.get();
 
-                                // for some library implementations std::rotate
-                                // does not return the new middle point
-                                std::advance(first, std::distance(mid, last));
-                                return first;
-                            },
-                            std::move(left), std::move(right)));
-                }
-                catch (...) {
-                    return result::get(detail::handle_exception<
-                                ExPolicy, RandIter
-                            >::call(boost::current_exception()));
-                }
+                            std::rotate(first, mid, last);
+
+                            // for some library implementations std::rotate
+                            // does not return the new middle point
+                            std::advance(first, std::distance(mid, last));
+                            return first;
+                        },
+                        std::move(left), std::move(right));
             }
         };
 
@@ -124,37 +144,54 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy && policy, RandIter first, RandIter last,
                 F && f, Proj && proj)
             {
+                typedef util::detail::algorithm_result<ExPolicy, RandIter>
+                    algorithm_result;
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
-                difference_type size = std::distance(first, last);
+                future<RandIter> result;
 
-                if (size == 0)
-                {
-                    return util::detail::algorithm_result<
-                            ExPolicy, RandIter
-                        >::get(std::move(last));
+                try {
+                    difference_type size = std::distance(first, last);
+
+                    if (size == 0)
+                    {
+                        result = hpx::make_ready_future(std::move(last));
+                    }
+
+                    typedef typename hpx::util::decay<ExPolicy>::type::executor_type
+                        executor_type;
+                    typedef typename
+                        hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                        parameters_type;
+
+                    typedef executor_parameter_traits<parameters_type> traits;
+                    typedef executor_information_traits<executor_type> info_traits;
+
+                    std::size_t const cores =
+                        info_traits::processing_units_count(policy.executor(),
+                                policy.parameters());
+                    std::size_t max_chunks = traits::maximal_number_of_chunks(
+                        policy.parameters(), policy.executor(), cores, size);
+
+                    result = stable_partition_helper()(
+                        std::forward<ExPolicy>(policy), first, last, size,
+                        std::forward<F>(f), std::forward<Proj>(proj),
+                        size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                }
+                catch (...) {
+                    result = hpx::make_exceptional_future<RandIter>(
+                        boost::current_exception());
                 }
 
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
+                if (result.has_exception())
+                {
+                    return algorithm_result::get(
+                        detail::handle_exception<ExPolicy, RandIter>::call(
+                            std::move(result)));
+                }
 
-                typedef executor_parameter_traits<parameters_type> traits;
-                typedef executor_information_traits<executor_type> info_traits;
-
-                std::size_t const cores =
-                    info_traits::processing_units_count(policy.executor(),
-                            policy.parameters());
-                std::size_t max_chunks = traits::maximal_number_of_chunks(
-                    policy.parameters(), policy.executor(), cores, size);
-
-                return stable_partition_helper()(
-                    std::forward<ExPolicy>(policy), first, last, size,
-                    std::forward<F>(f), std::forward<Proj>(proj),
-                    size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                return algorithm_result::get(std::move(result));
             }
         };
         /// \endcond

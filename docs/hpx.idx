@@ -452,6 +452,9 @@ unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanage
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.runtime\.get_ptr.*"
 
+# hpx/lcos/barrier.hpp
+barrier                               "" "header\.hpx\.lcos\.barrier.*"
+
 # hpx/lcos/broadcast.hpp
 broadcast                             "" "header\.hpx\.lcos\.broadcast.*"
 broadcast_with_index                  "" "header\.hpx\.lcos\.broadcast.*"

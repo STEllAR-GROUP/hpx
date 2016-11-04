@@ -1,28 +1,116 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
-//  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/lcos/server/barrier.hpp>
-#include <hpx/util/serialize_exception.hpp>
+#include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/detail/barrier_node.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-// Barrier
-typedef hpx::components::managed_component<hpx::lcos::server::barrier> barrier_type;
+#include <cstddef>
+#include <string>
+#include <utility>
 
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::server::barrier, hpx::components::component_barrier)
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(barrier_type, barrier,
-    "hpx::lcos::base_lco", hpx::components::factory_enabled)
+namespace hpx { namespace lcos {
+    barrier::barrier(std::string const& base_name)
+      : node_(new wrapping_type(new wrapped_type(
+            base_name, hpx::get_num_localities(hpx::launch::sync),
+            hpx::get_locality_id()
+        )))
+    {
+        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+            register_with_basename(
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+    }
 
-HPX_REGISTER_ACTION_ID(
-    hpx::lcos::server::barrier::create_component_action
-  , hpx_lcos_server_barrier_create_component_action
-  , hpx::actions::hpx_lcos_server_barrier_create_component_action_id
-)
+    barrier::barrier(std::string const& base_name, std::size_t num)
+      : node_(new wrapping_type(new wrapped_type(
+            base_name, num, hpx::get_locality_id()
+        )))
+    {
+        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+            register_with_basename(
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+    }
 
+    barrier::barrier(std::string const& base_name, std::size_t num, std::size_t rank)
+      : node_(new wrapping_type(new wrapped_type(base_name, num, rank)))
+    {
+        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+            register_with_basename(
+                base_name, node_->get_unmanaged_id(), (*node_)->rank_).get();
+    }
+
+    barrier::barrier()
+    {}
+
+    barrier::barrier(barrier&& other)
+      : node_(std::move(other.node_))
+    {
+        other.node_.reset();
+    }
+
+    barrier& barrier::operator=(barrier&& other)
+    {
+        release();
+        node_ = std::move(other.node_);
+        other.node_.reset();
+
+        return *this;
+    }
+
+    barrier::~barrier()
+    {
+        release();
+    }
+
+    void barrier::wait()
+    {
+        (*node_)->wait(false).get();
+    }
+
+    future<void> barrier::wait(hpx::launch::async_policy)
+    {
+        return (*node_)->wait(true);
+    }
+
+    void barrier::release()
+    {
+        if (node_)
+        {
+            if (hpx::get_runtime_ptr() != nullptr)
+            {
+                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                    hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_).get();
+
+                // we need to wait on everyone to have its name unregistered...
+                wait();
+            }
+            node_.reset();
+        }
+    }
+
+    barrier barrier::create_global_barrier()
+    {
+        runtime& rt = get_runtime();
+        util::runtime_configuration const& cfg = rt.get_config();
+        return barrier("/hpx/global_barrier", cfg.get_num_localities());
+    }
+
+    barrier& barrier::get_global_barrier()
+    {
+        static barrier b;
+        return b;
+    }
+
+    void barrier::synchronize()
+    {
+        static barrier& b = get_global_barrier();
+        HPX_ASSERT(b.node_);
+        b.wait();
+    }
+}}

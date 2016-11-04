@@ -7,24 +7,24 @@
 // hpxinspect:nodeprecatedname:boost::unique_lock
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/set_thread_name.hpp>
-#include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/lcos/latch.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
-#include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/server/console_error_sink.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
-#include <hpx/lcos/latch.hpp>
+#include <hpx/runtime_impl.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/apex.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/set_thread_name.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/thread/mutex.hpp>

@@ -3,7 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Locate the Vc template library. Vc can be found at https://github.com/VcDevel/Vc
+# Locate the Vc template library.
+# Vc can be found at https://github.com/VcDevel/Vc
 #
 # This file is meant to be copied into projects that want to use Vc. It will
 # search for VcConfig.cmake, which ships with Vc and will provide up-to-date
@@ -66,6 +67,7 @@ if(Vc_FOUND)
     endforeach()
   endif()
 
-  hpx_add_config_define(HPX_HAVE_VC_DATAPAR)
+  hpx_add_config_define(HPX_HAVE_DATAPAR)
+  hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
 endif()
 
