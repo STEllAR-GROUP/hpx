@@ -21,8 +21,9 @@
 namespace hpx { namespace parallel { namespace traits
 {
     template <typename T,
-              std::size_t N = LibFlatArray::estimate_optimum_short_vec_type<T, fake_accessor>::VALUE::ARITY,
-              typename Abi = void>
+        std::size_t N = LibFlatArray::estimate_optimum_short_vec_type<
+            T, fake_accessor>::VALUE::ARITY,
+        typename Abi = void>
     struct vector_pack_type
     {
         typedef LibFlatArray::short_vec<T, N> type;

@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_load
     {
         template <typename Iter>
-                static typename rebind_pack<
+        static typename rebind_pack<
             V, typename std::iterator_traits<Iter>::value_type
         >::type
         aligned(Iter const& iter)

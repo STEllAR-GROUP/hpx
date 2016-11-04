@@ -249,8 +249,10 @@ hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
   "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
-if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
-  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
+if((HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD) OR
+   (HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY) OR
+   (HPX_WITH_DATAPAR_BOOST_SIMD AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY))
+  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC, HPX_WITH_DATAPAR_BOOST_SIMD, OR HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY)")
 endif()
 
 if(HPX_WITH_DATAPAR_LIBFLATARRAY)

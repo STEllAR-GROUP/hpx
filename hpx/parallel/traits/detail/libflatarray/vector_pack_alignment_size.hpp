@@ -54,19 +54,21 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, typename Enable>
     struct vector_pack_alignment
     {
-        typedef typename LibFlatArray::estimate_optimum_short_vec_type<T, fake_accessor>::VALUE shortvec;
-        typedef typename shortvec::strategy strategy;
-        typedef typename strategy::alignment foo;
+        typedef typename LibFlatArray::estimate_optimum_short_vec_type<
+                T, fake_accessor
+            >::VALUE shortvec;
 
-        static std::size_t const value = foo::ALIGNMENT;
+        static std::size_t const value =
+            shortvec::strategy::alignment<T>::ALIGNMENT;
     };
 
     template <typename T, std::size_t N>
     struct vector_pack_alignment<LibFlatArray::short_vec<T, N> >
     {
-        typedef typename LibFlatArray::short_vec<T, N>  shortvec;
+        typedef typename LibFlatArray::short_vec<T, N> shortvec;
 
-        static std::size_t const value = shortvec::strategy::alignment::ALIGNMENT;
+        static std::size_t const value =
+            shortvec::strategy::alignment<T>::ALIGNMENT;
     };
 
     template <typename ... Vector>
@@ -86,7 +88,9 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, typename Enable>
     struct vector_pack_size
     {
-        typedef typename LibFlatArray::estimate_optimum_short_vec_type<T, fake_accessor>::VALUE shortvec;
+        typedef typename LibFlatArray::estimate_optimum_short_vec_type<
+                T, fake_accessor
+            >::VALUE shortvec;
 
         static std::size_t const value = shortvec::ARITY;
     };

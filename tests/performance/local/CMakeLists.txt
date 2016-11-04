@@ -21,7 +21,7 @@ set(benchmarks
     timed_task_spawn
 )
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLATARRAY)
   set(benchmarks
       ${benchmarks}
       inner_product
