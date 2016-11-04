@@ -140,15 +140,15 @@ namespace hpx { namespace parallel { namespace util
                 iterator_datapar_compatible<Iter>::value
             >::type>
         {
-            template <typename Iter>
-            static bool call(Iter const& first, Iter const& last)
+            template <typename Iter_>
+            static bool call(Iter_ const& first, Iter_ const& last)
             {
-                typedef typename std::iterator_traits<Iter>::value_type
+                typedef typename std::iterator_traits<Iter_>::value_type
                     value_type;
                 typedef typename traits::vector_pack_type<value_type>::type V;
 
                 return traits::vector_pack_size<V>::value <=
-                        std::distance(first, last);
+                        (std::size_t)std::distance(first, last);
             }
         };
 
@@ -263,6 +263,9 @@ namespace hpx { namespace parallel { namespace util
                 return std::make_pair(std::move(it1), std::move(it2));
             }
         };
+
+        template <typename Iter1, typename Iter2>
+        struct loop2;
 
         template <typename Iter1, typename Iter2>
         struct datapar_loop2<std::false_type, Iter1, Iter2>

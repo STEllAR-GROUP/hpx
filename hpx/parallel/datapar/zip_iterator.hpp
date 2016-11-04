@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
+#include <numeric>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -25,10 +25,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename Iter>
     struct data_alignment_impl
     {
-        template <typename Iter>
-        static HPX_FORCEINLINE std::size_t call(Iter const& it)
+        template <typename Iter_>
+        static HPX_FORCEINLINE std::size_t call(Iter_ const& it)
         {
-            typedef typename std::iterator_traits<Iter>::value_type value_type;
+            typedef typename std::iterator_traits<Iter_>::value_type value_type;
             return reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
                 (traits::vector_pack_alignment<value_type>::value - 1);
         }
