@@ -109,7 +109,6 @@ namespace hpx { namespace threads { namespace coroutines
         }
 #endif
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
             return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;
@@ -119,7 +118,6 @@ namespace hpx { namespace threads { namespace coroutines
         {
             return m_pimpl.get() ? m_pimpl->set_thread_data(data) : 0;
         }
-#endif
 
         void rebind(functor_type&& f, thread_id_repr_type id = nullptr)
         {

@@ -7,16 +7,13 @@
 set(tests
     block_os_threads_1036
     resume_priority
+    thread_data_1111
     thread_pool_executor_1112
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
     threads_all_1422
    )
-
-if(HPX_HAVE_THREAD_LOCAL_STORAGE)
-  set(tests ${tests} thread_data_1111)
-endif()
 
 if(HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
   set(tests ${tests}

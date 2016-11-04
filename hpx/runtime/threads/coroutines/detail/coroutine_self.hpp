@@ -168,7 +168,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
           : m_pimpl(pimpl), next_self_(next_self)
         {}
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
             HPX_ASSERT(m_pimpl);
@@ -180,6 +179,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_pimpl->set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data()
         {
             HPX_ASSERT(m_pimpl);

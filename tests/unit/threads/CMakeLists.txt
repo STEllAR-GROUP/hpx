@@ -17,7 +17,7 @@ set(tests
     thread_yield
    )
 
-if(HPX_HAVE_THREAD_LOCAL_STORAGE)
+if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 

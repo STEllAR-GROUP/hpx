@@ -113,9 +113,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             m_phase(0),
 #endif
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             m_thread_data(0),
-#endif
             m_type_info(),
             m_thread_id(id),
             continuation_recursion_count_(0)
@@ -177,6 +175,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
+#else
+            m_thread_data = 0;
 #endif
             m_thread_id = nullptr;
         }
@@ -447,22 +447,34 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
+#else
+            m_thread_data = 0;
 #endif
         }
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             if (!m_thread_data)
                 return 0;
             return get_tss_thread_data(m_thread_data);
+#else
+            return m_thread_data;
+#endif
         }
 
         std::size_t set_thread_data(std::size_t data)
         {
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             return set_tss_thread_data(m_thread_data, data);
+#else
+            std::size_t olddata = m_thread_data;
+            m_thread_data = data;
+            return olddata;
+#endif
         }
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data(bool create_if_needed) const
         {
             if (!m_thread_data && create_if_needed)
@@ -542,9 +554,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             HPX_ASSERT(m_phase == 0);
 #endif
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             HPX_ASSERT(m_thread_data == 0);
-#endif
             m_type_info = boost::exception_ptr();
         }
 
@@ -615,6 +625,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         mutable detail::tss_storage* m_thread_data;
+#else
+        mutable std::size_t m_thread_data;
 #endif
 
         // This is used to generate a meaningful exception trace.
