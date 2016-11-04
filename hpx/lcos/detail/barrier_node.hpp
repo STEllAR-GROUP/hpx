@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace detail {
         // intrusive reference counting
         friend void intrusive_ptr_release(barrier_node* p)
         {
-            if (--p->count_ == 0)
+            if (p && --p->count_ == 0)
             {
                 delete p;
             }
