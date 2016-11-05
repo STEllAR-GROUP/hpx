@@ -219,12 +219,18 @@ else()
 endif()
 
 target_link_libraries(hpx
-  #PUBLIC ${HPX_LIBRARIES})
-  ${HPX_LIBRARIES})
+  PUBLIC ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx
-    #PRIVATE ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
-    ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+    PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+endif()
+if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
+  target_link_libraries(hpx
+    PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+endif()
+
+if(HPX_WITH_APEX)
+  add_definitions(-DAPEX_HAVE_HPX)   # tell APEX that it runs withing HPX
 endif()
 
 set_property(TARGET hpx APPEND

@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -382,7 +383,8 @@ namespace hpx {
         util::set_thread_name("main-thread#wait_helper");
 
 #if defined(HPX_HAVE_APEX)
-        apex::register_thread("main-thread#wait_helper");
+        // not registering helper threads - for now
+        //apex::register_thread("main-thread#wait_helper");
 #endif
         // wait for termination
         runtime_support_->wait();
@@ -659,7 +661,8 @@ namespace hpx {
             util::set_thread_name(name);
 
 #if defined(HPX_HAVE_APEX)
-            apex::register_thread(name);
+            if (std::strstr(name, "worker") != nullptr)
+                apex::register_thread(name);
 #endif
         }
 
