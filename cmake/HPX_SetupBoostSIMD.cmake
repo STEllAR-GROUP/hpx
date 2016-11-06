@@ -18,3 +18,4 @@ include_directories(SYSTEM ${BOOST_SIMD_ROOT}/include)
 hpx_add_config_define(HPX_HAVE_DATAPAR)
 hpx_add_config_define(HPX_HAVE_DATAPAR_BOOST_SIMD)
 
+hpx_info("Found Boost.SIMD (vectorization): " ${BOOST_SIMD_ROOT}/include)
