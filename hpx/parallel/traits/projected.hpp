@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { namespace traits
         struct projected_result_of<Proj, Iter,
                 typename std::enable_if<hpx::traits::is_iterator<Iter>::value>::type>
           : hpx::util::result_of<Proj(
-                    typename std::iterator_traits<Iter>::value_type&
+                    typename std::iterator_traits<Iter>::reference
                 )>
         {};
 
