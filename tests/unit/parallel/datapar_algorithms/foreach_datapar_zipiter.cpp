@@ -26,8 +26,8 @@ struct set_42
     template <typename Tuple>
     void operator()(Tuple && t)
     {
-//        hpx::util::get<0>(t) = 42;
-//        hpx::util::get<1>(t) = 42;
+        hpx::util::get<0>(t) = 42;
+        hpx::util::get<1>(t) = 42;
     }
 };
 
@@ -71,7 +71,7 @@ void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
     static_assert(
 //        hpx::parallel::traits::is_indirect_callable<
 //            set_42, hpx::parallel::traits::projected<
-//                hpx::parallel::util::projection_identity, 
+//                hpx::parallel::util::projection_identity,
 //                decltype(begin)>
 //        >::value,
         hpx::traits::is_callable<

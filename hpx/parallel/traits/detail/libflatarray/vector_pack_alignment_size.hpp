@@ -109,9 +109,9 @@ namespace hpx { namespace parallel { namespace traits
     {
         typedef typename hpx::util::tuple_element<
                 0, hpx::util::tuple<Vector...>
-            >::type pack_type;
+            >::type shortvec;
 
-        static std::size_t const value = pack_type::alignment;
+        static std::size_t const value = shortvec::ARITY;
     };
 }}}
 

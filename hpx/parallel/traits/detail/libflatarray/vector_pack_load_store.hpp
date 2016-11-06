@@ -7,10 +7,10 @@
 #if !defined(HPX_PARALLEL_TRAITS_VECTOR_PACK_LOAD_STORE_LIBFLATARRAY)
 #define HPX_PARALLEL_TRAITS_VECTOR_PACK_LOAD_STORE_LIBFLATARRAY
 
-#include <hpx/parallel/traits/detail/libflatarray/fake_accessor.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_LIBFLATARRAY)
-#include <hpx/util/tuple.hpp>
+#include <hpx/parallel/traits/detail/libflatarray/fake_accessor.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <cstddef>
