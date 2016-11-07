@@ -26,7 +26,7 @@ namespace hpx { namespace actions
       : gid_(gid)
     {
         // Try to resolve the address locally ...
-        if(!agas::is_local_address_cached(gid_, addr_))
+        if(gid && !agas::is_local_address_cached(gid_, addr_))
         {
             addr_ = naming::address();
         }
@@ -36,7 +36,7 @@ namespace hpx { namespace actions
       : gid_(std::move(gid))
     {
         // Try to resolve the address locally ...
-        if(!agas::is_local_address_cached(gid_, addr_))
+        if(gid && !agas::is_local_address_cached(gid_, addr_))
         {
             addr_ = naming::address();
         }
@@ -51,6 +51,18 @@ namespace hpx { namespace actions
       : gid_(std::move(gid))
       , addr_(std::move(addr))
     {
+    }
+
+    continuation::continuation(continuation&& o)
+      : gid_(std::move(o.gid_))
+      , addr_(std::move(o.addr_))
+    {}
+
+    continuation& continuation::operator=(continuation&& o)
+    {
+        gid_ = std::move(o.gid_);
+        addr_ = std::move(o.addr_);
+        return *this;
     }
 
     ///////////////////////////////////////////////////////////////////////////

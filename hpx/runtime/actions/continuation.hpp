@@ -54,6 +54,9 @@ namespace hpx { namespace actions
         continuation(naming::id_type const& gid, naming::address && addr);
         continuation(naming::id_type && gid, naming::address && addr);
 
+        continuation(continuation&& o);
+        continuation& operator=(continuation&& o);
+
         //
         void trigger_error(boost::exception_ptr const& e);
         void trigger_error(boost::exception_ptr && e);
@@ -159,6 +162,13 @@ namespace hpx { namespace actions
           : continuation(std::move(o.gid_), std::move(o.addr_)),
             f_(std::move(o.f_))
         {}
+
+        typed_continuation& operator=(typed_continuation&& o)
+        {
+            continuation::operator=(std::move(o));
+            f_ = std::move(o.f_);
+            return *this;
+        }
 
         void trigger_value(Result && result)
         {
@@ -272,6 +282,12 @@ namespace hpx { namespace actions
           : base_type(static_cast<base_type &&>(o))
         {}
 
+        typed_continuation& operator=(typed_continuation&& o)
+        {
+            base_type::operator=(std::move(o));
+            return *this;
+        }
+
         void trigger_value(RemoteResult && result)
         {
             LLCO_(info)
@@ -379,6 +395,13 @@ namespace hpx { namespace actions
           : continuation(std::move(o.gid_), std::move(o.addr_)),
             f_(std::move(o.f_))
         {}
+
+        typed_continuation& operator=(typed_continuation&& o)
+        {
+            continuation::operator=(std::move(o));
+            f_ = std::move(o.f_);
+            return *this;
+        }
 
         void trigger()
         {
