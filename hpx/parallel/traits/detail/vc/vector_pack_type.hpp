@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_DATAPAR_VC)
 
 #include <cstddef>
+#include <type_traits>
 
 #include <Vc/Vc>
 
@@ -21,30 +22,28 @@ namespace hpx { namespace parallel { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename T, typename Abi>
+        template <typename T, std::size_t N, typename Abi>
         struct vector_pack_type
         {
-            typedef Vc::Vector<T, Abi> type;
+            typedef typename std::conditional<
+                    std::is_void<Abi>::value, Vc::VectorAbi::Best<T>, Abi
+                >::type abi_type;
+
+            typedef Vc::Vector<T, abi_type> type;
         };
 
-        template <typename T>
-        struct vector_pack_type<T, void>
+        template <typename T, typename Abi>
+        struct vector_pack_type<T, 1, Abi>
         {
-            typedef Vc::Vector<T> type;
+            typedef Vc::Scalar::Vector<T> type;
         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, std::size_t N, typename Abi>
     struct vector_pack_type
-      : detail::vector_pack_type<T, Abi>
+      : detail::vector_pack_type<T, N, Abi>
     {};
-
-    template <typename T, typename Abi>
-    struct vector_pack_type<T, 1, Abi>
-    {
-        typedef Vc::Scalar::Vector<T> type;
-    };
 }}}
 
 #endif
