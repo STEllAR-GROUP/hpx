@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             template <typename Op_>
             reduction_helper(T& var, T const& identity, Op_ && op)
-              : var_(var), op_(std::forward<Op_>(op)), curr_(0)
+              : var_(var), op_(std::forward<Op_>(op))
             {
                 std::size_t cores = hpx::get_os_thread_count();
                 data_.reset(new T[cores]);
@@ -47,13 +47,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             void init_iteration(std::size_t)
             {
-                curr_ = hpx::get_worker_thread_num();
-                HPX_ASSERT(curr_ < hpx::get_os_thread_count());
+                HPX_ASSERT(hpx::get_worker_thread_num() < hpx::get_os_thread_count());
             }
 
             T& iteration_value()
             {
-                return data_[curr_];
+                return data_[hpx::get_worker_thread_num()];
             }
 
             void next_iteration() HPX_NOEXCEPT {}
@@ -68,7 +67,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         private:
             T& var_;
             Op op_;
-            std::size_t curr_;
             boost::shared_array<T> data_;
         };
 
