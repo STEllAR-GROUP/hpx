@@ -201,7 +201,8 @@ namespace hpx { namespace actions { namespace detail
         // returned.
         static bool call(continuation_type& c, std::true_type)
         {
-            c = continuation_type(c.get_id(), wrapped_continuation<Action, N>{c.get_addr()});
+            c = continuation_type(
+                c.get_id(), wrapped_continuation<Action, N>{c.get_addr()});
             return true;
         }
 

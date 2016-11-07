@@ -109,14 +109,16 @@ namespace hpx { namespace actions
 
     template <typename Action>
     template <typename ...Ts>
-    transfer_continuation_action<Action>::transfer_continuation_action(continuation_type&& cont, Ts&&... vs)
+    transfer_continuation_action<Action>::transfer_continuation_action(
+        continuation_type&& cont, Ts&&... vs)
       : base_type(std::forward<Ts>(vs)...)
       , cont_(std::move(cont))
     {}
 
     template <typename Action>
     template <typename ...Ts>
-    transfer_continuation_action<Action>::transfer_continuation_action(threads::thread_priority priority, continuation_type&& cont, Ts&&... vs)
+    transfer_continuation_action<Action>::transfer_continuation_action(
+        threads::thread_priority priority, continuation_type&& cont, Ts&&... vs)
       : base_type(priority, std::forward<Ts>(vs)...)
       , cont_(std::move(cont))
     {}
@@ -130,8 +132,9 @@ namespace hpx { namespace actions
     template <typename Action>
     template <std::size_t ...Is>
     threads::thread_function_type
-    transfer_continuation_action<Action>::get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-    naming::id_type&& target, naming::address::address_type lva)
+    transfer_continuation_action<Action>::get_thread_function(
+        util::detail::pack_c<std::size_t, Is...>,
+        naming::id_type&& target, naming::address::address_type lva)
     {
         return base_type::derived_type::construct_thread_function(std::move(target),
             std::move(cont_), lva, util::get<Is>(std::move(this->arguments_))...);
@@ -139,7 +142,8 @@ namespace hpx { namespace actions
 
     template <typename Action>
     threads::thread_function_type
-    transfer_continuation_action<Action>::get_thread_function(naming::id_type&& target, naming::address::address_type lva)
+    transfer_continuation_action<Action>::get_thread_function(
+        naming::id_type&& target, naming::address::address_type lva)
     {
         return get_thread_function(
             typename util::detail::make_index_pack<Action::arity>::type(),
@@ -149,7 +153,8 @@ namespace hpx { namespace actions
     template <typename Action>
     template <std::size_t ...Is>
     void
-    transfer_continuation_action<Action>::schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+    transfer_continuation_action<Action>::schedule_thread(
+        util::detail::pack_c<std::size_t, Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
@@ -172,7 +177,8 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    void transfer_continuation_action<Action>::schedule_thread(naming::gid_type const& target_gid,
+    void transfer_continuation_action<Action>::schedule_thread(
+        naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
     {
@@ -185,21 +191,24 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    void transfer_continuation_action<Action>::load(hpx::serialization::input_archive & ar)
+    void transfer_continuation_action<Action>::load(
+        hpx::serialization::input_archive & ar)
     {
         this->load_base(ar);
         ar >> cont_;
     }
 
     template <typename Action>
-    void transfer_continuation_action<Action>::save(hpx::serialization::output_archive & ar)
+    void transfer_continuation_action<Action>::save(
+        hpx::serialization::output_archive & ar)
     {
         this->save_base(ar);
         ar << cont_;
     }
 
     template <typename Action>
-    void transfer_continuation_action<Action>::load_schedule(serialization::input_archive& ar,
+    void transfer_continuation_action<Action>::load_schedule(
+        serialization::input_archive& ar,
         naming::gid_type&& target, naming::address_type lva,
         std::size_t num_thread)
     {

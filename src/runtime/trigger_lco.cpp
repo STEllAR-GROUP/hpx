@@ -9,6 +9,10 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
+#include <boost/exception_ptr.hpp>
+
+#include <utility>
+
 namespace hpx
 {
     void trigger_lco_event(naming::id_type const& id, naming::address && addr,

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace actions { namespace detail
@@ -30,7 +31,8 @@ namespace hpx { namespace actions { namespace detail
             cache_id(it->second, ctor);
     }
 
-    void action_registry::register_typename(std::string const& type_name, std::uint32_t id)
+    void action_registry::register_typename(
+        std::string const& type_name, std::uint32_t id)
     {
         HPX_ASSERT(id != invalid_id);
 

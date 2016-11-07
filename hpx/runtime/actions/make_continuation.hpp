@@ -15,6 +15,7 @@
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx {
     inline hpx::actions::set_lco_value_continuation

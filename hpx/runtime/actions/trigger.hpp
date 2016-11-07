@@ -28,8 +28,8 @@ namespace hpx { namespace actions {
 
         // special handling of actions returning a future
         template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::false_type, typed_continuation<Result, RemoteResult>&& cont,
-            Future&& result)
+        void deferred_trigger(std::false_type,
+            typed_continuation<Result, RemoteResult>&& cont, Future&& result)
         {
             try {
                 HPX_ASSERT(result.is_ready());
@@ -42,8 +42,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
-            Future&& result)
+        void deferred_trigger(std::true_type,
+            typed_continuation<Result, RemoteResult>&& cont, Future&& result)
         {
             try {
                 HPX_ASSERT(result.is_ready());
@@ -91,8 +91,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::false_type, typed_continuation<Result, RemoteResult>&& cont,
-            F&& f, Ts&&... vs)
+        void trigger_impl(std::false_type,
+            typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs)
         {
             try {
                 cont.trigger_value(

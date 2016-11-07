@@ -138,7 +138,8 @@ namespace hpx { namespace actions
 
     template <typename Action>
     threads::thread_function_type
-    transfer_action<Action>::get_thread_function(naming::id_type&& target, naming::address::address_type lva)
+    transfer_action<Action>::get_thread_function(
+        naming::id_type&& target, naming::address::address_type lva)
     {
         return get_thread_function(
             typename util::detail::make_index_pack<Action::arity>::type(),
