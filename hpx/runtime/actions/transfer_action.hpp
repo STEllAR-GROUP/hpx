@@ -77,7 +77,8 @@ namespace hpx { namespace actions
             naming::id_type&& target, naming::address::address_type lva);
 
         threads::thread_function_type
-        get_thread_function(naming::id_type&& target, naming::address::address_type lva);
+        get_thread_function(naming::id_type&& target,
+            naming::address::address_type lva);
 
         template <std::size_t ...Is>
         void
@@ -116,7 +117,8 @@ namespace hpx { namespace actions
 
     template <typename Action>
     template <typename ...Ts>
-    transfer_action<Action>::transfer_action(threads::thread_priority priority, Ts&&... vs)
+    transfer_action<Action>::transfer_action(
+            threads::thread_priority priority, Ts&&... vs)
       : base_type(priority, std::forward<Ts>(vs)...)
     {}
 
@@ -129,10 +131,12 @@ namespace hpx { namespace actions
     template <typename Action>
     template <std::size_t ...Is>
     threads::thread_function_type
-    transfer_action<Action>::get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-    naming::id_type&& target, naming::address::address_type lva)
+    transfer_action<Action>::get_thread_function(
+        util::detail::pack_c<std::size_t, Is...>,
+        naming::id_type&& target, naming::address::address_type lva)
     {
-        return base_type::derived_type::construct_thread_function(std::move(target), lva,
+        return base_type::derived_type::construct_thread_function(
+            std::move(target), lva,
             util::get<Is>(std::move(this->arguments_))...);
     }
 
@@ -149,7 +153,8 @@ namespace hpx { namespace actions
     template <typename Action>
     template <std::size_t ...Is>
     void
-    transfer_action<Action>::schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+    transfer_action<Action>::schedule_thread(
+            util::detail::pack_c<std::size_t, Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
@@ -172,7 +177,8 @@ namespace hpx { namespace actions
     }
 
     template <typename Action>
-    void transfer_action<Action>::schedule_thread(naming::gid_type const& target_gid,
+    void transfer_action<Action>::schedule_thread(
+        naming::gid_type const& target_gid,
         naming::address::address_type lva,
         std::size_t num_thread)
     {
