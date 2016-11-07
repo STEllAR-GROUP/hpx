@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/apex.hpp>
 
 #include <hpx/util/atomic_count.hpp>
 
@@ -422,6 +423,7 @@ namespace hpx { namespace parcelset
         std::size_t num_thread)
     {
         load_data(ar);
+
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
@@ -436,9 +438,16 @@ namespace hpx { namespace parcelset
             return true;
         }
 
-        // dispatch action, register work item either with or without
         // continuation support, this is handled in the transfer action
         action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread);
+
+#if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
+        // tell APEX about the received parcel
+        apex::recv(data_.parcel_id_.get_lsb(), size_,
+            naming::get_locality_id_from_gid(data_.source_id_),
+            reinterpret_cast<std::uint64_t>(action_->get_parent_thread_id()));
+#endif
+
         return false;
     }
 

@@ -417,26 +417,6 @@ namespace hpx { namespace parcelset
             return static_cast<ConnectionHandler const &>(*this);
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // the code below is needed to bootstrap the parcel layer
-        void early_pending_parcel_handler(
-            boost::system::error_code const& ec, parcel const & p)
-        {
-            if (ec) {
-                // all errors during early parcel handling are fatal
-                boost::exception_ptr exception =
-                    HPX_GET_EXCEPTION(ec,
-                        "early_pending_parcel_handler",
-                        "error while handling early parcel: " +
-                            ec.message() + "(" +
-                            std::to_string(ec.value()) +
-                            ")" + parcelset::dump_parcel(p));
-
-                hpx::report_error(exception);
-                return;
-            }
-        }
-
         template <typename ConnectionHandler_>
         typename std::enable_if<
             connection_handler_traits<
@@ -449,7 +429,7 @@ namespace hpx { namespace parcelset
                 dest
               , std::move(p)
               , util::bind(
-                    &parcelport_impl::early_pending_parcel_handler
+                    &parcelport::early_pending_parcel_handler
                   , this
                   , util::placeholders::_1
                   , util::placeholders::_2

@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return nullptr;
 #endif
     }
@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -114,7 +114,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -138,7 +138,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return nullptr;
 #endif
     }

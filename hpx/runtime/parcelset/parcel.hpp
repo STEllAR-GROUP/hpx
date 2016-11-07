@@ -102,8 +102,8 @@ namespace hpx { namespace parcelset
         );
 
         friend struct detail::create_parcel;
-    public:
 
+    public:
         parcel(parcel && other);
 
         parcel &operator=(parcel && other);

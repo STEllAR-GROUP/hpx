@@ -338,6 +338,10 @@ namespace hpx { namespace parcelset
             return async_serialization_;
         }
 
+        // callback while bootstrap the parcel layer
+        void early_pending_parcel_handler(boost::system::error_code const& ec,
+            parcel const & p);
+
     protected:
         /// mutex for all of the member data
         mutable lcos::local::spinlock mtx_;

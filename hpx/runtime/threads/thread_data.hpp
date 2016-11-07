@@ -531,7 +531,6 @@ namespace hpx { namespace threads
 #endif
         }
 
-#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();
@@ -541,7 +540,6 @@ namespace hpx { namespace threads
         {
             return coroutine_.set_thread_data(data);
         }
-#endif
 
         void rebind(thread_init_data& init_data,
             thread_state_enum newstate)

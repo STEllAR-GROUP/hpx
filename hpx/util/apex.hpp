@@ -8,6 +8,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/startup_function.hpp>
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
@@ -16,10 +18,16 @@
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+    static void hpx_util_apex_init_startup(void)
+    {
+        apex::init(nullptr, hpx::get_locality_id(),
+            hpx::get_initial_num_localities());
+    }
+
     inline void apex_init()
     {
-        apex::init(nullptr);
-        apex::set_node_id(hpx::get_locality_id());
+        hpx_util_apex_init_startup();
+        //hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
     }
 
     inline void apex_finalize()
@@ -70,7 +78,9 @@ namespace hpx { namespace util
     {
         apex_wrapper_init(int argc, char **argv)
         {
-            apex::init(argc, argv, nullptr);
+            //apex::init(nullptr, hpx::get_locality_id(),
+            //    hpx::get_initial_num_localities());
+            hpx::register_pre_startup_function(&hpx_util_apex_init_startup);
         }
         ~apex_wrapper_init()
         {

@@ -413,14 +413,12 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::size_t get_thread_data(thread_id_type const& id,
         error_code& ec = throws);
 
     HPX_API_EXPORT std::size_t set_thread_data(thread_id_type const& id,
         std::size_t data, error_code& ec = throws);
-#endif
 
     HPX_API_EXPORT std::size_t& get_continuation_recursion_count();
     HPX_API_EXPORT void reset_continuation_recursion_count();
