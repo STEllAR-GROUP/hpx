@@ -10,9 +10,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
-
 #include <cstddef>
 #include <type_traits>
 
@@ -73,19 +70,6 @@ namespace hpx { namespace parallel { namespace traits
         static std::size_t const value = Vc::Scalar::Vector<T>::MemoryAlignment;
     };
 
-    template <typename ... Vector>
-    struct vector_pack_alignment<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type pack_type;
-
-        static std::size_t const value = pack_type::MemoryAlignment;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct vector_pack_size
@@ -103,19 +87,6 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_size<Vc::Scalar::Vector<T> >
     {
         static std::size_t const value = Vc::Scalar::Vector<T>::Size;
-    };
-
-    template <typename ... Vector>
-    struct vector_pack_size<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type pack_type;
-
-        static std::size_t const value = pack_type::Size;
     };
 }}}
 

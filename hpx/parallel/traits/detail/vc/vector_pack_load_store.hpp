@@ -20,13 +20,6 @@
 namespace hpx { namespace parallel { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename NewT>
-    struct rebind_pack
-    {
-        typedef Vc::Vector<T> type;
-    };
-
-    // handle non-tuple values
     template <typename T, typename Abi, typename NewT>
     struct rebind_pack<Vc::Vector<T, Abi>, NewT>
     {

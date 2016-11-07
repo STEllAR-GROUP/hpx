@@ -9,9 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
-
 #include <cstddef>
 #include <type_traits>
 
@@ -58,20 +55,8 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, std::size_t N, typename Abi>
     struct vector_pack_alignment<boost::simd::pack<T, N, Abi> >
     {
-        static std::size_t const value = boost::simd::pack<T, N, Abi>::alignment;
-    };
-
-    template <typename ... Vector>
-    struct vector_pack_alignment<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type pack_type;
-
-        static std::size_t const value = pack_type::alignment;
+        static std::size_t const value =
+            boost::simd::pack<T, N, Abi>::alignment;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -84,20 +69,8 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, std::size_t N, typename Abi>
     struct vector_pack_size<boost::simd::pack<T, N, Abi> >
     {
-        static std::size_t const value = boost::simd::pack<T, N, Abi>::static_size;
-    };
-
-    template <typename ... Vector>
-    struct vector_pack_size<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type pack_type;
-
-        static std::size_t const value = pack_type::alignment;
+        static std::size_t const value =
+            boost::simd::pack<T, N, Abi>::static_size;
     };
 }}}
 

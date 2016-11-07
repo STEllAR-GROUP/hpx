@@ -25,12 +25,6 @@
 namespace hpx { namespace parallel { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename NewT>
-    struct rebind_pack
-    {
-        typedef boost::simd::pack<T> type;
-    };
-
     template <typename T, std::size_t N, typename Abi, typename NewT>
     struct rebind_pack<boost::simd::pack<T, N, Abi>, NewT>
     {

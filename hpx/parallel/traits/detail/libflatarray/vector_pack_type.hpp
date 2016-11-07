@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_DATAPAR_LIBFLATARRAY)
 #include <hpx/parallel/traits/detail/libflatarray/fake_accessor.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 
@@ -20,6 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename T, std::size_t N>
@@ -40,17 +40,13 @@ namespace hpx { namespace parallel { namespace traits
         };
     }
 
-    // avoid premature instantiation of LibFlatArray::estimate_optimum_short_vec_type
-    template <typename T, std::size_t N = 0, typename Abi = void>
+    ///////////////////////////////////////////////////////////////////////////
+    // avoid premature instantiation of
+    // LibFlatArray::estimate_optimum_short_vec_type
+    template <typename T, std::size_t N, typename Abi>
     struct vector_pack_type
       : detail::vector_pack_type<T, N>
     {};
-
-    template <typename ... T, std::size_t N>
-    struct vector_pack_type<hpx::util::tuple<T...>, N, void>
-    {
-        typedef hpx::util::tuple<typename vector_pack_type<T, N>::type...> type;
-    };
 }}}
 
 #endif

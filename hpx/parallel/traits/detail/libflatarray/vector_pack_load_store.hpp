@@ -23,14 +23,6 @@
 namespace hpx { namespace parallel { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename NewT>
-    struct rebind_pack
-    {
-        typedef typename LibFlatArray::estimate_optimum_short_vec_type<
-                T, fake_accessor
-            >::VALUE type;
-    };
-
     template <typename T, std::size_t N, typename NewT>
     struct rebind_pack<LibFlatArray::short_vec<T, N>, NewT>
     {

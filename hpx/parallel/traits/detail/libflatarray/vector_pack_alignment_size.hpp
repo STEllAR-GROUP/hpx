@@ -11,8 +11,6 @@
 
 #if defined(HPX_HAVE_DATAPAR_LIBFLATARRAY)
 #include <hpx/parallel/traits/detail/libflatarray/fake_accessor.hpp>
-#include <hpx/util/detail/pack.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -71,19 +69,6 @@ namespace hpx { namespace parallel { namespace traits
             shortvec::strategy::alignment<T>::ALIGNMENT;
     };
 
-    template <typename ... Vector>
-    struct vector_pack_alignment<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type pack_type;
-
-        static std::size_t const value = pack_type::alignment;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct vector_pack_size
@@ -99,19 +84,6 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_size<LibFlatArray::short_vec<T, N> >
     {
         static std::size_t const value = LibFlatArray::short_vec<T, N>::ARITY;
-    };
-
-    template <typename ... Vector>
-    struct vector_pack_size<hpx::util::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value
-        >::type>
-    {
-        typedef typename hpx::util::tuple_element<
-                0, hpx::util::tuple<Vector...>
-            >::type shortvec;
-
-        static std::size_t const value = shortvec::ARITY;
     };
 }}}
 

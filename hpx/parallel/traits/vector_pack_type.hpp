@@ -9,15 +9,33 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
+#include <hpx/util/tuple.hpp>
 
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     // exposition only
-    template <typename T, std::size_t N, typename Abi>
+    template <typename T, std::size_t N = 0, typename Abi = void>
     struct vector_pack_type;
+
+    // handle tuple<> transformations
+    template <typename ... T, std::size_t N, typename Abi>
+    struct vector_pack_type<hpx::util::tuple<T...>, N, Abi>
+    {
+        typedef hpx::util::tuple<
+                typename vector_pack_type<T, N, Abi>::type...
+            > type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename NewT>
+    struct rebind_pack
+    {
+        typedef typename vector_pack_type<T>::type type;
+    };
 }}}
 
 #include <hpx/parallel/traits/detail/vc/vector_pack_type.hpp>
