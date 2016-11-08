@@ -37,6 +37,8 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
+
+/*
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
         void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::apply_continuation_impl<              \
@@ -49,9 +51,12 @@ namespace hpx { namespace detail
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
+    */
 /**/
 
 #define HPX_REGISTER_APPLY_COLOCATED(action, name)                            \
+
+/*
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
         void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::apply_continuation_impl<              \
@@ -64,6 +69,7 @@ namespace hpx { namespace detail
         >)                                                                    \
       , name                                                                  \
     );                                                                        \
+    */
 /**/
 
 #endif

@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
+#include <hpx/traits/action_continuation.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
@@ -54,7 +54,10 @@ namespace hpx { namespace applier { namespace detail
             naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
-            std::unique_ptr<actions::continuation> cont;
+            typedef typename traits::action_continuation<Action>::type
+                continuation_type;
+
+            continuation_type cont;
             if (traits::action_decorate_continuation<Action>::call(cont)) //-V614
             {
                 data.func = Action::construct_thread_function(target, std::move(cont),
@@ -84,20 +87,6 @@ namespace hpx { namespace applier { namespace detail
         template <typename Continuation, typename ...Ts>
         static void
         call (threads::thread_init_data&& data, Continuation && cont,
-            naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority priority, Ts&&... vs)
-        {
-            std::unique_ptr<actions::continuation> c(
-                new typename util::decay<Continuation>::type(
-                    std::forward<Continuation>(cont)));
-            call(std::move(data), std::move(c), target, lva, priority,
-                std::forward<Ts>(vs)...);
-        }
-
-        template <typename ...Ts>
-        static void
-        call (threads::thread_init_data&& data,
-            std::unique_ptr<actions::continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -150,22 +139,7 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename Continuation, typename ...Ts>
         HPX_FORCEINLINE static void
-        call (threads::thread_init_data&& data, Continuation && c,
-            naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority priority, Ts &&... vs)
-        {
-            std::unique_ptr<actions::continuation> cont(
-                new typename util::decay<Continuation>::type(
-                    std::forward<Continuation>(c)));
-
-            call(std::move(data), std::move(cont), target, lva, priority,
-                std::forward<Ts>(vs)...);
-        }
-
-        template <typename ...Ts>
-        HPX_FORCEINLINE static void
-        call (threads::thread_init_data&& data,
-            std::unique_ptr<actions::continuation> cont,
+        call (threads::thread_init_data&& data, Continuation && cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts &&... vs)
         {
@@ -175,18 +149,19 @@ namespace hpx { namespace applier { namespace detail
                 hpx::threads::get_self_ptr() == nullptr)
             {
                 try {
-                    cont->trigger(Action::execute_function(lva,
+                    cont.trigger_value(Action::execute_function(lva,
                         std::forward<Ts>(vs)...));
                 }
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the
                     // client
-                    cont->trigger_error(boost::current_exception());
+                    cont.trigger_error(boost::current_exception());
                 }
             }
             else
             {
-                apply_helper<Action, false>::call(std::move(data), std::move(cont),
+                apply_helper<Action, false>::call(std::move(data),
+                    std::forward<Continuation>(cont),
                     target, lva, priority, std::forward<Ts>(vs)...);
             }
         }

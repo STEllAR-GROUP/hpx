@@ -19,6 +19,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>

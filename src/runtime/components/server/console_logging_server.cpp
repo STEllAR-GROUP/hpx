@@ -14,6 +14,7 @@
 // This is needed to get rid of an undefined reference to
 // hpx::actions::detail::register_remote_action_invocation_count
 #include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>

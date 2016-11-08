@@ -10,8 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>
@@ -20,6 +18,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -399,14 +398,17 @@ namespace hpx
             HPX_ASSERT(id.get_management_type() == naming::id_type::unmanaged);
             naming::gid_type gid = id.get_gid();
             parcelset::parcel p =
-                parcelset::detail::create_parcel::call(
-                    std::false_type(), std::false_type(),
+                parcelset::detail::create_parcel::call(std::false_type(),
                     std::move(gid), complement_addr<action_type_>(addr),
                     action_type_(), priority
                 );
-            p.size() = 4096;
-            hpx::get_runtime().get_parcel_handler()
-                .sync_put_parcel(std::move(p));
+
+            auto f = [](parcelset::parcel&& p)
+                {
+                    hpx::get_runtime().get_parcel_handler()
+                        .sync_put_parcel(std::move(p));
+                };
+            parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
             return false;     // destination is remote
         }
 

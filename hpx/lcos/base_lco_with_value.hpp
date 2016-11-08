@@ -179,9 +179,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_DECLARATION(                                            \
         hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
         BOOST_PP_CAT(get_value_non_direct_action_, Name))                       \
-    HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
@@ -203,9 +200,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION(                                                        \
         hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
         BOOST_PP_CAT(get_value_non_direct_action_, Name))                       \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
@@ -230,9 +224,6 @@ namespace hpx { namespace traits
         hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
         BOOST_PP_CAT(get_value_non_direct_action_, Name),                       \
         BOOST_PP_CAT(ActionIdGet, _non_direct))                                 \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
@@ -258,9 +249,6 @@ namespace hpx { namespace traits
         hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
         BOOST_PP_CAT(get_value_non_direct_action_, Name),                       \
         BOOST_PP_CAT(ActionIdGet, _non_direct))                                 \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \

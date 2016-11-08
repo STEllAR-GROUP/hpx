@@ -9,6 +9,10 @@
 #define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/actions/action_priority.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/decay.hpp>
@@ -266,6 +270,157 @@ namespace hpx
         bool move_credits = true)
     {
         set_lco_error(id, naming::address(), std::move(e), cont, move_credits);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // forward declare the required overload of apply.
+    template <typename Action, typename ...Ts>
+    bool apply(naming::id_type const& gid, Ts&&... vs);
+
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename Cont, typename ...Ts>
+    bool apply_continue(
+        hpx::actions::basic_action<Component, Signature, Derived>,
+        Cont&& cont, naming::id_type const& gid, Ts&&... vs);
+
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
+    inline bool
+    apply_c(hpx::actions::basic_action<Component, Signature, Derived>,
+        naming::id_type const& contgid, naming::id_type const& gid,
+        Ts&&... vs);
+
+    //////////////////////////////////////////////////////////////////////////
+    // handling special case of triggering an LCO
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename T>
+        struct make_rvalue_impl
+        {
+            typedef T && type;
+
+            template <typename U>
+            HPX_FORCEINLINE static T && call(U& u)
+            {
+                return std::move(u);
+            }
+        };
+
+        template <typename T>
+        struct make_rvalue_impl<T const>
+        {
+            typedef T type;
+
+            template <typename U>
+            HPX_FORCEINLINE static T call(U const& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
+        struct make_rvalue_impl<T&>
+        {
+            typedef T type;
+
+            HPX_FORCEINLINE static T call(T& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
+        struct make_rvalue_impl<T const&>
+        {
+            typedef T type;
+
+            HPX_FORCEINLINE static T call(T const& u)
+            {
+                return u;
+            }
+        };
+
+        template <typename T>
+        HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type
+        make_rvalue(typename std::remove_reference<T>::type& v)
+        {
+            return detail::make_rvalue_impl<T>::call(v);
+        }
+
+        template <typename T>
+        HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type
+        make_rvalue(typename std::remove_reference<T>::type&& v)
+        {
+            return detail::make_rvalue_impl<T>::call(v);
+        }
+    }
+
+    template <typename Result>
+    void set_lco_value(naming::id_type const& id, naming::address && addr,
+        Result && t, bool move_credits)
+    {
+        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename traits::promise_local_result<
+                remote_result_type
+            >::type local_result_type;
+        typedef typename lcos::base_lco_with_value<
+                local_result_type, remote_result_type
+            >::set_value_action set_value_action;
+
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
+        {
+            naming::id_type target(id.get_gid(),
+                naming::id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            detail::apply_impl<set_value_action>(target, std::move(addr),
+                actions::action_priority<set_value_action>(),
+                detail::make_rvalue<Result>(t));
+        }
+        else
+        {
+            detail::apply_impl<set_value_action>(id, std::move(addr),
+                actions::action_priority<set_value_action>(),
+                detail::make_rvalue<Result>(t));
+        }
+    }
+
+    template <typename Result>
+    void set_lco_value(naming::id_type const& id, naming::address && addr,
+        Result && t, naming::id_type const& cont, bool move_credits)
+    {
+        typedef typename util::decay<Result>::type remote_result_type;
+        typedef typename traits::promise_local_result<
+                remote_result_type
+            >::type local_result_type;
+        typedef typename lcos::base_lco_with_value<
+                local_result_type, remote_result_type
+            >::set_value_action set_value_action;
+
+        if (move_credits &&
+            id.get_management_type() != naming::id_type::unmanaged)
+        {
+            naming::id_type target(id.get_gid(),
+                naming::id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            detail::apply_impl<set_value_action>(
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont),
+                target, std::move(addr),
+                detail::make_rvalue<Result>(t));
+        }
+        else
+        {
+            detail::apply_impl<set_value_action>(
+                actions::typed_continuation<
+                    local_result_type, remote_result_type>(cont),
+                id, std::move(addr),
+                detail::make_rvalue<Result>(t));
+        }
     }
 }
 

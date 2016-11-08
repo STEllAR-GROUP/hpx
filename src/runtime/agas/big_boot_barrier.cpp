@@ -73,10 +73,14 @@ namespace hpx { namespace agas { namespace detail
     {
         // supposed to be run on locality 0 before
         // before locality communication
-        hpx::serialization::detail::id_registry& registry =
+        hpx::serialization::detail::id_registry& serialization_registry =
             hpx::serialization::detail::id_registry::instance();
 
-        registry.fill_missing_typenames();
+        serialization_registry.fill_missing_typenames();
+
+        hpx::actions::detail::action_registry& action_registry =
+            hpx::actions::detail::action_registry::instance();
+        action_registry.fill_missing_typenames();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,25 +89,30 @@ namespace hpx { namespace agas { namespace detail
         unassigned_typename_sequence() {}
 
         unassigned_typename_sequence(bool /*dummy*/)
-          : typenames(hpx::serialization::detail::id_registry::
+          : serialization_typenames(hpx::serialization::detail::id_registry::
+                instance().get_unassigned_typenames())
+          , action_typenames(hpx::actions::detail::action_registry::
                 instance().get_unassigned_typenames())
         {}
 
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
             // part running on worker node
-            HPX_ASSERT(!typenames.empty());
-            ar << typenames;
+            HPX_ASSERT(!action_typenames.empty());
+            ar << serialization_typenames;
+            ar << action_typenames;
         }
 
         void load(hpx::serialization::input_archive& ar, unsigned)
         {
             // part running on locality 0
-            ar >> typenames;
+            ar >> serialization_typenames;
+            ar >> action_typenames;
         }
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
-        std::vector<std::string> typenames;
+        std::vector<std::string> serialization_typenames;
+        std::vector<std::string> action_typenames;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -118,13 +127,15 @@ namespace hpx { namespace agas { namespace detail
 
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
-            HPX_ASSERT(!ids.empty());
-            ar << ids;      // part running on locality 0
+            HPX_ASSERT(!action_ids.empty());
+            ar << serialization_ids;      // part running on locality 0
+            ar << action_ids;
         }
 
         void load(hpx::serialization::input_archive& ar, unsigned)
         {
-            ar >> ids;      // part running on worker node
+            ar >> serialization_ids;      // part running on worker node
+            ar >> action_ids;
         }
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
@@ -132,49 +143,93 @@ namespace hpx { namespace agas { namespace detail
         void register_ids_on_main_loc(
             unassigned_typename_sequence const& unassigned_ids)
         {
-            hpx::serialization::detail::id_registry& registry =
-                hpx::serialization::detail::id_registry::instance();
-            std::uint32_t max_id = registry.get_max_registered_id();
-
-            for (const std::string& s : unassigned_ids.typenames)
             {
-                std::uint32_t id = registry.try_get_id(s);
-                if (id == hpx::serialization::detail::id_registry::invalid_id)
+                hpx::serialization::detail::id_registry& registry =
+                    hpx::serialization::detail::id_registry::instance();
+                std::uint32_t max_id = registry.get_max_registered_id();
+
+                for (const std::string& s : unassigned_ids.serialization_typenames)
                 {
-                    // this id is not registered yet
-                    id = ++max_id;
-                    registry.register_typename(s, id);
+                    std::uint32_t id = registry.try_get_id(s);
+                    if (id == hpx::serialization::detail::id_registry::invalid_id)
+                    {
+                        // this id is not registered yet
+                        id = ++max_id;
+                        registry.register_typename(s, id);
+                    }
+                    serialization_ids.push_back(id);
                 }
-                ids.push_back(id);
+            }
+            {
+                hpx::actions::detail::action_registry& registry =
+                    hpx::actions::detail::action_registry::instance();
+                std::uint32_t max_id = registry.max_id_;
+
+                for (const std::string& s : unassigned_ids.action_typenames)
+                {
+                    std::uint32_t id = registry.try_get_id(s);
+                    if (id == hpx::actions::detail::action_registry::invalid_id)
+                    {
+                        // this id is not registered yet
+                        id = ++max_id;
+                        registry.register_typename(s, id);
+                    }
+                    action_ids.push_back(id);
+                }
             }
         }
 
     public:
         void register_ids_on_worker_loc() const
         {
-            hpx::serialization::detail::id_registry& registry =
-                hpx::serialization::detail::id_registry::instance();
-
-            // Yes, we look up the unassigned typenames twice, but this allows
-            // to avoid using globals and protects from race conditions during
-            // de-serialization.
-            std::vector<std::string> typenames =
-                registry.get_unassigned_typenames();
-
-            // we should have received as many ids as we have unassigned names
-            HPX_ASSERT(typenames.size() == ids.size());
-
-            for (std::size_t k = 0; k < ids.size(); ++k)
             {
-                registry.register_typename(typenames[k], ids[k]);
-            }
+                hpx::serialization::detail::id_registry& registry =
+                    hpx::serialization::detail::id_registry::instance();
 
-            // fill in holes which might have been caused by initialization
-            // order problems
-            registry.fill_missing_typenames();
+                // Yes, we look up the unassigned typenames twice, but this allows
+                // to avoid using globals and protects from race conditions during
+                // de-serialization.
+                std::vector<std::string> typenames =
+                    registry.get_unassigned_typenames();
+
+                // we should have received as many ids as we have unassigned names
+                HPX_ASSERT(typenames.size() == serialization_ids.size());
+
+                for (std::size_t k = 0; k < serialization_ids.size(); ++k)
+                {
+                    registry.register_typename(typenames[k], serialization_ids[k]);
+                }
+
+                // fill in holes which might have been caused by initialization
+                // order problems
+                registry.fill_missing_typenames();
+            }
+            {
+                hpx::actions::detail::action_registry& registry =
+                    hpx::actions::detail::action_registry::instance();
+
+                // Yes, we look up the unassigned typenames twice, but this allows
+                // to avoid using globals and protects from race conditions during
+                // de-serialization.
+                std::vector<std::string> typenames =
+                    registry.get_unassigned_typenames();
+
+                // we should have received as many ids as we have unassigned names
+                HPX_ASSERT(typenames.size() == action_ids.size());
+
+                for (std::size_t k = 0; k < action_ids.size(); ++k)
+                {
+                    registry.register_typename(typenames[k], action_ids[k]);
+                }
+
+                // fill in holes which might have been caused by initialization
+                // order problems
+                registry.fill_missing_typenames();
+            }
         }
 
-        std::vector<std::uint32_t> ids;
+        std::vector<std::uint32_t> serialization_ids;
+        std::vector<std::uint32_t> action_ids;
     };
 }}} // namespace hpx::agas::detail
 
@@ -593,7 +648,7 @@ void register_worker(registration_header const& header)
         void (big_boot_barrier::*f)(
             std::uint32_t,
             std::uint32_t,
-            parcelset::locality const&,
+            parcelset::locality,
             notify_worker_action,
             notification_header&&)
             = &big_boot_barrier::apply<notify_worker_action, notification_header&&>;

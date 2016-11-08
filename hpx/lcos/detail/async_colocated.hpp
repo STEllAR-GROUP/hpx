@@ -57,7 +57,8 @@ namespace hpx { namespace detail
               , hpx::detail::async_colocated_bound_tuple<                     \
                     Action ::arguments_type                                   \
                 >::type                                                       \
-            >                                                                 \
+            >,                                                                \
+            hpx::util::unused_type                                            \
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
@@ -72,7 +73,8 @@ namespace hpx { namespace detail
               , hpx::detail::async_colocated_bound_tuple<                     \
                     Action ::arguments_type                                   \
                 >::type                                                       \
-            >                                                                 \
+            >,                                                                \
+            hpx::util::unused_type                                            \
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
@@ -96,7 +98,7 @@ namespace hpx { namespace detail
 
         typedef
             typename hpx::traits::extract_action<Action>::remote_result_type
-        remote_result_type;
+            remote_result_type;
         typedef agas::server::primary_namespace::colocate_action action_type;
 
         using util::placeholders::_2;

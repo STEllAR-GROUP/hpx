@@ -9,6 +9,8 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
@@ -32,35 +34,9 @@ namespace hpx { namespace parcelset {
             template <typename Action, typename Continuation, typename... Args>
             static parcel call(
                 std::true_type /* Continuation */,
-                std::true_type /* Action */,
                 naming::gid_type&& dest,
                 naming::address&& addr,
                 Continuation&& cont,
-                Action,
-                Args&&... args)
-            {
-                return parcel(
-                    std::move(dest),
-                    std::move(addr),
-                    std::unique_ptr<actions::continuation>(
-                        new typename util::decay<Continuation>::type(
-                            std::forward<Continuation>(cont)
-                        )
-                    ),
-                    std::unique_ptr<actions::base_action>(
-                        new actions::transfer_action<Action>(
-                            std::forward<Args>(args)...
-                        )
-                    )
-                );
-            }
-            template <typename Action, typename... Args>
-            static parcel call(
-                std::false_type /* Continuation */,
-                std::true_type /* Action */,
-                naming::gid_type&& dest,
-                naming::address&& addr,
-                std::unique_ptr<actions::continuation> cont,
                 Action,
                 Args&&... args)
             {
@@ -69,9 +45,9 @@ namespace hpx { namespace parcelset {
                 return parcel(
                     std::move(dest),
                     std::move(addr),
-                    std::move(cont),
                     std::unique_ptr<actions::base_action>(
-                        new actions::transfer_action<Action>(
+                        new actions::transfer_continuation_action<Action>(
+                            std::forward<Continuation>(cont),
                             std::forward<Args>(args)...
                         )
                     )
@@ -81,7 +57,6 @@ namespace hpx { namespace parcelset {
             template <typename Action, typename... Args>
             static parcel call(
                 std::false_type /* Continuation */,
-                std::false_type /* Action */,
                 naming::gid_type&& dest,
                 naming::address&& addr,
                 Action,
@@ -92,7 +67,6 @@ namespace hpx { namespace parcelset {
                 return parcel(
                     std::move(dest),
                     std::move(addr),
-                    std::unique_ptr<actions::continuation>(),
                     std::unique_ptr<actions::base_action>(
                         new actions::transfer_action<Action>(
                             std::forward<Args>(args)...
@@ -110,23 +84,9 @@ namespace hpx { namespace parcelset {
             typedef
                 typename util::detail::at_index<0, Args...>::type
                 arg0_type;
-            typedef
-                typename util::detail::at_index<1, Args...>::type
-                arg1_type;
 
             // Is the first argument a continuation?
-            std::integral_constant<bool,
-                traits::is_continuation<arg0_type>::value &&
-                // We need to treat unique pointers to continuations
-                // differently because it can be moved directly into
-                // the parcel.
-                !std::is_same<
-                    std::unique_ptr<actions::continuation>, arg0_type
-                >::value
-            > is_continuation;
-
-            // Is the second paramter a action?
-            traits::is_action<arg1_type> is_action;
+            traits::is_continuation<arg0_type> is_continuation;
 
             if (dest.get_management_type() == naming::id_type::unmanaged)
             {
@@ -135,7 +95,7 @@ namespace hpx { namespace parcelset {
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call(
-                    is_continuation, is_action,
+                    is_continuation,
                     std::move(gid), std::move(addr),
                     std::forward<Args>(args)...
                 ));
@@ -146,7 +106,7 @@ namespace hpx { namespace parcelset {
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call(
-                    is_continuation, is_action,
+                    is_continuation,
                     std::move(gid), std::move(addr),
                     std::forward<Args>(args)...
                 ));
@@ -158,7 +118,7 @@ namespace hpx { namespace parcelset {
                 if (split_gid.is_ready())
                 {
                     pp(detail::create_parcel::call(
-                        is_continuation, is_action,
+                        is_continuation,
                         split_gid.get(), std::move(addr),
                         std::forward<Args>(args)...
                     ));
@@ -168,14 +128,14 @@ namespace hpx { namespace parcelset {
                     split_gid.then(
                         hpx::util::bind(
                             hpx::util::one_shot(
-                                [is_continuation, is_action, dest]
+                                [is_continuation, dest]
                                 (hpx::future<naming::gid_type> f,
                                  typename util::decay<PutParcel>::type&& pp_,
                                  naming::address&& addr_,
                                  typename util::decay<Args>::type&&... args_)
                                 {
                                     pp_(detail::create_parcel::call(
-                                        is_continuation, is_action,
+                                        is_continuation,
                                         f.get(), std::move(addr_),
                                         std::move(args_)...
                                     ));

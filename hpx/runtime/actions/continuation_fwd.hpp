@@ -7,14 +7,17 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_HPP
 
 #include <hpx/config.hpp>
-#include <memory>
 
 namespace hpx { namespace actions
 {
     class HPX_EXPORT continuation;
 
-    template <typename Result, typename F, typename ...Ts>
-    void trigger(std::unique_ptr<continuation> cont, F&& f, Ts&&... vs);
+    template <typename Result, typename RemoteResult = Result>
+    struct typed_continuation;
+
+    template <
+        typename Result, typename RemoteResult, typename F, typename ...Ts>
+    void trigger(typed_continuation<Result, RemoteResult>&& cont, F&& f, Ts&&... vs);
 }}
 
 #endif

@@ -100,7 +100,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     hpx::naming::gid_type dest = here.get_gid();
     if (continuation) {
         outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
-            std::true_type(), std::true_type(),
+            std::true_type(),
             std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action(), hpx::threads::thread_priority_normal, buffer
@@ -108,7 +108,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     }
     else {
         outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
-            std::false_type(), std::false_type(),
+            std::false_type(),
             std::move(dest), std::move(addr),
             test_action(), hpx::threads::thread_priority_normal, buffer));
     }
