@@ -38,7 +38,7 @@
 // The parcelport does not support HPX bootstrapping by default
 // it is a work in progress and may cause lockups on start if enabled
 // this value should be either std::true_type or std::false_type
-#define HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP  std::false_type
+#define HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP      std::true_type
 
 // --------------------------------------------------------------------
 // Enable or disable the use of the parcelport connection cache that
@@ -76,7 +76,7 @@
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
-#define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR  true
+#define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR    true
 
 // --------------------------------------------------------------------
 // When enabled, the parcelport can create a custom scheduler to help
@@ -1096,7 +1096,7 @@ namespace verbs
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
-            return false;
+            return HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP();
         }
 
         /// Return the name of this locality

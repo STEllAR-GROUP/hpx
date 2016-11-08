@@ -26,7 +26,7 @@ namespace hpx { namespace parcelset {
       explicit locality(boost::uint32_t ip) :
             ip_(ip), qp_(0xFFFF)
       {
-          LOG_DEBUG_MSG("constructing locality from " << hexuint32(ip))
+          LOG_DEBUG_MSG("explicit constructing locality from " << hexuint32(ip))
       }
 
       locality() : ip_(0xFFFF), qp_(0xFFFF)
