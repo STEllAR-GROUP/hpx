@@ -12,10 +12,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-
-#include <hpx/apply.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/runtime.hpp>
@@ -185,8 +182,8 @@ namespace verbs
                 util::section const* sec = ini.get_section("hpx.parcel");
                 if (NULL != sec) {
                     LOG_DEBUG_MSG("hpx.parcel port number "
-                        << hpx::util::get_entry_as<boost::uint16_t>(*sec,
-                            "port", HPX_INITIAL_IP_PORT));
+                        << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                            "port", HPX_INITIAL_IP_PORT)));
                 }
             }
             FUNC_END_DEBUG_MSG;
@@ -326,10 +323,6 @@ namespace verbs
         // Used to control incoming and outgoing connection requests
         mutex_type              new_connection_mutex;
         condition_type          new_connection_condition;
-
-        // used when suspending threads that flood us with parcels
-        mutex_type              suspend_mutex;
-        condition_type          suspend_condition;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -1528,7 +1521,7 @@ namespace verbs
                         << ", chunks "      << as.chunks.size()
                         << ", ZC size "     << as.zero_copy_regions.size());
                 }
-                suspended_task_debug("");
+//                suspended_task_debug("");
             )
 
             if (threads::get_self_ptr() == nullptr) {
