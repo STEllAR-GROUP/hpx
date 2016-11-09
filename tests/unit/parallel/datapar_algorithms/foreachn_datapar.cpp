@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/datapar.hpp>
 
 #include <cstddef>
 #include <iostream>

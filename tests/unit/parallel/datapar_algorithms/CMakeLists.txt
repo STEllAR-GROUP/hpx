@@ -5,11 +5,12 @@
 
 set(tests)
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLATARRAY)
   set(tests
       count_datapar
       countif_datapar
       foreach_datapar
+      foreach_datapar_zipiter
       foreachn_datapar
       inner_product_datapar
       transform_datapar

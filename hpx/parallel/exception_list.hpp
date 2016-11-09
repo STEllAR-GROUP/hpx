@@ -98,14 +98,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
 
-            static hpx::future<Result> call(hpx::future<Result> f)
+            static future<Result> call(future<Result> f)
             {
                 HPX_ASSERT(f.has_exception());
                 // Intel complains if this is not explicitly moved
                 return std::move(f);
             }
 
-            static hpx::future<Result> call(boost::exception_ptr const& e)
+            static future<Result> call(boost::exception_ptr const& e)
             {
                 try {
                     boost::rethrow_exception(e);

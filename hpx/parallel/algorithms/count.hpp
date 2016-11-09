@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/traits/vector_pack_count_bits.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -90,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(Iter curr,
                 typename std::iterator_traits<Iter>::difference_type& ret)
             {
-                ret += util::detail::count_bits(hpx::util::invoke(op_, *curr));
+                ret += traits::count_bits(hpx::util::invoke(op_, *curr));
             }
         };
 
