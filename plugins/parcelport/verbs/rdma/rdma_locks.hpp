@@ -15,7 +15,7 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-#ifdef HPX_PARCELPORT_VERBS_DEBUG_LOCKS
+#if HPX_PARCELPORT_VERBS_DEBUG_LOCKS
     template<typename Mutex>
     struct scoped_lock: std::lock_guard<Mutex>
     {

@@ -24,24 +24,12 @@
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
 #include <hpx/util/debug/thread_stacktrace.hpp>
-//
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
-#include <plugins/parcelport/verbs/unordered_map.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
-//
-#include <boost/container/small_vector.hpp>
 
 // --------------------------------------------------------------------
 // The parcelport does not support HPX bootstrapping by default
 // it is a work in progress and may cause lockups on start if enabled
 // this value should be either std::true_type or std::false_type
 #define HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP      std::true_type
-
-// --------------------------------------------------------------------
-// Enable or disable the use of the parcelport connection cache that
-// will send multiple parcels at once when congestion is detected
-// this value should be either true or false
-#define HPX_PARCELPORT_VERBS_ENABLE_CONN_CACHE false
 
 // --------------------------------------------------------------------
 // This defines the standard size of messages that can be sent/received without
@@ -62,18 +50,22 @@
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
 // when we have maxed out the number of sends we can handle
-#define HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND 1
 #define HPX_PARCELPORT_VERBS_SUSPEND_WAKE         (HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE/2)
 
 // --------------------------------------------------------------------
 // When defined, we use a reader/writer lock on maps to squeeze a tiny performance
 // improvement from our code.
-#define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS 1
+#define HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS true
 
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR    true
+
+// --------------------------------------------------------------------
+// Turn on the use of debugging log messages for lock/unlock
+// to help find places where locks are being taken before suspending
+#define HPX_PARCELPORT_VERBS_DEBUG_LOCKS         false
 
 // --------------------------------------------------------------------
 // When enabled, the parcelport can create a custom scheduler to help
@@ -87,13 +79,17 @@
 #undef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
 
 // --------------------------------------------------------------------
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
+//
 #include "plugins/parcelport/verbs/sender_connection.hpp"
 #include "plugins/parcelport/verbs/connection_handler.hpp"
 #include "plugins/parcelport/verbs/locality.hpp"
 #include "plugins/parcelport/verbs/header.hpp"
 #include "plugins/parcelport/verbs/pinned_memory_vector.hpp"
 //
-#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+#if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
 # include "plugins/parcelport/verbs/scheduler.hpp"
 #endif
 //
@@ -104,8 +100,11 @@
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
 #include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
 //
-#include <unordered_map>
+#if HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
+# include <boost/container/small_vector.hpp>
+#endif
 //
+#include <unordered_map>
 #include <memory>
 #include <mutex>
 
@@ -237,19 +236,17 @@ namespace verbs
         //
         boost::atomic<bool>       stopped_;
         boost::atomic_uint        active_send_count_;
-
-#ifdef HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND
         boost::atomic<bool>       immediate_send_allowed_;
-#endif
+
         memory_pool_ptr_type      chunk_pool_;
         verbs::tag_provider       tag_provider_;
 
-#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+#if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
         custom_scheduler          parcelport_scheduler;
 #endif
         // performance_counters::parcels::gatherer& parcels_sent_;
 
-#ifdef HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
+#if HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
         typedef boost::container::small_vector<rdma_memory_region*,4> zero_copy_vector;
 #else
         typedef std::vector<rdma_memory_region*>                      zero_copy_vector;
@@ -286,7 +283,7 @@ namespace verbs
         typedef std::list<parcel_recv_data>      active_recv_list_type;
         typedef active_recv_list_type::iterator  active_recv_iterator;
 
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
         // map send/recv parcel wr_id to all info needed on completion
         typedef hpx::concurrent::unordered_map<uint64_t, active_send_iterator>
             send_wr_map;
@@ -340,24 +337,6 @@ namespace verbs
               , total_reads(0)
 
         {
-#ifdef HPX_PARCELPORT_VERBS_HAVE_LOGGING
-            std::cout << "Initializing logging " << std::endl;
-            boost::log::add_console_log(
-            std::clog,
-            // This makes the sink to write log records that look like this:
-            // 1: <normal> A normal severity message
-            // 2: <error> An error severity message
-            boost::log::keywords::format =
-                (
-                    boost::log::expressions::stream
-                    //            << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
-                    << boost::log::expressions::attr< unsigned int >("LineID")
-                    << ": <" << boost::log::trivial::severity
-                    << "> " << boost::log::expressions::smessage
-                )
-            );
-            boost::log::add_common_attributes();
-#endif
             FUNC_START_DEBUG_MSG;
             // we need this for background OS threads to get 'this' pointer
             parcelport::_parcelport_instance = this;
@@ -414,7 +393,7 @@ namespace verbs
                 );
             }
 
-#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+#if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
             // initialize our custom scheduler
             parcelport_scheduler.init();
 
@@ -602,7 +581,7 @@ namespace verbs
                 // if the lock is not obtained and this thread is waiting, then
                 // zero copy Gets might complete and another thread might receive a zero copy
                 // complete message then delete the current send data whilst we are still waiting
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                 auto is_present = SendCompletionMap.is_in_map(wr_id);
                 if (is_present.second) {
                     found_wr_id = true;
@@ -625,7 +604,7 @@ namespace verbs
                 }
 #endif
                 else {
-#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+#if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
                     lock.unlock();
                     handle_tag_send_completion(wr_id);
                     return;
@@ -747,7 +726,7 @@ namespace verbs
                             // put region into map before posting read in case it
                             // completes whilst this thread is suspended
                             {
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                                 ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
 #else
                                 scoped_lock lock(ReadCompletionMap_mutex);
@@ -795,7 +774,7 @@ namespace verbs
                 // put region into map before posting read in case it completes whilst this thread is suspended
                 {
 
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                     ReadCompletionMap.insert(std::make_pair((uint64_t)get_region, current_recv));
 #else
                     scoped_lock lock(ReadCompletionMap_mutex);
@@ -820,7 +799,7 @@ namespace verbs
             //          data.time_ = timer.elapsed_nanoseconds() - data.time_;
         }
 
-#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+#if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
         void handle_tag_send_completion(uint64_t wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
@@ -833,7 +812,7 @@ namespace verbs
 
         void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag, const RdmaClient *client)
         {
-#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+#if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
             rdma_memory_region *region = (rdma_memory_region *)wr_id;
             tag = *((uint32_t*) (region->get_address()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
@@ -850,7 +829,7 @@ namespace verbs
             // now release any zero copy regions we were holding until parcel complete
             active_send_iterator current_send;
             {
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                 auto is_present = TagSendCompletionMap.is_in_map(tag);
                 if (is_present.second) {
                     current_send = is_present.first->second;
@@ -889,7 +868,7 @@ namespace verbs
             bool                 found_wr_id;
             active_recv_iterator current_recv;
             {
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
                 auto is_present = ReadCompletionMap.is_in_map(wr_id);
                 if (is_present.second) {
                     found_wr_id = true;
@@ -924,7 +903,7 @@ namespace verbs
                     return;
                 }
                 //
-#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+#if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting 4 byte ack to origin");
                 rdma_memory_region *tag_region = chunk_pool_->allocate_region(4); // space for a uint32_t
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
@@ -1243,11 +1222,9 @@ namespace verbs
         }
 
         bool can_send_immediate() {
-#ifdef HPX_PARCELPORT_VERBS_ALLOW_SENDER_SUSPEND
             while (!immediate_send_allowed_) {
                 background_work(0);
             }
-#endif
             return true;
         }
 
@@ -1392,7 +1369,7 @@ namespace verbs
                 {
                     // add wr_id's to completion map
                     // put everything into map to be retrieved when send completes
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
 #else
                     scoped_lock lock(SendCompletionMap_mutex);
 #endif
@@ -1405,7 +1382,7 @@ namespace verbs
                     // we must hold onto the regions until the destination tells us
                     // it has completed all rdma Get operations
                     if (send_data.has_zero_copy) {
-#ifdef HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
+#if HPX_PARCELPORT_VERBS_USE_CONCURRENT_MAPS
 #else
                         scoped_lock lock(TagSendCompletionMap_mutex);
 #endif
@@ -1474,7 +1451,7 @@ namespace verbs
         // to poll in an OS background thread which is pre-emtive and therefore
         // could help reduce latencies (when hpx threads are all doing work).
         // --------------------------------------------------------------------
-#ifdef HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
+#if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
         void background_work_scheduler_thread()
         {
             // repeat until no more parcels are to be sent
@@ -1601,8 +1578,23 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         FUNC_START_DEBUG_MSG;
         static int log_init = false;
         if (!log_init) {
-#ifdef RDMAHELPER_HAVE_LOGGING
-            initRdmaHelperLogging();
+#ifdef HPX_PARCELPORT_VERBS_HAVE_LOGGING
+            std::cout << "Initializing logging " << std::endl;
+            boost::log::add_console_log(
+            std::clog,
+            // This makes the sink to write log records that look like this:
+            // 1: <normal> A normal severity message
+            // 2: <error> An error severity message
+            boost::log::keywords::format =
+                (
+                    boost::log::expressions::stream
+                    //            << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
+                    << boost::log::expressions::attr< unsigned int >("LineID")
+                    << ": <" << boost::log::trivial::severity
+                    << "> " << boost::log::expressions::smessage
+                )
+            );
+            boost::log::add_common_attributes();
 #endif
             log_init = true;
         }
