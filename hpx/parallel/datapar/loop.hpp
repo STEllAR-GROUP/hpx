@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { namespace util
             >::type
             call(Begin first, End last, F && f)
             {
-                while (data_alignment(first) && first != last)
+                while (is_data_aligned(first) && first != last)
                 {
                     datapar_loop_step<Begin>::call1(f, first);
                 }
@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { namespace util
 
                 typedef typename traits::vector_pack_type<value_type>::type V;
 
-                if (detail::data_alignment(it1) || detail::data_alignment(it2))
+                if (detail::is_data_aligned(it1) || detail::is_data_aligned(it2))
                 {
                     return std::make_pair(std::move(it1), std::move(it2));
                 }
@@ -299,7 +299,7 @@ namespace hpx { namespace parallel { namespace util
             {
                 std::size_t len = count;
 
-                for (/* */; detail::data_alignment(first) && len != 0; --len)
+                for (/* */; detail::is_data_aligned(first) && len != 0; --len)
                 {
                     datapar_loop_step<InIter>::call1(f, first);
                 }

@@ -31,23 +31,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ... Iter>
-    struct data_alignment_impl<hpx::util::zip_iterator<Iter...> >
+    struct is_data_aligned_impl<hpx::util::zip_iterator<Iter...> >
     {
         template <std::size_t ... Is>
-        static HPX_FORCEINLINE std::size_t
+        static HPX_FORCEINLINE bool
         call(hpx::util::zip_iterator<Iter...> const& it,
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = it.get_iterator_tuple();
             int const sequencer[] = {
-                0, (data_alignment(hpx::util::get<Is>(t)), 0)...
+                0, (is_data_aligned(hpx::util::get<Is>(t)), 0)...
             };
             return std::accumulate(
                 &sequencer[0], &sequencer[sizeof(sequencer)/sizeof(sequencer[0])],
-                std::size_t(0));
+                std::size_t(0)) != 0;
         }
 
-        static HPX_FORCEINLINE std::size_t
+        static HPX_FORCEINLINE bool
         call(hpx::util::zip_iterator<Iter...> const& it)
         {
             return call(it,
