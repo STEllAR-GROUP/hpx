@@ -39,12 +39,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             hpx::util::detail::pack_c<std::size_t, Is...>)
         {
             auto const& t = it.get_iterator_tuple();
-            int const sequencer[] = {
-                0, (is_data_aligned(hpx::util::get<Is>(t)), 0)...
+            bool const sequencer[] = {
+                false, is_data_aligned(hpx::util::get<Is>(t)) ...
             };
-            return std::accumulate(
-                &sequencer[0], &sequencer[sizeof(sequencer)/sizeof(sequencer[0])],
-                std::size_t(0)) != 0;
+            return std::any_of(
+                &sequencer[1], &sequencer[sizeof...(Is) + 1],
+                [](bool val) { return val; });
         }
 
         static HPX_FORCEINLINE bool
