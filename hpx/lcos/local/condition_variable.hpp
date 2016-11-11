@@ -37,14 +37,12 @@ namespace hpx { namespace lcos { namespace local
     public:
         void notify_one(error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
@@ -52,8 +50,8 @@ namespace hpx { namespace lcos { namespace local
         void wait(std::unique_lock<mutex>& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
+            util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
 
-            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
@@ -78,7 +76,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            util::ignore_all_while_checking ignore_lock;
+            util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
@@ -141,7 +139,6 @@ namespace hpx { namespace lcos { namespace local
 
         void notify_all(error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
