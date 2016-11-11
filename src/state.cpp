@@ -26,6 +26,15 @@ namespace hpx
             }
             return (rt->get_thread_manager().status() == st);
         }
+        bool threadmanager_is_at_least(state st)
+        {
+            hpx::runtime* rt = get_runtime_ptr();
+            if (nullptr == rt) {
+                // we're probably either starting or stopping
+                return false;
+            }
+            return (rt->get_thread_manager().status() >= st);
+        }
     }
 
     namespace agas

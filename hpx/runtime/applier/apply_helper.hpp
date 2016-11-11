@@ -8,6 +8,7 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
+#include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -80,6 +81,12 @@ namespace hpx { namespace applier { namespace detail
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
 
+            while (!threads::threadmanager_is_at_least(state_running))
+            {
+                boost::this_thread::sleep(boost::get_system_time() +
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            }
+
             traits::action_schedule_thread<Action>::call(
                 lva, data, threads::pending);
         }
@@ -106,6 +113,12 @@ namespace hpx { namespace applier { namespace detail
             data.stacksize = threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
+
+            while (!threads::threadmanager_is_at_least(state_running))
+            {
+                boost::this_thread::sleep(boost::get_system_time() +
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            }
 
             traits::action_schedule_thread<Action>::call(
                 lva, data, threads::pending);

@@ -35,6 +35,7 @@ namespace hpx
     {
         // return whether thread manager is in the state described by 'mask'
         HPX_EXPORT bool threadmanager_is(state st);
+        HPX_EXPORT bool threadmanager_is_at_least(state st);
     }
 
     namespace agas
