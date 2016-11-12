@@ -8,8 +8,6 @@
 //
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/traits/is_chunk_allocator.hpp>
-#include <hpx/util/memory_chunk_pool_allocator.hpp>
 //
 #include <atomic>
 #include <stack>
@@ -61,24 +59,6 @@ namespace verbs
 {
     struct rdma_memory_pool;
 }}}}
-
-// -------------------------
-// specialize chunk pool allocator traits for this memory_chunk_pool
-// -------------------------
-namespace hpx { namespace traits
-{
-    // if the chunk pool supplies fixed chunks of memory when the alloc
-    // is smaller than some threshold, then the pool must declare
-    // std::size_t small_chunk_size_
-    template <typename T, typename M>
-    struct is_chunk_allocator<util::detail::memory_chunk_pool_allocator<T,
-        hpx::parcelset::policies::verbs::rdma_memory_pool,M>>
-      : std::false_type {};
-
-    template <>
-    struct is_chunk_allocator<hpx::parcelset::policies::verbs::rdma_memory_pool>
-      : std::false_type {};
-}}
 
 namespace hpx {
 namespace parcelset {
