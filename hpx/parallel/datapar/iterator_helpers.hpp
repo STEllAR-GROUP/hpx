@@ -90,15 +90,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct store_on_exit
     {
         typedef V pack_type;
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
 
         store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<V>::aligned(iter)),
+          : value_(traits::vector_pack_load<V, value_type>::aligned(iter)),
             iter_(iter)
         {
         }
         ~store_on_exit()
         {
-            traits::vector_pack_store<pack_type>::aligned(value_, iter_);
+            traits::vector_pack_store<V, value_type>::aligned(value_, iter_);
         }
 
         pack_type* operator&() { return &value_; }
@@ -117,9 +118,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         >::type>
     {
         typedef V pack_type;
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
 
         store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<V>::aligned(iter))
+          : value_(traits::vector_pack_load<V, value_type>::aligned(iter))
         {
         }
 
@@ -134,15 +136,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct store_on_exit_unaligned
     {
         typedef V pack_type;
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
 
         store_on_exit_unaligned(Iter const& iter)
-          : value_(traits::vector_pack_load<V>::unaligned(iter)),
+          : value_(traits::vector_pack_load<V, value_type>::unaligned(iter)),
             iter_(iter)
         {
         }
         ~store_on_exit_unaligned()
         {
-            traits::vector_pack_store<pack_type>::unaligned(value_, iter_);
+            traits::vector_pack_store<V, value_type>::unaligned(value_, iter_);
         }
 
         pack_type* operator&() { return &value_; }
@@ -161,6 +164,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         >::type>
     {
         typedef V pack_type;
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
 
         store_on_exit_unaligned(Iter const& iter)
           : value_(traits::vector_pack_load<V>::unaligned(iter))

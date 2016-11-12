@@ -24,6 +24,11 @@ namespace hpx { namespace parallel { namespace traits
       : std::true_type
     {};
 
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct is_vector_pack<Vc::SimdArray<T, N, V, W> >
+      : std::true_type
+    {};
+
     template <typename T>
     struct is_vector_pack<Vc::Scalar::Vector<T> >
       : std::true_type
@@ -35,6 +40,11 @@ namespace hpx { namespace parallel { namespace traits
       : std::false_type
     {};
 
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct is_scalar_vector_pack<Vc::SimdArray<T, N, V, W> >
+      : std::integral_constant<bool, N == 1>
+    {};
+
     template <typename T>
     struct is_scalar_vector_pack<Vc::Scalar::Vector<T> >
       : std::true_type
@@ -44,6 +54,11 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, typename Abi>
     struct is_non_scalar_vector_pack<Vc::Vector<T, Abi> >
       : std::true_type
+    {};
+
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct is_non_scalar_vector_pack<Vc::SimdArray<T, N, V, W> >
+      : std::integral_constant<bool, N != 1>
     {};
 
     template <typename T>
@@ -64,6 +79,13 @@ namespace hpx { namespace parallel { namespace traits
         static std::size_t const value = Vc::Vector<T, Abi>::MemoryAlignment;
     };
 
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct vector_pack_alignment<Vc::SimdArray<T, N, V, W> >
+    {
+        static std::size_t const value =
+            Vc::SimdArray<T, N, V, W>::MemoryAlignment;
+    };
+
     template <typename T>
     struct vector_pack_alignment<Vc::Scalar::Vector<T> >
     {
@@ -81,6 +103,12 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_size<Vc::Vector<T, Abi> >
     {
         static std::size_t const value = Vc::Vector<T, Abi>::Size;
+    };
+
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct vector_pack_size<Vc::SimdArray<T, N, V, W> >
+    {
+        static std::size_t const value = Vc::SimdArray<T, N, V, W>::Size;
     };
 
     template <typename T>
