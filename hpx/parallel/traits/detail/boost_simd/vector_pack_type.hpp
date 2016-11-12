@@ -50,6 +50,14 @@ namespace hpx { namespace parallel { namespace traits
     struct vector_pack_type
       : detail::vector_pack_type<T, N, Abi>
     {};
+
+    // don't wrap types twice
+    template <typename T, std::size_t N1, typename Abi1, std::size_t N2,
+        typename Abi2>
+    struct vector_pack_type<boost::simd::pack<T, N1, Abi1>, N2, Abi2>
+    {
+        typedef boost::simd::pack<T, N1, Abi1> type;
+    };
 }}}
 
 #endif

@@ -68,10 +68,7 @@ namespace hpx { namespace parallel { namespace traits
         static typename rebind_pack<V, ValueType>::type
         aligned(Iter const& iter)
         {
-            typedef typename rebind_pack<
-                    V, ValueType
-                >::type vector_pack_type;
-
+            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return vector_pack_type(std::addressof(*iter), Vc::Aligned);
         }
 
@@ -79,10 +76,7 @@ namespace hpx { namespace parallel { namespace traits
         static typename rebind_pack<V, ValueType>::type
         unaligned(Iter const& iter)
         {
-            typedef typename rebind_pack<
-                    V, ValueType
-                >::type vector_pack_type;
-
+            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return vector_pack_type(std::addressof(*iter), Vc::Unaligned);
         }
     };

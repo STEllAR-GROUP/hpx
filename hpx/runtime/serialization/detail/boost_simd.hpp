@@ -23,14 +23,14 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, boost::simd::pack<T, N, Abi> & v,
         unsigned)
     {
-        ar & make_array(&v.storage(), v.size() * sizeof(T));
+        ar & make_array((T*)&v.storage(), v.size());
     }
 
     template <typename T, std::size_t N, typename Abi>
     void serialize(output_archive & ar, boost::simd::pack<T, N, Abi> const& v,
         unsigned)
     {
-        ar & make_array(&v.storage(), v.size() * sizeof(T));
+        ar & make_array((T const*)&v.storage(), v.size());
     }
 }}
 
