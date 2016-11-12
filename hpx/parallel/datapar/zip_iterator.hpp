@@ -81,7 +81,8 @@ namespace hpx { namespace parallel { namespace traits
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(
                 vector_pack_load<
-                    typename hpx::util::tuple_element<Is, Tuple>::type
+                    typename hpx::util::tuple_element<Is, Tuple>::type,
+                    typename std::iterator_traits<Iter>::value_type
                 >::aligned(hpx::util::get<Is>(t)) ...
             );
         }
@@ -93,14 +94,15 @@ namespace hpx { namespace parallel { namespace traits
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(
                 vector_pack_load<
-                    typename hpx::util::tuple_element<Is, Tuple>::type
+                    typename hpx::util::tuple_element<Is, Tuple>::type,
+                    typename std::iterator_traits<Iter>::value_type
                 >::unaligned(hpx::util::get<Is>(t)) ...
             );
         }
     }
 
-    template <typename ... Vector>
-    struct vector_pack_load<hpx::util::tuple<Vector...> >
+    template <typename ... Vector, typename ValueType>
+    struct vector_pack_load<hpx::util::tuple<Vector...>, ValueType>
     {
         typedef hpx::util::tuple<Vector...> tuple_type;
 
@@ -137,7 +139,8 @@ namespace hpx { namespace parallel { namespace traits
             int const sequencer[] = {
                 0, (
                     vector_pack_store<
-                        typename hpx::util::tuple_element<Is, Tuple>::type
+                        typename hpx::util::tuple_element<Is, Tuple>::type,
+                        typename std::iterator_traits<Iter>::value_type
                     >::aligned(
                         hpx::util::get<Is>(value), hpx::util::get<Is>(t)
                     ), 0
@@ -155,7 +158,8 @@ namespace hpx { namespace parallel { namespace traits
             int const sequencer[] = {
                 0, (
                     vector_pack_store<
-                        typename hpx::util::tuple_element<Is, Tuple>::type
+                        typename hpx::util::tuple_element<Is, Tuple>::type,
+                        typename std::iterator_traits<Iter>::value_type
                     >::unaligned(
                         hpx::util::get<Is>(value), hpx::util::get<Is>(t)
                     ), 0
@@ -165,8 +169,8 @@ namespace hpx { namespace parallel { namespace traits
         }
     }
 
-    template <typename ... Vector>
-    struct vector_pack_store<hpx::util::tuple<Vector...> >
+    template <typename ... Vector, typename ValueType>
+    struct vector_pack_store<hpx::util::tuple<Vector...>, ValueType>
     {
         template <typename V, typename ... Iter>
         static void

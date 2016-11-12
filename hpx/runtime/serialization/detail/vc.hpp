@@ -39,6 +39,13 @@ namespace hpx { namespace serialization
         }
     }
 
+    template <typename T, std::size_t N, typename V>
+    void serialize(input_archive & ar, Vc::SimdArray<T, N, V, N> & v, unsigned)
+    {
+        ar & make_array((T*)&internal_data(v),
+                Vc::SimdArray<T, N, V, N>::storage_type::Size);
+    }
+
     template <typename T>
     void serialize(input_archive & ar, Vc::Scalar::Vector<T> & v, unsigned)
     {
@@ -63,6 +70,13 @@ namespace hpx { namespace serialization
             ar & make_array((T const*)&internal_data1(v),
                     Vc::SimdArrayTraits<T, N>::storage_type1::Size);
         }
+    }
+
+    template <typename T, std::size_t N, typename V>
+    void serialize(output_archive & ar, Vc::SimdArray<T, N, V, N> const& v, unsigned)
+    {
+        ar & make_array((T const*)&internal_data(v),
+                Vc::SimdArray<T, N, V, N>::storage_type::Size);
     }
 
     template <typename T>
