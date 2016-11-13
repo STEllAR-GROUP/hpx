@@ -30,7 +30,7 @@
 #define RDMA_POOL_LARGE_CHUNK_SIZE  0x100000 //  1MB
 
 // the maximum number of preposted receives (pre receive queue)
-#define RDMA_MAX_PREPOSTS 256
+#define RDMA_MAX_PREPOSTS HPX_PARCELPORT_VERBS_MAX_PREPOSTS
 
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
 #define RDMA_POOL_MAX_SMALL_CHUNKS  1024

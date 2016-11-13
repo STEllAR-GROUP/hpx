@@ -45,7 +45,11 @@
 
 // --------------------------------------------------------------------
 // The maximum number of sends that can be posted before we activate throttling
-#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        64
+#define HPX_PARCELPORT_VERBS_MAX_PREPOSTS          512
+
+// --------------------------------------------------------------------
+// The maximum number of sends that can be posted before we activate throttling
+#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
 
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
@@ -466,19 +470,20 @@ namespace verbs
 
             {
                 LOG_DEBUG_MSG("Taking lock on active_send_mutex in delete_send_data "
-                    << hexnumber(active_send_count_) );
+                    << decnumber(active_send_count_) );
                 //
                 scoped_lock lock(active_send_mutex);
                 active_sends.erase(send);
                 if (--active_send_count_ < HPX_PARCELPORT_VERBS_SUSPEND_WAKE)
                 {
                     if (!immediate_send_allowed_) {
-                        LOG_DEVEL_MSG("Enabling immediate send");
+                        LOG_DEVEL_MSG("Enabling immediate send : active "
+                            << decnumber(active_send_count_));
                     }
                     immediate_send_allowed_ = true;
                 }
                 LOG_DEBUG_MSG("Active send after erase size "
-                    << hexnumber(active_send_count_) );
+                    << decnumber(active_send_count_) );
             }
         }
 
@@ -1244,19 +1249,20 @@ namespace verbs
                 active_send_iterator current_send;
                 {
                     LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write "
-                        << hexnumber(active_send_count_) );
+                        << decnumber(active_send_count_) );
                     //
                     scoped_lock lock(active_send_mutex);
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
                     if (++active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
                         if (immediate_send_allowed_) {
-                            LOG_DEVEL_MSG("Disabling immediate send");
+                            LOG_DEVEL_MSG("Disabling immediate send : active "
+                                << decnumber(active_send_count_));
                         }
                         immediate_send_allowed_ = false;
                     }
                     LOG_DEBUG_MSG("Active send after insert size "
-                        << hexnumber(active_send_count_));
+                        << decnumber(active_send_count_));
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
@@ -1486,7 +1492,7 @@ namespace verbs
             LOG_TIMED_INIT(background_sends);
             LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
                 for (const auto & as : active_sends) {
-                    LOG_DEVEL_MSG("active_send "
+                    LOG_DEVEL_MSG("active_sends "
                         << ", tag "     << hexnumber(as.tag)
                         << ", ZC "      << as.has_zero_copy
                         << ", ZC size " << as.zero_copy_regions.size());
