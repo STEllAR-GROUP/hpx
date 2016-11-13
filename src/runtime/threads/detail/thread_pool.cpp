@@ -381,7 +381,6 @@ namespace hpx { namespace threads { namespace detail
             );
 
             // run threads and wait for initialization to complete
-            sched_.set_all_states(state_running);
 
             topology const& topology_ = get_topology();
 
@@ -433,6 +432,9 @@ namespace hpx { namespace threads { namespace detail
             // the main thread needs to have a unique thread_num
             init_tss(num_threads);
             startup_->wait();
+
+            // The scheduler is now running.
+            sched_.set_all_states(state_running);
         }
         catch (std::exception const& e) {
             LTM_(always)
