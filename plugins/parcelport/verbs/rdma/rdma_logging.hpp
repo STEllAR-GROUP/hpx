@@ -17,20 +17,24 @@
 #include <boost/log/trivial.hpp>
 
 //
-// useful macros for formatting messages
+// useful macros for formatting log messages
 //
-#define hexpointer(p) "0x" << std::setfill('0') << std::setw(12) << std::noshowbase << std::hex << (uintptr_t)(p) << " "
-#define hexuint32(p)  "0x" << std::setfill('0') << std::setw( 8) << std::noshowbase << std::hex << (uint32_t)(p) << " "
-#define hexlength(p)  "0x" << std::setfill('0') << std::setw( 6) << std::noshowbase << std::hex << (uintptr_t)(p) << " "
-#define hexnumber(p)  "0x" << std::setfill('0') << std::setw( 4) << std::noshowbase << std::hex << p << " "
+#define nhex(n) "0x" << std::setfill('0') << std::setw(n) << std::noshowbase << std::hex
+#define hexpointer(p) nhex(12) << (uintptr_t)(p) << " "
+#define hexuint32(p)  nhex(8)  << (uint32_t)(p) << " "
+#define hexlength(p)  nhex(6)  << (uintptr_t)(p) << " "
+#define hexnumber(p)  nhex(4)  << p << " "
 #define decnumber(p)  "" << std::dec << p << " "
-#define ipaddress(p)  "" << std::dec << (int) ((uint8_t*) &p)[0] << "." << (int) ((uint8_t*) &p)[1] << \
-    "." << (int) ((uint8_t*) &p)[2] << "." << (int) ((uint8_t*) &p)[3] << " "
+#define ipaddress(p)  "" << std::dec << (int) ((uint8_t*) &p)[0] << "." \
+                                     << (int) ((uint8_t*) &p)[1] << "." \
+                                     << (int) ((uint8_t*) &p)[2] << "." \
+                                     << (int) ((uint8_t*) &p)[3] << " "
 
 namespace hpx {
 namespace parcelset {
 namespace policies {
 namespace verbs {
+namespace detail {
 
     struct rdma_thread_print_helper {};
 
@@ -43,19 +47,18 @@ namespace verbs {
             hpx::threads::thread_data *dummy = hpx::this_thread::get_id().native_handle().get();
             os << hexpointer(dummy);
         }
-        os << "0x" << std::setfill('0') << std::setw(12) << std::noshowbase
-            << std::hex << std::this_thread::get_id();
+        os << nhex(12) << std::this_thread::get_id();
         return os;
     }
 
-}}}}
+}}}}}
 
-#define THREAD_ID "" << hpx::parcelset::policies::verbs::rdma_thread_print_helper()
+#define THREAD_ID hpx::parcelset::policies::verbs::detail::rdma_thread_print_helper()
 
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages
 // without enabling all of them
-//#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << THREAD_ID << " " << x;
+//#define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #define LOG_DEVEL_MSG(x)
 
 //
@@ -96,7 +99,6 @@ namespace verbs {
         log_timed_start_ ## name = log_timed_now_ ## name; \
     }
 
-
 #else
 //
 // Logging enabled
@@ -125,8 +127,8 @@ namespace verbs {
 //
 #  define LOG_EXCLUSIVE(x) x
 //
-#  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("**************** Enter " << __func__);
-#  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("################ Exit  " << __func__);
+#  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("*** Enter " << __func__);
+#  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("### Exit  " << __func__);
 
 #  define LOG_TIMED_INIT(name)                                                      \
     using namespace std::chrono;                                                    \
