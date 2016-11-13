@@ -19,7 +19,10 @@ void test_transform_binary()
 {
     using namespace hpx::parallel;
 
+    test_transform_binary(dataseq_execution, IteratorTag());
     test_transform_binary(datapar_execution, IteratorTag());
+
+    test_transform_binary_async(dataseq_execution(task), IteratorTag());
     test_transform_binary_async(datapar_execution(task), IteratorTag());
 }
 
@@ -36,7 +39,10 @@ void test_transform_binary_exception()
 {
     using namespace hpx::parallel;
 
+    test_transform_binary_exception(dataseq_execution, IteratorTag());
     test_transform_binary_exception(datapar_execution, IteratorTag());
+
+    test_transform_binary_exception_async(dataseq_execution(task), IteratorTag());
     test_transform_binary_exception_async(datapar_execution(task), IteratorTag());
 }
 
@@ -53,7 +59,10 @@ void test_transform_binary_bad_alloc()
 {
     using namespace hpx::parallel;
 
+    test_transform_binary_bad_alloc(dataseq_execution, IteratorTag());
     test_transform_binary_bad_alloc(datapar_execution, IteratorTag());
+
+    test_transform_binary_bad_alloc_async(dataseq_execution(task), IteratorTag());
     test_transform_binary_bad_alloc_async(datapar_execution(task), IteratorTag());
 }
 

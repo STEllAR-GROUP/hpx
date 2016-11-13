@@ -18,7 +18,10 @@ template <typename IteratorTag>
 void test_count()
 {
     using namespace hpx::parallel;
+    test_count(dataseq_execution, IteratorTag());
     test_count(datapar_execution, IteratorTag());
+
+    test_count_async(dataseq_execution(task), IteratorTag());
     test_count_async(datapar_execution(task), IteratorTag());
 }
 
@@ -35,7 +38,10 @@ void test_count_exception()
 {
     using namespace hpx::parallel;
 
+    test_count_exception(dataseq_execution, IteratorTag());
     test_count_exception(datapar_execution, IteratorTag());
+
+    test_count_exception_async(dataseq_execution(task), IteratorTag());
     test_count_exception_async(datapar_execution(task), IteratorTag());
 }
 
@@ -52,7 +58,10 @@ void test_count_bad_alloc()
 {
     using namespace hpx::parallel;
 
+    test_count_bad_alloc(dataseq_execution, IteratorTag());
     test_count_bad_alloc(datapar_execution, IteratorTag());
+
+    test_count_bad_alloc_async(dataseq_execution(task), IteratorTag());
     test_count_bad_alloc_async(datapar_execution(task), IteratorTag());
 }
 

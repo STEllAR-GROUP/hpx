@@ -13,6 +13,18 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
+    ///////////////////////////////////////////////////////////////////////////
+    struct dataseq_execution_policy;
+
+    template <typename Executor, typename Parameters>
+    struct dataseq_execution_policy_shim;
+
+    struct dataseq_task_execution_policy;
+
+    template <typename Executor, typename Parameters>
+    struct dataseq_task_execution_policy_shim;
+
+    ///////////////////////////////////////////////////////////////////////////
     struct datapar_execution_policy;
 
     template <typename Executor, typename Parameters>

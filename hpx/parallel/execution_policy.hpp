@@ -11,9 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/execution_policy.hpp>
-#endif
 #include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors.hpp>
 #include <hpx/parallel/executors/executor_parameters.hpp>
@@ -743,13 +741,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// Extension: The class parallel_task_execution_policy_shim is an
     /// execution policy type used as a unique type to disambiguate parallel
     /// algorithm overloading based on combining a underlying
-    /// \a sequential_task_execution_policy and an executor and indicate that
-    /// a parallel algorithm's execution may not be parallelized  (has to run
-    /// sequentially).
-    ///
-    /// The algorithm returns a future representing the result of the
-    /// corresponding algorithm when invoked with the
-    /// sequential_execution_policy.
+    /// \a parallel_task_execution_policy and an executor and indicate that
+    /// a parallel algorithm's execution may be parallelized.
     template <typename Executor, typename Parameters>
     struct parallel_task_execution_policy_shim : parallel_task_execution_policy
     {
