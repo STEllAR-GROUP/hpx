@@ -78,14 +78,14 @@ template <typename Promise> struct coroutine_handle : coroutine_handle<> {
   }
 
 struct suspend_always {
-  bool await_ready() { return false; }
-  void await_suspend(coroutine_handle<>) {}
-  void await_resume() {}
+  bool await_ready() const { return false; }
+  void await_suspend(coroutine_handle<>) const {}
+  void await_resume() const {}
 };
 struct suspend_never {
-  bool await_ready() { return true; }
-  void await_suspend(coroutine_handle<>) {}
-  void await_resume() {}
+  bool await_ready() const { return true; }
+  void await_suspend(coroutine_handle<>) const {}
+  void await_resume() const {}
 };
 struct suspend_if {
 private:
@@ -94,9 +94,9 @@ private:
 public:
   suspend_if(bool b) : b_(b) {}
 
-  bool await_ready() { return !b_; }
-  void await_suspend(coroutine_handle<>) {}
-  void await_resume() {}
+  bool await_ready() const { return !b_; }
+  void await_suspend(coroutine_handle<>) const {}
+  void await_resume() const {}
 };
 
 }}
