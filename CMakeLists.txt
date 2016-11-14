@@ -181,6 +181,16 @@ if(HPX_WITH_STATIC_LINKING)
   hpx_add_config_define(HPX_HAVE_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
   set(CMAKE_SHARED_LIBS OFF)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    hpx_option(HPX_WITH_STATIC_EXE_LINKING BOOL
+      "Compile HPX statically linked executables (Default: OFF)" OFF ADVANCED)
+
+    if(HPX_WITH_STATIC_EXE_LINKING)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+    endif()
+  endif()
 else()
   set(hpx_library_link_mode SHARED)
 endif()
@@ -830,7 +840,7 @@ if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
     hpx_add_config_define(HPX_HAVE_AWAIT)
 
     hpx_option(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
-        "Use hpx/util/await_traits.hpp instead of <experimental/coroutines>"
+        "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>"
         OFF ADVANCED CATEGORY "LCOs")
 
     if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)

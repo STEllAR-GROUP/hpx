@@ -17,7 +17,7 @@
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
     #include <hpx/util/await_traits.hpp>
 #else
-    #include <experimental/resumable>
+    #include <experimental/coroutine>
 #endif
 
 #include <type_traits>
@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace detail
     HPX_FORCEINLINE void await_suspend(future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
-        // f.then([=](future<T> result) mutable
+        // f.then([=](future<T> result) {});
         traits::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace detail
     HPX_FORCEINLINE void await_suspend(shared_future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
-        // f.then([=](shared_future<T> result) mutable
+        // f.then([=](shared_future<T> result) {})
         traits::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
