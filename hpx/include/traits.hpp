@@ -36,7 +36,6 @@
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
