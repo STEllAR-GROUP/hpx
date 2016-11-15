@@ -65,15 +65,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::util::decay<F>::type fun_type;
             typedef typename hpx::util::decay<Proj>::type proj_type;
 
-            execution_policy_type policy_;
             fun_type f_;
             proj_type proj_;
 
-            template <typename ExPolicy_, typename F_, typename Proj_>
-            HPX_HOST_DEVICE transform_iteration(
-                    ExPolicy_ && policy, F_ && f, Proj_ && proj)
-              : policy_(std::forward<ExPolicy_>(policy))
-              , f_(std::forward<F_>(f))
+            template <typename F_, typename Proj_>
+            HPX_HOST_DEVICE transform_iteration(F_ && f, Proj_ && proj)
+              : f_(std::forward<F_>(f))
               , proj_(std::forward<Proj_>(proj))
             {}
 
@@ -82,14 +79,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             transform_iteration(transform_iteration&&) = default;
 #else
             HPX_HOST_DEVICE transform_iteration(transform_iteration const& rhs)
-              : policy_(rhs.policy_)
-              , f_(rhs.f_)
+              : f_(rhs.f_)
               , proj_(rhs.proj_)
             {}
 
             HPX_HOST_DEVICE transform_iteration(transform_iteration && rhs)
-              : policy_(std::move(rhs.policy_))
-              , f_(std::move(rhs.f_))
+              : f_(std::move(rhs.f_))
               , proj_(std::move(rhs.proj_))
             {}
 #endif
@@ -111,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t /*part_index*/)
             {
                 auto iters = part_begin.get_iterator_tuple();
-                return util::transform_loop_n(policy_,
+                return util::transform_loop_n<execution_policy_type>(
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters),
                     transform_projected<F, Proj>{f_, proj_});
@@ -147,7 +142,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (first != last)
                 {
-                    auto f1 = transform_iteration<ExPolicy, F, Proj>(policy,
+                    auto f1 = transform_iteration<ExPolicy, F, Proj>(
                         std::forward<F>(f), std::forward<Proj>(proj));
 
                     return get_iter_pair(
@@ -313,18 +308,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::util::decay<Proj1>::type proj1_type;
             typedef typename hpx::util::decay<Proj2>::type proj2_type;
 
-            execution_policy_type policy_;
             fun_type f_;
             proj1_type proj1_;
             proj2_type proj2_;
 
-            template <typename ExPolicy_, typename F_, typename Proj1_,
-                typename Proj2_>
+            template <typename F_, typename Proj1_, typename Proj2_>
             HPX_HOST_DEVICE
-            transform_binary_iteration(ExPolicy_ && policy, F_ && f,
-                    Proj1_ && proj1, Proj2_ && proj2)
-              : policy_(std::forward<ExPolicy_>(policy))
-              , f_(std::forward<F_>(f))
+            transform_binary_iteration(F_ && f, Proj1_ && proj1, Proj2_ && proj2)
+              : f_(std::forward<F_>(f))
               , proj1_(std::forward<Proj1_>(proj1))
               , proj2_(std::forward<Proj2_>(proj2))
             {}
@@ -335,16 +326,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #else
             HPX_HOST_DEVICE
             transform_binary_iteration(transform_binary_iteration const& rhs)
-              : policy_(rhs.policy_)
-              , f_(rhs.f_)
+              : f_(rhs.f_)
               , proj1_(rhs.proj1_)
               , proj2_(rhs.proj2_)
             {}
 
             HPX_HOST_DEVICE
             transform_binary_iteration(transform_binary_iteration && rhs)
-              : policy_(std::move(rhs.policy_))
-              , f_(std::move(rhs.f_))
+              : f_(std::move(rhs.f_))
               , proj1_(std::move(rhs.proj1_))
               , proj2_(std::move(rhs.proj2_))
             {}
@@ -370,7 +359,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t /*part_index*/)
             {
                 auto iters = part_begin.get_iterator_tuple();
-                return util::transform_binary_loop_n(policy_,
+                return util::transform_binary_loop_n<execution_policy_type>(
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters), hpx::util::get<2>(iters),
                     transform_binary_projected<F, Proj1, Proj2>{
@@ -395,8 +384,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 InIter2 first2, OutIter dest, F && f, Proj1 && proj1,
                 Proj2 && proj2)
             {
-                return util::transform_binary_loop(
-                    std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+                return util::transform_binary_loop<ExPolicy>(
+                    first1, last1, first2, dest,
                     transform_binary_projected<F, Proj1, Proj2>{
                         f, proj1, proj2
                     });
@@ -414,7 +403,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first1 != last1)
                 {
                     auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
-                        policy, std::forward<F>(f), std::forward<Proj1>(proj1),
+                        std::forward<F>(f), std::forward<Proj1>(proj1),
                         std::forward<Proj2>(proj2));
 
                     return get_iter_tuple(
@@ -601,8 +590,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 InIter2 first2, InIter2 last2,
                 OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2)
             {
-                return util::transform_binary_loop(
-                    std::forward<ExPolicy>(policy),
+                return util::transform_binary_loop<ExPolicy>(
                     first1, last1, first2, last2, dest,
                     transform_binary_projected<F, Proj1, Proj2>{
                         f, proj1, proj2
@@ -621,7 +609,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first1 != last1 && first2 != last2)
                 {
                     auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
-                        policy, std::forward<F>(f), std::forward<Proj1>(proj1),
+                        std::forward<F>(f), std::forward<Proj1>(proj1),
                         std::forward<Proj2>(proj2));
 
                     return get_iter_tuple(

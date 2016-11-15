@@ -1280,6 +1280,56 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {};
         /// \endcond
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <>
+        struct is_datapar_execution_policy<dataseq_execution_policy>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_datapar_execution_policy<dataseq_task_execution_policy>
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_datapar_execution_policy<
+                dataseq_execution_policy_shim<Executor, Parameters> >
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_datapar_execution_policy<
+                dataseq_task_execution_policy_shim<Executor, Parameters> >
+          : std::true_type
+        {};
+
+        template <>
+        struct is_datapar_execution_policy<datapar_execution_policy>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_datapar_execution_policy<datapar_task_execution_policy>
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_datapar_execution_policy<
+                datapar_execution_policy_shim<Executor, Parameters> >
+          : std::true_type
+        {};
+
+        template <typename Executor, typename Parameters>
+        struct is_datapar_execution_policy<
+                datapar_task_execution_policy_shim<Executor, Parameters> >
+          : std::true_type
+        {};
+        /// \endcond
+    }
 }}}
 
 #endif

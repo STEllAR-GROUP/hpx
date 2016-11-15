@@ -97,8 +97,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         if (part_count == 1)
                             return fst_bool;
 
-                        util::loop_n(
-                            policy, ++part_begin, --part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            ++part_begin, --part_count, tok,
                             [&fst_bool, &pred, &tok](Iter const& a) {
                                 if (fst_bool != pred(*a))
                                 {

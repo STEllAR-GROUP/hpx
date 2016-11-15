@@ -131,8 +131,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         *dst++ = val;
 
                         // MSVC 2015 fails if op is captured by reference
-                        util::loop_n(
-                            policy, dst, part_size - 1,
+                        util::loop_n<ExPolicy>(
+                            dst, part_size - 1,
                             [=, &val](OutIter it)
                             {
                                 *it = hpx::util::invoke(op, val, *it);

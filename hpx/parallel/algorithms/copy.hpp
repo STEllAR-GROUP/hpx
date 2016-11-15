@@ -419,8 +419,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::size_t curr = 0;
 
                         // MSVC complains if proj is captured by ref below
-                        util::loop_n(
-                            policy, part_begin, part_size,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size,
                             [&pred, proj, &curr](zip_iterator it) mutable
                             {
                                 using hpx::util::invoke;
@@ -442,8 +442,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         next.get();     // rethrow exceptions
 
                         std::advance(dest, curr.get());
-                        util::loop_n(
-                            policy, part_begin, part_size,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size,
                             [&dest](zip_iterator it) mutable
                             {
                                 if(get<1>(*it))
