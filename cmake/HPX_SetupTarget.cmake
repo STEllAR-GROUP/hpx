@@ -198,7 +198,7 @@ function(hpx_setup_target target)
     target_compile_options(${target} PUBLIC ${CXX_FLAG})
   endif()
 
-  target_link_libraries(${target} ${hpx_libs} ${target_DEPENDENCIES})
+  target_link_libraries(${target} PUBLIC ${hpx_libs} ${target_DEPENDENCIES})
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 
