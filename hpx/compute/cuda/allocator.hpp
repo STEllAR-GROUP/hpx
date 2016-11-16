@@ -184,7 +184,7 @@ namespace hpx { namespace compute { namespace cuda
                         ::new (p + idx) T (std::forward<Args>(args)...);
                     }
                 },
-                p, count, std::forward<Args>(args)...);
+                p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
         }
 
@@ -199,7 +199,7 @@ namespace hpx { namespace compute { namespace cuda
                 {
                     ::new (p) T (std::forward<Args>(args)...);
                 },
-                p, std::forward<Args>(args)...);
+                p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
         }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace compute { namespace cuda
                         (p + idx)->~T();
                     }
                 },
-                p, count);
+                p.device_ptr(), count);
             target_.synchronize();
         }
 
