@@ -218,15 +218,25 @@ else()
     FOLDER "Core")
 endif()
 
-target_link_libraries(hpx
-  PUBLIC ${HPX_LIBRARIES})
-if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx
-    PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
-endif()
-if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx
-    PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
+    target_link_libraries(hpx
+      PUBLIC ${HPX_LIBRARIES})
+    if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
+      target_link_libraries(hpx
+        PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+    endif()
+    if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
+      target_link_libraries(hpx
+        PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+    endif()
+else()
+    target_link_libraries(hpx ${HPX_LIBRARIES})
+    if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
+      target_link_libraries(hpx ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+    endif()
+    if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
+      target_link_libraries(hpx ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+    endif()
 endif()
 
 if(HPX_WITH_APEX)
