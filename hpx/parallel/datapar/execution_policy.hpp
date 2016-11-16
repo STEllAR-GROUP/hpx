@@ -27,7 +27,7 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: The class sequential_task_execution_policy is an execution
+    /// Extension: The class dataseq_task_execution_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may not
     /// be parallelized (has to run sequentially).
@@ -131,12 +131,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename... Parameters, typename ParametersType =
             typename executor_parameters_join<Parameters...>::type>
         typename rebind_executor<
-            sequential_task_execution_policy, executor_type, ParametersType
+            dataseq_task_execution_policy, executor_type, ParametersType
         >::type
         with(Parameters &&... params) const
         {
             typedef typename rebind_executor<
-                sequential_task_execution_policy, executor_type, ParametersType
+                dataseq_task_execution_policy, executor_type, ParametersType
             >::type rebound_type;
             return rebound_type(executor(),
                 join_executor_parameters(std::forward<Parameters>(params)...));
@@ -1286,45 +1286,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         template <>
-        struct is_datapar_execution_policy<dataseq_execution_policy>
+        struct is_vectorpack_execution_policy<dataseq_execution_policy>
           : std::true_type
         {};
 
         template <>
-        struct is_datapar_execution_policy<dataseq_task_execution_policy>
+        struct is_vectorpack_execution_policy<dataseq_task_execution_policy>
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_datapar_execution_policy<
+        struct is_vectorpack_execution_policy<
                 dataseq_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_datapar_execution_policy<
+        struct is_vectorpack_execution_policy<
                 dataseq_task_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
         template <>
-        struct is_datapar_execution_policy<datapar_execution_policy>
+        struct is_vectorpack_execution_policy<datapar_execution_policy>
           : std::true_type
         {};
 
         template <>
-        struct is_datapar_execution_policy<datapar_task_execution_policy>
+        struct is_vectorpack_execution_policy<datapar_task_execution_policy>
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_datapar_execution_policy<
+        struct is_vectorpack_execution_policy<
                 datapar_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_datapar_execution_policy<
+        struct is_vectorpack_execution_policy<
                 datapar_task_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};

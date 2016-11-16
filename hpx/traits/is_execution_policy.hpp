@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {};
 
         template <typename Executor>
-        struct is_datapar_execution_policy
+        struct is_vectorpack_execution_policy
           : std::false_type
         {};
     }
@@ -131,8 +131,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     // extension:
     template <typename T>
-    struct is_datapar_execution_policy
-      : detail::is_datapar_execution_policy<typename hpx::util::decay<T>::type>
+    struct is_vectorpack_execution_policy
+      : detail::is_vectorpack_execution_policy<typename hpx::util::decay<T>::type>
     {};
 }}}
 
