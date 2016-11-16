@@ -84,8 +84,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         // VS2015RC bails out when op is captured by ref
                         using hpx::util::get;
-                        util::loop_n(
-                            policy, part_begin, part_size,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size,
                             [op](zip_iterator it)
                             {
                                 get<2>(*it) = hpx::util::invoke(

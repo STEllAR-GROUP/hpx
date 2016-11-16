@@ -16,6 +16,7 @@
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
 #include <hpx/parallel/traits/vector_pack_type.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <algorithm>
@@ -31,22 +32,13 @@ namespace hpx { namespace parallel { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename Vector>
+        template <typename ExPolicy, typename Vector>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename Vector::value_type
-        extract_value(parallel::v1::datapar_execution_policy,
-            Vector const& value)
-        {
-            static_assert(traits::is_scalar_vector_pack<Vector>::value,
-                "this should be called with a scalar only");
-            return value[0];
-        }
-
-        template <typename Vector>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename Vector::value_type
-        extract_value(parallel::v1::datapar_task_execution_policy,
-            Vector const& value)
+        typename std::enable_if<
+            is_vectorpack_execution_policy<ExPolicy>::value,
+            typename Vector::value_type
+        >::type
+        extract_value(Vector const& value)
         {
             static_assert(traits::is_scalar_vector_pack<Vector>::value,
                 "this should be called with a scalar only");
@@ -54,33 +46,15 @@ namespace hpx { namespace parallel { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Vector>
+        template <typename ExPolicy, typename F, typename Vector>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename traits::vector_pack_type<
-            typename hpx::util::decay<Vector>::type::value_type, 1
+        typename std::enable_if<
+            is_vectorpack_execution_policy<ExPolicy>::value,
+            typename traits::vector_pack_type<
+                typename hpx::util::decay<Vector>::type::value_type, 1
+            >::type
         >::type
-        accumulate_values(parallel::v1::datapar_execution_policy,
-            F && f, Vector const& value)
-        {
-            typedef typename hpx::util::decay<Vector>::type vector_type;
-            typedef typename vector_type::value_type entry_type;
-
-            entry_type accum = value[0];
-            for(size_t i = 1; i != value.size(); ++i)
-            {
-                accum = f(accum, entry_type(value[i]));
-            }
-
-            return typename traits::vector_pack_type<entry_type, 1>::type(accum);
-        }
-
-        template <typename F, typename Vector>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename traits::vector_pack_type<
-            typename hpx::util::decay<Vector>::type::value_type, 1
-        >::type
-        accumulate_values(parallel::v1::datapar_task_execution_policy,
-            F && f, Vector const& value)
+        accumulate_values(F && f, Vector const& value)
         {
             typedef typename hpx::util::decay<Vector>::type vector_type;
             typedef typename vector_type::value_type entry_type;
@@ -95,25 +69,13 @@ namespace hpx { namespace parallel { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Vector, typename T>
+        template <typename ExPolicy, typename F, typename Vector, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename traits::vector_pack_type<T, 1>::type
-        accumulate_values(parallel::v1::datapar_execution_policy,
-            F && f, Vector const& value, T accum)
-        {
-            for(size_t i = 0; i != value.size(); ++i)
-            {
-                accum = f(accum, T(value[i]));
-            }
-
-            return typename traits::vector_pack_type<T, 1>::type(accum);
-        }
-
-        template <typename F, typename Vector, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename traits::vector_pack_type<T, 1>::type
-        accumulate_values(parallel::v1::datapar_task_execution_policy,
-            F && f, Vector const& value, T accum)
+        typename std::enable_if<
+            is_vectorpack_execution_policy<ExPolicy>::value,
+            typename traits::vector_pack_type<T, 1>::type
+        >::type
+        accumulate_values(F && f, Vector const& value, T accum)
         {
             for(size_t i = 0; i != value.size(); ++i)
             {
@@ -338,10 +300,13 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename Iter1, typename Iter2>
+    template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
+        typename U = typename std::enable_if<
+            is_vectorpack_execution_policy<ExPolicy>::value
+        >::type
+    >
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_execution_policy, std::false_type,
-            F && f, Iter1& it1, Iter2& it2)
+    auto loop_step(std::false_type, F && f, Iter1& it1, Iter2& it2)
     ->  decltype(
             detail::datapar_loop_step2<Iter1, Iter2>::call1(
                 std::forward<F>(f), it1, it2)
@@ -351,10 +316,13 @@ namespace hpx { namespace parallel { namespace util
             std::forward<F>(f), it1, it2);
     }
 
-    template <typename F, typename Iter1, typename Iter2>
+    template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
+        typename U = typename std::enable_if<
+            is_vectorpack_execution_policy<ExPolicy>::value
+        >::type
+    >
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_execution_policy, std::true_type,
-            F && f, Iter1& it1, Iter2& it2)
+    auto loop_step(std::true_type, F && f, Iter1& it1, Iter2& it2)
     ->  decltype(
             detail::datapar_loop_step2<Iter1, Iter2>::callv(
                 std::forward<F>(f), it1, it2)
@@ -365,45 +333,12 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename Iter1, typename Iter2>
+    template <typename ExPolicy, typename Iter>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_task_execution_policy, std::false_type,
-            F && f, Iter1& it1, Iter2& it2)
-    ->  decltype(
-            detail::datapar_loop_step2<Iter1, Iter2>::call1(
-                std::forward<F>(f), it1, it2)
-            )
-    {
-        return detail::datapar_loop_step2<Iter1, Iter2>::call1(
-            std::forward<F>(f), it1, it2);
-    }
-
-    template <typename F, typename Iter1, typename Iter2>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    auto loop_step(parallel::v1::datapar_task_execution_policy, std::true_type,
-            F && f, Iter1& it1, Iter2& it2)
-    ->  decltype(
-            detail::datapar_loop_step2<Iter1, Iter2>::callv(
-                std::forward<F>(f), it1, it2)
-            )
-    {
-        return detail::datapar_loop_step2<Iter1, Iter2>::callv(
-            std::forward<F>(f), it1, it2);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    bool loop_optimization(parallel::v1::datapar_execution_policy,
-        Iter const& first1, Iter const& last1)
-    {
-        return detail::loop_optimization<Iter>::call(first1, last1);
-    }
-
-    template <typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    bool loop_optimization(parallel::v1::datapar_task_execution_policy,
-        Iter const& first1, Iter const& last1)
+    typename std::enable_if<
+        is_vectorpack_execution_policy<ExPolicy>::value, bool
+    >::type
+    loop_optimization(Iter const& first1, Iter const& last1)
     {
         return detail::loop_optimization<Iter>::call(first1, last1);
     }
@@ -424,37 +359,25 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename VecOnly, typename Iter1, typename Iter2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
-    loop2(parallel::v1::datapar_execution_policy, VecOnly,
-        Iter1 first1, Iter1 last1, Iter2 first2, F && f)
-    {
-        return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
-            first1, last1, first2, std::forward<F>(f));
-    }
-
-    template <typename VecOnly, typename Iter1, typename Iter2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter1, Iter2>
-    loop2(parallel::v1::datapar_task_execution_policy, VecOnly,
-        Iter1 first1, Iter1 last1, Iter2 first2, F && f)
+    template <typename ExPolicy, typename VecOnly, typename Iter1,
+        typename Iter2, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::enable_if<
+        is_vectorpack_execution_policy<ExPolicy>::value, std::pair<Iter1, Iter2>
+    >::type
+    loop2(VecOnly, Iter1 first1, Iter1 last1, Iter2 first2, F && f)
     {
         return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
             first1, last1, first2, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_execution_policy, Iter it,
-        std::size_t count, F && f)
-    {
-        return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
-    }
-
-    template <typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(parallel::v1::datapar_task_execution_policy, Iter it,
-        std::size_t count, F && f)
+    template <typename ExPolicy, typename Iter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::enable_if<
+        is_vectorpack_execution_policy<ExPolicy>::value, Iter
+    >::type
+    loop_n(Iter it, std::size_t count, F && f)
     {
         return detail::datapar_loop_n<Iter>::call(it, count, std::forward<F>(f));
     }

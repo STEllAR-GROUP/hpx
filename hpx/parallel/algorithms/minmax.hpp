@@ -51,8 +51,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return it;
 
             FwdIter smallest = it;
-            util::loop_n(
-                std::forward<ExPolicy>(policy), ++it, count-1,
+            util::loop_n<ExPolicy>(
+                ++it, count-1,
                 [&f, &smallest, &proj](FwdIter const& curr)
                 {
                     if (hpx::util::invoke(f,
@@ -84,8 +84,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return *it;
 
                 typename std::iterator_traits<FwdIter>::value_type smallest = *it;
-                util::loop_n(
-                    std::forward<ExPolicy>(policy), ++it, count-1,
+                util::loop_n<ExPolicy>(
+                    ++it, count-1,
                     [&f, &smallest, &proj](FwdIter const& curr)
                     {
                         if (hpx::util::invoke(f,
@@ -277,8 +277,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return it;
 
             FwdIter greatest = it;
-            util::loop_n(
-                std::forward<ExPolicy>(policy), ++it, count-1,
+            util::loop_n<ExPolicy>(
+                ++it, count-1,
                 [&f, &greatest, &proj](FwdIter const& curr)
                 {
                     if (hpx::util::invoke(f,
@@ -310,8 +310,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return *it;
 
                 typename std::iterator_traits<FwdIter>::value_type greatest = *it;
-                util::loop_n(
-                    std::forward<ExPolicy>(policy), ++it, count-1,
+                util::loop_n<ExPolicy>(
+                    ++it, count-1,
                     [&f, &greatest, &proj](FwdIter const& curr)
                     {
                         if (hpx::util::invoke(f,
@@ -509,8 +509,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             if (count == 0 || count == 1)
                 return result;
 
-            util::loop_n(
-                std::forward<ExPolicy>(policy), ++it, count-1,
+            util::loop_n<ExPolicy>(
+                ++it, count-1,
                 [&f, &result, &proj](FwdIter const& curr)
                 {
                     if (hpx::util::invoke(f,
@@ -550,8 +550,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return *it;
 
                 typename std::iterator_traits<PairIter>::value_type result = *it;
-                util::loop_n(
-                    std::forward<ExPolicy>(policy), ++it, count-1,
+                util::loop_n<ExPolicy>(
+                    ++it, count-1,
                     [&f, &result, &proj](PairIter const& curr)
                     {
                         if (hpx::util::invoke(f,

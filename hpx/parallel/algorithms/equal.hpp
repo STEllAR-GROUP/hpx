@@ -115,8 +115,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
-                        util::loop_n(
-                            policy, it, part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
                                 using hpx::util::get;
@@ -290,8 +290,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
-                        util::loop_n(
-                            policy, it, part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
                                 reference t = *curr;

@@ -41,6 +41,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         struct is_rebound_execution_policy
           : std::false_type
         {};
+
+        template <typename Executor>
+        struct is_vectorpack_execution_policy
+          : std::false_type
+        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -122,6 +127,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename T>
     struct is_rebound_execution_policy
       : detail::is_rebound_execution_policy<typename hpx::util::decay<T>::type>
+    {};
+
+    // extension:
+    template <typename T>
+    struct is_vectorpack_execution_policy
+      : detail::is_vectorpack_execution_policy<typename hpx::util::decay<T>::type>
     {};
 }}}
 

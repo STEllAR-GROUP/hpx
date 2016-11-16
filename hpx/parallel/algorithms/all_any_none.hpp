@@ -68,8 +68,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
-                        util::loop_n(
-                            policy, part_begin, part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (op(*curr))
@@ -214,8 +214,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
-                        util::loop_n(
-                            policy, part_begin, part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (op(*curr))
@@ -359,8 +359,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
-                        util::loop_n(
-                            policy, part_begin, part_count, tok,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
                             {
                                 if (!op(*curr))

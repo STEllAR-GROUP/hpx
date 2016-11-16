@@ -11,6 +11,7 @@
 #include <hpx/parallel/datapar/loop.hpp>
 #endif
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
@@ -27,15 +28,21 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename VecOnly, typename F, typename ... Iters>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename std::result_of<F&&(Iters...)>::type
-    loop_step(ExPolicy&&, VecOnly, F && f, Iters& ... its)
+    typename std::enable_if<
+       !is_vectorpack_execution_policy<ExPolicy>::value,
+        typename std::result_of<F&&(Iters...)>::type
+    >::type
+    loop_step(VecOnly, F && f, Iters& ... its)
     {
         return hpx::util::invoke(std::forward<F>(f), (its++)...);
     }
 
     template <typename ExPolicy, typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-    HPX_CONSTEXPR bool loop_optimization(ExPolicy&&, Iter, Iter)
+    HPX_HOST_DEVICE HPX_FORCEINLINE HPX_CONSTEXPR
+    typename std::enable_if<
+        !is_vectorpack_execution_policy<ExPolicy>::value, bool
+    >::type
+    loop_optimization(Iter, Iter)
     {
         return false;
     }
@@ -116,8 +123,11 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename ExPolicy, typename VecOnly,
         typename Begin1, typename End1, typename Begin2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Begin1, Begin2>
-    loop2(ExPolicy&&, VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::enable_if<
+       !is_vectorpack_execution_policy<ExPolicy>::value, std::pair<Begin1, Begin2>
+    >::type
+    loop2(VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
     {
         return detail::loop2<Begin1, Begin2>::call(begin1, end1, begin2,
             std::forward<F>(f));
@@ -160,36 +170,52 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        T const& extract_value(ExPolicy&&, T const& v)
+        typename std::enable_if<
+            !is_vectorpack_execution_policy<ExPolicy>::value, T const&
+        >::type
+        extract_value(T const& v)
         {
             return v;
         }
 
         template <typename ExPolicy, typename F, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        T const& accumulate_values(ExPolicy&&, F &&, T const& v)
+        typename std::enable_if<
+            !is_vectorpack_execution_policy<ExPolicy>::value, T const&
+        >::type
+        accumulate_values(F &&, T const& v)
         {
             return v;
         }
 
         template <typename ExPolicy, typename F, typename T, typename T1>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        T accumulate_values(ExPolicy&&, F && f, T && v, T1 && init)
+        typename std::enable_if<
+            !is_vectorpack_execution_policy<ExPolicy>::value, T
+        >::type
+        accumulate_values(F && f, T && v, T1 && init)
         {
-            return std::forward<F>(f)(std::forward<T1>(init), std::forward<T>(v));
+            return hpx::util::invoke(std::forward<F>(f),
+                std::forward<T1>(init), std::forward<T>(v));
         }
     }
 
     template <typename ExPolicy, typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(ExPolicy &&, Iter it, std::size_t count, F && f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::enable_if<
+        !is_vectorpack_execution_policy<ExPolicy>::value, Iter
+    >::type
+    loop_n(Iter it, std::size_t count, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter
-    loop_n(ExPolicy &&, Iter it, std::size_t count, CancelToken& tok, F && f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename std::enable_if<
+        !is_vectorpack_execution_policy<ExPolicy>::value, Iter
+    >::type
+    loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
         return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
     }

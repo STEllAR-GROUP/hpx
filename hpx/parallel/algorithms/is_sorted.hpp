@@ -72,8 +72,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ) mutable -> bool
                     {
                         FwdIter trail = part_begin++;
-                        util::loop_n(
-                            policy, part_begin, part_size - 1,
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size - 1,
                             [&trail, &tok, &pred](FwdIter it)
                             {
                                 if (hpx::util::invoke(pred, *it, *trail++))

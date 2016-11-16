@@ -19,7 +19,10 @@ void test_count_if()
 {
     using namespace hpx::parallel;
 
+    test_count_if(dataseq_execution, IteratorTag());
     test_count_if(datapar_execution, IteratorTag());
+
+    test_count_if_async(dataseq_execution(task), IteratorTag());
     test_count_if_async(datapar_execution(task), IteratorTag());
 }
 
@@ -36,7 +39,10 @@ void test_count_if_exception()
 {
     using namespace hpx::parallel;
 
+    test_count_if_exception(dataseq_execution, IteratorTag());
     test_count_if_exception(datapar_execution, IteratorTag());
+
+    test_count_if_exception_async(dataseq_execution(task), IteratorTag());
     test_count_if_exception_async(datapar_execution(task), IteratorTag());
 }
 
@@ -52,7 +58,10 @@ void test_count_if_bad_alloc()
 {
     using namespace hpx::parallel;
 
+    test_count_if_bad_alloc(dataseq_execution, IteratorTag());
     test_count_if_bad_alloc(datapar_execution, IteratorTag());
+
+    test_count_if_bad_alloc_async(dataseq_execution(task), IteratorTag());
     test_count_if_bad_alloc_async(datapar_execution(task), IteratorTag());
 }
 

@@ -191,11 +191,11 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::parallel::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_bad_alloc = false;
@@ -220,11 +220,11 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     bool caught_bad_alloc = false;

@@ -125,8 +125,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         T val = curr.get();
                         OutIter dst = get<1>(part_begin.get_iterator_tuple());
 
-                        util::loop_n(
-                            policy, dst, part_size,
+                        util::loop_n<ExPolicy>(
+                            dst, part_size,
                             [&op, &val](OutIter it)
                             {
                                 *it = hpx::util::invoke(op, *it, val);

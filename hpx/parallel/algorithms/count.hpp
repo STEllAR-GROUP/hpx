@@ -45,13 +45,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
             typedef typename hpx::util::decay<Op>::type op_type;
 
-            execution_policy_type policy_;
             op_type op_;
 
-            template <typename ExPolicy_, typename Op_>
-            HPX_HOST_DEVICE count_iteration(ExPolicy_ && policy, Op_ && op)
-              : policy_(std::forward<ExPolicy_>(policy))
-              , op_(std::forward<Op_>(op))
+            template <typename Op_,
+                typename U = typename std::enable_if<
+                   !std::is_same<
+                        typename hpx::util::decay<Op_>::type, count_iteration
+                    >::value
+                >::type>
+            HPX_HOST_DEVICE count_iteration(Op_ && op)
+              : op_(std::forward<Op_>(op))
             {}
 
 #if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
@@ -59,13 +62,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             count_iteration(count_iteration&&) = default;
 #else
             HPX_HOST_DEVICE count_iteration(count_iteration const& rhs)
-              : policy_(rhs.policy_)
-              , op_(rhs.op_)
+              : op_(rhs.op_)
             {}
 
             HPX_HOST_DEVICE count_iteration(count_iteration && rhs)
-              : policy_(std::move(rhs.policy_))
-              , op_(std::move(rhs.op_))
+              : op_(std::move(rhs.op_))
             {}
 #endif
 
@@ -79,8 +80,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 using hpx::util::placeholders::_1;
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
-                util::loop_n(
-                    policy_, part_begin, part_size,
+                util::loop_n<execution_policy_type>(
+                    part_begin, part_size,
                     hpx::util::bind(*this, _1, std::ref(ret))
                 );
                 return ret;
@@ -112,7 +113,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T> >(
-                        std::forward<ExPolicy>(policy),
                         detail::compare_to<T>(value));
 
                 using hpx::util::placeholders::_1;
@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T> >(
-                        policy, detail::compare_to<T>(value));
+                        detail::compare_to<T>(value));
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
@@ -269,8 +269,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static difference_type
             sequential(ExPolicy && policy, Iter first, Iter last, Pred && op)
             {
-                auto f1 = count_iteration<ExPolicy, Pred>(
-                    std::forward<ExPolicy>(policy), op);
+                auto f1 = count_iteration<ExPolicy, Pred>(op);
 
                 using hpx::util::placeholders::_1;
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
@@ -295,7 +294,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         >::get(0);
                 }
 
-                auto f1 = count_iteration<ExPolicy, Pred>(policy, op);
+                auto f1 = count_iteration<ExPolicy, Pred>(op);
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),

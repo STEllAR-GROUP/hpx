@@ -19,7 +19,10 @@ void test_transform()
 {
     using namespace hpx::parallel;
 
+    test_transform(dataseq_execution, IteratorTag());
     test_transform(datapar_execution, IteratorTag());
+
+    test_transform_async(dataseq_execution(task), IteratorTag());
     test_transform_async(datapar_execution(task), IteratorTag());
 }
 
@@ -35,7 +38,10 @@ void test_transform_exception()
 {
     using namespace hpx::parallel;
 
+    test_transform_exception(dataseq_execution, IteratorTag());
     test_transform_exception(datapar_execution, IteratorTag());
+
+    test_transform_exception_async(dataseq_execution(task), IteratorTag());
     test_transform_exception_async(datapar_execution(task), IteratorTag());
 }
 
@@ -52,7 +58,10 @@ void test_transform_bad_alloc()
 {
     using namespace hpx::parallel;
 
+    test_transform_bad_alloc(dataseq_execution, IteratorTag());
     test_transform_bad_alloc(datapar_execution, IteratorTag());
+
+    test_transform_bad_alloc_async(dataseq_execution(task), IteratorTag());
     test_transform_bad_alloc_async(datapar_execution(task), IteratorTag());
 }
 
