@@ -5,7 +5,6 @@
 
 // config
 #include <hpx/config.hpp>
-
 // util
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -24,37 +23,13 @@
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
 #include <hpx/util/debug/thread_stacktrace.hpp>
-
-// --------------------------------------------------------------------
-// The parcelport does not support HPX bootstrapping by default
-// it is a work in progress and may cause lockups on start if enabled
-// this value should be either std::true_type or std::false_type
-#define HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP      std::true_type
-
-// --------------------------------------------------------------------
-// This defines the standard size of messages that can be sent/received without
-// resorting to RDMA GET operations to fetch data. Chunks are still retrieved
-// using GET operations, this only affects the main message body/header size.
-#define HPX_PARCELPORT_VERBS_MESSAGE_HEADER_SIZE   RDMA_POOL_SMALL_CHUNK_SIZE
-
-// --------------------------------------------------------------------
-// This determines the lower size limit for messages that are copied into an
-// existing RDMA buffer. Messages larger than this will be registered on the fly
-// and sent without a memory copy
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_MEDIUM_CHUNK_SIZE
-
-// --------------------------------------------------------------------
-// The maximum number of sends that can be posted before we activate throttling
-#define HPX_PARCELPORT_VERBS_MAX_PREPOSTS          512
-
-// --------------------------------------------------------------------
-// The maximum number of sends that can be posted before we activate throttling
-#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
+//
+#include <hpx/config/parcelport_verbs_defines.hpp>
 
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
 // when we have maxed out the number of sends we can handle
-#define HPX_PARCELPORT_VERBS_SUSPEND_WAKE         (HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE/2)
+#define HPX_PARCELPORT_VERBS_SUSPEND_WAKE  (HPX_PARCELPORT_VERBS_THROTTLE_SENDS/2)
 
 // --------------------------------------------------------------------
 // When defined, we use a reader/writer lock on maps to squeeze a tiny performance
@@ -65,11 +40,6 @@
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR    true
-
-// --------------------------------------------------------------------
-// Turn on the use of debugging log messages for lock/unlock
-// to help find places where locks are being taken before suspending
-#define HPX_PARCELPORT_VERBS_DEBUG_LOCKS         false
 
 // --------------------------------------------------------------------
 // When enabled, the parcelport can create a custom scheduler to help
@@ -474,11 +444,13 @@ namespace verbs
                 //
                 scoped_lock lock(active_send_mutex);
                 active_sends.erase(send);
-                if (--active_send_count_ < HPX_PARCELPORT_VERBS_SUSPEND_WAKE)
+                //
+                if (--active_send_count_ <= HPX_PARCELPORT_VERBS_SUSPEND_WAKE)
                 {
                     if (!immediate_send_allowed_) {
                         LOG_DEVEL_MSG("Enabling immediate send : active "
-                            << decnumber(active_send_count_));
+                            << decnumber(active_send_count_) << " "
+                            << active_sends.size());
                     }
                     immediate_send_allowed_ = true;
                 }
@@ -1073,7 +1045,7 @@ namespace verbs
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
-            return HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP();
+            return HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING();
         }
 
         /// Return the name of this locality
@@ -1254,10 +1226,12 @@ namespace verbs
                     scoped_lock lock(active_send_mutex);
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
-                    if (++active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
+                    //
+                    if (++active_send_count_ >= HPX_PARCELPORT_VERBS_THROTTLE_SENDS) {
                         if (immediate_send_allowed_) {
                             LOG_DEVEL_MSG("Disabling immediate send : active "
-                                << decnumber(active_send_count_));
+                                << decnumber(active_send_count_) << " "
+                                << active_sends.size());
                         }
                         immediate_send_allowed_ = false;
                     }

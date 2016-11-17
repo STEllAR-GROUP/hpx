@@ -3,128 +3,255 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#------------------------------------------------------------------------------
+# If not enabled, define the empty registration macro and exit
+#------------------------------------------------------------------------------
+if (NOT HPX_WITH_PARCELPORT_VERBS)
+  macro(add_parcelport_verbs_module)
+  endmacro()
+  return()
+endif()
+
+#------------------------------------------------------------------------------
+# Add #define to global defines.hpp
+#------------------------------------------------------------------------------
+hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
+
+#------------------------------------------------------------------------------
+# Define the ParcelPort registration macro
+#------------------------------------------------------------------------------
 include(HPX_AddLibrary)
+macro(add_parcelport_verbs_module)
+  hpx_debug("add_parcelport_verbs_module")
 
-################################################################################
-# Decide whether to use the VERBS based parcelport
-################################################################################
-if(HPX_WITH_PARCELPORT_VERBS)
+  add_parcelport(verbs
+    STATIC
+    SOURCES
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+    INCLUDE_DIRECTORIES
+      "${_parcelport_verbs_INCLUDE_DIRECTORIES}"
+    HEADERS
+    DEPENDENCIES
+    FOLDER 
+      "Core/Plugins/Parcelport/verbs")
+endmacro()
 
-  include(GitExternal)
-  include(SubProject)
+#------------------------------------------------------------------------------
+# Setup our rdmahelper mini library
+#------------------------------------------------------------------------------
+include(GitExternal)
+include(SubProject)
   
-  #--------------------------------------------------
-  # checkout sub-project required by this plugin
-  #--------------------------------------------------
-  Git_External(
-    ${CMAKE_CURRENT_SOURCE_DIR}/rdmahelper
-    git@github.com:biddisco/rdmahelper.git
-    master
-    VERBOSE
-    NO_UPDATE
-  )
-
-  if (NOT Boost_USE_STATIC_LIBS)
-    hpx_add_config_define(BOOST_LOG_DYN_LINK)
-  endif()
+#--------------------------------------------------
+# checkout sub-project required by this plugin
+#--------------------------------------------------
+Git_External(
+  ${CMAKE_CURRENT_SOURCE_DIR}/rdmahelper
+  git@github.com:biddisco/rdmahelper.git
+  master
+  VERBOSE
+  NO_UPDATE
+)
 
 #------------------------------------------------------------------------------
 # Logging
 #------------------------------------------------------------------------------
-option(HPX_PARCELPORT_VERBS_WITH_LOGGING "Enable logging" ON)
+hpx_option(HPX_PARCELPORT_VERBS_WITH_LOGGING BOOL 
+  "Enable logging in the Verbs ParcelPort (default: OFF - Warning "
+  "- severely impacts usability when enabled)" 
+  OFF CATEGORY "Parcelport" ADVANCED)
+
 if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_HAVE_LOGGING)
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_HAVE_LOGGING 
+      NAMESPACE parcelport_verbs)
 endif()
 
-hpx_option(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD STRING
-  "Size of the message payload not sent with RDMA (default: 512 byte)"
-  "512" CATEGORY "Parcelport" ADVANCED)
+# also make sure boost log is linked correctly
+if (NOT Boost_USE_STATIC_LIBS)
+  hpx_add_config_define_namespace(
+      DEFINE    BOOST_LOG_DYN_LINK 
+      NAMESPACE parcelport_verbs)
+endif()
 
+#------------------------------------------------------------------------------
+# IB device selection
+#------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_DEVICE STRING 
-  "The device name of the ibverbs capable network adapter (default: roq0)" 
-  "roq" CATEGORY "Parcelport" ADVANCED)
+  "The device name of the ibverbs capable network adapter (default: mlx5_0)" 
+  "mlx5_0" CATEGORY "Parcelport" ADVANCED)
 
 hpx_option(HPX_PARCELPORT_VERBS_INTERFACE STRING 
-  "The interface name of the ibverbs capable network adapter (default: roq0)" 
-  "roq0" CATEGORY "Parcelport" ADVANCED)
+  "The interface name of the ibverbs capable network adapter (default: ib0)" 
+  "ib0" CATEGORY "Parcelport" ADVANCED)
 
+hpx_add_config_define_namespace(
+    DEFINE HPX_PARCELPORT_VERBS_DEVICE 
+    VALUE  "\"${HPX_PARCELPORT_VERBS_DEVICE}\""
+    NAMESPACE parcelport_verbs)
+                    
+hpx_add_config_define_namespace(
+    DEFINE HPX_PARCELPORT_VERBS_INTERFACE 
+    VALUE  "\"${HPX_PARCELPORT_VERBS_INTERFACE}\""
+    NAMESPACE parcelport_verbs)
+
+#------------------------------------------------------------------------------
+# Bootstrap options
+#------------------------------------------------------------------------------
+hpx_option(HPX_PARCELPORT_VERBS_WITH_BOOTSTRAPPING BOOL 
+  "Configure the parcelport to enable bootstrap capabilities (default: ON)" 
+  ON CATEGORY "Parcelport" ADVANCED)
+
+if (HPX_PARCELPORT_VERBS_WITH_BOOTSTRAPPING)
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING 
+      VALUE     std::true_type
+      NAMESPACE parcelport_verbs)
+else()
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING 
+      VALUE     std::false_type
+      NAMESPACE parcelport_verbs)
+endif()
+
+#------------------------------------------------------------------------------
+# Throttling options
+#------------------------------------------------------------------------------
+hpx_option(HPX_PARCELPORT_VERBS_THROTTLE_SENDS STRING
+  "Threshold of active sends at which throttling is enabled (default: 16)"
+  "16" CATEGORY "Parcelport" ADVANCED)
+
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_THROTTLE_SENDS 
+    VALUE     ${HPX_PARCELPORT_VERBS_THROTTLE_SENDS}
+    NAMESPACE parcelport_verbs)
+
+#------------------------------------------------------------------------------
+# Custom Scheduler options
+#------------------------------------------------------------------------------
+hpx_option(HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER BOOL 
+  "Configure the parcelport to use a custom scheduler (default: OFF - 
+  Warning, experimental, may cause serious program errors)" 
+  OFF CATEGORY "Parcelport" ADVANCED)
+
+if (HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER)
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER 
+      NAMESPACE parcelport_verbs)
+endif()  
+
+#------------------------------------------------------------------------------
+# Lock checking
+#------------------------------------------------------------------------------
+hpx_option(HPX_PARCELPORT_VERBS_DEBUG_LOCKS BOOL 
+  "Turn on extra log messages for lock/unlock (default: OFF - 
+  Warning, severely impacts performance when enabled)" 
+  OFF CATEGORY "Parcelport" ADVANCED)
+
+if (HPX_PARCELPORT_VERBS_DEBUG_LOCKS)
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_DEBUG_LOCKS 
+      NAMESPACE parcelport_verbs)
+endif()  
+
+#------------------------------------------------------------------------------
+# Memory chunk/reservation options
+#------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING 
-  "Number of bytes a chunk in the memory pool can hold (default: 4K)" 
+  "Number of bytes a default chunk in the memory pool can hold (default: 1K)" 
+  "1024" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_PARCELPORT_VERBS_64K_PAGES STRING 
+  "Number of 64K pages we reserve for default message buffers (default: 10)" 
+  "10" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD STRING 
+  "Cutoff size over which data is never copied into existing buffers (default: 4K)" 
   "4096" CATEGORY "Parcelport" ADVANCED)
-  
-hpx_option(HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS STRING 
-  "The number of chunks that can are allocated initially (default: 64)" 
-  "64" CATEGORY "Parcelport" ADVANCED)
 
-hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING 
-  "Maximum number of chunks that can be allocated (default: 128)" 
-  "128" CATEGORY "Parcelport" ADVANCED)
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE 
+    VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}
+    NAMESPACE parcelport_verbs)
 
+# define the message header size to be equal to the chunk size
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_MESSAGE_HEADER_SIZE 
+    VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}
+    NAMESPACE parcelport_verbs)
+
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_64K_PAGES 
+    VALUE     ${HPX_PARCELPORT_VERBS_64K_PAGES}
+    NAMESPACE parcelport_verbs)
+
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 
+    VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD}
+    NAMESPACE parcelport_verbs)
+
+#------------------------------------------------------------------------------
+# Preposting options
+#------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING 
-  "The number of pre-posted receive buffers (default: 32)" 
-  "32" CATEGORY "Parcelport" ADVANCED)
+  "The number of pre-posted receive buffers (default: 512)" 
+  "512" CATEGORY "Parcelport" ADVANCED)
 
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_DEVICE "\"${HPX_PARCELPORT_VERBS_DEVICE}\"")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_INTERFACE "\"${HPX_PARCELPORT_VERBS_INTERFACE}\"")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_PREPOSTS "${HPX_PARCELPORT_VERBS_MAX_PREPOSTS}")
-
-
-  if(HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
-    message(WARNING "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
-    hpx_add_config_define(HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED 1)
-  endif()
+hpx_add_config_define_namespace(
+    DEFINE    HPX_PARCELPORT_VERBS_MAX_PREPOSTS 
+    VALUE     ${HPX_PARCELPORT_VERBS_MAX_PREPOSTS}
+    NAMESPACE parcelport_verbs)
   
-  message("Adding subproject")
-  set(rdmahelper_EXPORTED_TARGETS HPXTargets)
- 
-  if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
-    set_source_files_properties(
-      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
-      PROPERTIES COMPILE_DEFINITIONS "HPX_PARCELPORT_VERBS_HAVE_LOGGING"
-    )
-  endif()
+#------------------------------------------------------------------------------
+# Hardware checks
+#------------------------------------------------------------------------------
+if (HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
+  message(WARNING "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
+  hpx_add_config_define_namespace(
+      DEFINE HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED 
+      VALUE  1 
+      NAMESPACE parcelport_verbs)
+endif()
 
-  # build rdma helperlibrary with HPX support
+#------------------------------------------------------------------------------
+# Write parcelport_verbs_defines.hpp
+#------------------------------------------------------------------------------
+# write config to build dir
+write_config_defines_file(
+  TEMPLATE ""
+  NAMESPACE "parcelport_verbs"
+  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/parcelport_verbs_defines.hpp")
+
+# write config to install dir
+write_config_defines_file(
+  TEMPLATE ""
+  NAMESPACE "parcelport_verbs"
+  FILENAME 
+  "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_verbs_defines.hpp")
+  
+#------------------------------------------------------------------------------
+# RdmaHelper library
+#------------------------------------------------------------------------------
+message("Adding subproject")
+set(rdmahelper_EXPORTED_TARGETS HPXTargets)
+ 
+# build rdma helperlibrary with HPX support
 #  add_definitions(-DRDMAHELPER_HAVE_HPX)
   
-  add_subproject(rdmahelper rdmahelper)
+add_subproject(rdmahelper rdmahelper)
 
-  find_package(rdmahelper REQUIRED)
+find_package(rdmahelper REQUIRED)
   
-  set(_parcelport_verbs_SOURCES 
-    "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp" 
-    CACHE INTERNAL "global variable" FORCE)
-  set(_parcelport_verbs_INCLUDE_DIRECTORIES 
-    "${rdmahelper_INCLUDE_DIRS}" 
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    CACHE INTERNAL "global variable" FORCE)
-  set(_parcelport_verbs_LINKMODE 
-    "STATIC" 
-    CACHE INTERNAL "global variable" FORCE)
-  set(_parcelport_verbs_LIBRARIES 
-    "rdmahelper" 
-    CACHE INTERNAL "global variable" FORCE)
-
-  macro(add_parcelport_verbs_module)
-    hpx_debug("add_parcelport_verbs_module")
-
-    add_parcelport(verbs
-      STATIC
-      SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
-      INCLUDE_DIRECTORIES
-        "${_parcelport_verbs_INCLUDE_DIRECTORIES}"
-      HEADERS
-      DEPENDENCIES
-      FOLDER 
-        "Core/Plugins/Parcelport/verbs")
-  endmacro()
-else()
-  macro(add_parcelport_verbs_module)
-  endmacro()
-endif()
+set(_parcelport_verbs_SOURCES 
+  "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp" 
+  CACHE INTERNAL "global variable" FORCE)
+set(_parcelport_verbs_INCLUDE_DIRECTORIES 
+  "${rdmahelper_INCLUDE_DIRS}" 
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  CACHE INTERNAL "global variable" FORCE)
+set(_parcelport_verbs_LINKMODE 
+  "STATIC" 
+  CACHE INTERNAL "global variable" FORCE)
+set(_parcelport_verbs_LIBRARIES 
+  "rdmahelper" 
+  CACHE INTERNAL "global variable" FORCE)

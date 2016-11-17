@@ -14,6 +14,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 //
+#include <hpx/config/parcelport_verbs_defines.hpp>
+//
 #include <boost/log/trivial.hpp>
 
 //
@@ -53,7 +55,7 @@ namespace detail {
 
 }}}}}
 
-#define THREAD_ID hpx::parcelset::policies::verbs::detail::rdma_thread_print_helper()
+#define THREAD_ID "" << hpx::parcelset::policies::verbs::detail::rdma_thread_print_helper()
 
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages
@@ -95,8 +97,8 @@ namespace detail {
     duration<double> log_timed_elapsed_ ## name =          \
       log_timed_now_ ## name - log_timed_start_ ## name;   \
     if (log_timed_elapsed_ ## name.count()>delay) {        \
-        x;                                                 \
         log_timed_start_ ## name = log_timed_now_ ## name; \
+        x;                                                 \
     }
 
 #else
@@ -150,8 +152,8 @@ namespace detail {
     duration<double> log_timed_elapsed_ ## name =          \
       log_timed_now_ ## name - log_timed_start_ ## name;   \
     if (log_timed_elapsed_ ## name.count()>delay) {        \
-        x;                                                 \
         log_timed_start_ ## name = log_timed_now_ ## name; \
+        x;                                                 \
     }
 
 #  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \

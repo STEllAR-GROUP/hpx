@@ -25,10 +25,10 @@ namespace verbs
     template <>
     struct connection_handler_traits<policies::verbs::parcelport>
     {
-        typedef policies::verbs::sender_connection connection_type;
-        typedef HPX_PARCELPORT_VERBS_ENABLE_BOOTSTRAP send_early_parcel;
-        typedef std::true_type                        do_background_work;
-        typedef std::true_type                        send_immediate_parcels;
+        typedef policies::verbs::sender_connection      connection_type;
+        typedef HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING send_early_parcel;
+        typedef std::true_type                          do_background_work;
+        typedef std::true_type                          send_immediate_parcels;
 
         static const char * type()
         {

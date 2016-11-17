@@ -17,6 +17,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/stack.hpp>
 //
+#include <hpx/config/parcelport_verbs_defines.hpp>
+//
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/protection_domain.hpp>
@@ -29,28 +31,21 @@
 #define RDMA_POOL_MEDIUM_CHUNK_SIZE 0x004000 // 16KB
 #define RDMA_POOL_LARGE_CHUNK_SIZE  0x100000 //  1MB
 
-// the maximum number of preposted receives (pre receive queue)
-#define RDMA_MAX_PREPOSTS HPX_PARCELPORT_VERBS_MAX_PREPOSTS
-
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
 #define RDMA_POOL_MAX_SMALL_CHUNKS  1024
 #define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
 #define RDMA_POOL_MAX_LARGE_CHUNKS  4
 
 #define RDMA_POOL_USE_LOCKFREE_STACK 1
-/*
+
 // if the HPX configuration has set a different value, use it
 #if defined(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE)
 # undef RDMA_POOL_SMALL_CHUNK_SIZE
 # define RDMA_POOL_SMALL_CHUNK_SIZE HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE
 #endif
 
-// if the HPX configuration has set a different value, use it
-#if defined(HPX_PARCELPORT_VERBS_MAX_PREPOSTS)
-# undef RDMA_MAX_PREPOSTS
-# define RDMA_MAX_PREPOSTS HPX_PARCELPORT_VERBS_MAX_PREPOSTS
-#endif
-*/
+static_assert ( HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE<RDMA_POOL_MEDIUM_CHUNK_SIZE , 
+"Default memory Chunk size must be less than medium chunk size" );  
 
 namespace hpx {
 namespace parcelset {
