@@ -423,7 +423,7 @@ namespace verbs
             send_data.handler.operator()(error_code());
             //
             LOG_DEBUG_MSG("deallocating region 1 for completed send "
-                << hexpointer(send_data.header_region));
+                << hexpointer(send_data.header_region) << " tag " << hexuint32(send_data.tag));
             chunk_pool_->deallocate(send_data.header_region);
             send_data.header_region  = NULL;
             // if this message had multiple (2) SGEs then release other regions
@@ -448,7 +448,7 @@ namespace verbs
                 if (--active_send_count_ <= HPX_PARCELPORT_VERBS_SUSPEND_WAKE)
                 {
                     if (!immediate_send_allowed_) {
-                        LOG_DEVEL_MSG("Enabling immediate send : active "
+                        LOG_DEBUG_MSG("Enabling immediate send : active "
                             << decnumber(active_send_count_) << " "
                             << active_sends.size());
                     }
@@ -469,7 +469,7 @@ namespace verbs
             parcel_recv_data &recv_data = *recv;
             chunk_pool_->deallocate(recv_data.header_region);
             LOG_DEBUG_MSG("Zero copy regions size is (delete) "
-                << decnumber(recv_data.zero_copy_regions.size()));
+                << decnumber(recv_data.zero_copy_regions.size()) << hexuint32(recv_data.tag));
             for (auto r : recv_data.zero_copy_regions) {
                 LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
                 chunk_pool_->deallocate(r);
@@ -901,14 +901,14 @@ namespace verbs
                     << decnumber(recv_data.zero_copy_regions.size()));
 
                 header_type *h = (header_type*)recv_data.header_region->get_address();
-                LOG_DEBUG_MSG( "get completion " <<
-                        "buffsize " << decnumber(h->size())
-                        << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
-                        << ", chunk_flag " << decnumber(h->header_length())
-                        << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                        << " chunkdata " << decnumber((h->chunk_data()!=NULL))
-                        << " piggyback " << decnumber((h->piggy_back()!=NULL))
-                        << " tag " << hexuint32(h->tag())
+                LOG_DEBUG_MSG( "rdma get completion "
+                    << "buffsize " << decnumber(h->size())
+                    << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
+                    << ", chunk_flag " << decnumber(h->header_length())
+                    << ", normal( " << decnumber(h->num_chunks().second) << ") "
+                    << " chunkdata " << decnumber((h->chunk_data()!=NULL))
+                    << " piggyback " << decnumber((h->piggy_back()!=NULL))
+                    << " tag " << hexuint32(h->tag())
                 );
 
                 std::size_t message_length;
@@ -950,7 +950,7 @@ namespace verbs
                 LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
             }
             else {
-                throw std::runtime_error("RDMA Send completed with unmatched Id");
+                throw std::runtime_error("RDMA Get completed with unmatched Id");
             }
         }
 
@@ -1229,7 +1229,7 @@ namespace verbs
                     //
                     if (++active_send_count_ >= HPX_PARCELPORT_VERBS_THROTTLE_SENDS) {
                         if (immediate_send_allowed_) {
-                            LOG_DEVEL_MSG("Disabling immediate send : active "
+                            LOG_DEBUG_MSG("Disabling immediate send : active "
                                 << decnumber(active_send_count_) << " "
                                 << active_sends.size());
                         }
@@ -1245,9 +1245,6 @@ namespace verbs
                 send_data.message_region = NULL;
                 send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
-
-                LOG_DEBUG_MSG("Generated unique dest " << hexnumber(sender->dest_ip_)
-                    << " coded tag " << hexuint32(send_data.tag));
 
                 // for each zerocopy chunk, we must create a memory region for the data
                 LOG_EXCLUSIVE(
@@ -1355,7 +1352,10 @@ namespace verbs
 #endif
                     SendCompletionMap.insert(std::make_pair(wr_id, current_send));
                     LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
-                            << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
+                            << hexpointer(wr_id) << " Entries "
+                            << decnumber(SendCompletionMap.size())
+                            << "tag " << hexuint32(h->tag())
+                    );
                 }
                 {
                     // if there are zero copy regions (or message/chunks are not piggybacked),
@@ -1453,40 +1453,60 @@ namespace verbs
             if (stopped_ || hpx::is_stopped()) {
                 return false;
             }
-            LOG_TIMED_INIT(background_work);
-            LOG_TIMED_MSG(background_work, DEVEL, 5.0,
-                "active_send_count_ " << decnumber(active_send_count_)
-                << "active_send_size " << decnumber(active_sends.size())
-                << "Total sends " << decnumber(sends_posted)
-                << "Total recvs " << decnumber(handled_receives)
-                << "Total reads " << decnumber(total_reads)
-                << "Total completions " << decnumber(completions_handled)
-                << decnumber(sends_posted+handled_receives+total_reads));
-
-            LOG_TIMED_INIT(background_sends);
-            LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
-                for (const auto & as : active_sends) {
-                    LOG_DEVEL_MSG("active_sends "
-                        << ", tag "     << hexnumber(as.tag)
-                        << ", ZC "      << as.has_zero_copy
-                        << ", ZC size " << as.zero_copy_regions.size());
-                }
-                for (const auto & as : active_recvs) {
-                    LOG_DEVEL_MSG("active_recvs "
-                        << ", tag "         << hexnumber(as.tag)
-                        << ", rdma_count "  << as.rdma_count
-                        << ", chunks "      << as.chunks.size()
-                        << ", ZC size "     << as.zero_copy_regions.size());
-                }
-//                suspended_task_debug("");
-            )
-
-            if (threads::get_self_ptr() == nullptr) {
-                // this is an OS thread, we are still not 100% sure our code is
-                // safe on an OS thread, call this function to skip checks
-                return background_work_OS_thread();
+            int result;
+            if (hpx::threads::get_self_ptr() == nullptr) {
+                result = background_work_OS_thread();
             }
-            return background_work_hpx_thread();
+            else {
+                result = background_work_hpx_thread();
+            }
+            // if we are still blocked after making progress on the network
+            // we must block the thread that is sending to allow returning futures
+            // to be handled
+            if (!immediate_send_allowed_) {
+                if (hpx::threads::get_self_ptr() != nullptr) {
+                    hpx::this_thread::suspend();
+                    //using namespace std::chrono_literals;
+                    //std::this_thread::sleep_for(5us);
+                }
+
+                LOG_TIMED_INIT(background_sends);
+                LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
+                {
+                    scoped_lock lock(active_send_mutex);
+                    int count = 0;
+                    for (const auto & as : active_sends) {
+                        LOG_DEBUG_MSG("active_sends " << decnumber(count)
+                            << ", tag "     << hexnumber(as.tag)
+                            << ", ZC "      << as.has_zero_copy
+                            << ", ZC size " << as.zero_copy_regions.size());
+                        count++;
+                    }
+                }
+                {
+                    scoped_lock lock(active_recv_mutex);
+                    int count = 0;
+                    for (const auto & as : active_recvs) {
+                        LOG_DEBUG_MSG("active_recvs " << decnumber(count)
+                            << ", tag "         << hexnumber(as.tag)
+                            << ", rdma_count "  << as.rdma_count
+                            << ", chunks "      << as.chunks.size()
+                            << ", ZC size "     << as.zero_copy_regions.size());
+                        count++;
+                    }
+                }
+                // suspended_task_debug("");
+                LOG_DEBUG_MSG(
+                    "active_send_count_ " << decnumber(active_send_count_)
+                    << "active_send_size " << decnumber(active_sends.size())
+                    << "Total sends " << decnumber(sends_posted)
+                    << "Total recvs " << decnumber(handled_receives)
+                    << "Total reads " << decnumber(total_reads)
+                    << "Total completions " << decnumber(completions_handled)
+                    << "(" << decnumber(sends_posted+handled_receives+total_reads) << ")");
+                )
+            }
+            return result;
         }
 
         static parcelport *get_singleton()
@@ -1619,3 +1639,4 @@ boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_port;
 hpx::parcelset::policies::verbs::parcelport *hpx::parcelset::policies::verbs::parcelport::_parcelport_instance;
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::verbs::parcelport, verbs);
+
