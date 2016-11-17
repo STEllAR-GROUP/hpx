@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
@@ -93,6 +94,17 @@
 #define MAX_RANKS 64
 
 //----------------------------------------------------------------------------
+// Define this to make memory access asynchronous and return a future
+#define ASYNC_MEMORY
+#ifdef ASYNC_MEMORY
+ typedef hpx::future<int> async_mem_result_type;
+ #define ASYNC_MEM_RESULT(x) (hpx::make_ready_future<int>(TEST_SUCCESS));
+#else
+ typedef int async_mem_result_type;
+ #define ASYNC_MEM_RESULT(x) (x);
+#endif
+
+//----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
 #define DEBUG_LEVEL 1
 
@@ -173,12 +185,12 @@ void release_storage_lock(char *p)
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-hpx::future<int> copy_to_local_storage(char const* src, uint32_t offset, uint64_t length)
+async_mem_result_type copy_to_local_storage(char const* src, uint32_t offset, uint64_t length)
 {
     char *dest = &local_storage[offset];
     std::copy(src, src + length, dest);
     //  memcpy(dest, src, length);
-    return hpx::make_ready_future<int>(TEST_SUCCESS);
+    return ASYNC_MEM_RESULT(TEST_SUCCESS);
 }
 
 //----------------------------------------------------------------------------
@@ -187,12 +199,12 @@ hpx::future<int> copy_to_local_storage(char const* src, uint32_t offset, uint64_
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-hpx::future<int> copy_from_local_storage(char *dest, uint32_t offset, uint64_t length)
+async_mem_result_type copy_from_local_storage(char *dest, uint32_t offset, uint64_t length)
 {
     char const* src = &local_storage[offset];
     std::copy(src, src + length, dest);
     //  memcpy(dest, src, length);
-    return hpx::make_ready_future<int>(TEST_SUCCESS);
+    return ASYNC_MEM_RESULT(TEST_SUCCESS);
 }
 
 //----------------------------------------------------------------------------
@@ -317,7 +329,7 @@ namespace Storage {
     //------------------------------------------------------------------------
     // A PUT into memory on this locality from a requester sending a
     // general_buffer_type
-    hpx::future<int> CopyToStorage(general_buffer_type const& srcbuffer,
+    async_mem_result_type CopyToStorage(general_buffer_type const& srcbuffer,
         uint32_t address, uint64_t length)
     {
         boost::shared_array<char> src = srcbuffer.data_array();
@@ -345,7 +357,7 @@ namespace Storage {
         );
 
         // allow the storage class to asynchronously copy the data into buffer
-        hpx::future<int> fut =
+        async_mem_result_type fut =
             copy_from_local_storage(local_buffer.get(), address, length);
         DEBUG_OUTPUT(6, "create local buffer count " << local_buffer.use_count());
 
@@ -355,7 +367,7 @@ namespace Storage {
 
         // lock the mutex, will be unlocked by the transfer buffer's deleter
 //        storage_mutex.lock();
-
+#ifdef ASYNC_MEMORY
         return fut.then(
             hpx::launch::sync,
             // return the data in a transfer buffer
@@ -370,7 +382,17 @@ namespace Storage {
                     return_allocator);
             }
         );
-
+#else
+        return hpx::make_ready_future<transfer_buffer_type>(
+            transfer_buffer_type(
+                local_buffer.get(), length,
+                transfer_buffer_type::take,
+                [](char *p) {
+                    release_storage_lock(p);
+                },
+                return_allocator
+            ));
+#endif
     }
 } // namespace storage
 
@@ -378,10 +400,9 @@ namespace Storage {
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
 HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
-//HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
-HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
+//HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
 //HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
@@ -633,6 +654,7 @@ void test_write(
         hpx::util::simple_profiler fwait(iteration, "Future wait");
         int numwait = static_cast<int>(final_list.size());
 
+        DEBUG_OUTPUT(1,"Waiting on future");
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
@@ -720,9 +742,9 @@ void test_read(
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
-      DEBUG_OUTPUT(1,
-          "Starting iteration " << i << " on rank " << rank
-      );
+        DEBUG_OUTPUT(1,
+            "Starting iteration " << i << " on rank " << rank
+        );
 #ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
@@ -749,7 +771,7 @@ void test_read(
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::high_resolution_timer looptimer;
             int send_rank;
-            if(options.distribution==0) {
+            if (options.distribution==0) {
               // pick a random locality to send to
               send_rank = random_rank(gen);
             }
@@ -860,6 +882,7 @@ void test_read(
         int numwait = static_cast<int>(final_list.size());
         hpx::util::high_resolution_timer futuretimer;
 
+        DEBUG_OUTPUT(1,"Waiting on future");
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
