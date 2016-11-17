@@ -1654,27 +1654,19 @@ add_plugin_modules()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-get_property(HPX_CONFIG_DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
-
-list(SORT HPX_CONFIG_DEFINITIONS_VAR)
-list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS_VAR)
-
-set(hpx_config_defines "\n")
-foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
-  set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
-endforeach()
-
 # Generate a defines.hpp to be used in the build directory ...
 set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-               "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
-               @ONLY)
+write_config_defines_file(
+  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+  NAMESPACE default
+  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp")
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-               "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
-               @ONLY)
+write_config_defines_file(
+  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+  NAMESPACE default
+  FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
