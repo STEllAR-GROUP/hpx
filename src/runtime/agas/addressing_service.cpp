@@ -2487,6 +2487,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
+        l.unlock();
         HPX_RETHROWS_IF(ec, e,
             "addressing_service::send_refcnt_requests_non_blocking");
     }

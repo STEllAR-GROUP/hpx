@@ -228,7 +228,10 @@ namespace hpx { namespace iostreams
                 hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next).get();
             }
-
+            else
+            {
+                l.unlock();     // must unlock in any case
+            }
             return *this;
         } // }}}
 
