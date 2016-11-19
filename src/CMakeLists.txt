@@ -220,7 +220,7 @@ endif()
 
 if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
   target_link_libraries(hpx
-    PUBLIC ${HPX_LIBRARIES})
+    PUBLIC ${HPX_LIBRARIES_TARGETS})
   if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
     target_link_libraries(hpx
       PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
@@ -230,7 +230,7 @@ if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
       PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
   endif()
 else()
-  target_link_libraries(hpx ${HPX_LIBRARIES})
+  target_link_libraries(hpx ${HPX_LIBRARIES_TARGETS})
   if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
     target_link_libraries(hpx ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
   endif()
