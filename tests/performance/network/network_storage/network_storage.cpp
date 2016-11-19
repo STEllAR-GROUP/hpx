@@ -157,6 +157,7 @@ typedef struct {
     std::string   network;
     bool          all2all;
     bool          distribution;
+    bool          nolocal;
 } test_options;
 
 //----------------------------------------------------------------------------
@@ -443,9 +444,9 @@ int RemoveCompletions()
                 for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); )
                 {
-                    if(fut->is_ready()){
+                    if (fut->is_ready()){
                         int ret = fut->get();
-                        if(ret != TEST_SUCCESS) {
+                        if (ret != TEST_SUCCESS) {
                             throw std::runtime_error("Remote put/get failed");
                         }
                         num_removed++;
@@ -469,7 +470,7 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
     int res = TEST_SUCCESS;
     std::vector<hpx::future<int> > vfs = futvec.get();
     for(hpx::future<int>& f : vfs) {
-        if(f.get() == TEST_FAIL) return TEST_FAIL;
+        if (f.get() == TEST_FAIL) return TEST_FAIL;
     }
     return res;
 }
@@ -499,7 +500,7 @@ void test_write(
     hpx::util::simple_profiler level1("Write function");
 
     //
-    bool active = (rank==0) | (rank>0 && options.all2all);
+    bool active = (rank==0) || (rank>0 && options.all2all);
     for(std::uint64_t i = 0; active && i < options.iterations; i++) {
         hpx::util::simple_profiler iteration(level1,"Iteration");
 
@@ -535,13 +536,19 @@ void test_write(
 #endif
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::simple_profiler prof_setup(iteration, "Setup slots");
-            int send_rank;
-            if(options.distribution==0) {
+            unsigned int send_rank;
+            if (options.distribution==0) {
               // pick a random locality to send to
               send_rank = random_rank(gen);
+              while (options.nolocal && send_rank==rank) {
+                  send_rank = random_rank(gen);
+              }
             }
             else {
               send_rank = static_cast<int>(i % nranks);
+              while (options.nolocal && send_rank==rank) {
+                  send_rank = static_cast<int>((send_rank+1) % nranks);
+              }
             }
 
             // get the pointer to the current packet send buffer
@@ -678,7 +685,7 @@ void test_write(
     double writeBW   = writeMB / writeTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
     double IOPs_s    = IOPS/writeTime;
-    if(rank == 0) {
+    if (rank == 0) {
         std::cout << "Total time         : " << writeTime << "\n";
         std::cout << "Memory Transferred : " << writeMB   << " MB\n";
         std::cout << "Number of IOPs     : " << IOPS      << "\n";
@@ -770,15 +777,20 @@ void test_read(
         //
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::high_resolution_timer looptimer;
-            int send_rank;
+            unsigned int send_rank;
             if (options.distribution==0) {
               // pick a random locality to send to
               send_rank = random_rank(gen);
+              while (options.nolocal && send_rank==rank) {
+                  send_rank = random_rank(gen);
+              }
             }
             else {
               send_rank = static_cast<int>(i % nranks);
+              while (options.nolocal && send_rank==rank) {
+                  send_rank = static_cast<int>((send_rank+1) % nranks);
+              }
             }
-//            send_rank = rank;
 
             // get the pointer to the current packet send buffer
 //            char *buffer = &local_storage[i*options.transfer_size_B];
@@ -904,7 +916,7 @@ void test_read(
     double readBW = readMB / readTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
     double IOPs_s    = IOPS/readTime;
-    if(rank == 0) {
+    if (rank == 0) {
         std::cout << "Total time         : " << readTime << "\n";
         std::cout << "Memory Transferred : " << readMB << " MB \n";
         std::cout << "Number of IOPs     : " << IOPS      << "\n";
@@ -956,6 +968,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.network           = vm["parceltype"].as<std::string>();
     options.all2all           = vm["all-to-all"].as<bool>();
     options.distribution      = vm["distribution"].as<std::uint64_t>() ? true : false;
+    options.nolocal           = vm["no-local"].as<bool>();
     options.semaphore         = vm["semaphore"].as<std::uint64_t>();
 
     //
@@ -1041,8 +1054,15 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "all-to-all",
           boost::program_options::value<bool>()->default_value(true),
-          "When set, all ranks send to all others, when off, \
-                only rank 0 send to the others.\n")
+          "When set, all ranks send to all others, when off, "
+          "only rank 0 sends to the others.\n")
+        ;
+
+    desc_commandline.add_options()
+        ( "no-local",
+          boost::program_options::value<bool>()->default_value(false),
+          "When set, non local transfers are made, "
+          "ranks send to the others but not to themselves.\n")
         ;
 
     // if the user does not set parceltype on the command line,
