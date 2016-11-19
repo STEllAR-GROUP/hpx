@@ -20,6 +20,9 @@ endif()
 if(POLICY CMP0054)
   cmake_policy(SET CMP0054 OLD)
 endif()
+if(POLICY CMP0060)
+  cmake_policy(SET CMP0060 NEW)
+endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
