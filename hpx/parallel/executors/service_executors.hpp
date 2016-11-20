@@ -21,7 +21,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     /// \note All tasks executed by one of these executors will run on
     ///       one of the OS-threads dedicated for the given thread pool. The
-    ///       tasks will not run a HPX-threads.
+    ///       tasks will not run as HPX-threads.
     ///
     struct service_executor
 #if !defined(DOXYGEN)
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     /// \note All tasks executed by one of these executors will run on
     ///       one of the OS-threads dedicated for the IO thread pool. The
-    ///       tasks will not run a HPX-threads.
+    ///       tasks will not run as HPX-threads.
     ///
     struct io_pool_executor : service_executor
     {
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     /// \note All tasks executed by one of these executors will run on
     ///       one of the OS-threads dedicated for the parcel thread pool. The
-    ///       tasks will not run a HPX-threads.
+    ///       tasks will not run as HPX-threads.
     ///
     struct parcel_pool_executor : service_executor
     {
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     /// \note All tasks executed by one of these executors will run on
     ///       one of the OS-threads dedicated for the timer thread pool. The
-    ///       tasks will not run a HPX-threads.
+    ///       tasks will not run as HPX-threads.
     ///
     struct timer_pool_executor : service_executor
     {
@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     /// \note All tasks executed by one of these executors will run on
     ///       one of the OS-threads dedicated for the main thread pool. The
-    ///       tasks will not run a HPX-threads.
+    ///       tasks will not run as HPX-threads.
     ///
     struct main_pool_executor : service_executor
     {
