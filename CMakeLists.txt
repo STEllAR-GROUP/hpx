@@ -14,10 +14,14 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 # explicitly set certain policies
 cmake_policy(VERSION 2.8.12)
-if(NOT(CMAKE_VERSION VERSION_LESS 3.1.0))
-  cmake_policy(SET CMP0054 OLD)
-  cmake_policy(SET CMP0042 NEW)
-endif()
+macro(hpx_set_cmake_policy policy value)
+  if(POLICY ${policy})
+    cmake_policy(SET ${policy} ${value})
+  endif()
+endmacro()
+hpx_set_cmake_policy(CMP0042 NEW)
+hpx_set_cmake_policy(CMP0054 OLD)
+hpx_set_cmake_policy(CMP0060 NEW)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
