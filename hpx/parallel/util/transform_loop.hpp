@@ -7,9 +7,6 @@
 #define HPX_PARALLEL_UTIL_TRANSFORM_LOOP_SEP_08_2016_0611PM
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/transform_loop.hpp>
-#endif
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/invoke.hpp>
@@ -186,5 +183,9 @@ namespace hpx { namespace parallel { namespace util
             first1, count, first2, dest, std::forward<F>(f));
     }
 }}}
+
+#if defined(HPX_HAVE_DATAPAR)
+#include <hpx/parallel/datapar/transform_loop.hpp>
+#endif
 
 #endif
