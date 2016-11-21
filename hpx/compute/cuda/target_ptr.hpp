@@ -111,7 +111,7 @@ namespace hpx { namespace compute { namespace cuda
 
     public:
 #if defined(__CUDA_ARCH__)
-        HPX_DEVICE operator T*() const
+        HPX_HOST_DEVICE operator T*() const
         {
             return this->base();
         }
