@@ -105,7 +105,6 @@ namespace hpx { namespace compute { namespace cuda
                 {
                     auto begin = hpx::util::get<0>(s);
                     std::size_t chunk_size = hpx::util::get<1>(s);
-                    std::size_t base_idx = hpx::util::get<2>(s);
 
                     // FIXME: make the 1024 to be configurable...
                     int threads_per_block =
