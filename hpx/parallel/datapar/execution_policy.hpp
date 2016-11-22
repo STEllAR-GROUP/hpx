@@ -204,14 +204,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 > type;
         };
 
-        /// Create a new sequential_task_execution_policy from itself
+        /// Create a new dataseq_task_execution_policy_shim from itself
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        dataseq_execution_policy_shim const& operator()(
+        dataseq_task_execution_policy_shim const& operator()(
             task_execution_policy_tag tag) const
         {
             return *this;
