@@ -1,4 +1,5 @@
 //  Copyright (c) 2013-2015 Agustin Berge
+//  Copyright (c) 2016 Antoine Tran Tan
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -64,6 +65,16 @@ namespace hpx { namespace util
             return util::invoke(std::forward<F>(f),
                 get<Is>(std::forward<Tuple>(t))...);
         }
+
+        template <typename R, typename F, typename Tuple, std::size_t ...Is>
+        HPX_HOST_DEVICE
+        inline R
+        invoke_fused_impl(F&&f, Tuple&& t, pack_c<std::size_t, Is...>)
+        {
+            using util::get;
+            return util::invoke<R>(std::forward<F>(f),
+                get<Is>(std::forward<Tuple>(t))...);
+        }
     }
 
     template <typename F, typename Tuple>
@@ -86,7 +97,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE HPX_FORCEINLINE
             R operator()(F&& f, Tuple&& t)
             {
-                return detail::invoke_fused_impl(
+                return detail::invoke_fused_impl<R>(
                     std::forward<F>(f), std::forward<Tuple>(t),
                     typename detail::fused_index_pack<Tuple>::type());
             }
@@ -99,7 +110,7 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE HPX_FORCEINLINE
             void operator()(F&& f, Tuple&& t)
             {
-                detail::invoke_fused_impl(
+                detail::invoke_fused_impl<void>(
                     std::forward<F>(f), std::forward<Tuple>(t),
                     typename detail::fused_index_pack<Tuple>::type());
             }
