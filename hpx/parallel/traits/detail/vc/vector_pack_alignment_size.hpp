@@ -15,6 +15,8 @@
 
 #include <Vc/Vc>
 
+#if Vc_IS_VERSION_1
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
@@ -117,6 +119,68 @@ namespace hpx { namespace parallel { namespace traits
         static std::size_t const value = Vc::Scalar::Vector<T>::Size;
     };
 }}}
+
+#else
+
+#include <Vc/datapar>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parallel { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    struct is_vector_pack<Vc::datapar<T, Abi> >
+      : std::true_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    struct is_scalar_vector_pack
+      : std::false_type
+    {};
+
+    template <typename T>
+    struct is_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> >
+      : std::true_type
+    {};
+
+    template <typename T>
+    struct is_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::scalar> >
+      : std::true_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    struct is_non_scalar_vector_pack<Vc::datapar<T, Abi> >
+      : std::true_type
+    {};
+
+    template <typename T>
+    struct is_non_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> >
+      : std::false_type
+    {};
+
+    template <typename T>
+    struct is_non_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::scalar> >
+      : std::false_type
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable>
+    struct vector_pack_alignment
+    {
+        static std::size_t const value = Vc::datapar<T>::alignment();
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable>
+    struct vector_pack_size
+    {
+        static std::size_t const value = Vc::datapar<T>::size();
+    };
+}}}
+
+#endif  // Vc_IS_VERSION_1
 
 #endif
 #endif
