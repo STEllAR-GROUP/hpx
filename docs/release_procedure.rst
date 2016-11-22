@@ -60,25 +60,13 @@ the lines as they are completed to avoid confusion.
     *   ``git push origin [new branch name]``
     *   ``git branch --set-upstream-to=origin/[branch name] [branch name]``
     
-#.  Checkout the main branch, and bump the HPX version to the next release
-    target. The following files contain version info:
-
-    *   ``hpx/config/version.hpp``
-    *   ``docs/hpx.qbk``
-    *   ``CMakeLists.txt``
-    *   Grep for old version number
-
-#.  Create new logos for documentation. Update the logo used on line 170 
-    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt`` 
-    lines 262/263.
-
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
     
 #.  Change logo for release documentation by removing '_draft' suffix 
-    in ``docs/cmakelist.txt`` on line 211. Update logo size accordingly on
-    lines 262/263.
+    in ``docs/cmakelist.txt`` on line 234. Update logo size accordingly on
+    lines 330/331.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
@@ -89,20 +77,31 @@ the lines as they are completed to avoid confusion.
     *   ``git push origin [tag name]``
     *   Create a pre-release on GitHub
 
-#.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
-    availability of the release candidate. Ask users to test the candidate by 
-    checking out the release candidate tag.
-
 #.  Switch Buildbot over to test the release branch
 
     *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
     *   Line 120
+
+#.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
+    availability of the release candidate. Ask users to test the candidate by 
+    checking out the release candidate tag.
     
-#.  Allow at least a week for testing of the release candidate. Pull in changes
-    as needed from master to resolve bug fixes, etc.
+#.  Allow at least a week for testing of the release candidate.
 
     *   Use ``git merge`` when possible, and fall back to ``git cherry-pick``
         when needed.
+
+#.  Checkout the main branch, and bump the HPX version to the next release
+    target. The following files contain version info:
+
+    *   ``hpx/config/version.hpp``
+    *   ``docs/hpx.qbk``
+    *   ``CMakeLists.txt``
+    *   Grep for old version number
+
+#.  Create new logos for documentation. Update the logo used on line 234 
+    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt`` 
+    lines 330/331.
 
 #.  Update ``$HPX_SOURCE/README.rst`` 
 
