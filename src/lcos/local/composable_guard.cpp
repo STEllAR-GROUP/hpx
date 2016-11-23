@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
 
         ~stage_data() {
             if(stages == nullptr)
-              abort();
+                abort();
             HPX_ASSERT(n == gs.size());
             delete[] stages;
             stages = nullptr;
@@ -210,17 +210,17 @@ namespace hpx { namespace lcos { namespace local
     static void run_composable(detail::guard_task* task)
     {
         if(task == empty)
-          return;
+            return;
         HPX_ASSERT(task != nullptr);
         task->check();
         if (task->single_guard) {
-          run_composable_cleanup rcc(task);
-          task->run();
+            run_composable_cleanup rcc(task);
+            task->run();
         } else {
-          task->run();
-          // Note that by this point in the execution
-          // the task data structure has probably
-          // been deleted.
+            task->run();
+            // Note that by this point in the execution
+            // the task data structure has probably
+            // been deleted.
         }
     }
 
@@ -228,7 +228,7 @@ namespace hpx { namespace lcos { namespace local
         guard_task *zero = nullptr;
         guard_task *current = task.load();
         if(current == nullptr)
-          return;
+            return;
         if(!current->next.compare_exchange_strong(zero,empty)) {
             free(zero);
         }

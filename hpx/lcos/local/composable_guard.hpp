@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         std::size_t size() {
-          return guards.size();
+            return guards.size();
         }
 
         friend HPX_API_EXPORT void run_guarded(
