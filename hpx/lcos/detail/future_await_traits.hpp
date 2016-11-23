@@ -12,16 +12,18 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/future_access.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
+#include <boost/intrusive_ptr.hpp>
 
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-    #include <hpx/util/await_traits.hpp>
+#include <hpx/util/await_traits.hpp>
 #else
-    #include <experimental/coroutine>
+#include <experimental/coroutine>
 #endif
 
 #include <type_traits>
+#include <utility>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
     // Allow using co_await with an expression which evaluates to
@@ -151,6 +153,5 @@ namespace std { namespace experimental
 }}
 
 #endif // HPX_HAVE_AWAIT
-
 #endif // HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C
 
