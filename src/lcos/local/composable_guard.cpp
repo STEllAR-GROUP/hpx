@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/lcos/local/composable_guard.hpp>
-
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
+
+#include <hpx/lcos/local/composable_guard.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -24,6 +24,8 @@ namespace hpx { namespace lcos { namespace local
     static void run_composable(detail::guard_task* task);
     static void run_async(detail::guard_task* task);
 
+    static void nothing() {}
+
     namespace detail
     {
         // A link in the list of tasks attached
@@ -35,9 +37,9 @@ namespace hpx { namespace lcos { namespace local
             bool const single_guard;
 
             guard_task()
-              : next(nullptr), run(nullptr), single_guard(true) {}
+              : next(nullptr), run(nothing), single_guard(true) {}
             guard_task(bool sg)
-              : next(nullptr), run(nullptr), single_guard(sg) {}
+              : next(nullptr), run(nothing), single_guard(sg) {}
         };
 
         void free(guard_task* task)
@@ -62,20 +64,25 @@ namespace hpx { namespace lcos { namespace local
     {
         guard_set gs;
         detail::guard_function task;
+        std::size_t n;
         detail::guard_task** stages;
 
         stage_data(detail::guard_function task_,
             std::vector<std::shared_ptr<guard> >& guards)
-          : task(std::move(task_))
-          , stages(new detail::guard_task*[guards.size()])
+          : gs()
+          , task(std::move(task_))
+          , n(guards.size())
+          , stages(new detail::guard_task*[n])
         {
-            std::size_t const n = guards.size();
             for (std::size_t i=0; i<n; i++) {
                 stages[i] = new detail::guard_task(false);
             }
         }
 
         ~stage_data() {
+            if(stages == nullptr)
+              abort();
+            HPX_ASSERT(n == gs.size());
             delete[] stages;
             stages = nullptr;
         }
@@ -90,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
             prev->check();
             detail::guard_task* zero = nullptr;
             if (!prev->next.compare_exchange_strong(zero, task)) {
-                run_async(task);
+                run_composable(task);
                 free(prev);
             }
         } else {
@@ -116,7 +123,7 @@ namespace hpx { namespace lcos { namespace local
                 zero = nullptr;
                 if (!lt->next.compare_exchange_strong(zero, lt)) {
                     HPX_ASSERT(zero != lt);
-                    run_async(zero);
+                    run_composable(zero);
                     free(lt);
                 }
             }
@@ -190,22 +197,40 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(task != nullptr);
             task->check();
             if (!task->next.compare_exchange_strong(zero, task)) {
-                HPX_ASSERT(task->next.load()!=nullptr);
-                run_async(zero);
+                HPX_ASSERT(zero != nullptr);
+                run_composable(zero);
                 free(task);
             }
         }
     };
 
+    using hpx::lcos::local::detail::guard_task;
+    guard_task *empty = new guard_task;
+
     static void run_composable(detail::guard_task* task)
     {
+        if(task == empty)
+          return;
         HPX_ASSERT(task != nullptr);
         task->check();
         if (task->single_guard) {
-            run_composable_cleanup rcc(task);
-            task->run();
+          run_composable_cleanup rcc(task);
+          task->run();
         } else {
-            task->run();
+          task->run();
+          // Note that by this point in the execution
+          // the task data structure has probably
+          // been deleted.
+        }
+    }
+
+    guard::~guard() {
+        guard_task *zero = nullptr;
+        guard_task *current = task.load();
+        if(current == nullptr)
+          return;
+        if(!current->next.compare_exchange_strong(zero,empty)) {
+            free(zero);
         }
     }
 }}}
