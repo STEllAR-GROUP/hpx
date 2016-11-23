@@ -185,6 +185,16 @@ if(HPX_WITH_STATIC_LINKING)
   hpx_add_config_define(HPX_HAVE_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
   set(CMAKE_SHARED_LIBS OFF)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    hpx_option(HPX_WITH_STATIC_EXE_LINKING BOOL
+      "Compile HPX statically linked executables (Default: OFF)" OFF ADVANCED)
+
+    if(HPX_WITH_STATIC_EXE_LINKING)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+    endif()
+  endif()
 else()
   set(hpx_library_link_mode SHARED)
 endif()
@@ -826,13 +836,28 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if(MSVC14 AND CMAKE_CL_64)
+if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
-    hpx_add_target_compile_option(-await)
+
+    hpx_option(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
+        "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>"
+        OFF ADVANCED CATEGORY "LCOs")
+
+    if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+      hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+    endif()
+
+    if(MSVC14 AND CMAKE_CL_64)
+      hpx_add_target_compile_option(-await)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      hpx_add_target_compile_option(-Xclang -fcoroutines-ts)
+    endif()
   endif()
 endif()
 
