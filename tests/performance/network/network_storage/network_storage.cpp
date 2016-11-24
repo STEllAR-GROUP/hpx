@@ -679,22 +679,23 @@ void test_write(
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
     hpx::lcos::barrier::synchronize();
     //
+    uint64_t active_ranks = options.all2all ? nranks : 1;
     double writeMB   = static_cast<double>
-        (nranks*options.local_storage_MB*options.iterations);
+        (active_ranks*options.local_storage_MB*options.iterations);
     double writeTime = timerWrite.elapsed();
     double writeBW   = writeMB / writeTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
     double IOPs_s    = IOPS/writeTime;
     if (rank == 0) {
-        std::cout << "Total time         : " << writeTime << "\n";
-        std::cout << "Memory Transferred : " << writeMB   << " MB\n";
-        std::cout << "Number of IOPs     : " << IOPS      << "\n";
-        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
-        std::cout << "Aggregate BW Write : " << writeBW   << " MB/s" << std::endl;
+        std::cout << "Total time           : " << writeTime << "\n";
+        std::cout << "Memory Transferred   : " << writeMB   << " MB\n";
+        std::cout << "Number of local IOPs : " << IOPS      << "\n";
+        std::cout << "IOPs/s (local)       : " << IOPs_s    << "\n";
+        std::cout << "Aggregate BW Write   : " << writeBW   << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, write, network, \
-            %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, \
-            IOPS/s, %6%, BW(MB/s), %7%, ";
+        char const* msg = "CSVData, write, network, "
+            "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
+            "IOPS/s, %6%, BW(MB/s), %7%, ";
         std::cout << (boost::format(msg) % options.network
             % nranks % options.threads % writeMB % options.transfer_size_B
           % IOPs_s % writeBW ) << std::endl;
@@ -910,22 +911,23 @@ void test_read(
     }
     hpx::lcos::barrier::synchronize();
     //
-    double readMB = static_cast<double>
-        (nranks*options.local_storage_MB*options.iterations);
+    uint64_t active_ranks = options.all2all ? nranks : 1;
+    double readMB   = static_cast<double>
+        (active_ranks*options.local_storage_MB*options.iterations);
     double readTime = timerRead.elapsed();
     double readBW = readMB / readTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
     double IOPs_s    = IOPS/readTime;
     if (rank == 0) {
-        std::cout << "Total time         : " << readTime << "\n";
-        std::cout << "Memory Transferred : " << readMB << " MB \n";
-        std::cout << "Number of IOPs     : " << IOPS      << "\n";
-        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
-        std::cout << "Aggregate BW Read  : " << readBW << " MB/s" << std::endl;
+        std::cout << "Total time           : " << readTime << "\n";
+        std::cout << "Memory Transferred   : " << readMB << " MB \n";
+        std::cout << "Number of local IOPs : " << IOPS      << "\n";
+        std::cout << "IOPs/s (local)       : " << IOPs_s    << "\n";
+        std::cout << "Aggregate BW Read    : " << readBW << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, network, %1%, ranks, \
-          %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, \
-            BW(MB/s), %7%, ";
+        char const* msg = "CSVData, read, network, %1%, ranks, "
+            "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
+            "BW(MB/s), %7%, ";
         std::cout << (boost::format(msg) % options.network % nranks
             % options.threads % readMB % options.transfer_size_B
           % IOPs_s % readBW ) << std::endl;
