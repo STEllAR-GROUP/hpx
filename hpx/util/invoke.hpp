@@ -90,7 +90,8 @@ namespace hpx { namespace util
             >::type
             operator()(F f, T0&& v0, Ts&&... vs)
             {
-                return hpx::util::void_guard<R>(), (std::forward<T0>(v0).*f)(std::forward<Ts>(vs)...);
+                return hpx::util::void_guard<R>(),
+                    (std::forward<T0>(v0).*f)(std::forward<Ts>(vs)...);
             }
 
             // ((*t0).*f)(t1, ..., tN)
@@ -102,7 +103,8 @@ namespace hpx { namespace util
             >::type
             operator()(F f, T0&& v0, Ts&&... vs)
             {
-                return hpx::util::void_guard<R>(), (*this)(f, *std::forward<T0>(v0), std::forward<Ts>(vs)...);
+                return hpx::util::void_guard<R>(),
+                    (*this)(f, *std::forward<T0>(v0), std::forward<Ts>(vs)...);
             }
         };
 
