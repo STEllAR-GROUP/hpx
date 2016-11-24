@@ -1049,12 +1049,15 @@ namespace verbs
         }
 
         /// Return the name of this locality
-        std::string get_locality_name() const {
+        std::string get_locality_name() const
+        {
             FUNC_START_DEBUG_MSG;
-
+            // return ibverbs ip address
+            std::stringstream temp;
+            temp << ipaddress(_ibv_ip);
+            std::string tstr = temp.str();
             FUNC_END_DEBUG_MSG;
-            // return ip address + ?
-            return "verbs";
+            return tstr.substr(0, tstr.size()-1);
         }
 
         parcelset::locality agas_locality(util::runtime_configuration const & ini) const
@@ -1072,8 +1075,8 @@ namespace verbs
                         parcelset::locality(locality(buf.s_addr));
                 }
             }
-            FUNC_END_DEBUG_MSG;
             LOG_DEBUG_MSG("Returning NULL agas locality")
+            FUNC_END_DEBUG_MSG;
             return parcelset::locality(locality(0xFFFF));
         }
 
