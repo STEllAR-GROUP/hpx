@@ -181,6 +181,10 @@ namespace verbs
         static boost::uint32_t   _port;
         static boost::uint32_t   _ibv_ip;
 
+        // Not currently working, we support bootstrapping, but when not enabled
+        // we should be able to skip it
+        bool bootstrap_enabled_;
+
         // to quickly lookup a queue-pair (QP) from a destination ip address
         typedef hpx::concurrent::unordered_map<boost::uint32_t, boost::uint32_t> ip_map;
         typedef ip_map::iterator ip_map_iterator;
@@ -317,6 +321,16 @@ namespace verbs
             // port number is set during locality initialization in 'here()'
             _rdmaController = std::make_shared<RdmaController>
                 (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
+
+            if (ini.has_section("hpx.parcel")) {
+                util::section const* sec = ini.get_section("hpx.parcel");
+                if (nullptr != sec) {
+                    bootstrap_enabled_ = ("verbs" ==
+                        hpx::util::get_entry_as<std::string>(*sec, "bootstrap", ""));
+                    LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
+
+                }
+            }
             //
             FUNC_END_DEBUG_MSG;
         }
@@ -358,13 +372,14 @@ namespace verbs
                 std::placeholders::_1, std::placeholders::_2);
             _rdmaController->setCompletionFunction(completion_function);
 
-            for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
-            {
-                io_service_pool_.get_io_service(int(i)).post(
-                    hpx::util::bind(
-                        &parcelport::io_service_work, this
-                    )
-                );
+            if (HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING() && bootstrap_enabled_) {
+                for (std::size_t i=0; i!=io_service_pool_.size(); ++i) {
+                    io_service_pool_.get_io_service(int(i)).post(
+                        hpx::util::bind(
+                            &parcelport::io_service_work, this
+                        )
+                    );
+                }
             }
 
 #if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
@@ -1041,11 +1056,13 @@ namespace verbs
             FUNC_END_DEBUG_MSG;
         }
 
-        /// Should not be used any more as parcelport_impl handles this
+        /// Should not be used any more as parcelport_impl handles this?
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
+            bool can_boot = HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING();
+            LOG_DEBUG_MSG("Returning " << can_boot << " from can_bootstrap")
             FUNC_END_DEBUG_MSG;
-            return HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING();
+            return can_boot;
         }
 
         /// Return the name of this locality
