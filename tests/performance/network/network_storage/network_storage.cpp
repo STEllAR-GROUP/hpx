@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 // Define this to make memory access asynchronous and return a future
-#define ASYNC_MEMORY
+//#define ASYNC_MEMORY
 #ifdef ASYNC_MEMORY
  typedef hpx::future<int> async_mem_result_type;
  #define ASYNC_MEM_RESULT(x) (hpx::make_ready_future<int>(TEST_SUCCESS));
@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
@@ -114,9 +114,9 @@
 // otherwise use this
 #if DEBUG_LEVEL>0
 # define LOG_DEBUG_MSG(x) std::cout << "Network storage " << x << std::endl
-# define DEBUG_OUTPUT(level,x)                                               \
-    if (DEBUG_LEVEL>=level) {                                                \
-        LOG_DEBUG_MSG(x);                                                    \
+# define DEBUG_OUTPUT(level,x)   \
+    if (DEBUG_LEVEL>=level) {    \
+        LOG_DEBUG_MSG(x);        \
     }
 #else
 # define DEBUG_OUTPUT(level,x)
@@ -125,8 +125,6 @@
 //----------------------------------------------------------------------------
 #define TEST_FAIL    0
 #define TEST_SUCCESS 1
-
-#undef USE_SEMAPHORE
 
 //----------------------------------------------------------------------------
 // global vars
@@ -175,7 +173,7 @@ void delete_local_storage()
 //----------------------------------------------------------------------------
 void release_storage_lock(char *p)
 {
-    DEBUG_OUTPUT(6,"Release lock and delete memory");
+    DEBUG_OUTPUT(6, "Release lock and delete memory");
     delete []p;
 //  storage_mutex.unlock();
 }
@@ -300,9 +298,7 @@ alive_map  keep_alive_buffers;
 void async_callback(const uint64_t index, boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     scoped_lock lock(keep_alive_mutex);
-    DEBUG_OUTPUT(7,
-            "Async callback triggered for index " << index
-    );
+    DEBUG_OUTPUT(7, "Async callback triggered for index " << index);
     alive_map::iterator it = keep_alive_buffers.find(index);
     if (it!=keep_alive_buffers.end()) {
         keep_alive_buffers.erase(it);
@@ -353,7 +349,7 @@ namespace Storage {
         std::allocator<char> local_allocator;
         boost::shared_array<char> local_buffer(local_allocator.allocate(length),
             [](char*){
-                DEBUG_OUTPUT(6,"Not deleting memory");
+                DEBUG_OUTPUT(6, "Not deleting memory");
             }
         );
 
@@ -440,8 +436,8 @@ int RemoveCompletions()
     {
         {
             std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
-            for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
-                for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
+            for (std::vector<hpx::future<int> > &futvec : ActiveFutures) {
+                for (std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); )
                 {
                     if (fut->is_ready()){
@@ -469,7 +465,7 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 {
     int res = TEST_SUCCESS;
     std::vector<hpx::future<int> > vfs = futvec.get();
-    for(hpx::future<int>& f : vfs) {
+    for (hpx::future<int>& f : vfs) {
         if (f.get() == TEST_FAIL) return TEST_FAIL;
     }
     return res;
@@ -486,27 +482,22 @@ void test_write(
 {
     CopyToStorage_action actWrite;
     //
-    DEBUG_OUTPUT(1,
-        "Entering Barrier at start of write on rank " << rank
-    );
+    DEBUG_OUTPUT(1, "Entering Barrier at start of write on rank " << rank);
     //
     hpx::lcos::barrier::synchronize();
     //
-    DEBUG_OUTPUT(1,
-        "Passed Barrier at start of write on rank " << rank
-    );
+    DEBUG_OUTPUT(1, "Passed Barrier at start of write on rank " << rank);
     //
     hpx::util::high_resolution_timer timerWrite;
     hpx::util::simple_profiler level1("Write function");
 
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
-    for(std::uint64_t i = 0; active && i < options.iterations; i++) {
-        hpx::util::simple_profiler iteration(level1,"Iteration");
+    for (std::uint64_t i = 0; active && i < options.iterations; i++) {
+        hpx::util::simple_profiler iteration(level1, "Iteration");
 
-        DEBUG_OUTPUT(1,
-            "Starting iteration " << i << " on rank " << rank
-        );
+        DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
+
 #ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
@@ -531,12 +522,9 @@ void test_write(
         //
 
         // limit number of tasks we generate at a time so we don't oversubscribe resources
-#ifdef USE_SEMAPHORE
-        hpx::lcos::local::sliding_semaphore sem(options.semaphore);
-#endif
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::simple_profiler prof_setup(iteration, "Setup slots");
-            unsigned int send_rank;
+            uint64_t send_rank;
             if (options.distribution==0) {
               // pick a random locality to send to
               send_rank = random_rank(gen);
@@ -545,9 +533,9 @@ void test_write(
               }
             }
             else {
-              send_rank = static_cast<int>(i % nranks);
+              send_rank = i % nranks;
               while (options.nolocal && send_rank==rank) {
-                  send_rank = static_cast<int>((send_rank+1) % nranks);
+                  send_rank = (send_rank+1) % nranks;
               }
             }
 
@@ -560,8 +548,7 @@ void test_write(
             uint32_t memory_offset = static_cast<uint32_t>
                 (memory_slot*options.transfer_size_B);
             DEBUG_OUTPUT(5,
-                "Rank " << rank << " sending block " << i
-                << " to rank " << send_rank
+                "Rank " << rank << " sending block " << i << " to rank " << send_rank
             );
             prof_setup.done();
 
@@ -601,31 +588,10 @@ void test_write(
                         });
                 buffer_index++;
 
-                // After every 10 actions complete, add another future to signal
-                // the semaphore with our state so that it doesn't wait too long
-#ifdef USE_SEMAPHORE
-                if (i % 1 == 0) {
-                    ActiveFutures[send_rank].push_back(
-                        std::move(temp_future.then(
-                            [&sem, i](hpx::future<int> &&result)
-                            {
-                                // inform semaphore about new lower limit
-                                sem.signal(i);
-                                return result.get();
-                            })));
-                }
-                else {
-                    ActiveFutures[send_rank].push_back(std::move(temp_future));
-                }
-                sem.wait(i);
-#else
                 ActiveFutures[send_rank].push_back(std::move(temp_future));
-#endif
             }
         }
-        DEBUG_OUTPUT(2,
-          "Exited transfer loop " << rank
-        );
+        DEBUG_OUTPUT(2, "Exited transfer loop " << rank);
 
 #ifdef USE_CLEANING_THREAD
         int removed = 0;
@@ -635,9 +601,7 @@ void test_write(
           FuturesActive = false;
           // wait for cleanup thread to terminate before we reduce any remaining futures
           removed = cleaner.get();
-          DEBUG_OUTPUT(2,
-            "Cleaning thread rank " << rank << " removed " << removed
-          );
+          DEBUG_OUTPUT(2, "Cleaning thread rank " << rank << " removed " << removed);
         }
 #endif
 
@@ -649,7 +613,7 @@ void test_write(
         //
         hpx::util::simple_profiler prof_move(iteration, "Moving futures");
         std::vector<hpx::future<int> > final_list;
-        for(uint64_t i = 0; i < nranks; i++) {
+        for (uint64_t i = 0; i < nranks; i++) {
           // move the contents of intermediate vector into final list
           final_list.reserve(final_list.size() + ActiveFutures[i].size());
           std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(),
@@ -661,20 +625,16 @@ void test_write(
         hpx::util::simple_profiler fwait(iteration, "Future wait");
         int numwait = static_cast<int>(final_list.size());
 
-        DEBUG_OUTPUT(1,"Waiting on future");
+        DEBUG_OUTPUT(1, "Waiting on future");
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
         int total = numwait+removed;
 #endif
-        DEBUG_OUTPUT(3,
-            "Future wait, rank " << rank << " waiting on " << numwait
-        );
+        DEBUG_OUTPUT(3, "Future wait, rank " << rank << " waiting on " << numwait);
         fwait.done();
     }
-    DEBUG_OUTPUT(2,
-      "Exited iterations loop " << rank
-    );
+    DEBUG_OUTPUT(2, "Exited iterations loop " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
     hpx::lcos::barrier::synchronize();
@@ -715,9 +675,7 @@ static void transfer_data(general_buffer_type recv,
   }
 /*
   else {
-    DEBUG_OUTPUT(2,
-      "Skipped copy due to matching pointers"
-    );
+    DEBUG_OUTPUT(2, "Skipped copy due to matching pointers");
   }
   */
 }
@@ -733,15 +691,11 @@ void test_read(
 {
     CopyFromStorage_action actRead;
     //
-    DEBUG_OUTPUT(1,
-        "Entering Barrier at start of read on rank " << rank
-    );
+    DEBUG_OUTPUT(1, "Entering Barrier at start of read on rank " << rank);
     //
     hpx::lcos::barrier::synchronize();
     //
-    DEBUG_OUTPUT(1,
-        "Passed Barrier at start of read on rank " << rank
-    );
+    DEBUG_OUTPUT(1, "Passed Barrier at start of read on rank " << rank);
     //
     // this is mostly the same as the put loop, except that the received future
     // is not an int, but a transfer buffer which we have to copy out of.
@@ -750,9 +704,7 @@ void test_read(
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
-        DEBUG_OUTPUT(1,
-            "Starting iteration " << i << " on rank " << rank
-        );
+        DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
 #ifdef USE_CLEANING_THREAD
         //
         // start a thread which will clear any completed futures from our list.
@@ -771,14 +723,10 @@ void test_read(
         //
         // Start main message sending loop
         //
-        // limit number of tasks we generate at a time so we don't oversubscribe resources
-#ifdef USE_SEMAPHORE
-        hpx::lcos::local::sliding_semaphore sem(options.semaphore);
-#endif
         //
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::high_resolution_timer looptimer;
-            unsigned int send_rank;
+            uint64_t send_rank;
             if (options.distribution==0) {
               // pick a random locality to send to
               send_rank = random_rank(gen);
@@ -787,9 +735,9 @@ void test_read(
               }
             }
             else {
-              send_rank = static_cast<int>(i % nranks);
+              send_rank = static_cast<uint64_t>(i % nranks);
               while (options.nolocal && send_rank==rank) {
-                  send_rank = static_cast<int>((send_rank+1) % nranks);
+                  send_rank = static_cast<uint64_t>((send_rank+1) % nranks);
               }
             }
 
@@ -844,24 +792,7 @@ void test_read(
                         }
                     );
 
-#ifdef USE_SEMAPHORE
-                if (i % 1 == 0) {
-                    ActiveFutures[send_rank].push_back(
-                        std::move(temp_future.then(
-                            [&sem, i](hpx::future<int> &&result)
-                            {
-                                // inform semaphore about new lower limit
-                                sem.signal(i);
-                                return result.get();
-                            })));
-                }
-                else {
-                    ActiveFutures[send_rank].push_back(std::move(temp_future));
-                }
-                sem.wait(i);
-#else
                 ActiveFutures[send_rank].push_back(std::move(temp_future));
-#endif
             }
         }
 #ifdef USE_CLEANING_THREAD
@@ -870,9 +801,7 @@ void test_read(
         // wait for cleanup thread to terminate before we reduce any remaining
         // futures
         int removed = cleaner.get();
-        DEBUG_OUTPUT(2,
-            "Cleaning thread rank " << rank << " removed " << removed
-        );
+        DEBUG_OUTPUT(2, "Cleaning thread rank " << rank << " removed " << removed);
 #endif
 
 #ifdef USE_PARCELPORT_THREAD
@@ -883,7 +812,7 @@ void test_read(
         //
         hpx::util::high_resolution_timer movetimer;
         std::vector<hpx::future<int> > final_list;
-        for(uint64_t i = 0; i < nranks; i++) {
+        for (uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
             std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(),
@@ -895,7 +824,7 @@ void test_read(
         int numwait = static_cast<int>(final_list.size());
         hpx::util::high_resolution_timer futuretimer;
 
-        DEBUG_OUTPUT(1,"Waiting on future");
+        DEBUG_OUTPUT(1, "Waiting on future");
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
@@ -950,13 +879,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     if (nranks>MAX_RANKS) {
       std::cerr << "This test can only be run using " << MAX_RANKS
-        << " nodes, please recompile this test with the \
-              MAX_RANKS set to a higher number " << std::endl;
+        << " nodes, please recompile this test with the"
+           " MAX_RANKS set to a higher number " << std::endl;
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread %1% on locality \
-                        %2% rank %3% hostname %4%";
+    char const* msg = "hello world from OS-thread %1% on locality "
+        "%2% rank %3% hostname %4%";
     std::cout << (boost::format(msg) % current % hpx::get_locality_id()
         % rank % name.c_str()) << std::endl;
     //
@@ -977,9 +906,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (options.global_storage_MB>0) {
       options.local_storage_MB = options.global_storage_MB/nranks;
     }
-    DEBUG_OUTPUT(2,
-        "Allocating local storage on " << rank
-    );
+
+    DEBUG_OUTPUT(2, "Allocating local storage on " << rank);
     allocate_local_storage(options.local_storage_MB*1024*1024);
     //
     uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB
@@ -995,7 +923,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         (int)num_transfer_slots - 1);
     //
     ActiveFutures.reserve(nranks);
-    for(uint64_t i = 0; i < nranks; i++) {
+    for (uint64_t i = 0; i < nranks; i++) {
         FuturesWaiting[i].store(0);
         ActiveFutures.push_back(std::vector<hpx::future<int> >());
     }
@@ -1005,7 +933,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     delete_local_storage();
 
-    DEBUG_OUTPUT(2,"Calling finalize" << rank);
+    DEBUG_OUTPUT(2, "Calling finalize" << rank);
     if (rank==0)
       return hpx::finalize();
     else return 0;
