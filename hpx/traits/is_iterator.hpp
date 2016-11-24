@@ -107,6 +107,13 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_zip_iterator
       : std::false_type

@@ -64,36 +64,34 @@ namespace hpx { namespace parallel { namespace traits
     template <typename V, typename ValueType, typename Enable>
     struct vector_pack_load
     {
+        typedef typename rebind_pack<V, ValueType>::type value_type;
+
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
-            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter), Vc::Aligned);
+            return value_type(std::addressof(*iter), Vc::Aligned);
         }
 
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        unaligned(Iter const& iter)
+        static value_type unaligned(Iter const& iter)
         {
-            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter), Vc::Unaligned);
+            return value_type(std::addressof(*iter), Vc::Unaligned);
         }
     };
 
     template <typename V, typename T, typename Abi>
     struct vector_pack_load<V, Vc::Vector<T, Abi> >
     {
+        typedef typename rebind_pack<V, Vc::Vector<T, Abi> >::type value_type;
+
         template <typename Iter>
-        static typename rebind_pack<V, Vc::Vector<T, Abi> >::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
             return *iter;
         }
 
         template <typename Iter>
-        static typename rebind_pack<V, Vc::Vector<T, Abi> >::type
-        unaligned(Iter const& iter)
+        static value_type unaligned(Iter const& iter)
         {
             return *iter;
         }
@@ -102,16 +100,17 @@ namespace hpx { namespace parallel { namespace traits
     template <typename Value, typename T, std::size_t N, typename V, std::size_t W>
     struct vector_pack_load<Value, Vc::SimdArray<T, N, V, W> >
     {
+        typedef typename rebind_pack<Value, Vc::SimdArray<T, N, V, W> >::type
+            value_type;
+
         template <typename Iter>
-        static typename rebind_pack<Value, Vc::SimdArray<T, N, V, W> >::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
             return *iter;
         }
 
         template <typename Iter>
-        static typename rebind_pack<Value, Vc::SimdArray<T, N, V, W> >::type
-        unaligned(Iter const& iter)
+        static value_type unaligned(Iter const& iter)
         {
             return *iter;
         }

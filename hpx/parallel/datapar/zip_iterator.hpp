@@ -104,23 +104,23 @@ namespace hpx { namespace parallel { namespace traits
     template <typename ... Vector, typename ValueType>
     struct vector_pack_load<hpx::util::tuple<Vector...>, ValueType>
     {
-        typedef hpx::util::tuple<Vector...> tuple_type;
+        typedef hpx::util::tuple<Vector...> value_type;
 
         template <typename ... Iter>
-        static tuple_type
+        static value_type
         aligned(hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::aligned_pack<tuple_type>(iter,
+            return traits::detail::aligned_pack<value_type>(iter,
                 typename hpx::util::detail::make_index_pack<
                         sizeof...(Iter)
                     >::type());
         }
 
         template <typename ... Iter>
-        static tuple_type
+        static value_type
         unaligned(hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::unaligned_pack<tuple_type>(iter,
+            return traits::detail::unaligned_pack<value_type>(iter,
                 typename hpx::util::detail::make_index_pack<
                         sizeof...(Iter)
                     >::type());

@@ -30,40 +30,28 @@ namespace hpx { namespace parallel { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename V, typename Enable>
+    template <typename V, typename ValueType, typename Enable>
     struct vector_pack_load
     {
-        template <typename Iter>
-        static typename rebind_pack<
-            V, typename std::iterator_traits<Iter>::value_type
-        >::type
-        unaligned(Iter const& iter)
-        {
-            typedef typename rebind_pack<
-                    V, typename std::iterator_traits<Iter>::value_type
-                >::type vector_pack_type;
+        typedef typename rebind_pack<V, ValueType>::type value_type;
 
-            return vector_pack_type(std::addressof(*iter));
+        template <typename Iter>
+        static value_type unaligned(Iter const& iter)
+        {
+            return value_type(std::addressof(*iter));
         }
 
         template <typename Iter>
-        static typename rebind_pack<
-            V, typename std::iterator_traits<Iter>::value_type
-        >::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
-            typedef typename rebind_pack<
-                    V, typename std::iterator_traits<Iter>::value_type
-                >::type vector_pack_type;
-
-            vector_pack_type v;
+            value_type v;
             v.load_aligned(std::addressof(*iter));
             return v;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename V, typename Enable>
+    template <typename V, typename ValueType, typename Enable>
     struct vector_pack_store
     {
         template <typename Iter_>
