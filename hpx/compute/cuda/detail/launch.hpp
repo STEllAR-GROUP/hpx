@@ -16,6 +16,7 @@
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <cuda_runtime.h>
 
@@ -63,10 +64,10 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
         HPX_DELETE_COPY_ASSIGN(closure);
         HPX_DELETE_MOVE_ASSIGN(closure);
 
-        HPX_HOST_DEVICE void operator()()
+        HPX_DEVICE void operator()()
         {
             // FIXME: is it possible to move the arguments?
-            hpx::util::invoke_fused(f_, args_);
+            hpx::util::invoke_fused_r<void>(f_, args_);
         }
     };
 
@@ -91,6 +92,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
             launch_function_type launcher = get_launch_function();
+            HPX_UNUSED(launcher);
             Closure c{std::move(f), std::move(args)};
 
             static_assert(sizeof(Closure) < 256,
