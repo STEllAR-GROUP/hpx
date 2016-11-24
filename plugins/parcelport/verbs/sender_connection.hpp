@@ -13,7 +13,7 @@
 //
 #include <memory>
 //
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaClient.h>
+#include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
 #include "pinned_memory_vector.hpp"
 
 using namespace bgcios;
@@ -30,7 +30,7 @@ namespace policies { namespace verbs
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
     typedef hpx::util::detail::memory_chunk_pool_allocator
             <char, memory_pool_type, mutex_type>            allocator_type;
-    typedef util::detail::pinned_memory_vector<char>        snd_data_type;
+    typedef pinned_memory_vector<char>                      snd_data_type;
     typedef parcel_buffer<snd_data_type>                    snd_buffer_type;
 
     struct sender_connection
@@ -55,7 +55,7 @@ namespace policies { namespace verbs
             parcelport_type * pp
           , boost::uint32_t dest
           , locality there
-          , RdmaClient *client
+          , verbs_endpoint *client
           , memory_pool_type * chunk_pool
           , performance_counters::parcels::gatherer & parcels_sent
         )
@@ -101,7 +101,7 @@ namespace policies { namespace verbs
         parcelport_type       * parcelport_;
         boost::uint32_t         dest_ip_;
         parcelset::locality     there_;
-        RdmaClient            * client_;
+        verbs_endpoint            * client_;
         memory_pool_type      * chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;
     };

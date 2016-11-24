@@ -78,7 +78,7 @@ namespace verbs
             //  }
         }
 
-        inline struct ibv_srq *get_SRQ() {
+        inline struct ibv_srq *getsrq_() {
             if (_cmId->qp == NULL) {
                 std::cout << "Trying to access SRQ before QP is ready! " << std::endl;
                 return NULL;
@@ -98,5 +98,5 @@ namespace verbs
 
 }}}}
 
-#endif // COMMON_RDMACLIENT_H
+#endif // COMMON_verbs_endpoint_H
 

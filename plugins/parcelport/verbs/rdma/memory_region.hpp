@@ -52,6 +52,7 @@ namespace verbs {
 
             if (region_ == NULL) {
                 int err = errno;
+                rdma_error(errno, "error registering user mem ibv_reg_mr ");
                 LOG_ERROR_MSG(
                     "error registering user mem ibv_reg_mr " << hexpointer(buffer) << " "
                     << hexlength(length) << " error/message: " << err << "/"

@@ -50,13 +50,12 @@ namespace verbs
         }
 
         // ----------------------------------------------------------------------------
-        bool create_channel() {
+        bool create_channel()
+        {
             auto t = rdma_create_event_channel();
             event_channel_ = std::unique_ptr<struct rdma_event_channel>(t);
             if (event_channel_ == nullptr) {
                 rdma_error e(EINVAL, "rdma_create_event_channel() failed");
-                LOG_ERROR_MSG(tag_ << "error creating rdma event channel: "
-                    << rdma_error::error_string(e.error_code()));
                 throw e;
             }
             LOG_DEBUG_MSG(tag_ << "created rdma event channel with fd "
@@ -106,9 +105,8 @@ namespace verbs
                     LOG_TRACE_MSG("poll returned EINTR, continuing ...");
                     return 0;
                 }
-                LOG_ERROR_MSG(
-                    "error polling socket descriptors: " << rdma_error::error_string(err));
-                return 0;
+                rdma_error e(err, "poll_event_channel failed");
+                throw e;
             }
 
             if (pollInfo[eventChannel].revents & POLLIN) {
@@ -135,7 +133,7 @@ namespace verbs
         {
             cm_event = NULL;
             // This operation can block if there are no pending events available.
-            LOG_TRACE_MSG("waiting for " << rdma_event_str(event)
+            LOG_DEVEL_MSG("waiting for " << rdma_event_str(event)
                 << " on event channel " << hexnumber(channel->fd));
             int rc = rdma_get_cm_event(channel, &cm_event);
             if (rc != 0) {
@@ -144,6 +142,8 @@ namespace verbs
                     << rdma_error::error_string(err));
                 return -1;
             }
+            LOG_DEVEL_MSG("got " << rdma_event_str(cm_event->event)
+                << " on event channel " << hexnumber(channel->fd));
 
             if (ack) {
                 // we have to ack events, even when they are not the ones we wanted
@@ -172,16 +172,12 @@ namespace verbs
 
             int err = rdma_ack_cm_event(cm_event);
             if (err != 0) {
-                err = abs(err);
-                LOG_ERROR_MSG("Failed acking event " << rdma_event_str(cm_event->event)
-                    << ": " << rdma_error::error_string(err));
-                return err;
+                rdma_error e(errno, std::string("Failed acking event ") +
+                    rdma_event_str(cm_event->event));
+                throw e;
             }
             return 0;
         }
-
-        //! \brief  Get the descriptor representing the rdma event channel.
-        //! \return Event channel descriptor.
 
         int get_file_descriptor(void) const { return event_channel_->fd; }
 

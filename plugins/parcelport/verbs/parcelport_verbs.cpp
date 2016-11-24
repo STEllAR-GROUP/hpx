@@ -24,7 +24,11 @@
 //
 #include <hpx/util/debug/thread_stacktrace.hpp>
 //
+#include <boost/asio/ip/address_v4.hpp>
+//
 #include <hpx/config/parcelport_verbs_defines.hpp>
+
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_MEDIUM_CHUNK_SIZE
 
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
@@ -81,6 +85,7 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
+#include <sstream>
 
 using namespace hpx::parcelset::policies;
 
@@ -136,7 +141,7 @@ namespace verbs
                         _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
-                        _ibv_ip = ::Get_rdma_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
+                        _ibv_ip = ::Get_verbs_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
                         LOG_DEBUG_MSG("here() got hostname of " << buff);
                     }
                 }
@@ -174,6 +179,7 @@ namespace verbs
 
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
+        // These are called from a static function, so use static
         // --------------------------------------------------------------------
         static RdmaControllerPtr _rdmaController;
         static std::string       _ibverbs_device;
@@ -194,7 +200,11 @@ namespace verbs
         // to that address is currently being initiated. We need this to prevent two ends
         // of a connection simultaneously initiating a connection to each other
         typedef hpx::concurrent::unordered_map<boost::uint32_t, bool> connect_map;
-        connect_map connection_requests_;
+        connect_map             connection_requests_;
+
+        // Used to control incoming and outgoing connection requests
+        mutex_type              new_connection_mutex;
+        condition_type          new_connection_condition;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
         // more consistent reuse of classes/types.
@@ -205,7 +215,7 @@ namespace verbs
         typedef std::shared_ptr<memory_pool_type>                  memory_pool_ptr_type;
         typedef hpx::util::detail::memory_chunk_pool_allocator
                 <char, memory_pool_type, mutex_type>               allocator_type;
-        typedef util::detail::pinned_memory_vector<char>           rcv_data_type;
+        typedef pinned_memory_vector<char>                         rcv_data_type;
         typedef parcel_buffer<rcv_data_type>                       snd_buffer_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>>    rcv_buffer_type;
 
@@ -294,10 +304,6 @@ namespace verbs
         boost::atomic_uint      handled_receives;
         boost::atomic_uint      completions_handled;
         boost::atomic_uint      total_reads;
-
-        // Used to control incoming and outgoing connection requests
-        mutex_type              new_connection_mutex;
-        condition_type          new_connection_condition;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -413,7 +419,7 @@ namespace verbs
             LOG_DEBUG_MSG("Create connection from " << ipaddress(_ibv_ip)
                 << "to " << ipaddress(dest_ip) );
 
-            RdmaClient *client = get_remote_connection(dest);
+            verbs_endpoint *client = get_remote_connection(dest_ip);
             std::shared_ptr<sender_connection> result = std::make_shared<sender_connection>(
                   this
                 , dest_ip
@@ -427,10 +433,11 @@ namespace verbs
             return result;
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // Clean up a completed send and all its regions etc
-        // Called when we finish sending a simple message, or when all zero-copy Get operations are done
-        // ----------------------------------------------------------------------------------------------
+        // Called when we finish sending a simple message,
+        // or when all zero-copy Get operations are done
+        // --------------------------------------------------------------------
         void delete_send_data(active_send_iterator send) {
             parcel_send_data &send_data = *send;
             // trigger the send complete handler for hpx internal cleanup
@@ -474,10 +481,10 @@ namespace verbs
             }
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // Clean up a completed recv and all its regions etc
         // Called when a parcel_buffer finishes decoding a message
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         void delete_recv_data(active_recv_iterator recv)
         {
             FUNC_START_DEBUG_MSG;
@@ -522,15 +529,15 @@ namespace verbs
             return 1;
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // handler for connections, this is triggered as a callback from the rdmaController when
         // a connection event has occurred.
         // When we connect to another locality, all internal structures are updated accordingly,
         // but when another locality connects to us, we must do it manually via this callback
-        // ----------------------------------------------------------------------------------------------
-        int handle_verbs_connection(std::pair<uint32_t,uint64_t> qpinfo, RdmaClientPtr client)
+        // --------------------------------------------------------------------
+        int handle_verbs_connection(std::pair<uint32_t,uint64_t> qpinfo, verbs_endpoint_ptr client)
         {
-            boost::uint32_t dest_ip = client->getRemoteIPv4Address();
+            boost::uint32_t dest_ip = client->get_remote_address()->sin_addr.s_addr;
             LOG_DEVEL_MSG("Connection callback received from "
                 << ipaddress(dest_ip) << "to "
                 << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
@@ -557,13 +564,13 @@ namespace verbs
             return 0;
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // When a send completes take one of two actions ...
         // if there are no zero copy chunks, we consider the parcel sending complete
         // so release memory and trigger write_handler.
         // If there are zero copy chunks to be RDMA GET from the remote end, then
         // we hold onto data until they have completed.
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         void handle_send_completion(uint64_t wr_id)
         {
             bool                 found_wr_id = false;
@@ -626,14 +633,14 @@ namespace verbs
             }
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // When a recv completes, take one of two actions ...
         // if there are no zero copy chunks, we consider the parcel receive complete
         // so release memory and trigger write_handler.
-        // If there are zero copy chunks to be RDMA GET from the remote end, then
-        // we hold onto data until they have completed.
-        // ----------------------------------------------------------------------------------------------
-        void handle_recv_completion(uint64_t wr_id, RdmaClient* client)
+        // If there are zero copy chunks to be RDMA GET'ed from the remote end,
+        // then we hold onto data until they have completed.
+        // --------------------------------------------------------------------
+        void handle_recv_completion(uint64_t wr_id, verbs_endpoint* client)
         {
             util::high_resolution_timer timer;
 
@@ -802,7 +809,7 @@ namespace verbs
         }
 #endif
 
-        void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag, const RdmaClient *client)
+        void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag, const verbs_endpoint *client)
         {
 #if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
             rdma_memory_region *region = (rdma_memory_region *)wr_id;
@@ -855,7 +862,7 @@ namespace verbs
 
         }
 
-        void handle_rdma_get_completion(uint64_t wr_id, RdmaClient *client)
+        void handle_rdma_get_completion(uint64_t wr_id, verbs_endpoint *client)
         {
             bool                 found_wr_id;
             active_recv_iterator current_recv;
@@ -969,12 +976,12 @@ namespace verbs
             }
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // Every (signalled) rdma operation triggers a completion event when it completes,
         // the rdmaController calls this callback function and we must clean up all temporary
         // memory etc and signal hpx when sends or receives finish.
-        // ----------------------------------------------------------------------------------------------
-        int handle_verbs_completion(const struct ibv_wc completion, RdmaClient *client)
+        // --------------------------------------------------------------------
+        int handle_verbs_completion(const struct ibv_wc completion, verbs_endpoint *client)
         {
             uint64_t wr_id = completion.wr_id;
             LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
@@ -982,9 +989,9 @@ namespace verbs
             completions_handled++;
 /*
             _rdmaController->for_each_client(
-                [](std::pair<uint32_t, RdmaClientPtr> clientpair)
+                [](std::pair<uint32_t, verbs_endpoint_ptr> clientpair)
                 {
-                RdmaClient* client = clientpair.second.get();
+                verbs_endpoint* client = clientpair.second.get();
                 LOG_TIMED_INIT(clientlog);
                 LOG_TIMED_MSG(clientlog, DEVEL, 0.1,
                     "internal reported, \n"
@@ -1027,7 +1034,6 @@ namespace verbs
             // we can release any data we were holding onto and signal a send as finished.
             // On hardware that does not support immediate data, a 4 byte tag message is used.
             //
-
             else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
                 handle_tag_recv_completion(wr_id, completion.imm_data, client);
                 return 0;
@@ -1045,7 +1051,7 @@ namespace verbs
             }
 
             throw std::runtime_error("Unexpected opcode in handle_verbs_completion "
-                + rdma_sender_receiver::
+                + verbs_sender_receiver::
                 ibv_wc_opcode_string((ibv_wr_opcode)(completion.opcode)));
             return 0;
         }
@@ -1141,77 +1147,70 @@ namespace verbs
             // Stop receiving and sending of parcels
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // find the client queue pair object that is at the destination ip address
         // if no connection has been made yet, make one.
-        // ----------------------------------------------------------------------------------------------
-        RdmaClient *get_remote_connection(parcelset::locality const& dest)
+        // --------------------------------------------------------------------
+        verbs_endpoint *get_remote_connection(boost::uint32_t dest_ip)
         {
-            boost::uint32_t dest_ip = dest.get<locality>().ip_;
-            // @TODO, don't need smartpointers here, remove them as they waste an atomic refcount
-            RdmaClientPtr client;
-            {
-                // if a connection exists to this destination, get it
-                ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-                if (ip_it!=ip_qp_map.end()) {
-                    LOG_TRACE_MSG("Client found connection made from "
+            // if a connection exists to this destination, get it
+            ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
+            if (ip_it!=ip_qp_map.end()) {
+                LOG_TRACE_MSG("Client found connection made from "
+                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                    << "with QP " << ip_it->second);
+                return _rdmaController->getClient(ip_it->second);
+            }
+            // Didn't find a connection. We must create a new one
+            else {
+                // set a flag to prevent more connections to the same ip address
+                auto inserted =
+                    connection_requests_.insert(std::make_pair(dest_ip, true));
+
+                // if a connection to this dest has already been started
+                if (inserted.second==false) {
+                    LOG_DEVEL_MSG("Connection race (in request) from "
                         << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                        << "with QP " << ip_it->second);
-                    client = _rdmaController->getClient(ip_it->second);
-                    return client.get();
+                        << "( " << ipaddress(_ibv_ip) << ")");
+
+                    // wait until a connection has been established
+                    LOG_DEVEL_MSG("Going to wait/sleep on connection mutex");
+                    unique_lock lock(new_connection_mutex);
+                    new_connection_condition.wait(lock, [&,this] {
+                        return ip_qp_map.find(dest_ip)!=ip_qp_map.end();
+                    });
+                    LOG_DEVEL_MSG("Waking up for the connection from "
+                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                        << "( " << ipaddress(_ibv_ip) << ")");
+
+                    ip_it = ip_qp_map.find(dest_ip);
+                    if (ip_it==ip_qp_map.end()) {
+                        LOG_DEVEL_MSG("After wake, did not find connection from "
+                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                            << "( " << ipaddress(_ibv_ip) << ")");
+                        std::terminate();
+                    }
+                    return _rdmaController->getClient(ip_it->second);
                 }
-                // Didn't find a connection. We must create a new one
+                // start a new connection
                 else {
-                    // set a flag to prevent more connections to the same ip address
-                    auto inserted =
-                        connection_requests_.insert(std::make_pair(dest_ip, true));
-
-                    // if a connection to this dest has already been started
-                    if (inserted.second==false) {
-                        LOG_DEVEL_MSG("Connection race (in request) from "
-                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                            << "( " << ipaddress(_ibv_ip) << ")");
-
-                        // wait until a connection has been established
-                        LOG_DEVEL_MSG("Going to wait/sleep on connection mutex");
-                        unique_lock lock(new_connection_mutex);
-                        new_connection_condition.wait(lock, [&,this] {
-                            return ip_qp_map.find(dest_ip)!=ip_qp_map.end();
-                        });
-                        LOG_DEVEL_MSG("Waking up for the connection from "
-                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                            << "( " << ipaddress(_ibv_ip) << ")");
-
-                        ip_it = ip_qp_map.find(dest_ip);
-                        if (ip_it==ip_qp_map.end()) {
-                            LOG_DEVEL_MSG("After wake, did not find connection from "
-                                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                                << "( " << ipaddress(_ibv_ip) << ")");
-                            std::terminate();
-                        }
-                        client = _rdmaController->getClient(ip_it->second);
+                    LOG_DEVEL_MSG("Starting new connect request from "
+                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                        << "( " << ipaddress(_ibv_ip) << ")");
+                    verbs_endpoint_ptr client = _rdmaController->makeServerToServerConnection(
+                        dest_ip, _rdmaController->getPort(),
+                        _rdmaController->getServer()->getContext());
+                    if (client) {
+                        LOG_DEVEL_MSG("Setting qpnum in main client map "
+                            << client->getQpNum());
+                        ip_qp_map.insert(std::make_pair(dest_ip, client->getQpNum()));
+                        new_connection_condition.notify_all();
                         return client.get();
                     }
-                    // start a new connection
                     else {
-                        LOG_DEVEL_MSG("Starting new connect request from "
+                        LOG_DEVEL_MSG("Failed new server connection from "
                             << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
                             << "( " << ipaddress(_ibv_ip) << ")");
-                        client = _rdmaController->makeServerToServerConnection(
-                            dest_ip, _rdmaController->getPort(),
-                            _rdmaController->getServer()->getContext());
-                        if (client) {
-                            LOG_DEVEL_MSG("Setting qpnum in main client map "
-                                << client->getQpNum());
-                            ip_qp_map.insert(std::make_pair(dest_ip, client->getQpNum()));
-                            new_connection_condition.notify_all();
-                            return client.get();
-                        }
-                        else {
-                            LOG_DEVEL_MSG("Failed new server connection from "
-                                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                                << "( " << ipaddress(_ibv_ip) << ")");
-                        }
                     }
                 }
             }
@@ -1416,7 +1415,7 @@ namespace verbs
             return true;
         }
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages as well as complete
         // outgoing messages.
         //
@@ -1425,7 +1424,7 @@ namespace verbs
         // Since the parcelport can be serviced by hpx threads or by OS threads, we must use extra
         // care when dealing with mutexes and condition_variables since we do not want to suspend an
         // OS thread, but we do want to suspend hpx threads when necessary.
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         inline bool background_work_OS_thread() {
             bool done = false;
             do {
@@ -1489,7 +1488,7 @@ namespace verbs
                     //using namespace std::chrono_literals;
                     //std::this_thread::sleep_for(5us);
                 }
-
+/*
                 LOG_TIMED_INIT(background_sends);
                 LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
                 {
@@ -1525,6 +1524,7 @@ namespace verbs
                     << "Total completions " << decnumber(completions_handled)
                     << "(" << decnumber(sends_posted+handled_receives+total_reads) << ")");
                 )
+*/
             }
             return result;
         }
@@ -1598,7 +1598,8 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         FUNC_START_DEBUG_MSG;
         static int log_init = false;
         if (!log_init) {
-#ifdef HPX_PARCELPORT_VERBS_HAVE_LOGGING
+#if defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING) || \
+    defined(HPX_PARCELPORT_VERBS_ENABLE_DEVEL_MSG)
             std::cout << "Initializing logging " << std::endl;
             boost::log::add_console_log(
             std::clog,

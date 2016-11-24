@@ -13,7 +13,10 @@
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 //
-namespace hpx { namespace util { namespace detail
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs
 {
 // this class looks like a vector, but can be initialized from a pointer and size,
 // it is used by the verbs parcelport to pass an rdma memory chunk with received
@@ -157,6 +160,6 @@ class pinned_memory_vector
     pinned_memory_vector(pinned_memory_vector<T> const & other);
 
   };
-}}}
+}}}}
 
 #endif

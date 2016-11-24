@@ -18,25 +18,18 @@ namespace parcelset {
 namespace policies {
 namespace verbs {
 
-//! \brief InfiniBand device for RDMA operations.
-
-class rdma_device
+class verbs_device
 {
 public:
 
-    //! \brief  Default constructor.
-    //! \param  device Name of InfiniBand device.
-    //! \param  interface Name of network interface.
-    //! \throws rdma_error
-
-    rdma_device(std::string device, std::string interface) : context_(NULL)
+    // ---------------------------------------------------------------------------
+    verbs_device(std::string device, std::string interface) : context_(NULL)
     {
         // Get the list of InfiniBand devices.
         int numDevices = 0;
         devices_ = ibv_get_device_list(&numDevices);
         if (devices_ == NULL) {
-            //      std::cout << "there are no InfiniBand devices available on the node" << std::endl;
-            LOG_ERROR_MSG("there are no InfiniBand devices available on the node");
+            LOG_ERROR_MSG("no InfiniBand devices available");
             rdma_error e(ENODEV, "no InfiniBand devices available");
             throw e;
         }
@@ -92,9 +85,8 @@ public:
         }
     }
 
-    //! \brief  Default destructor.
-
-    ~rdma_device()
+    // ---------------------------------------------------------------------------
+    ~verbs_device()
     {
         // Free the list of InfiniBand devices.
         ibv_free_device_list(devices_);
@@ -111,9 +103,7 @@ public:
 //        }
     }
 
-    //! \brief  Get the InfiniBand device name.
-    //! \return Device name string.
-
+    // ---------------------------------------------------------------------------
     std::string get_device_name(void)
     {
         std::string result;
@@ -127,9 +117,7 @@ public:
     }
 
 
-    //! \brief  Get the network interface name.
-    //! \return Network interface name string.
-
+    // ---------------------------------------------------------------------------
     std::string get_interface_name(void)
     {
         std::string result;
@@ -139,18 +127,18 @@ public:
         return result;
     }
 
-    //! \brief  Get the IP address of the network interface.
-    //! \return IP address for RDMA connection management.
-
+    // ---------------------------------------------------------------------------
     in_addr_t get_address(void)
     {
         if (interface_ == NULL) {
            return 0;
         }
-        struct sockaddr_in *addr = reinterpret_cast<struct sockaddr_in *>(interface_->ifa_addr);
+        struct sockaddr_in *addr =
+            reinterpret_cast<struct sockaddr_in *>(interface_->ifa_addr);
         return addr->sin_addr.s_addr;
     }
 
+    // ---------------------------------------------------------------------------
     struct ibv_context *get_context()
     {
         if (device_ == NULL) {
@@ -169,6 +157,7 @@ public:
         return context_;
     }
 
+    // ---------------------------------------------------------------------------
     std::string get_device_info(bool verbose)
     {
         struct ibv_device_attr device_attr;
@@ -236,27 +225,25 @@ public:
     }
 
 private:
-
-    //! Pointer to list of InfiniBand devices.
+    // Pointer to list of InfiniBand devices.
     struct ibv_device **devices_;
 
-    //! Pointer to selected device in the list.
+    // Pointer to selected device in the list.
     struct ibv_device *device_;
 
     struct ibv_context *context_;
 
-    //! Pointer to list of network interfaces.
+    // Pointer to list of network interfaces.
     struct ifaddrs *interfaces_;
 
-    //! Pointer to selected interface in the list.
+    // Pointer to selected interface in the list.
     struct ifaddrs *interface_;
 
 };
 
-//! Smart pointer for rdma_device object.
-typedef std::shared_ptr<rdma_device> rdma_device_ptr;
+// Smart pointer for verbs_device object.
+typedef std::shared_ptr<verbs_device> verbs_device_ptr;
 
 }}}}
 
 #endif
-

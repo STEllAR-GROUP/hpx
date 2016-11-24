@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_CONNECTION_BASE
-#define HPX_PARCELSET_POLICIES_VERBS_CONNECTION_BASE
+#ifndef HPX_PARCELSET_POLICIES_VERBS_SENDER_RECEIVER_HPP
+#define HPX_PARCELSET_POLICIES_VERBS_SENDER_RECEIVER_HPP
 
 // Includes
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
@@ -16,7 +16,7 @@
 #include <iomanip>
 #include <atomic>
 
-//! Base connection class for RDMA operations with a remote partner.
+// Base connection class for RDMA operations with a remote partner.
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -36,37 +36,37 @@ namespace verbs
     };
 
     // ---------------------------------------------------------------------------
-    enum connection_state {
-        connecting,
-        accepting,
-        rejecting,
-        connected,
-        disconnecting,
-        being_disconnected
-    };
-//    std::atomic<connection_state> state_;
-
-    // ---------------------------------------------------------------------------
     // Provides the most low level access to send/receive read/write operations
     // using the verbs rdma API.
-    // For debugging purposes we provide a count of current outstanging receives
-    // posted. Allowing the preposted receives to drop to zero can be disastrous
-    // if infinit retries are not enabled.
-    struct rdma_sender_receiver {
+    // For performance monitoring and debugging, counters of send/recv/read/write
+    // operations are maintained.
+    //
+    // The number of preposted receives is tracked to prevent the receive queue
+    // from becoming empty and causing RNR retry errors.
+    // NB. Allowing the preposted receives to drop to zero can be disastrous
+    // if infinite retries are not enabled.
 
-        rdma_sender_receiver()
-            : cmId_(nullptr),
-              waiting_receives_(0) {}
+    struct verbs_sender_receiver
+    {
+        verbs_sender_receiver(struct rdma_cm_id *cmId) : cmId_(cmId)
+        {
+            clear_counters();
+        }
 
-        rdma_sender_receiver(struct rdma_cm_id *cmId)
-            : cmId_(cmId),
-              waiting_receives_(0) {}
-
-        ~rdma_sender_receiver() {
-            if (waiting_receives_>0) {
+        ~verbs_sender_receiver() {
+            if (preposted_receives_>0) {
                 LOG_ERROR_MSG("Closing connection with receives still pending "
                     ": implement FLUSH");
             }
+        }
+
+        // ---------------------------------------------------------------------------
+        void clear_counters() {
+            total_posted_recv_  = 0;
+            total_posted_send_  = 0;
+            total_posted_read_  = 0;
+            total_write_posted_ = 0;
+            preposted_receives_ = 0;
         }
 
         // ---------------------------------------------------------------------------
@@ -75,22 +75,25 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
+        struct rdma_cm_id *get_cm_id() { return cmId_; }
+
+        // ---------------------------------------------------------------------------
         inline void pop_receive_count() const {
-            LOG_EXCLUSIVE(uint64_t temp =) --waiting_receives_;
+            LOG_EXCLUSIVE(uint64_t temp =) --preposted_receives_;
             LOG_DEBUG_MSG("After decrement size of waiting receives is "
                 << decnumber(temp));
         }
 
         // ---------------------------------------------------------------------------
         inline void push_receive_count() const {
-            LOG_EXCLUSIVE(uint64_t temp =) ++waiting_receives_;
+            LOG_EXCLUSIVE(uint64_t temp =) ++preposted_receives_;
             LOG_DEBUG_MSG("After increment size of waiting receives is "
                 << decnumber(temp));
         }
 
         // ---------------------------------------------------------------------------
-        //! The number of outstanding work requests
-        inline uint32_t get_receive_count() { return waiting_receives_; }
+        // The number of outstanding work requests
+        inline uint32_t get_receive_count() { return preposted_receives_; }
 
         // ---------------------------------------------------------------------------
         // The basic send of a single request operation
@@ -98,7 +101,7 @@ namespace verbs
         {
             // Post the send request.
             struct ibv_send_wr *badRequest;
-            LOG_TRACE_MSG(tag_ << "posting "
+            LOG_TRACE_MSG("posting "
                 << ibv_wc_opcode_string(request->opcode) << " (" << request->opcode
                 << ") work request to send queue with " << request->num_sge
                 << " sge, id=" << hexpointer(request->wr_id)
@@ -111,7 +114,7 @@ namespace verbs
                     throw e;
                 }
                 else {
-                    LOG_ERROR_MSG(tag_ << "error posting to send queue: "
+                    LOG_ERROR_MSG("error posting to send queue: "
                         << rdma_error::error_string(err));
                     rdma_error e(err, "posting to send queue failed");
                     throw e;
@@ -151,11 +154,11 @@ namespace verbs
             // use address for wr_id
             send_wr.wr_id = (uint64_t)region;
 
-            ++_totalSendPosted;
+            ++total_posted_send_;
 
-            LOG_TRACE_MSG(tag_ << "Posted Send wr_id " << hexpointer(send_wr.wr_id)
+            LOG_TRACE_MSG("Posted Send wr_id " << hexpointer(send_wr.wr_id)
                 << "with Length " << decnumber(send_sge.length) << hexpointer(send_sge.addr)
-                << "total send posted " << decnumber(_totalSendPosted));
+                << "total send posted " << decnumber(total_posted_send_));
             // Post a send for outbound message.
             //   ++_waitingSendPosted;
             return post_request(&send_wr);
@@ -195,12 +198,12 @@ namespace verbs
             // use address for wr_id
             send_wr.wr_id = (uint64_t)region[0];
 
-            ++_totalSendPosted;
+            ++total_posted_send_;
 
-            LOG_TRACE_MSG(tag_ << "Posted Send wr_id " << hexpointer(send_wr.wr_id) << hexpointer((uint64_t)region[1])
+            LOG_TRACE_MSG("Posted Send wr_id " << hexpointer(send_wr.wr_id) << hexpointer((uint64_t)region[1])
                 << "num SGE " << decnumber(send_wr.num_sge)
                 << "with Length " << decnumber(total_length) << hexpointer(send_sge[0].addr)
-                << "total send posted " << decnumber(_totalSendPosted));
+                << "total send posted " << decnumber(total_posted_send_));
             // Post a send for outbound message.
             //   ++_waitingSendPosted;
             return post_request(&send_wr);
@@ -236,12 +239,12 @@ namespace verbs
             // use address for wr_id
             send_wr.wr_id = (uint64_t)region;
 
-            ++_totalSendPosted;
+            ++total_posted_send_;
 
-            LOG_TRACE_MSG(tag_ << "Posted Zero byte Send wr_id " << hexpointer(send_wr.wr_id)
+            LOG_TRACE_MSG("Posted Zero byte Send wr_id " << hexpointer(send_wr.wr_id)
                 << "with Length " << decnumber(send_sge.length)
                 << "address " << hexpointer(send_sge.addr)
-                << "total send posted " << decnumber(_totalSendPosted));
+                << "total send posted " << decnumber(total_posted_send_));
             //   ++_waitingSendPosted;
             return post_request(&send_wr);
         }
@@ -270,17 +273,17 @@ namespace verbs
             send_wr.wr.rdma.remote_addr = (uint64_t)remoteAddr;
             send_wr.wr.rdma.rkey        = remoteKey;
 
-            ++_totalReadPosted;
+            ++total_posted_read_;
 
             // Post a send to read data.
-            LOG_TRACE_MSG(tag_ << "Posted Read wr_id " << hexpointer(send_wr.wr_id)
+            LOG_TRACE_MSG("Posted Read wr_id " << hexpointer(send_wr.wr_id)
                 << " with Length " << decnumber(read_sge.length) << " " << hexpointer(read_sge.addr)
                 << " remote key " << decnumber(send_wr.wr.rdma.rkey) << " remote addr " << hexpointer(send_wr.wr.rdma.remote_addr));
             return post_request(&send_wr);
         }
 
         // ---------------------------------------------------------------------------
-        //! \brief  Post a rdma write operation to a remote memory region from the specified memory region.
+        // \brief  Post a rdma write operation to a remote memory region from the specified memory region.
         inline uint64_t post_write(rdma_memory_region *localregion,
             uint32_t remoteKey, const void *remoteAddr, std::size_t length)
         {
@@ -302,7 +305,7 @@ namespace verbs
             send_wr.wr.rdma.remote_addr = (uint64_t)remoteAddr;
             send_wr.wr.rdma.rkey        = remoteKey;
 
-            ++_totalWritePosted;
+            ++total_write_posted_;
 
             // Post a send to write data.
             LOG_ERROR_MSG("Post write has not been implemented and should be checked"
@@ -311,18 +314,16 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint64_t  postRecvRegionAsIDChecked(rdma_memory_region *region,
-            uint32_t length, bool expected=false)
+        uint64_t  post_recv_region_as_id_counted(rdma_memory_region *region, uint32_t length)
         {
-            uint64_t wr_id = postRecvRegionAsID(region, length, expected);
+            uint64_t wr_id = post_recv_region_as_id(region, length);
             push_receive_count();
             return wr_id;
         }
 
     private:
         // ---------------------------------------------------------------------------
-        uint64_t postRecvRegionAsID(rdma_memory_region *region, uint32_t length,
-            bool expected=false)
+        uint64_t post_recv_region_as_id(rdma_memory_region *region, uint32_t length)
         {
             // Build scatter/gather element for inbound message.
             struct ibv_sge recv_sge;
@@ -340,25 +341,22 @@ namespace verbs
             struct ibv_recv_wr *badRequest;
             int err = ibv_post_recv(cmId_->qp, &recv_wr, &badRequest);
             if (err!=0) {
-                LOG_ERROR_MSG("postRecvRegionAsID failed");
-                throw(std::runtime_error(std::string("postRecvRegionAsID failed")
+                LOG_ERROR_MSG("post_recv_region_as_id failed");
+                throw(std::runtime_error(std::string("post_recv_region_as_id failed")
                     + rdma_error::error_string(errno)));
             }
 
-            ++_totalRecvPosted;
+            ++total_posted_recv_;
 
-            LOG_DEBUG_MSG(tag_.c_str() << "posting Recv wr_id " << hexpointer(recv_wr.wr_id)
+            LOG_DEBUG_MSG("posting Recv wr_id " << hexpointer(recv_wr.wr_id)
                 << " with Length " << hexlength(length)
-                << " total recv posted " << decnumber(_totalRecvPosted));
+                << " total recv posted " << decnumber(total_posted_recv_));
             return recv_wr.wr_id;
         }
 
         // ---------------------------------------------------------------------------
-        // @TODO support shared receive queue
-        uint64_t
-        postRecvRegionAsID_shared(rdma_memory_region *region, uint32_t length,
-            struct ibv_srq* srq,
-            bool expected=false)
+        uint64_t post_recv_region_as_id_shared(rdma_memory_region *region,
+            uint32_t length, struct ibv_srq* srq)
         {
           // Build scatter/gather element for inbound message.
           struct ibv_sge recv_sge;
@@ -373,15 +371,15 @@ namespace verbs
           recv_wr.sg_list = &recv_sge;
           recv_wr.num_sge = 1;
           recv_wr.wr_id   = (uint64_t)region;
-          ++_totalRecvPosted;
+          ++total_posted_recv_;
           struct ibv_recv_wr *badRequest;
           int err = ibv_post_srq_recv(srq, &recv_wr, &badRequest);
           if (err!=0) {
-              LOG_ERROR_MSG("postRecvRegionAsID SRQ failed");
-              throw(std::runtime_error(std::string("postRecvRegionAsID SRQ failed")
+              LOG_ERROR_MSG("post_recv_region_as_id SRQ failed");
+              throw(std::runtime_error(std::string("post_recv_region_as_id SRQ failed")
                   + rdma_error::error_string(errno)));
          }
-         LOG_DEBUG_MSG(tag_.c_str() << "posting SRQ Recv wr_id "
+         LOG_DEBUG_MSG("posting SRQ Recv wr_id "
               << hexpointer(recv_wr.wr_id) << " with Length " << hexlength(length)
               << " " << hexpointer(region->get_address()));
          return recv_wr.wr_id;
@@ -389,10 +387,6 @@ namespace verbs
 
     public:
         // ---------------------------------------------------------------------------
-        //! \brief  Return a string naming a ibv_wr_opcode value.
-        //! \param  opcode ibv_wr_opcode value.
-        //! \return String representing value.
-
         static std::string ibv_wc_opcode_string(enum ibv_wr_opcode opcode)
         {
            std::string str;
@@ -408,38 +402,30 @@ namespace verbs
            return str;
         }
 
-        // debugging info when logging
-//        LOG_EXCLUSIVE(
-        std::string& get_tag(void) { return tag_; }
-        void setTag(std::string tag) { tag_ = tag; }
-//        )
-
-        int get_total_posted_recv_count()  { return _totalRecvPosted; }
-        int get_total_posted_send_count()  { return _totalSendPosted; }
-        int get_total_posted_read_count()  { return _totalReadPosted; }
-        int get_total_posted_write_count() { return _totalWritePosted; }
+        // ---------------------------------------------------------------------------
+        int get_total_posted_recv_count()  { return total_posted_recv_; }
+        int get_total_posted_send_count()  { return total_posted_send_; }
+        int get_total_posted_read_count()  { return total_posted_read_; }
+        int get_total_posted_write_count() { return total_write_posted_; }
 
     protected:
         // RDMA connection management id.
         struct rdma_cm_id *cmId_;
 
-        //! Tag to identify this connection in trace points.
-        std::string tag_;
+        // Number of receives that are preposted and (as yet) uncompleted
+        mutable std::atomic<uint64_t> preposted_receives_;
 
-        mutable std::atomic<uint64_t> waiting_receives_;
+        // Total number of receive operations posted to queue pair.
+        std::atomic<uint64_t> total_posted_recv_;
 
-        //! Total number of receive operations posted to queue pair.
-        std::atomic<uint64_t> _totalRecvPosted;
+        // Total number of send operations posted to queue pair.
+        std::atomic<uint64_t> total_posted_send_;
 
-        //! Total number of send operations posted to queue pair.
-        std::atomic<uint64_t> _totalSendPosted;
+        // Total number of rdma read operations posted to queue pair.
+        std::atomic<uint64_t> total_posted_read_;
 
-        //! Total number of rdma read operations posted to queue pair.
-        std::atomic<uint64_t> _totalReadPosted;
-
-        //! Total number of rdma write operations posted to queue pair.
-        std::atomic<uint64_t> _totalWritePosted;
-
+        // Total number of rdma write operations posted to queue pair.
+        std::atomic<uint64_t> total_write_posted_;
 
     };
 

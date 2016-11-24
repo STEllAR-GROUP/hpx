@@ -7,6 +7,8 @@
 #define HPX_PARCELSET_POLICIES_VERBS_RDMA_ERROR_HPP
 
 // Includes
+#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+//
 #include <stdexcept>
 #include <string>
 #include <string.h>
@@ -21,10 +23,18 @@ class rdma_error : public std::runtime_error
 public:
     // --------------------------------------------------------------------
     rdma_error(int err, const std::string &msg)
-        : std::runtime_error(msg), error_(err) {}
+        : std::runtime_error(msg),
+          error_(err)
+    {
+        LOG_ERROR_MSG(msg << error_string(err));
+    }
 
     rdma_error(int err)
-        : std::runtime_error(error_string(err)), error_(err) {}
+        : std::runtime_error(error_string(err)),
+          error_(err)
+    {
+        LOG_ERROR_MSG(what());
+    }
 
     // --------------------------------------------------------------------
     int error_code() const { return error_; }

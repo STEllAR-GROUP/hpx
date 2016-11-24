@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_CONNECTION_HANDLER_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_CONNECTION_HANDLER_HPP
+#ifndef HPX_PARCELSET_POLICIES_CONNECTION_HANDLER_HPP
+#define HPX_PARCELSET_POLICIES_CONNECTION_HANDLER_HPP
 
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -12,7 +12,7 @@
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_device.hpp>
+#include "rdma/verbs_device.hpp"
 //
 namespace hpx {
 namespace parcelset {
@@ -49,13 +49,13 @@ namespace verbs
 namespace policies {
 namespace verbs
 {
-        uint32_t Get_rdma_device_address(const char *devicename, const char *iface, char *hostname)
+        uint32_t Get_verbs_device_address(const char *devicename, const char *iface, char *hostname)
         {
           FUNC_START_DEBUG_MSG
           // Find the address of the I/O link device.
-          rdma_device_ptr linkDevice;
+          verbs_device_ptr linkDevice;
           try {
-            linkDevice = rdma_device_ptr(new rdma_device(devicename, iface));
+            linkDevice = verbs_device_ptr(new verbs_device(devicename, iface));
           }
           catch (rdma_error& e) {
             LOG_ERROR_MSG("error opening InfiniBand device: " << e.what());

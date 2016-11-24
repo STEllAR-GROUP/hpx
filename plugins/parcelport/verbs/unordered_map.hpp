@@ -19,9 +19,11 @@
 
 // A quick wrapper around an unordered_map with a mutex to ensure two
 // threads don't simultaneously write or read during write.
-// Warning: not thread safe to use iterators whilst others are changing the set
-// and several other functions are unsafe.
-
+// Warning: not thread safe to use iterators whilst others are changing the map
+// obtain a read lock before iterating using the provided mutex and function
+//   map_type::map_read_lock_type read_lock(map.read_write_mutex());
+// in order to safely iterate over contents and block any writers from gaining access
+//
 namespace hpx {
 namespace concurrent {
 

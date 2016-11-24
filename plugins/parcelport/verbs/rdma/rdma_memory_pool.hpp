@@ -26,15 +26,15 @@
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
 
 // the default memory chunk size in bytes
-#define RDMA_POOL_1K_CHUNK          0x000400 //  1KB
-#define RDMA_POOL_SMALL_CHUNK_SIZE  0x001000 //  4KB
-#define RDMA_POOL_MEDIUM_CHUNK_SIZE 0x004000 // 16KB
-#define RDMA_POOL_LARGE_CHUNK_SIZE  0x100000 //  1MB
+#define RDMA_POOL_1K_CHUNK          0x001*0x0400 //  1KB
+#define RDMA_POOL_SMALL_CHUNK_SIZE  0x010*0x0400 // 16KB
+#define RDMA_POOL_MEDIUM_CHUNK_SIZE 0x040*0x0400 // 64KB
+#define RDMA_POOL_LARGE_CHUNK_SIZE  0x400*0x0400 //  1MB
 
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
 #define RDMA_POOL_MAX_SMALL_CHUNKS  1024
 #define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
-#define RDMA_POOL_MAX_LARGE_CHUNKS  4
+#define RDMA_POOL_MAX_LARGE_CHUNKS  32
 
 #define RDMA_POOL_USE_LOCKFREE_STACK 1
 
@@ -44,8 +44,8 @@
 # define RDMA_POOL_SMALL_CHUNK_SIZE HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE
 #endif
 
-static_assert ( HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE<RDMA_POOL_MEDIUM_CHUNK_SIZE , 
-"Default memory Chunk size must be less than medium chunk size" );  
+static_assert ( HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE<RDMA_POOL_MEDIUM_CHUNK_SIZE ,
+"Default memory Chunk size must be less than medium chunk size" );
 
 
 // Description of memory pool objects:

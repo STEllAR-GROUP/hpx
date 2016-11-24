@@ -52,9 +52,10 @@ namespace policies { namespace verbs
     template <int SIZE>
     struct header
     {
-        static const unsigned int data_size_   = SIZE - sizeof(detail::header_block);
-        static const unsigned int chunk_flag   = 0x01;
-        static const unsigned int message_flag = 0x02;
+        static constexpr unsigned int header_block_size = sizeof(detail::header_block);
+        static constexpr unsigned int data_size_        = SIZE - header_block_size;
+        static const     unsigned int chunk_flag        = 0x01;
+        static const     unsigned int message_flag      = 0x02;
         //
     private:
         detail::header_block           message_header;
