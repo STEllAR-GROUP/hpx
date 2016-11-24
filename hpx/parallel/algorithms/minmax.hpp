@@ -245,7 +245,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            F,
+            ExPolicy, F,
                 traits::projected<Proj, FwdIter>,
                 traits::projected<Proj, FwdIter>
         >::value)>
@@ -475,7 +475,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            F,
+            ExPolicy, F,
                 traits::projected<Proj, FwdIter>,
                 traits::projected<Proj, FwdIter>
         >::value)>
@@ -742,7 +742,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            F, traits::projected<Proj, FwdIter>, traits::projected<Proj, FwdIter>
+            ExPolicy, F,
+                traits::projected<Proj, FwdIter>,
+                traits::projected<Proj, FwdIter>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::min(FwdIter), tag::max(FwdIter)>

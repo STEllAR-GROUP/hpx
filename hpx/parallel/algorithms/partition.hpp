@@ -274,7 +274,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
-            F, traits::projected<Proj, BidirIter>
+            ExPolicy, F, traits::projected<Proj, BidirIter>
         >::value)
 #endif
     >

@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_iterator<Rng>::type

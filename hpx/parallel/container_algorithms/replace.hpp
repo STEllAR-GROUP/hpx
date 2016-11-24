@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T1>,
+            ExPolicy, std::equal_to<T1>,
                 traits::projected_range<Proj, Rng>,
                 traits::projected<Proj, T1 const*>
         >::value)>
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, typename traits::range_traits<Rng>::iterator_type
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T1>,
+            ExPolicy, std::equal_to<T1>,
                 traits::projected_range<Proj, Rng>,
                 traits::projected<Proj, T1 const*>
         >::value)>
@@ -361,7 +361,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,

@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T1>,
+            ExPolicy, std::equal_to<T1>,
                 traits::projected<Proj, FwdIter>,
                 traits::projected<Proj, T1 const*>
         >::value)>
@@ -316,7 +316,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            F, traits::projected<Proj, FwdIter>
+            ExPolicy, F, traits::projected<Proj, FwdIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     replace_if(ExPolicy && policy, FwdIter first, FwdIter last,
@@ -477,7 +477,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T1>,
+            ExPolicy, std::equal_to<T1>,
                 traits::projected<Proj, InIter>,
                 traits::projected<Proj, T1 const*>
         >::value)>
@@ -671,7 +671,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
-            F, traits::projected<Proj, InIter>
+            ExPolicy, F, traits::projected<Proj, InIter>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>

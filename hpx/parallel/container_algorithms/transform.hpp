@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)
 #endif
     >
@@ -228,7 +228,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj1, Rng>,
+            ExPolicy, F,
+                traits::projected_range<Proj1, Rng>,
                 traits::projected<Proj2, InIter2>
         >::value)
 #endif
@@ -354,7 +355,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 #if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj1, Rng1>,
+            ExPolicy, F,
+                traits::projected_range<Proj1, Rng1>,
                 traits::projected_range<Proj2, Rng2>
         >::value)
 #endif

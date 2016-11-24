@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/always_void.hpp>
@@ -131,6 +132,19 @@ namespace hpx { namespace parallel { namespace traits
       : detail::is_projected_indirect<Projected>
     {};
 
+    template <typename Projected, typename Enable = void>
+    struct is_projected_zip_iterator
+      : std::false_type
+    {};
+
+    template <typename Projected>
+    struct is_projected_zip_iterator<Projected,
+            typename hpx::util::always_void<
+                typename Projected::iterator_type
+            >::type>
+      : hpx::traits::is_zip_iterator<typename Projected::iterator_type>
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -139,26 +153,57 @@ namespace hpx { namespace parallel { namespace traits
           : hpx::traits::is_callable<F(Args...)>
         {};
 
-        template <typename F, typename ProjectedPack, typename Enable = void>
+        template <typename ExPolicy, typename F, typename ProjectedPack,
+            typename Enable = void>
         struct is_indirect_callable
           : std::false_type
         {};
 
-        template <typename F, typename ...Projected>
-        struct is_indirect_callable<F, hpx::util::detail::pack<Projected...>,
+        template <typename ExPolicy, typename F, typename ...Projected>
+        struct is_indirect_callable<
+                ExPolicy, F, hpx::util::detail::pack<Projected...>,
                 typename std::enable_if<
                     hpx::util::detail::all_of<
                         is_projected_indirect<Projected>...
-                    >::value
+                    >::value &&
+                    (  !hpx::parallel::is_vectorpack_execution_policy<
+                            ExPolicy
+                        >::value ||
+                       !hpx::util::detail::all_of<
+                            is_projected_zip_iterator<Projected>...
+                        >::value
+                    )
                 >::type>
           : is_indirect_callable_impl<
                 F, typename projected_result_of_indirect<Projected>::type...>
         {};
+
+#if defined(HPX_HAVE_DATAPAR)
+        // For now, disable concept checking for vector pack execution policies
+        // if it is used with zip-iterators.
+        template <typename ExPolicy, typename F, typename ...Projected>
+        struct is_indirect_callable<
+                ExPolicy, F, hpx::util::detail::pack<Projected...>,
+                typename std::enable_if<
+                    hpx::util::detail::all_of<
+                        is_projected_indirect<Projected>...
+                    >::value &&
+                    hpx::parallel::is_vectorpack_execution_policy<
+                        ExPolicy
+                    >::value &&
+                    hpx::util::detail::all_of<
+                        is_projected_zip_iterator<Projected>...
+                    >::value
+                >::type>
+          : std::true_type
+        {};
+#endif
     }
 
-    template <typename F, typename ...Projected>
+    template <typename ExPolicy, typename F, typename ...Projected>
     struct is_indirect_callable
       : detail::is_indirect_callable<
+            typename hpx::util::decay<ExPolicy>::type,
             typename hpx::util::decay<F>::type,
             hpx::util::detail::pack<
                 typename hpx::util::decay<Projected>::type...
