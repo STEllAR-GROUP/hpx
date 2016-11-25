@@ -47,6 +47,38 @@
 static_assert ( HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE<RDMA_POOL_MEDIUM_CHUNK_SIZE , 
 "Default memory Chunk size must be less than medium chunk size" );  
 
+
+// Description of memory pool objects:
+//
+// memory_region_allocator:
+// An allocator that returns memory of the requested size. The memory is pinned
+// and ready to be used for RDMA operations. A memory_region object is
+// used, it contains the memory registration information needed by the verbs API.
+//
+// rdma_chunk_pool :
+// This is a class taken from boost that takes a block of memory (in this case provided
+// by the memory_region_allocator) and divides it up into N smaller blocks.
+// These smaller blocks can be used for individual objects or can be used as buffers.
+// If 16 blocks of 1K are requested, it will call the allocator and request
+// 16*1K + 16 bytes. The overhead per memory allocation request is 16 bytes
+//
+// pool_container:
+// The pool container wraps an rdma_chunk_pool and provides a stack. When a user
+// requests a small block, one is popped off the stack. At startup, the pool_container
+// requests a large number of blocks from the rdma_chunk_pool and sets the correct
+// address offset within each larger chunk for each small block and pushes the mini
+// rdma_memory_region onto the stack. Thus N small rdma_regions are created from a
+// single larger one and memory blocks come from contiguous memory.
+//
+// rdma_memory_pool:
+// The rdma_memory_pool maintains 4 pool_container (stacks) of different sized blocks
+// so that most user requests can be fulfilled.
+// If a request cannot be filled, the pool can generate temporary blocks with
+// new allocations and on-the-fly registration of the memory.
+// Additionally, it also provides a simple API so users may pass pre-allocated
+// memory to the pool for on-the-fly registration (rdma transfer of user memory chunks)
+// and later de-registration.
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -208,10 +240,10 @@ namespace verbs
         // constructor
         rdma_memory_pool(rdma_protection_domain_ptr pd) :
                 protection_domain_(pd),
-                tiny_  (pd, RDMA_POOL_1K_CHUNK,          256, RDMA_POOL_MAX_1K_CHUNKS),
-                small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 8192, RDMA_POOL_MAX_SMALL_CHUNKS),
-                medium_(pd, RDMA_POOL_MEDIUM_CHUNK_SIZE,  16, RDMA_POOL_MAX_MEDIUM_CHUNKS),
-                large_ (pd, RDMA_POOL_LARGE_CHUNK_SIZE,    4, RDMA_POOL_MAX_LARGE_CHUNKS),
+                tiny_  (pd, RDMA_POOL_1K_CHUNK,         1024, RDMA_POOL_MAX_1K_CHUNKS),
+                small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 1024, RDMA_POOL_MAX_SMALL_CHUNKS),
+                medium_(pd, RDMA_POOL_MEDIUM_CHUNK_SIZE,  64, RDMA_POOL_MAX_MEDIUM_CHUNKS),
+                large_ (pd, RDMA_POOL_LARGE_CHUNK_SIZE,   32, RDMA_POOL_MAX_LARGE_CHUNKS),
                 temp_regions(0),
                 user_regions(0)
         {
@@ -226,11 +258,11 @@ namespace verbs
         // destructor
         ~rdma_memory_pool()
         {
-            deallocte_pools();
+            deallocate_pools();
         }
 
         //----------------------------------------------------------------------------
-        int deallocte_pools()
+        int deallocate_pools()
         {
             bool ok = true;
             ok = ok && tiny_.DeallocatePool();
@@ -250,7 +282,7 @@ namespace verbs
         //----------------------------------------------------------------------------
         // query the pool for a chunk of a given size to see if one is available
         // this function is 'unsafe' because it is not thread safe and another
-        // thread may pop a block after this is called and invalidate the result.
+        // thread may push/pop a block after this is called and invalidate the result.
         inline bool can_allocate_unsafe(size_t length) const
         {
             if (length<=tiny_.chunk_size_) {
