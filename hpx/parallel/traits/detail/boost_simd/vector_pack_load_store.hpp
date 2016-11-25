@@ -44,20 +44,18 @@ namespace hpx { namespace parallel { namespace traits
     template <typename V, typename ValueType, typename Enable>
     struct vector_pack_load
     {
+        typedef typename rebind_pack<V, ValueType>::type value_type;
+
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
-            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return boost::simd::aligned_load<vector_pack_type>(
                 std::addressof(*iter));
         }
 
         template <typename Iter>
-        static typename rebind_pack<V, ValueType>::type
-        unaligned(Iter const& iter)
+        static value_type unaligned(Iter const& iter)
         {
-            typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return boost::simd::load<vector_pack_type>(std::addressof(*iter));
         }
     };
@@ -65,16 +63,17 @@ namespace hpx { namespace parallel { namespace traits
     template <typename V, typename T, std::size_t N, typename Abi>
     struct vector_pack_load<V, boost::simd::pack<T, N, Abi> >
     {
+        typedef typename rebind_pack<V, boost::simd::pack<T, N, Abi> >::type
+            value_type;
+
         template <typename Iter>
-        static typename rebind_pack<V, boost::simd::pack<T, N, Abi> >::type
-        aligned(Iter const& iter)
+        static value_type aligned(Iter const& iter)
         {
             return *iter;
         }
 
         template <typename Iter>
-        static typename rebind_pack<V, boost::simd::pack<T, N, Abi> >::type
-        unaligned(Iter const& iter)
+        static value_type unaligned(Iter const& iter)
         {
             return *iter;
         }

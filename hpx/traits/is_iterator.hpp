@@ -105,6 +105,19 @@ namespace hpx { namespace traits
       : detail::has_category<
             typename std::decay<Iter>::type, std::random_access_iterator_tag>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename Enable = void>
+    struct is_zip_iterator
+      : std::false_type
+    {};
 }}
 
 #endif

@@ -279,7 +279,9 @@ if(HPX_WITH_DATAPAR_BOOST_SIMD)
   include(HPX_SetupBoostSIMD)
 endif()
 if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD) AND (NOT HPX_WITH_DATAPAR_LIBFLATARRAY))
-hpx_info("No vectorization library configured")
+  hpx_info("No vectorization library configured")
+else()
+  set(HPX_WITH_DATAPAR ON)
 endif()
 
 ################################################################################

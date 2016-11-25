@@ -47,6 +47,12 @@ set(subdirs
     executors
    )
 
+if(HPX_WITH_DATAPAR)
+  set(subdirs ${subdirs}
+      datapar
+     )
+endif()
+
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.regressions.parallel_dir.${subdir}_dir)
   add_subdirectory(${subdir})

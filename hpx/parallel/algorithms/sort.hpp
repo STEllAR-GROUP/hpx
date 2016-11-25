@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<RandomIt>::value &&
         traits::is_projected<Proj, RandomIt>::value &&
         traits::is_indirect_callable<
-            Compare,
+            ExPolicy, Compare,
                 traits::projected<Proj, RandomIt>,
                 traits::projected<Proj, RandomIt>
         >::value)>

@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
@@ -766,6 +767,12 @@ namespace hpx { namespace traits
                     >::call(iter));
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ... Iter>
+    struct is_zip_iterator<hpx::util::zip_iterator<Iter...> >
+      : std::true_type
+    {};
 }}
 
 #endif

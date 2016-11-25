@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            Compare,
+            ExPolicy, Compare,
                 traits::projected_range<Proj, Rng>,
                 traits::projected_range<Proj, Rng>
         >::value)>
