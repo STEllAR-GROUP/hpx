@@ -168,7 +168,7 @@ namespace hpx { namespace lcos { namespace local
                 if (generation == std::size_t(-1))
                     generation = set_generation_;
 
-                buffer_.store_received(generation, std::move(t));
+                buffer_.store_received(generation, std::move(t), &l);
             }
 
             void close()
