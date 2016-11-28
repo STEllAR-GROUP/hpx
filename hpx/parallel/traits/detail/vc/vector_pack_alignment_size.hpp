@@ -169,7 +169,8 @@ namespace hpx { namespace parallel { namespace traits
     template <typename T, typename Enable>
     struct vector_pack_alignment
     {
-        static std::size_t const value = Vc::datapar<T>::alignment();
+        static std::size_t const value =
+            Vc::memory_alignment<Vc::datapar<T> >::value;
     };
 
     ///////////////////////////////////////////////////////////////////////////
