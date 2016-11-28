@@ -2,6 +2,81 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+//  How do guards work:
+//  Pythonesque pseudocode
+//
+//  class guard:
+//    task # an atomic pointer to a guard_task
+//
+//  class guard_task:
+//    run # a function pointer of some kind
+//    next # an atomic pointer to another guard task
+//
+//  def run_guarded(g,func):
+//    n = new guard_task
+//    n.run = func
+//    t = g.task.exchange(n)
+//    if t == nullptr:
+//      run_task(n)
+//    else:
+//      zero = nullptr
+//      if t.next.compare_exchange_strong(zero,n):
+//        pass
+//      else:
+//        run_task(n)
+//        delete t
+//
+//  def run_task(t):
+//    t.run() // call the task
+//    zero = nullptr
+//    if t.next.compare_exchange_strong(zero,t):
+//      pass
+//    else:
+//      run_task(zero)
+//      delete t
+//
+// Consider cases. Thread A, B, and C on guard g.
+// Case 1:
+// Thread A runs on guard g, gets t == nullptr and runs to completion.
+// Thread B starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
+// Thread C starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
+//
+// Case 2:
+// Thread A runs on guard g, gets t == nullptr,
+//  but before it completes, thread B starts.
+// Thread B runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds. It does nothing further.
+// Thread A resumes and finishes, compare_exchange_strong fails,
+//  it runs B's task to completion.
+// Thread C starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
+//
+// Case 3:
+// Thread A runs on guard g, gets t == nullptr,
+//  but before it completes, thread B starts.
+// Thread B runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds, It does nothing further.
+// Thread C runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds, It does nothing further.
+// Thread A resumes and finishes, compare_exchange_strong fails,
+//  it runs B's task to completion.
+// Thread B does compare_exchange_strong fails,
+//  it runs C's task to completion.
+//
+//  def destructor guard:
+//    t = g.load()
+//    if t == nullptr:
+//      pass
+//    else:
+//      zero = nullptr
+//      if t.next.compare_exchange_strong(zero,empty):
+//        pass
+//      else:
+//        delete t
+
 #ifndef HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
 #define HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
 
@@ -10,6 +85,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -62,9 +138,7 @@ namespace hpx { namespace lcos { namespace local
         detail::guard_atomic task;
 
         guard() : task(nullptr) {}
-        ~guard() {
-            detail::free(task.load());
-        }
+        HPX_API_EXPORT ~guard();
     };
 
     class guard_set : public detail::debug_object
@@ -78,13 +152,18 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         guard_set() : guards(), sorted(true) {}
-        ~guard_set() {}
+         ~guard_set() {}
 
         std::shared_ptr<guard> get(std::size_t i) { return guards[i]; }
 
         void add(std::shared_ptr<guard> const& guard_ptr) {
+            HPX_ASSERT(guard_ptr.get() != nullptr);
             guards.push_back(guard_ptr);
             sorted = false;
+        }
+
+        std::size_t size() {
+            return guards.size();
         }
 
         friend HPX_API_EXPORT void run_guarded(
