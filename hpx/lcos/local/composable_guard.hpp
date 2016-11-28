@@ -2,7 +2,7 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//  
+//
 //  How do guards work:
 //  Pythonesque pseudocode
 //
@@ -26,35 +26,46 @@
 //      else:
 //        run_task(n)
 //        delete t
-//    
+//
 //  def run_task(t):
 //    t.run() // call the task
 //    zero = nullptr
 //    if t.next.compare_exchange_strong(zero,t):
 //      pass
-//    else: 
+//    else:
 //      run_task(zero)
 //      delete t
 //
 // Consider cases. Thread A, B, and C on guard g.
 // Case 1:
 // Thread A runs on guard g, gets t == nullptr and runs to completion.
-// Thread B starts, gets t != null, compare_exchange_strong fails, it runs to completion and deletes t
-// Thread C starts, gets t != null, compare_exchange_strong fails, it runs to completion and deletes t
+// Thread B starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
+// Thread C starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
 //
 // Case 2:
-// Thread A runs on guard g, gets t == nullptr, but before it completes, thread B starts.
-// Thread B runs on guard g, gets t != nullptr, compare_exchange_strong succeeds. It does nothing further.
-// Thread A resumes and finishes, compare_exchange_strong fails, it runs B's task to completion.
-// Thread C starts, gets t != null, compare_exchange_strong fails, it runs to completion and deletes t
+// Thread A runs on guard g, gets t == nullptr,
+//  but before it completes, thread B starts.
+// Thread B runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds. It does nothing further.
+// Thread A resumes and finishes, compare_exchange_strong fails,
+//  it runs B's task to completion.
+// Thread C starts, gets t != null, compare_exchange_strong fails,
+//  it runs to completion and deletes t
 //
 // Case 3:
-// Thread A runs on guard g, gets t == nullptr, but before it completes, thread B starts.
-// Thread B runs on guard g, gets t != nullptr, compare_exchange_strong succeeds, It does nothing further.
-// Thread C runs on guard g, gets t != nullptr, compare_exchange_strong succeeds, It does nothing further.
-// Thread A resumes and finishes, compare_exchange_strong fails, it runs B's task to completion.
-// Thread B does compare_exchange_strong fails, it runs C's task to completion.
-//  
+// Thread A runs on guard g, gets t == nullptr,
+//  but before it completes, thread B starts.
+// Thread B runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds, It does nothing further.
+// Thread C runs on guard g, gets t != nullptr,
+//  compare_exchange_strong succeeds, It does nothing further.
+// Thread A resumes and finishes, compare_exchange_strong fails,
+//  it runs B's task to completion.
+// Thread B does compare_exchange_strong fails,
+//  it runs C's task to completion.
+//
 //  def destructor guard:
 //    t = g.load()
 //    if t == nullptr:
