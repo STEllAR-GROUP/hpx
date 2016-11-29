@@ -6,9 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
-// hpxinspect:nodeprecatedname:boost::chrono
-
 #include <hpx/runtime.hpp>
 
 #include <hpx/error_code.hpp>
@@ -28,8 +25,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/tuple.hpp>
-
-#include <boost/chrono/chrono.hpp>
 
 #include <cstddef>
 #include <string>
