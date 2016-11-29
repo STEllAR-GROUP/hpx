@@ -198,7 +198,11 @@ function(hpx_setup_target target)
     target_compile_options(${target} PUBLIC ${CXX_FLAG})
   endif()
 
+if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
   target_link_libraries(${target} PUBLIC ${hpx_libs} ${target_DEPENDENCIES})
+else()
+  target_link_libraries(${target} ${hpx_libs} ${target_DEPENDENCIES})
+endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 
