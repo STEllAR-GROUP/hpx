@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/throw_exception.hpp>
@@ -162,7 +163,8 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
-        void store_received(std::size_t step, T && val)
+        template <typename Lock = hpx::lcos::local::no_mutex>
+        void store_received(std::size_t step, T && val, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
 
@@ -187,6 +189,9 @@ namespace hpx { namespace lcos { namespace local
                     buffer_map_.erase(it);
                 }
             }
+
+            if (lock)
+                lock->unlock();
 
             // set value in promise, but only after the lock went out of scope
             entry->set_value(std::move(val));
@@ -374,7 +379,8 @@ namespace hpx { namespace lcos { namespace local
             return true;
         }
 
-        void store_received(std::size_t step)
+        template <typename Lock = hpx::lcos::local::no_mutex>
+        void store_received(std::size_t step, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
 
@@ -399,6 +405,9 @@ namespace hpx { namespace lcos { namespace local
                     buffer_map_.erase(it);
                 }
             }
+
+            if (lock)
+                lock->unlock();
 
             // set value in promise, but only after the lock went out of scope
             entry->set_value();
