@@ -26,35 +26,38 @@ namespace hpx { namespace actions {
     namespace detail
     {
 
-        // special handling of actions returning a future
-        template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::false_type,
-            typed_continuation<Result, RemoteResult>&& cont, Future&& result)
+        struct deferred_trigger
         {
-            try {
-                HPX_ASSERT(result.is_ready());
-                cont.trigger_value(hpx::util::detail::decay_copy(result.get()));
+            // special handling of actions returning a future
+            template <typename Result, typename RemoteResult, typename Future>
+            void operator()(std::false_type,
+                typed_continuation<Result, RemoteResult>&& cont, Future&& result)
+            {
+                try {
+                    HPX_ASSERT(result.is_ready());
+                    cont.trigger_value(hpx::util::detail::decay_copy(result.get()));
+                }
+                catch (...) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont.trigger_error(boost::current_exception());
+                }
             }
-            catch (...) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
-            }
-        }
 
-        template <typename Result, typename RemoteResult, typename Future>
-        void deferred_trigger(std::true_type,
-            typed_continuation<Result, RemoteResult>&& cont, Future&& result)
-        {
-            try {
-                HPX_ASSERT(result.is_ready());
-                result.get();                   // rethrow exceptions
-                cont.trigger();
+            template <typename Result, typename RemoteResult, typename Future>
+            void operator()(std::true_type,
+                typed_continuation<Result, RemoteResult>&& cont, Future&& result)
+            {
+                try {
+                    HPX_ASSERT(result.is_ready());
+                    result.get();                   // rethrow exceptions
+                    cont.trigger();
+                }
+                catch (...) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont.trigger_error(boost::current_exception());
+                }
             }
-            catch (...) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
-            }
-        }
+        };
 
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
         void trigger_impl_future(std::true_type,
@@ -69,20 +72,18 @@ namespace hpx { namespace actions {
 
             typedef typename hpx::util::decay<decltype(result)>::type future_type;
 
+            deferred_trigger trigger;
+
             if(result.is_ready())
             {
-                detail::deferred_trigger<Result, RemoteResult>(
+                trigger(
                     is_void(), std::move(cont), std::move(result));
                 return;
             }
 
-            void (*fun)(is_void, typed_continuation<Result, RemoteResult>&&,
-                    future_type&&)
-                = &detail::deferred_trigger<Result, RemoteResult, future_type>;
-
             result.then(
                 hpx::util::bind(
-                    hpx::util::one_shot(fun)
+                    hpx::util::one_shot(trigger)
                   , is_void()
                   , std::move(cont) //-V575
                   , util::placeholders::_1
