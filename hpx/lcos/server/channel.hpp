@@ -75,7 +75,11 @@ namespace hpx { namespace lcos { namespace server
         }
 
         // Retrieve the next value from the channel
-        result_type get_value(error_code& ec = throws)
+        result_type get_value()
+        {
+            return channel_.get(launch::sync);
+        }
+        result_type get_value(error_code& ec)
         {
             return channel_.get(launch::sync);
         }

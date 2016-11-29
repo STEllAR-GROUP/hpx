@@ -80,6 +80,10 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// This is invoked whenever the is_ready() function is called
+        bool get_value()
+        {
+            return latch_.is_ready();
+        }
         bool get_value(hpx::error_code &)
         {
             return latch_.is_ready();
@@ -110,7 +114,7 @@ namespace hpx { namespace lcos { namespace server
             > create_component_action;
 
         // additional functionality
-        void wait() const
+        HPX_HOST_DEVICE void wait() const
         {
             latch_.wait();
         }

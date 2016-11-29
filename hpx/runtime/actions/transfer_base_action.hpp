@@ -103,7 +103,7 @@ namespace hpx { namespace actions
         {}
 
         //
-        ~transfer_base_action()
+        virtual ~transfer_base_action() HPX_NOEXCEPT
         {
             detail::register_action<derived_type>::instance.instantiate();
         }

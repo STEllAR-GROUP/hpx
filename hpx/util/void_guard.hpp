@@ -22,7 +22,8 @@ namespace hpx { namespace util
     struct void_guard<void>
     {
         template <typename T>
-        void operator,(T const&) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        void operator,(T const&) const HPX_NOEXCEPT
         {}
     };
 }}
