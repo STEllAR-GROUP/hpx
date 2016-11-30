@@ -16,7 +16,7 @@ if(HPX_WITH_STATIC_LINKING)
 else()
 endif()
 
-# Set the Intel Compiler
+# Set the Cray Compiler Wrapper
 set(CMAKE_CXX_COMPILER CC)
 set(CMAKE_C_COMPILER cc)
 set(CMAKE_Fortran_COMPILER ftn)
