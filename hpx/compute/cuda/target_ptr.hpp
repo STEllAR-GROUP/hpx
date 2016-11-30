@@ -111,12 +111,13 @@ namespace hpx { namespace compute { namespace cuda
 
     public:
 #if defined(__CUDA_ARCH__)
-        HPX_HOST_DEVICE operator T*() const
+        HPX_DEVICE operator T*() const
         {
             return this->base();
         }
 #else
-        explicit operator T*() const
+        // The keyword 'explicit' has been removed for Cuda Clang compliance
+        operator T*() const
         {
             return this->base();
         }
