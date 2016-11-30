@@ -6,6 +6,8 @@
 #ifndef HPX_UTIL_VOID_GUARD_HPP
 #define HPX_UTIL_VOID_GUARD_HPP
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

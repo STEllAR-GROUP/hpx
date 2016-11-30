@@ -65,9 +65,11 @@ namespace hpx { namespace parallel { namespace traits
     };
 }}}
 
+#if !defined(__CUDACC__)
 #include <hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/detail/boost_simd/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/detail/libflatarray/vector_pack_alignment_size.hpp>
+#endif
 
 #endif
 #endif
