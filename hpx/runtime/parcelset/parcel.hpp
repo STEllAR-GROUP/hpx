@@ -71,8 +71,6 @@ namespace hpx { namespace parcelset
 
     class HPX_EXPORT parcel
     {
-    private:
-        HPX_MOVABLE_ONLY(parcel);
 
     private:
 
@@ -105,8 +103,8 @@ namespace hpx { namespace parcelset
 
     public:
         parcel(parcel && other);
-
         parcel &operator=(parcel && other);
+        HPX_MOVABLE_ONLY(parcel);
 
         void reset();
 
