@@ -248,6 +248,13 @@ namespace hpx { namespace compute
             return data_;
         }
 
+        /// Returns a raw pointer corresponding to the address of the data
+        /// allocated on the device.
+        T* device_data() const HPX_NOEXCEPT
+        {
+            return data_.device_ptr();
+        }
+
         //
         std::size_t size() const HPX_NOEXCEPT
         {
