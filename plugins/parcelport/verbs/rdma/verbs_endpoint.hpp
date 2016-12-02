@@ -25,7 +25,7 @@
 #include <iomanip>
 #include <atomic>
 
-#define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS     2048
+#define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS 1024
 
 using namespace bgcios;
 
@@ -41,6 +41,9 @@ namespace verbs
     public:
         // ---------------------------------------------------------------------------
         enum connection_state {
+            uninitialized,
+            resolving_address,
+            resolveing_route,
             connecting,
             accepting,
             rejecting,
@@ -53,10 +56,10 @@ namespace verbs
 
        // ---------------------------------------------------------------------------
         // This constructor is used to create a local server endpoint.
-        // The server endpoint can accept incoming connections, or make outgoing ones.
-        // Every node will create one server endpoint, then for each connection
-        // made a new client endpoint will be constructed.
-        // The endpoint will represent the local node.
+        // It can accept incoming connections, or make outgoing ones.
+        // Every node will create one server endpoint, and then for each connection
+        // made to another node a new client endpoint will be constructed.
+        // The endpoint constructed here will represent the local node.
         verbs_endpoint(struct sockaddr_in local_address) : verbs_sender_receiver(nullptr)
          {
             LOG_DEVEL_MSG("verbs_endpoint Listening Server Constructor");
@@ -68,8 +71,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // This constructor is used when we have received a connection request and
-        // create a client endpoint to manage the remote client/server.
-        // The endpoint will represent the remote node.
+        // create a client endpoint represent the remote end of the link.
         // NB. we only use one CompletionQ, send/recv share the same one.
         // This could be changed if need arises
         verbs_endpoint(
@@ -86,48 +88,72 @@ namespace verbs
             init();
 
             // Use the input rdma connection management id.
-            cmId_           = cmId;
-            remote_address_ = *(sockaddr_in*)(&cmId->route.addr.dst_addr);
-            srq_            = SRQ;
-            completionQ_    = CompletionQ;
-            memory_pool_    = pool;
+            cmId_             = cmId;
+            remote_address_   = *(sockaddr_in*)(&cmId->route.addr.dst_addr);
+            srq_              = SRQ;
+            completion_queue_ = CompletionQ;
+            memory_pool_      = pool;
+            domain_           = domain;
 
             // Create a queue pair. Both send and receive share a completion queue
-            createQp(domain, CompletionQ, CompletionQ,
+            create_queue_pair(domain, CompletionQ, CompletionQ,
                 HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS, signalSendQueue);
         }
 
         // ---------------------------------------------------------------------------
         // This constructor is used when we make/start a new connection to a remote
         // node (as opposed to when they connect to us).
-        // The endpoint will represent the remote node.
+        // The constructed endpoint will represent the remote node.
         verbs_endpoint(
             struct sockaddr_in localAddress,
-            struct sockaddr_in remoteAddress) :
+            struct sockaddr_in remoteAddress,
+            rdma_protection_domain_ptr domain,
+            bgcios::RdmaCompletionQueuePtr CompletionQ,
+            rdma_memory_pool_ptr pool,
+            bool signalSendQueue = false) :
                 verbs_sender_receiver(nullptr)
         {
             LOG_DEVEL_MSG("verbs_endpoint create connection constructor "
-                << ipaddress(localAddress.sin_addr.s_addr) << " "
+                << ipaddress(localAddress.sin_addr.s_addr) << "to "
                 << ipaddress(remoteAddress.sin_addr.s_addr));
             //
             init();
             create_id();
             //
-            resolve_address(&localAddress, &remoteAddress, std::chrono::milliseconds(10000));
+            completion_queue_     = CompletionQ;
+            memory_pool_          = pool;
+            domain_               = domain;
+            _initiated_connection = true;
+
+            // resolve ib addresses
+            resolve_address(&localAddress, &remoteAddress,
+                std::chrono::milliseconds(10000));
+
+            create_queue_pair(domain_, completion_queue_, completion_queue_,
+                HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS, signalSendQueue);
+
+            // Resolve a route to the (remote) server.
+            resolve_route();
         }
 
         // ---------------------------------------------------------------------------
         ~verbs_endpoint(void)
         {
+            LOG_DEVEL_MSG("reset domain");
+            domain_.reset();
+
+            LOG_DEVEL_MSG("reset CQ ");
+            completion_queue_.reset();
+
             // Destroy the rdma cm id and queue pair.
             if (cmId_ != nullptr) {
                 if (cmId_->qp != nullptr) {
                     rdma_destroy_qp(cmId_); // No return code
-                    LOG_DEBUG_MSG("destroyed queue pair");
+                    LOG_DEVEL_MSG("destroyed queue pair");
                 }
 
                 if (rdma_destroy_id(cmId_) == 0) {
-                    LOG_DEBUG_MSG("destroyed rdma cm id " << cmId_);
+                    LOG_DEVEL_MSG("destroyed rdma cm id " << cmId_);
                     cmId_ = nullptr;
                 }
                 else {
@@ -146,67 +172,8 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        //
-        void handle_event() {
-
-        }
-
-
-        // ---------------------------------------------------------------------------
-        // Initiate a connection to another node's server endpoint
-        int makePeer(rdma_protection_domain_ptr domain,
-            RdmaCompletionQueuePtr completionQ)
-        {
-            this->_domain = domain;
-            this->completionQ_ = completionQ;
-
-            // Create a queue pair.
-            try {
-                createQp(domain, completionQ, completionQ, 1, false);
-            }
-            catch (rdma_error& e) {
-                LOG_ERROR_MSG(
-                    "makePeer error creating queue pair: "
-                    << rdma_error::error_string(e.error_code()));
-                return e.error_code();
-            }
-
-            // Resolve a route to the server.
-            int err = resolve_route();
-            if (err != 0) {
-                LOG_ERROR_MSG("error resolving route to "
-                    << sockaddress(&remote_address_)
-                    << "from " << sockaddress(&local_address_)
-                    << ": " << rdma_error::error_string(err));
-                return err;
-            }
-
-            // Connect to server.
-            err = connect();
-            if (err != 0) {
-                LOG_ERROR_MSG("error in makePeer connecting to "
-                    << sockaddress(&remote_address_)
-                    << "from " << sockaddress(&local_address_)
-                    << ": " << rdma_error::error_string(err));
-
-                LOG_ERROR_MSG("destroy qp");
-                rdma_destroy_qp(cmId_);
-
-                LOG_ERROR_MSG("reset domain");
-                this->_domain.reset();
-
-                LOG_ERROR_MSG("reset CQ ");
-                this->completionQ_.reset();
-
-                return err;
-            }
-
-            return 0;
-        }
-
-        // ---------------------------------------------------------------------------
         RdmaCompletionQueuePtr& getCompletionQ(void) {
-            return completionQ_;
+            return completion_queue_;
         }
 
         // ---------------------------------------------------------------------------
@@ -279,7 +246,8 @@ namespace verbs
            int err = rdma_listen(cmId_, backlog);
            if (err != 0) {
               err = abs(err);
-              LOG_ERROR_MSG("error listening for connections: " << rdma_error::error_string(err));
+              LOG_ERROR_MSG("error listening for connections: "
+                  << rdma_error::error_string(err));
               return err;
            }
            LOG_DEBUG_MSG("listening for connections with backlog " << backlog);
@@ -287,9 +255,22 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
+        // this poll for event function is used by the main server endpoint when
+        // it is waiting for connection/disconnection requests etc
+        // ack_event, deletes the cm_event data structure allocated by the CM,
+        // so we do not ack and alow the event handler routine to do it
         template<typename Func>
-        int poll_for_events(Func &&f) {
-            return event_channel_->poll_event_channel(std::forward<Func>(f));
+        int poll_for_event(Func &&f)
+        {
+            return event_channel_->poll_event_channel([this, &f]()
+                {
+                    struct rdma_cm_event *cm_event;
+                    int err = event_channel_->get_event(event_channel::no_ack_event,
+                        rdma_cm_event_type(-1), cm_event);
+                    if (err != 0) return 0;
+                    return f(cm_event);
+                }
+            );
         }
 
         // ---------------------------------------------------------------------------
@@ -300,6 +281,9 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
+        // resolve_address is called when we wish to make a connection to another node.
+        // This endpoint is created on demand, so it does not share an event channel
+        // between other nodes (unlike server endpoints)
         int resolve_address(
             struct sockaddr_in *localAddr,
             struct sockaddr_in *remoteAddr,
@@ -315,6 +299,7 @@ namespace verbs
                 LOG_DEVEL_MSG("resolving remote address "
                     << sockaddress(localAddr) << ": "
                     << sockaddress(remoteAddr));
+                // set our port to zero and let it find one
                 localAddr->sin_port = 0 ;
                 int rc = rdma_resolve_addr(cmId_,
                     (struct sockaddr *) localAddr,
@@ -335,7 +320,8 @@ namespace verbs
                     memcpy(&local_address_, localAddr, sizeof(struct sockaddr_in));
                 }
 
-                LOG_DEVEL_MSG("Called  rdma_resolve_addr    from "
+                LOG_DEVEL_MSG("rdma_resolve_addr     "
+                    << hexnumber(event_channel_->get_file_descriptor()) << "from "
                     << sockaddress(&local_address_)
                     << "to " << sockaddress(&remote_address_)
                     << "( " << sockaddress(remoteAddr) << ")");
@@ -355,6 +341,33 @@ namespace verbs
             }
 
             LOG_DEBUG_MSG("resolved to address " << sockaddress(&remote_address_));
+            return err;
+        }
+
+        // ---------------------------------------------------------------------------
+        int resolve_route(void)
+        {
+            LOG_DEBUG_MSG("Calling rdma_resolve_route   "
+                << "from " << sockaddress(&local_address_)
+                << "to " << sockaddress(&remote_address_)
+                << "( " << sockaddress(&local_address_) << ")");
+            // Resolve a route.
+            int rc = rdma_resolve_route(cmId_, 1000); // Configurable timeout?
+            if (rc != 0) {
+                rdma_error e(rc, LOG_FORMAT_MSG("error resolving route to "
+                    << sockaddress(&remote_address_)
+                    << "from " << sockaddress(&local_address_)
+                    << ": " << rdma_error::error_string(err)));
+                return rc;
+            }
+
+            // Wait for RDMA_CM_EVENT_ROUTE_RESOLVED event.
+            struct rdma_cm_event *event;
+            int err = event_channel_->get_event(event_channel::do_ack_event,
+                RDMA_CM_EVENT_ROUTE_RESOLVED, event);
+
+            LOG_DEBUG_MSG("resolved route to " << sockaddress(&remote_address_));
+
             return err;
         }
 
@@ -386,8 +399,8 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 1;
-            param.rnr_retry_count = 7; // special code for infinite retries
-
+            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+            //
             int rc = rdma_accept(cmId_, &param);
             if (rc != 0) {
                 int err = errno;
@@ -396,7 +409,9 @@ namespace verbs
                 return err;
             }
 
-            LOG_DEBUG_MSG("accepted connection from client " << sockaddress(&remote_address_));
+            LOG_DEBUG_MSG("accepted connection from client "
+                << sockaddress(&remote_address_));
+
             return 0;
         }
 
@@ -405,18 +420,14 @@ namespace verbs
         {
             //
             // Debugging code to get ip address of soure/dest of event
-            // NB: The src and dest fields refer to the message and not the connect request
-            // so we are actually receiving a request from dest (it is the src of the msg)
+            // NB: The src and dest fields refer to the message - not the connect request
+            // so we are actually receiving a request from dest (but src of the msg)
             //
             struct sockaddr *ip_src = &cmId_->route.addr.src_addr;
             struct sockaddr_in *addr_src =
                 reinterpret_cast<struct sockaddr_in *>(ip_src);
             //
-            struct sockaddr *ip_dst = &cmId_->route.addr.dst_addr;
-            struct sockaddr_in *addr_dst =
-                reinterpret_cast<struct sockaddr_in *>(ip_dst);
             local_address_ = *addr_src;
-            remote_address_ = *addr_dst;
 
             LOG_DEVEL_MSG("Calling rdma_reject          from "
                 << ipaddress(remote_address_.sin_addr.s_addr)
@@ -436,45 +447,31 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int resolve_route(void)
+        // Initiate a connection to another node's server endpoint
+        // If two node simultaneously attempt to connect to one another using 1 thread,
+        // a deadlock could occur if both A and B waited for a ESTABLISHED events
+        // this is because they would both be waiting on their own event channels
+        // but the connection event goes to the server event channel, so any 'wait'
+        // must poll the server channel as well as the channel for this endpoint
+        // and be able to process events on that channel.
+        // To facilitate this we provide a function parameter that can be called
+        // for processing/progressing events on the server channel.
+        template <typename Func>
+        int connect(Func &&polling_function)
         {
-            LOG_DEBUG_MSG("Calling rdma_resolve_route   from "
+            LOG_DEVEL_MSG("rdma_connect          "
+                << hexnumber(event_channel_->get_file_descriptor()) << "from "
                 << ipaddress(local_address_.sin_addr.s_addr)
                 << "to " << ipaddress(remote_address_.sin_addr.s_addr)
                 << "( " << ipaddress(local_address_.sin_addr.s_addr) << ")");
-            // Resolve a route.
-            int rc = rdma_resolve_route(cmId_, 1000); // Configurable timeout?
-            if (rc != 0) {
-                int err = errno;
-                LOG_ERROR_MSG(
-                    "error resolving route: " << rdma_error::error_string(err));
-                return err;
-            }
 
-            // Wait for RDMA_CM_EVENT_ROUTE_RESOLVED event.
-            struct rdma_cm_event *event;
-            int err = event_channel_->get_event(event_channel::do_ack_event,
-                RDMA_CM_EVENT_ROUTE_RESOLVED, event);
-
-            LOG_DEBUG_MSG("resolved route to " << sockaddress(&remote_address_));
-
-            return err;
-        }
-
-        // ---------------------------------------------------------------------------
-        int connect(void)
-        {
-            LOG_DEVEL_MSG("Calling rdma_connect         from "
-                << ipaddress(local_address_.sin_addr.s_addr)
-                << "to " << ipaddress(remote_address_.sin_addr.s_addr)
-                << "( " << ipaddress(local_address_.sin_addr.s_addr) << ")");
             // Connect to the server.
             struct rdma_conn_param param;
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 2;
-            param.retry_count = 7;
-            param.rnr_retry_count = 7;
+            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+            //
             int rc = rdma_connect(cmId_, &param);
             if (rc != 0) {
                 int err = errno;
@@ -485,10 +482,21 @@ namespace verbs
                 return err;
             }
 
-            // Wait for RDMA_CM_EVENT_ESTABLISHED event.
+            // Wait for RDMA_CM_EVENT_ESTABLISHED (or rejected) event.
+            // Also call external polling function to avoid deadlocks
+            bool done = false;
             struct rdma_cm_event *event;
-            int err = event_channel_->get_event(event_channel::no_ack_event,
-                RDMA_CM_EVENT_ESTABLISHED, event);
+            int err = 0;
+            while (!done) {
+                event_channel_->poll_event_channel(
+                    [&,this](){
+                    err = event_channel_->get_event(event_channel::no_ack_event,
+                        RDMA_CM_EVENT_ESTABLISHED, event);
+                    done = true;
+                    }
+                );
+                if (!done) polling_function();
+            }
 
             if (err != 0 && event == NULL)
             {
@@ -503,12 +511,13 @@ namespace verbs
                         << "from " << ipaddress(remote_address_.sin_addr.s_addr)
                         << "( " << ipaddress(local_address_.sin_addr.s_addr) << ")");
                 } else {
+                    LOG_DEVEL_MSG("Error in connecting");
+                    std::terminate();
                     throw rdma_error(errno, "Error in connecting");
                 }
-                int status = event->status;
                 event_channel::ack_event(event);
                 //
-                return status;
+                return -1;
             }
             else if (err != 0)
             {
@@ -518,7 +527,6 @@ namespace verbs
 
             LOG_DEBUG_MSG("connected to " << sockaddress(&remote_address_));
             return event_channel::ack_event(event);
-            ;
         }
 
         // ---------------------------------------------------------------------------
@@ -560,12 +568,12 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint32_t getQpNum(void) const {
+        uint32_t get_qp_num(void) const {
             return cmId_->qp->qp_num;
         }
 
         // ---------------------------------------------------------------------------
-        struct ibv_context *getContext(void) const {
+        struct ibv_context *get_device_context(void) const {
             return cmId_->verbs;
         }
 
@@ -629,6 +637,7 @@ namespace verbs
             event_channel_ = std::unique_ptr<event_channel> (new event_channel);
             clear_counters();
             _initiated_connection = false;
+            state_ = connection_state::uninitialized;
             return;
         }
 
@@ -639,8 +648,10 @@ namespace verbs
             event_channel_->create_channel();
 
             // Create the rdma cm id.
-            int err = rdma_create_id(event_channel_->get_event_channel(),
-                &cmId_, this, RDMA_PS_TCP);
+            LOG_DEVEL_MSG("Creating cmid with event channel "
+                << hexnumber(event_channel_->get_file_descriptor()));
+            int err = rdma_create_id(
+                event_channel_->get_event_channel(), &cmId_, this, RDMA_PS_TCP);
             if (err != 0) {
                 rdma_error e(err, "rdma_create_id() failed");
                 LOG_ERROR_MSG(
@@ -651,7 +662,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        void createQp(rdma_protection_domain_ptr domain,
+        void create_queue_pair(rdma_protection_domain_ptr domain,
             bgcios::RdmaCompletionQueuePtr sendCompletionQ,
             bgcios::RdmaCompletionQueuePtr recvCompletionQ,
             uint32_t maxWorkRequests, bool signalSendQueue)
@@ -659,8 +670,8 @@ namespace verbs
             // Create a queue pair.
             struct ibv_qp_init_attr qpAttributes;
             memset(&qpAttributes, 0, sizeof qpAttributes);
-            qpAttributes.cap.max_send_wr = 4096; // maxWorkRequests;
-            qpAttributes.cap.max_recv_wr = 4096; // maxWorkRequests;
+            qpAttributes.cap.max_send_wr = maxWorkRequests;
+            qpAttributes.cap.max_recv_wr = maxWorkRequests;
             qpAttributes.cap.max_send_sge = 6; // 6;
             qpAttributes.cap.max_recv_sge = 6; // 6;
             qpAttributes.qp_context = this; // Save the pointer this object.
@@ -682,14 +693,14 @@ namespace verbs
             if (rc != 0) {
                 rdma_error e(errno, "rdma_create_qp() failed");
                 LOG_ERROR_MSG(
-                    "createQp : error creating queue pair: " << hexpointer(this)
+                    "error creating queue pair: " << hexpointer(this)
                     "local address " << sockaddress(&local_address_)
                 << " remote address " << sockaddress(&remote_address_)
                 << rdma_error::error_string(e.error_code()));
                 throw e;
             }
 
-            LOG_DEBUG_MSG("created queue pair " << decnumber(cmId_->qp->qp_num)
+            LOG_DEVEL_MSG("created queue pair " << decnumber(cmId_->qp->qp_num)
                 << " max inline data is " << hexnumber(qpAttributes.cap.max_inline_data));
 
             return;
@@ -713,10 +724,10 @@ namespace verbs
         bool _initiated_connection;
 
         // Memory region for inbound messages.
-        rdma_protection_domain_ptr _domain;
+        rdma_protection_domain_ptr domain_;
 
         // Completion queue.
-        bgcios::RdmaCompletionQueuePtr completionQ_;
+        bgcios::RdmaCompletionQueuePtr completion_queue_;
 
     };
 

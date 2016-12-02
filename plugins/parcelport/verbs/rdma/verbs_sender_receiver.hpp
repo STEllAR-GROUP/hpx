@@ -341,9 +341,9 @@ namespace verbs
             struct ibv_recv_wr *badRequest;
             int err = ibv_post_recv(cmId_->qp, &recv_wr, &badRequest);
             if (err!=0) {
-                LOG_ERROR_MSG("post_recv_region_as_id failed");
-                throw(std::runtime_error(std::string("post_recv_region_as_id failed")
-                    + rdma_error::error_string(errno)));
+                rdma_error e(err, LOG_FORMAT_MSG("post_recv_region_as_id failed on qp "
+                    << decnumber(cmId_->qp->qp_num)));
+                throw e;
             }
 
             ++total_posted_recv_;

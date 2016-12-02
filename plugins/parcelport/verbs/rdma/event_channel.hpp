@@ -28,8 +28,6 @@ namespace verbs
         //
         typedef hpx::lcos::local::spinlock   mutex_type;
         typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
-         //
-        static mutex_type event_mutex_;
 
         // ----------------------------------------------------------------------------
         enum event_ack_type {
@@ -37,12 +35,14 @@ namespace verbs
             no_ack_event = false
         };
 
+        // ----------------------------------------------------------------------------
         event_channel() {}
 
+        // ----------------------------------------------------------------------------
         ~event_channel() {
             // Destroy the event channel.
             if (event_channel_ != nullptr) {
-                LOG_TRACE_MSG(tag_ << "destroying rdma event channel with fd "
+                LOG_TRACE_MSG("destroying rdma event channel with fd "
                     << hexnumber(event_channel_->fd));
                 rdma_destroy_event_channel(event_channel_.get()); // No return code
             }
@@ -58,7 +58,7 @@ namespace verbs
                 rdma_error e(EINVAL, "rdma_create_event_channel() failed");
                 throw e;
             }
-            LOG_DEBUG_MSG(tag_ << "created rdma event channel with fd "
+            LOG_DEBUG_MSG("created rdma event channel with fd "
                 << hexnumber(event_channel_->fd));
             return true;
         }
@@ -73,13 +73,6 @@ namespace verbs
         template<typename Func>
         static int poll_event_channel(int fd, Func &&f)
         {
-            // there is no need for more than one thread to poll the event channel
-            // so try the lock and if someone has it, leave immediately
-            unique_lock lock(event_mutex_, std::try_to_lock);
-            if (!lock.owns_lock()) {
-                return 0;
-            }
-
             const int eventChannel = 0;
             const int numFds = 1;
             //
@@ -101,6 +94,7 @@ namespace verbs
             // There was an error so log the failure and try again.
             if (rc == -1) {
                 int err = errno;
+                // an interrupt is ok, not an epic fail
                 if (err == EINTR) {
                     LOG_TRACE_MSG("poll returned EINTR, continuing ...");
                     return 0;
@@ -128,11 +122,15 @@ namespace verbs
             return get_event(event_channel_.get(), ack, event, cm_event);
         }
 
-        static int get_event(struct rdma_event_channel *channel, event_ack_type ack,
-            rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
+        static int get_event(
+            struct rdma_event_channel *channel,
+            event_ack_type ack,
+            rdma_cm_event_type event,
+            struct rdma_cm_event *&cm_event)
         {
             cm_event = NULL;
             // This operation can block if there are no pending events available.
+            // (So only call it after the event poll says there is an event waiting)
             LOG_DEVEL_MSG("waiting for " << rdma_event_str(event)
                 << " on event channel " << hexnumber(channel->fd));
             int rc = rdma_get_cm_event(channel, &cm_event);
@@ -145,18 +143,16 @@ namespace verbs
             LOG_DEVEL_MSG("got " << rdma_event_str(cm_event->event)
                 << " on event channel " << hexnumber(channel->fd));
 
-            if (ack) {
-                // we have to ack events, even when they are not the ones we wanted
-                if (cm_event->event != event) {
-                    LOG_ERROR_MSG(" mismatch " << rdma_event_str(cm_event->event)
-                        << " not " << rdma_event_str(event));
-                    ack_event(cm_event);
-                    return -1;
-                }
-                // Acknowledge the event.
-                return ack_event(cm_event);
+            // we have to ack events, even when they are not the ones we wanted
+            if (cm_event->event != event && event!=rdma_cm_event_type(-1)) {
+                LOG_ERROR_MSG("mismatch " << rdma_event_str(cm_event->event)
+                    << " not " << rdma_event_str(event));
+                if (ack) ack_event(cm_event);
+                return -1;
             }
-            return 0;
+            // Acknowledge the event.
+            if (ack) return ack_event(cm_event);
+            else return 0;
         }
 
         // ----------------------------------------------------------------------------
@@ -189,7 +185,6 @@ namespace verbs
     private:
         // Event channel for notification of RDMA connection management events.
         std::unique_ptr<struct rdma_event_channel> event_channel_;
-        std::string tag_;
     };
 
 }}}}

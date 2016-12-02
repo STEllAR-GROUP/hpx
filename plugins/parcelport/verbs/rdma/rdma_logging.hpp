@@ -28,11 +28,11 @@
 #define hexuint32(p)  nhex(8)  << (uint32_t)(p) << " "
 #define hexlength(p)  nhex(6)  << (uintptr_t)(p) << " "
 #define hexnumber(p)  nhex(4)  << p << " "
-#define decnumber(p)  "" << std::dec << p << " "
-#define ipaddress(p)  "" << std::dec << (int) ((uint8_t*) &p)[0] << "." \
-                                     << (int) ((uint8_t*) &p)[1] << "." \
-                                     << (int) ((uint8_t*) &p)[2] << "." \
-                                     << (int) ((uint8_t*) &p)[3] << " "
+#define decnumber(p)  std::dec << p << " "
+#define ipaddress(p)  std::dec << (int) ((uint8_t*) &p)[0] << "." \
+                               << (int) ((uint8_t*) &p)[1] << "." \
+                               << (int) ((uint8_t*) &p)[2] << "." \
+                               << (int) ((uint8_t*) &p)[3] << " "
 #define sockaddress(p) ipaddress(((struct sockaddr_in*)(p))->sin_addr.s_addr)
 
 namespace hpx {
@@ -75,29 +75,29 @@ namespace detail {
 #  include <boost/log/utility/setup/console.hpp>
 #  include <boost/log/utility/setup/common_attributes.hpp>
 #  define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
+#  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #else
 #  define LOG_DEVEL_MSG(x)
 #endif
 
 //
-// Logging disabled, #define all macros to be empty
+// Logging disabled, #define all macros (except for error), to be empty
 //
 #ifndef HPX_PARCELPORT_VERBS_HAVE_LOGGING
+#  undef  LOG_DEBUG_MSG
 #  define LOG_DEBUG_MSG(x)
 #  define LOG_TRACE_MSG(x)
 #  define LOG_INFO_MSG(x)
 #  define LOG_WARN_MSG(x)
-#  define LOG_ERROR_MSG(x) std::cout << "ERROR: " << x << " " \
-    << __FILE__ << " " << __LINE__ << std::endl;
+#  define LOG_ERROR_MSG(x) std::cout << "00: <ERROR> " << THREAD_ID << " " << x << " " \
+    << __FILE__ << " " << std::dec << __LINE__ << std::endl;
+#  define LOG_FORMAT_MSG(x) ""
 #  define LOG_EXCLUSIVE(x)
 //
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
 
-#  define LOG_TIMED_INIT(name)                                                      \
-    using namespace std::chrono;                                                    \
-    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
-
+#  define LOG_TIMED_INIT(name)
 #  define LOG_TIMED_MSG(name, level, delay, x)
 #  define LOG_TIMED_BLOCK(name, level, delay, x)
 
@@ -119,7 +119,6 @@ namespace detail {
 
 #  include <boost/preprocessor.hpp>
 
-
 #  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug)   << THREAD_ID << " " << x;
 #  define LOG_INFO_MSG(x)  BOOST_LOG_TRIVIAL(info)    << THREAD_ID << " " << x;
@@ -131,6 +130,11 @@ namespace detail {
 //
 #  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("*** Enter " << __func__);
 #  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("### Exit  " << __func__);
+
+#  define LOG_FORMAT_MSG(x)                                 \
+    (dynamic_cast<ostringstream &> (                        \
+        ostringstream().seekp(0, ios_base::cur) << x        \
+        << __FILE__ << " " << std::dec << __LINE__ )).str()
 
 #  define LOG_TIMED_INIT(name)                                                      \
     using namespace std::chrono;                                                    \
