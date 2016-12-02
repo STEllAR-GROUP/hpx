@@ -1,6 +1,6 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
 //
@@ -294,30 +294,30 @@ namespace hpx { namespace threads { namespace coroutines
         private:
 #if defined(__x86_64__)
             /** structure of context_data:
-             * 13: backup address of function to execute
-             * 12: backup address of trampoline
-             * 11: additional alignment (or valgrind_id if enabled)
-             * 10: parm 0 of trampoline
-             * 9:  dummy return address for trampoline
-             * 8:  return addr (here: start addr)
-             * 7:  rbp
-             * 6:  rbx
-             * 5:  rsi
-             * 4:  rdi
-             * 3:  r12
-             * 2:  r13
-             * 1:  r14
-             * 0:  r15
+             * 14: backup address of function to execute
+             * 13: backup address of trampoline
+             * 12: additional alignment (or valgrind_id if enabled)
+             * 11: param 0 of trampoline
+             * 10: dummy return address for trampoline
+             * 9:  return addr (here: start addr)
+             * 8:  rbp
+             * 7:  rbx
+             * 6:  rsi
+             * 5:  rdi
+             * 4:  r12
+             * 3:  r13
+             * 2:  r14
+             * 1:  r15
+             * 0:  fc_mxcsr/fc_x87_cw
              **/
+            static const std::size_t context_size = 15;
+            static const std::size_t backup_cb_idx = 14;
+            static const std::size_t backup_funp_idx = 13;
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-            static const std::size_t valgrind_id_idx = 11;
+            static const std::size_t valgrind_id_idx = 12;
 #endif
-
-            static const std::size_t context_size = 14;
-            static const std::size_t backup_cb_idx = 13;
-            static const std::size_t backup_funp_idx = 12;
-            static const std::size_t cb_idx = 10;
-            static const std::size_t funp_idx = 8;
+            static const std::size_t cb_idx = 11;
+            static const std::size_t funp_idx = 9;
 #else
             /** structure of context_data:
              * 9: valgrind_id (if enabled)
