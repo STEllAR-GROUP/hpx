@@ -19,7 +19,7 @@ namespace hpx { namespace compute { namespace host
     struct default_executor : hpx::parallel::executor_tag
     {
         default_executor(host::target& target)
-          : target_(target)
+ //         : target_(target)
         {}
 
         template <typename F, typename ... Ts>
@@ -51,7 +51,7 @@ namespace hpx { namespace compute { namespace host
         }
 
     private:
-        host::target& target_;
+ //       host::target& target_;
     };
 }}}
 

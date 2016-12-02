@@ -115,7 +115,7 @@ namespace hpx { namespace compute
           , alloc_(std::move(other.alloc_))
           , data_(std::move(other.data_))
         {
-            other.data_ = nullptr;
+            other.data_ = pointer(nullptr);
             other.size_ = 0;
             other.capacity_ = 0;
         }
@@ -126,7 +126,7 @@ namespace hpx { namespace compute
           , alloc_(alloc)
           , data_(std::move(other.data_))
         {
-            other.data_ = nullptr;
+            other.data_ = pointer(nullptr);
             other.size_ = 0;
             other.capacity_ = 0;
         }
@@ -193,7 +193,7 @@ namespace hpx { namespace compute
             alloc_ = std::move(other.alloc_);
             data_ = std::move(other.data_);
 
-            other.data_ = nullptr;
+            other.data_ = pointer(nullptr);
             other.size_ = 0;
             other.capacity_ = 0;
 
@@ -246,6 +246,13 @@ namespace hpx { namespace compute
         const_pointer data() const HPX_NOEXCEPT
         {
             return data_;
+        }
+
+        /// Returns a raw pointer corresponding to the address of the data
+        /// allocated on the device.
+        T* device_data() const HPX_NOEXCEPT
+        {
+            return data_.device_ptr();
         }
 
         //
