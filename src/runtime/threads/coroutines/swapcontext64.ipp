@@ -1,5 +1,5 @@
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -55,7 +55,7 @@
         ".globl " #name "\n\t"                                                \
         HPX_COROUTINE_TYPE_DIRECTIVE(name)                                    \
     #name ":\n\t"                                                             \
-        "movq  64(%rsi), %rcx\n\t"                                            \
+        "movq  72(%rsi), %rcx\n\t"                                            \
         "pushq %rbp\n\t"                                                      \
         "pushq %rbx\n\t"                                                      \
         "pushq %rax\n\t"                                                      \
@@ -64,8 +64,14 @@
         "pushq %r13\n\t"                                                      \
         "pushq %r14\n\t"                                                      \
         "pushq %r15\n\t"                                                      \
+        "leaq -0x8(%rsp), %rsp\n\t"                                           \
+        "stmxcsr (%rsp)\n\t"                                                  \
+        "fnstcw 0x4(%rsp)\n\t"                                                \
         "movq  %rsp, (%rdi)\n\t"                                              \
         "movq  %rsi, %rsp\n\t"                                                \
+        "ldmxcsr (%rsp)\n\t"                                                  \
+        "fldcw 0x4(%rsp)\n\t"                                                 \
+        "leaq  0x8(%rsp), %rsp\n\t"                                           \
         "popq  %r15\n\t"                                                      \
         "popq  %r14\n\t"                                                      \
         "popq  %r13\n\t"                                                      \
@@ -74,7 +80,7 @@
         "popq  %rax\n\t"                                                      \
         "popq  %rbx\n\t"                                                      \
         "popq  %rbp\n\t"                                                      \
-        "movq 80(%rsi), %rdi\n\t"                                             \
+        "movq 88(%rsi), %rdi\n\t"                                             \
         "add   $8, %rsp\n\t"                                                  \
         "jmp   *%rcx\n\t"                                                     \
         "ud2\n\t"                                                             \
