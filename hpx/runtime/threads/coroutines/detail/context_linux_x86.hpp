@@ -183,6 +183,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
                 m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
+                m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(0x1f80);
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
@@ -234,6 +235,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                     m_sp[cb_idx] = m_sp[backup_cb_idx];
                     m_sp[funp_idx] = m_sp[backup_funp_idx];
+                    m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(0x1f80);
                 }
             }
 
@@ -294,7 +296,6 @@ namespace hpx { namespace threads { namespace coroutines
         private:
 #if defined(__x86_64__)
             /** structure of context_data:
-             * 15: unused - align stack at 16 byte boundary
              * 14: backup address of function to execute
              * 13: backup address of trampoline
              * 12: additional alignment (or valgrind_id if enabled)
@@ -311,7 +312,7 @@ namespace hpx { namespace threads { namespace coroutines
              * 1:  r15
              * 0:  fc_mxcsr/fc_x87_cw
              **/
-            static const std::size_t context_size = 16;
+            static const std::size_t context_size = 15;
             static const std::size_t backup_cb_idx = 14;
             static const std::size_t backup_funp_idx = 13;
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
@@ -319,6 +320,7 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             static const std::size_t cb_idx = 11;
             static const std::size_t funp_idx = 9;
+            static const std::size_t fp_ctrl_idx = 0;
 #else
             /** structure of context_data:
              * 9: valgrind_id (if enabled)
