@@ -6,10 +6,9 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 
-// Includes
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include <plugins/parcelport/verbs/rdma/protection_domain.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
 #include <infiniband/verbs.h>
 #include <errno.h>
@@ -19,23 +18,23 @@
 namespace hpx {
 namespace parcelset {
 namespace policies {
-namespace verbs {
-
-    struct rdma_memory_region
+namespace verbs
+{
+    struct verbs_memory_region
     {
         // --------------------------------------------------------------------
-        rdma_memory_region() :
+        verbs_memory_region() :
             region_(nullptr), address_(nullptr), flags_(0), size_(0), used_space_(0) {}
 
         // --------------------------------------------------------------------
-        rdma_memory_region(struct ibv_mr *region, char * address,
+        verbs_memory_region(struct ibv_mr *region, char * address,
             uint32_t flags, uint64_t size) :
                 region_(region), address_(address), flags_(flags),
                 size_(size), used_space_(0) {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
-        rdma_memory_region(rdma_protection_domain_ptr pd,
+        verbs_memory_region(verbs_protection_domain_ptr pd,
             const void *buffer, const uint64_t length)
         {
             address_    = static_cast<char*>(const_cast<void*>(buffer));
@@ -69,7 +68,7 @@ namespace verbs {
 
         // --------------------------------------------------------------------
         // allocate a block of size length and register it
-        int allocate(rdma_protection_domain_ptr pd, uint64_t length)
+        int allocate(verbs_protection_domain_ptr pd, uint64_t length)
         {
             // Allocate storage for the memory region.
             void *buffer = new char[length];
@@ -105,7 +104,7 @@ namespace verbs {
 
         // --------------------------------------------------------------------
         // destroy the region and memory according to flag settings
-        ~rdma_memory_region()
+        ~verbs_memory_region()
         {
             release();
         }
@@ -258,8 +257,8 @@ namespace verbs {
         uint64_t used_space_;
     };
 
-    // Smart pointer for rdma_memory_region object.
-    typedef std::shared_ptr<rdma_memory_region> rdma_memory_region_ptr;
+    // Smart pointer for verbs_memory_region object.
+    typedef std::shared_ptr<verbs_memory_region> verbs_memory_region_ptr;
 
 }}}}
 

@@ -19,10 +19,10 @@ namespace policies {
 namespace verbs
 {
 
-    struct rdma_protection_domain
+    struct verbs_protection_domain
     {
         // ---------------------------------------------------------------------------
-        rdma_protection_domain(struct ibv_context *context)
+        verbs_protection_domain(struct ibv_context *context)
         {
             // Validate context pointer (since ibv_ functions won't check it).
             if (context == NULL) {
@@ -41,7 +41,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        ~rdma_protection_domain()
+        ~verbs_protection_domain()
         {
             if (pd_ != NULL) {
                 uint32_t handle = pd_->handle;
@@ -76,8 +76,8 @@ namespace verbs
 
     };
 
-    // Smart pointer for rdma_protection_domain object.
-    typedef std::shared_ptr<rdma_protection_domain> rdma_protection_domain_ptr;
+    // Smart pointer for verbs_protection_domain object.
+    typedef std::shared_ptr<verbs_protection_domain> verbs_protection_domain_ptr;
 
 }}}}
 

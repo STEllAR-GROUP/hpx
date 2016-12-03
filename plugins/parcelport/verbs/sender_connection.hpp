@@ -16,8 +16,6 @@
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
 #include "pinned_memory_vector.hpp"
 
-using namespace bgcios;
-
 namespace hpx { namespace parcelset {
 namespace policies { namespace verbs
 {

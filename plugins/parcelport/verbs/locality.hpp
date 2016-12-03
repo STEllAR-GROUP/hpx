@@ -9,9 +9,11 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
-namespace hpx { namespace parcelset {
-    namespace policies { namespace verbs
-    {
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs
+{
 
     // --------------------------------------------------------------------
     // Locality, represented by an ip address and a queue pair (qp) id

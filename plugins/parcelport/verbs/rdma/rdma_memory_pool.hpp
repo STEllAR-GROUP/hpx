@@ -5,7 +5,7 @@
 
 #ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
 #define HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
-//
+
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 //
@@ -21,9 +21,9 @@
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
-#include <plugins/parcelport/verbs/rdma/protection_domain.hpp>
-#include <plugins/parcelport/verbs/rdma/memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 
 // the default memory chunk size in bytes
 #define RDMA_POOL_1K_CHUNK          0x001*0x0400 //  1KB
@@ -67,7 +67,7 @@ static_assert ( HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE<RDMA_POOL_MEDIUM_CHUNK_SI
 // requests a small block, one is popped off the stack. At startup, the pool_container
 // requests a large number of blocks from the rdma_chunk_pool and sets the correct
 // address offset within each larger chunk for each small block and pushes the mini
-// rdma_memory_region onto the stack. Thus N small rdma_regions are created from a
+// verbs_memory_region onto the stack. Thus N small rdma_regions are created from a
 // single larger one and memory blocks come from contiguous memory.
 //
 // rdma_memory_pool:
@@ -111,7 +111,7 @@ namespace verbs
 #endif
 
         // ------------------------------------------------------------------------
-        pool_container(rdma_protection_domain_ptr pd, std::size_t chunk_size,
+        pool_container(verbs_protection_domain_ptr pd, std::size_t chunk_size,
             std::size_t chunks_per_block, std::size_t max_items) :
                 chunk_size_(chunk_size), max_chunks_(max_items), used_(0),
                 chunk_allocator(pd, chunk_size, chunks_per_block, chunks_per_block)
@@ -129,11 +129,11 @@ namespace verbs
             for (std::size_t i=0; i<_num_chunks; i++) {
                 LOG_TRACE_MSG(PoolType::desc() << "Allocate Block "
                     << i << " of size " << hexlength(chunk_size_));
-                rdma_memory_region region = chunk_allocator.malloc();
+                verbs_memory_region region = chunk_allocator.malloc();
                 if (region.get_address()!=nullptr) {
                     block_list_[region.get_address()] = region;
                     // we use the pointer to the region
-                    rdma_memory_region *r = &block_list_[region.get_address()];
+                    verbs_memory_region *r = &block_list_[region.get_address()];
                     push(r);
                 }
                 else {
@@ -162,7 +162,7 @@ namespace verbs
         }
 
         // ------------------------------------------------------------------------
-        inline void push(rdma_memory_region *region)
+        inline void push(verbs_memory_region *region)
         {
 #ifndef RDMA_POOL_USE_LOCKFREE_STACK
             scoped_lock lock(memBuffer_mutex_);
@@ -183,7 +183,7 @@ namespace verbs
         }
 
         // ------------------------------------------------------------------------
-        inline rdma_memory_region *pop()
+        inline verbs_memory_region *pop()
         {
 #ifndef RDMA_POOL_USE_LOCKFREE_STACK
             scoped_lock lock(memBuffer_mutex_);
@@ -197,12 +197,12 @@ namespace verbs
             }
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
             // get a block
-            rdma_memory_region *region = NULL;
+            verbs_memory_region *region = NULL;
             if (!free_list_.pop(region)) {
                 LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
             }
 #else
-            rdma_memory_region *region = free_list_.top();
+            verbs_memory_region *region = free_list_.top();
             free_list_.pop();
 #endif
             // Keep reference counts to self so that we can check
@@ -220,14 +220,14 @@ namespace verbs
         std::size_t                                 max_chunks_;
         std::atomic<int>                            used_;
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
-        boost::lockfree::stack<rdma_memory_region*, boost::lockfree::capacity<8192>> free_list_;
+        boost::lockfree::stack<verbs_memory_region*, boost::lockfree::capacity<8192>> free_list_;
 #else
-        std::stack<rdma_memory_region*> free_list_;
+        std::stack<verbs_memory_region*> free_list_;
         mutex_type                      memBuffer_mutex_;
 #endif
         //
         pool_chunk_allocator                           chunk_allocator;
-        std::unordered_map<char *, rdma_memory_region> block_list_;
+        std::unordered_map<char *, verbs_memory_region> block_list_;
 };
 
     // ---------------------------------------------------------------------------
@@ -238,7 +238,7 @@ namespace verbs
     {
         //----------------------------------------------------------------------------
         // constructor
-        rdma_memory_pool(rdma_protection_domain_ptr pd) :
+        rdma_memory_pool(verbs_protection_domain_ptr pd) :
                 protection_domain_(pd),
                 tiny_  (pd, RDMA_POOL_1K_CHUNK,         1024, RDMA_POOL_MAX_1K_CHUNKS),
                 small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 1024, RDMA_POOL_MAX_SMALL_CHUNKS),
@@ -275,7 +275,7 @@ namespace verbs
         // -------------------------
         // User allocation interface
         // -------------------------
-        // The rdma_memory_region* versions of allocate/deallocate
+        // The verbs_memory_region* versions of allocate/deallocate
         // should be used in preference to the std:: compatible
         // versions using char* for efficiency
 
@@ -302,9 +302,9 @@ namespace verbs
 
         //----------------------------------------------------------------------------
         // allocate a region, if size=0 a tiny region is returned
-        inline rdma_memory_region *allocate_region(size_t length)
+        inline verbs_memory_region *allocate_region(size_t length)
         {
-            rdma_memory_region *region = NULL;
+            verbs_memory_region *region = NULL;
             //
             if (length<=tiny_.chunk_size_) {
                 region = tiny_.pop();
@@ -343,7 +343,7 @@ namespace verbs
 
         //----------------------------------------------------------------------------
         // release a region back to the pool
-        inline void deallocate(rdma_memory_region *region)
+        inline void deallocate(verbs_memory_region *region)
         {
             // if this region was registered on the fly, then don't return it to the pool
             if (region->get_temp_region() || region->get_user_region()) {
@@ -391,9 +391,9 @@ namespace verbs
         //----------------------------------------------------------------------------
         // allocates a region from the heap and registers it, it bypasses the pool
         // when deallocted, it will be unregistered and deleted, not returned to the pool
-        inline rdma_memory_region* allocate_temporary_region(std::size_t length)
+        inline verbs_memory_region* allocate_temporary_region(std::size_t length)
         {
-            rdma_memory_region *region = new rdma_memory_region();
+            verbs_memory_region *region = new verbs_memory_region();
             region->set_temp_region();
             region->allocate(protection_domain_, length);
             temp_regions++;
@@ -409,7 +409,7 @@ namespace verbs
         // as deallocation requires a map lookup of the address to find it's block
         char *allocate(size_t length)
         {
-            rdma_memory_region *region = allocate_region(length);
+            verbs_memory_region *region = allocate_region(length);
             return region->get_address();
         }
 
@@ -419,13 +419,13 @@ namespace verbs
         // less efficient than releasing memory via the region pointer
         void deallocate(void *address, size_t size=0)
         {
-            rdma_memory_region *region = pointer_map_[address];
+            verbs_memory_region *region = pointer_map_[address];
             deallocate(region);
         }
 
         //----------------------------------------------------------------------------
-        // find an rdma_memory_region* from the memory address it wraps
-        rdma_memory_region *RegionFromAddress(char * const addr) {
+        // find an verbs_memory_region* from the memory address it wraps
+        verbs_memory_region *RegionFromAddress(char * const addr) {
             return pointer_map_[addr];
         }
 
@@ -434,10 +434,10 @@ namespace verbs
         //----------------------------------------------------------------------------
         // used to map the internal memory address to the region that
         // holds the registration information
-        std::unordered_map<const void *, rdma_memory_region*> pointer_map_;
+        std::unordered_map<const void *, verbs_memory_region*> pointer_map_;
 */
         // protection domain that memory is registered with
-        rdma_protection_domain_ptr protection_domain_;
+        verbs_protection_domain_ptr protection_domain_;
 
         // maintain 4 pools of thread safe pre-allocated regions of fixed size.
         // they obtain their memory from the segmented storage provided

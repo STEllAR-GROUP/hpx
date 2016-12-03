@@ -16,7 +16,8 @@
 #undef BOOST_POOL_INSTRUMENT
 
 #include <hpx/config.hpp>
-#include "memory_region.hpp"
+//
+#include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 
 // std::less, std::less_equal, std::greater
 #include <functional>
@@ -82,7 +83,7 @@ namespace policies {
 namespace verbs {
 
     // --------------------------------------------------------------------
-    // allocate an rdma_memory_region and register the memory
+    // allocate an verbs_memory_region and register the memory
     struct memory_region_allocator
     {
         typedef std::size_t    size_type;
@@ -90,14 +91,14 @@ namespace verbs {
 
         memory_region_allocator() {}
 
-        static rdma_memory_region_ptr malloc(rdma_protection_domain_ptr pd, const size_type bytes) {
-            rdma_memory_region_ptr region = std::make_shared<rdma_memory_region>();
+        static verbs_memory_region_ptr malloc(verbs_protection_domain_ptr pd, const size_type bytes) {
+            verbs_memory_region_ptr region = std::make_shared<verbs_memory_region>();
             LOG_DEBUG_MSG("Allocating " << decnumber(bytes) << "using chunk mallocator");
             region->allocate(pd, bytes);
             return region;
         }
 
-        static void free(rdma_memory_region_ptr region) {
+        static void free(verbs_memory_region_ptr region) {
             LOG_DEBUG_MSG("Freeing a block from chunk mallocator (ref count) "
                 << region.use_count());
             region.reset();
@@ -298,10 +299,10 @@ namespace details
         size_type next_size;
         size_type start_size;
         size_type max_size;
-        rdma_protection_domain_ptr pd_;
+        verbs_protection_domain_ptr pd_;
 
         // each time we allocate a new block, we store the rdma region data
-        std::unordered_map<char *, rdma_memory_region_ptr> region_map;
+        std::unordered_map<char *, verbs_memory_region_ptr> region_map;
 
         //! finds which POD in the list 'chunk' was allocated from.
         details::PODptr<size_type> find_POD(void * const chunk) const;
@@ -357,7 +358,7 @@ namespace details
     public:
         // pre: npartition_size != 0 && nnext_size != 0
         explicit rdma_chunk_pool(
-            rdma_protection_domain_ptr pd,
+            verbs_protection_domain_ptr pd,
             const size_type nrequested_size,
             const size_type nnext_size = 32,
             const size_type nmax_size = 0)
@@ -415,7 +416,7 @@ namespace details
         // free chunks.  Only if we need to get another memory block do we call
         // the non-inlined *_need_resize() functions.
         // Returns 0 if out-of-memory
-        rdma_memory_region malloc BOOST_PREVENT_MACRO_SUBSTITUTION()
+        verbs_memory_region malloc BOOST_PREVENT_MACRO_SUBSTITUTION()
         { //! Allocates a chunk of memory. Searches in the list of memory blocks
             //! for a block that has a free chunk, and returns that free chunk if found.
             //! Otherwise, creates a new memory block, adds its free list to pool's free list,
@@ -438,10 +439,10 @@ namespace details
             std::ptrdiff_t offset = (static_cast<char*>(data_chunk) - pod.begin());
             //
             struct ibv_mr *region = region_map[pod.begin()]->get_region();
-            rdma_memory_region chunk(
+            verbs_memory_region chunk(
                 region,
                 static_cast<char*>(region->addr) + offset,
-                rdma_memory_region::BLOCK_PARTIAL,
+                verbs_memory_region::BLOCK_PARTIAL,
                 requested_size
             );
             //
@@ -450,7 +451,7 @@ namespace details
 
         // pre: 'chunk' must have been previously
         //        returned by *this.malloc().
-        void free BOOST_PREVENT_MACRO_SUBSTITUTION(rdma_memory_region chunk)
+        void free BOOST_PREVENT_MACRO_SUBSTITUTION(verbs_memory_region chunk)
         {
             if (!chunk.get_partial_region()) {
                 LOG_ERROR_MSG("Chunk was not allocated from this pool correctly");
@@ -592,7 +593,7 @@ namespace details
 
                 // delete the storage, and release memory region
                 char *base_ptr = find_POD(ptr.begin()).begin();
-                rdma_memory_region_ptr region = region_map[base_ptr];
+                verbs_memory_region_ptr region = region_map[base_ptr];
                 region_map.erase(base_ptr);
                 (UserAllocator::free)(region);
 
@@ -628,7 +629,7 @@ namespace details
 
             // delete the storage, and release memory region
             char *base_ptr = find_POD(iter.begin()).begin();
-            rdma_memory_region_ptr region = region_map[base_ptr];
+            verbs_memory_region_ptr region = region_map[base_ptr];
             region_map.erase(base_ptr);
             (UserAllocator::free)(region);
 
@@ -652,7 +653,7 @@ namespace details
         size_type POD_size = static_cast<size_type>(next_size * partition_size +
             boost::integer::static_lcm<sizeof(size_type), sizeof(void *)>::value + sizeof(size_type));
 
-        rdma_memory_region_ptr ptr = (UserAllocator::malloc)(pd_, POD_size);
+        verbs_memory_region_ptr ptr = (UserAllocator::malloc)(pd_, POD_size);
         if (ptr == 0)
         {
             if (next_size > 4)

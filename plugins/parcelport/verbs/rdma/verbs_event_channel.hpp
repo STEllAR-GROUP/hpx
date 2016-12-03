@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_EVENT_CHANNEL_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_EVENT_CHANNEL_HPP
+#ifndef HPX_PARCELSET_POLICIES_VERBS_event_channel_HPP
+#define HPX_PARCELSET_POLICIES_VERBS_event_channel_HPP
 
 // config
 #include <hpx/config/defines.hpp>
@@ -24,7 +24,7 @@ namespace policies {
 namespace verbs
 {
 
-    struct event_channel {
+    struct verbs_event_channel {
         //
         typedef hpx::lcos::local::spinlock   mutex_type;
         typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
@@ -36,10 +36,10 @@ namespace verbs
         };
 
         // ----------------------------------------------------------------------------
-        event_channel() {}
+        verbs_event_channel() {}
 
         // ----------------------------------------------------------------------------
-        ~event_channel() {
+        ~verbs_event_channel() {
             // Destroy the event channel.
             if (event_channel_ != nullptr) {
                 LOG_TRACE_MSG("destroying rdma event channel with fd "
@@ -55,7 +55,7 @@ namespace verbs
             auto t = rdma_create_event_channel();
             event_channel_ = std::unique_ptr<struct rdma_event_channel>(t);
             if (event_channel_ == nullptr) {
-                rdma_error e(EINVAL, "rdma_create_event_channel() failed");
+                rdma_error e(EINVAL, "rdma_create_verbs_event_channel() failed");
                 throw e;
             }
             LOG_DEBUG_MSG("created rdma event channel with fd "
@@ -65,13 +65,13 @@ namespace verbs
 
         // ----------------------------------------------------------------------------
         template<typename Func>
-        int poll_event_channel(Func &&f)
+        int poll_verbs_event_channel(Func &&f)
         {
-            return poll_event_channel(get_file_descriptor(), std::forward<Func>(f));
+            return poll_verbs_event_channel(get_file_descriptor(), std::forward<Func>(f));
         }
 
         template<typename Func>
-        static int poll_event_channel(int fd, Func &&f)
+        static int poll_verbs_event_channel(int fd, Func &&f)
         {
             const int eventChannel = 0;
             const int numFds = 1;
@@ -99,7 +99,7 @@ namespace verbs
                     LOG_TRACE_MSG("poll returned EINTR, continuing ...");
                     return 0;
                 }
-                rdma_error e(err, "poll_event_channel failed");
+                rdma_error e(err, "poll_verbs_event_channel failed");
                 throw e;
             }
 
@@ -177,7 +177,7 @@ namespace verbs
 
         int get_file_descriptor(void) const { return event_channel_->fd; }
 
-        struct rdma_event_channel *get_event_channel(void) const {
+        struct rdma_event_channel *get_verbs_event_channel(void) const {
             return event_channel_.get();
         }
 

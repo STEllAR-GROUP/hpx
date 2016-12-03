@@ -49,7 +49,7 @@ namespace verbs
 namespace policies {
 namespace verbs
 {
-        uint32_t Get_verbs_device_address(const char *devicename, const char *iface, char *hostname)
+        uint32_t get_verbs_device_address(const char *devicename, const char *iface, char *hostname)
         {
           FUNC_START_DEBUG_MSG
           // Find the address of the I/O link device.

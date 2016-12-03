@@ -6,8 +6,6 @@
 #ifndef HPX_PARCELSEMutex_POLICIES_VERBS_RDMA_LOCKS_HPP
 #define HPX_PARCELSEMutex_POLICIES_VERBS_RDMA_LOCKS_HPP
 
-// Includes
-//
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>

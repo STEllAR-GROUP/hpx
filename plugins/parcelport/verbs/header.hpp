@@ -16,9 +16,11 @@
 #include <cstdint>
 
 // A generic header structure that can be used by parcelports
-// currently, the mpi and verbs parcelports make use of it
-namespace hpx { namespace parcelset {
-namespace policies { namespace verbs
+// currently, the verbs parcelports make use of it
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs
 {
     namespace detail {
         struct rdma_region {

@@ -126,7 +126,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // Post a send operation using the specified memory region.
-        uint64_t post_send(rdma_memory_region *region, bool signaled,
+        uint64_t post_send(verbs_memory_region *region, bool signaled,
             bool withImmediate, uint32_t immediateData)
         {
             // Build scatter/gather element for outbound data.
@@ -166,7 +166,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // Post N regions in one send using scatter gather elements
-        inline uint64_t post_send_xN(rdma_memory_region *region[], int N, bool signaled,
+        inline uint64_t post_send_xN(verbs_memory_region *region[], int N, bool signaled,
             bool withImmediate, uint32_t immediateData)
         {
             // Build scatter/gather element for outbound data.
@@ -211,7 +211,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // Post a zero byte message, this is used for a special ack signal
-        inline uint64_t post_send_x0(rdma_memory_region *region, bool signaled,
+        inline uint64_t post_send_x0(verbs_memory_region *region, bool signaled,
             bool withImmediate, uint32_t immediateData)
         {
             // Build scatter/gather element for outbound data.
@@ -252,7 +252,7 @@ namespace verbs
         // ---------------------------------------------------------------------------
         // Post an RDMA read operation from a remote memory region to the
         // specified local memory region.
-        inline uint64_t post_read(rdma_memory_region *localregion,
+        inline uint64_t post_read(verbs_memory_region *localregion,
             uint32_t remoteKey, const void *remoteAddr, std::size_t length)
         {
             // Build scatter/gather element for message.
@@ -284,7 +284,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // \brief  Post a rdma write operation to a remote memory region from the specified memory region.
-        inline uint64_t post_write(rdma_memory_region *localregion,
+        inline uint64_t post_write(verbs_memory_region *localregion,
             uint32_t remoteKey, const void *remoteAddr, std::size_t length)
         {
             // Build scatter/gather element for inbound message.
@@ -314,7 +314,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint64_t  post_recv_region_as_id_counted(rdma_memory_region *region, uint32_t length)
+        uint64_t  post_recv_region_as_id_counted(verbs_memory_region *region, uint32_t length)
         {
             uint64_t wr_id = post_recv_region_as_id(region, length);
             push_receive_count();
@@ -323,7 +323,7 @@ namespace verbs
 
     private:
         // ---------------------------------------------------------------------------
-        uint64_t post_recv_region_as_id(rdma_memory_region *region, uint32_t length)
+        uint64_t post_recv_region_as_id(verbs_memory_region *region, uint32_t length)
         {
             // Build scatter/gather element for inbound message.
             struct ibv_sge recv_sge;
@@ -355,7 +355,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint64_t post_recv_region_as_id_shared(rdma_memory_region *region,
+        uint64_t post_recv_region_as_id_shared(verbs_memory_region *region,
             uint32_t length, struct ibv_srq* srq)
         {
           // Build scatter/gather element for inbound message.

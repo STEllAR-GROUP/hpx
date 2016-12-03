@@ -74,12 +74,12 @@
 # include "plugins/parcelport/verbs/scheduler.hpp"
 #endif
 //
-// rdmahelper library
+// rdma verbs utilities
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
-#include <plugins/parcelport/verbs/rdma/memory_region.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaController.h>
+#include <plugins/parcelport/verbs/rdma/rdma_controller.hpp>
 //
 #if HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
 # include <boost/container/small_vector.hpp>
@@ -144,7 +144,7 @@ namespace verbs
                         _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
-                        _ibv_ip = ::Get_verbs_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
+                        _ibv_ip = get_verbs_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
                         LOG_DEBUG_MSG("here() got hostname of " << buff);
                     }
                 }
@@ -184,11 +184,11 @@ namespace verbs
         // main vars used to manage the RDMA controller and interface
         // These are called from a static function, so use static
         // --------------------------------------------------------------------
-        static RdmaControllerPtr rdma_controller_;
-        static std::string       _ibverbs_device;
-        static std::string       _ibverbs_interface;
-        static boost::uint32_t   _port;
-        static boost::uint32_t   _ibv_ip;
+        static rdma_controller_ptr rdma_controller_;
+        static std::string         _ibverbs_device;
+        static std::string         _ibverbs_interface;
+        static boost::uint32_t     _port;
+        static boost::uint32_t     _ibv_ip;
 
         // Not currently working, we support bootstrapping, but when not enabled
         // we should be able to skip it
@@ -238,9 +238,9 @@ namespace verbs
         // performance_counters::parcels::gatherer& parcels_sent_;
 
 #if HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
-        typedef boost::container::small_vector<rdma_memory_region*,4> zero_copy_vector;
+        typedef boost::container::small_vector<verbs_memory_region*,4> zero_copy_vector;
 #else
-        typedef std::vector<rdma_memory_region*>                      zero_copy_vector;
+        typedef std::vector<verbs_memory_region*>                      zero_copy_vector;
 #endif
 
         // --------------------------------------------------------------------
@@ -252,7 +252,7 @@ namespace verbs
             std::atomic_flag                                        delete_flag;
             bool                                                    has_zero_copy;
             util::unique_function_nonser< void(error_code const&) > handler;
-            rdma_memory_region                     *header_region, *message_region;
+            verbs_memory_region                     *header_region, *message_region;
             zero_copy_vector                                        zero_copy_regions;
         } parcel_send_data;
 
@@ -264,7 +264,7 @@ namespace verbs
             std::atomic_uint                                 rdma_count;
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
-            rdma_memory_region              *header_region, *message_region;
+            verbs_memory_region              *header_region, *message_region;
             zero_copy_vector                                 zero_copy_regions;
         } parcel_recv_data;
 
@@ -327,7 +327,7 @@ namespace verbs
             // we need this for background OS threads to get 'this' pointer
             parcelport::_parcelport_instance = this;
             // port number is set during locality initialization in 'here()'
-            rdma_controller_ = std::make_shared<RdmaController>
+            rdma_controller_ = std::make_shared<rdma_controller>
             (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
 
             if (ini.has_section("hpx.parcel")) {
@@ -679,7 +679,7 @@ namespace verbs
             }
             parcel_recv_data &recv_data = *current_recv;
             // get the header of the new message/parcel
-            recv_data.header_region  = (rdma_memory_region *)wr_id;
+            recv_data.header_region  = (verbs_memory_region *)wr_id;
             header_type *h = (header_type*)recv_data.header_region->get_address();
             recv_data.message_region = NULL;
             // zero copy chunks we have to GET from the source locality
@@ -736,7 +736,7 @@ namespace verbs
                     })
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         if (c.type_ == serialization::chunk_type_pointer) {
-                            rdma_memory_region *get_region =
+                            verbs_memory_region *get_region =
                                 chunk_pool_->allocate_region(c.size_);
 
                             LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
@@ -801,7 +801,7 @@ namespace verbs
             }
             else {
                 std::size_t size = h->get_message_rdma_size();
-                rdma_memory_region *get_region = chunk_pool_->allocate_region(size);
+                verbs_memory_region *get_region = chunk_pool_->allocate_region(size);
                 get_region->set_message_length(size);
                 recv_data.zero_copy_regions.push_back(get_region);
                 // put region into map before posting read in case it completes
@@ -839,7 +839,7 @@ namespace verbs
         void handle_tag_send_completion(uint64_t wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
-            rdma_memory_region *region = (rdma_memory_region *)wr_id;
+            verbs_memory_region *region = (verbs_memory_region *)wr_id;
             uint32_t tag = *(uint32_t*) (region->get_address());
             chunk_pool_->deallocate(region);
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
@@ -851,11 +851,11 @@ namespace verbs
             const verbs_endpoint *client)
         {
 #if HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
-            rdma_memory_region *region = (rdma_memory_region *)wr_id;
+            verbs_memory_region *region = (verbs_memory_region *)wr_id;
             tag = *((uint32_t*) (region->get_address()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
 #else
-            rdma_memory_region *region = (rdma_memory_region *)wr_id;
+            verbs_memory_region *region = (verbs_memory_region *)wr_id;
             LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
 #endif
             // bookkeeping : decrement counter that keeps preposted queue full
@@ -947,7 +947,7 @@ namespace verbs
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
                     << " has completed : posting 4 byte ack to origin");
                 // allocate space for a single uint32_t
-                rdma_memory_region *tag_region = chunk_pool_->allocate_region(4);
+                verbs_memory_region *tag_region = chunk_pool_->allocate_region(4);
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
@@ -958,7 +958,7 @@ namespace verbs
                 // convert uint32 to uint64 so we can use it as a fake message region
                 // (wr_id only for 0 byte send)
                 uint64_t fake_region = recv_data.tag;
-                client->post_send_x0((rdma_memory_region*)fake_region,
+                client->post_send_x0((verbs_memory_region*)fake_region,
                     false, true, recv_data.tag);
 #endif
                 //
@@ -982,7 +982,7 @@ namespace verbs
                     message_length = h->size();
                 }
                 else {
-                    rdma_memory_region *message_region =
+                    verbs_memory_region *message_region =
                         recv_data.zero_copy_regions.back();
                     recv_data.zero_copy_regions.resize(
                         recv_data.zero_copy_regions.size()-1);
@@ -1035,7 +1035,7 @@ namespace verbs
         {
             uint64_t wr_id = completion.wr_id;
             LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id)
-                << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
+                << verbs_completion_queue::wc_opcode_str(completion.opcode));
 
             completions_handled++;
 /*
@@ -1066,7 +1066,7 @@ namespace verbs
 
             if (completion.opcode==IBV_WC_SEND) {
                 LOG_DEBUG_MSG("Handle general completion " << hexpointer(wr_id)
-                    << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
+                    << verbs_completion_queue::wc_opcode_str(completion.opcode));
                 handle_send_completion(wr_id);
                 return 0;
             }
@@ -1345,7 +1345,7 @@ namespace verbs
                         send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
 //                        util::high_resolution_timer regtimer;
-                        rdma_memory_region *zero_copy_region;
+                        verbs_memory_region *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
                             zero_copy_region = chunk_pool_->allocate_region(
                               std::max(c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
@@ -1360,7 +1360,7 @@ namespace verbs
                         }
                         else {
                             // create a memory region from the pointer
-                            zero_copy_region = new rdma_memory_region(
+                            zero_copy_region = new verbs_memory_region(
                                     rdma_controller_->getProtectionDomain(),
                                     c.data_.cpos_, std::max(c.size_,
                                         (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
@@ -1407,7 +1407,7 @@ namespace verbs
 
                 // header region is always sent, message region is usually piggybacked
                 int num_regions = 1;
-                rdma_memory_region *region_list[2] =
+                verbs_memory_region *region_list[2] =
                     { send_data.header_region, send_data.message_region };
                 if (h->chunk_data()) {
                     LOG_DEBUG_MSG("Chunk info is piggybacked");
@@ -1733,11 +1733,12 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
 };
 }}
 
-RdmaControllerPtr hpx::parcelset::policies::verbs::parcelport::rdma_controller_;
-std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
-std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
-boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_ibv_ip;
-boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_port;
+std::string         hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
+std::string         hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
+boost::uint32_t     hpx::parcelset::policies::verbs::parcelport::_ibv_ip;
+boost::uint32_t     hpx::parcelset::policies::verbs::parcelport::_port;
+hpx::parcelset::policies::verbs::rdma_controller_ptr
+    hpx::parcelset::policies::verbs::parcelport::rdma_controller_;
 hpx::parcelset::policies::verbs::parcelport *
     hpx::parcelset::policies::verbs::parcelport::_parcelport_instance;
 

@@ -6,17 +6,14 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_ENDPOINT_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_ENDPOINT_HPP
 
-// Includes
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include <plugins/parcelport/verbs/rdma/protection_domain.hpp>
-#include <plugins/parcelport/verbs/rdma/memory_region.hpp>
-#include <plugins/parcelport/verbs/rdma/event_channel.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_event_channel.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_shared_receive_queue.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_sender_receiver.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_completion_queue.hpp>
 //
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
-#include <plugins/parcelport/verbs/rdmahelper/include/RdmaCompletionQueue.h>
 #include <inttypes.h>
 #include <stdexcept>
 #include <string>
@@ -25,9 +22,10 @@
 #include <iomanip>
 #include <atomic>
 
-#define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS 1024
+#include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 
-using namespace bgcios;
+#define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS 1024
 
 namespace hpx {
 namespace parcelset {
@@ -76,8 +74,8 @@ namespace verbs
         // This could be changed if need arises
         verbs_endpoint(
             struct rdma_cm_id *cmId,
-            rdma_protection_domain_ptr domain,
-            bgcios::RdmaCompletionQueuePtr CompletionQ,
+            verbs_protection_domain_ptr domain,
+            verbs_completion_queue_ptr CompletionQ,
             rdma_memory_pool_ptr pool,
             rdma_shared_receive_queue_ptr SRQ,
             bool signalSendQueue = false) :
@@ -107,8 +105,8 @@ namespace verbs
         verbs_endpoint(
             struct sockaddr_in localAddress,
             struct sockaddr_in remoteAddress,
-            rdma_protection_domain_ptr domain,
-            bgcios::RdmaCompletionQueuePtr CompletionQ,
+            verbs_protection_domain_ptr domain,
+            verbs_completion_queue_ptr CompletionQ,
             rdma_memory_pool_ptr pool,
             bool signalSendQueue = false) :
                 verbs_sender_receiver(nullptr)
@@ -172,7 +170,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        RdmaCompletionQueuePtr& getCompletionQ(void) {
+        verbs_completion_queue_ptr& getCompletionQ(void) {
             return completion_queue_;
         }
 
@@ -188,7 +186,7 @@ namespace verbs
                 {
                     LOG_DEBUG_MSG("Pre-Posting a receive to client size "
                         << hexnumber(this->memory_pool_->small_.chunk_size_));
-                    rdma_memory_region *region =
+                    verbs_memory_region *region =
                         this->get_free_region(
                             this->memory_pool_->small_.chunk_size_);
                     this->post_recv_region_as_id_counted(region,
@@ -206,9 +204,9 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        inline rdma_memory_region *get_free_region(size_t size)
+        inline verbs_memory_region *get_free_region(size_t size)
         {
-            rdma_memory_region* region = this->memory_pool_->allocate_region(size);
+            verbs_memory_region* region = this->memory_pool_->allocate_region(size);
             if (!region) {
                 LOG_ERROR_MSG("Error creating free memory region");
             }
@@ -262,10 +260,10 @@ namespace verbs
         template<typename Func>
         int poll_for_event(Func &&f)
         {
-            return event_channel_->poll_event_channel([this, &f]()
+            return event_channel_->poll_verbs_event_channel([this, &f]()
                 {
                     struct rdma_cm_event *cm_event;
-                    int err = event_channel_->get_event(event_channel::no_ack_event,
+                    int err = event_channel_->get_event(verbs_event_channel::no_ack_event,
                         rdma_cm_event_type(-1), cm_event);
                     if (err != 0) return 0;
                     return f(cm_event);
@@ -274,7 +272,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int get_event(event_channel::event_ack_type ack,
+        int get_event(verbs_event_channel::event_ack_type ack,
             rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
         {
             return event_channel_->get_event(ack, event, cm_event);
@@ -328,7 +326,7 @@ namespace verbs
 
                 // Wait for RDMA_CM_EVENT_ADDR_RESOLVED event.
                 struct rdma_cm_event *event;
-                err = event_channel_->get_event(event_channel::do_ack_event,
+                err = event_channel_->get_event(verbs_event_channel::do_ack_event,
                     RDMA_CM_EVENT_ADDR_RESOLVED, event);
                 if (err != 0) {
                     std::cout << "local address "
@@ -363,7 +361,7 @@ namespace verbs
 
             // Wait for RDMA_CM_EVENT_ROUTE_RESOLVED event.
             struct rdma_cm_event *event;
-            int err = event_channel_->get_event(event_channel::do_ack_event,
+            int err = event_channel_->get_event(verbs_event_channel::do_ack_event,
                 RDMA_CM_EVENT_ROUTE_RESOLVED, event);
 
             LOG_DEBUG_MSG("resolved route to " << sockaddress(&remote_address_));
@@ -488,9 +486,9 @@ namespace verbs
             struct rdma_cm_event *event;
             int err = 0;
             while (!done) {
-                event_channel_->poll_event_channel(
+                event_channel_->poll_verbs_event_channel(
                     [&,this](){
-                    err = event_channel_->get_event(event_channel::no_ack_event,
+                    err = event_channel_->get_event(verbs_event_channel::no_ack_event,
                         RDMA_CM_EVENT_ESTABLISHED, event);
                     done = true;
                     }
@@ -515,7 +513,7 @@ namespace verbs
                     std::terminate();
                     throw rdma_error(errno, "Error in connecting");
                 }
-                event_channel::ack_event(event);
+                verbs_event_channel::ack_event(event);
                 //
                 return -1;
             }
@@ -526,7 +524,7 @@ namespace verbs
             }
 
             LOG_DEBUG_MSG("connected to " << sockaddress(&remote_address_));
-            return event_channel::ack_event(event);
+            return verbs_event_channel::ack_event(event);
         }
 
         // ---------------------------------------------------------------------------
@@ -546,7 +544,7 @@ namespace verbs
             if (initiate) {
                 LOG_INFO_MSG("initiated disconnect");
                 struct rdma_cm_event *event;
-                err = event_channel_->get_event(event_channel::do_ack_event,
+                err = event_channel_->get_event(verbs_event_channel::do_ack_event,
                     RDMA_CM_EVENT_DISCONNECTED, event);
             }
 
@@ -555,7 +553,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int create_srq(rdma_protection_domain_ptr domain)
+        int create_srq(verbs_protection_domain_ptr domain)
         {
             try {
                 srq_ = std::make_shared < rdma_shared_receive_queue
@@ -634,7 +632,7 @@ namespace verbs
             // Initialize private data.
             memset(&local_address_, 0, sizeof(local_address_));
             memset(&remote_address_, 0, sizeof(remote_address_));
-            event_channel_ = std::unique_ptr<event_channel> (new event_channel);
+            event_channel_ = std::unique_ptr<verbs_event_channel> (new verbs_event_channel);
             clear_counters();
             _initiated_connection = false;
             state_ = connection_state::uninitialized;
@@ -651,7 +649,7 @@ namespace verbs
             LOG_DEVEL_MSG("Creating cmid with event channel "
                 << hexnumber(event_channel_->get_file_descriptor()));
             int err = rdma_create_id(
-                event_channel_->get_event_channel(), &cmId_, this, RDMA_PS_TCP);
+                event_channel_->get_verbs_event_channel(), &cmId_, this, RDMA_PS_TCP);
             if (err != 0) {
                 rdma_error e(err, "rdma_create_id() failed");
                 LOG_ERROR_MSG(
@@ -662,9 +660,9 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        void create_queue_pair(rdma_protection_domain_ptr domain,
-            bgcios::RdmaCompletionQueuePtr sendCompletionQ,
-            bgcios::RdmaCompletionQueuePtr recvCompletionQ,
+        void create_queue_pair(verbs_protection_domain_ptr domain,
+            verbs_completion_queue_ptr sendCompletionQ,
+            verbs_completion_queue_ptr recvCompletionQ,
             uint32_t maxWorkRequests, bool signalSendQueue)
         {
             // Create a queue pair.
@@ -711,7 +709,7 @@ namespace verbs
         rdma_shared_receive_queue_ptr srq_;
 
         // Event channel for notification of RDMA connection management events.
-        std::unique_ptr<event_channel> event_channel_;
+        std::unique_ptr<verbs_event_channel> event_channel_;
 
         // Address of this (local) side of the connection.
         struct sockaddr_in local_address_;
@@ -724,10 +722,10 @@ namespace verbs
         bool _initiated_connection;
 
         // Memory region for inbound messages.
-        rdma_protection_domain_ptr domain_;
+        verbs_protection_domain_ptr domain_;
 
         // Completion queue.
-        bgcios::RdmaCompletionQueuePtr completion_queue_;
+        verbs_completion_queue_ptr completion_queue_;
 
     };
 
