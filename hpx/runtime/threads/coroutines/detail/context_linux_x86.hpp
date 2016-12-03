@@ -48,13 +48,12 @@
  */
 
 #if defined(__x86_64__)
+#include <x86intrin.h>      // _mm_getcsr
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
-extern "C" void swapcontext_stack3 (void***, void**) throw();
 #else
 extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
 extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
-extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm(2)));
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,7 +182,10 @@ namespace hpx { namespace threads { namespace coroutines
 
                 m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
                 m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
-                m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(0x1f80);
+#if defined(__x86_64__)
+                std::size_t mxcsr = _mm_getcsr();
+                m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(mxcsr);
+#endif
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
@@ -235,7 +237,10 @@ namespace hpx { namespace threads { namespace coroutines
 
                     m_sp[cb_idx] = m_sp[backup_cb_idx];
                     m_sp[funp_idx] = m_sp[backup_funp_idx];
-                    m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(0x1f80);
+#if defined(__x86_64__)
+                    std::size_t mxcsr = _mm_getcsr();
+                    m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(mxcsr);
+#endif
                 }
             }
 
