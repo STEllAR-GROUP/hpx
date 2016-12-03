@@ -20,7 +20,6 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-
     class verbs_completion_queue
     {
     public:
@@ -31,27 +30,31 @@ namespace verbs
         {
             // Initialize private data.
             _context = context;
-            completionQ_ = NULL;
+            completionQ_ = nullptr;
 
             // Validate context pointer (since ibv_ functions won't check it).
-            if (context == NULL) {
+            if (context == nullptr) {
                 rdma_error e(EFAULT, "device context pointer is null");
                 LOG_ERROR_MSG(
-                    "error with context pointer " << context << " when constructing completion queue");
+                    "error with context pointer "
+                    << context << " when constructing completion queue");
                 throw e;
             }
 
             LOG_DEBUG_MSG("Creating completion queue with size " << queue_size);
-            completionQ_ = ibv_create_cq(context, queue_size, NULL,
+            completionQ_ = ibv_create_cq(context, queue_size, nullptr,
                 completionChannel, 0);
-            if (completionQ_ == NULL) {
+            if (completionQ_ == nullptr) {
                 rdma_error e(errno, "ibv_create_cq() failed");
                 LOG_ERROR_MSG(
-                    decnumber(completionQ_->handle) << "error creating completion queue: " << rdma_error::error_string(e.error_code()));
+                    decnumber(completionQ_->handle)
+                    << "error creating completion queue: "
+                    << rdma_error::error_string(e.error_code()));
                 throw e;
             }
 
-            LOG_DEBUG_MSG(decnumber(completionQ_->handle) << "created completion queue ");
+            LOG_DEBUG_MSG(decnumber(completionQ_->handle)
+                << "created completion queue ");
 
             // Request notification of events on the completion queue.
             try {
@@ -59,24 +62,30 @@ namespace verbs
             }
             catch (const rdma_error& e) {
                 LOG_ERROR_MSG(
-                    decnumber(completionQ_->handle) << "error requesting first completion queue notification: " << rdma_error::error_string(e.error_code()));
+                    decnumber(completionQ_->handle)
+                    << "error requesting first completion queue notification: "
+                    << rdma_error::error_string(e.error_code()));
                 throw e;
             }
-            LOG_TRACE_MSG(decnumber(completionQ_->handle) << "requested first notification for completion queue");
+            LOG_TRACE_MSG(decnumber(completionQ_->handle)
+                << "requested first notification for completion queue");
         }
 
         // ---------------------------------------------------------------------------
         ~verbs_completion_queue()
         {
-            if (completionQ_ != NULL) {
+            if (completionQ_ != nullptr) {
                 int err = ibv_destroy_cq(completionQ_);
                 if (err == 0) {
-                    completionQ_ = NULL;
-                    LOG_DEBUG_MSG(decnumber(completionQ_->handle) << "destroyed completion queue");
+                    completionQ_ = nullptr;
+                    LOG_DEBUG_MSG(decnumber(completionQ_->handle)
+                        << "destroyed completion queue");
                 }
                 else {
                     LOG_ERROR_MSG(
-                        decnumber(completionQ_->handle) << "error destroying completion queue: " << rdma_error::error_string(err));
+                        decnumber(completionQ_->handle)
+                        << "error destroying completion queue: "
+                        << rdma_error::error_string(err));
                 }
             }
         }
@@ -93,11 +102,14 @@ namespace verbs
             if (err != 0) {
                 rdma_error e(err, "ibv_req_notify_cq() failed");
                 LOG_ERROR_MSG(
-                    decnumber(completionQ_->handle) << "error requesting notification for completion queue: " << rdma_error::error_string(e.error_code()));
+                    decnumber(completionQ_->handle)
+                    << "error requesting notification for completion queue: "
+                    << rdma_error::error_string(e.error_code()));
                 throw e;
             }
 
-            LOG_TRACE_MSG(decnumber(completionQ_->handle) << "requested notification for completion queue");
+            LOG_TRACE_MSG(decnumber(completionQ_->handle)
+                << "requested notification for completion queue");
             return;
         }
 
@@ -107,25 +119,32 @@ namespace verbs
             int nc = ibv_poll_cq(completionQ_, 1, completion);
             if (nc < 0) {
                 rdma_error e(EINVAL, "ibv_poll_cq() failed");
-                LOG_ERROR_MSG(decnumber(completionQ_->handle) << "error polling completion queue: "
+                LOG_ERROR_MSG(decnumber(completionQ_->handle)
+                    << "error polling completion queue: "
                     << rdma_error::error_string(e.error_code()));
                 throw e;
             }
             if (nc > 0) {
                 if (completion->status != IBV_WC_SUCCESS) {
                     LOG_ERROR_MSG(
-                        decnumber(completionQ_->handle) << "work completion status '" << ibv_wc_status_str(completion->status)
+                        decnumber(completionQ_->handle)
+                        << "work completion status '"
+                        << ibv_wc_status_str(completion->status)
                         << "' for operation " << wc_opcode_str(completion->opcode)
                         << " (" << completion->opcode << ") "
                         << hexpointer(completion->wr_id));
                     std::terminate();
                 }
                 else {
-                    LOG_TRACE_MSG(decnumber(completionQ_->handle) << "work completion status '" << ibv_wc_status_str(completion->status)
-                        << "' for operation " << wc_opcode_str(completion->opcode) << " (" << completion->opcode << ")");
+                    LOG_TRACE_MSG(decnumber(completionQ_->handle)
+                        << "work completion status '"
+                        << ibv_wc_status_str(completion->status)
+                        << "' for operation " << wc_opcode_str(completion->opcode)
+                        << " (" << completion->opcode << ")");
                 }
 
-                LOG_TRACE_MSG(decnumber(completionQ_->handle) << " removing " << hexpointer(completion->wr_id)
+                LOG_TRACE_MSG(decnumber(completionQ_->handle) << " removing "
+                    << hexpointer(completion->wr_id)
                     << verbs_completion_queue::wc_opcode_str(completion->opcode));
             }
             return nc;

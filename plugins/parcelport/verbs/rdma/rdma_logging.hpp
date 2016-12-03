@@ -49,7 +49,8 @@ namespace detail {
             os << "-------------- ";
         }
         else {
-            hpx::threads::thread_data *dummy = hpx::this_thread::get_id().native_handle().get();
+            hpx::threads::thread_data *dummy =
+                hpx::this_thread::get_id().native_handle().get();
             os << hexpointer(dummy);
         }
         os << nhex(12) << std::this_thread::get_id();
@@ -58,7 +59,8 @@ namespace detail {
 
 }}}}}
 
-#define THREAD_ID "" << hpx::parcelset::policies::verbs::detail::rdma_thread_print_helper()
+#define THREAD_ID "" \
+    << hpx::parcelset::policies::verbs::detail::rdma_thread_print_helper()
 
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages

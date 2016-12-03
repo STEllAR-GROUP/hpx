@@ -49,7 +49,7 @@ namespace verbs
                 IBV_ACCESS_REMOTE_WRITE |
                 IBV_ACCESS_REMOTE_READ);
 
-            if (region_ == NULL) {
+            if (region_ == nullptr) {
                 int err = errno;
                 rdma_error(errno, "error registering user mem ibv_reg_mr ");
                 LOG_ERROR_MSG(
@@ -72,7 +72,7 @@ namespace verbs
         {
             // Allocate storage for the memory region.
             void *buffer = new char[length];
-            if (buffer != NULL) {
+            if (buffer != nullptr) {
                 LOG_DEBUG_MSG("allocated storage for memory region with malloc OK "
                     << hexnumber(length));
             }
@@ -84,7 +84,7 @@ namespace verbs
                 IBV_ACCESS_REMOTE_WRITE |
                 IBV_ACCESS_REMOTE_READ);
 
-            if (region_ == NULL) {
+            if (region_ == nullptr) {
                 LOG_ERROR_MSG("error registering ibv_reg_mr : "
                     << " " << errno << " " << rdma_error::error_string(errno));
                 return -1;
@@ -114,8 +114,9 @@ namespace verbs
         // returns 0 when successful, -1 otherwise
         int release(void)
         {
-            LOG_DEBUG_MSG("About to release memory region with local key " << get_local_key());
-            if (region_ != NULL) {
+            LOG_DEBUG_MSG("About to release memory region with local key "
+                << get_local_key());
+            if (region_ != nullptr) {
                 // get these before deleting/unregistering (for logging)
                 void *buffer = get_base_address();
                 LOG_EXCLUSIVE(
@@ -128,14 +129,16 @@ namespace verbs
                         return -1;
                     }
                     else {
-                        LOG_DEBUG_MSG("deregistered memory region with local key " << get_local_key()
-                            << " at address " << buffer << " with length " << hexlength(length));
+                        LOG_DEBUG_MSG("deregistered memory region with local key "
+                            << get_local_key()
+                            << " at address " << buffer
+                            << " with length " << hexlength(length));
                     }
                 }
                 if (!get_partial_region() && !get_user_region()) {
                     delete [](static_cast<char*>(buffer));
                 }
-                region_ = NULL;
+                region_ = nullptr;
             }
             return 0;
         }

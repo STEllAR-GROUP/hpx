@@ -13,8 +13,9 @@
 #include <stack>
 #include <unordered_map>
 #include <iostream>
+#include <cstddef>
+#include <memory>
 //
-#include <boost/noncopyable.hpp>
 #include <boost/lockfree/stack.hpp>
 //
 #include <hpx/config/parcelport_verbs_defines.hpp>
@@ -137,7 +138,8 @@ namespace verbs
                     push(r);
                 }
                 else {
-                    LOG_ERROR_MSG(PoolType::desc() << "Block Allocation Stopped at " << (i-1));
+                    LOG_ERROR_MSG(PoolType::desc()
+                        << "Block Allocation Stopped at " << (i-1));
                     return false;
                 }
             }
@@ -190,14 +192,15 @@ namespace verbs
 #endif
             // if we have not exceeded our max size, allocate a new block
             if (free_list_.empty()) {
-                //  LOG_TRACE_MSG("Creating new small Block as free list is empty but max chunks " << max_small_chunks_ << " not reached");
+                //  LOG_TRACE_MSG("Creating new small Block as free list is empty "
+                // "but max chunks " << max_small_chunks_ << " not reached");
                 //  AllocateRegisteredBlock(length);
                 //std::terminate();
-                return NULL;
+                return nullptr;
             }
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
             // get a block
-            verbs_memory_region *region = NULL;
+            verbs_memory_region *region = nullptr;
             if (!free_list_.pop(region)) {
                 LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
             }
@@ -220,7 +223,8 @@ namespace verbs
         std::size_t                                 max_chunks_;
         std::atomic<int>                            used_;
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
-        boost::lockfree::stack<verbs_memory_region*, boost::lockfree::capacity<8192>> free_list_;
+        boost::lockfree::stack<verbs_memory_region*,
+            boost::lockfree::capacity<8192>> free_list_;
 #else
         std::stack<verbs_memory_region*> free_list_;
         mutex_type                      memBuffer_mutex_;
@@ -234,18 +238,20 @@ namespace verbs
     // memory pool, holds 4 smaller pools and pops/pushes to the one
     // of the right size for the requested data
     // ---------------------------------------------------------------------------
-    struct rdma_memory_pool : boost::noncopyable
+    struct rdma_memory_pool
     {
+        HPX_NON_COPYABLE(rdma_memory_pool);
+
         //----------------------------------------------------------------------------
         // constructor
         rdma_memory_pool(verbs_protection_domain_ptr pd) :
-                protection_domain_(pd),
-                tiny_  (pd, RDMA_POOL_1K_CHUNK,         1024, RDMA_POOL_MAX_1K_CHUNKS),
-                small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 1024, RDMA_POOL_MAX_SMALL_CHUNKS),
-                medium_(pd, RDMA_POOL_MEDIUM_CHUNK_SIZE,  64, RDMA_POOL_MAX_MEDIUM_CHUNKS),
-                large_ (pd, RDMA_POOL_LARGE_CHUNK_SIZE,   32, RDMA_POOL_MAX_LARGE_CHUNKS),
-                temp_regions(0),
-                user_regions(0)
+            protection_domain_(pd),
+            tiny_  (pd, RDMA_POOL_1K_CHUNK,         1024, RDMA_POOL_MAX_1K_CHUNKS),
+            small_ (pd, RDMA_POOL_SMALL_CHUNK_SIZE, 1024, RDMA_POOL_MAX_SMALL_CHUNKS),
+            medium_(pd, RDMA_POOL_MEDIUM_CHUNK_SIZE,  64, RDMA_POOL_MAX_MEDIUM_CHUNKS),
+            large_ (pd, RDMA_POOL_LARGE_CHUNK_SIZE,   32, RDMA_POOL_MAX_LARGE_CHUNKS),
+            temp_regions(0),
+            user_regions(0)
         {
             tiny_.allocate_pool(RDMA_POOL_MAX_1K_CHUNKS);
             small_.allocate_pool(RDMA_POOL_MAX_SMALL_CHUNKS);
@@ -304,7 +310,7 @@ namespace verbs
         // allocate a region, if size=0 a tiny region is returned
         inline verbs_memory_region *allocate_region(size_t length)
         {
-            verbs_memory_region *region = NULL;
+            verbs_memory_region *region = nullptr;
             //
             if (length<=tiny_.chunk_size_) {
                 region = tiny_.pop();
@@ -319,7 +325,7 @@ namespace verbs
                 region = large_.pop();
             }
             // if we didn't get a block from the cache, create one on the fly
-            if (region==NULL) {
+            if (region==nullptr) {
                 region = allocate_temporary_region(length);
             }
 

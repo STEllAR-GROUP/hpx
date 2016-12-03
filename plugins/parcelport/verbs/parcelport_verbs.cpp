@@ -89,6 +89,14 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
+#include <list>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace hpx::parcelset::policies;
 
@@ -98,15 +106,17 @@ namespace policies {
 namespace verbs
 {
     // --------------------------------------------------------------------
-    // simple atomic counter we use for tags
-    // when a parcel is sent to a remote locality, it may need to pull zero copy chunks from us.
-    // we keep the chunks until the remote locality sends a zero byte message with the tag we gave
-    // them and then we know it is safe to release the memory back to the pool.
-    // The tags can have a short lifetime, but must be unique, so we encode the ip address with
-    // a counter to generate tags per destination.
-    // The tag is sent in immediate data so must be 32bits only : Note that the tag only has a
-    // lifetime of the unprocessed parcel, so it can be reused as soon as the parcel has been completed
-    // and therefore a 16bit count is sufficient as we only keep a few parcels per locality in flight at a time
+    // Simple atomic counter we use for tags
+    // When a parcel is sent to a remote locality, it may need to pull zero copy
+    // chunks from us. We keep the chunks until the remote locality sends a zero byte
+    // message with the tag we gave them and then we know it is safe to release the
+    // memory back to the pool.
+    // The tags can have a short lifetime, but must be unique, so we encode the ip
+    // address with a counter to generate tags per destination.
+    // The tag is sent in immediate data so must be 32bits only : Note that the tag
+    // only has a lifetime of the unprocessed parcel, so it can be reused as soon as
+    // the parcel has been completed and therefore a 16bit count is sufficient as we
+    // only keep a few parcels per locality in flight at a time
     // --------------------------------------------------------------------
     struct tag_provider {
         tag_provider() : next_tag_(1) {}
@@ -118,7 +128,7 @@ namespace verbs
         }
 
         // using 16 bits currently.
-        boost::atomic<uint32_t> next_tag_;
+        std::atomic<uint32_t> next_tag_;
     };
 
     // --------------------------------------------------------------------
@@ -137,33 +147,35 @@ namespace verbs
             FUNC_START_DEBUG_MSG;
             if (ini.has_section("hpx.parcel.verbs")) {
                 util::section const * sec = ini.get_section("hpx.parcel.verbs");
-                if (NULL != sec) {
+                if (nullptr != sec) {
                     std::string ibverbs_enabled(sec->get_entry("enable", "0"));
                     if (boost::lexical_cast<int>(ibverbs_enabled)) {
-                        // _ibverbs_ifname    = sec->get_entry("ifname",    HPX_PARCELPORT_VERBS_IFNAME);
-                        _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
-                        _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
+                        _ibverbs_device    =
+                            sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
+                        _ibverbs_interface =
+                            sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
-                        _ibv_ip = get_verbs_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
+                        _ibv_ip = get_verbs_device_address(_ibverbs_device.c_str(),
+                            _ibverbs_interface.c_str(), buff);
                         LOG_DEBUG_MSG("here() got hostname of " << buff);
                     }
                 }
             }
             if (ini.has_section("hpx.agas")) {
                 util::section const* sec = ini.get_section("hpx.agas");
-                if (NULL != sec) {
+                if (nullptr != sec) {
                     LOG_DEBUG_MSG("hpx.agas port number "
-                        << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                        << decnumber(hpx::util::get_entry_as<std::uint16_t>(*sec,
                             "port", HPX_INITIAL_IP_PORT)));
-                    _port = hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                    _port = hpx::util::get_entry_as<std::uint16_t>(*sec,
                         "port", HPX_INITIAL_IP_PORT);
                 }
             }
             if (ini.has_section("hpx.parcel")) {
                 util::section const* sec = ini.get_section("hpx.parcel");
-                if (NULL != sec) {
+                if (nullptr != sec) {
                     LOG_DEBUG_MSG("hpx.parcel port number "
-                        << decnumber(hpx::util::get_entry_as<boost::uint16_t>(*sec,
+                        << decnumber(hpx::util::get_entry_as<std::uint16_t>(*sec,
                             "port", HPX_INITIAL_IP_PORT)));
                 }
             }
@@ -187,22 +199,22 @@ namespace verbs
         static rdma_controller_ptr rdma_controller_;
         static std::string         _ibverbs_device;
         static std::string         _ibverbs_interface;
-        static boost::uint32_t     _port;
-        static boost::uint32_t     _ibv_ip;
+        static std::uint32_t     _port;
+        static std::uint32_t     _ibv_ip;
 
         // Not currently working, we support bootstrapping, but when not enabled
         // we should be able to skip it
         bool bootstrap_enabled_;
 
         // to quickly lookup a queue-pair (QP) from a destination ip address
-        typedef hpx::concurrent::unordered_map<boost::uint32_t, boost::uint32_t> ip_map;
+        typedef hpx::concurrent::unordered_map<std::uint32_t, std::uint32_t> ip_map;
         typedef ip_map::iterator ip_map_iterator;
         ip_map ip_qp_map;
 
         // a map that stores the ip address and a boolean to tell us if a connection
         // to that address is currently being initiated. We need this to prevent two ends
         // of a connection simultaneously initiating a connection to each other
-        typedef hpx::concurrent::unordered_map<boost::uint32_t, bool> connect_map;
+        typedef hpx::concurrent::unordered_map<std::uint32_t, bool> connect_map;
         connect_map             connection_requests_;
 
         // Used to control incoming and outgoing connection requests
@@ -225,12 +237,12 @@ namespace verbs
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
         //
-        boost::atomic<bool>       stopped_;
-        boost::atomic_uint        active_send_count_;
-        boost::atomic<bool>       immediate_send_allowed_;
+        std::atomic<bool>       stopped_;
+        std::atomic_uint        active_send_count_;
+        std::atomic<bool>       immediate_send_allowed_;
 
-        memory_pool_ptr_type      chunk_pool_;
-        verbs::tag_provider       tag_provider_;
+        memory_pool_ptr_type    chunk_pool_;
+        verbs::tag_provider     tag_provider_;
 
 #if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
         custom_scheduler          parcelport_scheduler;
@@ -303,10 +315,10 @@ namespace verbs
         mutex_type              active_recv_mutex;
 
         // a count of all receives, for debugging/performance measurement
-        boost::atomic_uint      sends_posted;
-        boost::atomic_uint      handled_receives;
-        boost::atomic_uint      completions_handled;
-        boost::atomic_uint      total_reads;
+        std::atomic_uint      sends_posted;
+        std::atomic_uint      handled_receives;
+        std::atomic_uint      completions_handled;
+        std::atomic_uint      total_reads;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -417,7 +429,7 @@ namespace verbs
         {
             FUNC_START_DEBUG_MSG;
 
-            boost::uint32_t dest_ip = dest.get<locality>().ip_;
+            std::uint32_t dest_ip = dest.get<locality>().ip_;
             LOG_DEBUG_MSG("Create connection from " << ipaddress(_ibv_ip)
                 << "to " << ipaddress(dest_ip) );
 
@@ -451,13 +463,13 @@ namespace verbs
                 << hexpointer(send_data.header_region)
                 << " tag " << hexuint32(send_data.tag));
             chunk_pool_->deallocate(send_data.header_region);
-            send_data.header_region  = NULL;
+            send_data.header_region  = nullptr;
             // if this message had multiple (2) SGEs then release other regions
             if (send_data.message_region) {
                 LOG_DEBUG_MSG("deallocating region 2 for completed send "
                     << hexpointer(send_data.message_region));
                 chunk_pool_->deallocate(send_data.message_region);
-                send_data.message_region = NULL;
+                send_data.message_region = nullptr;
             }
             for (auto r : send_data.zero_copy_regions) {
                 LOG_DEBUG_MSG("Deallocating zero_copy_regions " << hexpointer(r));
@@ -550,7 +562,7 @@ namespace verbs
         int handle_verbs_connection(
             std::pair<uint32_t,uint64_t> qpinfo, verbs_endpoint_ptr client)
         {
-            boost::uint32_t dest_ip = client->get_remote_address()->sin_addr.s_addr;
+            std::uint32_t dest_ip = client->get_remote_address()->sin_addr.s_addr;
             LOG_DEVEL_MSG("Connection callback received from "
                 << ipaddress(dest_ip) << "to "
                 << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
@@ -681,7 +693,7 @@ namespace verbs
             // get the header of the new message/parcel
             recv_data.header_region  = (verbs_memory_region *)wr_id;
             header_type *h = (header_type*)recv_data.header_region->get_address();
-            recv_data.message_region = NULL;
+            recv_data.message_region = nullptr;
             // zero copy chunks we have to GET from the source locality
             if (h->piggy_back()) {
               recv_data.rdma_count        = h->num_chunks().first;
@@ -698,8 +710,8 @@ namespace verbs
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                     << ", chunk_flag " << decnumber(h->header_length())
                     << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                    << " chunkdata " << decnumber((h->chunk_data()!=NULL))
-                    << " piggyback " << decnumber((h->piggy_back()!=NULL))
+                    << " chunkdata " << decnumber((h->chunk_data()!=nullptr))
+                    << " piggyback " << decnumber((h->piggy_back()!=nullptr))
                     << " tag " << hexuint32(h->tag())
                     << " total receives " << decnumber(handled_receives)
             );
@@ -790,8 +802,8 @@ namespace verbs
             if (piggy_back) {
                 if (parcel_complete) {
                     rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                        boost::bind(&parcelport::delete_recv_data, this, current_recv),
-                        chunk_pool_.get(), NULL);
+                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                        chunk_pool_.get(), nullptr);
                     rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                     LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
                     parcelset::decode_message_with_chunks<parcelport, rcv_buffer_type>
@@ -971,8 +983,8 @@ namespace verbs
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                     << ", chunk_flag " << decnumber(h->header_length())
                     << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                    << " chunkdata " << decnumber((h->chunk_data()!=NULL))
-                    << " piggyback " << decnumber((h->piggy_back()!=NULL))
+                    << " chunkdata " << decnumber((h->chunk_data()!=nullptr))
+                    << " piggyback " << decnumber((h->piggy_back()!=nullptr))
                     << " tag " << hexuint32(h->tag())
                 );
 
@@ -997,8 +1009,8 @@ namespace verbs
                 LOG_DEBUG_MSG("Creating a release buffer callback for tag "
                     << hexuint32(recv_data.tag));
                 rcv_data_type wrapped_pointer(message, message_length,
-                        boost::bind(&parcelport::delete_recv_data, this, current_recv),
-                        chunk_pool_.get(), NULL);
+                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                        chunk_pool_.get(), nullptr);
                 rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                 LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
 
@@ -1151,7 +1163,7 @@ namespace verbs
                         parcelset::locality(locality(buf.s_addr));
                 }
             }
-            LOG_DEBUG_MSG("Returning NULL agas locality")
+            LOG_DEBUG_MSG("Returning nullptr agas locality")
             FUNC_END_DEBUG_MSG;
             return parcelset::locality(locality(0xFFFF));
         }
@@ -1204,7 +1216,7 @@ namespace verbs
         // find the client queue pair object that is at the destination ip address
         // if no connection has been made yet, make one.
         // --------------------------------------------------------------------
-        verbs_endpoint *get_remote_connection(boost::uint32_t dest_ip)
+        verbs_endpoint *get_remote_connection(std::uint32_t dest_ip)
         {
             // if a connection exists to this destination, get it
             ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
@@ -1274,7 +1286,7 @@ namespace verbs
                     }
                 }
             }
-            return NULL;
+            return nullptr;
         }
 
         bool can_send_immediate() {
@@ -1322,8 +1334,8 @@ namespace verbs
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
                 send_data.handler        = std::move(handler);
-                send_data.header_region  = NULL;
-                send_data.message_region = NULL;
+                send_data.header_region  = nullptr;
+                send_data.message_region = nullptr;
                 send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
 
@@ -1347,8 +1359,8 @@ namespace verbs
 //                        util::high_resolution_timer regtimer;
                         verbs_memory_region *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
-                            zero_copy_region = chunk_pool_->allocate_region(
-                              std::max(c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
+                            zero_copy_region = chunk_pool_->allocate_region((std::max)
+                              (c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
                             char *zero_copy_memory =
                                 (char*)(zero_copy_region->get_address());
                             std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
@@ -1362,7 +1374,7 @@ namespace verbs
                             // create a memory region from the pointer
                             zero_copy_region = new verbs_memory_region(
                                     rdma_controller_->getProtectionDomain(),
-                                    c.data_.cpos_, std::max(c.size_,
+                                    c.data_.cpos_, (std::max)(c.size_,
                                         (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
 //                            LOG_DEBUG_MSG("Time to register memory (ns) "
 //                                << decnumber(regtimer.elapsed_nanoseconds()));
@@ -1433,7 +1445,7 @@ namespace verbs
                         << "pos " << hexpointer(send_data.message_region->get_address()));
                     // do not delete twice, clear the message block pointer as it
                     // is also used in the zero_copy_regions list
-                    send_data.message_region = NULL;
+                    send_data.message_region = nullptr;
                 }
 
                 uint64_t wr_id = (uint64_t)(send_data.header_region);
@@ -1733,10 +1745,10 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
 };
 }}
 
-std::string         hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
-std::string         hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
-boost::uint32_t     hpx::parcelset::policies::verbs::parcelport::_ibv_ip;
-boost::uint32_t     hpx::parcelset::policies::verbs::parcelport::_port;
+std::string    hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
+std::string    hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
+std::uint32_t  hpx::parcelset::policies::verbs::parcelport::_ibv_ip;
+std::uint32_t  hpx::parcelset::policies::verbs::parcelport::_port;
 hpx::parcelset::policies::verbs::rdma_controller_ptr
     hpx::parcelset::policies::verbs::parcelport::rdma_controller_;
 hpx::parcelset::policies::verbs::parcelport *

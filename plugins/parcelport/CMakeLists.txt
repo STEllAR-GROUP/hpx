@@ -25,10 +25,10 @@ macro(add_parcelport name)
 
   if (_parcelport_${name}_INCLUDE_DIRECTORIES)
 
-    set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name} 
+    set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name}
 #      ${HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name}}
       "${${name}_SOURCES}"
-      APPEND PROPERTY INCLUDE_DIRECTORIES 
+      APPEND PROPERTY INCLUDE_DIRECTORIES
       "${_parcelport_${name}_INCLUDE_DIRECTORIES}"
     )
   endif()

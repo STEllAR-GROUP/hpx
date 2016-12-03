@@ -148,7 +148,7 @@ namespace local {
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.writers) {
-                // std::cout << "rw lock sleep write " << val << " " << ticket.s.next << " \n";
+// std::cout << "rw lock sleep write " << val << " " << ticket.s.next << " \n";
                 hpx::util::detail::yield_k(4, nullptr);
             }
 
@@ -203,7 +203,7 @@ namespace local {
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.readers) {
-                // std::cout << "rw lock sleep read " << val << " " << ticket.s.readers << "\n";
+// std::cout << "rw lock sleep read " << val << " " << ticket.s.readers << "\n";
                 hpx::util::detail::yield_k(0, nullptr);
             }
 

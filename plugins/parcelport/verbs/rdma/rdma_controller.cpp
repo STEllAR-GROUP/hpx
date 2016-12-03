@@ -23,18 +23,16 @@
 #include <stdio.h>
 #include <thread>
 #include <fstream>
-
-// network stuff, only need inet_ntoa
-#include <sys/socket.h>
+#include <memory>
+#include <utility>
+//
 #include <netinet/in.h>
-#include <arpa/inet.h>
 
 const int hpx::parcelset::policies::verbs::verbs_completion_queue::MaxQueueSize;
 
-
 using namespace hpx::parcelset::policies::verbs;
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 rdma_controller::rdma_controller(const char *device, const char *interface, int port)
 {
     device_    = device;
@@ -45,7 +43,7 @@ rdma_controller::rdma_controller(const char *device, const char *interface, int 
     local_addr_.sin_addr.s_addr = 0xFFFFFFFF;
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 rdma_controller::~rdma_controller()
 {
     LOG_DEBUG_MSG("rdma_controller destructor clearing clients");
@@ -61,7 +59,7 @@ rdma_controller::~rdma_controller()
     LOG_DEBUG_MSG("rdma_controller destructor done");
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 int rdma_controller::startup()
 {
     // Find the address of the I/O link device.
@@ -69,7 +67,8 @@ int rdma_controller::startup()
     try {
         LOG_DEVEL_MSG("creating InfiniBand device for " << device_
             << " using interface " << interface_);
-        linkDevice = hpx::parcelset::policies::verbs::verbs_device_ptr(new hpx::parcelset::policies::verbs::verbs_device(device_, interface_));
+        linkDevice = hpx::parcelset::policies::verbs::verbs_device_ptr(
+            new hpx::parcelset::policies::verbs::verbs_device(device_, interface_));
     } catch (rdma_error& e) {
         LOG_ERROR_MSG("error opening InfiniBand device: " << e.what());
         return e.error_code();
@@ -90,7 +89,8 @@ int rdma_controller::startup()
 
         if (server_endpoint_->get_local_port() != local_addr_.sin_port) {
             local_addr_.sin_port = server_endpoint_->get_local_port();
-            LOG_DEBUG_MSG("verbs_endpoint port changed to " << std::dec << decnumber(local_addr_.sin_port));
+            LOG_DEBUG_MSG("verbs_endpoint port changed to "
+                << decnumber(local_addr_.sin_port));
         }
     } catch (rdma_error& e) {
         LOG_ERROR_MSG("error creating listening RDMA connection: " << e.what());
@@ -135,7 +135,8 @@ int rdma_controller::startup()
     int err = server_endpoint_->listen(256);
     if (err != 0) {
         LOG_ERROR_MSG(
-            "error listening for new RDMA connections: " << rdma_error::error_string(err));
+            "error listening for new RDMA connections: "
+            << rdma_error::error_string(err));
         return err;
     }
     LOG_DEVEL_MSG("LISTEN enabled for new RDMA connections on "
@@ -143,12 +144,13 @@ int rdma_controller::startup()
 
     return 0;
 }
-/*---------------------------------------------------------------------------*/
+
+//----------------------------------------------------------------------------
 int rdma_controller::cleanup(void) {
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 void rdma_controller::refill_client_receives() {
     // make sure all clients have a pre-posted receive in their queues
     map_read_lock_type read_lock(clients_.read_write_mutex());
@@ -159,7 +161,7 @@ void rdma_controller::refill_client_receives() {
     });
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 int rdma_controller::pollCompletionQueues()
 {
     int ntot = 0, nc = 0;
@@ -178,8 +180,10 @@ int rdma_controller::pollCompletionQueues()
                 if (nc > 0) {
                     if (completion.status != IBV_WC_SUCCESS) {
                         LOG_ERROR_MSG(
-                            "Message failed current receive count is " << client->get_receive_count());
-                        LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id " << hexpointer(completion.wr_id) << " "
+                            "Message failed current receive count is "
+                            << client->get_receive_count());
+                        LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id "
+                            << hexpointer(completion.wr_id) << " "
                             << verbs_completion_queue::wc_opcode_str(completion.opcode));
                         std::terminate();
                     }
@@ -204,7 +208,8 @@ int rdma_controller::pollCompletionQueues()
             nc = completionQ->poll_completion(&completion);
             if (nc > 0) {
                 if (completion.status != IBV_WC_SUCCESS) {
-                    LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id " << hexpointer(completion.wr_id) << " "
+                    LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id "
+                        << hexpointer(completion.wr_id) << " "
                         << verbs_completion_queue::wc_opcode_str(completion.opcode));
                     std::terminate();
                 }
@@ -220,7 +225,7 @@ int rdma_controller::pollCompletionQueues()
     return ntot;
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 int rdma_controller::eventMonitor(int Nevents)
 {
     // completions of work requests
@@ -246,7 +251,7 @@ int rdma_controller::eventMonitor(int Nevents)
     return completions_handled;
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
 {
     // Debugging code to get ip address of soure/dest of event
@@ -296,7 +301,7 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
             //    _completionChannel->getChannel());
             completionQ = std::make_shared < verbs_completion_queue >
                 (cm_event->id->verbs, verbs_completion_queue::MaxQueueSize,
-                (ibv_comp_channel*) NULL);
+                (ibv_comp_channel*) nullptr);
         } catch (rdma_error& e) {
             LOG_ERROR_MSG("error creating completion queue: " << e.what());
             break;
@@ -419,9 +424,11 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
     // rdma_cm that it can delete the structure it allocated for the event data
     return verbs_event_channel::ack_event(cm_event);
 }
+
 /*
 // ---------------------------------------------------------------------------
-bool rdma_controller::completionChannelHandler(uint64_t requestId) { //, lock_type2 &&lock) {
+bool rdma_controller::completionChannelHandler(uint64_t requestId) {
+//, lock_type2 &&lock) {
     verbs_endpoint *client;
     try {
         // Get the notification event from the completion channel.
@@ -431,10 +438,12 @@ bool rdma_controller::completionChannelHandler(uint64_t requestId) { //, lock_ty
         while (completionQ->removeCompletions() != 0) {
             // Get the next work completion.
             struct ibv_wc *completion;
-            // the completion queue isn't yet thread safe, so only allow one thread at a time to pop a completion
+            // the completion queue isn't yet thread safe, so only allow one
+            // thread at a time to pop a completion
             {
                 completion = completionQ->popCompletion();
-                LOG_DEBUG_MSG("Controller completion - removing wr_id " << hexpointer(completion->wr_id));
+                LOG_DEBUG_MSG("Controller completion - removing wr_id "
+                    << hexpointer(completion->wr_id));
                 // Find the connection that received the message.
                 client = clients_[completion->qp_num].get();
             }
@@ -446,7 +455,8 @@ bool rdma_controller::completionChannelHandler(uint64_t requestId) { //, lock_ty
 
     catch (const rdma_error& e) {
         LOG_ERROR_MSG(
-            "error removing work completions from completion queue: " << rdma_error::error_string(e.error_code()));
+            "error removing work completions from completion queue: "
+            << rdma_error::error_string(e.error_code()));
     }
 
     return true;
@@ -465,7 +475,7 @@ bool rdma_controller::completionChannelHandler(uint64_t requestId) { //, lock_ty
  };
  */
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 // return the client
 verbs_endpoint_ptr rdma_controller::connect_to_server(
     uint32_t remote_ip)
@@ -487,10 +497,11 @@ verbs_endpoint_ptr rdma_controller::connect_to_server(
     verbs_completion_queue_ptr completionQ;
     try {
         //    completionQ = std::make_shared < verbs_completion_queue >
-        //      (server_endpoint_->get_device_context(), verbs_completion_queue::MaxQueueSize, _completionChannel->getChannel());
+        //      (server_endpoint_->get_device_context(),
+        // verbs_completion_queue::MaxQueueSize, _completionChannel->getChannel());
         completionQ = std::make_shared < verbs_completion_queue >
             (server_endpoint_->get_device_context(), verbs_completion_queue::MaxQueueSize,
-            (ibv_comp_channel*) NULL);
+            (ibv_comp_channel*) nullptr);
     } catch (rdma_error& e) {
         LOG_ERROR_MSG("error creating completion queue: " << e.what());
     }
@@ -502,7 +513,7 @@ verbs_endpoint_ptr rdma_controller::connect_to_server(
     } catch (rdma_error& e) {
         LOG_ERROR_MSG("error creating rdma client: %s\n" << e.what());
         completionQ.reset();
-        return NULL;
+        return nullptr;
     }
 
     // make a connection
@@ -528,8 +539,8 @@ verbs_endpoint_ptr rdma_controller::connect_to_server(
         newClient.reset();
         LOG_ERROR_MSG("Reset completion Q");
         completionQ.reset();
-        LOG_ERROR_MSG("returning NULL ");
-        return NULL;
+        LOG_ERROR_MSG("returning nullptr ");
+        return nullptr;
     }
 
     // make sure client has preposted receives
@@ -556,7 +567,7 @@ verbs_endpoint_ptr rdma_controller::connect_to_server(
     return newClient;
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 void rdma_controller::removeServerToServerConnection(verbs_endpoint_ptr client)
 {
     LOG_DEBUG_MSG("Removing Server-Server client object");
@@ -589,7 +600,7 @@ void rdma_controller::removeServerToServerConnection(verbs_endpoint_ptr client)
     completionQ.reset();
 }
 
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 void rdma_controller::removeAllInitiatedConnections()
 {
     while (std::count_if(clients_.begin(), clients_.end(),

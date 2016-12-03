@@ -12,8 +12,11 @@
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include "rdma/verbs_device.hpp"
+#include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 //
+#include <sstream>
+#include <type_traits>
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -49,7 +52,8 @@ namespace verbs
 namespace policies {
 namespace verbs
 {
-        uint32_t get_verbs_device_address(const char *devicename, const char *iface, char *hostname)
+        uint32_t get_verbs_device_address(const char *devicename, const char *iface,
+            char *hostname)
         {
           FUNC_START_DEBUG_MSG
           // Find the address of the I/O link device.
@@ -60,7 +64,9 @@ namespace verbs
           catch (rdma_error& e) {
             LOG_ERROR_MSG("error opening InfiniBand device: " << e.what());
           }
-          LOG_DEBUG_MSG("Created InfiniBand device for " << linkDevice->get_device_name() << " using interface " << linkDevice->get_interface_name());
+          LOG_DEBUG_MSG("Created InfiniBand device for "
+              << linkDevice->get_device_name() << " using interface "
+              << linkDevice->get_interface_name());
 
           std::stringstream temp;
           in_addr_t addr = linkDevice->get_address();

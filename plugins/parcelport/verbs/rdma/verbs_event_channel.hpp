@@ -15,6 +15,10 @@
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
+#include <memory>
+#include <string>
+#include <utility>
+//
 #include <rdma/rdma_cma.h>
 #include <poll.h>
 //
@@ -128,7 +132,7 @@ namespace verbs
             rdma_cm_event_type event,
             struct rdma_cm_event *&cm_event)
         {
-            cm_event = NULL;
+            cm_event = nullptr;
             // This operation can block if there are no pending events available.
             // (So only call it after the event poll says there is an event waiting)
             LOG_DEVEL_MSG("waiting for " << rdma_event_str(event)
@@ -159,7 +163,7 @@ namespace verbs
         static int ack_event(struct rdma_cm_event *cm_event)
         {
             if (cm_event == nullptr) {
-                LOG_ERROR_MSG("NULL rdma cm event : cannot ack");
+                LOG_ERROR_MSG("nullptr rdma cm event : cannot ack");
                 return ENOENT;
             }
 

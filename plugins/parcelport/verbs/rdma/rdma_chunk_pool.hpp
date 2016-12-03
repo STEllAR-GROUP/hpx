@@ -31,6 +31,8 @@
 #include <exception>
 // std::max
 #include <algorithm>
+#include <memory>
+#include <unordered_map>
 
 #include <boost/pool/poolfwd.hpp>
 
@@ -57,15 +59,18 @@
 
 /*!
   \file
-  \brief Provides class \ref pool: a fast memory allocator that guarantees proper alignment of all allocated chunks,
-  and which extends and generalizes the framework provided by the simple segregated storage solution.
+  \brief Provides class \ref pool: a fast memory allocator that guarantees proper
+  alignment of all allocated chunks,
+  and which extends and generalizes the framework provided by the simple segregated
+  storage solution.
   Also provides two UserAllocator classes which can be used in conjuction with \ref pool.
  */
 
 /*!
   \mainpage Boost.Pool Memory Allocation Scheme
   \section intro_sec Introduction
-   Pool allocation is a memory allocation scheme that is very fast, but limited in its usage.
+   Pool allocation is a memory allocation scheme that is very fast, but limited
+   in its usage.
    This Doxygen-style documentation is complementary to the
    full Quickbook-generated html and pdf documentation at www.boost.org.
   This page generated from file pool.hpp.
@@ -91,7 +96,9 @@ namespace verbs {
 
         memory_region_allocator() {}
 
-        static verbs_memory_region_ptr malloc(verbs_protection_domain_ptr pd, const size_type bytes) {
+        static verbs_memory_region_ptr malloc(verbs_protection_domain_ptr pd,
+            const size_type bytes)
+        {
             verbs_memory_region_ptr region = std::make_shared<verbs_memory_region>();
             LOG_DEBUG_MSG("Allocating " << decnumber(bytes) << "using chunk mallocator");
             region->allocate(pd, bytes);
@@ -112,7 +119,8 @@ namespace details
     class PODptr
     {
 
-        /*! \details A PODptr holds the location and size of a memory block allocated from the system.
+        /*! \details A PODptr holds the location and size of a memory block allocated
+             from the system.
              Each memory block is split logically into three sections:
              <b>Chunk area</b>. This section may be different sizes.
              PODptr does not care what the size of the chunks is,
@@ -254,12 +262,18 @@ namespace details
   Finally, if the doubling algorithm results in no memory
   being allocated, the pool will backtrack just once, halving
   the chunk size and trying again.
-  <b>UserAllocator type</b> - the method that the Pool will use to allocate memory from the system.
-  There are essentially two ways to use class pool: the client can call \ref malloc() and \ref free() to allocate
-  and free single chunks of memory, this is the most efficient way to use a pool, but does not allow for
-  the efficient allocation of arrays of chunks.  Alternatively, the client may call \ref ordered_malloc() and \ref
-  ordered_free(), in which case the free list is maintained in an ordered state, and efficient allocation of arrays
-  of chunks are possible.  However, this latter option can suffer from poor performance when large numbers of
+  <b>UserAllocator type</b> - the method that the Pool will use to allocate memory
+  from the system.
+  There are essentially two ways to use class pool: the client can call \ref malloc()
+  and \ref free() to allocate
+  and free single chunks of memory, this is the most efficient way to use a pool,
+  but does not allow for
+  the efficient allocation of arrays of chunks.  Alternatively, the client may
+  call \ref ordered_malloc() and \ref
+  ordered_free(), in which case the free list is maintained in an ordered state,
+  and efficient allocation of arrays
+  of chunks are possible.  However, this latter option can suffer from poor performance
+  when large numbers of
   allocations are performed.
      */
     template <typename UserAllocator>
@@ -267,9 +281,13 @@ namespace details
         protected boost::simple_segregated_storage<typename UserAllocator::size_type>
     {
     public:
-        typedef UserAllocator user_allocator; //!< User allocator.
-        typedef typename UserAllocator::size_type size_type;  //!< An unsigned integral type that can represent the size of the largest object to be allocated.
-        typedef typename UserAllocator::difference_type difference_type;  //!< A signed integral type that can represent the difference of any two pointers.
+        typedef UserAllocator user_allocator;
+        //!< User allocator.
+        typedef typename UserAllocator::size_type size_type;
+        //!< An unsigned integral type that can represent the size of the
+        //! largest object to be allocated.
+        typedef typename UserAllocator::difference_type difference_type;
+        //!< A signed integral type that can represent the difference of any two pointers.
 
     private:
         BOOST_STATIC_CONSTANT(size_type, min_alloc_size =
@@ -312,15 +330,18 @@ namespace details
             const size_type sizeof_i)
         { //! \param chunk chunk to check if is from this pool.
             //! \param i memory chunk at i with element sizeof_i.
-            //! \param sizeof_i element size (size of the chunk area of that block, not the total size of that block).
+            //! \param sizeof_i element size (size of the chunk area of that block,
+            //! not the total size of that block).
             //! \returns true if chunk was allocated or may be returned.
             //! as the result of a future allocation.
             //!
             //! Returns false if chunk was allocated from some other pool,
-            //! or may be returned as the result of a future allocation from some other pool.
+            //! or may be returned as the result of a future allocation from some
+            //! other pool.
             //! Otherwise, the return value is meaningless.
             //!
-            //! Note that this function may not be used to reliably test random pointer values.
+            //! Note that this function may not be used to reliably test random
+            //! pointer values.
 
             // We use std::less_equal and std::less to test 'chunk'
             //  against the array bounds because standard operators
@@ -337,8 +358,10 @@ namespace details
         size_type alloc_size() const
         { //!  Calculated size of the memory chunks that will be allocated by this Pool.
             //! \returns allocated size.
-            // For alignment reasons, this used to be defined to be lcm(requested_size, sizeof(void *), sizeof(size_type)),
-            // but is now more parsimonious: just rounding up to the minimum required alignment of our housekeeping data
+            // For alignment reasons, this used to be defined to be lcm(requested_size,
+            // sizeof(void *), sizeof(size_type)),
+            // but is now more parsimonious: just rounding up to the minimum required
+            // alignment of our housekeeping data
             // when required.  This works provided all alignments are powers of two.
             size_type s = (std::max)(requested_size, min_alloc_size);
             size_type rem = s % min_align;
@@ -365,7 +388,9 @@ namespace details
         :
             list(0, 0), requested_size(nrequested_size), next_size(nnext_size),
             start_size(nnext_size), max_size(nmax_size), pd_(pd)
-        { //!   Constructs a new empty Pool that can be used to allocate chunks of size RequestedSize.
+        {
+            //!   Constructs a new empty Pool that can be used to allocate chunks of
+            //! size RequestedSize.
             //! \param nrequested_size  Requested chunk size
             //! \param  nnext_size parameter is of type size_type,
             //!   is the number of chunks to request from the system
@@ -389,12 +414,16 @@ namespace details
         bool purge_memory();
 
         size_type get_next_size() const
-        { //! Number of chunks to request from the system the next time that object needs to allocate system memory. This value should never be 0.
+        {
+            //! Number of chunks to request from the system the next time that
+            //! object needs to allocate system memory. This value should never be 0.
             //! \returns next_size;
             return next_size;
         }
         void set_next_size(const size_type nnext_size)
-        { //! Set number of chunks to request from the system the next time that object needs to allocate system memory. This value should never be set to 0.
+        {
+            //! Set number of chunks to request from the system the next time that object
+            //! needs to allocate system memory. This value should never be set to 0.
             //! \returns nnext_size.
             next_size = start_size = nnext_size;
         }
@@ -417,9 +446,11 @@ namespace details
         // the non-inlined *_need_resize() functions.
         // Returns 0 if out-of-memory
         verbs_memory_region malloc BOOST_PREVENT_MACRO_SUBSTITUTION()
-        { //! Allocates a chunk of memory. Searches in the list of memory blocks
+        {
+            //! Allocates a chunk of memory. Searches in the list of memory blocks
             //! for a block that has a free chunk, and returns that free chunk if found.
-            //! Otherwise, creates a new memory block, adds its free list to pool's free list,
+            //! Otherwise, creates a new memory block, adds its free list to pool's
+            //! free list,
             //! \returns a free chunk from that block.
             //! If a new memory block cannot be allocated, returns 0. Amortized O(1).
             // Look for a non-empty storage
@@ -455,7 +486,7 @@ namespace details
         {
             if (!chunk.get_partial_region()) {
                 LOG_ERROR_MSG("Chunk was not allocated from this pool correctly");
-                throw std::runtime_error("Chunk was not allocated from this pool correctly");
+                throw std::runtime_error("Chunk was not allocated from pool correctly");
             }
             (store().free)(chunk.get_address());
         }
@@ -467,21 +498,26 @@ namespace details
             //! Returns false if chunk was allocated from some other pool or
             //! may be returned as the result of a future allocation from some other pool.
             //! Otherwise, the return value is meaningless.
-            //! Note that this function may not be used to reliably test random pointer values.
+            //! Note that this function may not be used to reliably test random
+            //! pointer values.
             return (find_POD(chunk).valid());
         }
     };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
     template <typename UserAllocator>
-    typename rdma_chunk_pool<UserAllocator>::size_type const rdma_chunk_pool<UserAllocator>::min_alloc_size;
+    typename rdma_chunk_pool<UserAllocator>::size_type const
+        rdma_chunk_pool<UserAllocator>::min_alloc_size;
     template <typename UserAllocator>
-    typename rdma_chunk_pool<UserAllocator>::size_type const rdma_chunk_pool<UserAllocator>::min_align;
+    typename rdma_chunk_pool<UserAllocator>::size_type const
+        rdma_chunk_pool<UserAllocator>::min_align;
 #endif
 
     template <typename UserAllocator>
     bool rdma_chunk_pool<UserAllocator>::release_memory()
-    { //! pool must be ordered. Frees every memory block that doesn't have any allocated chunks.
+    {
+        //! pool must be ordered. Frees every memory block that doesn't have any
+        //! allocated chunks.
         //! \returns true if at least one memory block was freed.
 
         // ret is the return value: it will be set to true when we actually call
@@ -566,9 +602,9 @@ namespace details
                     } while (free_p && lt(free_p, end));
                 }
                 // This invariant is now restored:
-                //     free_p points to the first free chunk in some next memory block, or
-                //       0 if there is no such chunk.
-                //     prev_free_p points to the last free chunk in this memory block.
+                //    free_p points to the first free chunk in some next memory block, or
+                //      0 if there is no such chunk.
+                //    prev_free_p points to the last free chunk in this memory block.
 
                 // We are just about to advance ptr.  Maintain the invariant:
                 // prev is the PODptr whose next() is ptr, or !valid()
@@ -651,7 +687,8 @@ namespace details
         //! \returns pointer to chunk.
         size_type partition_size = alloc_size();
         size_type POD_size = static_cast<size_type>(next_size * partition_size +
-            boost::integer::static_lcm<sizeof(size_type), sizeof(void *)>::value + sizeof(size_type));
+            boost::integer::static_lcm<sizeof(size_type), sizeof(void *)>::value
+                + sizeof(size_type));
 
         verbs_memory_region_ptr ptr = (UserAllocator::malloc)(pd_, POD_size);
         if (ptr == 0)
@@ -661,7 +698,8 @@ namespace details
                 next_size >>= 1;
                 partition_size = alloc_size();
                 POD_size = static_cast<size_type>(next_size * partition_size +
-                    boost::integer::static_lcm<sizeof(size_type), sizeof(void *)>::value + sizeof(size_type));
+                    boost::integer::static_lcm<sizeof(size_type), sizeof(void *)>::value
+                        + sizeof(size_type));
                 ptr = (UserAllocator::malloc)(pd_, POD_size);
             }
             if (ptr == 0)
@@ -674,7 +712,8 @@ namespace details
         if(!max_size)
             next_size <<= 1;
         else if( next_size*partition_size/requested_size < max_size)
-            next_size = min BOOST_PREVENT_MACRO_SUBSTITUTION(next_size << 1, max_size*requested_size/ partition_size);
+            next_size = min BOOST_PREVENT_MACRO_SUBSTITUTION(next_size << 1,
+                max_size*requested_size/ partition_size);
 
         //  initialize it,
         store().add_block(node.begin(), node.element_size(), partition_size);

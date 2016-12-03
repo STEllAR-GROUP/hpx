@@ -25,7 +25,7 @@ namespace verbs
         verbs_protection_domain(struct ibv_context *context)
         {
             // Validate context pointer (since ibv_ functions won't check it).
-            if (context == NULL) {
+            if (context == nullptr) {
                 LOG_ERROR_MSG("error with context pointer " << context
                     << " when constructing protection domain");
                 throw std::runtime_error("Null context in protection domain");
@@ -33,7 +33,7 @@ namespace verbs
 
             // Allocate a protection domain.
             pd_ = ibv_alloc_pd(context);
-            if (pd_ == NULL) {
+            if (pd_ == nullptr) {
                 LOG_ERROR_MSG("error allocating protection domain");
                 throw std::runtime_error("error allocating protection domain");
             }
@@ -43,11 +43,11 @@ namespace verbs
         // ---------------------------------------------------------------------------
         ~verbs_protection_domain()
         {
-            if (pd_ != NULL) {
+            if (pd_ != nullptr) {
                 uint32_t handle = pd_->handle;
                 int err = ibv_dealloc_pd(pd_);
                 if (err == 0) {
-                    pd_ = NULL;
+                    pd_ = nullptr;
                     LOG_DEBUG_MSG("deallocated protection domain " << handle);
                 }
                 else {
@@ -66,7 +66,7 @@ namespace verbs
         // ---------------------------------------------------------------------------
         // get the infiniband verbs protection domain handle
         uint32_t getHandle(void) const {
-            return pd_ != NULL ? pd_->handle : 0;
+            return pd_ != nullptr ? pd_->handle : 0;
         }
 
     private:

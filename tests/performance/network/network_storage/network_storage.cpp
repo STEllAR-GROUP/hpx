@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
@@ -184,7 +185,8 @@ void release_storage_lock(char *p)
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-async_mem_result_type copy_to_local_storage(char const* src, uint32_t offset, uint64_t length)
+async_mem_result_type copy_to_local_storage(char const* src,
+    uint32_t offset, uint64_t length)
 {
     char *dest = &local_storage[offset];
     std::copy(src, src + length, dest);
@@ -198,7 +200,8 @@ async_mem_result_type copy_to_local_storage(char const* src, uint32_t offset, ui
 //
 // The function does not need to be asynchronous as it completes immediately,
 // but we return a future as this test needs to mimic "asynchronous" storage
-async_mem_result_type copy_from_local_storage(char *dest, uint32_t offset, uint64_t length)
+async_mem_result_type copy_from_local_storage(char *dest,
+    uint32_t offset, uint64_t length)
 {
     char const* src = &local_storage[offset];
     std::copy(src, src + length, dest);
@@ -295,7 +298,8 @@ mutex_type keep_alive_mutex;
 alive_map  keep_alive_buffers;
 
 //
-void async_callback(const uint64_t index, boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
+void async_callback(const uint64_t index, boost::system::error_code const& ec,
+    hpx::parcelset::parcel const& p)
 {
     scoped_lock lock(keep_alive_mutex);
     DEBUG_OUTPUT(7, "Async callback triggered for index " << index);
@@ -417,7 +421,7 @@ int background_work()
     while(FuturesActive)
     {
         hpx::parcelset::do_background_work(0);
-        hpx::this_thread::suspend(boost::chrono::microseconds(10));
+        hpx::this_thread::suspend(std::chrono::microseconds(10));
     }
     return 1;
 }
@@ -566,8 +570,10 @@ void test_write(
                 std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
 
-                std::shared_ptr<general_buffer_type> temp_buffer = std::make_shared<general_buffer_type>(
-                        static_cast<char*>(buffer), options.transfer_size_B, general_buffer_type::reference);
+                std::shared_ptr<general_buffer_type> temp_buffer =
+                    std::make_shared<general_buffer_type>(
+                        static_cast<char*>(buffer), options.transfer_size_B,
+                        general_buffer_type::reference);
                 using hpx::util::placeholders::_1;
                 using hpx::util::placeholders::_2;
                 {

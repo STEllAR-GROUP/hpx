@@ -8,13 +8,15 @@
 
 // Includes
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_shared_receive_queue.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_shared_receive_queue.hpp>
 //
 #include <rdma/rdma_cma.h>
 #include <infiniband/verbs.h>
 //
 #include <iomanip>
 #include <atomic>
+#include <cstddef>
+#include <string>
 
 // Base connection class for RDMA operations with a remote partner.
 namespace hpx {
@@ -157,7 +159,8 @@ namespace verbs
             ++total_posted_send_;
 
             LOG_TRACE_MSG("Posted Send wr_id " << hexpointer(send_wr.wr_id)
-                << "with Length " << decnumber(send_sge.length) << hexpointer(send_sge.addr)
+                << "with Length " << decnumber(send_sge.length)
+                << hexpointer(send_sge.addr)
                 << "total send posted " << decnumber(total_posted_send_));
             // Post a send for outbound message.
             //   ++_waitingSendPosted;
@@ -200,9 +203,11 @@ namespace verbs
 
             ++total_posted_send_;
 
-            LOG_TRACE_MSG("Posted Send wr_id " << hexpointer(send_wr.wr_id) << hexpointer((uint64_t)region[1])
+            LOG_TRACE_MSG("Posted Send wr_id " << hexpointer(send_wr.wr_id)
+                << hexpointer((uint64_t)region[1])
                 << "num SGE " << decnumber(send_wr.num_sge)
-                << "with Length " << decnumber(total_length) << hexpointer(send_sge[0].addr)
+                << "with Length " << decnumber(total_length)
+                << hexpointer(send_sge[0].addr)
                 << "total send posted " << decnumber(total_posted_send_));
             // Post a send for outbound message.
             //   ++_waitingSendPosted;
@@ -268,7 +273,8 @@ namespace verbs
             send_wr.sg_list             = &read_sge;
             send_wr.num_sge             = 1;
             send_wr.opcode              = IBV_WR_RDMA_READ;
-            send_wr.send_flags          = IBV_SEND_SIGNALED; // Force completion queue to be posted with result.
+            // Force completion queue to be posted with result.
+            send_wr.send_flags          = IBV_SEND_SIGNALED;
             send_wr.wr_id               = (uint64_t)localregion;
             send_wr.wr.rdma.remote_addr = (uint64_t)remoteAddr;
             send_wr.wr.rdma.rkey        = remoteKey;
@@ -277,13 +283,15 @@ namespace verbs
 
             // Post a send to read data.
             LOG_TRACE_MSG("Posted Read wr_id " << hexpointer(send_wr.wr_id)
-                << " with Length " << decnumber(read_sge.length) << " " << hexpointer(read_sge.addr)
-                << " remote key " << decnumber(send_wr.wr.rdma.rkey) << " remote addr " << hexpointer(send_wr.wr.rdma.remote_addr));
+                << " with Length " << decnumber(read_sge.length) << " "
+                << hexpointer(read_sge.addr)
+                << " remote key " << decnumber(send_wr.wr.rdma.rkey)
+                << " remote addr " << hexpointer(send_wr.wr.rdma.remote_addr));
             return post_request(&send_wr);
         }
 
         // ---------------------------------------------------------------------------
-        // \brief  Post a rdma write operation to a remote memory region from the specified memory region.
+        // Post an rdma write operation to a remote region from the local region.
         inline uint64_t post_write(verbs_memory_region *localregion,
             uint32_t remoteKey, const void *remoteAddr, std::size_t length)
         {
@@ -300,7 +308,8 @@ namespace verbs
             send_wr.sg_list             = &write_sge;
             send_wr.num_sge             = 1;
             send_wr.opcode              = IBV_WR_RDMA_WRITE;
-            send_wr.send_flags          = IBV_SEND_SIGNALED; // Force completion queue to be posted with result.
+            // Force completion queue to be posted with result.
+            send_wr.send_flags          = IBV_SEND_SIGNALED;
             send_wr.wr_id               = (uint64_t)localregion;
             send_wr.wr.rdma.remote_addr = (uint64_t)remoteAddr;
             send_wr.wr.rdma.rkey        = remoteKey;
@@ -314,7 +323,8 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint64_t  post_recv_region_as_id_counted(verbs_memory_region *region, uint32_t length)
+        uint64_t  post_recv_region_as_id_counted(verbs_memory_region *region,
+            uint32_t length)
         {
             uint64_t wr_id = post_recv_region_as_id(region, length);
             push_receive_count();
@@ -334,7 +344,7 @@ namespace verbs
             // Build receive work request.
             struct ibv_recv_wr recv_wr;
             memset(&recv_wr, 0, sizeof(recv_wr));
-            recv_wr.next    = NULL;
+            recv_wr.next    = nullptr;
             recv_wr.sg_list = &recv_sge;
             recv_wr.num_sge = 1;
             recv_wr.wr_id   = (uint64_t)region;
@@ -367,7 +377,7 @@ namespace verbs
           // Build receive work request.
           struct ibv_recv_wr recv_wr;
           memset(&recv_wr, 0, sizeof(recv_wr));
-          recv_wr.next    = NULL;
+          recv_wr.next    = nullptr;
           recv_wr.sg_list = &recv_sge;
           recv_wr.num_sge = 1;
           recv_wr.wr_id   = (uint64_t)region;
@@ -397,7 +407,7 @@ namespace verbs
               case IBV_WR_SEND_WITH_IMM: str = "IBV_WR_SEND_WITH_IMM"; break;
               case IBV_WR_RDMA_READ: str = "IBV_WR_RDMA_READ"; break;
               case IBV_WR_ATOMIC_CMP_AND_SWP: str = "IBV_WR_ATOMIC_CMP_AND_SWAP"; break;
-              case IBV_WR_ATOMIC_FETCH_AND_ADD: str = "IBV_WR_ATOMIC_FETCH_AND_ADD"; break;
+              case IBV_WR_ATOMIC_FETCH_AND_ADD: str = "IBV_WR_ATOMIC_FETCH_AND_ADD";break;
            }
            return str;
         }

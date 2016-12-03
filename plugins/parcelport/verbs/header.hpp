@@ -14,6 +14,10 @@
 #include <boost/array.hpp>
 //
 #include <cstdint>
+#include <cstddef>
+#include <cstring>
+#include <utility>
+#include <vector>
 
 // A generic header structure that can be used by parcelports
 // currently, the verbs parcelports make use of it
@@ -75,8 +79,10 @@ namespace verbs
                 std::make_pair(buffer.num_chunks_.first, buffer.num_chunks_.second);
 
             // find out how much space is needed for chunk information
-            const std::vector<serialization::serialization_chunk>& chunks = buffer.chunks_;
-            size_t chunkbytes = chunks.size() * sizeof(serialization::serialization_chunk);
+            const std::vector<serialization::serialization_chunk>&
+                chunks = buffer.chunks_;
+            size_t chunkbytes = chunks.size() *
+                sizeof(serialization::serialization_chunk);
             // can we send the chunk info inside the header
             if (chunkbytes <= data_size_) {
               message_header.flags |= chunk_flag;

@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace parcelset {
 

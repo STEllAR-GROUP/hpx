@@ -56,7 +56,8 @@ namespace hpx { namespace serialization
         return retval;
     }
 
-    inline serialization_chunk create_pointer_chunk(void const* pos, std::size_t size, std::uint32_t rkey=0)
+    inline serialization_chunk create_pointer_chunk(void const* pos, std::size_t size,
+        std::uint32_t rkey=0)
     {
         serialization_chunk retval = {
             { 0 }, size, static_cast<std::uint8_t>(chunk_type_pointer), rkey

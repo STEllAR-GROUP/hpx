@@ -8,10 +8,13 @@
 
 #include <hpx/config.hpp>
 //
-#include <vector>
-#include <functional>
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
+//
+#include <vector>
+#include <functional>
+#include <cstddef>
+#include <utility>
 //
 namespace hpx {
 namespace parcelset {

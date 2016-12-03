@@ -8,7 +8,7 @@
 
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_event_channel.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_shared_receive_queue.hpp>
+#include <plugins/parcelport/verbs/rdma/verbs_shared_receive_queue.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_sender_receiver.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_completion_queue.hpp>
 //
@@ -32,7 +32,6 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-
     // Connection for RDMA operations with a remote partner.
     class verbs_endpoint : public verbs_sender_receiver
     {
@@ -77,7 +76,7 @@ namespace verbs
             verbs_protection_domain_ptr domain,
             verbs_completion_queue_ptr CompletionQ,
             rdma_memory_pool_ptr pool,
-            rdma_shared_receive_queue_ptr SRQ,
+            verbs_shared_receive_queue_ptr SRQ,
             bool signalSendQueue = false) :
                 verbs_sender_receiver(nullptr)
         {
@@ -374,7 +373,7 @@ namespace verbs
         {
             //
             // Debugging code to get ip address of soure/dest of event
-            // NB: The src and dest fields refer to the message and not the connect request
+            // NB: The src and dest fields refer to the message not the connect request
             // so we are actually receiving a request from dest (it is the src of the msg)
             //
             struct sockaddr *ip_src = &cmId_->route.addr.src_addr;
@@ -496,7 +495,7 @@ namespace verbs
                 if (!done) polling_function();
             }
 
-            if (err != 0 && event == NULL)
+            if (err != 0 && event == nullptr)
             {
                 LOG_DEVEL_MSG("1: Connection error, unknown event ");
                 return err;
@@ -556,7 +555,7 @@ namespace verbs
         int create_srq(verbs_protection_domain_ptr domain)
         {
             try {
-                srq_ = std::make_shared < rdma_shared_receive_queue
+                srq_ = std::make_shared < verbs_shared_receive_queue
                     > (cmId_, domain);
             }
             catch (...) {
@@ -599,14 +598,14 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        inline rdma_shared_receive_queue_ptr SRQ() {
+        inline verbs_shared_receive_queue_ptr SRQ() {
             return srq_;
         }
 
         // ---------------------------------------------------------------------------
         virtual inline struct ibv_srq *getsrq_() {
-            if (srq_ == NULL)
-                return NULL;
+            if (srq_ == nullptr)
+                return nullptr;
             return srq_->getsrq_();
         }
 
@@ -632,7 +631,8 @@ namespace verbs
             // Initialize private data.
             memset(&local_address_, 0, sizeof(local_address_));
             memset(&remote_address_, 0, sizeof(remote_address_));
-            event_channel_ = std::unique_ptr<verbs_event_channel> (new verbs_event_channel);
+            event_channel_ = std::unique_ptr<verbs_event_channel>
+                (new verbs_event_channel);
             clear_counters();
             _initiated_connection = false;
             state_ = connection_state::uninitialized;
@@ -706,7 +706,7 @@ namespace verbs
 
         rdma_memory_pool_ptr memory_pool_;
 
-        rdma_shared_receive_queue_ptr srq_;
+        verbs_shared_receive_queue_ptr srq_;
 
         // Event channel for notification of RDMA connection management events.
         std::unique_ptr<verbs_event_channel> event_channel_;

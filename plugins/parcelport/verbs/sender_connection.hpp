@@ -12,12 +12,16 @@
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 //
 #include <memory>
+#include <cstdint>
+#include <utility>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
 #include "pinned_memory_vector.hpp"
 
-namespace hpx { namespace parcelset {
-namespace policies { namespace verbs
+namespace hpx {
+namespace parcelset {
+namespace policies {
+namespace verbs
 {
     struct sender_connection;
     struct parcelport;
@@ -51,7 +55,7 @@ namespace policies { namespace verbs
     public:
         sender_connection(
             parcelport_type * pp
-          , boost::uint32_t dest
+          , std::uint32_t dest
           , locality there
           , verbs_endpoint *client
           , memory_pool_type * chunk_pool
@@ -65,9 +69,10 @@ namespace policies { namespace verbs
           , chunk_pool_(chunk_pool)
           , parcels_sent_(parcels_sent)
         {
-            // the send buffer is created with our allocator and will get memory from our pool
-            // - disable deallocation so that we can manage the block lifetime better
-            // @TODO, integrate the pointer wrapper and allocators better into parcel_buffer
+            // the send buffer is created with our allocator and will get memory from
+            // our pool - disable deallocation so that we can manage the block lifetime
+            // better
+            // @TODO, integrate pointer wrapper and allocators better into parcel_buffer
             snd_data_type pinned_vector(chunk_pool_);
             snd_buffer_type buffer(std::move(pinned_vector), chunk_pool_);
             buffer_ = std::move(buffer);
@@ -96,11 +101,11 @@ namespace policies { namespace verbs
             )
         > postprocess_handler_;
 
-        parcelport_type       * parcelport_;
-        boost::uint32_t         dest_ip_;
-        parcelset::locality     there_;
-        verbs_endpoint            * client_;
-        memory_pool_type      * chunk_pool_;
+        parcelport_type     *parcelport_;
+        std::uint32_t        dest_ip_;
+        parcelset::locality  there_;
+        verbs_endpoint      *client_;
+        memory_pool_type    *chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;
     };
 }}}}

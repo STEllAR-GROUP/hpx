@@ -15,9 +15,11 @@
 #include <memory>
 #include <tuple>
 #include <cstdio>
+#include <string>
+#include <map>
 
 namespace hpx { namespace util {
-       
+
 //----------------------------------------------------------------------------
 // an experimental profiling class which times sections of code and collects
 // the timing from a tree of profiler objects to break down the time spend
@@ -29,7 +31,7 @@ class simple_profiler {
     typedef std::tuple<double,int,int> valtype;
 
     simple_profiler(const char *title) {
-        this->_parent = NULL;
+        this->_parent = nullptr;
         this->_title  = title;
         this->_done   = false;
     }
@@ -75,7 +77,8 @@ class simple_profiler {
               int &level = std::get<1>(p->second);
               level_totals[level] += std::get<0>(p->second);
               if (level<last_level) {
-                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ') << "------\n";
+                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                    << "------\n";
                 hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')
                   % (100.0*level_totals[last_level]/elapsed)) << "\n";
@@ -92,7 +95,8 @@ class simple_profiler {
                   % std::string (level*9, ' ')
                   % (100.0*std::get<0>(p->second)/elapsed)) << "\n";
               if ((++p)==this->_profiles.end()) {
-                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ') << "------\n";
+                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                    << "------\n";
                 hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')
                   % (100.0*level_totals[last_level]/elapsed)) << "\n";

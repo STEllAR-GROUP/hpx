@@ -1,3 +1,8 @@
+//  Copyright (c) 2015-2016 John Biddiscombe
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef __PARCELPORT_VERBS_CUSTOM_SCHEDULER_H__
 #define __PARCELPORT_VERBS_CUSTOM_SCHEDULER_H__
 //
@@ -12,6 +17,10 @@
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
+#include <cstddef>
+#include <iostream>
+#include <utility>
+
 using namespace hpx;
 using namespace hpx::threads::policies;
 //
@@ -109,7 +118,8 @@ namespace verbs
 
             hpx::threads::thread_id_type id = threads::invalid_thread_id;
 
-            hpx::threads::detail::create_thread(&scheduler_, data, id, initial_state, run_now, ec);
+            hpx::threads::detail::create_thread(&scheduler_, data, id,
+                initial_state, run_now, ec);
 
             std::cout << "created a thread and got id " << id << std::endl;
             return id;

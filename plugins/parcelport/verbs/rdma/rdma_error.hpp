@@ -43,7 +43,7 @@ public:
     {
         char buffer[256];
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
-        return strerror_r(err, buffer, sizeof(buf)) ? NULL : buffer;
+        return strerror_r(err, buffer, sizeof(buf)) ? nullptr : buffer;
 #else
         return strerror_r(err, buffer, 256);
 #endif

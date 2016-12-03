@@ -179,13 +179,13 @@ set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
 #
 # set_source_files_properties and set_property appear to be broken when setting
 # INCLUDE_DIRECTORIES, so work around by adding compile flags for the include
-# locations needed by parcelport plugin sources 
+# locations needed by parcelport plugin sources
 #
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_INCLUDE_DIRECTORIES)
     string (REPLACE ";" " -I" _INCLUDE_STRING "${_parcelport_${_plugin}_INCLUDE_DIRECTORIES}")
     set_property(
-      SOURCE 
+      SOURCE
         ${_parcelport_${_plugin}_SOURCES}
       APPEND_STRING PROPERTY COMPILE_FLAGS
         " -I${_INCLUDE_STRING}"
@@ -261,7 +261,7 @@ endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
-    target_link_libraries(hpx 
+    target_link_libraries(hpx
       PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
     hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
   endif()

@@ -8,6 +8,8 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+//
+#include <cstdint>
 
 namespace hpx {
 namespace parcelset {
@@ -25,7 +27,7 @@ namespace verbs
         return "verbs";
       }
 
-      explicit locality(boost::uint32_t ip) :
+      explicit locality(std::uint32_t ip) :
             ip_(ip), qp_(0xFFFF)
       {
           LOG_DEBUG_MSG("explicit constructing locality from " << hexuint32(ip))
@@ -38,7 +40,7 @@ namespace verbs
 
       // some condition marking this locality as valid
       explicit operator bool() const {
-        return (ip_ != boost::uint32_t(0xFFFF));
+        return (ip_ != std::uint32_t(0xFFFF));
       }
 
       void save(serialization::output_archive & ar) const {
@@ -66,8 +68,8 @@ namespace verbs
         return os;
       }
     public:
-      boost::uint32_t ip_;
-      boost::uint32_t qp_;
+      std::uint32_t ip_;
+      std::uint32_t qp_;
     };
 
 }}}}
