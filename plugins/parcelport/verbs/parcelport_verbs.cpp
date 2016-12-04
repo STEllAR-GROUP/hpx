@@ -9,7 +9,6 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/memory_chunk_pool_allocator.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
@@ -30,8 +29,6 @@
 // setting that affect the parcelport. It needs to be #included before
 // other files that are part of the parcelport
 #include <hpx/config/parcelport_verbs_defines.hpp>
-
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_POOL_MEDIUM_CHUNK_SIZE
 
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
@@ -227,8 +224,6 @@ namespace verbs
 
         typedef rdma_memory_pool                                   memory_pool_type;
         typedef std::shared_ptr<memory_pool_type>                  memory_pool_ptr_type;
-        typedef hpx::util::detail::memory_chunk_pool_allocator
-                <char, memory_pool_type, mutex_type>               allocator_type;
         typedef pinned_memory_vector<char>                         rcv_data_type;
         typedef parcel_buffer<rcv_data_type>                       snd_buffer_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>>    rcv_buffer_type;

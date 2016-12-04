@@ -9,14 +9,13 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/memory_chunk_pool_allocator.hpp>
 //
 #include <memory>
 #include <cstdint>
 #include <utility>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
-#include "pinned_memory_vector.hpp"
+#include <plugins/parcelport/verbs/pinned_memory_vector.hpp>
 
 namespace hpx {
 namespace parcelset {
@@ -30,8 +29,6 @@ namespace verbs
 
     typedef rdma_memory_pool                                memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
-    typedef hpx::util::detail::memory_chunk_pool_allocator
-            <char, memory_pool_type, mutex_type>            allocator_type;
     typedef pinned_memory_vector<char>                      snd_data_type;
     typedef parcel_buffer<snd_data_type>                    snd_buffer_type;
 
