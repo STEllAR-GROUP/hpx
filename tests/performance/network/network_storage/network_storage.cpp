@@ -9,11 +9,11 @@
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
-#include <boost/array.hpp>
 #include <boost/assert.hpp>
 #include <boost/atomic.hpp>
 #include <boost/random.hpp>
 
+#include <array>
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
@@ -131,7 +131,7 @@
 // global vars
 //----------------------------------------------------------------------------
 std::vector<std::vector<hpx::future<int> > > ActiveFutures;
-boost::array<boost::atomic<int>, MAX_RANKS>  FuturesWaiting;
+std::array<boost::atomic<int>, MAX_RANKS>    FuturesWaiting;
 
 #if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
  boost::atomic<bool>                        FuturesActive;

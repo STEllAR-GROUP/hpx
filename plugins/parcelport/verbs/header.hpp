@@ -11,8 +11,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/util/assert.hpp>
 //
-#include <boost/array.hpp>
-//
+#include <array>
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
@@ -64,8 +63,8 @@ namespace verbs
         static const     unsigned int message_flag      = 0x02;
         //
     private:
-        detail::header_block           message_header;
-        boost::array<char, data_size_> data_;
+        detail::header_block         message_header;
+        std::array<char, data_size_> data_;
 
     public:
         //
