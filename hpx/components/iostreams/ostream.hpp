@@ -15,6 +15,7 @@
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/util/register_locks.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -331,7 +332,8 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
+            util::ignore_while_checking<std::unique_lock<mutex_type> > ignore(&l);
             return streaming_operator_lazy(manip_fun);
         }
     };
