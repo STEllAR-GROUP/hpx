@@ -169,7 +169,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        verbs_completion_queue_ptr& getCompletionQ(void) {
+        verbs_completion_queue_ptr& get_completion_queue(void) {
             return completion_queue_;
         }
 
@@ -353,8 +353,7 @@ namespace verbs
             if (rc != 0) {
                 rdma_error e(rc, LOG_FORMAT_MSG("error resolving route to "
                     << sockaddress(&remote_address_)
-                    << "from " << sockaddress(&local_address_)
-                    << ": " << rdma_error::error_string(err)));
+                    << "from " << sockaddress(&local_address_)));
                 return rc;
             }
 

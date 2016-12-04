@@ -109,7 +109,7 @@ int rdma_controller::startup()
         LOG_ERROR_MSG("error allocating protection domain: " << e.what());
         return e.error_code();
     }
-    LOG_DEBUG_MSG("created protection domain " << protection_domain_->getHandle());
+    LOG_DEBUG_MSG("created protection domain " << protection_domain_->get_handle());
 
     // Create a completion channel object.
     try {
@@ -171,7 +171,7 @@ int rdma_controller::pollCompletionQueues()
     if (this->get_shared_receive_queue() == nullptr) {
         for (auto _client : clients_) {
             verbs_endpoint *client = _client.second.get();
-            verbs_completion_queue *completionQ = client->getCompletionQ().get();
+            verbs_completion_queue *completionQ = client->get_completion_queue().get();
 
             // Remove work completions from the completion queue until it is empty.
             do {
@@ -379,7 +379,7 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
             << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
         // Find connection associated with this event.
         verbs_endpoint_ptr client = clients_[cm_event->id->qp->qp_num];
-        verbs_completion_queue_ptr completionQ = client->getCompletionQ();
+        verbs_completion_queue_ptr completionQ = client->get_completion_queue();
 
         // Complete disconnect initiated by peer.
         int err = client->disconnect(false);
@@ -406,7 +406,7 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
         //    _completionChannel->removeCompletionQ(completionQ);
 
         // Destroy the completion queue.
-        LOG_DEBUG_MSG("destroying completion queue " << completionQ->getHandle());
+        LOG_DEBUG_MSG("destroying completion queue " << completionQ->get_handle());
         completionQ.reset();
 
         // even already ack'ed - do not do it again, just return
@@ -572,7 +572,7 @@ void rdma_controller::removeServerToServerConnection(verbs_endpoint_ptr client)
 {
     LOG_DEBUG_MSG("Removing Server-Server client object");
     // Find connection associated with this event.
-    verbs_completion_queue_ptr completionQ = client->getCompletionQ();
+    verbs_completion_queue_ptr completionQ = client->get_completion_queue();
     uint32_t qp = client->get_qp_num();
 
     // disconnect initiated by us
@@ -596,7 +596,7 @@ void rdma_controller::removeServerToServerConnection(verbs_endpoint_ptr client)
     //    _completionChannel->removeCompletionQ(completionQ);
 
     // Destroy the completion queue.
-    LOG_DEBUG_MSG("destroying completion queue " << completionQ->getHandle());
+    LOG_DEBUG_MSG("destroying completion queue " << completionQ->get_handle());
     completionQ.reset();
 }
 

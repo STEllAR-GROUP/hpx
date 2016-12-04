@@ -65,7 +65,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // get the infiniband verbs protection domain handle
-        uint32_t getHandle(void) const {
+        uint32_t get_handle(void) const {
             return pd_ != nullptr ? pd_->handle : 0;
         }
 

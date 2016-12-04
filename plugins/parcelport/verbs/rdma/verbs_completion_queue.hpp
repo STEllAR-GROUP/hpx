@@ -75,16 +75,15 @@ namespace verbs
         ~verbs_completion_queue()
         {
             if (completionQ_ != nullptr) {
+                LOG_DEBUG_MSG(decnumber(completionQ_->handle)
+                    << "destroying completion queue");
                 int err = ibv_destroy_cq(completionQ_);
                 if (err == 0) {
                     completionQ_ = nullptr;
-                    LOG_DEBUG_MSG(decnumber(completionQ_->handle)
-                        << "destroyed completion queue");
                 }
                 else {
                     LOG_ERROR_MSG(
-                        decnumber(completionQ_->handle)
-                        << "error destroying completion queue: "
+                        "error destroying completion queue: "
                         << rdma_error::error_string(err));
                 }
             }
@@ -93,6 +92,11 @@ namespace verbs
         // ---------------------------------------------------------------------------
         struct ibv_cq *getQueue(void) const {
             return completionQ_;
+        }
+
+        // ---------------------------------------------------------------------------
+        uint32_t get_handle(void) const {
+            return completionQ_ != nullptr ? completionQ_->handle : 0;
         }
 
         // ---------------------------------------------------------------------------

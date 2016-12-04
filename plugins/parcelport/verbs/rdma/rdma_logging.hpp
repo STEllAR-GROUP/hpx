@@ -6,6 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_LOGGING
 #define HPX_PARCELSET_POLICIES_VERBS_RDMA_LOGGING
 
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <thread>
@@ -121,6 +122,7 @@ namespace detail {
 
 #  include <boost/preprocessor.hpp>
 
+#  undef  LOG_DEBUG_MSG
 #  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug)   << THREAD_ID << " " << x;
 #  define LOG_INFO_MSG(x)  BOOST_LOG_TRIVIAL(info)    << THREAD_ID << " " << x;
@@ -133,9 +135,9 @@ namespace detail {
 #  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("*** Enter " << __func__);
 #  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("### Exit  " << __func__);
 
-#  define LOG_FORMAT_MSG(x)                                 \
-    (dynamic_cast<ostringstream &> (                        \
-        ostringstream().seekp(0, ios_base::cur) << x        \
+#  define LOG_FORMAT_MSG(x)                                    \
+    (dynamic_cast<std::ostringstream &> (                      \
+        std::ostringstream().seekp(0, std::ios_base::cur) << x \
         << __FILE__ << " " << std::dec << __LINE__ )).str()
 
 #  define LOG_TIMED_INIT(name)                                                      \
