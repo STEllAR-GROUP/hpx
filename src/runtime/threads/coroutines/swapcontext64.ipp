@@ -65,6 +65,7 @@
         "pushq %r14\n\t"                                                      \
         "pushq %r15\n\t"                                                      \
         "leaq -0x8(%rsp), %rsp\n\t"                                           \
+        "fnclex\n\t"                                                          \
         "stmxcsr (%rsp)\n\t"                                                  \
         "fnstcw 0x4(%rsp)\n\t"                                                \
         "movq  %rsp, (%rdi)\n\t"                                              \
