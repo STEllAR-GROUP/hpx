@@ -60,15 +60,13 @@
 #undef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
 
 // --------------------------------------------------------------------
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/unordered_map.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
-//
-#include "plugins/parcelport/verbs/sender_connection.hpp"
-#include "plugins/parcelport/verbs/connection_handler.hpp"
-#include "plugins/parcelport/verbs/locality.hpp"
-#include "plugins/parcelport/verbs/header.hpp"
-#include "plugins/parcelport/verbs/pinned_memory_vector.hpp"
+#include <plugins/parcelport/verbs/sender_connection.hpp>
+#include <plugins/parcelport/verbs/connection_handler.hpp>
+#include <plugins/parcelport/verbs/locality.hpp>
+#include <plugins/parcelport/verbs/header.hpp>
+#include <plugins/parcelport/verbs/pinned_memory_vector.hpp>
+#include <plugins/parcelport/verbs/performance_counter.hpp>
 //
 #if HPX_PARCELPORT_VERBS_USE_SPECIALIZED_SCHEDULER
 # include "plugins/parcelport/verbs/scheduler.hpp"
@@ -79,6 +77,7 @@
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_controller.hpp>
 //
 #if HPX_PARCELPORT_VERBS_USE_SMALL_VECTOR
@@ -236,10 +235,13 @@ namespace verbs
 
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
-        //
-        std::atomic<bool>       stopped_;
-        std::atomic_uint        active_send_count_;
-        std::atomic<bool>       immediate_send_allowed_;
+
+        // These are counters that are used for flow control so that we can throttle
+        // send tasks when too many messages have been posted.
+        std::atomic<unsigned int> active_send_count_;
+        std::atomic<bool>         immediate_send_allowed_;
+        // Used to help with shutdown
+        std::atomic<bool>         stopped_;
 
         memory_pool_ptr_type    chunk_pool_;
         verbs::tag_provider     tag_provider_;
@@ -273,7 +275,7 @@ namespace verbs
         // they must be held onto until all transfers of data are complete.
         // --------------------------------------------------------------------
         typedef struct {
-            std::atomic_uint                                 rdma_count;
+            std::atomic<unsigned int>                        rdma_count;
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
             verbs_memory_region              *header_region, *message_region;
@@ -315,10 +317,10 @@ namespace verbs
         mutex_type              active_recv_mutex;
 
         // a count of all receives, for debugging/performance measurement
-        std::atomic_uint      sends_posted;
-        std::atomic_uint      handled_receives;
-        std::atomic_uint      completions_handled;
-        std::atomic_uint      total_reads;
+        performance_counter<unsigned int>   sends_posted;
+        performance_counter<unsigned int>   handled_receives;
+        performance_counter<unsigned int>   completions_handled;
+        performance_counter<unsigned int>   total_reads;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -327,9 +329,9 @@ namespace verbs
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
             : base_type(ini, here(ini), on_start_thread, on_stop_thread)
-            , stopped_(false)
             , active_send_count_(0)
             , immediate_send_allowed_(true)
+            , stopped_(false)
             , sends_posted(0)
             , handled_receives(0)
             , completions_handled(0)
@@ -1049,7 +1051,7 @@ namespace verbs
             LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id)
                 << verbs_completion_queue::wc_opcode_str(completion.opcode));
 
-            completions_handled++;
+            ++completions_handled;
 /*
             rdma_controller_->for_each_client(
                 [](std::pair<uint32_t, verbs_endpoint_ptr> clientpair)

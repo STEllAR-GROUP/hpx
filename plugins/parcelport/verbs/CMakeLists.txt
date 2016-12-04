@@ -107,6 +107,19 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+# Performance counters
+#------------------------------------------------------------------------------
+hpx_option(HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS BOOL
+  "Enable verbs parcelport performance counters (default: OFF)"
+  OFF CATEGORY "Parcelport" ADVANCED)
+
+if (HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS)
+  hpx_add_config_define_namespace(
+      DEFINE    HPX_PARCELPORT_VERBS_HAVE_PERFORMANCE_COUNTERS
+      NAMESPACE parcelport_verbs)
+endif()
+
+#------------------------------------------------------------------------------
 # Throttling options
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_THROTTLE_SENDS STRING

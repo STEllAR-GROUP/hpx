@@ -9,6 +9,7 @@
 // Includes
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_shared_receive_queue.hpp>
+#include <plugins/parcelport/verbs/performance_counter.hpp>
 //
 #include <rdma/rdma_cma.h>
 #include <infiniband/verbs.h>
@@ -16,6 +17,7 @@
 #include <iomanip>
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 // Base connection class for RDMA operations with a remote partner.
@@ -413,29 +415,31 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int get_total_posted_recv_count()  { return total_posted_recv_; }
-        int get_total_posted_send_count()  { return total_posted_send_; }
-        int get_total_posted_read_count()  { return total_posted_read_; }
-        int get_total_posted_write_count() { return total_write_posted_; }
+        std::uint64_t get_total_posted_recv_count()  { return total_posted_recv_; }
+        std::uint64_t get_total_posted_send_count()  { return total_posted_send_; }
+        std::uint64_t get_total_posted_read_count()  { return total_posted_read_; }
+        std::uint64_t get_total_posted_write_count() { return total_write_posted_; }
 
     protected:
         // RDMA connection management id.
         struct rdma_cm_id *cmId_;
 
         // Number of receives that are preposted and (as yet) uncompleted
+        // we need to track this to ensure we do not ever have an empty
+        // receive queue
         mutable std::atomic<uint64_t> preposted_receives_;
 
         // Total number of receive operations posted to queue pair.
-        std::atomic<uint64_t> total_posted_recv_;
+        mutable performance_counter<std::uint64_t> total_posted_recv_;
 
         // Total number of send operations posted to queue pair.
-        std::atomic<uint64_t> total_posted_send_;
+        mutable performance_counter<std::uint64_t> total_posted_send_;
 
         // Total number of rdma read operations posted to queue pair.
-        std::atomic<uint64_t> total_posted_read_;
+        mutable performance_counter<std::uint64_t> total_posted_read_;
 
         // Total number of rdma write operations posted to queue pair.
-        std::atomic<uint64_t> total_write_posted_;
+        mutable performance_counter<std::uint64_t> total_write_posted_;
 
     };
 
