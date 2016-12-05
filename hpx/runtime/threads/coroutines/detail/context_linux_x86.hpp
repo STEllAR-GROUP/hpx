@@ -48,7 +48,6 @@
  */
 
 #if defined(__x86_64__)
-#include <x86intrin.h>      // _mm_getcsr
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
 #else
@@ -182,10 +181,6 @@ namespace hpx { namespace threads { namespace coroutines
 
                 m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
                 m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
-#if defined(__x86_64__)
-                std::size_t mxcsr = _mm_getcsr();
-                m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(mxcsr);
-#endif
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
                 {
@@ -237,10 +232,6 @@ namespace hpx { namespace threads { namespace coroutines
 
                     m_sp[cb_idx] = m_sp[backup_cb_idx];
                     m_sp[funp_idx] = m_sp[backup_funp_idx];
-#if defined(__x86_64__)
-                    std::size_t mxcsr = _mm_getcsr();
-                    m_sp[fp_ctrl_idx] = reinterpret_cast<void*>(mxcsr);
-#endif
                 }
             }
 
@@ -301,31 +292,30 @@ namespace hpx { namespace threads { namespace coroutines
         private:
 #if defined(__x86_64__)
             /** structure of context_data:
-             * 14: backup address of function to execute
-             * 13: backup address of trampoline
-             * 12: additional alignment (or valgrind_id if enabled)
-             * 11: param 0 of trampoline
-             * 10: dummy return address for trampoline
-             * 9:  return addr (here: start addr)
-             * 8:  rbp
-             * 7:  rbx
-             * 6:  rsi
-             * 5:  rdi
-             * 4:  r12
-             * 3:  r13
-             * 2:  r14
-             * 1:  r15
-             * 0:  fc_mxcsr/fc_x87_cw
+             * 13: backup address of function to execute
+             * 12: backup address of trampoline
+             * 11: additional alignment (or valgrind_id if enabled)
+             * 10: parm 0 of trampoline
+             * 9:  dummy return address for trampoline
+             * 8:  return addr (here: start addr)
+             * 7:  rbp
+             * 6:  rbx
+             * 5:  rsi
+             * 4:  rdi
+             * 3:  r12
+             * 2:  r13
+             * 1:  r14
+             * 0:  r15
              **/
-            static const std::size_t context_size = 15;
-            static const std::size_t backup_cb_idx = 14;
-            static const std::size_t backup_funp_idx = 13;
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-            static const std::size_t valgrind_id_idx = 12;
+            static const std::size_t valgrind_id_idx = 11;
 #endif
-            static const std::size_t cb_idx = 11;
-            static const std::size_t funp_idx = 9;
-            static const std::size_t fp_ctrl_idx = 0;
+
+            static const std::size_t context_size = 14;
+            static const std::size_t backup_cb_idx = 13;
+            static const std::size_t backup_funp_idx = 12;
+            static const std::size_t cb_idx = 10;
+            static const std::size_t funp_idx = 8;
 #else
             /** structure of context_data:
              * 9: valgrind_id (if enabled)
