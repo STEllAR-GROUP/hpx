@@ -24,9 +24,8 @@ namespace hpx { namespace compute { namespace host
         std::size_t numa_nodes = topo.get_number_of_numa_nodes();
         if (numa_nodes == 0)
             numa_nodes = topo.get_number_of_sockets();
-        std::vector<target> res(numa_nodes, target(hpx::threads::mask_type()));
+        std::vector<hpx::threads::mask_type> node_masks(numa_nodes);
 
-        numa_nodes = 0;
         auto & tm = hpx::get_runtime().get_thread_manager();
         std::size_t num_os_threads = hpx::get_os_thread_count();
         for(std::size_t num_thread = 0; num_thread != num_os_threads; ++num_thread)
@@ -35,20 +34,28 @@ namespace hpx { namespace compute { namespace host
             std::size_t numa_node = topo.get_numa_node_number(pu_num);
 
             auto const& mask = topo.get_thread_affinity_mask(pu_num, true);
+
             std::size_t mask_size = hpx::threads::mask_size(mask);
             for(std::size_t idx = 0; idx != mask_size; ++idx)
             {
                 if(hpx::threads::test(mask, idx))
                 {
-                    hpx::threads::set(
-                        res[numa_node].native_handle().get_device(), idx);
+                    hpx::threads::set(node_masks[numa_node], idx);
                 }
             }
 
-            numa_nodes = (std::max)(numa_node, numa_nodes);
         }
+        std::vector<target> res;
+        res.reserve(numa_nodes);
 
-        res.resize(numa_nodes + 1);
+        // Sort out the masks which don't have any bits set
+        for (auto& mask: node_masks)
+        {
+            if (hpx::threads::any(mask))
+            {
+                res.push_back(target(mask));
+            }
+        }
 
         return res;
     }
