@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace server
         }
         result_type get_value(error_code& ec)
         {
-            return channel_.get(launch::sync);
+            return channel_.get(launch::sync, ec);
         }
 
         // Additional functionality exposed by the channel component
