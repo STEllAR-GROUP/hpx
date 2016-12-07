@@ -121,7 +121,12 @@ namespace lcos {
             {
             }
 
-            result_type get_value(error_code& ec = throws)
+            result_type get_value()
+            {
+                result_type* result = this->shared_state_->get_result();
+                return std::move(*result);
+            }
+            result_type get_value(error_code& ec)
             {
                 result_type* result = this->shared_state_->get_result(ec);
                 return std::move(*result);
@@ -152,7 +157,12 @@ namespace lcos {
             {
             }
 
-            hpx::util::unused_type get_value(error_code& ec = throws)
+            hpx::util::unused_type get_value()
+            {
+                this->shared_state_->get_result();
+                return hpx::util::unused;
+            }
+            hpx::util::unused_type get_value(error_code& ec)
             {
                 this->shared_state_->get_result(ec);
                 return hpx::util::unused;

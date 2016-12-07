@@ -6,6 +6,8 @@
 #ifndef HPX_UTIL_VOID_GUARD_HPP
 #define HPX_UTIL_VOID_GUARD_HPP
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -22,7 +24,8 @@ namespace hpx { namespace util
     struct void_guard<void>
     {
         template <typename T>
-        void operator,(T const&) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE
+        void operator,(T const&) const HPX_NOEXCEPT
         {}
     };
 }}

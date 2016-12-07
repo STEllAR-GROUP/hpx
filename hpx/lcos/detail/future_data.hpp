@@ -256,7 +256,7 @@ namespace detail
           : state_(empty)
         {}
 
-        ~future_data()
+        virtual ~future_data() HPX_NOEXCEPT
         {
             reset();
         }

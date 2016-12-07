@@ -102,7 +102,28 @@ namespace hpx { namespace lcos { namespace server
         // queue). This method blocks if the value queue is empty. Waiting
         // threads are resumed automatically as soon as new values are placed
         // into the value queue.
-        ValueType get_value(error_code& ec = throws)
+        ValueType get_value()
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // cond_.wait() unlocks the lock before suspension and re-locks it
+            // afterwards. During this time span another thread may retrieve
+            // the next items from the queue for which the thread was resumed.
+            while (queue_.empty())
+            {
+                cond_.wait(l, "queue::get_value");
+            }
+            HPX_ASSERT(!queue_.empty());
+
+            // get the first value from the value queue and return it to the
+            // caller
+            ValueType value = std::move(queue_.front());
+            queue_.pop();
+
+            return value;
+        }
+
+        ValueType get_value(error_code& ec)
         {
             std::unique_lock<mutex_type> l(mtx_);
 
