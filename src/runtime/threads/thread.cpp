@@ -371,6 +371,16 @@ namespace hpx
             this_thread::suspend(abs_time, "this_thread::sleep_until");
         }
 
+        std::size_t get_thread_data()
+        {
+            return threads::get_thread_data(threads::get_self_id());
+        }
+
+        std::size_t set_thread_data(std::size_t data)
+        {
+            return threads::set_thread_data(threads::get_self_id(), data);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         disable_interruption::disable_interruption()
           : interruption_was_enabled_(interruption_enabled())
