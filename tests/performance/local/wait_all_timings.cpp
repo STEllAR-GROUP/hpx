@@ -11,6 +11,9 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,7 +40,7 @@ create_tasks(std::size_t num_tasks, std::size_t delay)
 double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
     std::size_t num_chunks, std::size_t delay)
 {
-    std::size_t num_chunk_tasks = (num_tasks + num_chunks) / num_chunks;
+    std::size_t num_chunk_tasks = ((num_tasks + num_chunks) / num_chunks) - 1;
     std::size_t last_num_chunk_tasks = num_tasks - (num_chunks - 1) * num_chunk_tasks;
 
     double result = 0;
