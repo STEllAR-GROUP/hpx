@@ -41,12 +41,12 @@ namespace lcos {
             void do_run()
             {
                 if (!f_)
-                    return;    // do nothing if no deferred task is given
+                    return;         // do nothing if no deferred task is given
 
                 try
                 {
-                    f_();    // trigger action
-                    this->wait();    // wait for value to come back
+                    f_();           // trigger action
+                    this->wait();   // wait for value to come back
                 }
                 catch (...)
                 {
