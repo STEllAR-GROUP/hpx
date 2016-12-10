@@ -162,7 +162,9 @@ namespace hpx { namespace lcos { namespace detail
       : public future_data<typename continuation_result<ContResult>::type>
     {
     private:
-        typedef future_data<ContResult> base_type;
+        typedef future_data<
+                typename continuation_result<ContResult>::type
+            > base_type;
 
         typedef typename base_type::mutex_type mutex_type;
         typedef typename base_type::result_type result_type;
@@ -195,10 +197,19 @@ namespace hpx { namespace lcos { namespace detail
         };
 
     public:
+        typedef typename base_type::init_no_addref init_no_addref;
+
         template <typename Func>
         continuation(Func && f)
           : started_(false), id_(threads::invalid_thread_id)
           , f_(std::forward<Func>(f))
+        {}
+
+        template <typename Func>
+        continuation(Func && f, init_no_addref no_addref)
+          : base_type(no_addref),
+            started_(false), id_(threads::invalid_thread_id),
+            f_(std::forward<Func>(f))
         {}
 
         void run_impl(
@@ -381,7 +392,7 @@ namespace hpx { namespace lcos { namespace detail
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready_locked())
+                if (this->is_ready_locked(l))
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
@@ -396,6 +407,7 @@ namespace hpx { namespace lcos { namespace detail
                         "future has been canceled");
                 }
                 else {
+                    l.unlock();
                     HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
                         "continuation<Future, ContResult>::cancel",
                         "future can't be canceled at this time");
@@ -484,11 +496,12 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation(Future const& future, launch policy, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f)));
+            new shared_state(std::forward<F>(f), init_no_addref()), false);
         static_cast<shared_state*>(p.get())->attach(future, policy);
         return p;
     }
@@ -500,11 +513,12 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation(Future const& future, threads::executor& sched, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f)));
+            new shared_state(std::forward<F>(f), init_no_addref()), false);
         static_cast<shared_state*>(p.get())->attach(future, sched);
         return p;
     }
@@ -517,11 +531,12 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_exec(Future const& future, Executor& exec, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f)));
+            new shared_state(std::forward<F>(f), init_no_addref()), false);
         static_cast<shared_state*>(p.get())->attach_exec(future, exec);
         return p;
     }
@@ -593,6 +608,12 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
+        unwrap_continuation() {}
+
+        unwrap_continuation(init_no_addref no_addref)
+          : future_data<ContResult>(no_addref)
+        {}
+
         template <typename Future>
         void attach(Future& future)
         {
@@ -622,10 +643,11 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename future_unwrap_result<Future>::result_type result_type;
         typedef detail::unwrap_continuation<result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state());
+            new shared_state(init_no_addref()), false);
         static_cast<shared_state*>(p.get())->attach(future);
         return p;
     }
@@ -653,6 +675,12 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
+        void_continuation() {}
+
+        void_continuation(init_no_addref no_addref)
+          : future_data<void>(no_addref)
+        {}
+
         template <typename Future>
         void attach(Future& future)
         {
@@ -678,10 +706,11 @@ namespace hpx { namespace lcos { namespace detail
     make_void_continuation(Future& future)
     {
         typedef detail::void_continuation void_shared_state;
+        typedef typename void_shared_state::init_no_addref init_no_addref;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<void>::type p(
-            new void_shared_state());
+            new void_shared_state(init_no_addref()), false);
         static_cast<void_shared_state*>(p.get())->attach(future);
         return p;
     }

@@ -158,6 +158,8 @@ namespace hpx { namespace lcos
           : hpx::lcos::detail::future_data<void>
         {
         private:
+            typedef hpx::lcos::detail::future_data<void> base_type;
+
             // workaround gcc regression wrongly instantiating constructors
             wait_all_frame();
             wait_all_frame(wait_all_frame const&);
@@ -171,8 +173,14 @@ namespace hpx { namespace lcos
             {};
 
         public:
+            typedef typename base_type::init_no_addref init_no_addref;
+
             wait_all_frame(Tuple const& t)
               : t_(t)
+            {}
+
+            wait_all_frame(Tuple const& t, init_no_addref no_addref)
+              : base_type(no_addref), t_(t)
             {}
 
         protected:
@@ -317,9 +325,11 @@ namespace hpx { namespace lcos
     {
         typedef util::tuple<std::vector<Future> const&> result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type data(values);
-        boost::intrusive_ptr<frame_type> frame(new frame_type(data));
+        boost::intrusive_ptr<frame_type> frame(
+            new frame_type(data, init_no_addref()), false);
         frame->wait_all();
     }
 
@@ -388,11 +398,13 @@ namespace hpx { namespace lcos
                 typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type values =
             result_type(traits::detail::get_shared_state(ts)...);
 
-        boost::intrusive_ptr<frame_type> frame(new frame_type(values));
+        boost::intrusive_ptr<frame_type> frame(
+            new frame_type(values, init_no_addref()), false);
         frame->wait_all();
     }
 }}

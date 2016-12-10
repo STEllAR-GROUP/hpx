@@ -61,6 +61,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename hpx::traits::future_traits<Future>::type value_type;
         typedef lcos::detail::future_data<value_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         int state = future_state::invalid;
         ar >> state;
@@ -69,16 +70,16 @@ namespace hpx { namespace lcos { namespace detail
             value_type value;
             ar >> value;
 
-            boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_value(std::move(value));
+            boost::intrusive_ptr<shared_state> p(
+                new shared_state(std::move(value), init_no_addref()), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
             boost::exception_ptr exception;
             ar >> exception;
 
-            boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_exception(exception);
+            boost::intrusive_ptr<shared_state> p(
+                new shared_state(std::move(exception), init_no_addref()), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -94,21 +95,22 @@ namespace hpx { namespace lcos { namespace detail
     >::type serialize_future_load(Archive& ar, Future& f) //-V659
     {
         typedef lcos::detail::future_data<void> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         int state = future_state::invalid;
         ar >> state;
         if (state == future_state::has_value)
         {
-            boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_value(hpx::util::unused);
+            boost::intrusive_ptr<shared_state> p(
+                new shared_state(hpx::util::unused, init_no_addref()), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
             boost::exception_ptr exception;
             ar >> exception;
 
-            boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_exception(exception);
+            boost::intrusive_ptr<shared_state> p(
+                new shared_state(std::move(exception), init_no_addref()), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -1285,9 +1287,11 @@ namespace hpx { namespace lcos
     {
         typedef typename hpx::util::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
-        boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_value(std::forward<Result>(init));
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(std::forward<Result>(init), init_no_addref()),
+            false);
 
         return hpx::traits::future_access<future<result_type> >::create(std::move(p));
     }
@@ -1298,9 +1302,10 @@ namespace hpx { namespace lcos
     future<T> make_exceptional_future(boost::exception_ptr const& e)
     {
         typedef lcos::detail::future_data<T> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
-        boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_exception(e);
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(e, init_no_addref()), false);
 
         return hpx::traits::future_access<future<T> >::create(std::move(p));
     }
@@ -1345,9 +1350,10 @@ namespace hpx { namespace lcos
     inline future<void> make_ready_future()
     {
         typedef lcos::detail::future_data<void> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
-        boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_value(hpx::util::unused);
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(hpx::util::unused, init_no_addref()), false);
 
         return hpx::traits::future_access<future<void> >::create(std::move(p));
     }

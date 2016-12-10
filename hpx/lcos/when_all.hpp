@@ -195,6 +195,7 @@ namespace hpx { namespace lcos
         {
             typedef typename when_all_result<Tuple>::type result_type;
             typedef hpx::lcos::future<result_type> type;
+            typedef hpx::lcos::detail::future_data<result_type> base_type;
 
         private:
             // workaround gcc regression wrongly instantiating constructors
@@ -210,9 +211,16 @@ namespace hpx { namespace lcos
             {};
 
         public:
+            typedef typename base_type::init_no_addref init_no_addref;
+
             template <typename Tuple_>
             when_all_frame(Tuple_&& t)
               : t_(std::forward<Tuple_>(t))
+            {}
+
+            template <typename Tuple_>
+            when_all_frame(Tuple_&& t, init_no_addref no_addref)
+              : base_type(no_addref), t_(std::forward<Tuple_>(t))
             {}
 
         protected:
@@ -347,12 +355,12 @@ namespace hpx { namespace lcos
         lcos::future<typename std::decay<Range>::type> >::type //-V659
     when_all(Range&& values)
     {
-        typedef detail::when_all_frame<
-                util::tuple<Range>
-            > frame_type;
+        typedef detail::when_all_frame<util::tuple<Range> > frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-            util::forward_as_tuple(std::move(values))));
+            util::forward_as_tuple(std::move(values)), init_no_addref()),
+            false);
         p->do_await();
 
         using traits::future_access;
@@ -421,11 +429,13 @@ namespace hpx { namespace lcos
                 typename traits::acquire_future<Ts>::type...
             > result_type;
         typedef detail::when_all_frame<result_type> frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         traits::acquire_future_disp func;
         result_type values(func(std::forward<Ts>(ts))...);
 
-        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        boost::intrusive_ptr<frame_type> p(
+            new frame_type(std::move(values), init_no_addref()), false);
         p->do_await();
 
         using traits::future_access;
