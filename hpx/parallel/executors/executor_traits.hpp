@@ -21,12 +21,14 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <iterator>
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#include <boost/range/const_iterator.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/throw_exception.hpp>

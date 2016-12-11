@@ -608,6 +608,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
+        typedef typename future_data<ContResult>::init_no_addref init_no_addref;
+
         unwrap_continuation() {}
 
         unwrap_continuation(init_no_addref no_addref)
@@ -675,6 +677,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
+        typedef typename future_data<void>::init_no_addref init_no_addref;
+
         void_continuation() {}
 
         void_continuation(init_no_addref no_addref)

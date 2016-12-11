@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -70,7 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         std::vector<hpx::future<
             typename detail::bulk_async_execute_result<F, S, Ts...>::type
         > >
-        bulk_async_execute(F && f, S && shape, Ts &&... ts)
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
             typedef std::vector<hpx::future<
                     typename detail::bulk_async_execute_result<F, S, Ts...>::type
