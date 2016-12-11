@@ -992,7 +992,7 @@ namespace hpx { namespace lcos
         make_future_helper(Future && f)
         {
             return std::move(f);
-        };
+        }
 
         template <typename T, typename Future>
         typename std::enable_if<
@@ -1033,7 +1033,7 @@ namespace hpx { namespace lcos
         convert_future_helper(Future && f, Conv && conv)
         {
             return std::move(f);
-        };
+        }
 
         template <typename T, typename Future, typename Conv>
         typename std::enable_if<

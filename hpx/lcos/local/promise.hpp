@@ -30,10 +30,11 @@ namespace hpx { namespace lcos { namespace local
             HPX_MOVABLE_ONLY(promise_base);
 
             typedef SharedState shared_state_type;
+            typedef typename shared_state_type::init_no_addref init_no_addref;
 
         public:
             promise_base()
-              : shared_state_(new shared_state_type())
+              : shared_state_(new shared_state_type(init_no_addref()), false)
               , future_retrieved_(false)
             {}
 
