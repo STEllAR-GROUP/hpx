@@ -146,6 +146,7 @@ namespace hpx { namespace lcos { namespace local
                     Result, F, lcos::detail::cancelable_task_base<Result>
                 > base_type;
             typedef typename base_type::result_type result_type;
+            typedef typename base_type::init_no_addref init_no_addref;
 
             cancelable_task_object(F const& f)
               : base_type(f)
