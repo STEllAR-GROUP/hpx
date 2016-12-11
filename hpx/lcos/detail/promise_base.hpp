@@ -32,6 +32,14 @@ namespace lcos {
         template <typename Result>
         struct promise_data : task_base<Result>
         {
+            typedef typename task_base<Result>::init_no_addref init_no_addref;
+
+            promise_data() {}
+
+            promise_data(init_no_addref no_addref)
+              : task_base<Result>(no_addref)
+            {}
+
             void set_task(util::unique_function_nonser<void()>&& f)
             {
                 f_ = std::move(f);

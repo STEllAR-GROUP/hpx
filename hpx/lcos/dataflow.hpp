@@ -123,6 +123,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef
             typename detail::dataflow_return<Func, Futures>::type
             result_type;
+        typedef hpx::lcos::detail::future_data<result_type> base_type;
 
         typedef hpx::lcos::future<result_type> type;
 
@@ -152,12 +153,27 @@ namespace hpx { namespace lcos { namespace detail
         dataflow_frame(dataflow_frame const&);
 
     public:
+        typedef typename base_type::init_no_addref init_no_addref;
+
         template <typename FFunc, typename FFutures>
         dataflow_frame(
             Policy policy
           , FFunc && func
           , FFutures && futures)
               : policy_(std::move(policy))
+              , func_(std::forward<FFunc>(func))
+              , futures_(std::forward<FFutures>(futures))
+              , done_(false)
+        {}
+
+        template <typename FFunc, typename FFutures>
+        dataflow_frame(
+            Policy policy
+          , FFunc && func
+          , FFutures && futures
+          , init_no_addref no_addref)
+              : base_type(no_addref)
+              , policy_(std::move(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
@@ -473,6 +489,7 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
+            typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
                     launch_policy
@@ -481,7 +498,8 @@ namespace hpx { namespace lcos { namespace detail
                         id
                       , traits::acquire_future_disp()(std::forward<Ts>(ts))...
                     )
-                ));
+                  , init_no_addref()
+                ), false);
             p->do_await();
 
             using traits::future_access;
