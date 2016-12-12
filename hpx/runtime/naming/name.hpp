@@ -92,7 +92,7 @@ namespace hpx { namespace naming
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
-        explicit gid_type (std::uint64_t lsb_id = 0)
+        HPX_HOST_DEVICE gid_type (std::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
@@ -107,17 +107,29 @@ namespace hpx { namespace naming
             id_lsb_(rhs.get_lsb())
         {
         }
-        gid_type (gid_type && rhs)
+
+        HPX_HOST_DEVICE gid_type (gid_type && rhs)
+#if !defined(__CUDA_ARCH__)
           : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
             id_lsb_(rhs.get_lsb())
         {
             rhs.id_lsb_ = rhs.id_msb_ = 0;
         }
-
-        ~gid_type()
+#else
+          : id_msb_(rhs.id_msb_),
+            id_lsb_(rhs.id_lsb_)
         {
-            HPX_ASSERT(!is_locked());
+            rhs.id_lsb_ = rhs.id_msb_ = 0;
         }
+#endif
+
+        HPX_HOST_DEVICE ~gid_type()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!is_locked());
+#endif
+        }
+
 
         gid_type& operator=(std::uint64_t lsb_id)
         {
