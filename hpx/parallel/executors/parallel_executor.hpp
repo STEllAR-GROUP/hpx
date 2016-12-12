@@ -47,7 +47,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// Create a new parallel executor
         explicit parallel_executor(launch l = launch::async,
-                std::size_t spread = 4, std::size_t tasks = 128)
+                std::size_t spread = 4, std::size_t tasks =
+                    (std::min)(std::size_t(128), hpx::get_os_thread_count()))
           : l_(l), num_spread_(spread), num_tasks_(tasks)
         {}
 
