@@ -47,8 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// Create a new parallel executor
         explicit parallel_executor(launch l = launch::async,
-                std::size_t spread = 4, std::size_t tasks =
-                    (std::min)(std::size_t(128), hpx::get_os_thread_count()))
+                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : l_(l), num_spread_(spread), num_tasks_(tasks)
         {}
 
@@ -102,6 +101,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             std::size_t base, std::size_t size, F const& func, Iter it,
             Ts const&... ts)
         {
+            if (num_tasks_ == std::size_t(-1))
+            {
+                static std::size_t num_tasks =
+                    (std::min)(std::size_t(128), hpx::get_os_thread_count());
+                num_tasks_ = num_tasks;
+            }
+
             if (size > num_tasks_)
             {
                 // spawn hierarchical tasks
