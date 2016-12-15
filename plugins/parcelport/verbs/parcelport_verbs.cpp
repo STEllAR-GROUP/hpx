@@ -195,8 +195,8 @@ namespace verbs
         static rdma_controller_ptr rdma_controller_;
         static std::string         _ibverbs_device;
         static std::string         _ibverbs_interface;
-        static std::uint32_t     _port;
-        static std::uint32_t     _ibv_ip;
+        static std::uint32_t       _port;
+        static std::uint32_t       _ibv_ip;
 
         // Not currently working, we support bootstrapping, but when not enabled
         // we should be able to skip it
@@ -206,16 +206,6 @@ namespace verbs
         typedef hpx::concurrent::unordered_map<std::uint32_t, std::uint32_t> ip_map;
         typedef ip_map::iterator ip_map_iterator;
         ip_map ip_qp_map;
-
-        // a map that stores the ip address and a boolean to tell us if a connection
-        // to that address is currently being initiated. We need this to prevent two ends
-        // of a connection simultaneously initiating a connection to each other
-        typedef hpx::concurrent::unordered_map<std::uint32_t, bool> connect_map;
-        connect_map             connection_requests_;
-
-        // Used to control incoming and outgoing connection requests
-        mutex_type              new_connection_mutex;
-        condition_type          new_connection_condition;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
         // more consistent reuse of classes/types.
@@ -369,13 +359,7 @@ namespace verbs
             rdma_controller_->startup();
 
             LOG_DEBUG_MSG("Fetching memory pool");
-            chunk_pool_ = rdma_controller_->getMemoryPool();
-
-            LOG_DEBUG_MSG("Setting ConnectRequest function");
-            auto connectRequest_function = std::bind(
-                &parcelport::handle_verbs_preconnection, this,
-                std::placeholders::_1, std::placeholders::_2);
-            rdma_controller_->setConnectRequestFunction(connectRequest_function);
+            chunk_pool_ = rdma_controller_->get_memory_pool();
 
             LOG_DEBUG_MSG("Setting Connection function");
             auto connection_function = std::bind(
@@ -427,7 +411,8 @@ namespace verbs
             FUNC_START_DEBUG_MSG;
 
             std::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEBUG_MSG("Create connection from " << ipaddress(_ibv_ip)
+            LOG_DEVEL_MSG("Create sender_connection     from "
+                << ipaddress(_ibv_ip)
                 << "to " << ipaddress(dest_ip) );
 
             verbs_endpoint *client = get_remote_connection(dest_ip);
@@ -519,74 +504,38 @@ namespace verbs
             ++handled_receives;
         }
 
-        int handle_verbs_preconnection(
-            struct sockaddr_in *addr_src,
-            struct sockaddr_in *addr_dst)
-        {
-            LOG_DEVEL_MSG("Callback for connect request from "
-                << ipaddress(addr_src->sin_addr.s_addr) << "to "
-                << ipaddress(addr_dst->sin_addr.s_addr) << "( "
-                << ipaddress(_ibv_ip) << ")");
-
-            // Set a flag to prevent any other connections to this ip address
-            auto inserted = connection_requests_.insert(
-                std::make_pair(addr_src->sin_addr.s_addr, true));
-
-            // if the flag was already set, we must reject this connection attempt
-            if (!inserted.second) {
-                LOG_DEVEL_MSG("Connection detection in race from "
-                    << ipaddress(addr_src->sin_addr.s_addr) << "to "
-                    << ipaddress(addr_dst->sin_addr.s_addr) << "( "
-                    << ipaddress(_ibv_ip) << ")");
-                if (addr_src->sin_addr.s_addr>addr_dst->sin_addr.s_addr) {
-                    LOG_DEVEL_MSG("Reject connection , priority from "
-                        << ipaddress(addr_src->sin_addr.s_addr) << "to "
-                        << ipaddress(addr_dst->sin_addr.s_addr) << "( "
-                        << ipaddress(_ibv_ip) << ")");
-                    return 0;
-                }
-            }
-            return 1;
-        }
-
         // --------------------------------------------------------------------
         // handler for connections, this is triggered as a callback from the
-        // controller when a connection event has occurred.
+        // controller when a connection has been established.
         // When we connect to another locality, all internal structures are
         // updated accordingly, but when another locality connects to us,
         // we must do it manually via this callback
         // --------------------------------------------------------------------
-        int handle_verbs_connection(
-            std::pair<uint32_t,uint64_t> qpinfo, verbs_endpoint_ptr client)
+        void handle_verbs_connection(
+            uint32_t qpinfo, verbs_endpoint_ptr client)
         {
             std::uint32_t dest_ip = client->get_remote_address()->sin_addr.s_addr;
-            LOG_DEVEL_MSG("Connection callback received from "
-                << ipaddress(dest_ip) << "to "
-                << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
+            if (client->is_client_endpoint()) {
+                LOG_DEVEL_MSG("Connection established       from "
+                    << ipaddress(_ibv_ip) << "to "
+                    << ipaddress(dest_ip) << "( " << ipaddress(_ibv_ip) << ")");
+            }
+            else {
+                LOG_DEVEL_MSG("Connection established       from "
+                    << ipaddress(dest_ip) << "to "
+                    << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
+            }
+            //
             ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
             if (ip_it==ip_qp_map.end()) {
-                ip_qp_map.insert(std::make_pair(dest_ip, qpinfo.first));
-                if (connection_requests_.is_in_map(dest_ip).second) {
-                    LOG_DEVEL_MSG("Completed connection request from "
-                        << ipaddress(dest_ip) << "to "
-                        << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
-                    connection_requests_.erase(dest_ip);
-                }
-                else {
-                    LOG_ERROR_MSG("Connection not present in map "
-                        << ipaddress(dest_ip));
-                    std::terminate();
-                }
-                LOG_DEVEL_MSG("handle_verbs_connection OK adding "
-                    << ipaddress(dest_ip)
-                    << "and waking new_connection_condition");
-                new_connection_condition.notify_all();
+                ip_qp_map.insert(std::make_pair(dest_ip, qpinfo));
+                LOG_DEVEL_MSG("handle_verbs_connection OK adding to ip_qp_map "
+                    << ipaddress(dest_ip));
             }
             else {
                 throw std::runtime_error("verbs parcelport "
                     ": should not be receiving a connection more than once");
             }
-            return 0;
         }
 
         // --------------------------------------------------------------------
@@ -1043,7 +992,9 @@ namespace verbs
             verbs_endpoint *client)
         {
             uint64_t wr_id = completion.wr_id;
-            LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id)
+            LOG_DEVEL_MSG("Handle verbs completion " << hexpointer(wr_id)
+                << decnumber(completion.qp_num)
+                << sockaddress(client->get_remote_address())
                 << verbs_completion_queue::wc_opcode_str(completion.opcode));
 
             ++completions_handled;
@@ -1128,7 +1079,7 @@ namespace verbs
         bool can_bootstrap() const {
             FUNC_START_DEBUG_MSG;
             bool can_boot = HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING();
-            LOG_DEBUG_MSG("Returning " << can_boot << " from can_bootstrap")
+            LOG_TRACE_MSG("Returning " << can_boot << " from can_bootstrap")
             FUNC_END_DEBUG_MSG;
             return can_boot;
         }
@@ -1194,13 +1145,15 @@ namespace verbs
                     }
                 } while (!finished && !hpx::is_stopped());
 
+                // we don't want multiple threads trying to stop the clients
                 scoped_lock lock(stop_mutex);
+
                 LOG_DEBUG_MSG("Removing all initiated connections");
                 rdma_controller_->removeAllInitiatedConnections();
 
                 // wait for all clients initiated elsewhere to be disconnected
                 while (rdma_controller_->num_clients()!=0 && !hpx::is_stopped()) {
-                    rdma_controller_->eventMonitor(0);
+                    rdma_controller_->poll_endpoints();
                     std::cout << "Polling before shutdown" << std::endl;
                 }
                 LOG_DEBUG_MSG("stopped removing clients and terminating");
@@ -1218,72 +1171,38 @@ namespace verbs
             // if a connection exists to this destination, get it
             ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
             if (ip_it!=ip_qp_map.end()) {
-                LOG_TRACE_MSG("Client found connection made from "
+                LOG_DEVEL_MSG("Client found connection made from "
                     << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
                     << "with QP " << ip_it->second);
-                return rdma_controller_->getClient(ip_it->second);
+                return rdma_controller_->get_endpoint(dest_ip);
             }
+
             // Didn't find a connection. We must create a new one
-            else {
-                // set a flag to prevent more connections to the same ip address
-                auto inserted =
-                    connection_requests_.insert(std::make_pair(dest_ip, true));
+            LOG_DEVEL_MSG("Starting new connect request from "
+                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                << "( " << ipaddress(_ibv_ip) << ")");
 
-                // if a connection to this dest has already been started
-                if (inserted.second==false) {
-                    LOG_DEVEL_MSG("Connection race (in request) from "
-                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                        << "( " << ipaddress(_ibv_ip) << ")");
+            verbs_endpoint_ptr client;
+            while (client==nullptr) {
+                hpx::shared_future<verbs_endpoint_ptr> client_future =
+                    rdma_controller_->connect_to_server(dest_ip);
 
-                    // wait until a connection has been established
-                    LOG_DEVEL_MSG("Going to wait/sleep on connection mutex");
-                    unique_lock lock(new_connection_mutex);
-                    new_connection_condition.wait(lock, [&,this] {
-                        return ip_qp_map.find(dest_ip)!=ip_qp_map.end();
-                    });
-                    LOG_DEVEL_MSG("Waking up for the connection from "
-                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                        << "( " << ipaddress(_ibv_ip) << ")");
+                LOG_DEVEL_MSG("About to wait client future  from "
+                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                    << "( " << ipaddress(_ibv_ip) << ")");
 
-                    ip_it = ip_qp_map.find(dest_ip);
-                    if (ip_it==ip_qp_map.end()) {
-                        LOG_DEVEL_MSG("After wake, did not find connection from "
-                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                            << "( " << ipaddress(_ibv_ip) << ")");
-                        std::terminate();
-                    }
-                    LOG_DEVEL_MSG("Found qp for the connection  from "
-                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                        << "( " << ipaddress(_ibv_ip) << ")");
-                    return rdma_controller_->getClient(ip_it->second);
-                }
-                // start a new connection
-                else {
-                    LOG_DEVEL_MSG("Starting new connect request from "
-                        << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                        << "( " << ipaddress(_ibv_ip) << ")");
-                    verbs_endpoint_ptr client =
-                        rdma_controller_->connect_to_server(dest_ip);
-                    if (client) {
-                        LOG_DEVEL_MSG("Setting qpnum in main client map "
-                            << decnumber(client->get_qp_num()));
-                        ip_qp_map.insert(std::make_pair(dest_ip, client->get_qp_num()));
-                        new_connection_condition.notify_all();
-                        LOG_DEVEL_MSG("Returning new client with qp "
-                            << decnumber(client->get_qp_num()));
-                        return client.get();
-                    }
-                    else {
-                        LOG_DEVEL_MSG("Failed new server connection from "
-                            << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                            << "( " << ipaddress(_ibv_ip) << ")");
-                        // a rejected connection will result in a fail,
-                        // try again to see if another attempted succeeded
-                        return get_remote_connection(dest_ip);
-                    }
-                }
+                // block until a connection is available
+                client = client_future.get();
+                // if client is nullptr, then we retry. A nullptr future is returned
+                // during aborted connections in the controller as/when it retries
             }
-            return nullptr;
+
+            LOG_DEVEL_MSG("Client future ("
+                << decnumber(client->get_qp_num()) << ") from "
+                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
+                << "( " << ipaddress(_ibv_ip) << ")");
+
+            return client.get();
         }
 
         bool can_send_immediate() {
@@ -1370,7 +1289,7 @@ namespace verbs
                         else {
                             // create a memory region from the pointer
                             zero_copy_region = new verbs_memory_region(
-                                    rdma_controller_->getProtectionDomain(),
+                                    rdma_controller_->get_protection_domain(),
                                     c.data_.cpos_, (std::max)(c.size_,
                                         (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
 //                            LOG_DEBUG_MSG("Time to register memory (ns) "
@@ -1520,12 +1439,12 @@ namespace verbs
                 // and another may arrive during this handling,
                 // so keep checking until none are received
                 rdma_controller_->refill_client_receives();
-                done = (rdma_controller_->eventMonitor(0) == 0);
+                done = (rdma_controller_->poll_endpoints() == 0);
             } while (!done);
             return true;
         }
 
-        // There is o difference between our background polling work on OS or HPX
+        // There is no difference between our background polling work on OS or HPX
         // threads any more, but we will keep the two entry points for future use
         inline bool background_work_hpx_thread() {
             // this must be called on an HPX thread
@@ -1557,7 +1476,6 @@ namespace verbs
         // This is called whenever the main thread scheduler is idling,
         // is used to poll for events, messages on the verbs connection
         // --------------------------------------------------------------------
-
         bool background_work(std::size_t num_thread) {
             if (stopped_ || hpx::is_stopped()) {
                 return false;
@@ -1578,7 +1496,7 @@ namespace verbs
                     //using namespace std::chrono_literals;
                     //std::this_thread::sleep_for(5us);
                 }
-/*
+
                 LOG_TIMED_INIT(background_sends);
                 LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
                 {
@@ -1612,9 +1530,9 @@ namespace verbs
                     << "Total recvs " << decnumber(handled_receives)
                     << "Total reads " << decnumber(total_reads)
                     << "Total completions " << decnumber(completions_handled)
-                   << "(" << decnumber(sends_posted+handled_receives+total_reads) << ")");
+                    << "("<< decnumber(sends_posted+handled_receives+total_reads)<<")");
                 )
-*/
+
             }
             return result;
         }

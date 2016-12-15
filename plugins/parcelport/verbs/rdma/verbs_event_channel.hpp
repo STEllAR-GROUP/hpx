@@ -30,8 +30,8 @@ namespace verbs
 
     struct verbs_event_channel {
         //
-        typedef hpx::lcos::local::spinlock   mutex_type;
-        typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
+        typedef hpx::lcos::local::spinlock                               mutex_type;
+        typedef hpx::parcelset::policies::verbs::scoped_lock<mutex_type> scoped_lock;
 
         // ----------------------------------------------------------------------------
         enum event_ack_type {
@@ -46,7 +46,8 @@ namespace verbs
         ~verbs_event_channel() {
             // Destroy the event channel.
             if (event_channel_ != nullptr) {
-                LOG_TRACE_MSG("destroying rdma event channel with fd "
+                LOG_TRACE_MSG("destroying rdma event channel "
+                    << hexpointer(event_channel_.get())
                     << hexnumber(event_channel_->fd));
                 rdma_destroy_event_channel(event_channel_.get()); // No return code
             }
@@ -62,7 +63,8 @@ namespace verbs
                 rdma_error e(EINVAL, "rdma_create_verbs_event_channel() failed");
                 throw e;
             }
-            LOG_DEBUG_MSG("created rdma event channel with fd "
+            LOG_DEVEL_MSG("created rdma event channel "
+                << hexpointer(event_channel_.get()) << "with fd "
                 << hexnumber(event_channel_->fd));
             return true;
         }
@@ -74,11 +76,14 @@ namespace verbs
             return poll_verbs_event_channel(get_file_descriptor(), std::forward<Func>(f));
         }
 
+    private:
         template<typename Func>
-        static int poll_verbs_event_channel(int fd, Func &&f)
+        int poll_verbs_event_channel(int fd, Func &&f)
         {
             const int eventChannel = 0;
             const int numFds = 1;
+            //
+            scoped_lock lock(polling_mutex);
             //
             pollfd pollInfo[numFds];
             int polltimeout = 0; // seconds*1000; // 10000 == 10 sec
@@ -114,6 +119,7 @@ namespace verbs
             return 1;
         }
 
+    public:
         // ----------------------------------------------------------------------------
         // If the expected event is received, it is acked, otherwise the
         // event is returned in the event param (but it turns out we must ack
@@ -144,8 +150,10 @@ namespace verbs
                     << rdma_error::error_string(err));
                 return -1;
             }
+            uint32_t qpnum = (cm_event->id->qp) ? cm_event->id->qp->qp_num : 0;
             LOG_DEVEL_MSG("got " << rdma_event_str(cm_event->event)
-                << " on event channel " << hexnumber(channel->fd));
+                << " on event channel " << hexnumber(channel->fd)
+                << ": on qp " << decnumber(qpnum));
 
             // we have to ack events, even when they are not the ones we wanted
             if (cm_event->event != event && event!=rdma_cm_event_type(-1)) {
@@ -189,7 +197,11 @@ namespace verbs
     private:
         // Event channel for notification of RDMA connection management events.
         std::unique_ptr<struct rdma_event_channel> event_channel_;
+        mutex_type polling_mutex;
+
     };
+
+    typedef std::shared_ptr<verbs_event_channel> verbs_event_channel_ptr;
 
 }}}}
 

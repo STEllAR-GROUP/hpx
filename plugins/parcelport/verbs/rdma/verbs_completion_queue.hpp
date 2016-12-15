@@ -41,7 +41,7 @@ namespace verbs
                 throw e;
             }
 
-            LOG_DEBUG_MSG("Creating completion queue with size " << queue_size);
+            LOG_DEVEL_MSG("Creating completion queue with size " << queue_size);
             completionQ_ = ibv_create_cq(context, queue_size, nullptr,
                 completionChannel, 0);
             if (completionQ_ == nullptr) {
@@ -53,30 +53,29 @@ namespace verbs
                 throw e;
             }
 
-            LOG_DEBUG_MSG(decnumber(completionQ_->handle)
-                << "created completion queue ");
+            LOG_DEVEL_MSG("created completion queue "
+                << decnumber(completionQ_->handle));
 
             // Request notification of events on the completion queue.
             try {
                 requestEvent();
             }
             catch (const rdma_error& e) {
-                LOG_ERROR_MSG(
-                    decnumber(completionQ_->handle)
-                    << "error requesting first completion queue notification: "
+                LOG_ERROR_MSG("error requesting first completion queue notification: "
+                    << decnumber(completionQ_->handle)
                     << rdma_error::error_string(e.error_code()));
                 throw e;
             }
-            LOG_TRACE_MSG(decnumber(completionQ_->handle)
-                << "requested first notification for completion queue");
+            LOG_TRACE_MSG("requested first notification for completion queue"
+                << decnumber(completionQ_->handle));
         }
 
         // ---------------------------------------------------------------------------
         ~verbs_completion_queue()
         {
             if (completionQ_ != nullptr) {
-                LOG_DEBUG_MSG(decnumber(completionQ_->handle)
-                    << "destroying completion queue");
+                LOG_DEVEL_MSG("destroying completion queue "
+                    << decnumber(completionQ_->handle));
                 int err = ibv_destroy_cq(completionQ_);
                 if (err == 0) {
                     completionQ_ = nullptr;
@@ -130,13 +129,22 @@ namespace verbs
             }
             if (nc > 0) {
                 if (completion->status != IBV_WC_SUCCESS) {
+                    // if the completion was from a flushed queue pair
+                    // then it was not a fatal error
+                    if (completion->status == IBV_WC_WR_FLUSH_ERR) {
+                        LOG_DEVEL_MSG("Received a flushed work completion on qp "
+                            << decnumber(completion->qp_num));
+                        return -1;
+                    }
                     LOG_ERROR_MSG(
                         decnumber(completionQ_->handle)
                         << "work completion status '"
                         << ibv_wc_status_str(completion->status)
                         << "' for operation " << wc_opcode_str(completion->opcode)
                         << " (" << completion->opcode << ") "
-                        << hexpointer(completion->wr_id));
+                        << hexpointer(completion->wr_id)
+                        << "qpnum " << decnumber(completion->qp_num)
+                        );
                     std::terminate();
                 }
                 else {

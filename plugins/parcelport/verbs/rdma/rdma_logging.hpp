@@ -123,7 +123,8 @@ namespace detail {
 #  include <boost/preprocessor.hpp>
 
 #  undef  LOG_DEBUG_MSG
-#  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
+#  define LOG_TRACE_MSG(x)
+//BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug)   << THREAD_ID << " " << x;
 #  define LOG_INFO_MSG(x)  BOOST_LOG_TRIVIAL(info)    << THREAD_ID << " " << x;
 #  define LOG_WARN_MSG(x)  BOOST_LOG_TRIVIAL(warning) << THREAD_ID << " " << x;
@@ -132,8 +133,8 @@ namespace detail {
 //
 #  define LOG_EXCLUSIVE(x) x
 //
-#  define FUNC_START_DEBUG_MSG LOG_DEBUG_MSG("*** Enter " << __func__);
-#  define FUNC_END_DEBUG_MSG   LOG_DEBUG_MSG("### Exit  " << __func__);
+#  define FUNC_START_DEBUG_MSG LOG_TRACE_MSG("*** Enter " << __func__);
+#  define FUNC_END_DEBUG_MSG   LOG_TRACE_MSG("### Exit  " << __func__);
 
 #  define LOG_FORMAT_MSG(x)                                    \
     (dynamic_cast<std::ostringstream &> (                      \
@@ -164,6 +165,8 @@ namespace detail {
         x;                                                 \
     }
 
+#endif
+
 #  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \
     case elem : return BOOST_PP_STRINGIZE(elem);
 
@@ -187,7 +190,5 @@ namespace detail {
 
     // example of usage
     // DEFINE_ENUM_WITH_STRING_CONVERSIONS(test_type, (test1)(test2)(test3))
-
-#endif
 
 #endif

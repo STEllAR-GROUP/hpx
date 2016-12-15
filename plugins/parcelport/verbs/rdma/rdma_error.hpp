@@ -25,7 +25,7 @@ public:
         : std::runtime_error(msg),
           error_(err)
     {
-        LOG_ERROR_MSG(msg << error_string(err));
+        LOG_ERROR_MSG(msg << " : " << error_string(err));
     }
 
     rdma_error(int err)

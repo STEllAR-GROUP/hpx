@@ -6,6 +6,7 @@
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
+#include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_event_channel.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_controller.hpp>
@@ -46,17 +47,17 @@ rdma_controller::rdma_controller(const char *device, const char *interface, int 
 //----------------------------------------------------------------------------
 rdma_controller::~rdma_controller()
 {
-    LOG_DEBUG_MSG("rdma_controller destructor clearing clients");
-    clients_.clear();
-    LOG_DEBUG_MSG("rdma_controller destructor closing server");
+    LOG_DEVEL_MSG("rdma_controller destructor clearing clients");
+    connections_started_.clear();
+    LOG_DEVEL_MSG("rdma_controller destructor closing server");
     this->server_endpoint_.reset();
-    LOG_DEBUG_MSG("rdma_controller destructor freeing memory pool");
+    LOG_DEVEL_MSG("rdma_controller destructor freeing memory pool");
     this->memory_pool_.reset();
-    LOG_DEBUG_MSG("rdma_controller destructor releasing protection domain");
+    LOG_DEVEL_MSG("rdma_controller destructor releasing protection domain");
     this->protection_domain_.reset();
-//    LOG_DEBUG_MSG("rdma_controller destructor deleting completion channel");
+//    LOG_DEVEL_MSG("rdma_controller destructor deleting completion channel");
 //    this->_completionChannel.reset();
-    LOG_DEBUG_MSG("rdma_controller destructor done");
+    LOG_DEVEL_MSG("rdma_controller destructor done");
 }
 
 //----------------------------------------------------------------------------
@@ -84,12 +85,11 @@ int rdma_controller::startup()
     // Create server/listener for RDMA connections.
     try {
         //
-        server_endpoint_ = hpx::parcelset::policies::verbs::verbs_endpoint_ptr(
-            new hpx::parcelset::policies::verbs::verbs_endpoint(local_addr_));
+        server_endpoint_ = std::make_shared<verbs_endpoint>(local_addr_);
 
         if (server_endpoint_->get_local_port() != local_addr_.sin_port) {
             local_addr_.sin_port = server_endpoint_->get_local_port();
-            LOG_DEBUG_MSG("verbs_endpoint port changed to "
+            LOG_DEVEL_MSG("verbs_endpoint port changed to "
                 << decnumber(local_addr_.sin_port));
         }
     } catch (rdma_error& e) {
@@ -97,8 +97,9 @@ int rdma_controller::startup()
         return e.error_code();
     }
 
-    LOG_DEBUG_MSG(
-        "created listening RDMA connection on port " << decnumber(local_addr_.sin_port)
+    LOG_DEVEL_MSG(
+        "created listening RDMA connection " << hexpointer(server_endpoint_.get())
+        << " on port " << decnumber(local_addr_.sin_port)
         << " IP address " << sockaddress(&local_addr_));
 
     // Create a protection domain object.
@@ -109,7 +110,7 @@ int rdma_controller::startup()
         LOG_ERROR_MSG("error allocating protection domain: " << e.what());
         return e.error_code();
     }
-    LOG_DEBUG_MSG("created protection domain " << protection_domain_->get_handle());
+    LOG_DEVEL_MSG("created protection domain " << protection_domain_->get_handle());
 
     // Create a completion channel object.
     try {
@@ -125,13 +126,13 @@ int rdma_controller::startup()
 
 #ifdef USE_SHARED_RECEIVE_QUEUE
     // create a shared receive queue
-    LOG_DEBUG_MSG("Creating SRQ shared receive queue ");
+    LOG_DEVEL_MSG("Creating SRQ shared receive queue ");
     server_endpoint_->create_srq(protection_domain_);
 #endif
 
     // Listen for connections.
     LOG_DEVEL_MSG("Calling LISTEN function on "
-        << ipaddress(local_addr_.sin_addr.s_addr));
+        << sockaddress(&local_addr_));
     int err = server_endpoint_->listen(256);
     if (err != 0) {
         LOG_ERROR_MSG(
@@ -140,37 +141,74 @@ int rdma_controller::startup()
         return err;
     }
     LOG_DEVEL_MSG("LISTEN enabled for new RDMA connections on "
-        << ipaddress(local_addr_.sin_addr.s_addr));
+        << sockaddress(&local_addr_));
 
     return 0;
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::cleanup(void) {
-    return 0;
-}
-
-//----------------------------------------------------------------------------
-void rdma_controller::refill_client_receives() {
+void rdma_controller::refill_client_receives()
+{
     // make sure all clients have a pre-posted receive in their queues
-    map_read_lock_type read_lock(clients_.read_write_mutex());
+    // @TODO : implement Shared receive queue
+    unique_lock lock(controller_mutex_, std::try_to_lock);
+    if (!lock.owns_lock()) return;
     //
-    std::for_each(clients_.begin(), clients_.end(),
-        [](rdma_controller::ClientMapPair _client) {
-        _client.second->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+    map_read_lock_type read_lock(connections_started_.read_write_mutex());
+    //
+    std::for_each(connections_started_.begin(), connections_started_.end(),
+        [](const rdma_controller::ClientMapPair &_client) {
+            if (std::get<0>(_client.second)) {
+                if (std::get<0>(_client.second)->get_state()==
+                    verbs_endpoint::connection_state::connected)
+                    std::get<0>(_client.second)->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+            }
     });
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::pollCompletionQueues()
+int rdma_controller::poll_endpoints()
 {
+    // completions of work requests
+    int handled = poll_for_completions();
+
+    // no need to check for connection events very often
+    using namespace std::chrono;
+    time_point<system_clock> now = system_clock::now();
+    if (duration_cast<microseconds>(now - event_check_time_).count() > 100)
+    {
+        event_check_time_ = now;
+        // scoped lock around event channel handler as it makes things easier if
+        // only one thread handles connection/disconnection events etc
+        unique_lock lock(controller_mutex_, std::try_to_lock);
+        if (lock.owns_lock())
+        {
+            LOG_TIMED_INIT(event_poll);
+            LOG_TIMED_BLOCK(event_poll, DEVEL, 5.0,
+                {
+                    LOG_DEVEL_MSG("Polling event channel");
+                }
+            )
+            handled += poll_for_events();
+        }
+    }
+    return handled;
+}
+
+//----------------------------------------------------------------------------
+int rdma_controller::poll_for_completions()
+{
+    map_read_lock_type read_lock(connections_started_.read_write_mutex());
+    //
     int ntot = 0, nc = 0;
     //
-    map_read_lock_type read_lock(clients_.read_write_mutex());
-    //
     if (this->get_shared_receive_queue() == nullptr) {
-        for (auto _client : clients_) {
-            verbs_endpoint *client = _client.second.get();
+        for (auto &_client : connections_started_) {
+            verbs_endpoint *client = std::get<0>(_client.second).get();
+            if (!client) continue;
+            //|| (client->get_state()!=verbs_endpoint::connection_state::connected))
+            //    continue;
+
             verbs_completion_queue *completionQ = client->get_completion_queue().get();
 
             // Remove work completions from the completion queue until it is empty.
@@ -178,25 +216,41 @@ int rdma_controller::pollCompletionQueues()
                 struct ibv_wc completion;
                 nc = completionQ->poll_completion(&completion);
                 if (nc > 0) {
-                    if (completion.status != IBV_WC_SUCCESS) {
+                    this->completion_function_(completion, client);
+                    ntot++;
+                }
+            } while (nc > 0);
+        }
+        for (auto &_client : connections_aborted_) {
+            verbs_endpoint *client = _client.second.get();
+            //|| (client->get_state()!=verbs_endpoint::connection_state::connected))
+            //    continue;
+
+            verbs_completion_queue *completionQ = client->get_completion_queue().get();
+            if (!completionQ) continue;
+
+            // Remove work completions from the completion queue until it is empty.
+            int na = 0;
+            do {
+                struct ibv_wc completion;
+                na = completionQ->poll_completion(&completion);
+                if (na > 0) {
+                    if (completion.status == IBV_WC_SUCCESS) {
                         LOG_ERROR_MSG(
-                            "Message failed current receive count is "
-                            << client->get_receive_count());
-                        LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id "
-                            << hexpointer(completion.wr_id) << " "
-                            << verbs_completion_queue::wc_opcode_str(completion.opcode));
-                        std::terminate();
-                    }
-                    if (this->completion_function_) {
-                        this->completion_function_(completion, client);
-                    }
-                    else {
-                        LOG_ERROR_MSG("No completion function set");
+                            "Got a successful completion on aborted client qp "
+                            << decnumber(completion.qp_num));
                         std::terminate();
                     }
                 }
-                ntot += nc;
-            } while (nc > 0);
+                else if (na < 0) {
+                    // flushed completion, just delete it
+                    verbs_memory_region *region = (verbs_memory_region *)completion.wr_id;
+                    // bookkeeping : decrement counter that keeps preposted queue full
+                    client->pop_receive_count();
+                    // let go of this region (waste really as this was a zero byte message)
+                    memory_pool_->deallocate(region);
+                }
+            } while (nc != 0);
         }
     }
     else {
@@ -208,7 +262,7 @@ int rdma_controller::pollCompletionQueues()
             nc = completionQ->poll_completion(&completion);
             if (nc > 0) {
                 if (completion.status != IBV_WC_SUCCESS) {
-                    LOG_DEBUG_MSG("pollCompletionQueues - removing wr_id "
+                    LOG_DEVEL_MSG("poll_for_completions - removing wr_id "
                         << hexpointer(completion.wr_id) << " "
                         << verbs_completion_queue::wc_opcode_str(completion.opcode));
                     std::terminate();
@@ -226,196 +280,262 @@ int rdma_controller::pollCompletionQueues()
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::eventMonitor(int Nevents)
+int rdma_controller::poll_for_events()
 {
-    // completions of work requests
-    int completions_handled = pollCompletionQueues();
-
-    // no need to check for events very often
-    using namespace std::chrono;
-    time_point<system_clock> now = system_clock::now();
-    if (duration_cast<microseconds>(now-event_check_time_).count()>100)
-    {
-        event_check_time_ = now;
-        // scoped lock around event channel handler as it makes things easier if
-        // one one thread handles connection/disconnection events etc
-        unique_lock lock(event_channel_mutex_, std::try_to_lock);
-        if (lock.owns_lock()) {
-            completions_handled += server_endpoint_->poll_for_event(
-                [this](struct rdma_cm_event *cm_event) {
-                    return handle_event(cm_event);
-                }
-            );
+    // Poll the server endpoint, it shares an event channel with all
+    // the clients, so all cm_events will be found here, in the event
+    // handler we can use the cm_id qp_num to tell where they came from
+    return server_endpoint_->poll_for_event(
+        [this](struct rdma_cm_event *cm_event) {
+            return handle_event(cm_event, server_endpoint_.get());
         }
-    }
-    return completions_handled;
+    );
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
+int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
+    verbs_endpoint *a_client)
 {
-    // Debugging code to get ip address of soure/dest of event
-    // NB: The src and dest fields refer to the message and not the connect request
-    // so we are actually receiving a request from dest (it is the src of the msg)
-    //
+    // Get ip address of source/dest of event
+    // NB: The src and dest fields refer to the event and not the 'request'
     struct sockaddr *ip_src = &cm_event->id->route.addr.src_addr;
-    struct sockaddr_in *addr_src = reinterpret_cast<struct sockaddr_in *>(ip_src);
-    //
     struct sockaddr *ip_dst = &cm_event->id->route.addr.dst_addr;
+    struct sockaddr_in *addr_src = reinterpret_cast<struct sockaddr_in *>(ip_src);
     struct sockaddr_in *addr_dst = reinterpret_cast<struct sockaddr_in *>(ip_dst);
+
+    LOG_DEVEL_MSG("event src is " << sockaddress(addr_src)
+        << "( " << sockaddress(&local_addr_) << ")");
+
+    verbs_endpoint_ptr event_client;
+    uint32_t qpnum = (cm_event->id->qp) ? cm_event->id->qp->qp_num : 0;
+    if (qpnum>0) {
+        // Find connection associated with this event if it's not a new request
+        LOG_DEVEL_MSG("handle_event : Looking for qp in map " << decnumber(qpnum));
+        event_client = std::get<0>(
+            connections_started_.find(addr_dst->sin_addr.s_addr)->second);
+        if (event_client->get_qp_num()!=qpnum) {
+            LOG_DEVEL_MSG("event qpnum did not match endpoint qpnum");
+            event_client =
+                connections_aborted_.find(addr_dst->sin_addr.s_addr)->second;
+            LOG_DEVEL_MSG("found aborted event with qpnum " << decnumber(event_client->get_qp_num()));
+        }
+    }
+    //
+    struct sockaddr_in *conn_src = reinterpret_cast<struct sockaddr_in *>(ip_src);
+    struct sockaddr_in *conn_dst = reinterpret_cast<struct sockaddr_in *>(ip_dst);
+    //
+    // are we the server or client end of the connection, flip the src/dst
+    // pointers if we are the server end (clients init connections to servers)
+    if (event_client && !event_client->is_client_endpoint()) {
+        conn_src = reinterpret_cast<struct sockaddr_in *>(ip_dst);
+        conn_dst = reinterpret_cast<struct sockaddr_in *>(ip_src);
+    }
 
     // Handle the event : NB ack_event will delete the event, do not use it afterwards.
     switch (cm_event->event) {
 
+    // a connect request event will only ever occur on the server_endpoint_
+    // in response to a connect request from a client
     case RDMA_CM_EVENT_CONNECT_REQUEST: {
         LOG_DEVEL_MSG("RDMA_CM_EVENT_CONNECT_REQUEST     "
-            << sockaddress(ip_dst) << "to "
-            << sockaddress(ip_src)
+            << sockaddress(conn_dst) << "to "
+            << sockaddress(conn_src)
             << "( " << sockaddress(&local_addr_) << ")");
-        //
-        // prevent two connections from taking place between the same endpoints
-        //
-        if (this->request_connect_function_) {
-            LOG_DEVEL_MSG("Connection request, callback from "
-                << sockaddress(ip_dst) << "to "
-                << sockaddress(ip_src)
-                << "( " << sockaddress(&local_addr_) << ")");
-            //
-            if (!this->request_connect_function_(addr_dst, addr_src)) {
-                LOG_ERROR_MSG("Connect request callback rejected");
-                // reject() does not wait or ack
-                server_endpoint_->reject(cm_event->id);
-                LOG_DEVEL_MSG("Rejected connection request, from "
-                    << sockaddress(ip_dst) << "to "
-                    << sockaddress(ip_src)
-                    << "( " << sockaddress(&local_addr_) << ")");
-                break;
-            }
-        }
 
-        // Construct a verbs_completion_queue object for the new client.
-        verbs_completion_queue_ptr completionQ;
-        try {
-            //completionQ = std::make_shared<verbs_completion_queue>
-            //    (cm_event->id->verbs, verbs_completion_queue::MaxQueueSize,
-            //    _completionChannel->getChannel());
-            completionQ = std::make_shared < verbs_completion_queue >
-                (cm_event->id->verbs, verbs_completion_queue::MaxQueueSize,
-                (ibv_comp_channel*) nullptr);
-        } catch (rdma_error& e) {
-            LOG_ERROR_MSG("error creating completion queue: " << e.what());
-            break;
-        }
+        handle_connect_request(cm_event, conn_dst->sin_addr.s_addr);
 
-        // Construct a new verbs_endpoint object for the new client.
-        verbs_endpoint_ptr client;
-        try {
-            client = std::make_shared < verbs_endpoint >
-            (cm_event->id, protection_domain_, completionQ,
-                memory_pool_, server_endpoint_->SRQ());
-        } catch (rdma_error& e) {
-            LOG_ERROR_MSG("error creating rdma client: %s\n" << e.what());
-            completionQ.reset();
-            break;
-        }
-
-        LOG_DEBUG_MSG("adding a new client with qpnum "
-            << decnumber(client->get_qp_num()));
-
-        // make sure client has preposted receives
-        // @TODO, when we use a shared receive queue, fix this
-        client->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
-
-        // Add new client to map of active clients.
-        clients_.insert(
-            std::pair<uint32_t, verbs_endpoint_ptr>(client->get_qp_num(), client));
-
-        // Add completion queue to completion channel.
-        //    _completionChannel->addCompletionQ(completionQ);
-
-        // Accept the connection from the new client.
-        // accept() does not wait or ack
-        if (client->accept() != 0) {
-            LOG_ERROR_MSG("error accepting client connection: %s "
-                << rdma_error::error_string(errno));
-            clients_.erase(client->get_qp_num());
-            //      _completionChannel->removeCompletionQ(completionQ);
-            std::terminate();
-            //            client->reject();
-            client.reset();
-            completionQ.reset();
-            break;
-        }
-        LOG_DEBUG_MSG("accepted connection from "
-            << sockaddress(client->get_remote_address()));
         break;
     }
 
+    // this event will be generated after an accept or reject
+    // RDMA_CM_EVENT_ESTABLISHED is sent to both ends of a new connection
+    case RDMA_CM_EVENT_REJECTED:
     case RDMA_CM_EVENT_ESTABLISHED: {
-        LOG_DEVEL_MSG("RDMA_CM_EVENT_ESTABLISHED         "
-            << ipaddress(addr_dst->sin_addr.s_addr) << "to "
-            << ipaddress(addr_src->sin_addr.s_addr)
-            << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
+        // we use addr_dst because it is the remote end of the connection
+        // regardless of whether we are connecting to, or being connected from
+        uint32_t remote_ip = addr_dst->sin_addr.s_addr;
 
-        // Find connection associated with this event.
-        verbs_endpoint_ptr client = clients_[cm_event->id->qp->qp_num];
-        LOG_INFO_MSG("connection established with "
-            << sockaddress(client->get_remote_address()));
-        if (this->connection_function_) {
-            LOG_DEVEL_MSG("calling connection callback from  "
-                << ipaddress(addr_dst->sin_addr.s_addr) << "to "
-                << ipaddress(addr_src->sin_addr.s_addr)
-                << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
-            this->connection_function_(
-                std::make_pair(cm_event->id->qp->qp_num, 0), client);
+        LOG_DEVEL_MSG(rdma_event_str(cm_event->event) << "    from "
+            << sockaddress(conn_src) << "to "
+            << sockaddress(conn_dst)
+            << "( " << sockaddress(&local_addr_) << ")");
+
+        // process the established event
+        int established = event_client->handle_establish(cm_event);
+
+        // connection established without problem
+        if (established==0)
+        {
+            LOG_DEVEL_MSG("calling connection callback  from "
+                << sockaddress(conn_src) << "to "
+                << sockaddress(conn_dst)
+                << "( " << sockaddress(&local_addr_) << ")");
+
+            // call connection function before making the future ready
+            // to avoid a race in the parcelport get connection routines
+            this->connection_function_(qpnum, event_client);
+
+            LOG_DEVEL_MSG("established connection       from "
+                << sockaddress(conn_src) << "to "
+                << sockaddress(conn_dst)
+                << "and making future ready, qp = " << decnumber(qpnum));
+
+            // make the future ready with the new verbs endpoint
+            if (connections_started_.find(remote_ip)==
+                connections_started_.end())
+            {
+                // @TODO : delete this once all is working
+                LOG_ERROR_MSG("Did not find dst address " << sockaddress(addr_dst));
+                std::terminate();
+            }
+
+            std::get<1>(connections_started_.find(remote_ip)->second).
+                set_value(event_client);
         }
-        break;
+
+        // the event was not intended for this endpoint, find an aborted one and
+        // send the event to that
+        else if (established==-1)
+        {
+            auto aborted = connections_aborted_.is_in_map(remote_ip);
+            if (aborted.second) {
+                verbs_endpoint_ptr aborted_client = aborted.first->second;
+                aborted_client->handle_establish(cm_event, true);
+            }
+            else std::terminate();
+        }
+
+        // the remote end rejected our connection, so we must abort and clean up
+        else if (established==-2)
+        {
+            // we need to delete the connection we have started and replace it with a new one
+            LOG_DEVEL_MSG("Abort old connect,  rejected from "
+                << sockaddress(addr_src) << "to "
+                << sockaddress(addr_dst)
+                << "( " << sockaddress(&local_addr_) << ")"
+                << "qp = " << decnumber(qpnum));
+
+            auto aborted = connections_aborted_.is_in_map(remote_ip);
+            if (aborted.second) {
+                LOG_DEVEL_MSG("Connection already aborted - no action taken");
+            }
+            else {
+                auto it = connections_started_.find(remote_ip);
+
+                // get the client that we are aborting
+                verbs_endpoint_ptr aborted_client = std::get<0>(it->second);
+
+                // put it into the aborted list in case future events are received
+                connections_aborted_.insert(
+                    std::make_pair(remote_ip, aborted_client));
+
+                // invalidate the endpoint in the map, we don't delete the entry
+                // because we still need the promise and future
+                std::get<0>(it->second) = nullptr;
+
+                // get the aborted client ready for deletion
+                LOG_DEVEL_MSG("Abort old connect, flushing qp "
+                    << ipaddress(remote_ip) << "to "
+                    << sockaddress(&local_addr_)
+                    << "( " << sockaddress(&local_addr_) << ")");
+//                aborted_client->flush();
+            }
+        }
+        // event acked by handle_establish
+        return 0;
+    }
+
+    // this event is only ever received on the client end of a connection
+    // after starting to make a connection to a remote server
+    case RDMA_CM_EVENT_ADDR_RESOLVED: {
+        LOG_DEVEL_MSG("RDMA_CM_EVENT_ADDR_RESOLVED         "
+            << sockaddress(conn_src) << "to "
+            << sockaddress(conn_dst)
+            << "( " << sockaddress(&local_addr_) << ")");
+        verbs_endpoint_ptr temp_client =
+            std::get<0>(connections_started_.find(conn_dst->sin_addr.s_addr)->second);
+        if (temp_client->handle_addr_resolved(cm_event)==-1) {
+            auto aborted = connections_aborted_.is_in_map(conn_dst->sin_addr.s_addr);
+            if (aborted.second) {
+                verbs_endpoint_ptr aborted_client = aborted.first->second;
+                aborted_client->handle_addr_resolved(cm_event, true);
+            }
+            else std::terminate();
+        }
+        // event acked by handle_addr_resolved
+        return 0;
+    }
+
+    // this event is only ever received on the client end of a connection
+    // after starting to make a connection to a remote server
+    case RDMA_CM_EVENT_ROUTE_RESOLVED: {
+        LOG_DEVEL_MSG("RDMA_CM_EVENT_ROUTE_RESOLVED        "
+            << sockaddress(conn_src) << "to "
+            << sockaddress(conn_dst)
+            << "( " << sockaddress(&local_addr_) << ")");
+        //
+        verbs_endpoint_ptr temp_client =
+            std::get<0>(connections_started_.find(conn_dst->sin_addr.s_addr)->second);
+        if (temp_client->handle_route_resolved(cm_event)==-1) {
+            auto aborted = connections_aborted_.is_in_map(conn_dst->sin_addr.s_addr);
+            if (aborted.second) {
+                verbs_endpoint_ptr aborted_client = aborted.first->second;
+                aborted_client->handle_route_resolved(cm_event, true);
+            }
+            else std::terminate();
+        }
+        // event acked by handle_route_resolved
+        return 0;
     }
 
     case RDMA_CM_EVENT_DISCONNECTED: {
-        LOG_DEVEL_MSG("RDMA_CM_EVENT_DISCONNECTED        "
-            << ipaddress(addr_dst->sin_addr.s_addr) << "to "
-            << ipaddress(addr_src->sin_addr.s_addr)
-            << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
-        // Find connection associated with this event.
-        verbs_endpoint_ptr client = clients_[cm_event->id->qp->qp_num];
-        verbs_completion_queue_ptr completionQ = client->get_completion_queue();
+        LOG_DEVEL_MSG("RDMA_CM_EVENT_DISCONNECTED          "
+            << sockaddress(addr_src) << "to "
+            << sockaddress(addr_dst)
+            << "( " << sockaddress(&local_addr_) << ")");
+        //
+        if (event_client->handle_disconnect(cm_event)==-1) {
+            auto aborted = connections_aborted_.is_in_map(addr_dst->sin_addr.s_addr);
+            if (aborted.second) {
+                verbs_endpoint_ptr aborted_client = aborted.first->second;
+                aborted_client->handle_disconnect(cm_event, true);
+            }
+            else std::terminate();
 
-        // Complete disconnect initiated by peer.
-        int err = client->disconnect(false);
-        if (err == 0) {
-            LOG_INFO_MSG("disconnected from "
-                << sockaddress(client->get_remote_address()));
-        } else {
-            LOG_ERROR_MSG(
-                "error disconnecting from peer: " << rdma_error::error_string(err));
         }
 
-        // ack the event (before removing the rdma cm id).
-        verbs_event_channel::ack_event(cm_event);
+        // get cq before we delete client
+        verbs_completion_queue_ptr completionQ = event_client->get_completion_queue();
 
         // Remove connection from map of active connections.
-        clients_.erase(cm_event->id->qp->qp_num);
+        LOG_ERROR_MSG("@TODO : Need to handle erase here");
+        // clients_.erase(qpnum);
 
         // Destroy connection object.
-        LOG_DEBUG_MSG("destroying RDMA connection to client "
-            << sockaddress(client->get_remote_address()));
-        client.reset();
+        LOG_DEVEL_MSG("destroying client "
+            << sockaddress(event_client->get_remote_address()));
+        event_client.reset();
 
         // Remove completion queue from the completion channel.
         //    _completionChannel->removeCompletionQ(completionQ);
 
         // Destroy the completion queue.
-        LOG_DEBUG_MSG("destroying completion queue " << completionQ->get_handle());
+        LOG_DEVEL_MSG("destroying completion queue " << completionQ->get_handle());
         completionQ.reset();
 
-        // even already ack'ed - do not do it again, just return
+        // event acked by handle_disconnect
         return 0;
     }
 
     default: {
         LOG_ERROR_MSG(
-            "RDMA event: " << rdma_event_str(cm_event->event) << " is not supported");
+            "RDMA event: " << rdma_event_str(cm_event->event)
+            << " is not supported "
+            << " event came with "
+            << hexpointer(cm_event->param.conn.private_data) << " , "
+            << decnumber((int)(cm_event->param.conn.private_data_len)) << " , "
+            << decnumber(cm_event->id->qp->qp_num));
+
         break;
     }
     }
@@ -425,6 +545,202 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event)
     return verbs_event_channel::ack_event(cm_event);
 }
 
+//----------------------------------------------------------------------------
+// This function is only ever called from inside the event handler and is therefore
+// protected by the controller mutex
+int rdma_controller::handle_connect_request(
+    struct rdma_cm_event *cm_event, std::uint32_t remote_ip)
+{
+    std::cout <<  "handle_connect_request, " << hexpointer(cm_event) << hexpointer(cm_event->id) << std::endl;
+
+    auto present = connections_started_.is_in_map(remote_ip);
+    if (present.second)
+    {
+        LOG_DEVEL_MSG("Race connection, check priority   "
+            << ipaddress(remote_ip) << "to "
+            << sockaddress(&local_addr_)
+            << "( " << sockaddress(&local_addr_) << ")");
+
+        // if a connection to this ip address is already being made, and we have
+        // a lower ip than the remote end, reject the incoming connection
+        if (remote_ip>local_addr_.sin_addr.s_addr) {
+            LOG_DEVEL_MSG("Reject connection , priority from "
+                << ipaddress(remote_ip) << "to "
+                << sockaddress(&local_addr_)
+                << "( " << sockaddress(&local_addr_) << ")");
+            //
+            server_endpoint_->reject(cm_event->id);
+            return 0;
+        }
+        else {
+            // we need to delete the connection we started and replace it with a new one
+            LOG_DEVEL_MSG("Priorty to new, Aborting old from "
+                << sockaddress(&local_addr_) << "to "
+                << ipaddress(remote_ip)
+                << "( " << sockaddress(&local_addr_) << ")");
+
+            // we might have already received a rejection and put the connection
+            // into the aborted map
+            auto aborted = connections_aborted_.is_in_map(remote_ip);
+            if (aborted.second) {
+                // we must replace the endpoint in the connection map with a new
+                // connection
+                //std::get<0>(*present.first) = ;
+            }
+            else {
+                // get the client that we are aborting
+                verbs_endpoint_ptr aborted_client = std::get<0>(present.first->second);
+
+                // put it into the aborted list in case future events are received
+                connections_aborted_.insert(
+                    std::make_pair(remote_ip, aborted_client));
+
+                // invalidate the endpoint in the map, we don't delete the entry
+                // because we still need the promise and future
+                // use find, because iterator from present.first is const
+                std::get<0>(connections_started_.find(remote_ip)->second) = nullptr;
+
+                // get the aborted client ready for deletion
+                LOG_DEVEL_MSG("Abort old connect, flushing qp "
+                    << sockaddress(&local_addr_) << "to "
+                    << ipaddress(remote_ip)
+                    << "( " << sockaddress(&local_addr_) << ")");
+//                aborted_client->flush();
+            }
+        }
+    }
+
+    // Construct a verbs_completion_queue object for the new client.
+    verbs_completion_queue_ptr completionQ;
+
+        //completionQ = std::make_shared<verbs_completion_queue>
+        //    (cm_event->id->verbs, verbs_completion_queue::MaxQueueSize,
+        //    _completionChannel->getChannel());
+
+    completionQ = std::make_shared < verbs_completion_queue >
+        (cm_event->id->verbs, verbs_completion_queue::MaxQueueSize,
+        (ibv_comp_channel*) nullptr);
+
+    // Construct a new verbs_endpoint object for the new client.
+    verbs_endpoint_ptr new_client;
+    new_client = std::make_shared < verbs_endpoint >
+        (cm_event->id, protection_domain_, completionQ,
+        memory_pool_, server_endpoint_->SRQ(),
+        server_endpoint_->get_event_channel());
+    LOG_DEVEL_MSG("Created a new endpoint with pointer "
+        << hexpointer(new_client.get())
+        << "qp " << decnumber(new_client->get_qp_num()));
+
+    uint32_t qpnum = new_client->get_qp_num();
+
+    // make sure client has preposted receives
+    // @TODO, when we use a shared receive queue, fix this
+    new_client->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+
+    LOG_DEVEL_MSG("CR.Map<ip <endpoint,promise>>from "
+        << ipaddress(remote_ip) << "to "
+        << sockaddress(&local_addr_)
+        << "( " << sockaddress(&local_addr_) << ")"
+        << decnumber(qpnum));
+
+    if (present.second)
+    {
+        // previous attempt was aborted, reset the endpoint in the connection map
+        // use find, because iterator from present.first is const
+        std::get<0>(connections_started_.find(remote_ip)->second) = new_client;
+    }
+    else
+    {
+        // Add new client to connection map
+        hpx::promise<verbs_endpoint_ptr> new_endpoint_promise;
+        hpx::future<verbs_endpoint_ptr>  new_endpoint_future =
+            new_endpoint_promise.get_future();
+
+        connections_started_.insert(
+            std::make_pair(
+                remote_ip,
+                std::make_tuple(
+                    new_client,
+                    std::move(new_endpoint_promise),
+                    std::move(new_endpoint_future))));
+    }
+
+    // Add completion queue to completion channel.
+    //    _completionChannel->addCompletionQ(completionQ);
+
+    // Accept the connection from the new client.
+    // accept() does not wait or ack
+    if (new_client->accept() != 0)
+    {
+        LOG_ERROR_MSG("error accepting client connection: %s "
+            << rdma_error::error_string(errno));
+        // @TODO : Handle failed connection - is there a correct thing to do
+        std::terminate();
+        return -1;
+    }
+
+    LOG_DEVEL_MSG("accepted connection from "
+        << ipaddress(remote_ip)
+        << "qp = " << decnumber(qpnum));
+
+    return 0;
+}
+
+//----------------------------------------------------------------------------
+int rdma_controller::start_server_connection(uint32_t remote_ip)
+{
+    sockaddr_in remote_addr;
+    sockaddr_in local_addr;
+    //
+    remote_addr.sin_family      = AF_INET;
+    remote_addr.sin_port        = local_addr_.sin_port;
+    remote_addr.sin_addr.s_addr = remote_ip;
+    local_addr.sin_port         = 0;
+    local_addr                  = local_addr_;
+
+    LOG_DEVEL_MSG("start_server_connection      from "
+        << sockaddress(&local_addr_)
+        << "to " << ipaddress(remote_ip)
+        << "( " << sockaddress(&local_addr_) << ")");
+
+    verbs_completion_queue_ptr completionQ;
+    try {
+        //    completionQ = std::make_shared < verbs_completion_queue >
+        //      (server_endpoint_->get_device_context(),
+        // verbs_completion_queue::MaxQueueSize, _completionChannel->getChannel());
+        completionQ = std::make_shared < verbs_completion_queue >
+            (server_endpoint_->get_device_context(),
+                verbs_completion_queue::MaxQueueSize, (ibv_comp_channel*) nullptr);
+    }
+    catch (rdma_error& e)
+    {
+        LOG_ERROR_MSG("error creating completion queue: " << e.what());
+    }
+
+    // create a new client object for the remote endpoint
+    verbs_endpoint_ptr new_client = std::make_shared<verbs_endpoint>(
+        local_addr, remote_addr, protection_domain_, completionQ,
+        memory_pool_, server_endpoint_->get_event_channel());
+
+    LOG_DEVEL_MSG("SS.Map<ip <endpoint,promise>>from "
+        << sockaddress(&local_addr_) << "to "
+        << sockaddress(&remote_addr)
+        << "( " << sockaddress(&local_addr_) << ")");
+
+    hpx::promise<verbs_endpoint_ptr> new_endpoint_promise;
+    hpx::future<verbs_endpoint_ptr>  new_endpoint_future =
+        new_endpoint_promise.get_future();
+
+    connections_started_.insert(
+        std::make_pair(
+            remote_ip,
+            std::make_tuple(
+                new_client,
+                std::move(new_endpoint_promise),
+                std::move(new_endpoint_future))));
+
+    return 0;
+}
 /*
 // ---------------------------------------------------------------------------
 bool rdma_controller::completionChannelHandler(uint64_t requestId) {
@@ -442,7 +758,7 @@ bool rdma_controller::completionChannelHandler(uint64_t requestId) {
             // thread at a time to pop a completion
             {
                 completion = completionQ->popCompletion();
-                LOG_DEBUG_MSG("Controller completion - removing wr_id "
+                LOG_DEVEL_MSG("Controller completion - removing wr_id "
                     << hexpointer(completion->wr_id));
                 // Find the connection that received the message.
                 client = clients_[completion->qp_num].get();
@@ -462,160 +778,59 @@ bool rdma_controller::completionChannelHandler(uint64_t requestId) {
     return true;
 }
 */
-/*
- struct sockaddr_in {
- short            sin_family;   // e.g. AF_INET
- unsigned short   sin_port;     // e.g. htons(3490)
- struct in_addr   sin_addr;     // see struct in_addr, below
- char             sin_zero[8];  // zero this if you want to
- };
-
- struct in_addr {
- unsigned long s_addr;  // load with inet_aton()
- };
- */
 
 //----------------------------------------------------------------------------
-// return the client
-verbs_endpoint_ptr rdma_controller::connect_to_server(
+// return a future to a client - it will become ready when
+hpx::shared_future<verbs_endpoint_ptr> rdma_controller::connect_to_server(
     uint32_t remote_ip)
 {
-    sockaddr_in remote_addr;
-    sockaddr_in local_addr;
+    // Prevent an event handler and a server request from colliding by protecting
+    // code where new connections are made
+    scoped_lock lock(controller_mutex_);
+
     //
-    remote_addr.sin_family      = AF_INET;
-    remote_addr.sin_port        = local_addr_.sin_port;
-    remote_addr.sin_addr.s_addr = remote_ip;
-    local_addr.sin_port         = 0;
-    local_addr                  = local_addr_;
-
-    LOG_DEVEL_MSG("connect_to_server from "
-        << ipaddress(local_addr_.sin_addr.s_addr)
-        << "to " << ipaddress(remote_ip)
-        << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
-
-    verbs_completion_queue_ptr completionQ;
-    try {
-        //    completionQ = std::make_shared < verbs_completion_queue >
-        //      (server_endpoint_->get_device_context(),
-        // verbs_completion_queue::MaxQueueSize, _completionChannel->getChannel());
-        completionQ = std::make_shared < verbs_completion_queue >
-            (server_endpoint_->get_device_context(), verbs_completion_queue::MaxQueueSize,
-            (ibv_comp_channel*) nullptr);
-    } catch (rdma_error& e) {
-        LOG_ERROR_MSG("error creating completion queue: " << e.what());
+    if (connections_started_.find(remote_ip)==connections_started_.end()) {
+        start_server_connection(remote_ip);
     }
 
-    verbs_endpoint_ptr newClient;
-    try {
-        newClient = std::make_shared < verbs_endpoint >
-        (local_addr, remote_addr, protection_domain_, completionQ, memory_pool_);
-    } catch (rdma_error& e) {
-        LOG_ERROR_MSG("error creating rdma client: %s\n" << e.what());
-        completionQ.reset();
-        return nullptr;
-    }
-
-    // make a connection
-    LOG_DEVEL_MSG("Calling connect on new endpoint");
-
-    auto polling_function = [this]()
-        {
-            server_endpoint_->poll_for_event(
-                [this](struct rdma_cm_event *cm_event) {
-                    LOG_DEVEL_MSG("Got an event in lambda poll, calling handler");
-                    int temp = handle_event(cm_event);
-                    LOG_DEVEL_MSG("Completed lambda poll");
-                    return temp;
-                });
-        };
-
-    if (newClient->connect(polling_function) == -1)
-    {
-        LOG_DEBUG_MSG("connect failed in connect_to_server from "
-            << ipaddress(local_addr_.sin_addr.s_addr)
-            << "to " << ipaddress(remote_ip));
-        // throw away our client endpoint
-        newClient.reset();
-        LOG_ERROR_MSG("Reset completion Q");
-        completionQ.reset();
-        LOG_ERROR_MSG("returning nullptr ");
-        return nullptr;
-    }
-
-    // make sure client has preposted receives
-    // @TODO, when we use a shared receive queue, fix this
-    newClient->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
-
-    LOG_DEVEL_MSG("Inserting QP " << decnumber(newClient->get_qp_num())
-        << "in clients map from "
-        << ipaddress(local_addr_.sin_addr.s_addr)
-        << "to " << ipaddress(remote_ip)
-        << "( " << ipaddress(local_addr_.sin_addr.s_addr) << ")");
-
-    // Add new client to map of active clients.
-    clients_.insert(
-        std::pair<uint32_t, verbs_endpoint_ptr>(newClient->get_qp_num(), newClient));
-
-    // Add completion queue to completion channel.
-    //  _completionChannel->addCompletionQ(completionQ);
-
-//    this->refill_client_receives();
-
-    LOG_DEBUG_MSG("Added a server-server client with qpnum "
-        << decnumber(newClient->get_qp_num()));
-    return newClient;
-}
-
-//----------------------------------------------------------------------------
-void rdma_controller::removeServerToServerConnection(verbs_endpoint_ptr client)
-{
-    LOG_DEBUG_MSG("Removing Server-Server client object");
-    // Find connection associated with this event.
-    verbs_completion_queue_ptr completionQ = client->get_completion_queue();
-    uint32_t qp = client->get_qp_num();
-
-    // disconnect initiated by us
-    int err = client->disconnect(true);
-    if (err == 0) {
-        LOG_INFO_MSG("disconnected from "
-            << sockaddress(client->get_remote_address()));
-    } else {
-        LOG_ERROR_MSG("error disconnecting from peer: " << rdma_error::error_string(err));
-    }
-
-    // Remove connection from map of active connections.
-    clients_.erase(qp);
-
-    // Destroy connection object.
-    LOG_DEBUG_MSG("destroying RDMA connection to client "
-        << sockaddress(client->get_remote_address()));
-    client.reset();
-
-    // Remove completion queue from the completion channel.
-    //    _completionChannel->removeCompletionQ(completionQ);
-
-    // Destroy the completion queue.
-    LOG_DEBUG_MSG("destroying completion queue " << completionQ->get_handle());
-    completionQ.reset();
+    // the future will become ready when the remote end accepts/rejects the connection
+    return std::get<2>(connections_started_.find(remote_ip)->second);
 }
 
 //----------------------------------------------------------------------------
 void rdma_controller::removeAllInitiatedConnections()
 {
-    while (std::count_if(clients_.begin(), clients_.end(),
-        [](const std::pair<uint32_t, verbs_endpoint_ptr> & c) {
-        return c.second->getInitiatedConnection();
-    }) > 0)
-    {
-        hpx::concurrent::unordered_map<uint32_t, verbs_endpoint_ptr>::iterator c =
-            clients_.begin();
-        while (c != clients_.end()) {
-            if (c->second->getInitiatedConnection()) {
-                LOG_DEBUG_MSG("Removing a connection");
-                removeServerToServerConnection(c->second);
-                break;
+    // removing connections will affect the map, so lock it and loop over
+    // each element triggering a disconnect on each
+    map_read_lock_type read_lock(connections_started_.read_write_mutex());
+    //
+    std::for_each(connections_started_.begin(), connections_started_.end(),
+        [this](const rdma_controller::ClientMapPair &_client) {
+            if (std::get<0>(_client.second)->is_client_endpoint()) {
+                LOG_DEVEL_MSG("Removing a connection        from "
+                    << sockaddress(&local_addr_) << "to "
+                    << sockaddress(std::get<0>(_client.second)->get_remote_address())
+                    << "( " << sockaddress(&local_addr_) << ")");
+                std::get<0>(_client.second)->disconnect();
             }
         }
+    );
+}
+
+//----------------------------------------------------------------------------
+bool rdma_controller::connection_present(uint32_t dest_ip)
+{
+    map_read_lock_type read_lock(connections_started_.read_write_mutex());
+    //
+    for (const auto &_client : connections_started_)
+    {
+        verbs_endpoint *client = std::get<0>(_client.second).get();
+        if (client->get_remote_ip_address() == dest_ip &&
+            client->get_state() != verbs_endpoint::connection_state::uninitialized)
+        {
+            LOG_DEBUG_MSG("Found a connection with remote ip " << ipaddress(dest_ip));
+            return true;
+        }
     }
+    return false;
 }
