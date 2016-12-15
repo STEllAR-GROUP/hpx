@@ -10,6 +10,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
@@ -98,6 +99,7 @@ double receive_double(
     double elapsed = t.elapsed();
     return (elapsed * 1e6) / (2 * loop * window_size);
 }
+
 double receive(
     hpx::naming::id_type dest,
     char * send_buffer,
@@ -113,28 +115,45 @@ double receive(
     hpx::util::high_resolution_timer t;
 
     message_action msg;
-    for (std::size_t i = 0; i != loop + skip; ++i) {
+    hpx::lcos::local::sliding_semaphore sem(window_size);
+    int parcel_count = 0;
+    //
+    int divisor = (window_size>1) ? (window_size/2) : 1;
+    //
+    for (std::size_t i = 0; i != (loop*window_size) + skip; ++i) {
         // do not measure warm up phase
         if (i == skip)
             t.restart();
 
-        using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        // launch a message to the remote node
+        if (parcel_count % divisor == 0) {
 
-        std::size_t const start = 0;
-
-        auto range = boost::irange(start, window_size);
-        for_each(par, boost::begin(range), boost::end(range),
-            [&](std::uint64_t j)
-            {
-                msg(dest,
-                    buffer_type(send_buffer, size, buffer_type::reference));
-            }
-        );
+            hpx::async(msg, dest,
+                buffer_type(send_buffer, size, buffer_type::reference)).then(
+                    hpx::launch::sync,
+                    // when the message completes, increment our semaphore count
+                    // so that N are always in flight
+                    [&,parcel_count](auto &&f) -> void {
+                        sem.signal(parcel_count);
+                    }
+                );
+        }
+        else {
+            hpx::async(msg, dest,
+                buffer_type(send_buffer, size, buffer_type::reference));
+        }
+        //
+        sem.wait(parcel_count);
+        //
+        parcel_count++;
     }
+    // when we reach this point, there will still be "window_size" parcels in flight
+    // and we skipped some at the start, so take that into account in our
+    // calculation of speed/latency
 
+    double d = (static_cast<double>(parcel_count) - (window_size + skip));
     double elapsed = t.elapsed();
-    return (elapsed * 1e6) / (2 * loop * window_size);
+    return 0.5*(elapsed * 1e6) / d;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
