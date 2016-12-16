@@ -49,8 +49,11 @@ namespace verbs
         pinned_memory_vector(allocator_type* alloc) :
         m_array_(0), m_size_(0), m_cb_(0), m_alloc_(alloc), m_region_(0)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector constructed (alloc)"
-                << hexuint32(m_size_) << hexpointer(m_array_) << hexpointer(m_region_));
+            LOG_DEBUG_MSG("pinned_memory_vector constructed (alloc) "
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_));
         }
 
         // construct from existing memory chunk
@@ -59,7 +62,10 @@ namespace verbs
                 m_array_(p), m_size_(s), m_cb_(cb), m_alloc_(alloc), m_region_(r)
         {
             LOG_DEBUG_MSG("pinned_memory_vector constructed "
-                << hexuint32(m_size_) << hexpointer(m_array_) << hexpointer(m_region_));
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_));
         }
 
         // move constructor,
@@ -69,7 +75,10 @@ namespace verbs
             m_region_(other.m_region_)
         {
             LOG_DEBUG_MSG("pinned_memory_vector moved into "
-                << hexuint32(m_size_) << hexpointer(m_array_) << hexpointer(m_region_));
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_));
             other.m_size_ = 0;
             other.m_array_ = 0;
             other.m_cb_ = nullptr;
@@ -80,8 +89,10 @@ namespace verbs
         ~pinned_memory_vector() {
             if (m_array_ && m_cb_) {
                 LOG_DEBUG_MSG("pinned_memory_vector calling delete callback, "
-                    << hexuint32(m_size_) << hexpointer(m_array_)
-                    << hexpointer(m_region_));
+                    << "size " << hexuint32(m_size_)
+                    << "array " << hexpointer(m_array_)
+                    << "region " << hexpointer(m_region_)
+                    << "alloc " << hexpointer(m_alloc_));
                 m_cb_();
             }
         }
@@ -89,17 +100,20 @@ namespace verbs
         // move copy operator
         pinned_memory_vector & operator=(pinned_memory_vector && other)
         {
-            m_array_ = other.m_array_;
-            m_size_ = other.m_size_;
-            m_cb_ = other.m_cb_;
-            m_alloc_ = other.m_alloc_;
+            m_array_  = other.m_array_;
+            m_size_   = other.m_size_;
+            m_cb_     = other.m_cb_;
+            m_alloc_  = other.m_alloc_;
             m_region_ = other.m_region_;
             LOG_DEBUG_MSG("pinned_memory_vector copied into "
-                << hexuint32(m_size_) << hexpointer(m_array_) << hexpointer(m_region_));
-            other.m_size_ = 0;
-            other.m_array_ = 0;
-            other.m_cb_ = nullptr;
-            other.m_alloc_ = nullptr;
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_));
+            other.m_size_   = 0;
+            other.m_array_  = 0;
+            other.m_cb_     = nullptr;
+            other.m_alloc_  = nullptr;
             other.m_region_ = nullptr;
             return *this;
         }
@@ -151,8 +165,13 @@ namespace verbs
         }
 
         inline void resize(std::size_t s) {
-            LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_)
-                << hexpointer(m_region_) << " resizing from " << m_size_ << " to " << s);
+            LOG_TRACE_MSG("pinned_memory_vector "
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_)
+                << "resizing from " << m_size_ << " to " << s);
+
             if (m_region_) {
                 if (s > m_region_->get_size()) {
                     LOG_ERROR_MSG(
@@ -171,8 +190,12 @@ namespace verbs
         }
 
         void reserve(std::size_t s) {
-            LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_)
-                << hexpointer(m_region_) " reserving from " << m_size_ << " to " << s);
+            LOG_DEBUG_MSG("pinned_memory_vector "
+                << "size " << hexuint32(m_size_)
+                << "array " << hexpointer(m_array_)
+                << "region " << hexpointer(m_region_)
+                << "alloc " << hexpointer(m_alloc_)
+                << "reserving from " << m_size_ << " to " << s);
             if (m_array_ || m_region_) {
                 throw std::runtime_error(
                     "pinned_memory_vector should never be resized once an "

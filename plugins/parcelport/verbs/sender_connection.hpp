@@ -25,8 +25,6 @@ namespace verbs
     struct sender_connection;
     struct parcelport;
 
-    typedef lcos::local::spinlock                           mutex_type;
-
     typedef rdma_memory_pool                                memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
     typedef pinned_memory_vector<char>                      snd_data_type;
@@ -58,22 +56,14 @@ namespace verbs
           , memory_pool_type * chunk_pool
           , performance_counters::parcels::gatherer & parcels_sent
         )
-          : base_type(chunk_pool)
+          : base_type(snd_buffer_type(snd_data_type(chunk_pool), chunk_pool))
           , parcelport_(pp)
           , dest_ip_(dest)
           , there_(there)
           , client_(client)
           , chunk_pool_(chunk_pool)
           , parcels_sent_(parcels_sent)
-        {
-            // the send buffer is created with our allocator and will get memory from
-            // our pool - disable deallocation so that we can manage the block lifetime
-            // better
-            // @TODO, integrate pointer wrapper and allocators better into parcel_buffer
-            snd_data_type pinned_vector(chunk_pool_);
-            snd_buffer_type buffer(std::move(pinned_vector), chunk_pool_);
-            buffer_ = std::move(buffer);
-        }
+        {}
 
         void verify(parcelset::locality const & parcel_locality_id) const
         {
