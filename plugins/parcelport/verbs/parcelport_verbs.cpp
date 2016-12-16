@@ -411,11 +411,18 @@ namespace verbs
             FUNC_START_DEBUG_MSG;
 
             std::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEVEL_MSG("Create sender_connection     from "
+            LOG_DEVEL_MSG("get_remote_connection        from "
                 << ipaddress(_ibv_ip)
-                << "to " << ipaddress(dest_ip) );
+                << "to " << ipaddress(dest_ip)
+                << "chunk pool " << hexpointer(chunk_pool_.get()));
 
             verbs_endpoint *client = get_remote_connection(dest_ip);
+
+            LOG_DEVEL_MSG("Create sender_connection     from "
+                << ipaddress(_ibv_ip)
+                << "to " << ipaddress(dest_ip)
+                << "chunk pool " << hexpointer(chunk_pool_.get()));
+
             std::shared_ptr<sender_connection> result =
                 std::make_shared<sender_connection>(
                   this
@@ -1149,12 +1156,17 @@ namespace verbs
                 scoped_lock lock(stop_mutex);
 
                 LOG_DEBUG_MSG("Removing all initiated connections");
-                rdma_controller_->removeAllInitiatedConnections();
+                rdma_controller_->disconnect_all();
 
                 // wait for all clients initiated elsewhere to be disconnected
-                while (rdma_controller_->num_clients()!=0 && !hpx::is_stopped()) {
+                while (rdma_controller_->active() /*&& !hpx::is_stopped()*/) {
                     rdma_controller_->poll_endpoints();
-                    std::cout << "Polling before shutdown" << std::endl;
+                    LOG_TIMED_INIT(disconnect_poll);
+                    LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
+                        {
+                            LOG_DEVEL_MSG("Polling before shutdown");
+                        }
+                    )
                 }
                 LOG_DEBUG_MSG("stopped removing clients and terminating");
             }

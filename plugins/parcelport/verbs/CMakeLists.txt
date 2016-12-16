@@ -163,8 +163,8 @@ endif()
 # Memory chunk/reservation options
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
-  "Number of bytes a default chunk in the memory pool can hold (default: 1K)"
-  "1024" CATEGORY "Parcelport" ADVANCED)
+  "Number of bytes a default chunk in the memory pool can hold (default: 4K)"
+  "4096" CATEGORY "Parcelport" ADVANCED)
 
 hpx_option(HPX_PARCELPORT_VERBS_64K_PAGES STRING
   "Number of 64K pages we reserve for default message buffers (default: 10)"

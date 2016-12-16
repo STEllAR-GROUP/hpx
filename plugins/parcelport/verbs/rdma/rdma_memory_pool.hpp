@@ -118,13 +118,13 @@ namespace verbs
                 chunk_allocator(pd, chunk_size, chunks_per_block, chunks_per_block)
         {
             LOG_DEBUG_MSG(PoolType::desc() << "Creating with chunk_size "
-                << hexnumber(chunk_size_) << "max_chunks " << max_chunks_);
+                << hexnumber(chunk_size_) << "max_chunks " << decnumber(max_chunks_));
         }
 
         // ------------------------------------------------------------------------
         bool allocate_pool(std::size_t _num_chunks)
         {
-            LOG_DEBUG_MSG(PoolType::desc() << "Allocating " << std::dec << _num_chunks
+            LOG_DEBUG_MSG(PoolType::desc() << "Allocating " << decnumber(_num_chunks)
                 << " blocks of " << hexlength(chunk_size_));
             //
             for (std::size_t i=0; i<_num_chunks; i++) {

@@ -114,7 +114,7 @@ namespace verbs
         // returns 0 when successful, -1 otherwise
         int release(void)
         {
-            LOG_DEBUG_MSG("About to release memory region with local key "
+            LOG_TRACE_MSG("About to release memory region with local key "
                 << get_local_key());
             if (region_ != nullptr) {
                 // get these before deleting/unregistering (for logging)

@@ -120,7 +120,9 @@ namespace verbs
 
         void disconnect_from_server(verbs_endpoint_ptr client);
 
-        void removeAllInitiatedConnections();
+        void disconnect_all();
+
+        bool active();
 
     private:
 

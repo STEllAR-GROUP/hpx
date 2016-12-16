@@ -100,9 +100,30 @@ namespace detail {
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
 
-#  define LOG_TIMED_INIT(name)
-#  define LOG_TIMED_MSG(name, level, delay, x)
-#  define LOG_TIMED_BLOCK(name, level, delay, x)
+
+#  define LOG_TIMED_INIT(name)                                                      \
+    using namespace std::chrono;                                                    \
+    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
+
+#  define LOG_TIMED_MSG(name, level, delay, x)             \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        LOG_DEVEL_MSG(x);                                  \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+        x;                                                 \
+    }
 
 #else
 //
@@ -175,7 +196,7 @@ namespace detail {
         BOOST_PP_SEQ_ENUM(enumerators)                                        \
     };                                                                        \
                                                                               \
-    inline const char* ToString(name v)                                       \
+    static const char* ToString(name v)                                       \
     {                                                                         \
         switch (v)                                                            \
         {                                                                     \

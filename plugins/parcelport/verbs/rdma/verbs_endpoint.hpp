@@ -53,6 +53,8 @@ namespace verbs
             (rejecting)
             (connected)
             (disconnecting)
+            (disconnected)
+            (terminated)
         )
 
         std::atomic<connection_state> state_;
@@ -523,7 +525,7 @@ namespace verbs
                     << sockaddress(&remote_address_)
                     << "( " << sockaddress(&local_address_) << ")");
                 verbs_event_channel::ack_event(event);
-                state_ = connection_state::uninitialized;
+                state_ = connection_state::terminated;
                 LOG_DEVEL_MSG("Current state is " << ToString(state_));
                 return -2;
             }
@@ -558,6 +560,7 @@ namespace verbs
                     "error disconnect: " << rdma_error::error_string(err));
                 return err;
             }
+
             return 0;
         }
 
@@ -565,14 +568,16 @@ namespace verbs
         int handle_disconnect(struct rdma_cm_event *event, bool aborted=false)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
-            if (state_!=connection_state::disconnecting)
+            if (state_!=connection_state::disconnecting &&
+                state_!=connection_state::terminated &&
+                state_!=connection_state::connected)
             {
                 rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_disconnect"
                     << aborted));
                 return -1;
             }
 
-            state_ = connection_state::uninitialized;
+            state_ = connection_state::disconnected;
             verbs_event_channel::ack_event(event);
 
             // if this connection attempt has been aborted, exit cleanly
@@ -580,6 +585,8 @@ namespace verbs
                 LOG_DEBUG_MSG("resolved route aborted " << sockaddress(&remote_address_));
                 return 0;
             }
+
+            flush();
 
             LOG_DEBUG_MSG("Disconnected               "
                 << "from " << sockaddress(&remote_address_)
@@ -646,24 +653,29 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        virtual inline struct ibv_srq *getsrq_() {
+        virtual inline struct ibv_srq *getsrq_() const {
             if (srq_ == nullptr)
                 return nullptr;
             return srq_->getsrq_();
         }
 
         // ---------------------------------------------------------------------------
-        inline bool is_client_endpoint(void) {
+        inline bool is_client_endpoint(void) const {
             return initiated_connection_;
         }
 
         // ---------------------------------------------------------------------------
-        connection_state get_state(void) {
+        connection_state get_state(void) const {
             return state_;
         }
 
         // ---------------------------------------------------------------------------
-        verbs_event_channel_ptr get_event_channel(void) {
+        void set_state(connection_state s) {
+            state_ = s;
+        }
+
+        // ---------------------------------------------------------------------------
+        verbs_event_channel_ptr get_event_channel(void) const {
             return event_channel_;
         }
 
@@ -675,7 +687,7 @@ namespace verbs
                 return;
             }
             //
-            state_ = connection_state::uninitialized;
+            state_ = connection_state::disconnected;
             //
             struct ibv_qp_attr attr;
             memset(&attr, 0, sizeof(attr));

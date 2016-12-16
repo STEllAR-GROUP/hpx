@@ -84,14 +84,18 @@ namespace verbs
         // ---------------------------------------------------------------------------
         inline void pop_receive_count() const {
             LOG_EXCLUSIVE(uint64_t temp =) --preposted_receives_;
-            LOG_DEBUG_MSG("After decrement size of waiting receives is "
+            LOG_TRACE_MSG("After decrement size of waiting receives is "
                 << decnumber(temp));
+            if (preposted_receives_ < 5) {
+                LOG_DEVEL_MSG("After decrement size of waiting receives is "
+                    << decnumber(preposted_receives_));
+            }
         }
 
         // ---------------------------------------------------------------------------
         inline void push_receive_count() const {
             LOG_EXCLUSIVE(uint64_t temp =) ++preposted_receives_;
-            LOG_DEBUG_MSG("After increment size of waiting receives is "
+            LOG_TRACE_MSG("After increment size of waiting receives is "
                 << decnumber(temp));
         }
 
@@ -360,7 +364,7 @@ namespace verbs
 
             ++total_posted_recv_;
 
-            LOG_DEBUG_MSG("posting Recv wr_id " << hexpointer(recv_wr.wr_id)
+            LOG_TRACE_MSG("posting Recv wr_id " << hexpointer(recv_wr.wr_id)
                 << " with Length " << hexlength(length)
                 << " total recv posted " << decnumber(total_posted_recv_));
             return recv_wr.wr_id;

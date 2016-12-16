@@ -26,6 +26,7 @@
 #include <fstream>
 #include <memory>
 #include <utility>
+#include <cstdint>
 //
 #include <netinet/in.h>
 
@@ -161,7 +162,8 @@ void rdma_controller::refill_client_receives()
             if (std::get<0>(_client.second)) {
                 if (std::get<0>(_client.second)->get_state()==
                     verbs_endpoint::connection_state::connected)
-                    std::get<0>(_client.second)->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+                    std::get<0>(_client.second)->
+                        refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
             }
     });
 }
@@ -200,6 +202,14 @@ int rdma_controller::poll_for_completions()
 {
     map_read_lock_type read_lock(connections_started_.read_write_mutex());
     //
+
+    LOG_TIMED_INIT(completion_poll);
+    LOG_TIMED_BLOCK(completion_poll, DEVEL, 5.0,
+        {
+            LOG_DEVEL_MSG("Polling completion_poll channel");
+        }
+    )
+
     int ntot = 0, nc = 0;
     //
     if (this->get_shared_receive_queue() == nullptr) {
@@ -219,6 +229,21 @@ int rdma_controller::poll_for_completions()
                     this->completion_function_(completion, client);
                     ntot++;
                 }
+                else if (nc < 0) {
+                    // flushed completion, just delete it, a disconnection has started
+                    verbs_memory_region *region = (verbs_memory_region *)completion.wr_id;
+                    // let go of this region (waste really this was a zero byte message)
+                    memory_pool_->deallocate(region);
+                    // bookkeeping : decrement counter that keeps preposted queue full
+                    client->pop_receive_count();
+                    if (client->get_receive_count()<=0) {
+                        // set the state to terminated so we can clean it up
+                        LOG_ERROR_MSG("Client receive count hit zero before disconnect");
+                        client->set_state(
+                            verbs_endpoint::connection_state::terminated);
+                    }
+                }
+
             } while (nc > 0);
         }
         for (auto &_client : connections_aborted_) {
@@ -245,12 +270,17 @@ int rdma_controller::poll_for_completions()
                 else if (na < 0) {
                     // flushed completion, just delete it
                     verbs_memory_region *region = (verbs_memory_region *)completion.wr_id;
+                    // let go of this region (waste really this was a zero byte message)
+                    memory_pool_->deallocate(region);
                     // bookkeeping : decrement counter that keeps preposted queue full
                     client->pop_receive_count();
-                    // let go of this region (waste really as this was a zero byte message)
-                    memory_pool_->deallocate(region);
+                    if (client->get_receive_count()<=0) {
+                        // set the state to terminated so we can clean it up
+                        client->set_state(
+                            verbs_endpoint::connection_state::terminated);
+                    }
                 }
-            } while (nc != 0);
+            } while (na != 0);
         }
     }
     else {
@@ -311,13 +341,16 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
     if (qpnum>0) {
         // Find connection associated with this event if it's not a new request
         LOG_DEVEL_MSG("handle_event : Looking for qp in map " << decnumber(qpnum));
-        event_client = std::get<0>(
-            connections_started_.find(addr_dst->sin_addr.s_addr)->second);
-        if (event_client->get_qp_num()!=qpnum) {
+        auto it = connections_started_.find(addr_dst->sin_addr.s_addr);
+        if (it!=connections_started_.end()) {
+            event_client = std::get<0>(it->second);
+        }
+        if (!event_client || event_client->get_qp_num()!=qpnum) {
             LOG_DEVEL_MSG("event qpnum did not match endpoint qpnum");
             event_client =
                 connections_aborted_.find(addr_dst->sin_addr.s_addr)->second;
-            LOG_DEVEL_MSG("found aborted event with qpnum " << decnumber(event_client->get_qp_num()));
+            LOG_DEVEL_MSG("found aborted event with qpnum "
+                << decnumber(event_client->get_qp_num()));
         }
     }
     //
@@ -408,8 +441,8 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
         // the remote end rejected our connection, so we must abort and clean up
         else if (established==-2)
         {
-            // we need to delete the connection we have started and replace it with a new one
-            LOG_DEVEL_MSG("Abort old connect,  rejected from "
+            // we need to delete the started connection and replace it with a new one
+            LOG_DEVEL_MSG("Abort old connect,     rejected from "
                 << sockaddress(addr_src) << "to "
                 << sockaddress(addr_dst)
                 << "( " << sockaddress(&local_addr_) << ")"
@@ -501,16 +534,19 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
                 aborted_client->handle_disconnect(cm_event, true);
             }
             else std::terminate();
-
         }
 
         // get cq before we delete client
         verbs_completion_queue_ptr completionQ = event_client->get_completion_queue();
 
-        // Remove connection from map of active connections.
-        LOG_ERROR_MSG("@TODO : Need to handle erase here");
-        // clients_.erase(qpnum);
+        uint32_t remote_ip = event_client->get_remote_ip_address();
+        connections_aborted_.insert(std::make_pair(remote_ip, event_client));
+        connections_started_.erase(remote_ip);
 
+        // Remove connection from map of active connections.
+        //LOG_ERROR_MSG("@TODO : Need to handle erase here");
+        // clients_.erase(qpnum);
+/*
         // Destroy connection object.
         LOG_DEVEL_MSG("destroying client "
             << sockaddress(event_client->get_remote_address()));
@@ -522,9 +558,12 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
         // Destroy the completion queue.
         LOG_DEVEL_MSG("destroying completion queue " << completionQ->get_handle());
         completionQ.reset();
-
+*/
         // event acked by handle_disconnect
         return 0;
+    }
+    case RDMA_CM_EVENT_TIMEWAIT_EXIT: {
+        // do nothing
     }
 
     default: {
@@ -551,8 +590,6 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
 int rdma_controller::handle_connect_request(
     struct rdma_cm_event *cm_event, std::uint32_t remote_ip)
 {
-    std::cout <<  "handle_connect_request, " << hexpointer(cm_event) << hexpointer(cm_event->id) << std::endl;
-
     auto present = connections_started_.is_in_map(remote_ip);
     if (present.second)
     {
@@ -798,7 +835,7 @@ hpx::shared_future<verbs_endpoint_ptr> rdma_controller::connect_to_server(
 }
 
 //----------------------------------------------------------------------------
-void rdma_controller::removeAllInitiatedConnections()
+void rdma_controller::disconnect_all()
 {
     // removing connections will affect the map, so lock it and loop over
     // each element triggering a disconnect on each
@@ -829,6 +866,40 @@ bool rdma_controller::connection_present(uint32_t dest_ip)
             client->get_state() != verbs_endpoint::connection_state::uninitialized)
         {
             LOG_DEBUG_MSG("Found a connection with remote ip " << ipaddress(dest_ip));
+            return true;
+        }
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------
+bool rdma_controller::active()
+{
+    for (const auto &_client : connections_started_)
+    {
+        verbs_endpoint *client = std::get<0>(_client.second).get();
+        if (client->get_state()!=verbs_endpoint::connection_state::terminated) {
+            LOG_TIMED_INIT(terminated);
+            LOG_TIMED_BLOCK(terminated, DEVEL, 5.0,
+                {
+                    LOG_DEVEL_MSG("still active because client in state "
+                        << verbs_endpoint::ToString(client->get_state()));
+                }
+            )
+            return true;
+        }
+    }
+    for (const auto &_client : connections_aborted_)
+    {
+        verbs_endpoint *client = _client.second.get();
+        if (client->get_state()!=verbs_endpoint::connection_state::terminated) {
+            LOG_TIMED_INIT(terminated);
+            LOG_TIMED_BLOCK(terminated, DEVEL, 5.0,
+                {
+                    LOG_DEVEL_MSG("still active because client in state "
+                        << verbs_endpoint::ToString(client->get_state()));
+                }
+            )
             return true;
         }
     }
