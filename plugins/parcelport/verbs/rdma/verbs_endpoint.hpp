@@ -186,7 +186,7 @@ namespace verbs
                 if (this->memory_pool_->can_allocate_unsafe(
                     this->memory_pool_->small_.chunk_size_))
                 {
-                    LOG_DEBUG_MSG("Pre-Posting a receive to client size "
+                    LOG_TRACE_MSG("Pre-Posting a receive to client size "
                         << hexnumber(this->memory_pool_->small_.chunk_size_));
                     verbs_memory_region *region =
                         this->get_free_region(
@@ -262,7 +262,8 @@ namespace verbs
         template<typename Func>
         int poll_for_event(Func &&f)
         {
-            return event_channel_->poll_verbs_event_channel([this, &f]()
+            return event_channel_->poll_verbs_event_channel(
+                [this, &f]()
                 {
                     struct rdma_cm_event *cm_event;
                     int err = event_channel_->get_event(verbs_event_channel::no_ack_event,
@@ -345,7 +346,6 @@ namespace verbs
             }
 
             state_ = connection_state::address_resolved;
-            verbs_event_channel::ack_event(event);
 
             LOG_DEVEL_MSG("resolved to " << sockaddress(&remote_address_)
                 << "Current state is " << ToString(state_));
@@ -359,8 +359,7 @@ namespace verbs
         int resolve_route(void)
         {
             if (state_!=connection_state::address_resolved) {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in resolve_route"
-                    << aborted));
+                rdma_error e(0, LOG_FORMAT_MSG("invalid state in resolve_route"));
                 throw e;
             }
 
@@ -543,8 +542,7 @@ namespace verbs
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
             if (state_!=connection_state::connected)
             {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in disconnect"
-                    << aborted));
+                rdma_error e(0, LOG_FORMAT_MSG("invalid state in disconnect"));
                 throw e;
             }
             state_ = connection_state::disconnecting;

@@ -35,8 +35,8 @@ namespace verbs
 
         // ----------------------------------------------------------------------------
         enum event_ack_type {
-            do_ack_event = true,
-            no_ack_event = false
+            no_ack_event = false,
+            do_ack_event = true
         };
 
         // ----------------------------------------------------------------------------
@@ -159,11 +159,11 @@ namespace verbs
             if (cm_event->event != event && event!=rdma_cm_event_type(-1)) {
                 LOG_ERROR_MSG("mismatch " << rdma_event_str(cm_event->event)
                     << " not " << rdma_event_str(event));
-                if (ack) ack_event(cm_event);
+                if (ack==do_ack_event) ack_event(cm_event);
                 return -1;
             }
             // Acknowledge the event.
-            if (ack) return ack_event(cm_event);
+            if (ack==do_ack_event) return ack_event(cm_event);
             else return 0;
         }
 
@@ -175,7 +175,7 @@ namespace verbs
                 return ENOENT;
             }
 
-            LOG_TRACE_MSG("ack rdma cm event " << rdma_event_str(cm_event->event)
+            LOG_DEVEL_MSG("ack rdma cm event " << rdma_event_str(cm_event->event)
                 << " for rdma cm id " << cm_event->id);
 
             int err = rdma_ack_cm_event(cm_event);
