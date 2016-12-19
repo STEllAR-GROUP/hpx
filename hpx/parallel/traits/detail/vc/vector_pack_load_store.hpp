@@ -29,7 +29,8 @@ namespace hpx { namespace parallel { namespace traits
         typedef Vc::Vector<NewT, Abi> type;
     };
 
-    template <typename T, std::size_t N, typename V, std::size_t W, typename NewT>
+    template <typename T, std::size_t N, typename V, std::size_t W,
+        typename NewT>
     struct rebind_pack<Vc::SimdArray<T, N, V, W>, NewT>
     {
         typedef Vc::SimdArray<NewT, N, V, W> type;
@@ -101,7 +102,8 @@ namespace hpx { namespace parallel { namespace traits
         }
     };
 
-    template <typename Value, typename T, std::size_t N, typename V, std::size_t W>
+    template <typename Value, typename T, std::size_t N, typename V,
+        std::size_t W>
     struct vector_pack_load<Value, Vc::SimdArray<T, N, V, W> >
     {
         template <typename Iter>
@@ -152,7 +154,8 @@ namespace hpx { namespace parallel { namespace traits
         }
     };
 
-    template <typename Value, typename T, std::size_t N, typename V, std::size_t W>
+    template <typename Value, typename T, std::size_t N, typename V,
+        std::size_t W>
     struct vector_pack_store<Value, Vc::SimdArray<T, N, V, W> >
     {
         template <typename Iter>
@@ -199,7 +202,8 @@ namespace hpx { namespace parallel { namespace traits
         aligned(Iter const& iter)
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter), Vc::flags::vector_aligned_tag);
+            return vector_pack_type(std::addressof(*iter),
+                Vc::flags::vector_aligned_tag);
         }
 
         template <typename Iter>
@@ -207,7 +211,8 @@ namespace hpx { namespace parallel { namespace traits
         unaligned(Iter const& iter)
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
-            return vector_pack_type(std::addressof(*iter), Vc::flags::element_aligned_tag);
+            return vector_pack_type(std::addressof(*iter),
+                Vc::flags::element_aligned_tag);
         }
     };
 
