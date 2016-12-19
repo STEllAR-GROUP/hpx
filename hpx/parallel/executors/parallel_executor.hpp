@@ -73,6 +73,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         > >
         bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
+            // lazily initialize once
+            static std::size_t global_num_tasks =
+                (std::min)(std::size_t(128), hpx::get_os_thread_count());
+
+            std::size_t num_tasks =
+                (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
+
             typedef std::vector<hpx::future<
                     typename detail::bulk_async_execute_result<F, S, Ts...>::type
                 > > result_type;
@@ -89,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
 
             results.resize(size);
-            spawn(results, 0, size, f, boost::begin(shape), ts...).get();
+            spawn(results, 0, size, num_tasks, f, boost::begin(shape), ts...).get();
             return results;
         }
         /// \endcond
@@ -98,37 +105,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         template <typename Result, typename F, typename Iter, typename ... Ts>
         hpx::future<void> spawn(std::vector<hpx::future<Result> >& results,
-            std::size_t base, std::size_t size, F const& func, Iter it,
-            Ts const&... ts)
+            std::size_t base, std::size_t size, std::size_t num_tasks,
+            F const& func, Iter it, Ts const&... ts)
         {
-            if (num_tasks_ == std::size_t(-1))
-            {
-                static std::size_t num_tasks =
-                    (std::min)(std::size_t(128), hpx::get_os_thread_count());
-                num_tasks_ = num_tasks;
-            }
-
-            if (size > num_tasks_)
+            if (size > num_tasks)
             {
                 // spawn hierarchical tasks
                 std::size_t chunk_size = (size + num_spread_) / num_spread_ - 1;
-                chunk_size = (std::max)(chunk_size, num_tasks_);
+                chunk_size = (std::max)(chunk_size, num_tasks);
 
                 std::vector<hpx::future<void> > tasks;
                 tasks.reserve(num_spread_);
 
                 hpx::future<void> (parallel_executor::*spawn_func)(
-                        std::vector<hpx::future<Result> >&,
+                        std::vector<hpx::future<Result> >&, std::size_t,
                         std::size_t, std::size_t, F const&, Iter, Ts const&...
                     ) = &parallel_executor::spawn;
 
-                for (std::size_t i = 0; i != num_spread_ && size != 0; ++i)
+                while (size != 0)
                 {
                     std::size_t curr_chunk_size = (std::min)(chunk_size, size);
 
                     hpx::future<void> f = hpx::async(
                         spawn_func, this, std::ref(results), base,
-                        curr_chunk_size, std::ref(func), it, std::ref(ts)...);
+                        curr_chunk_size, num_tasks, std::ref(func), it,
+                        std::ref(ts)...);
                     tasks.push_back(std::move(f));
 
                     base += curr_chunk_size;
