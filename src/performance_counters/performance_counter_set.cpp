@@ -16,8 +16,10 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

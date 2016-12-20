@@ -13,6 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
