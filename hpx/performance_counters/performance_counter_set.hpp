@@ -8,13 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -77,8 +80,33 @@ namespace hpx { namespace performance_counters
         /// Return the number of counters in this set
         std::size_t size() const;
 
+        template <typename T>
+        hpx::future<std::vector<T> > get_values(bool reset = false) const
+        {
+            return hpx::dataflow(
+                &performance_counter_set::extract_values<T>,
+                get_counter_values(reset));
+        }
+        template <typename T>
+        std::vector<T> get_values(launch::sync_policy, bool reset = false,
+            error_code& ec = throws) const
+        {
+            return get_values<T>(reset).get(ec);
+        }
+
     protected:
         bool find_counter(counter_info const& info, error_code& ec);
+
+        template <typename T>
+        static std::vector<T> extract_values(
+            std::vector<hpx::future<counter_value> > && values)
+        {
+            std::vector<T> results;
+            results.reserve(values.size());
+            for (hpx::future<counter_value> & f : values)
+                results.push_back(f.get().get_value<T>());
+            return results;
+        }
 
     private:
         mutable mutex_type mtx_;
