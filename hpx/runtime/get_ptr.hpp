@@ -19,6 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <memory>
 
@@ -188,12 +189,7 @@ namespace hpx
                 Derived, Stub
             >::server_component_type component_type;
 
-        hpx::id_type id = c.get_id();
-        using util::placeholders::_1;
-        hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind(
-            &detail::get_ptr_postproc<component_type, detail::get_ptr_deleter>,
-            _1, id));
+        return get_ptr<component_type>(c.get_id());
     }
 
     /// \brief Returns the pointer to the underlying memory of a component
@@ -229,15 +225,22 @@ namespace hpx
     ///            parameter \a ec. Otherwise it throws an instance of
     ///            hpx::exception.
     ///
+#if defined(DOXYGEN)
     template <typename Component>
     std::shared_ptr<Component>
     get_ptr(launch::sync_policy p, naming::id_type const& id,
+        error_code& ec = throws);
+#else
+    template <typename Component>
+    std::shared_ptr<Component>
+    get_ptr(launch::sync_policy, naming::id_type const& id,
         error_code& ec = throws)
     {
         hpx::future<std::shared_ptr<Component> > ptr =
             get_ptr<Component>(id);
         return ptr.get(ec);
     }
+#endif
 
     /// \brief Returns the pointer to the underlying memory of a component
     ///
@@ -280,7 +283,7 @@ namespace hpx
                 Derived, Stub
             >::server_component_type component_type;
 
-        return get_ptr<component_type>(launch::sync, c.get_id(), ec);
+        return get_ptr<component_type>(p, c.get_id(), ec);
     }
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
