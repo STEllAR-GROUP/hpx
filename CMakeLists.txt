@@ -249,6 +249,9 @@ if(HPX_WITH_CUDA)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
 endif()
+if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+  hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
+endif()
 hpx_option(HPX_WITH_HCC BOOL
   "Enable hcc support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_SYCL BOOL
