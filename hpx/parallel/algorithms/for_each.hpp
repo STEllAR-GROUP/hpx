@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             call(T && t)
             {
                 auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
-                hpx::util::invoke(f_, tmp);
+                hpx::util::invoke_r<void>(f_,tmp);
             }
 
             template <typename Iter>
@@ -428,15 +428,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
+
+
+    // FIXME : Momentary comment out the is_indirect_callable checking for
+    // bug introspection
+
     template <typename ExPolicy, typename InIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_projected<Proj, InIter>::value
+/*        &&
         parallel::traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value)>
+        >::value*/
+        )>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f,
         Proj && proj = Proj())
