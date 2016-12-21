@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { namespace util
 
         template <typename R, typename Result1, typename Result2>
         struct static_scan_partitioner<
-            parallel_task_execution_policy, R, Result1, Result2>
+            execution::parallel_task_policy, R, Result1, Result2>
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
@@ -301,9 +301,9 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result1, typename Result2>
         struct static_scan_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                     R, Result1, Result2>
-          : static_scan_partitioner<parallel_task_execution_policy, R,
+          : static_scan_partitioner<execution::parallel_task_policy, R,
               Result1, Result2>
         {};
 
@@ -341,7 +341,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename R, typename Result1, typename Result2>
-        struct scan_partitioner<parallel_task_execution_policy, R, Result1,
+        struct scan_partitioner<execution::parallel_task_policy, R, Result1,
             Result2, parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename T,
@@ -364,27 +364,27 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result1, Result2, parallel::traits::static_partitioner_tag>
-          : scan_partitioner<parallel_task_execution_policy, R, Result1,
+          : scan_partitioner<execution::parallel_task_policy, R, Result1,
                 Result2, parallel::traits::static_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result1, Result2, parallel::traits::auto_partitioner_tag>
-          : scan_partitioner<parallel_task_execution_policy, R, Result1,
+          : scan_partitioner<execution::parallel_task_policy, R, Result1,
                 Result2, parallel::traits::auto_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result1, Result2, parallel::traits::default_partitioner_tag>
-          : scan_partitioner<parallel_task_execution_policy, R, Result1,
+          : scan_partitioner<execution::parallel_task_policy, R, Result1,
                 Result2, parallel::traits::static_partitioner_tag>
         {};
 

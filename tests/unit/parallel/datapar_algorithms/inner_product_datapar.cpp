@@ -19,11 +19,11 @@ void test_inner_product()
 {
     using namespace hpx::parallel;
 
-    test_inner_product(dataseq_execution, IteratorTag());
-    test_inner_product(datapar_execution, IteratorTag());
+    test_inner_product(execution::dataseq, IteratorTag());
+    test_inner_product(execution::datapar, IteratorTag());
 
-    test_inner_product_async(dataseq_execution(task), IteratorTag());
-    test_inner_product_async(datapar_execution(task), IteratorTag());
+    test_inner_product_async(execution::dataseq(execution::task), IteratorTag());
+    test_inner_product_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void inner_product_test()

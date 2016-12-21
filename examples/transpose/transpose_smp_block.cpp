@@ -62,8 +62,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "Number of iterations  = " << iterations << "\n";
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
 
     const std::uint64_t start = 0;
 
@@ -103,7 +103,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             [&](std::uint64_t b)
             {
                 transpose_futures[b] =
-                    for_each(par(task), boost::begin(range), boost::end(range),
+                    for_each(par(task),
+                        boost::begin(range), boost::end(range),
                         [&, b](std::uint64_t phase)
                         {
                             const std::uint64_t block_size = block_order * block_order;
@@ -220,8 +221,8 @@ void transpose(sub_block A, sub_block B, std::uint64_t block_order,
 double test_results(std::uint64_t order, std::uint64_t block_order,
     std::vector<block> const & trans)
 {
-    using hpx::parallel::for_each;
-    using hpx::parallel::par;
+    using hpx::parallel::transform_reduce;
+    using hpx::parallel::execution::par;
 
     const std::uint64_t start = 0;
     const std::uint64_t end = trans.size();

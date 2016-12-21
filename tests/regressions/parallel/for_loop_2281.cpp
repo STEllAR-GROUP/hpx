@@ -21,7 +21,7 @@ int hpx_main()
     std::set<hpx::thread::id> thread_ids;
 
     hpx::parallel::for_loop(
-        hpx::parallel::par, 0, 100,
+        hpx::parallel::execution::par, 0, 100,
         [&](int i)
         {
             std::lock_guard<hpx::lcos::local::spinlock> l(mtx);

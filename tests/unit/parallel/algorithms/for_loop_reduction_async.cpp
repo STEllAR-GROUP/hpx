@@ -24,8 +24,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -54,8 +54,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -84,8 +84,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -117,14 +117,14 @@ void test_for_loop_reduction()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_reduction_plus(seq(task), IteratorTag());
-    test_for_loop_reduction_plus(par(task), IteratorTag());
+    test_for_loop_reduction_plus(execution::seq(execution::task), IteratorTag());
+    test_for_loop_reduction_plus(execution::par(execution::task), IteratorTag());
 
-    test_for_loop_reduction_multiplies(seq(task), IteratorTag());
-    test_for_loop_reduction_multiplies(par(task), IteratorTag());
+    test_for_loop_reduction_multiplies(execution::seq(execution::task), IteratorTag());
+    test_for_loop_reduction_multiplies(execution::par(execution::task), IteratorTag());
 
-    test_for_loop_reduction_min(seq(task), IteratorTag());
-    test_for_loop_reduction_min(par(task), IteratorTag());
+    test_for_loop_reduction_min(execution::seq(execution::task), IteratorTag());
+    test_for_loop_reduction_min(execution::par(execution::task), IteratorTag());
 }
 
 void for_loop_reduction_test()
@@ -139,8 +139,8 @@ template <typename ExPolicy>
 void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
@@ -166,8 +166,8 @@ template <typename ExPolicy>
 void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
@@ -193,11 +193,11 @@ void for_loop_reduction_test_idx()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_reduction_bit_and_idx(seq(task));
-    test_for_loop_reduction_bit_and_idx(par(task));
+    test_for_loop_reduction_bit_and_idx(execution::seq(execution::task));
+    test_for_loop_reduction_bit_and_idx(execution::par(execution::task));
 
-    test_for_loop_reduction_bit_or_idx(seq(task));
-    test_for_loop_reduction_bit_or_idx(par(task));
+    test_for_loop_reduction_bit_or_idx(execution::seq(execution::task));
+    test_for_loop_reduction_bit_or_idx(execution::par(execution::task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

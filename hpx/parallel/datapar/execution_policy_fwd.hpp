@@ -9,31 +9,29 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/config/inline_namespace.hpp>
-
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct dataseq_execution_policy;
+    struct dataseq_policy;
 
     template <typename Executor, typename Parameters>
-    struct dataseq_execution_policy_shim;
+    struct dataseq_policy_shim;
 
-    struct dataseq_task_execution_policy;
+    struct dataseq_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct dataseq_task_execution_policy_shim;
+    struct dataseq_task_policy_shim;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_execution_policy;
+    struct datapar_policy;
 
     template <typename Executor, typename Parameters>
-    struct datapar_execution_policy_shim;
+    struct datapar_policy_shim;
 
-    struct datapar_task_execution_policy;
+    struct datapar_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct datapar_task_execution_policy_shim;
+    struct datapar_task_policy_shim;
 }}}
 
 #endif

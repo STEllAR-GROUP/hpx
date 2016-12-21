@@ -20,11 +20,11 @@ void test_for_each_n()
 {
     using namespace hpx::parallel;
 
-    test_for_each_n(dataseq_execution, IteratorTag());
-    test_for_each_n(datapar_execution, IteratorTag());
+    test_for_each_n(execution::dataseq, IteratorTag());
+    test_for_each_n(execution::datapar, IteratorTag());
 
-    test_for_each_n_async(dataseq_execution(task), IteratorTag());
-    test_for_each_n_async(datapar_execution(task), IteratorTag());
+    test_for_each_n_async(execution::dataseq(execution::task), IteratorTag());
+    test_for_each_n_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void for_each_n_test()

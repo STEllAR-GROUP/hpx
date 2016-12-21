@@ -82,7 +82,7 @@ inline bool satisfies_criteria(int d)
 int hpx_main(int argc, char* argv[])
 {
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     // initialize data
     std::vector<int> data = random_fill(1000);

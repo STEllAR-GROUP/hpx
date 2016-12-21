@@ -266,25 +266,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param init         The initial value for the sum.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a inner_product algorithm returns a \a hpx::future<T> if
     ///           the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
@@ -298,7 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;
@@ -375,26 +375,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of \a T.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a inner_product algorithm returns a \a hpx::future<T> if
     ///           the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
         typename Op1, typename Op2>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
@@ -408,7 +408,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;

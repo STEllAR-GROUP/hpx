@@ -237,8 +237,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, policy);
@@ -268,8 +267,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_segmented_out_with_policy(std::size_t size,
     DistPolicy const& in_policy, DistPolicy const& out_policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, in_policy);
@@ -301,8 +299,7 @@ template <typename T, typename DistPolicy>
 void exclusive_scan_tests_inplace_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup verification vector
     std::vector<T> ver(size);
@@ -312,11 +309,13 @@ void exclusive_scan_tests_inplace_with_policy(std::size_t size,
     hpx::parallel::v1::detail::sequential_exclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
-    //sync
-    exclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, seq);
-    exclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, par);
+    // sync
+    exclusive_scan_algo_tests_inplace_with_policy<T>(
+        size, policy, ver, seq);
+    exclusive_scan_algo_tests_inplace_with_policy<T>(
+        size, policy, ver, par);
 
-    //async
+    // async
     exclusive_scan_algo_tests_inplace_with_policy_async<T>(
         size, policy, ver, seq(task));
     exclusive_scan_algo_tests_inplace_with_policy_async<T>(

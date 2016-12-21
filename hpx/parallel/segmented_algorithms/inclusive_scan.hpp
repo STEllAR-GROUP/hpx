@@ -101,7 +101,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return result::get(
                     dataflow([=](vector_type r) {
                         inclusive_scan<typename vector_type::iterator>().parallel(
-                            hpx::parallel::par, first+1, last, r.begin()+1,
+                            hpx::parallel::execution::par,
+                            first+1, last, r.begin()+1,
                             std::forward<value_type>(*first), op);
                         return r;
                     }, std::move(res)));
@@ -254,7 +255,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             T const& init, Op && op, std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             if (first == last)
                 return util::detail::algorithm_result<

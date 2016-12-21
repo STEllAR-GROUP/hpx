@@ -24,23 +24,23 @@ void test_zero()
     std::vector<int> b, c, d, e, f, g;
 
     Iter i_inc_add =
-        inclusive_scan(par, a.begin(), a.end(), b.begin(), 100,
+        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(), 100,
         [](int bar, int baz){ return bar+baz; });
     Iter i_inc_mult =
-        inclusive_scan(par, a.begin(), a.end(), c.begin(), 10,
+        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(), 10,
         [](int bar, int baz){ return bar*baz; });
     Iter i_exc_add =
-        exclusive_scan(par, a.begin(), a.end(), d.begin(), 100,
+        exclusive_scan(execution::par, a.begin(), a.end(), d.begin(), 100,
         [](int bar, int baz){ return bar+baz; });
     Iter i_exc_mult =
-        exclusive_scan(par, a.begin(), a.end(), e.begin(), 10,
+        exclusive_scan(execution::par, a.begin(), a.end(), e.begin(), 10,
         [](int bar, int baz){ return bar*baz; });
     Iter i_transform_inc =
-        transform_inclusive_scan(par, a.begin(), a.end(), f.begin(),
+        transform_inclusive_scan(execution::par, a.begin(), a.end(), f.begin(),
         [](int foo){ return foo - 3; }, 10,
         [](int bar, int baz){ return 2*bar+2*baz; });
     Iter i_transform_exc =
-        transform_exclusive_scan(par, a.begin(), a.end(), g.begin(),
+        transform_exclusive_scan(execution::par, a.begin(), a.end(), g.begin(),
         [](int foo){ return foo - 3; }, 10,
         [](int bar, int baz){ return 2*bar+2*baz; });
 
@@ -60,23 +60,23 @@ void test_async_zero()
     std::vector<int> b, c, d, e, f, g;
 
     Fut_Iter f_inc_add =
-        inclusive_scan(par(task), a.begin(), a.end(), b.begin(), 100,
+        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), b.begin(), 100,
         [](int bar, int baz){ return bar+baz; });
     Fut_Iter f_inc_mult =
-        inclusive_scan(par(task), a.begin(), a.end(), c.begin(), 10,
+        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), c.begin(), 10,
         [](int bar, int baz){ return bar*baz; });
     Fut_Iter f_exc_add =
-        exclusive_scan(par(task), a.begin(), a.end(), d.begin(), 100,
+        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), d.begin(), 100,
         [](int bar, int baz){ return bar+baz; });
     Fut_Iter f_exc_mult =
-        exclusive_scan(par(task), a.begin(), a.end(), e.begin(), 10,
+        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), e.begin(), 10,
         [](int bar, int baz){ return bar*baz; });
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(par(task), a.begin(), a.end(), f.begin(),
+        transform_inclusive_scan(execution::par(execution::task), a.begin(), a.end(), f.begin(),
         [](int foo){ return foo - 3; }, 10,
         [](int bar, int baz){ return 2*bar+2*baz; });
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(par(task), a.begin(), a.end(), g.begin(),
+        transform_exclusive_scan(execution::par(execution::task), a.begin(), a.end(), g.begin(),
         [](int foo){ return foo - 3; }, 10,
         [](int bar, int baz){ return 2*bar+2*baz; });
 
@@ -103,18 +103,18 @@ void test_one(std::vector<int> a)
     auto fun_conv = [](int foo){ return foo - 3; };
 
     Iter f_inc_add =
-        inclusive_scan(par, a.begin(), a.end(), b.begin(), 10, fun_add);
+        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(), 10, fun_add);
     Iter f_inc_mult =
-        inclusive_scan(par, a.begin(), a.end(), c.begin(), 10, fun_mult);
+        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(), 10, fun_mult);
     Iter f_exc_add =
-        exclusive_scan(par, a.begin(), a.end(), d.begin(), 10, fun_add);
+        exclusive_scan(execution::par, a.begin(), a.end(), d.begin(), 10, fun_add);
     Iter f_exc_mult =
-        exclusive_scan(par, a.begin(), a.end(), e.begin(), 10, fun_mult);
+        exclusive_scan(execution::par, a.begin(), a.end(), e.begin(), 10, fun_mult);
     Iter f_transform_inc =
-        transform_inclusive_scan(par, a.begin(), a.end(), f.begin(),
+        transform_inclusive_scan(execution::par, a.begin(), a.end(), f.begin(),
         fun_conv, 10, fun_add);
     Iter f_transform_exc =
-        transform_exclusive_scan(par, a.begin(), a.end(), g.begin(),
+        transform_exclusive_scan(execution::par, a.begin(), a.end(), g.begin(),
         fun_conv, 10, fun_add);
 
     HPX_UNUSED(f_inc_add);
@@ -161,18 +161,18 @@ void test_async_one(std::vector<int> a)
     auto fun_conv = [](int foo){ return foo - 3; };
 
     Fut_Iter f_inc_add =
-        inclusive_scan(par(task), a.begin(), a.end(), b.begin(), 10, fun_add);
+        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), b.begin(), 10, fun_add);
     Fut_Iter f_inc_mult =
-        inclusive_scan(par(task), a.begin(), a.end(), c.begin(), 10, fun_mult);
+        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), c.begin(), 10, fun_mult);
     Fut_Iter f_exc_add =
-        exclusive_scan(par(task), a.begin(), a.end(), d.begin(), 10, fun_add);
+        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), d.begin(), 10, fun_add);
     Fut_Iter f_exc_mult =
-        exclusive_scan(par(task), a.begin(), a.end(), e.begin(), 10, fun_mult);
+        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), e.begin(), 10, fun_mult);
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(par(task), a.begin(), a.end(), f.begin(),
+        transform_inclusive_scan(execution::par(execution::task), a.begin(), a.end(), f.begin(),
         fun_conv, 10, fun_add);
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(par(task), a.begin(), a.end(), g.begin(),
+        transform_exclusive_scan(execution::par(execution::task), a.begin(), a.end(), g.begin(),
         fun_conv, 10, fun_add);
 
     hpx::parallel::v1::detail::sequential_inclusive_scan(

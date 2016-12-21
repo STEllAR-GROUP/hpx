@@ -26,7 +26,7 @@ int hpx_main()
 
     double result =
         hpx::parallel::transform_reduce(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             boost::counting_iterator<size_t>(0),
             boost::counting_iterator<size_t>(10007),
             [&xvalues, &yvalues](size_t i)

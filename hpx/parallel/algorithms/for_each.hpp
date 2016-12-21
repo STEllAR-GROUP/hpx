@@ -198,20 +198,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
+    /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each_n algorithm returns a
     ///           \a hpx::future<InIter> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a InIter
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a InIter
     ///           otherwise.
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Size, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         parallel::traits::is_projected<Proj, InIter>::value &&
         parallel::traits::is_indirect_callable<
@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -306,7 +306,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             Proj && proj, std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -386,27 +388,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
+    /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a
     ///           \a hpx::future<InIter> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a InIter
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a InIter
     ///           otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename InIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         parallel::traits::is_projected<Proj, InIter>::value &&
         parallel::traits::is_indirect_callable<

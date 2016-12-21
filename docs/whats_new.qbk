@@ -39,7 +39,11 @@ particular order):
   implementation and/or API might change in the future. Please see this
   [@http://stellar-group.org/2016/09/vectorized-cpp-parallel-algorithms-with-hpx/ blog-post]
   for more information.
-
+* All execution policies and related classes have been renamed to be consistent
+  with the naming changes applied for C++17. All policies now live in the
+  namespace `hpx::parallel::execution`. The ols names can be still enabled
+  at configure time by specifying `-DHPX_WITH_EXECUTION_POLICY_COMPATIBILITY=On`
+  to __cmake__.
 
 [heading Breaking Changes]
 
@@ -122,7 +126,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2299] - Replace boost::[c]ref with std::[c]ref, add inspect checks
 * [pr    2297] - Fixing compilation with no hw_loc
 * [pr    2296] - Hpx compute
-* [pr    2295] - Making sure for_loop(par, 0, N, ...) is actually executed in
+* [pr    2295] - Making sure for_loop(execution::par, 0, N, ...) is actually executed in
                  parallel
 * [pr    2294] - Throwing exceptions if the runtime is not up and running
 * [pr    2293] - Removing unused parcel port code

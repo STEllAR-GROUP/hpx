@@ -280,7 +280,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << "Number of iterations  = " << iterations << "\n";
         }
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
@@ -316,7 +316,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             auto range = boost::irange(blocks_start, blocks_end);
 
             const std::uint64_t block_size = block_order * block_order;
-            for_each(par, boost::begin(range), boost::end(range),
+            for_each(execution::par, boost::begin(range), boost::end(range),
                 [&](std::uint64_t b)
                 {
                     transpose_phase(A, B, block_order, b,
@@ -436,7 +436,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     std::uint64_t blocks_end)
 {
     using hpx::parallel::transform_reduce;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);

@@ -114,7 +114,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 "Requires at least input iterator.");
 
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -202,17 +204,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of those types.
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a transform_reduce algorithm returns a \a hpx::future<T> if the
-    ///           execution policy is of type \a parallel_task_execution_policy and
+    ///           execution policy is of type \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///           The \a transform_reduce algorithm returns the result of the
     ///           generalized sum over the values returned from \a conv_op when
@@ -233,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T, typename Reduce,
         typename Convert>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,

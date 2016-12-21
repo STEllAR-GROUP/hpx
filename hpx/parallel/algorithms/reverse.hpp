@@ -104,25 +104,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     algorithm will be applied to.
     ///
     /// The assignments in the parallel \a reverse algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a reverse algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reverse algorithm returns a \a hpx::future<BidirIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a BidirIter otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename BidirIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<BidirIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::reverse<BidirIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last);
@@ -229,20 +229,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param dest_first   Refers to the begin of the destination range.
     ///
     /// The assignments in the parallel \a reverse_copy algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a reverse_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(BidirIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_iterator<BidirIter>::value &&
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 

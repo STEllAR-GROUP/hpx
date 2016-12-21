@@ -23,8 +23,8 @@ template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_n(ExPolicy policy, IteratorTag, Proj && proj)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -76,20 +76,20 @@ void test_for_each_n()
 {
     using namespace hpx::parallel;
 
-    test_for_each_n(seq, IteratorTag(), Proj());
-    test_for_each_n(par, IteratorTag(), Proj());
-    test_for_each_n(par_vec, IteratorTag(), Proj());
+    test_for_each_n(execution::seq, IteratorTag(), Proj());
+    test_for_each_n(execution::par, IteratorTag(), Proj());
+    test_for_each_n(execution::par_unseq, IteratorTag(), Proj());
 
-    test_for_each_n_async(seq(task), IteratorTag(), Proj());
-    test_for_each_n_async(par(task), IteratorTag(), Proj());
+    test_for_each_n_async(execution::seq(execution::task), IteratorTag(), Proj());
+    test_for_each_n_async(execution::par(execution::task), IteratorTag(), Proj());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_n(execution_policy(seq), IteratorTag(), Proj());
-    test_for_each_n(execution_policy(par), IteratorTag(), Proj());
-    test_for_each_n(execution_policy(par_vec), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::seq), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::par), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::par_unseq), IteratorTag(), Proj());
 
-    test_for_each_n(execution_policy(seq(task)), IteratorTag(), Proj());
-    test_for_each_n(execution_policy(par(task)), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::seq(execution::task)), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::par(execution::task)), IteratorTag(), Proj());
 #endif
 }
 

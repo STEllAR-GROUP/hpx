@@ -17,20 +17,20 @@ template <typename IteratorTag>
 void test_count_if()
 {
     using namespace hpx::parallel;
-    test_count_if(seq, IteratorTag());
-    test_count_if(par, IteratorTag());
-    test_count_if(par_vec, IteratorTag());
+    test_count_if(execution::seq, IteratorTag());
+    test_count_if(execution::par, IteratorTag());
+    test_count_if(execution::par_unseq, IteratorTag());
 
-    test_count_if_async(seq(task), IteratorTag());
-    test_count_if_async(par(task), IteratorTag());
+    test_count_if_async(execution::seq(execution::task), IteratorTag());
+    test_count_if_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if(execution_policy(seq), IteratorTag());
-    test_count_if(execution_policy(par), IteratorTag());
-    test_count_if(execution_policy(par_vec), IteratorTag());
+    test_count_if(execution_policy(execution::seq), IteratorTag());
+    test_count_if(execution_policy(execution::par), IteratorTag());
+    test_count_if(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_count_if(execution_policy(seq(task)), IteratorTag());
-    test_count_if(execution_policy(par(task)), IteratorTag());
+    test_count_if(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_count_if(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -50,18 +50,18 @@ void test_count_if_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_count_if_exception(seq, IteratorTag());
-    test_count_if_exception(par, IteratorTag());
+    test_count_if_exception(execution::seq, IteratorTag());
+    test_count_if_exception(execution::par, IteratorTag());
 
-    test_count_if_exception_async(seq(task), IteratorTag());
-    test_count_if_exception_async(par(task), IteratorTag());
+    test_count_if_exception_async(execution::seq(execution::task), IteratorTag());
+    test_count_if_exception_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if_exception(execution_policy(seq), IteratorTag());
-    test_count_if_exception(execution_policy(par), IteratorTag());
+    test_count_if_exception(execution_policy(execution::seq), IteratorTag());
+    test_count_if_exception(execution_policy(execution::par), IteratorTag());
 
-    test_count_if_exception(execution_policy(seq(task)), IteratorTag());
-    test_count_if_exception(execution_policy(par(task)), IteratorTag());
+    test_count_if_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_count_if_exception(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -80,18 +80,18 @@ void test_count_if_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_count_if_bad_alloc(seq, IteratorTag());
-    test_count_if_bad_alloc(par, IteratorTag());
+    test_count_if_bad_alloc(execution::seq, IteratorTag());
+    test_count_if_bad_alloc(execution::par, IteratorTag());
 
-    test_count_if_bad_alloc_async(seq(task), IteratorTag());
-    test_count_if_bad_alloc_async(par(task), IteratorTag());
+    test_count_if_bad_alloc_async(execution::seq(execution::task), IteratorTag());
+    test_count_if_bad_alloc_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count_if_bad_alloc(execution_policy(seq), IteratorTag());
-    test_count_if_bad_alloc(execution_policy(par), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(execution::seq), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_count_if_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_count_if_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_count_if_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

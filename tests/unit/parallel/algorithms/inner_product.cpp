@@ -18,20 +18,20 @@ void test_inner_product()
 {
     using namespace hpx::parallel;
 
-    test_inner_product(seq, IteratorTag());
-    test_inner_product(par, IteratorTag());
-    test_inner_product(par_vec, IteratorTag());
+    test_inner_product(execution::seq, IteratorTag());
+    test_inner_product(execution::par, IteratorTag());
+    test_inner_product(execution::par_unseq, IteratorTag());
 
-    test_inner_product_async(seq(task), IteratorTag());
-    test_inner_product_async(par(task), IteratorTag());
+    test_inner_product_async(execution::seq(execution::task), IteratorTag());
+    test_inner_product_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inner_product(execution_policy(seq), IteratorTag());
-    test_inner_product(execution_policy(par), IteratorTag());
-    test_inner_product(execution_policy(par_vec), IteratorTag());
+    test_inner_product(execution_policy(execution::seq), IteratorTag());
+    test_inner_product(execution_policy(execution::par), IteratorTag());
+    test_inner_product(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_inner_product(execution_policy(seq(task)), IteratorTag());
-    test_inner_product(execution_policy(par(task)), IteratorTag());
+    test_inner_product(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_inner_product(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

@@ -21,11 +21,11 @@ Extensions for Parallelism), __cpp11_n4088__ (Task Blocks), and __cpp11_n4406__
 
 [section:parallel_algorithms Using Parallel Algorithms]
 
-[def __sequential_execution_policy__ [classref hpx::parallel::v1::sequential_execution_policy `sequential_execution_policy`]]
-[def __sequential_task_execution_policy__ [classref hpx::parallel::v1::sequential_task_execution_policy `sequential_task_execution_policy`]]
-[def __parallel_execution_policy__ [classref hpx::parallel::v1::parallel_execution_policy `parallel_execution_policy`]]
-[def __parallel_vector_execution_policy__ [classref hpx::parallel::v1::parallel_vector_execution_policy `parallel_vector_execution_policy`]]
-[def __parallel_task_execution_policy__ [classref hpx::parallel::v1::parallel_task_execution_policy `parallel_task_execution_policy`]]
+[def __sequential_execution_policy__ [classref hpx::parallel::execution::sequenced_policy `sequenced_policy`]]
+[def __sequential_task_execution_policy__ [classref hpx::parallel::execution::sequenced_task_policy `sequenced_task_policy`]]
+[def __parallel_execution_policy__ [classref hpx::parallel::execution::parallel_policy `parallel_policy`]]
+[def __parallel_vector_execution_policy__ [classref hpx::parallel::execution::parallel_unsequenced_policy `parallel_unsequenced_policy`]]
+[def __parallel_task_execution_policy__ [classref hpx::parallel::execution::parallel_task_policy `parallel_task_policy`]]
 [def __execution_policy__ [classref hpx::parallel::v1::execution_policy `execution_policy`]]
 
 [def __exception_list__ [classref hpx::exception_list `exception_list`]]
@@ -648,7 +648,7 @@ created `task_block`. In the following example the use of an explicit
         int left = 0, right = 0;
 
         define_task_block(
-            par,                // parallel_execution_policy
+            execution::par,                // execution::parallel_policy
             [&](task_block<>& tb) {
                 if (n->left)
                     tb.run([&] { left = traverse(n->left, compute); });
@@ -663,12 +663,12 @@ This also causes the [classref hpx::parallel::v2::task_block `hpx::parallel::tas
 object to be a template in our implementation.
 The template argument is the type of the execution policy used to create the
 task block. The template argument defaults to
-[classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+[classref hpx::parallel::execution::parallel_policy `hpx::parallel::execution::parallel_policy`].
 
 __hpx__ still supports calling
 [funcref hpx::parallel::v2::define_task_block `hpx::parallel::define_task_block`]
 without an explicit execution policy. In this case the task block will run using
-the [classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+the [classref hpx::parallel::execution::parallel_policy `hpx::parallel::execution::parallel_policy`].
 
 __hpx__ also adds the ability to access the execution policy which was used to
 create a given `task_block`.
@@ -687,7 +687,7 @@ function enables this use case:
         int left = 0, right = 0;
 
         define_task_block(
-            par,                // parallel_execution_policy
+            execution::par,                // execution::parallel_policy
             [&](auto& tb) {
                 if (n->left)
                 {

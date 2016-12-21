@@ -23,8 +23,8 @@ template <typename ExPolicy>
 void test_copy_if(ExPolicy policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
@@ -101,8 +101,8 @@ template <typename ExPolicy>
 void test_copy_if_outiter(ExPolicy policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
@@ -160,36 +160,36 @@ void test_copy_if()
 {
     using namespace hpx::parallel;
 
-    test_copy_if(seq);
-    test_copy_if(par);
-    test_copy_if(par_vec);
+    test_copy_if(execution::seq);
+    test_copy_if(execution::par);
+    test_copy_if(execution::par_unseq);
 
-    test_copy_if_async(seq(task));
-    test_copy_if_async(par(task));
+    test_copy_if_async(execution::seq(execution::task));
+    test_copy_if_async(execution::par(execution::task));
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if(execution_policy(seq));
-    test_copy_if(execution_policy(par));
-    test_copy_if(execution_policy(par_vec));
+    test_copy_if(execution_policy(execution::seq));
+    test_copy_if(execution_policy(execution::par));
+    test_copy_if(execution_policy(execution::par_unseq));
 
-    test_copy_if(execution_policy(seq(task)));
-    test_copy_if(execution_policy(par(task)));
+    test_copy_if(execution_policy(execution::seq(execution::task)));
+    test_copy_if(execution_policy(execution::par(execution::task)));
 #endif
 
-    test_copy_if_outiter(seq);
-    test_copy_if_outiter(par);
-    test_copy_if_outiter(par_vec);
+    test_copy_if_outiter(execution::seq);
+    test_copy_if_outiter(execution::par);
+    test_copy_if_outiter(execution::par_unseq);
 
-    test_copy_if_outiter_async(seq(task));
-    test_copy_if_outiter_async(par(task));
+    test_copy_if_outiter_async(execution::seq(execution::task));
+    test_copy_if_outiter_async(execution::par(execution::task));
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if_outiter(execution_policy(seq));
-    test_copy_if_outiter(execution_policy(par));
-    test_copy_if_outiter(execution_policy(par_vec));
+    test_copy_if_outiter(execution_policy(execution::seq));
+    test_copy_if_outiter(execution_policy(execution::par));
+    test_copy_if_outiter(execution_policy(execution::par_unseq));
 
-    test_copy_if_outiter(execution_policy(seq(task)));
-    test_copy_if_outiter(execution_policy(par(task)));
+    test_copy_if_outiter(execution_policy(execution::seq(execution::task)));
+    test_copy_if_outiter(execution_policy(execution::par(execution::task)));
 #endif
 }
 

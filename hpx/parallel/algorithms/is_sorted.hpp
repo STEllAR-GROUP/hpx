@@ -150,12 +150,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     implicitly converted to Type.
     ///
     /// The comparison operations in the parallel \a is_sorted algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// executes in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a is_sorted algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -169,7 +169,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_sorted(ExPolicy && policy, FwdIter first, FwdIter last,
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -311,12 +311,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The comparison operations in the parallel \a is_sorted_until algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy executes in sequential order in the
+    /// \a sequenced_policy executes in sequential order in the
     /// calling thread.
     ///
     /// The comparison operations in the parallel \a is_sorted_until algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified threads,
     /// and indeterminately sequenced within each thread.
     ///
@@ -329,7 +329,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last,
@@ -339,7 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted_until<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

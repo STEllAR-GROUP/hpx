@@ -202,6 +202,27 @@ namespace hpx
         using apply_policy = detail::apply_policy;
 
         ///////////////////////////////////////////////////////////////////////
+/*
+#if defined(HPX_HAVE_CXX11_CONSTEXPR)
+        HPX_EXPORT constexpr static detail::async_policy async =
+            detail::async_policy{};
+        HPX_EXPORT constexpr static detail::fork_policy fork =
+            detail::fork_policy{};
+        HPX_EXPORT constexpr static detail::sync_policy sync =
+            detail::sync_policy{};
+        HPX_EXPORT constexpr static detail::deferred_policy deferred =
+            detail::deferred_policy{};
+        HPX_EXPORT constexpr static detail::apply_policy apply =
+            detail::apply_policy{};
+
+        HPX_EXPORT constexpr static detail::policy_holder all =
+            detail::policy_holder{detail::launch_policy::all};
+        HPX_EXPORT constexpr static detail::policy_holder sync_policies =
+            detail::policy_holder{detail::launch_policy::sync_policies};
+        HPX_EXPORT constexpr static detail::policy_holder async_policies =
+            detail::policy_holder{detail::launch_policy::async_policies};
+#else
+*/
         HPX_EXPORT static const detail::async_policy async;
         HPX_EXPORT static const detail::fork_policy fork;
         HPX_EXPORT static const detail::sync_policy sync;
@@ -211,15 +232,19 @@ namespace hpx
         HPX_EXPORT static const detail::policy_holder all;
         HPX_EXPORT static const detail::policy_holder sync_policies;
         HPX_EXPORT static const detail::policy_holder async_policies;
+//#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     namespace detail
     {
-        HPX_FORCEINLINE bool has_async_policy(launch p) HPX_NOEXCEPT
+        HPX_FORCEINLINE HPX_CONSTEXPR
+        bool has_async_policy(launch p) HPX_NOEXCEPT
         {
-            return bool(p & launch::async_policies);
+            return bool(
+                p & detail::policy_holder{detail::launch_policy::async_policies}
+            );
         }
     }
     /// \endcond

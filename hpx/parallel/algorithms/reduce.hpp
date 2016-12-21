@@ -125,19 +125,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a reduce algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum over the elements given by the input range
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T, typename F>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init, F && f)
@@ -166,7 +166,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -199,19 +199,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a reduce algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///           The \a reduce algorithm returns the result of the
     ///           generalized sum (applying operator+()) over the elements given
@@ -230,7 +230,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init)
@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -270,19 +270,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     algorithm will be applied to.
     ///
     /// The reduce operations in the parallel \a reduce algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The reduce operations in the parallel \a copy_if algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a reduce algorithm returns a \a hpx::future<T> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns T otherwise (where T is the value_type of
     ///           \a InIter).
     ///           The \a reduce algorithm returns the result of the
@@ -305,7 +305,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::value_type
         >::type
@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 

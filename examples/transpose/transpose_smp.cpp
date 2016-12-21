@@ -52,7 +52,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "Number of iterations  = " << iterations << "\n";
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     const std::uint64_t start = 0;
 
@@ -179,7 +179,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
 {
 
     using hpx::parallel::transform_reduce;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     const std::uint64_t start = 0;
 

@@ -237,7 +237,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             // execution policy enforces sequential execution of if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequential_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
@@ -272,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             }
 
             typedef std::integral_constant<bool,
-                    is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequential_execution_policy<ExPolicy>::value ||
                    !hpx::traits::is_forward_iterator<B>::value
                 > is_seq;
 
@@ -367,13 +367,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \returns  The \a for_loop algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     typename util::detail::algorithm_result<ExPolicy>::type
     for_loop(ExPolicy && policy,
@@ -395,7 +395,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::seq as the execution policy.
+    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
     ///                     an (input) iterator type or an integral type.
@@ -474,7 +475,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         static_assert(sizeof...(Args) >= 1,
             "for_loop must be called with at least a function object");
 
-        return for_loop(parallel::seq, first, last, std::forward<Args>(args)...);
+        return for_loop(parallel::execution::seq, first, last, 
+            std::forward<Args>(args)...);
     }
 
     /// The for_loop_strided implements loop functionality over a range
@@ -565,13 +567,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \returns  The \a for_loop_strided algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
         std::is_integral<S>::value)>
     typename util::detail::algorithm_result<ExPolicy>::type
@@ -594,7 +596,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::seq as the execution policy.
+    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
     ///                     an (input) iterator type or an integral type.
@@ -680,7 +683,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         static_assert(sizeof...(Args) >= 1,
             "for_loop_strided must be called with at least a function object");
 
-        return for_loop_strided(parallel::seq, first, last, stride,
+        return for_loop_strided(parallel::execution::seq, first, last, stride,
             std::forward<Args>(args)...);
     }
 
@@ -768,13 +771,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \returns  The \a for_loop_n algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
         std::is_integral<Size>::value)>
     typename util::detail::algorithm_result<ExPolicy>::type
@@ -796,7 +799,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::seq as the execution policy.
+    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
     ///                     an (input) iterator type or an integral type.
@@ -877,7 +881,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n must be called with at least a function object");
 
-        return for_loop_n(parallel::seq, first, size, std::forward<Args>(args)...);
+        return for_loop_n(parallel::execution::seq, first, size, 
+            std::forward<Args>(args)...);
     }
 
     /// The for_loop_n_strided implements loop functionality over a range
@@ -970,14 +975,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \returns  The \a for_loop_n_strided algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a void
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a void
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value) &&
         std::is_integral<Size>::value &&
         std::is_integral<S>::value)>
@@ -1001,7 +1006,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::seq as the execution policy.
+    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
     ///                     an (input) iterator type or an integral type.
@@ -1088,8 +1094,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n_strided must be called with at least a function object");
-
-        return for_loop_strided_n(parallel::seq, first, size, stride,
+        return for_loop_strided_n(parallel::execution::seq, first, size, stride,
             std::forward<Args>(args)...);
     }
 }}}

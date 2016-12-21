@@ -20,16 +20,16 @@ void test_for_each_prefetching()
 {
     using namespace hpx::parallel;
 
-    test_for_each_prefetching(par, IteratorTag());
-    test_for_each_prefetching(par_vec, IteratorTag());
-    test_for_each_prefetching_async(par(task), IteratorTag());
+    test_for_each_prefetching(execution::par, IteratorTag());
+    test_for_each_prefetching(execution::par_unseq, IteratorTag());
+    test_for_each_prefetching_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching(execution_policy(par),
+    test_for_each_prefetching(execution_policy(execution::par),
         IteratorTag());
-    test_for_each_prefetching(execution_policy(par_vec),
+    test_for_each_prefetching(execution_policy(execution::par_unseq),
         IteratorTag());
-    test_for_each_prefetching(execution_policy(par(task)),
+    test_for_each_prefetching(execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
@@ -48,14 +48,14 @@ void test_for_each_prefetching_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_prefetching_exception(par, IteratorTag());
-    test_for_each_prefetching_exception_async(par(task),
+    test_for_each_prefetching_exception(execution::par, IteratorTag());
+    test_for_each_prefetching_exception_async(execution::par(execution::task),
         IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching_exception(execution_policy(par),
+    test_for_each_prefetching_exception(execution_policy(execution::par),
         IteratorTag());
-    test_for_each_prefetching_exception(execution_policy(par(task)),
+    test_for_each_prefetching_exception(execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
@@ -74,13 +74,13 @@ void test_for_each_prefetching_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_prefetching_bad_alloc(par, IteratorTag());
-    test_for_each_prefetching_bad_alloc_async(par(task), IteratorTag());
+    test_for_each_prefetching_bad_alloc(execution::par, IteratorTag());
+    test_for_each_prefetching_bad_alloc_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching_bad_alloc(execution_policy(par),
+    test_for_each_prefetching_bad_alloc(execution_policy(execution::par),
         IteratorTag());
-    test_for_each_prefetching_bad_alloc(execution_policy(par(task)),
+    test_for_each_prefetching_bad_alloc(execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }

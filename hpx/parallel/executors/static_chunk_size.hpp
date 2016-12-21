@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       the number of available cores and the overall number of loop
         ///       iterations to schedule.
         ///
-        static_chunk_size()
+        HPX_CONSTEXPR static_chunk_size()
           : chunk_size_(0)
         {}
 
@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     number of loop iterations to run on a single
         ///                     thread.
         ///
-        explicit static_chunk_size(std::size_t chunk_size)
+        HPX_CONSTEXPR explicit static_chunk_size(std::size_t chunk_size)
           : chunk_size_(chunk_size)
         {}
 
