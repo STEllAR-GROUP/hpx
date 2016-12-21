@@ -119,6 +119,10 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.init(data, topology);
         }
 
+        virtual void setup_stealing()
+        {
+        }
+
         void idle_callback(std::size_t /*num_thread*/)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
