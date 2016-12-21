@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -157,15 +158,82 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                         F, Shape, Ts...
                     >::type
                 > > results;
+// Before Boost V1.56 boost::size() does not respect the iterator category of
+// its argument.
+#if BOOST_VERSION < 105600
+            std::size_t size = std::distance(boost::begin(shape),
+                boost::end(shape));
+#else
+            std::size_t size = boost::size(shape);
+#endif
+            results.resize(size);
 
-            for (auto const& elem: shape)
-            {
-                results.push_back(hpx::async(sched, std::forward<F>(f),
-                    elem, ts...));
-            }
+
+            static std::size_t num_tasks =
+                (std::min)(std::size_t(128), hpx::get_os_thread_count());
+            spawn(sched, results, 0, size, num_tasks, f, boost::begin(shape), ts...).get();
+
+//             for (auto const& elem: shape)
+//             {
+//                 results.push_back(hpx::async(sched, std::forward<F>(f),
+//                     elem, ts...));
+//             }
 
             return results;
         }
+
+        /// \cond NOINTERNAL
+        template <typename Executor, typename Result, typename F, typename Iter, typename ... Ts>
+        static hpx::future<void> spawn(Executor & sched, std::vector<hpx::future<Result> >& results,
+            std::size_t base, std::size_t size, std::size_t num_tasks, F const& func, Iter it,
+            Ts const&... ts)
+        {
+            const std::size_t num_spread = 4;
+
+            if (size > num_tasks)
+            {
+                // spawn hierarchical tasks
+                std::size_t chunk_size = (size + num_spread) / num_spread - 1;
+                chunk_size = (std::max)(chunk_size, num_tasks);
+
+                std::vector<hpx::future<void> > tasks;
+                tasks.reserve(num_spread);
+
+                hpx::future<void> (*spawn_func)(
+                        Executor&, std::vector<hpx::future<Result> >&,
+                        std::size_t, std::size_t, std::size_t, F const&, Iter, Ts const&...
+                    ) = &executor_traits::spawn;
+
+                while (size != 0)
+                {
+                    std::size_t curr_chunk_size = (std::min)(chunk_size, size);
+
+                    hpx::future<void> f = hpx::async(
+                        spawn_func, std::ref(sched), std::ref(results), base,
+                        curr_chunk_size, num_tasks, std::ref(func), it, std::ref(ts)...);
+                    tasks.push_back(std::move(f));
+
+                    base += curr_chunk_size;
+                    it = hpx::parallel::v1::detail::next(it, curr_chunk_size);
+                    size -= curr_chunk_size;
+                }
+
+                HPX_ASSERT(size == 0);
+
+                return hpx::when_all(tasks);
+            }
+
+            // spawn all tasks sequentially
+            HPX_ASSERT(base + size <= results.size());
+
+            for (std::size_t i = 0; i != size; ++i, ++it)
+            {
+                results[base + i] = hpx::async(sched, func, *it, ts...);
+            }
+
+            return hpx::make_ready_future();
+        }
+        /// \endcond
 
         /// \brief Bulk form of synchronous execution agent creation
         ///
