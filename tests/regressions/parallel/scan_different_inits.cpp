@@ -14,7 +14,8 @@
 #include <string>
 #include <vector>
 
-// FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
+// FIXME: Intel 15 currently can not compile this code. This needs to be fixed.
+// See #1408
 #if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 void test_zero()
 {
@@ -60,25 +61,31 @@ void test_async_zero()
     std::vector<int> b, c, d, e, f, g;
 
     Fut_Iter f_inc_add =
-        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), b.begin(), 100,
-        [](int bar, int baz){ return bar+baz; });
+        inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), b.begin(), 100,
+            [](int bar, int baz){ return bar+baz; });
     Fut_Iter f_inc_mult =
-        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), c.begin(), 10,
-        [](int bar, int baz){ return bar*baz; });
+        inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), c.begin(), 10,
+            [](int bar, int baz){ return bar*baz; });
     Fut_Iter f_exc_add =
-        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), d.begin(), 100,
-        [](int bar, int baz){ return bar+baz; });
+        exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), d.begin(), 100,
+            [](int bar, int baz){ return bar+baz; });
     Fut_Iter f_exc_mult =
-        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), e.begin(), 10,
-        [](int bar, int baz){ return bar*baz; });
+        exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), e.begin(), 10,
+            [](int bar, int baz){ return bar*baz; });
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(execution::par(execution::task), a.begin(), a.end(), f.begin(),
-        [](int foo){ return foo - 3; }, 10,
-        [](int bar, int baz){ return 2*bar+2*baz; });
+        transform_inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), f.begin(),
+            [](int foo){ return foo - 3; }, 10,
+            [](int bar, int baz){ return 2*bar+2*baz; });
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(execution::par(execution::task), a.begin(), a.end(), g.begin(),
-        [](int foo){ return foo - 3; }, 10,
-        [](int bar, int baz){ return 2*bar+2*baz; });
+        transform_exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), g.begin(),
+            [](int foo){ return foo - 3; }, 10,
+            [](int bar, int baz){ return 2*bar+2*baz; });
 
 
     HPX_TEST(f_inc_add.get() == b.begin());
@@ -161,19 +168,25 @@ void test_async_one(std::vector<int> a)
     auto fun_conv = [](int foo){ return foo - 3; };
 
     Fut_Iter f_inc_add =
-        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), b.begin(), 10, fun_add);
+        inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), b.begin(), 10, fun_add);
     Fut_Iter f_inc_mult =
-        inclusive_scan(execution::par(execution::task), a.begin(), a.end(), c.begin(), 10, fun_mult);
+        inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), c.begin(), 10, fun_mult);
     Fut_Iter f_exc_add =
-        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), d.begin(), 10, fun_add);
+        exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), d.begin(), 10, fun_add);
     Fut_Iter f_exc_mult =
-        exclusive_scan(execution::par(execution::task), a.begin(), a.end(), e.begin(), 10, fun_mult);
+        exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), e.begin(), 10, fun_mult);
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(execution::par(execution::task), a.begin(), a.end(), f.begin(),
-        fun_conv, 10, fun_add);
+        transform_inclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), f.begin(),
+            fun_conv, 10, fun_add);
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(execution::par(execution::task), a.begin(), a.end(), g.begin(),
-        fun_conv, 10, fun_add);
+        transform_exclusive_scan(execution::par(execution::task),
+            a.begin(), a.end(), g.begin(),
+            fun_conv, 10, fun_add);
 
     hpx::parallel::v1::detail::sequential_inclusive_scan(
         a.begin(), a.end(), b_ans.begin(), 10, fun_add);

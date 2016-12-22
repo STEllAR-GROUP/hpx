@@ -70,7 +70,8 @@ void test_replace_copy_async(ExPolicy p, IteratorTag)
 
     std::size_t idx = std::rand() % c.size(); //-V104
 
-    auto f = hpx::parallel::replace_copy(p, c, boost::begin(d1), c[idx], c[idx]+1);
+    auto f = hpx::parallel::replace_copy(p, c,
+        boost::begin(d1), c[idx], c[idx]+1);
     f.wait();
 
     std::replace_copy(boost::begin(c.base()), boost::end(c.base()),
@@ -102,8 +103,10 @@ void test_replace_copy()
     test_replace_copy(execution_policy(execution::par), IteratorTag());
     test_replace_copy(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_replace_copy(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace_copy(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace_copy(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_replace_copy(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -202,15 +205,21 @@ void test_replace_copy_exception()
     test_replace_copy_exception(execution::seq, IteratorTag());
     test_replace_copy_exception(execution::par, IteratorTag());
 
-    test_replace_copy_exception_async(execution::seq(execution::task), IteratorTag());
-    test_replace_copy_exception_async(execution::par(execution::task), IteratorTag());
+    test_replace_copy_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_replace_copy_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_copy_exception(execution_policy(execution::seq), IteratorTag());
-    test_replace_copy_exception(execution_policy(execution::par), IteratorTag());
+    test_replace_copy_exception(execution_policy(execution::seq),
+        IteratorTag());
+    test_replace_copy_exception(execution_policy(execution::par),
+        IteratorTag());
 
-    test_replace_copy_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace_copy_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace_copy_exception(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_replace_copy_exception(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -307,15 +316,21 @@ void test_replace_copy_bad_alloc()
     test_replace_copy_bad_alloc(execution::seq, IteratorTag());
     test_replace_copy_bad_alloc(execution::par, IteratorTag());
 
-    test_replace_copy_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_replace_copy_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_replace_copy_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_replace_copy_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_copy_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_replace_copy_bad_alloc(execution_policy(execution::par), IteratorTag());
+    test_replace_copy_bad_alloc(execution_policy(execution::seq),
+        IteratorTag());
+    test_replace_copy_bad_alloc(execution_policy(execution::par),
+        IteratorTag());
 
-    test_replace_copy_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace_copy_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace_copy_bad_alloc(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_replace_copy_bad_alloc(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

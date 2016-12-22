@@ -78,9 +78,12 @@ void test_sort1()
     test_sort1_comp(execution::par_unseq, double(), std::greater<double>());
 
     // default comparison operator (std::less)
-    test_sort1_comp(execution::seq,     std::string(), std::greater<std::string>());
-    test_sort1_comp(execution::par,     std::string(), std::greater<std::string>());
-    test_sort1_comp(execution::par_unseq, std::string(), std::greater<std::string>());
+    test_sort1_comp(execution::seq,     std::string(),
+        std::greater<std::string>());
+    test_sort1_comp(execution::par,     std::string(),
+        std::greater<std::string>());
+    test_sort1_comp(execution::par_unseq, std::string(),
+        std::greater<std::string>());
 
     // Async execution, default comparison operator
     test_sort1_async(execution::seq(execution::task), int());
@@ -91,14 +94,20 @@ void test_sort1()
     test_sort1_async_str(execution::par(execution::task));
 
     // Async execution, user comparison operator
-    test_sort1_async(execution::seq(execution::task), int(),    std::less<unsigned int>());
-    test_sort1_async(execution::par(execution::task), char(),   std::less<char>());
+    test_sort1_async(execution::seq(execution::task), int(),
+        std::less<unsigned int>());
+    test_sort1_async(execution::par(execution::task), char(),
+        std::less<char>());
     //
-    test_sort1_async(execution::seq(execution::task), double(), std::greater<double>());
-    test_sort1_async(execution::par(execution::task), float(),  std::greater<float>());
+    test_sort1_async(execution::seq(execution::task), double(),
+        std::greater<double>());
+    test_sort1_async(execution::par(execution::task), float(),
+        std::greater<float>());
     //
-    test_sort1_async_str(execution::seq(execution::task), std::greater<std::string>());
-    test_sort1_async_str(execution::par(execution::task), std::greater<std::string>());
+    test_sort1_async_str(execution::seq(execution::task),
+        std::greater<std::string>());
+    test_sort1_async_str(execution::par(execution::task),
+        std::greater<std::string>());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort1(execution_policy(execution::seq),       int());
@@ -141,11 +150,15 @@ void test_sort2()
     test_sort2_async(execution::par(execution::task), float());
 
     // Async execution, user comparison operator
-    test_sort2_async(execution::seq(execution::task), int(),    std::less<unsigned int>());
-    test_sort2_async(execution::par(execution::task), char(),   std::less<char>());
+    test_sort2_async(execution::seq(execution::task), int(),
+        std::less<unsigned int>());
+    test_sort2_async(execution::par(execution::task), char(),
+        std::less<char>());
     //
-    test_sort2_async(execution::seq(execution::task), double(), std::greater<double>());
-    test_sort2_async(execution::par(execution::task), float(),  std::greater<float>());
+    test_sort2_async(execution::seq(execution::task), double(),
+        std::greater<double>());
+    test_sort2_async(execution::par(execution::task), float(),
+        std::greater<float>());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort2(execution_policy(execution::seq),       int());

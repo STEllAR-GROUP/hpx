@@ -22,7 +22,9 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_transform(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -108,8 +110,10 @@ void test_transform()
     test_transform(execution_policy(execution::par), IteratorTag());
     test_transform(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_transform(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_transform(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_transform(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -124,7 +128,9 @@ void transform_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -207,15 +213,19 @@ void test_transform_exception()
     test_transform_exception(execution::seq, IteratorTag());
     test_transform_exception(execution::par, IteratorTag());
 
-    test_transform_exception_async(execution::seq(execution::task), IteratorTag());
-    test_transform_exception_async(execution::par(execution::task), IteratorTag());
+    test_transform_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_exception(execution_policy(execution::seq), IteratorTag());
     test_transform_exception(execution_policy(execution::par), IteratorTag());
 
-    test_transform_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_transform_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_transform_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -230,7 +240,9 @@ void transform_exception_test()
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -311,15 +323,19 @@ void test_transform_bad_alloc()
     test_transform_bad_alloc(execution::seq, IteratorTag());
     test_transform_bad_alloc(execution::par, IteratorTag());
 
-    test_transform_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_transform_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_transform_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_transform_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_transform_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_transform_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_transform_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

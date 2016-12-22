@@ -332,8 +332,10 @@ void test_reduce_exception()
     test_reduce_exception(execution_policy(execution::seq), IteratorTag());
     test_reduce_exception(execution_policy(execution::par), IteratorTag());
 
-    test_reduce_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_reduce_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_reduce_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -432,8 +434,10 @@ void test_reduce_bad_alloc()
     test_reduce_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_reduce_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_reduce_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_reduce_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_reduce_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

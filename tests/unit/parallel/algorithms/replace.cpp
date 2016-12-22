@@ -99,8 +99,10 @@ void test_replace()
     test_replace(execution_policy(execution::par), IteratorTag());
     test_replace(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_replace(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_replace(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -201,8 +203,10 @@ void test_replace_exception()
     test_replace_exception(execution_policy(execution::seq), IteratorTag());
     test_replace_exception(execution_policy(execution::par), IteratorTag());
 
-    test_replace_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_replace_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -301,8 +305,10 @@ void test_replace_bad_alloc()
     test_replace_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_replace_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_replace_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_replace_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_replace_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_replace_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

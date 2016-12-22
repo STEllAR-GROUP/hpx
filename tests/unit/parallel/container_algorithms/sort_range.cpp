@@ -66,11 +66,15 @@ void test_sort1()
     test_sort1_async_string(execution::par(execution::task), std::string());
 
     // Async execution, user comparison operator
-    test_sort1_async(execution::seq(execution::task), int(),    std::less<unsigned int>());
-    test_sort1_async(execution::par(execution::task), char(),   std::less<char>());
+    test_sort1_async(execution::seq(execution::task), int(),
+        std::less<unsigned int>());
+    test_sort1_async(execution::par(execution::task), char(),
+        std::less<char>());
     //
-    test_sort1_async(execution::seq(execution::task), double(), std::greater<double>());
-    test_sort1_async(execution::par(execution::task), float(),  std::greater<float>());
+    test_sort1_async(execution::seq(execution::task), double(),
+        std::greater<double>());
+    test_sort1_async(execution::par(execution::task), float(),
+        std::greater<float>());
     //
     test_sort1_async_string(execution::seq(execution::task), std::string(),
         std::greater<std::string>());
@@ -118,11 +122,15 @@ void test_sort2()
     test_sort2_async(execution::par(execution::task), float());
 
     // Async execution, user comparison operator
-    test_sort2_async(execution::seq(execution::task), int(),    std::less<unsigned int>());
-    test_sort2_async(execution::par(execution::task), char(),   std::less<char>());
+    test_sort2_async(execution::seq(execution::task), int(),
+        std::less<unsigned int>());
+    test_sort2_async(execution::par(execution::task), char(),
+        std::less<char>());
     //
-    test_sort2_async(execution::seq(execution::task), double(), std::greater<double>());
-    test_sort2_async(execution::par(execution::task), float(),  std::greater<float>());
+    test_sort2_async(execution::seq(execution::task), double(),
+        std::greater<double>());
+    test_sort2_async(execution::par(execution::task), float(),
+        std::greater<float>());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sort2(execution_policy(execution::seq),       int());

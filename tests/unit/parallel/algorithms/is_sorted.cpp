@@ -28,8 +28,10 @@ void test_sorted1()
     test_sorted1(execution_policy(execution::seq), IteratorTag());
     test_sorted1(execution_policy(execution::par), IteratorTag());
     test_sorted1(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted1(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted1(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted1(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -55,8 +57,10 @@ void test_sorted2()
     test_sorted2(execution_policy(execution::seq), IteratorTag());
     test_sorted2(execution_policy(execution::par), IteratorTag());
     test_sorted2(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted2(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted2(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted2(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -82,8 +86,10 @@ void test_sorted3()
     test_sorted3(execution_policy(execution::seq), IteratorTag());
     test_sorted3(execution_policy(execution::par), IteratorTag());
     test_sorted3(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted3(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted3(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted3(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -109,8 +115,10 @@ void test_sorted_exception()
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_exception(execution_policy(execution::par), IteratorTag());
-    test_sorted_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -138,8 +146,10 @@ void test_sorted_bad_alloc()
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_bad_alloc(execution_policy(execution::par), IteratorTag());
     test_sorted_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_sorted_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

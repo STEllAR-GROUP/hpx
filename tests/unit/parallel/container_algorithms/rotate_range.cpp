@@ -111,8 +111,10 @@ void test_rotate()
     test_rotate(execution_policy(execution::par), IteratorTag());
     test_rotate(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_rotate(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_rotate(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -227,8 +229,10 @@ void test_rotate_exception()
     test_rotate_exception(execution_policy(execution::seq), IteratorTag());
     test_rotate_exception(execution_policy(execution::par), IteratorTag());
 
-    test_rotate_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_rotate_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -341,8 +345,10 @@ void test_rotate_bad_alloc()
     test_rotate_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_rotate_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_rotate_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_rotate_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

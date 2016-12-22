@@ -80,16 +80,20 @@ void test_for_each_n()
     test_for_each_n(execution::par, IteratorTag(), Proj());
     test_for_each_n(execution::par_unseq, IteratorTag(), Proj());
 
-    test_for_each_n_async(execution::seq(execution::task), IteratorTag(), Proj());
-    test_for_each_n_async(execution::par(execution::task), IteratorTag(), Proj());
+    test_for_each_n_async(execution::seq(execution::task),
+        IteratorTag(), Proj());
+    test_for_each_n_async(execution::par(execution::task),
+        IteratorTag(), Proj());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n(execution_policy(execution::seq), IteratorTag(), Proj());
     test_for_each_n(execution_policy(execution::par), IteratorTag(), Proj());
     test_for_each_n(execution_policy(execution::par_unseq), IteratorTag(), Proj());
 
-    test_for_each_n(execution_policy(execution::seq(execution::task)), IteratorTag(), Proj());
-    test_for_each_n(execution_policy(execution::par(execution::task)), IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::seq(execution::task)),
+        IteratorTag(), Proj());
+    test_for_each_n(execution_policy(execution::par(execution::task)),
+        IteratorTag(), Proj());
 #endif
 }
 

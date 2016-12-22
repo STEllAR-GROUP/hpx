@@ -85,9 +85,11 @@ void test_sorted_until1()
     //calls parallel and gets iter
     test_sorted_until1(execution_policy(execution::par_unseq), IteratorTag());
     //calls parallel and gets iter
-    test_sorted_until1(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_sorted_until1(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
     //calls sequential and gets iter
-    test_sorted_until1(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_until1(execution_policy(execution::par(execution::task)),
+        IteratorTag());
     //calls parallel and gets iter
 #endif
 }
@@ -176,8 +178,10 @@ void test_sorted_until2()
     test_sorted_until2(execution_policy(execution::seq), IteratorTag());
     test_sorted_until2(execution_policy(execution::par), IteratorTag());
     test_sorted_until2(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted_until2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_until2(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_until2(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_until2(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -274,8 +278,10 @@ void test_sorted_until3()
     test_sorted_until3(execution_policy(execution::seq), IteratorTag());
     test_sorted_until3(execution_policy(execution::par), IteratorTag());
     test_sorted_until3(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted_until3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_until3(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_until3(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_until3(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -370,13 +376,17 @@ void test_sorted_until_exception()
     test_sorted_until_exception(execution::seq, IteratorTag());
     test_sorted_until_exception(execution::par, IteratorTag());
 
-    test_sorted_until_async_exception(execution::seq(execution::task), IteratorTag());
-    test_sorted_until_async_exception(execution::par(execution::task), IteratorTag());
+    test_sorted_until_async_exception(execution::seq(execution::task),
+        IteratorTag());
+    test_sorted_until_async_exception(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until_exception(execution_policy(execution::par), IteratorTag());
-    test_sorted_until_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_until_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_until_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_until_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -477,14 +487,18 @@ void test_sorted_until_bad_alloc()
     test_sorted_until_bad_alloc(execution::par, IteratorTag());
     test_sorted_until_bad_alloc(execution::seq, IteratorTag());
 
-    test_sorted_until_async_bad_alloc(execution::seq(execution::task), IteratorTag());
-    test_sorted_until_async_bad_alloc(execution::par(execution::task), IteratorTag());
+    test_sorted_until_async_bad_alloc(execution::seq(execution::task),
+        IteratorTag());
+    test_sorted_until_async_bad_alloc(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_sorted_until_bad_alloc(execution_policy(execution::par), IteratorTag());
     test_sorted_until_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_sorted_until_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_sorted_until_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_sorted_until_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_sorted_until_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

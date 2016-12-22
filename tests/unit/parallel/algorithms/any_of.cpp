@@ -232,8 +232,10 @@ void test_any_of_exception()
     test_any_of_exception(execution_policy(execution::seq), IteratorTag());
     test_any_of_exception(execution_policy(execution::par), IteratorTag());
 
-    test_any_of_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_any_of_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_any_of_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_any_of_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -336,8 +338,10 @@ void test_any_of_bad_alloc()
     test_any_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_any_of_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_any_of_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_any_of_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_any_of_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_any_of_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

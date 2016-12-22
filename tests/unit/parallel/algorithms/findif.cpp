@@ -190,8 +190,10 @@ void test_find_if_exception()
     test_find_if_exception(execution_policy(execution::seq), IteratorTag());
     test_find_if_exception(execution_policy(execution::par), IteratorTag());
 
-    test_find_if_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_if_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_find_if_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_find_if_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -293,8 +295,10 @@ void test_find_if_bad_alloc()
     test_find_if_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_find_if_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_find_if_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_if_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_find_if_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_find_if_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

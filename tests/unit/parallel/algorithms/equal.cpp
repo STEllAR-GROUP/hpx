@@ -350,8 +350,10 @@ void test_equal_exception()
     test_equal_exception(execution_policy(execution::seq), IteratorTag());
     test_equal_exception(execution_policy(execution::par), IteratorTag());
 
-    test_equal_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_equal_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_equal_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_equal_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -458,8 +460,10 @@ void test_equal_bad_alloc()
     test_equal_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_equal_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_equal_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_equal_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_equal_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_equal_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

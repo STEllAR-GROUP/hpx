@@ -98,8 +98,10 @@ void test_none_of()
     test_none_of(execution_policy(execution::par), IteratorTag());
     test_none_of(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_none_of(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_none_of(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_none_of(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_none_of(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -232,8 +234,10 @@ void test_none_of_exception()
     test_none_of_exception(execution_policy(execution::seq), IteratorTag());
     test_none_of_exception(execution_policy(execution::par), IteratorTag());
 
-    test_none_of_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_none_of_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_none_of_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_none_of_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -336,8 +340,10 @@ void test_none_of_bad_alloc()
     test_none_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_none_of_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_none_of_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_none_of_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_none_of_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_none_of_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

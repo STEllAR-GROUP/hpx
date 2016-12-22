@@ -79,7 +79,8 @@ void test_persistent_executitor_parameters_ref()
 
     {
         persistent_auto_chunk_size p;
-        test_for_each_async(execution::par(execution::task).on(par_exec).with(std::ref(p)),
+        test_for_each_async(
+            execution::par(execution::task).on(par_exec).with(std::ref(p)),
             iterator_tag());
     }
 

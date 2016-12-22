@@ -76,15 +76,24 @@ void test_lexicographical_compare1()
     test_lexicographical_compare1(execution::par, IteratorTag());
     test_lexicographical_compare1(execution::par_unseq, IteratorTag());
 
-    test_lexicographical_compare1_async(execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare1_async(execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare1_async(execution::seq(execution::task),
+        IteratorTag());
+    test_lexicographical_compare1_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_lexicographical_compare1(execution_policy(execution::seq), IteratorTag());
-    test_lexicographical_compare1(execution_policy(execution::par), IteratorTag());
-    test_lexicographical_compare1(execution_policy(execution::par_unseq), IteratorTag());
-    test_lexicographical_compare1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_lexicographical_compare1(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_lexicographical_compare1(execution_policy(execution::seq),
+        IteratorTag());
+    test_lexicographical_compare1(execution_policy(execution::par),
+        IteratorTag());
+    test_lexicographical_compare1(execution_policy(execution::par_unseq),
+        IteratorTag());
+    test_lexicographical_compare1(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_lexicographical_compare1(
+        execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -151,15 +160,22 @@ void test_lexicographical_compare2()
     test_lexicographical_compare2(execution::par, IteratorTag());
     test_lexicographical_compare2(execution::par_unseq, IteratorTag());
 
-    test_lexicographical_compare2_async(execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare2_async(execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare2_async(execution::seq(execution::task),
+        IteratorTag());
+    test_lexicographical_compare2_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_lexicographical_compare2(execution_policy(execution::seq), IteratorTag());
-    test_lexicographical_compare2(execution_policy(execution::par), IteratorTag());
-    test_lexicographical_compare2(execution_policy(execution::par_unseq), IteratorTag());
-    test_lexicographical_compare2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_lexicographical_compare2(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_lexicographical_compare2(execution_policy(execution::seq),
+        IteratorTag());
+    test_lexicographical_compare2(execution_policy(execution::par),
+        IteratorTag());
+    test_lexicographical_compare2(execution_policy(execution::par_unseq),
+        IteratorTag());
+    test_lexicographical_compare2(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_lexicographical_compare2(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -228,15 +244,22 @@ void test_lexicographical_compare3()
     test_lexicographical_compare3(execution::par, IteratorTag());
     test_lexicographical_compare3(execution::par_unseq, IteratorTag());
 
-    test_lexicographical_compare3_async(execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare3_async(execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare3_async(execution::seq(execution::task),
+        IteratorTag());
+    test_lexicographical_compare3_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_lexicographical_compare3(execution_policy(execution::seq), IteratorTag());
-    test_lexicographical_compare3(execution_policy(execution::par), IteratorTag());
-    test_lexicographical_compare3(execution_policy(execution::par_unseq), IteratorTag());
-    test_lexicographical_compare3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_lexicographical_compare3(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_lexicographical_compare3(execution_policy(execution::seq),
+        IteratorTag());
+    test_lexicographical_compare3(execution_policy(execution::par),
+        IteratorTag());
+    test_lexicographical_compare3(execution_policy(execution::par_unseq),
+        IteratorTag());
+    test_lexicographical_compare3(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_lexicographical_compare3(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -342,15 +365,19 @@ void test_lexicographical_compare_exception()
     test_lexicographical_compare_exception(execution::seq, IteratorTag());
     test_lexicographical_compare_exception(execution::par, IteratorTag());
 
-    test_lexicographical_compare_async_exception(execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare_async_exception(execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare_async_exception(
+        execution::seq(execution::task), IteratorTag());
+    test_lexicographical_compare_async_exception(
+        execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_lexicographical_compare_exception(execution_policy(execution::par),
         IteratorTag());
-    test_lexicographical_compare_exception(execution_policy(execution::seq(execution::task)),
+    test_lexicographical_compare_exception(
+        execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_lexicographical_compare_exception(execution_policy(execution::par(execution::task)),
+    test_lexicographical_compare_exception(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
@@ -454,17 +481,21 @@ void test_lexicographical_compare_bad_alloc()
     test_lexicographical_compare_bad_alloc(execution::par, IteratorTag());
     test_lexicographical_compare_bad_alloc(execution::seq, IteratorTag());
 
-    test_lexicographical_compare_async_bad_alloc(execution::seq(execution::task), IteratorTag());
-    test_lexicographical_compare_async_bad_alloc(execution::par(execution::task), IteratorTag());
+    test_lexicographical_compare_async_bad_alloc(
+        execution::seq(execution::task), IteratorTag());
+    test_lexicographical_compare_async_bad_alloc(
+        execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_lexicographical_compare_bad_alloc(execution_policy(execution::par),
         IteratorTag());
     test_lexicographical_compare_bad_alloc(execution_policy(execution::seq),
         IteratorTag());
-    test_lexicographical_compare_bad_alloc(execution_policy(execution::seq(execution::task)),
+    test_lexicographical_compare_bad_alloc(
+        execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_lexicographical_compare_bad_alloc(execution_policy(execution::par(execution::task)),
+    test_lexicographical_compare_bad_alloc(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }

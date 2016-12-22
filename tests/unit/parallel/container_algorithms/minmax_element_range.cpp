@@ -109,8 +109,10 @@ void test_minmax_element()
     test_minmax_element(execution_policy(execution::par), IteratorTag());
     test_minmax_element(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_minmax_element(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_minmax_element(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_minmax_element(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_minmax_element(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -264,15 +266,21 @@ void test_minmax_element_exception()
     test_minmax_element_exception(execution::seq, IteratorTag());
     test_minmax_element_exception(execution::par, IteratorTag());
 
-    test_minmax_element_exception_async(execution::seq(execution::task), IteratorTag());
-    test_minmax_element_exception_async(execution::par(execution::task), IteratorTag());
+    test_minmax_element_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_minmax_element_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_minmax_element_exception(execution_policy(execution::seq), IteratorTag());
-    test_minmax_element_exception(execution_policy(execution::par), IteratorTag());
+    test_minmax_element_exception(execution_policy(execution::seq),
+        IteratorTag());
+    test_minmax_element_exception(execution_policy(execution::par),
+        IteratorTag());
 
-    test_minmax_element_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_minmax_element_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_minmax_element_exception(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_minmax_element_exception(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -422,15 +430,21 @@ void test_minmax_element_bad_alloc()
     test_minmax_element_bad_alloc(execution::seq, IteratorTag());
     test_minmax_element_bad_alloc(execution::par, IteratorTag());
 
-    test_minmax_element_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_minmax_element_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_minmax_element_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_minmax_element_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_minmax_element_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_minmax_element_bad_alloc(execution_policy(execution::par), IteratorTag());
+    test_minmax_element_bad_alloc(execution_policy(execution::seq),
+        IteratorTag());
+    test_minmax_element_bad_alloc(execution_policy(execution::par),
+        IteratorTag());
 
-    test_minmax_element_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_minmax_element_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_minmax_element_bad_alloc(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_minmax_element_bad_alloc(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

@@ -133,8 +133,10 @@ void test_mismatch1()
     test_mismatch1(execution_policy(execution::par), IteratorTag());
     test_mismatch1(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_mismatch1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_mismatch1(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_mismatch1(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_mismatch1(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -259,8 +261,10 @@ void test_mismatch2()
     test_mismatch2(execution_policy(execution::par), IteratorTag());
     test_mismatch2(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_mismatch2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_mismatch2(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_mismatch2(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_mismatch2(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -368,15 +372,19 @@ void test_mismatch_exception()
     test_mismatch_exception(execution::seq, IteratorTag());
     test_mismatch_exception(execution::par, IteratorTag());
 
-    test_mismatch_exception_async(execution::seq(execution::task), IteratorTag());
-    test_mismatch_exception_async(execution::par(execution::task), IteratorTag());
+    test_mismatch_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_mismatch_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_exception(execution_policy(execution::seq), IteratorTag());
     test_mismatch_exception(execution_policy(execution::par), IteratorTag());
 
-    test_mismatch_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_mismatch_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_mismatch_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_mismatch_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -482,15 +490,19 @@ void test_mismatch_bad_alloc()
     test_mismatch_bad_alloc(execution::seq, IteratorTag());
     test_mismatch_bad_alloc(execution::par, IteratorTag());
 
-    test_mismatch_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_mismatch_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_mismatch_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_mismatch_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_mismatch_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_mismatch_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_mismatch_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_mismatch_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_mismatch_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_mismatch_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

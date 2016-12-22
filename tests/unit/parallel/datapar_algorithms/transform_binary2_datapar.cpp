@@ -22,8 +22,10 @@ void test_transform_binary2()
     test_transform_binary2(execution::dataseq, IteratorTag());
     test_transform_binary2(execution::datapar, IteratorTag());
 
-    test_transform_binary2_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_binary2_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_binary2_async(execution::dataseq(execution::task),
+        IteratorTag());
+    test_transform_binary2_async(execution::datapar(execution::task),
+        IteratorTag());
 }
 
 void transform_binary2_test()
@@ -42,8 +44,10 @@ void test_transform_binary2_exception()
     test_transform_binary2_exception(execution::dataseq, IteratorTag());
     test_transform_binary2_exception(execution::datapar, IteratorTag());
 
-    test_transform_binary2_exception_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_binary2_exception_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_binary2_exception_async(
+        execution::dataseq(execution::task), IteratorTag());
+    test_transform_binary2_exception_async(
+        execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_binary2_exception_test()
@@ -62,8 +66,10 @@ void test_transform_binary2_bad_alloc()
     test_transform_binary2_bad_alloc(execution::dataseq, IteratorTag());
     test_transform_binary2_bad_alloc(execution::datapar, IteratorTag());
 
-    test_transform_binary2_bad_alloc_async(execution::dataseq(execution::task), IteratorTag());
-    test_transform_binary2_bad_alloc_async(execution::datapar(execution::task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(
+        execution::dataseq(execution::task), IteratorTag());
+    test_transform_binary2_bad_alloc_async(
+        execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_binary2_bad_alloc_test()

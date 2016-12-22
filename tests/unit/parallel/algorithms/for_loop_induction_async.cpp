@@ -205,14 +205,20 @@ void test_for_loop_induction()
     test_for_loop_induction(execution::seq(execution::task), IteratorTag());
     test_for_loop_induction(execution::par(execution::task), IteratorTag());
 
-    test_for_loop_induction_stride(execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_stride(execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_stride(execution::seq(execution::task),
+        IteratorTag());
+    test_for_loop_induction_stride(execution::par(execution::task),
+        IteratorTag());
 
-    test_for_loop_induction_life_out(execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_life_out(execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_life_out(execution::seq(execution::task),
+        IteratorTag());
+    test_for_loop_induction_life_out(execution::par(execution::task),
+        IteratorTag());
 
-    test_for_loop_induction_stride_life_out(execution::seq(execution::task), IteratorTag());
-    test_for_loop_induction_stride_life_out(execution::par(execution::task), IteratorTag());
+    test_for_loop_induction_stride_life_out(execution::seq(execution::task),
+        IteratorTag());
+    test_for_loop_induction_stride_life_out(execution::par(execution::task),
+        IteratorTag());
 }
 
 void for_loop_induction_test()

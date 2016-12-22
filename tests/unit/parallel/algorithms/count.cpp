@@ -60,8 +60,10 @@ void test_count_exception()
     test_count_exception(execution_policy(execution::seq), IteratorTag());
     test_count_exception(execution_policy(execution::par), IteratorTag());
 
-    test_count_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_count_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_count_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_count_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -91,8 +93,10 @@ void test_count_bad_alloc()
     test_count_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_count_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_count_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_count_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_count_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_count_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

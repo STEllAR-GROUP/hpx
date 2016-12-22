@@ -158,8 +158,10 @@ void test_copy_n()
     test_copy_n_outiter(execution_policy(execution::par), IteratorTag());
     test_copy_n_outiter(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_copy_n_outiter(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_n_outiter(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_copy_n_outiter(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_copy_n_outiter(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -266,8 +268,10 @@ void test_copy_n_exception()
     test_copy_n_exception(execution_policy(execution::seq), IteratorTag());
     test_copy_n_exception(execution_policy(execution::par), IteratorTag());
 
-    test_copy_n_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_n_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_copy_n_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_copy_n_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -373,8 +377,10 @@ void test_copy_n_bad_alloc()
     test_copy_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_copy_n_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_copy_n_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_n_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_copy_n_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_copy_n_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

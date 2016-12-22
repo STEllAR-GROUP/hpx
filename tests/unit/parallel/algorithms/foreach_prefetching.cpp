@@ -55,7 +55,8 @@ void test_for_each_prefetching_exception()
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_prefetching_exception(execution_policy(execution::par),
         IteratorTag());
-    test_for_each_prefetching_exception(execution_policy(execution::par(execution::task)),
+    test_for_each_prefetching_exception(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
@@ -75,12 +76,14 @@ void test_for_each_prefetching_bad_alloc()
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
     test_for_each_prefetching_bad_alloc(execution::par, IteratorTag());
-    test_for_each_prefetching_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_for_each_prefetching_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_prefetching_bad_alloc(execution_policy(execution::par),
         IteratorTag());
-    test_for_each_prefetching_bad_alloc(execution_policy(execution::par(execution::task)),
+    test_for_each_prefetching_bad_alloc(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }

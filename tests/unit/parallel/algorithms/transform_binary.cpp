@@ -30,8 +30,10 @@ void test_transform_binary()
     test_transform_binary(execution_policy(execution::par), IteratorTag());
     test_transform_binary(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_transform_binary(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_transform_binary(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_transform_binary(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_binary(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -54,16 +56,22 @@ void test_transform_binary_exception()
     test_transform_binary_exception(execution::seq, IteratorTag());
     test_transform_binary_exception(execution::par, IteratorTag());
 
-    test_transform_binary_exception_async(execution::seq(execution::task), IteratorTag());
-    test_transform_binary_exception_async(execution::par(execution::task), IteratorTag());
+    test_transform_binary_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_binary_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary_exception(execution_policy(execution::seq), IteratorTag());
-    test_transform_binary_exception(execution_policy(execution::par), IteratorTag());
-
-    test_transform_binary_exception(execution_policy(execution::seq(execution::task)),
+    test_transform_binary_exception(execution_policy(execution::seq),
         IteratorTag());
-    test_transform_binary_exception(execution_policy(execution::par(execution::task)),
+    test_transform_binary_exception(execution_policy(execution::par),
+        IteratorTag());
+
+    test_transform_binary_exception(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_binary_exception(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
@@ -87,16 +95,22 @@ void test_transform_binary_bad_alloc()
     test_transform_binary_bad_alloc(execution::seq, IteratorTag());
     test_transform_binary_bad_alloc(execution::par, IteratorTag());
 
-    test_transform_binary_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_transform_binary_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_transform_binary_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_binary_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_binary_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_transform_binary_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_transform_binary_bad_alloc(execution_policy(execution::seq(execution::task)),
+    test_transform_binary_bad_alloc(execution_policy(execution::seq),
         IteratorTag());
-    test_transform_binary_bad_alloc(execution_policy(execution::par(execution::task)),
+    test_transform_binary_bad_alloc(execution_policy(execution::par),
+        IteratorTag());
+
+    test_transform_binary_bad_alloc(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_binary_bad_alloc(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }

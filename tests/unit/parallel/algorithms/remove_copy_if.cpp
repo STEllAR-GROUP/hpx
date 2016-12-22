@@ -172,24 +172,30 @@ void test_remove_copy_if()
     test_remove_copy_if(execution_policy(execution::par), IteratorTag());
     test_remove_copy_if(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_remove_copy_if(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_if(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_remove_copy_if(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_remove_copy_if(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 
     test_remove_copy_if_outiter(execution::seq, IteratorTag());
     test_remove_copy_if_outiter(execution::par, IteratorTag());
     test_remove_copy_if_outiter(execution::par_unseq, IteratorTag());
 
-    test_remove_copy_if_outiter_async(execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_outiter_async(execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_outiter_async(execution::seq(execution::task),
+        IteratorTag());
+    test_remove_copy_if_outiter_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_remove_copy_if_outiter(execution_policy(execution::seq), IteratorTag());
     test_remove_copy_if_outiter(execution_policy(execution::par), IteratorTag());
     test_remove_copy_if_outiter(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_remove_copy_if_outiter(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_if_outiter(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_remove_copy_if_outiter(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_remove_copy_if_outiter(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -284,15 +290,19 @@ void test_remove_copy_if_exception()
     test_remove_copy_if_exception(execution::seq, IteratorTag());
     test_remove_copy_if_exception(execution::par, IteratorTag());
 
-    test_remove_copy_if_exception_async(execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_exception_async(execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_remove_copy_if_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_remove_copy_if_exception(execution_policy(execution::seq), IteratorTag());
     test_remove_copy_if_exception(execution_policy(execution::par), IteratorTag());
 
-    test_remove_copy_if_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_if_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_remove_copy_if_exception(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_remove_copy_if_exception(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -386,15 +396,19 @@ void test_remove_copy_if_bad_alloc()
     test_remove_copy_if_bad_alloc(execution::seq, IteratorTag());
     test_remove_copy_if_bad_alloc(execution::par, IteratorTag());
 
-    test_remove_copy_if_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_remove_copy_if_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_remove_copy_if_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_remove_copy_if_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_remove_copy_if_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_remove_copy_if_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_remove_copy_if_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_remove_copy_if_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_remove_copy_if_bad_alloc(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_remove_copy_if_bad_alloc(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

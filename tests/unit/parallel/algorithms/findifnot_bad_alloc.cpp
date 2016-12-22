@@ -102,15 +102,19 @@ void test_find_if_not_bad_alloc()
     test_find_if_not_bad_alloc(execution::seq, IteratorTag());
     test_find_if_not_bad_alloc(execution::par, IteratorTag());
 
-    test_find_if_not_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_find_if_not_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_find_if_not_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_find_if_not_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_find_if_not_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_find_if_not_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_find_if_not_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_if_not_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_find_if_not_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_find_if_not_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

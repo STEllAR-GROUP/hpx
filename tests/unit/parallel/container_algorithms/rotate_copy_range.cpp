@@ -114,8 +114,10 @@ void test_rotate_copy()
     test_rotate_copy(execution_policy(execution::par), IteratorTag());
     test_rotate_copy(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_rotate_copy(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate_copy(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate_copy(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_rotate_copy(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -227,15 +229,21 @@ void test_rotate_copy_exception()
     test_rotate_copy_exception(execution::seq, IteratorTag());
     test_rotate_copy_exception(execution::par, IteratorTag());
 
-    test_rotate_copy_exception_async(execution::seq(execution::task), IteratorTag());
-    test_rotate_copy_exception_async(execution::par(execution::task), IteratorTag());
+    test_rotate_copy_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_rotate_copy_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_rotate_copy_exception(execution_policy(execution::seq), IteratorTag());
-    test_rotate_copy_exception(execution_policy(execution::par), IteratorTag());
+    test_rotate_copy_exception(execution_policy(execution::seq),
+        IteratorTag());
+    test_rotate_copy_exception(execution_policy(execution::par),
+        IteratorTag());
 
-    test_rotate_copy_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate_copy_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate_copy_exception(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_rotate_copy_exception(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -345,15 +353,19 @@ void test_rotate_copy_bad_alloc()
     test_rotate_copy_bad_alloc(execution::seq, IteratorTag());
     test_rotate_copy_bad_alloc(execution::par, IteratorTag());
 
-    test_rotate_copy_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_rotate_copy_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_rotate_copy_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_rotate_copy_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_rotate_copy_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_rotate_copy_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_rotate_copy_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_rotate_copy_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_rotate_copy_bad_alloc(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_rotate_copy_bad_alloc(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

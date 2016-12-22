@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// equivalent to specifying \a parallel::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -475,7 +475,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         static_assert(sizeof...(Args) >= 1,
             "for_loop must be called with at least a function object");
 
-        return for_loop(parallel::execution::seq, first, last, 
+        return for_loop(parallel::execution::seq, first, last,
             std::forward<Args>(args)...);
     }
 
@@ -596,7 +596,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// equivalent to specifying \a parallel::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -799,7 +799,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// equivalent to specifying \a parallel::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
@@ -881,7 +881,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n must be called with at least a function object");
 
-        return for_loop_n(parallel::execution::seq, first, size, 
+        return for_loop_n(parallel::execution::seq, first, size,
             std::forward<Args>(args)...);
     }
 
@@ -1006,7 +1006,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// programmer when and if to dereference the iterator.
     ///
     /// The execution of for_loop without specifying an execution policy is
-    /// equivalent to specifying \a parallel::execution::seq as the execution 
+    /// equivalent to specifying \a parallel::execution::seq as the execution
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be

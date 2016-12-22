@@ -98,8 +98,10 @@ void test_for_each_n_exception()
     test_for_each_n_exception(execution::seq, IteratorTag(), Proj());
     test_for_each_n_exception(execution::par, IteratorTag(), Proj());
 
-    test_for_each_n_exception_async(execution::seq(execution::task), IteratorTag(), Proj());
-    test_for_each_n_exception_async(execution::par(execution::task), IteratorTag(), Proj());
+    test_for_each_n_exception_async(execution::seq(execution::task),
+        IteratorTag(), Proj());
+    test_for_each_n_exception_async(execution::par(execution::task),
+        IteratorTag(), Proj());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_for_each_n_exception(execution_policy(execution::seq),

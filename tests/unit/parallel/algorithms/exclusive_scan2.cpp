@@ -90,8 +90,10 @@ void test_exclusive_scan2()
     test_exclusive_scan2(execution_policy(execution::par), IteratorTag());
     test_exclusive_scan2(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_exclusive_scan2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_exclusive_scan2(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_exclusive_scan2(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_exclusive_scan2(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

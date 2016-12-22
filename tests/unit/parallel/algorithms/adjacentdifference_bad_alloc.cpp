@@ -103,8 +103,10 @@ void test_adjacent_difference_bad_alloc()
     test_adjacent_difference_bad_alloc(execution::seq, IteratorTag());
     test_adjacent_difference_bad_alloc(execution::par, IteratorTag());
 
-    test_adjacent_difference_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_adjacent_difference_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_adjacent_difference_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_adjacent_difference_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_adjacent_difference_bad_alloc(execution_policy(execution::seq),
@@ -112,9 +114,11 @@ void test_adjacent_difference_bad_alloc()
     test_adjacent_difference_bad_alloc(execution_policy(execution::par),
         IteratorTag());
 
-    test_adjacent_difference_bad_alloc(execution_policy(execution::seq(execution::task)),
+    test_adjacent_difference_bad_alloc(
+        execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_adjacent_difference_bad_alloc(execution_policy(execution::par(execution::task)),
+    test_adjacent_difference_bad_alloc(
+        execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }

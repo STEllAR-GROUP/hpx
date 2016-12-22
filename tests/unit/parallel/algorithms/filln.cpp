@@ -18,7 +18,7 @@
 
 #include "test_utils.hpp"
 
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_fill_n(ExPolicy policy, IteratorTag)
 {
@@ -187,8 +187,10 @@ void test_fill_n_exception()
     test_fill_n_exception(execution_policy(execution::seq), IteratorTag());
     test_fill_n_exception(execution_policy(execution::par), IteratorTag());
 
-    test_fill_n_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_fill_n_exception(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_fill_n_exception(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_fill_n_exception(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -287,8 +289,10 @@ void test_fill_n_bad_alloc()
     test_fill_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
     test_fill_n_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_fill_n_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_fill_n_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_fill_n_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_fill_n_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
