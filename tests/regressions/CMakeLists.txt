@@ -10,6 +10,7 @@ set(subdirs
     build
     block_matrix
     components
+    computeapi
     iostreams
     lcos
     parallel
