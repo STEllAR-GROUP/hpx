@@ -9,6 +9,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/shared_spinlock.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/bind.hpp>
@@ -17,6 +19,7 @@
 
 #include <chrono>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <vector>
 
@@ -112,7 +115,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     typedef std::unique_lock<Mutex> Lock;
 
     Mutex m;
-    hpx::lcos::local::mutex done_mutex;
+    hpx::lcos::local::spinlock done_mutex;
     bool done;
     bool locked;
     hpx::lcos::local::condition_variable_any done_cond;
@@ -126,7 +129,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         Lock lock(m,std::defer_lock);
         lock.try_lock_for(std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::spinlock> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();
@@ -136,7 +139,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m,std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::lcos::local::spinlock> lk(done_mutex);
         locked=lock.owns_lock();
         done=true;
         done_cond.notify_one();
@@ -161,7 +164,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         try
         {
             {
-                std::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
+                std::unique_lock<hpx::lcos::local::spinlock> lk(done_mutex);
                 HPX_TEST(done_cond.wait_for(lk,std::chrono::seconds(2),
                     hpx::util::bind(&this_type::is_done,this)));
                 HPX_TEST(!locked);
@@ -276,6 +279,428 @@ struct test_recursive_lock
     }
 };
 
+template <typename M, typename L>
+struct shared_locking_thread
+{
+    typedef M shared_mutex_type;
+
+    shared_mutex_type& rw_mutex;
+    unsigned& unblocked_count;
+    hpx::lcos::local::condition_variable_any& unblocked_condition;
+    unsigned& simultaneous_running_count;
+    unsigned& max_simultaneous_running;
+    hpx::lcos::local::spinlock& unblocked_count_mutex;
+    hpx::lcos::local::spinlock& finish_mutex;
+
+    shared_locking_thread(shared_mutex_type& rw_mutex_,
+        unsigned& unblocked_count_,
+        hpx::lcos::local::condition_variable_any& unblocked_condition_,
+        unsigned& simultaneous_running_count_,
+        unsigned& max_simultaneous_running_,
+        hpx::lcos::local::spinlock& unblocked_count_mutex_,
+        hpx::lcos::local::spinlock& finish_mutex_)
+      : rw_mutex(rw_mutex_),
+        unblocked_count(unblocked_count_),
+        unblocked_condition(unblocked_condition_),
+        simultaneous_running_count(simultaneous_running_count_),
+        max_simultaneous_running(max_simultaneous_running_),
+        unblocked_count_mutex(unblocked_count_mutex_),
+        finish_mutex(finish_mutex_)
+    {}
+
+    void operator()()
+    {
+        // acquire_lock
+        L lock(rw_mutex);
+        hpx::util::ignore_while_checking<L> il(&lock);
+
+        // increment count to show we're unblocked
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> ublock(unblocked_count_mutex);
+            ++unblocked_count;
+            ++simultaneous_running_count;
+            if (simultaneous_running_count > max_simultaneous_running)
+            {
+                max_simultaneous_running = simultaneous_running_count;
+            }
+        }
+        unblocked_condition.notify_one();
+
+        // wait to finish
+        std::unique_lock<hpx::lcos::local::spinlock> finish_lock(finish_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> ill(&finish_lock);
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> ublock(unblocked_count_mutex);
+
+            --simultaneous_running_count;
+        }
+    }
+
+};
+
+template <typename M>
+struct test_shared_lock
+{
+    typedef M mutex_type;
+
+    void test_multiple_readers()
+    {
+        mutex_type rw_mutex;
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        unsigned max_simultaneous_running = 0;
+        hpx::lcos::local::spinlock unblocked_count_mutex;
+        hpx::lcos::local::condition_variable_any unblocked_condition;
+        hpx::lcos::local::spinlock finish_mutex;
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_lock(finish_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> il(&finish_lock);
+
+        unsigned const number_of_threads = 10;
+
+        std::vector<hpx::thread> threads;
+        for (unsigned i = 0; i < number_of_threads; ++i)
+        {
+            threads.emplace_back(
+                shared_locking_thread<mutex_type, std::shared_lock<mutex_type>>(
+                    rw_mutex,
+                    unblocked_count,
+                    unblocked_condition,
+                    simultaneous_running_count,
+                    max_simultaneous_running,
+                    unblocked_count_mutex,
+                    finish_mutex
+                )
+            );
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            while (unblocked_count < number_of_threads)
+            {
+                unblocked_condition.wait(lk);
+            }
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(max_simultaneous_running, number_of_threads);
+        }
+
+        finish_lock.unlock();
+
+        for (auto& t: threads)
+        {
+            t.join();
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(max_simultaneous_running, number_of_threads);
+        }
+    }
+
+    void test_only_one_writer_permitted()
+    {
+        mutex_type rw_mutex;
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        unsigned max_simultaneous_running = 0;
+        hpx::lcos::local::spinlock unblocked_count_mutex;
+        hpx::lcos::local::condition_variable_any unblocked_condition;
+        hpx::lcos::local::spinlock finish_mutex;
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_lock(finish_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> il(&finish_lock);
+
+        unsigned const number_of_threads = 10;
+
+        std::vector<hpx::thread> threads;
+        for (unsigned i = 0; i < number_of_threads; ++i)
+        {
+            threads.emplace_back(
+                shared_locking_thread<mutex_type, std::unique_lock<mutex_type>>(
+                    rw_mutex,
+                    unblocked_count,
+                    unblocked_condition,
+                    simultaneous_running_count,
+                    max_simultaneous_running,
+                    unblocked_count_mutex,
+                    finish_mutex
+                )
+            );
+        }
+
+        hpx::this_thread::sleep_for(std::chrono::microseconds(2));
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, 1u);
+        }
+
+        finish_lock.unlock();
+
+        for (auto& t: threads)
+        {
+            t.join();
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, number_of_threads);
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(max_simultaneous_running, 1u);
+        }
+    }
+
+    void test_reader_blocks_writer()
+    {
+        mutex_type rw_mutex;
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        unsigned max_simultaneous_running = 0;
+        hpx::lcos::local::spinlock unblocked_count_mutex;
+        hpx::lcos::local::condition_variable_any unblocked_condition;
+        hpx::lcos::local::spinlock finish_mutex;
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_lock(finish_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> il(&finish_lock);
+
+        std::vector<hpx::thread> threads;
+
+        threads.emplace_back(
+            shared_locking_thread<mutex_type, std::shared_lock<mutex_type>>(
+                rw_mutex,
+                unblocked_count,
+                unblocked_condition,
+                simultaneous_running_count,
+                max_simultaneous_running,
+                unblocked_count_mutex,
+                finish_mutex
+            )
+        );
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            while (unblocked_count < 1)
+            {
+                unblocked_condition.wait(lk);
+            }
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, 1u);
+        }
+
+        threads.emplace_back(
+            shared_locking_thread<mutex_type, std::unique_lock<mutex_type>>(
+                rw_mutex,
+                unblocked_count,
+                unblocked_condition,
+                simultaneous_running_count,
+                max_simultaneous_running,
+                unblocked_count_mutex,
+                finish_mutex
+            )
+        );
+
+        hpx::this_thread::sleep_for(std::chrono::microseconds(2));
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, 1u);
+        }
+
+        finish_lock.unlock();
+
+        for (auto& t: threads)
+        {
+            t.join();
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, 2u);
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(max_simultaneous_running, 1u);
+        }
+    }
+
+    void test_unlocking_writer_unblocks_all_readers()
+    {
+        mutex_type rw_mutex;
+        std::unique_lock<mutex_type> write_lock(rw_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> iwl(&write_lock);
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        unsigned max_simultaneous_running = 0;
+        hpx::lcos::local::spinlock unblocked_count_mutex;
+        hpx::lcos::local::condition_variable_any unblocked_condition;
+        hpx::lcos::local::spinlock finish_mutex;
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_lock(finish_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> il(&finish_lock);
+
+        std::vector<hpx::thread> threads;
+
+        unsigned const reader_count=10;
+
+        for (unsigned i = 0; i < reader_count; ++i)
+        {
+            threads.emplace_back(
+                shared_locking_thread<mutex_type, std::shared_lock<mutex_type>>(
+                    rw_mutex,
+                    unblocked_count,
+                    unblocked_condition,
+                    simultaneous_running_count,
+                    max_simultaneous_running,
+                    unblocked_count_mutex,
+                    finish_mutex
+                )
+            );
+        }
+        hpx::this_thread::sleep_for(std::chrono::microseconds(2));
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, 0u);
+        }
+
+        write_lock.unlock();
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            while (unblocked_count < reader_count)
+            {
+                unblocked_condition.wait(lk);
+            }
+            HPX_TEST_EQ(unblocked_count, reader_count);
+        }
+        finish_lock.unlock();
+
+        for (auto& t: threads)
+        {
+            t.join();
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(max_simultaneous_running, 1u);
+        }
+    }
+
+    void test_unlocking_last_reader_only_unblocks_one_writer()
+    {
+        mutex_type rw_mutex;
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_readers = 0;
+        unsigned simultaneous_running_writers = 0;
+        unsigned max_simultaneous_readers = 0;
+        unsigned max_simultaneous_writers = 0;
+        hpx::lcos::local::spinlock unblocked_count_mutex;
+        hpx::lcos::local::condition_variable_any unblocked_condition;
+        hpx::lcos::local::spinlock finish_reading_mutex;
+        hpx::lcos::local::spinlock finish_writing_mutex;
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_reading_lock(finish_reading_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> irl(&finish_reading_lock);
+
+        std::unique_lock<hpx::lcos::local::spinlock> finish_writing_lock(finish_writing_mutex);
+        hpx::util::ignore_while_checking<std::unique_lock<hpx::lcos::local::spinlock>> iwl(&finish_writing_lock);
+
+        std::vector<hpx::thread> threads;
+
+        unsigned const reader_count = 10;
+        unsigned const writer_count = 10;
+
+        for (unsigned i = 0; i < reader_count; ++i)
+        {
+            threads.emplace_back(
+                shared_locking_thread<mutex_type, std::shared_lock<mutex_type>>(
+                    rw_mutex,
+                    unblocked_count,
+                    unblocked_condition,
+                    simultaneous_running_readers,
+                    max_simultaneous_readers,
+                    unblocked_count_mutex,
+                    finish_reading_mutex
+                )
+            );
+        }
+        hpx::this_thread::sleep_for(std::chrono::microseconds(2));
+
+        for (unsigned i = 0; i < reader_count; ++i)
+        {
+            threads.emplace_back(
+                shared_locking_thread<mutex_type, std::unique_lock<mutex_type>>(
+                    rw_mutex,
+                    unblocked_count,
+                    unblocked_condition,
+                    simultaneous_running_writers,
+                    max_simultaneous_writers,
+                    unblocked_count_mutex,
+                    finish_writing_mutex
+                )
+            );
+        }
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            while (unblocked_count < reader_count)
+            {
+                unblocked_condition.wait(lk);
+            }
+        }
+        hpx::this_thread::sleep_for(std::chrono::microseconds(2));
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, reader_count);
+        }
+
+        finish_reading_lock.unlock();
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            while (unblocked_count < reader_count + 1)
+            {
+                unblocked_condition.wait(lk);
+            }
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, reader_count);
+        }
+
+        finish_writing_lock.unlock();
+
+        for (auto& t: threads)
+        {
+            t.join();
+        }
+
+        {
+            std::unique_lock<hpx::lcos::local::spinlock> lk(unblocked_count_mutex);
+            HPX_TEST_EQ(unblocked_count, reader_count + writer_count);
+            HPX_TEST_EQ(max_simultaneous_readers, reader_count);
+            HPX_TEST_EQ(max_simultaneous_writers, 1u);
+        }
+    }
+
+    void operator()()
+    {
+        test_multiple_readers();
+        test_only_one_writer_permitted();
+        test_reader_blocks_writer();
+    }
+};
+
 void test_mutex()
 {
     test_lock<hpx::lcos::local::mutex>()();
@@ -287,6 +712,19 @@ void test_timed_mutex()
     test_lock<hpx::lcos::local::timed_mutex>()();
     test_trylock<hpx::lcos::local::timed_mutex>()();
     test_timedlock<hpx::lcos::local::timed_mutex>()();
+}
+
+void test_spinlock()
+{
+    test_lock<hpx::lcos::local::spinlock>()();
+    test_trylock<hpx::lcos::local::spinlock>()();
+}
+
+void test_shared_spinlock()
+{
+    test_lock<hpx::lcos::local::shared_spinlock>()();
+    test_trylock<hpx::lcos::local::shared_spinlock>()();
+    test_shared_lock<hpx::lcos::local::shared_spinlock>()();
 }
 
 //void test_recursive_mutex()
@@ -313,6 +751,8 @@ int hpx_main(variables_map&)
     {
         test_mutex();
         test_timed_mutex();
+        test_spinlock();
+        test_shared_spinlock();
         //~ test_recursive_mutex();
         //~ test_recursive_timed_mutex();
     }

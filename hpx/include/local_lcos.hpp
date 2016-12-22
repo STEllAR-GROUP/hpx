@@ -19,7 +19,9 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/lcos/local/shared_spinlock.hpp>
 #include <hpx/lcos/local/sliding_semaphore.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
