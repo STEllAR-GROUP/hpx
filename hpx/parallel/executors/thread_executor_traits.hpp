@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -183,8 +184,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename Result, typename F, typename Iter, typename ... Ts>
-        static hpx::future<void> spawn(Executor & sched, std::vector<hpx::future<Result> >& results,
+        template <typename Executor_, typename Result, typename F, typename Iter, typename ... Ts>
+        static hpx::future<void> spawn(Executor_ & sched, std::vector<hpx::future<Result> >& results,
             std::size_t base, std::size_t size, std::size_t num_tasks, F const& func, Iter it,
             Ts const&... ts)
         {
@@ -200,7 +201,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 tasks.reserve(num_spread);
 
                 hpx::future<void> (*spawn_func)(
-                        Executor&, std::vector<hpx::future<Result> >&,
+                        Executor_&, std::vector<hpx::future<Result> >&,
                         std::size_t, std::size_t, std::size_t, F const&, Iter, Ts const&...
                     ) = &executor_traits::spawn;
 
