@@ -38,11 +38,11 @@ void measure_transform_reduce(std::size_t size)
         hpx::parallel::transform_reduce(hpx::parallel::execution::par,
             boost::begin(data_representation),
             boost::end(data_representation),
+            0.0,
             [](Point r)
             {
                 return r.x * r.y;
             },
-            0.0,
             std::plus<double>()
         );
     HPX_UNUSED(result);

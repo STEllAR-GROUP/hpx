@@ -650,7 +650,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     double errsq =
         transform_reduce(
             par.on(execs[domain]),
-            boost::begin(range), boost::end(range),
+            boost::begin(range), boost::end(range), 0.0,
             [&](std::uint64_t b) -> double
             {
                 sub_block trans_block =
@@ -668,7 +668,6 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
                 }
                 return errsq;
             },
-            0.0,
             [](double lhs, double rhs) { return lhs + rhs; }
         );
 

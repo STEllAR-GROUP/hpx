@@ -239,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
-        Convert && conv_op, T init, Reduce && red_op)
+        T init, Convert && conv_op, Reduce && red_op)
     {
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 

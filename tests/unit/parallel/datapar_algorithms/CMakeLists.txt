@@ -12,10 +12,10 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLA
       foreach_datapar
       foreach_datapar_zipiter
       foreachn_datapar
-      inner_product_datapar
       transform_datapar
       transform_binary_datapar
       transform_binary2_datapar
+      transform_reduce_binary_datapar
      )
 endif()
 

@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/include/parallel_inner_product.hpp>
+#include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <cstddef>
@@ -42,7 +42,7 @@ float measure_inner_product(ExPolicy && policy,
     std::vector<float> const& data1, std::vector<float> const& data2)
 {
     return
-        hpx::parallel::inner_product(
+        hpx::parallel::transform_reduce(
             policy,
             std::begin(data1),
             std::end(data1),
@@ -109,9 +109,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         else
         {
             hpx::cout
-                << "inner_product(execution::par): " << std::right
+                << "transform_reduce(execution::par): " << std::right
                     << std::setw(15) << tr_time_par / 1e9 << "\n"
-                << "inner_product(datapar): " << std::right
+                << "transform_reduce(datapar): " << std::right
                     << std::setw(15) << tr_time_datapar / 1e9 << "\n"
                 << hpx::flush;
         }
