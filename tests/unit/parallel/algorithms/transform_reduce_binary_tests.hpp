@@ -3,14 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_INNER_PRODUCT_SEP_13_2016_1227PM)
-#define HPX_PARALLEL_TEST_INNER_PRODUCT_SEP_13_2016_1227PM
+#if !defined(HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM)
+#define HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM
 
-#include <hpx/include/parallel_inner_product.hpp>
+#include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -22,7 +23,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_inner_product(ExPolicy policy, IteratorTag)
+void test_transform_reduce_binary(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -35,7 +36,7 @@ void test_inner_product(ExPolicy policy, IteratorTag)
     std::vector<int> d = test::random_iota<int>(1007);
     int init = std::rand() % 1007; //-V101
 
-    int r = hpx::parallel::inner_product(policy,
+    int r = hpx::parallel::transform_reduce(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
         boost::begin(d), init);
 
@@ -44,7 +45,7 @@ void test_inner_product(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_inner_product_async(ExPolicy p, IteratorTag)
+void test_transform_reduce_binary_async(ExPolicy p, IteratorTag)
 {
     static_assert(
         hpx::parallel::is_execution_policy<ExPolicy>::value,
@@ -58,7 +59,7 @@ void test_inner_product_async(ExPolicy p, IteratorTag)
     int init = std::rand() % 1007; //-V101
 
     hpx::future<int> fut_r =
-        hpx::parallel::inner_product(p, iterator(boost::begin(c)),
+        hpx::parallel::transform_reduce(p, iterator(boost::begin(c)),
         iterator(boost::end(c)), boost::begin(d), init);
 
     fut_r.wait();

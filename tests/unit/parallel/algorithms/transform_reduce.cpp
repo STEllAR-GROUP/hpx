@@ -10,6 +10,7 @@
 
 #include <boost/range/functions.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <numeric>
@@ -54,7 +55,7 @@ void test_transform_reduce(ExPolicy policy, IteratorTag)
     result_type r1 =
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            convert_op, init, reduce_op);
+            init, convert_op, reduce_op);
 
     // verify values
     result_type r2 =
@@ -87,7 +88,7 @@ void test_transform_reduce_async(ExPolicy p, IteratorTag)
     hpx::future<std::size_t> f =
         hpx::parallel::transform_reduce(p,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t v){ return v; }, val, op);
+            val, [](std::size_t v){ return v; }, op);
     f.wait();
 
     // verify values
@@ -142,8 +143,8 @@ void test_transform_reduce_exception(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t v){ return v; },
             std::size_t(42),
+            [](std::size_t v){ return v; },
             [](std::size_t v1, std::size_t v2)
             {
                 return throw std::runtime_error("test"), v1 + v2;
@@ -178,8 +179,8 @@ void test_transform_reduce_exception_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform_reduce(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](std::size_t v){ return v; },
                 std::size_t(42),
+                [](std::size_t v){ return v; },
                 [](std::size_t v1, std::size_t v2)
                 {
                     return throw std::runtime_error("test"), v1 + v2;
@@ -250,8 +251,8 @@ void test_transform_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
-            [](std::size_t v){ return v; },
             std::size_t(42),
+            [](std::size_t v){ return v; },
             [](std::size_t v1, std::size_t v2)
             {
                 return throw std::bad_alloc(), v1 + v2;
@@ -285,8 +286,8 @@ void test_transform_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform_reduce(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
-                [](std::size_t v){ return v; },
                 std::size_t(42),
+                [](std::size_t v){ return v; },
                 [](std::size_t v1, std::size_t v2)
                 {
                     return throw std::bad_alloc(), v1 + v2;

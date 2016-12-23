@@ -12,6 +12,7 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/functions.hpp>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -29,11 +30,11 @@ int hpx_main()
             hpx::parallel::par,
             boost::counting_iterator<size_t>(0),
             boost::counting_iterator<size_t>(10007),
+            0.0,
             [&xvalues, &yvalues](size_t i)
             {
                 return xvalues[i] * yvalues[i];
             },
-            0.0,
             std::plus<double>()
         );
     // print the result

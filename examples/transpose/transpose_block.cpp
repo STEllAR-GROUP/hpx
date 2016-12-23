@@ -453,7 +453,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range),
+        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
             [&](std::uint64_t b) -> double
             {
                 sub_block trans_block =
@@ -471,7 +471,6 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
                 }
                 return errsq;
             },
-            0.0,
             [](double lhs, double rhs) { return lhs + rhs; }
         );
 

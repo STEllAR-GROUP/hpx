@@ -49,6 +49,12 @@ particular order):
   it have been replaced with `std::chrono`. This facility can be still enabled
   at configure time by specifying `-DHPX_WITH_BOOST_CHRONO_COMPATIBILITY=On`
   to __cmake__.
+* The parameter sequence for the `hpx::parallel::transform_reduce` overload
+  taking one iterator range has changed to match the changes this algorithm has
+  undergone while being moved to C++17.
+* The algorithm `hpx::parallel::inner_product` has been renamed to
+  `hpx::parallel::transform_reduce` to match the changes this algorithm has
+  undergone while being moved to C++17.
 
 [heading Bug Fixes (Closed Tickets)]
 

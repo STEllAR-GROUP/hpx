@@ -186,7 +186,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
     auto range = boost::irange(start, order);
     // parallel reduce
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range),
+        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
             [&](std::uint64_t i) -> double
             {
                 double errsq = 0.0;
@@ -198,7 +198,6 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
                 }
                 return errsq;
             },
-            0.0,
             [](double lhs, double rhs) { return lhs + rhs; }
         );
 
