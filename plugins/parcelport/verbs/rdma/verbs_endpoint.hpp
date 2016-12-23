@@ -144,9 +144,6 @@ namespace verbs
             LOG_DEVEL_MSG("reset domain");
             domain_.reset();
 
-            LOG_DEVEL_MSG("reset CQ ");
-            completion_queue_.reset();
-
             // Destroy the rdma cm id and queue pair.
             if (cmId_ != nullptr) {
                 if (cmId_->qp != nullptr) {
@@ -165,6 +162,9 @@ namespace verbs
                         << rdma_error::error_string(err));
                 }
             }
+
+            LOG_DEVEL_MSG("reset CQ ");
+            completion_queue_.reset();
 
             LOG_DEBUG_MSG("releasing memory pool reference");
             memory_pool_.reset();
@@ -429,6 +429,7 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 1;
+            param.retry_count     = 7; // 7 = special code for infinite retries
             param.rnr_retry_count = 7; // 7 = special code for infinite retries
             //
             int rc = rdma_accept(cmId_, &param);
@@ -492,6 +493,7 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 2;
+            param.retry_count     = 7; // 7 = special code for infinite retries
             param.rnr_retry_count = 7; // 7 = special code for infinite retries
             //
             int rc = rdma_connect(cmId_, &param);
