@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT current_executor : public scheduled_executor
+    struct current_executor : public scheduled_executor
     {
         current_executor();
         explicit current_executor(policies::scheduler_base* scheduler);
