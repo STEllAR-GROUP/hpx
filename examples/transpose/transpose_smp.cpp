@@ -187,6 +187,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
     // parallel reduce
     double errsq =
         transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
+            [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t i) -> double
             {
                 double errsq = 0.0;
@@ -197,8 +198,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
                     errsq += diff * diff;
                 }
                 return errsq;
-            },
-            [](double lhs, double rhs) { return lhs + rhs; }
+            }
         );
 
     if(verbose)

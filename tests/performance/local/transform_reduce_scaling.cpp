@@ -39,11 +39,11 @@ void measure_transform_reduce(std::size_t size)
             boost::begin(data_representation),
             boost::end(data_representation),
             0.0,
+            std::plus<double>(),
             [](Point r)
             {
                 return r.x * r.y;
-            },
-            std::plus<double>()
+            }
         );
     HPX_UNUSED(result);
 }

@@ -46,7 +46,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = op(init, conv(*first));
+                init = hpx::util::invoke(op, init,
+                    hpx::util::invoke(conv, *first));
                 *dest = temp;
                 temp = init;
             }
@@ -61,9 +62,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init  = op(init, conv(*first));
+                init = hpx::util::invoke(op, init,
+                    hpx::util::invoke(conv, *first));
                 *dest = temp;
-                temp  = init;
+                temp = init;
             }
             return init;
         }
@@ -273,7 +275,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     transform_exclusive_scan(ExPolicy&& policy, InIter first, InIter last,
-        OutIter dest, Conv && conv, T init, Op && op)
+        OutIter dest, T init, Op && op, Conv && conv)
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter>::value),

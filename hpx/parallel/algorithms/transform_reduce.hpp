@@ -58,7 +58,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::accumulate(first, last, std::forward<T_>(init),
                     [&r, &conv](T const& res, value_type const& next)
                     {
-                        return r(res, conv(next));
+                        return hpx::util::invoke(r, res,
+                            hpx::util::invoke(conv, next));
                     });
             }
 
@@ -90,7 +91,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             // reference
                             [=](T const& res, reference next)
                             {
-                                return r(res, conv(next));
+                                return hpx::util::invoke(r, res,
+                                    hpx::util::invoke(conv, next));
                             });
                     },
                     hpx::util::unwrapped([init, r](std::vector<T> && results)
@@ -237,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
-        T init, Convert && conv_op, Reduce && red_op)
+        T init, Reduce && red_op, Convert && conv_op)
     {
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
