@@ -9,8 +9,11 @@
 #define HPX_PARALLEL_ALGORITHM_TRANSFORM_EXCLUSIVE_SCAN_JAN_04_2015_0354PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
@@ -269,12 +272,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// a non-associative predicate.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
-        typename Conv, typename T, typename Op>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    transform_exclusive_scan(ExPolicy&& policy, InIter first, InIter last,
+        typename T, typename Op, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_callable<
+                Conv(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Op(typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
         OutIter dest, T init, Op && op, Conv && conv)
     {
         static_assert(
@@ -296,6 +311,51 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             first, last, dest, std::forward<Conv>(conv), std::move(init),
             std::forward<Op>(op));
     }
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+    /// \cond NOINTERNAL
+    template <typename ExPolicy, typename InIter, typename OutIter,
+        typename T, typename Op, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_callable<
+                Conv(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Op(typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
+        OutIter dest, Conv && conv, T init, Op && op)
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
+
+        return detail::transform_exclusive_scan<OutIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::forward<Conv>(conv), std::move(init),
+            std::forward<Op>(op));
+    }
+    /// \endcond
+#endif
 }}}
 
 #endif

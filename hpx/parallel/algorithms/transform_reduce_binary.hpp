@@ -9,8 +9,11 @@
 #define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -284,13 +287,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///
-
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter1>::value &&
+        hpx::traits::is_iterator<InIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init)
     {
         static_assert(
@@ -393,14 +396,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///
-
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
-        typename Reduce, typename Convert>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+        typename Reduce, typename Convert,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter1>::value &&
+        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_callable<
+                Convert(typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Reduce(
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init, Reduce && red_op, Convert && conv_op)
     {
         static_assert(

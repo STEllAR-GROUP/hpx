@@ -9,8 +9,11 @@
 #define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -84,7 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first, std::distance(first, last),
                     [r, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {
-                        T val = conv(*part_begin);
+                        T val = hpx::util::invoke(conv, *part_begin);
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val),
                             // MSVC14 bails out if r and conv are captured by
@@ -233,12 +236,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-        typename Convert>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    transform_reduce(ExPolicy&& policy, InIter first, InIter last,
+        typename Convert,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_callable<
+                Convert(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Reduce(
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter first, InIter last,
         T init, Reduce && red_op, Convert && conv_op)
     {
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
@@ -248,6 +263,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
             is_segmented());
     }
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+    /// \cond NOINTERNAL
+    template <typename ExPolicy, typename InIter, typename T, typename Reduce,
+        typename Convert,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_callable<
+                Convert(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Reduce(
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter first, InIter last,
+        Convert && conv_op, T init, Reduce && red_op)
+    {
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+
+        return detail::transform_reduce_(
+            std::forward<ExPolicy>(policy), first, last, std::move(init),
+            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            is_segmented());
+    }
+    /// \endcond
+#endif
 }}}
 
 #endif

@@ -31,11 +31,11 @@ int hpx_main()
             boost::counting_iterator<size_t>(0),
             boost::counting_iterator<size_t>(10007),
             0.0,
+            std::plus<double>(),
             [&xvalues, &yvalues](size_t i)
             {
                 return xvalues[i] * yvalues[i];
-            },
-            std::plus<double>()
+            }
         );
     // print the result
     hpx::cout << result << hpx::endl;
