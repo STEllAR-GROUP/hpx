@@ -188,9 +188,9 @@ void test_async_one(std::vector<int> a)
     hpx::parallel::v1::detail::sequential_exclusive_scan(
         a.begin(), a.end(), e_ans.begin(), 10, fun_mult);
     hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
-        a.begin(), a.end(), f_ans.begin(), 10, fun_add, fun_conv);
+        a.begin(), a.end(), f_ans.begin(), fun_conv, 10, fun_add);
     hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
-        a.begin(), a.end(), g_ans.begin(), 10, fun_add, fun_conv);
+        a.begin(), a.end(), g_ans.begin(), fun_conv, 10, fun_add);
 
     f_inc_add.wait();
     f_inc_mult.wait();

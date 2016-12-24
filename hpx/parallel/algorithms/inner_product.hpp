@@ -16,6 +16,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
