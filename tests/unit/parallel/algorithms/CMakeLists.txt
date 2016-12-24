@@ -44,7 +44,7 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_prefetching_executors
+    foreach_prefetching_executors_v1
     foreach_projection
     foreachn
     foreachn_exception
@@ -64,13 +64,13 @@ set(tests
     generaten
     includes
     inclusive_scan
-    inclusive_scan_executors
+    inclusive_scan_executors_v1
     inner_product
     inner_product_exception
     inner_product_bad_alloc
     is_partitioned
     is_sorted
-    is_sorted_executors
+    is_sorted_executors_v1
     is_sorted_until
     lexicographical_compare
     max_element
@@ -110,11 +110,17 @@ set(tests
     transform_inclusive_scan
     transform_reduce
     uninitialized_copy
-    uninitialized_copy_executors
+    uninitialized_copy_executors_v1
     uninitialized_copyn
     uninitialized_fill
     uninitialized_filln
    )
+
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      foreach_executors_v1
+     )
+endif()
 
 foreach(test ${tests})
   set(sources

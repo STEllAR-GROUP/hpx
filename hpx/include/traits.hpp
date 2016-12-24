@@ -40,7 +40,7 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>

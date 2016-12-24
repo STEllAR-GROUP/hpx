@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>

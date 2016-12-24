@@ -7,7 +7,7 @@
 set(tests
     apply_colocated
     apply_local
-    apply_local_executor
+    apply_local_executor_v1
     apply_remote
     apply_remote_client
     async_cb_colocated
@@ -32,12 +32,12 @@ set(tests
     future
     future_ref
     future_then
-    future_then_executor
+    future_then_executor_v1
     future_wait
     local_latch
     local_barrier
     local_dataflow
-    local_dataflow_executor
+    local_dataflow_executor_v1
     local_event
     local_mutex
     make_future

@@ -18,7 +18,7 @@
 #include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
 #include <type_traits>

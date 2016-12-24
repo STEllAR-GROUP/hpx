@@ -36,7 +36,7 @@ void test_executors_async(ExPolicy && p)
 
 void for_each_executors_test()
 {
-    using namespace hpx::parallel::execution;
+    using namespace hpx::parallel;
 
     {
         parallel_executor exec;

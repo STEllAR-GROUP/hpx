@@ -15,7 +15,7 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/tuple.hpp>
 

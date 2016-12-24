@@ -19,9 +19,11 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -32,14 +34,18 @@
 
 #include <boost/range/functions.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
+    namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
     /// which execute in threads implicitly created by the executor. This
     /// executor prefers continuing with the creating thread first before
     /// executing newly created threads.
-    struct parallel_executor : executor_tag
+    ///
+    /// This executor conforms to the concepts of a TwoWayExecutor,
+    /// and a BulkTwoWayExecutor
+    struct parallel_executor
     {
         /// Associate the auto_chunk_size executor parameters type as a default
         /// with this executor.
@@ -52,24 +58,89 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {}
 
         /// \cond NOINTERNAL
-        template <typename F, typename ... Ts>
-        static void apply_execute(F && f, Ts &&... ts)
+        bool operator==(parallel_executor const& rhs) const HPX_NOEXCEPT
         {
-            hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return context() == rhs.context();
         }
 
+        bool operator!=(parallel_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        parallel_executor const& context() const HPX_NOEXCEPT
+        {
+            return *this;
+        }
+
+        /// \cond NOINTERNAL
+
+        // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+            typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
         >
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
+        template <typename F, typename ... Ts>
+        typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
+        sync_execute(F && f, Ts &&... ts) const
+        {
+            return hpx::async(l_, std::forward<F>(f),
+                std::forward<Ts>(ts)...).get();
+        }
+
+        // overload for future<void>
+        template <typename F, typename Future, typename ... Ts,
+            typename U =
+                typename std::enable_if<
+                    std::is_void<
+                        typename hpx::traits::future_traits<Future>::type
+                    >::value
+                >::type>
+        typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
+        then_execute(F && f, Future& predcessor, Ts &&... ts) const
+        {
+            return predecessor.then(*this, hpx::util::unwrapped(
+                    hpx::util::deferred_call(
+                        std::forward<F>(f), std::forward<Ts>(ts)...
+                    )
+                ));
+        }
+
+        // overload for future<T> (T != void)
+        template <typename F, typename Future, typename ... Ts,
+            typename U =
+                typename std::enable_if<
+                   !std::is_void<
+                        typename hpx::traits::future_traits<Future>::type
+                    >::value
+                >::type>
+        typename hpx::util::detail::deferred_result_of<
+            F&&(typename hpx::traits::future_traits<Future>::type&, Ts &&...)
+        >::type
+        then_execute(F && f, Future& predcessor, Ts &&... ts) const
+        {
+            return predecessor.then(*this, hpx::util::unwrapped(hpx::util::bind(
+                    hpx::util::one_shot(std::forward<F>(f)),
+                    hpx::util::placeholders::_1, std::forward<Ts>(ts)...
+                )));
+        }
+
+        // NonBlockingOneWayExecutor (adapted) interface
+        template <typename F, typename ... Ts>
+        static void apply_execute(F && f, Ts &&... ts)
+        {
+            hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
+        // BulkTwoWayExecutor interface
         template <typename F, typename S, typename ... Ts>
         std::vector<hpx::future<
-            typename detail::bulk_async_execute_result<F, S, Ts...>::type
+            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
         > >
         bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
@@ -81,7 +152,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
 
             typedef std::vector<hpx::future<
-                    typename detail::bulk_async_execute_result<F, S, Ts...>::type
+                    typename v3::detail::bulk_async_execute_result<
+                        F, S, Ts...
+                    >::type
                 > > result_type;
 
             result_type results;
@@ -172,6 +245,43 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         std::size_t num_tasks_;
         /// \endcond
     };
+
+    /// \cond NOINTERNAL
+    template <>
+    struct is_two_way_executor<parallel_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_non_blocking_one_way_executor<parallel_executor>
+      : std::true_type
+    {};
+    /// \endcond
+}}}}
+
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+{
+    /// \cond NOINTERNAL
+
+    // this must be a type distinct from parallel::execution::parallel_executor
+    // to avoid ambiguities
+    struct parallel_executor
+      : parallel::execution::parallel_executor
+    {
+        parallel_executor(launch l = launch::async,
+                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : parallel::execution::parallel_executor(l, spread, tasks)
+        {}
+    };
+
+    namespace detail
+    {
+        template <>
+        struct is_executor<parallel_executor>
+          : std::true_type
+        {};
+    }
+    /// \endcond
 }}}
 
 #endif

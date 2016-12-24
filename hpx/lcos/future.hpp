@@ -19,6 +19,9 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/always_void.hpp>
@@ -36,6 +39,8 @@
 #if defined(HPX_HAVE_AWAIT)
     #include <hpx/lcos/detail/future_await_traits.hpp>
 #endif
+
+#include <hpx/parallel/executors/execution_fwd.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -410,12 +415,22 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, threads::executor& sched,
         F && f);
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename hpx::traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation_exec(Future const& future, Executor& exec, F && f);
+    make_continuation_exec_v1(Future const& future, Executor& exec, F && f);
+#endif
+
+    template <typename ContResult, typename Future, typename Executor,
+        typename F>
+    inline typename hpx::traits::detail::shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
+    make_continuation_exec(Future const& future, Executor const& exec, F && f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -568,7 +583,11 @@ namespace hpx { namespace lcos { namespace detail
         typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<F>::value &&
             !hpx::traits::is_threads_executor<F>::value &&
-            !hpx::traits::is_executor<F>::value
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+            !hpx::traits::is_executor<F>::value &&
+#endif
+            !hpx::traits::is_one_way_executor<F>::value &&
+            !hpx::traits::is_two_way_executor<F>::value
           , future_then_result<Derived, F>
         >::type
         then(F && f, error_code& ec = throws) const
@@ -636,12 +655,49 @@ namespace hpx { namespace lcos { namespace detail
                 std::move(p));
         }
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
             hpx::traits::is_executor<Executor>::value
           , future_then_result<Derived, F>
         >::type
         then(Executor& exec, F && f, error_code& ec = throws) const
+        {
+            typedef
+                typename future_then_result<Derived, F>::result_type
+                result_type;
+
+            if (!shared_state_)
+            {
+                HPX_THROWS_IF(ec, no_state,
+                    "future_base<R>::then",
+                    "this future has no valid shared state");
+                return future<result_type>();
+            }
+
+            typedef
+                typename hpx::util::result_of<F(Derived)>::type
+                continuation_result_type;
+            typedef
+                typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                shared_state_ptr;
+
+            shared_state_ptr p =
+                detail::make_continuation_exec_v1<continuation_result_type>(
+                    *static_cast<Derived const*>(this), exec,
+                    std::forward<F>(f));
+            return hpx::traits::future_access<future<result_type> >::
+                create(std::move(p));
+        }
+#endif
+
+        template <typename Executor, typename F>
+        typename util::lazy_enable_if<
+            hpx::traits::is_one_way_executor<Executor>::value ||
+            hpx::traits::is_two_way_executor<Executor>::value
+          , future_then_result<Derived, F>
+        >::type
+        then(Executor const& exec, F && f, error_code& ec = throws) const
         {
             typedef
                 typename future_then_result<Derived, F>::result_type

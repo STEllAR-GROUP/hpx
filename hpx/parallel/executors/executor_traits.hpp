@@ -12,14 +12,16 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/rebind_executor.hpp>
 
 #include <iterator>
 #include <functional>
@@ -42,56 +44,7 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Function invocations executed by a group of sequential execution agents
-    /// execute in sequential order.
-    struct sequential_execution_tag {};
-
-    /// Function invocations executed by a group of parallel execution agents
-    /// execute in unordered fashion. Any such invocations executing in the
-    /// same thread are indeterminately sequenced with respect to each other.
-    ///
-    /// \note \a parallel_execution_tag is weaker than
-    ///       \a sequential_execution_tag.
-    struct parallel_execution_tag {};
-
-    /// Function invocations executed by a group of vector execution agents are
-    /// permitted to execute in unordered fashion when executed in different
-    /// threads, and un-sequenced with respect to one another when executed in
-    /// the same thread.
-    ///
-    /// \note \a vector_execution_tag is weaker than
-    ///       \a parallel_execution_tag.
-    struct vector_execution_tag {};
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename Category1, typename Category2>
-        struct is_not_weaker
-          : std::false_type
-        {};
-
-        template <typename Category>
-        struct is_not_weaker<Category, Category>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_not_weaker<parallel_execution_tag, vector_execution_tag>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_not_weaker<sequential_execution_tag, vector_execution_tag>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_not_weaker<sequential_execution_tag, parallel_execution_tag>
-          : std::true_type
-        {};
-        /// \endcond
-    }
+    HPX_STATIC_CONSTEXPR task_execution_policy_tag task{};
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
