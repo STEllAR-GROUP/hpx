@@ -23,6 +23,8 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#include <hpx/parallel/executors/execution.hpp>
+
 #include <boost/intrusive_ptr.hpp>
 
 #include <functional>
@@ -167,12 +169,10 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename ContResult>
     class continuation
-      : public future_data<typename continuation_result<ContResult>::type>
+      : public future_data<ContResult>
     {
     private:
-        typedef future_data<
-                typename continuation_result<ContResult>::type
-            > base_type;
+        typedef future_data<ContResult> base_type;
 
         typedef typename base_type::mutex_type mutex_type;
         typedef typename base_type::result_type result_type;
@@ -260,7 +260,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         threads::thread_result_type
-        async_impl(
+        async_impl_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -269,6 +269,24 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, future, *this);
+            return threads::thread_result_type(threads::terminated, nullptr);
+        }
+
+        threads::thread_result_type
+        async_impl(
+            typename traits::detail::shared_state_ptr_for<
+                Future
+            >::type && f)
+        {
+            reset_id r(*this);
+
+            Future future = traits::future_access<Future>::create(std::move(f));
+
+            typedef std::is_void<
+                    typename util::result_of<F(Future)>::type
+                > is_void;
+            invoke_continuation(f_, future, *this, is_void());
+
             return threads::thread_result_type(threads::terminated, nullptr);
         }
 
@@ -292,7 +310,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<continuation> this_(this);
             threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl;
+            ) = &continuation::async_impl_v1;
 
             util::thread_description desc(f_, "continuation::async");
             applier::register_thread_plain(
@@ -324,7 +342,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<continuation> this_(this);
             threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl;
+            ) = &continuation::async_impl_v1;
 
             util::thread_description desc(f_, "continuation::async");
             sched.add(
@@ -357,7 +375,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<continuation> this_(this);
             threads::thread_result_type (continuation::*async_impl_ptr)(
                 typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl;
+            ) = &continuation::async_impl_v1;
 
             parallel::executor_traits<Executor>::apply_execute(
                 exec, async_impl_ptr, std::move(this_), std::move(f));
@@ -576,7 +594,7 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&, Executor&) =
+            void (continuation::*cb)(shared_state_ptr &&, Executor const&) =
                 &continuation::async_exec<Executor>;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
@@ -608,9 +626,9 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, launch policy, F && f)
     {
-        typedef detail::continuation<Future, F, ContResult> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
+        typedef detail::continuation<Future, F, result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
@@ -625,9 +643,9 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, threads::executor& sched, F && f)
     {
-        typedef detail::continuation<Future, F, ContResult> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
+        typedef detail::continuation<Future, F, result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
@@ -644,9 +662,9 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation_exec_v1(Future const& future, Executor& exec, F && f)
     {
-        typedef detail::continuation<Future, F, ContResult> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
         typedef typename continuation_result<ContResult>::type result_type;
+        typedef detail::continuation<Future, F, result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
@@ -658,20 +676,29 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename ContResult, typename Future, typename Executor,
         typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
     make_continuation_exec(Future const& future, Executor const& exec, F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
-        typedef typename continuation_result<ContResult>::type result_type;
 
         // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
+        typename traits::detail::shared_state_ptr<ContResult>::type p(
             new shared_state(std::forward<F>(f), init_no_addref()), false);
         static_cast<shared_state*>(p.get())->attach_exec(future, exec);
         return p;
+    }
+
+    template <typename Executor, typename Future, typename F, typename ... Ts>
+    inline typename hpx::traits::future_then_executor_result<
+        Executor, Future, F, Ts...
+    >::type
+    then_execute_helper(Executor const& exec, F && f, Future const& predecessor,
+        Ts &&... ts)
+    {
+        // simply forward this to executor
+        return parallel::execution::then_execute(exec, std::forward<F>(f),
+            predecessor, std::forward<Ts>(ts)...);
     }
 }}}
 

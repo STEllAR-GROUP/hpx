@@ -156,10 +156,16 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-    // parallel executor
+    // parallel executors
     template <typename Executor>
     struct dataflow_dispatch<Executor,
-        typename std::enable_if<traits::is_executor<Executor>::value>::type>
+        typename std::enable_if<
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+            traits::is_executor<Executor>::value ||
+#endif
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value
+        >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static

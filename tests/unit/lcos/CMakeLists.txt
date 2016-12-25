@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 set(tests
     apply_colocated
     apply_local
-    apply_local_executor_v1
+    apply_local_executor
     apply_remote
     apply_remote_client
     async_cb_colocated
@@ -32,12 +32,12 @@ set(tests
     future
     future_ref
     future_then
-    future_then_executor_v1
+    future_then_executor
     future_wait
     local_latch
     local_barrier
     local_dataflow
-    local_dataflow_executor_v1
+    local_dataflow_executor
     local_event
     local_mutex
     make_future
@@ -54,6 +54,15 @@ set(tests
     when_any
     when_some
    )
+
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      apply_local_executor_v1
+      async_local_executor_v1
+      future_then_executor_v1
+      local_dataflow_executor_v1
+     )
+endif()
 
 if(NOT MSVC12)
   # MSVC12 can't cope with split_future

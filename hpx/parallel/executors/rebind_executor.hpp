@@ -40,10 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel::execution::unsequenced_execution_tag;
 
     /// \cond NOINTERNAL
-    struct task_execution_policy_tag
-    {
-        HPX_CONSTEXPR task_execution_policy_tag() {}
-    };
+    using task_execution_policy_tag = parallel::execution::task_policy_tag;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////

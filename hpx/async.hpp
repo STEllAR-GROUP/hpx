@@ -13,11 +13,17 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/is_action.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
+#endif
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/lazy_enable_if.hpp>
+
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -264,6 +270,7 @@ namespace hpx { namespace detail
         }
     };
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     // parallel::executor
     template <typename Executor>
     struct async_dispatch<Executor,
@@ -282,6 +289,30 @@ namespace hpx { namespace detail
         call(Executor& exec, F&& f, Ts&&... ts)
         {
             return parallel::executor_traits<Executor>::async_execute(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    };
+#endif
+
+    // parallel::execution::executor
+    template <typename Executor>
+    struct async_dispatch<Executor,
+        typename std::enable_if<
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value
+        >::type>
+    {
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            hpx::future<
+                typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            >
+        >::type
+        call(Executor const& exec, F && f, Ts &&... ts)
+        {
+            return parallel::execution::async_execute(
                 exec, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };

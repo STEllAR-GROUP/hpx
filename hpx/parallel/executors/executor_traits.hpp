@@ -21,6 +21,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 
 #include <iterator>
@@ -44,7 +45,7 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_STATIC_CONSTEXPR task_execution_policy_tag task{};
+    HPX_STATIC_CONSTEXPR parallel::execution::task_policy_tag task{};
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -55,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename Enable = void>
         struct execution_category
         {
-            typedef parallel_execution_tag type;
+            typedef parallel::execution::parallel_execution_tag type;
         };
 
         template <typename Executor>

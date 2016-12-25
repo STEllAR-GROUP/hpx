@@ -19,7 +19,11 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_executor.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
+#endif
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -60,7 +64,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         /// \cond NOINTERNAL
         bool operator==(parallel_executor const& rhs) const HPX_NOEXCEPT
         {
-            return context() == rhs.context();
+            return l_ == rhs.l_ &&
+                num_spread_ == rhs.num_spread_ &&
+                num_tasks_ == rhs.num_tasks_;
         }
 
         bool operator!=(parallel_executor const& rhs) const HPX_NOEXCEPT
@@ -77,9 +83,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
-        hpx::future<
-            typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
-        >
+        hpx::future<typename hpx::util::detail::deferred_result_of<
+            F&&(Ts &&...)
+        >::type>
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -93,41 +99,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 std::forward<Ts>(ts)...).get();
         }
 
-        // overload for future<void>
-        template <typename F, typename Future, typename ... Ts,
-            typename U =
-                typename std::enable_if<
-                    std::is_void<
-                        typename hpx::traits::future_traits<Future>::type
-                    >::value
-                >::type>
-        typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
-        then_execute(F && f, Future& predcessor, Ts &&... ts) const
+        template <typename F, typename Future, typename ... Ts>
+        hpx::future<typename hpx::util::detail::deferred_result_of<
+            F(Future, Ts...)
+        >::type>
+        then_execute(F && f, Future& predecessor, Ts &&... ts) const
         {
-            return predecessor.then(*this, hpx::util::unwrapped(
-                    hpx::util::deferred_call(
-                        std::forward<F>(f), std::forward<Ts>(ts)...
-                    )
-                ));
-        }
+            typedef typename hpx::util::detail::deferred_result_of<
+                    F(Future, Ts...)
+                >::type result_type;
 
-        // overload for future<T> (T != void)
-        template <typename F, typename Future, typename ... Ts,
-            typename U =
-                typename std::enable_if<
-                   !std::is_void<
-                        typename hpx::traits::future_traits<Future>::type
-                    >::value
-                >::type>
-        typename hpx::util::detail::deferred_result_of<
-            F&&(typename hpx::traits::future_traits<Future>::type&, Ts &&...)
-        >::type
-        then_execute(F && f, Future& predcessor, Ts &&... ts) const
-        {
-            return predecessor.then(*this, hpx::util::unwrapped(hpx::util::bind(
-                    hpx::util::one_shot(std::forward<F>(f)),
-                    hpx::util::placeholders::_1, std::forward<Ts>(ts)...
-                )));
+            auto func = hpx::util::bind(
+                hpx::util::one_shot(std::forward<F>(f)),
+                hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
+
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                p = lcos::detail::make_continuation_exec<result_type>(
+                        predecessor, *this, std::move(func));
+
+            return hpx::traits::future_access<hpx::future<result_type> >::
+                create(std::move(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -247,18 +238,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     };
 
     /// \cond NOINTERNAL
-    template <>
-    struct is_two_way_executor<parallel_executor>
-      : std::true_type
-    {};
-
-    template <>
-    struct is_non_blocking_one_way_executor<parallel_executor>
-      : std::true_type
-    {};
+    namespace detail
+    {
+        template <>
+        struct is_two_way_executor<parallel_executor>
+          : std::true_type
+        {};
+    }
     /// \endcond
 }}}}
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     /// \cond NOINTERNAL
@@ -283,5 +273,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     }
     /// \endcond
 }}}
+#endif
 
 #endif

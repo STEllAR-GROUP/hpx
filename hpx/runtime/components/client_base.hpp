@@ -476,7 +476,7 @@ namespace hpx { namespace components
 
     private:
         template <typename F>
-        static typename lcos::detail::future_then_result<Derived, F>::cont_result
+        static typename hpx::traits::future_then_result<Derived, F>::cont_result
         on_ready(shared_future<id_type> && fut, F f)
         {
             return f(Derived(std::move(fut)));
@@ -484,11 +484,11 @@ namespace hpx { namespace components
 
     public:
         template <typename F>
-        typename lcos::detail::future_then_result<Derived, F>::type
+        typename hpx::traits::future_then_result<Derived, F>::type
         then(F && f)
         {
             typedef
-                typename lcos::detail::future_then_result<Derived, F>::result_type
+                typename hpx::traits::future_then_result<Derived, F>::result_type
                 result_type;
 
             if (!shared_state_)

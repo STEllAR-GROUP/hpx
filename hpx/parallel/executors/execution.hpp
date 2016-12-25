@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nounnamed
+
 /// \file parallel/executors/execution.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM)
@@ -10,13 +12,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/future_then_result.hpp>
+#include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detected.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
-#include <hpx/parallel/executors/rebind_executor.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -24,6 +31,8 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     namespace execution
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor>
     struct executor_context
@@ -36,42 +45,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
     template <typename Executor>
     using executor_context_t = typename executor_context<Executor>::type;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename Executor, typename F, typename Pack,
-            typename Enable = void>
-        struct executor_future;
-
-        template <typename Executor, typename F, typename ... Ts>
-        struct executor_future<Executor, F, hpx::util::detail::pack<Ts...>,
-            typename std::enable_if<
-                hpx::traits::is_two_way_executor<Executor>::value
-            >::type>
-        {
-            using type = decltype(
-                std::declval<Executor const&>().async_execute(
-                    std::declval<F(*)(Ts...)>(), std::declval<Ts>()...));
-        };
-
-        template <typename Executor, typename T, typename Pack>
-        struct executor_future<Executor, T, Pack,
-            typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value
-            >::type>
-        {
-            using type = hpx::future<T>;
-        };
-    }
-
-    template <typename Executor, typename T, typename ... Ts>
-    struct executor_future
-      : detail::executor_future<Executor, T, hpx::util::detail::pack<Ts...> >
-    {};
-
-    template <typename Executor, typename T, typename ... Ts>
-    using executor_future_t = typename executor_future<Executor, T, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     // Components which create groups of execution agents may use execution
@@ -131,11 +104,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
+    namespace detail
+    {
+        template <typename Executor, typename Enable = void>
+        struct execute_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct async_execute_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct sync_execute_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct then_execute_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct post_fn_helper;
+    }
 
     // customization point for OneWayExecutor interface
     // execute()
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         // default implementation of the execute() customization point
         template <typename OneWayExecutor, typename F, typename ... Ts>
         HPX_FORCEINLINE auto execute(OneWayExecutor const& exec, F && f,
@@ -145,11 +136,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             exec.execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename Executor,
+        template <typename Executor>
+        struct execute_fn_helper<Executor,
             typename std::enable_if<
-                is_one_way_executor<Executor>::value
+                hpx::traits::is_one_way_executor<Executor>::value
             >::type>
-        struct execute_fn_helper
         {
             template <typename OneWayExecutor, typename F, typename ... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor && exec, F && f,
@@ -158,37 +149,85 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                     execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...)
                 )
             {
-                execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return execute(exec, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
             }
         };
 
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto execute_fn::operator()(Executor const& exec,
-                F && f, Ts &&... ts) const
-        ->  decltype(execute_fn_helper<Executor>::call(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...
-            ))
+        struct execute_fn
         {
-            return execute_fn_helper<Executor>::call(exec,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE auto operator()(Executor const& exec,
+                    F && f, Ts &&... ts) const
+            ->  decltype(execute_fn_helper<Executor>::call(
+                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                return execute_fn_helper<Executor>::call(exec,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
 
-        template <typename Executor,
+        ///////////////////////////////////////////////////////////////////////
+        // emulate async_execute() on OneWayExecutors
+        template <typename Executor>
+        struct async_execute_fn_helper<Executor,
             typename std::enable_if<
-               !is_two_way_executor<Executor>::value &&
-                is_one_way_executor<Executor>::value
+                hpx::traits::is_one_way_executor<Executor>::value &&
+               !hpx::traits::is_two_way_executor<Executor>::value
             >::type>
-        struct async_execute_fn_helper
         {
-            template <typename TwoWayExecutor, typename F, typename ... Ts>
-            HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
+            template <typename OneWayExecutor, typename F, typename ... Ts>
+            HPX_FORCEINLINE static auto call(OneWayExecutor const& exec,
                     F && f, Ts &&... ts)
             ->  hpx::future<decltype(execute(
                     exec, std::forward<F>(f), std::forward<Ts>(ts)...
                 ))>
             {
-                return hpx::make_ready_future(execute(
+                return hpx::lcos::make_ready_future(execute(
                         exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                    ));
+            }
+        };
+
+        // emulate sync_execute() on OneWayExecutors
+        template <typename Executor>
+        struct sync_execute_fn_helper<Executor,
+            typename std::enable_if<
+                hpx::traits::is_one_way_executor<Executor>::value &&
+               !hpx::traits::is_two_way_executor<Executor>::value
+            >::type>
+        {
+            template <typename OneWayExecutor, typename F, typename ... Ts>
+            HPX_FORCEINLINE static auto call(OneWayExecutor const& exec,
+                    F && f, Ts &&... ts)
+            ->  decltype(execute(
+                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                return execute(exec, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
+            }
+        };
+
+        // emulate then_execute() on OneWayExecutors
+        template <typename Executor>
+        struct then_execute_fn_helper<Executor,
+            typename std::enable_if<
+                hpx::traits::is_one_way_executor<Executor>::value &&
+               !hpx::traits::is_two_way_executor<Executor>::value
+            >::type>
+        {
+            template <typename OneWayExecutor, typename F, typename Future,
+                typename ... Ts>
+            HPX_FORCEINLINE static
+            typename hpx::traits::future_then_result<F, Ts...>::type
+            call(OneWayExecutor const& exec, F && f, Future& predecessor,
+                Ts &&... ts)
+            {
+                return predecessor.then(hpx::util::bind(
+                        hpx::util::one_shot(std::forward<F>(f)),
+                        hpx::util::placeholders::_1, std::forward<Ts>(ts)...
                     ));
             }
         };
@@ -212,11 +251,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 std::forward<Ts>(ts)...);
         }
 
-        template <typename Executor,
+        template <typename Executor>
+        struct async_execute_fn_helper<Executor,
             typename std::enable_if<
-                is_two_way_executor<Executor>::value
+                hpx::traits::is_two_way_executor<Executor>::value
             >::type>
-        struct async_execute_fn_helper
         {
             template <typename TwoWayExecutor, typename F, typename ... Ts>
             HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
@@ -230,16 +269,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
 
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto async_execute_fn::operator()(Executor const& exec,
-                F && f, Ts &&... ts) const
-        ->  decltype(async_execute_fn_helper<Executor>::call(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...
-            ))
+        struct async_execute_fn
         {
-            return async_execute_fn_helper<Executor>::call(exec,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
+            template <typename Executor, typename F, typename ... Ts>
+            auto operator()(Executor const& exec, F && f, Ts &&... ts) const
+            ->  decltype(async_execute_fn_helper<Executor>::call(
+                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                return async_execute_fn_helper<Executor>::call(exec,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         // default implementation of the sync_execute() customization point
@@ -253,11 +294,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             return exec.sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        template <typename Executor,
+        template <typename Executor>
+        struct sync_execute_fn_helper<Executor,
             typename std::enable_if<
-                is_two_way_executor<Executor>::value
+                hpx::traits::is_two_way_executor<Executor>::value
             >::type>
-        struct sync_execute_fn_helper
         {
             template <typename TwoWayExecutor, typename F, typename ... Ts>
             HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
@@ -271,83 +312,113 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
 
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto sync_execute_fn::operator()(Executor const& exec,
-                F && f, Ts &&... ts) const
-        ->  decltype(sync_execute_fn_helper<Executor>::call(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...
-            ))
+        struct sync_execute_fn
         {
-            return sync_execute_fn_helper<Executor>::call(exec,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE auto operator()(Executor const& exec,
+                    F && f, Ts &&... ts) const
+            ->  decltype(sync_execute_fn_helper<Executor>::call(
+                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                return sync_execute_fn_helper<Executor>::call(exec,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         // default implementation of the then_execute() customization point
         template <typename TwoWayExecutor, typename F, typename Future,
-            typename ... Ts, typename U =
-                typename std::enable_if<
-                    std::is_void<
-                        typename hpx::traits::future_traits<Future>::type
-                    >::value
-                >::type>
+            typename ... Ts>
         HPX_FORCEINLINE auto then_execute(TwoWayExecutor const& exec, F && f,
                 Future& predecessor, Ts &&... ts)
         ->  decltype(exec.then_execute(
                 std::forward<F>(f), predecessor, std::forward<Ts>(ts)...
             ))
         {
-            return exec.then_execute(std::forward<F>(f), predecessor,
-                std::forward<Ts>(ts)...);
+            return exec.then_execute(std::forward<F>(f),
+                predecessor, std::forward<Ts>(ts)...);
         }
 
-        template <typename TwoWayExecutor, typename F, typename Future,
-            typename ... Ts, typename U =
-                typename std::enable_if<
-                   !std::is_void<
-                        typename hpx::traits::future_traits<Future>::type
-                    >::value
-                >::type>
-        HPX_FORCEINLINE auto then_execute(TwoWayExecutor const& exec, F && f,
-                Future& predecessor, Ts &&... ts)
-        ->  decltype(exec.then_execute(
-                std::forward<F>(f), predecessor, std::forward<Ts>(ts)...
-            ))
-        {
-            return exec.then_execute(std::forward<F>(f), predecessor,
-                std::forward<Ts>(ts)...);
-        }
-
-        template <typename Executor,
+        template <typename Executor>
+        struct then_execute_fn_helper<Executor,
             typename std::enable_if<
-                is_two_way_executor<Executor>::value
+                hpx::traits::is_two_way_executor<Executor>::value
             >::type>
-        struct then_execute_fn_helper
         {
             template <typename TwoWayExecutor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
                     F && f, Future& predecessor, Ts &&... ts)
             ->  decltype(then_execute(
-                    exec, std::forward<F>(f), predecessor, std::forward<Ts>(ts)...
+                    exec, std::forward<F>(f), predecessor,
+                    std::forward<Ts>(ts)...
                 ))
             {
-                return then_execute(exec, std::forward<F>(f), predecessor,
+                return then_execute(exec, std::forward<F>(f),
+                    predecessor, std::forward<Ts>(ts)...);
+            }
+        };
+
+        struct then_execute_fn
+        {
+            template <typename Executor, typename F, typename Future,
+                typename ... Ts>
+            HPX_FORCEINLINE auto operator()(Executor const& exec,
+                    F && f, Future& predecessor, Ts &&... ts) const
+            ->  decltype(then_execute_fn_helper<Executor>::call(
+                    exec, std::forward<F>(f), predecessor,
+                    std::forward<Ts>(ts)...
+                ))
+            {
+                return then_execute_fn_helper<Executor>::call(exec,
+                    std::forward<F>(f), predecessor,
                     std::forward<Ts>(ts)...);
             }
         };
 
-        template <typename Executor, typename F, typename Future,
-            typename ... Ts>
-        HPX_FORCEINLINE auto then_execute_fn::operator()(Executor const& exec,
-                F && f, Future& predecessor, Ts &&... ts) const
-        ->  decltype(then_execute_fn_helper<Executor>::call(
-                exec, std::forward<F>(f), predecessor, std::forward<Ts>(ts)...
-            ))
+        ///////////////////////////////////////////////////////////////////////
+        // emulate post() on TwoWayExecutors
+        template <typename Executor>
+        struct post_fn_helper<Executor,
+            typename std::enable_if<
+                hpx::traits::is_two_way_executor<Executor>::value &&
+               !hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+            >::type>
         {
-            return then_execute_fn_helper<Executor>::call(exec,
-                std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
-        }
+            // dispatch to V1 executors
+            template <typename TwoWayExecutor, typename F, typename ... Ts>
+            HPX_FORCEINLINE static auto
+            call_impl(int, TwoWayExecutor const& exec, F && f, Ts &&... ts)
+            ->  decltype(exec.apply_execute(
+                    std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                // use apply_execute, if exposed
+                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+
+            template <typename TwoWayExecutor, typename F, typename ... Ts>
+            HPX_FORCEINLINE static void
+            call_impl(hpx::traits::detail::wrap_int, TwoWayExecutor const& exec,
+                F && f, Ts &&... ts)
+            {
+                // simply discard the returned future
+                async_execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+
+            template <typename TwoWayExecutor, typename F, typename ... Ts>
+            HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
+                    F && f, Ts &&... ts)
+            ->  decltype(call_impl(
+                    0, exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
+            {
+                // simply discard the returned future
+                return call_impl(0, exec, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -355,8 +426,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     namespace detail
     {
         // default implementation of the post() customization point
-        template <typename NonBlockingOneWayExecutor, typename F, typename ... Ts>
-        auto post(NonBlockingOneWayExecutor const& exec, F && f, Ts &&... ts)
+        template <typename NonBlockingOneWayExecutor, typename F,
+            typename ... Ts>
+        HPX_FORCEINLINE auto post(NonBlockingOneWayExecutor const& exec,
+                F && f, Ts &&... ts)
         ->  decltype(
                 exec.post(std::forward<F>(f), std::forward<Ts>(ts)...)
             )
@@ -364,21 +437,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             return exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        // dispatch to V1 executors
-        template <typename NonBlockingOneWayExecutor, typename F, typename ... Ts>
-        auto post(NonBlockingOneWayExecutor const& exec, F && f, Ts &&... ts)
-        ->  decltype(
-                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
-            )
-        {
-            return exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-
-        template <typename Executor,
+        template <typename Executor>
+        struct post_fn_helper<Executor,
             typename std::enable_if<
-                is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
             >::type>
-        struct post_fn_helper
         {
             template <typename NonBlockingOneWayExecutor, typename F,
                 typename ... Ts>
@@ -395,7 +458,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         struct post_fn
         {
             template <typename Executor, typename F, typename ... Ts>
-            auto operator()(Executor const& exec, F && f, Ts &&... ts) const
+            HPX_FORCEINLINE auto operator()(Executor const& exec, F && f,
+                    Ts &&... ts) const
             ->  decltype(post_fn_helper<Executor>::call(
                     exec, std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
@@ -405,47 +469,137 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
     }
-//
-//     namespace
-//     {
-//         // execution::execute is a global function object
-//         constexpr auto const& post =
-//             detail::static_const<detail::post_fn>::value;
-//     }
-//
-//     ///////////////////////////////////////////////////////////////////////////
-//     // defer()
-//     namespace detail
-//     {
-//         // default implementation of the defer() customization point
-//         template <typename NonBlockingOneWayExecutor, typename F, typename ... Ts>
-//         auto defer(NonBlockingOneWayExecutor const& exec, F && f, Ts &&... ts)
-//         ->  decltype(
-//                 exec.defer(std::forward<F>(f), std::forward<Ts>(ts)...)
-//             )
-//         {
-//             return exec.defer(std::forward<F>(f), std::forward<Ts>(ts)...);
-//         }
-//
-//         struct defer_fn
-//         {
-//             template <typename Executor, typename F, typename ... Ts>
-//             auto operator()(Executor const& exec, F && f, Ts &&... ts) const
-//             ->  decltype(
-//                     defer(exec, std::forward<F>(f), std::forward<Ts>(ts)...)
-//                 )
-//             {
-//                 return defer(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
-//             }
-//         };
-//     }
-//
-//     namespace
-//     {
-//         // execution::execute is a global function object
-//         constexpr auto const& defer =
-//             detail::static_const<detail::defer_fn>::value;
-//     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Helper facility to avoid ODR violations
+        template <typename T>
+        struct static_const
+        {
+            HPX_STATIC_CONSTEXPR T value{};
+        };
+    }
+    /// \endcond
+
+    namespace
+    {
+        // OneWayExecutor customization point: execution::execute
+
+        /// Customization point for synchronous execution agent creation.
+        ///
+        /// This synchronously creates a single function invocation f() using
+        /// the associated executor. The execution of the supplied function
+        /// synchronizes with the caller
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \returns f(ts...)'s result
+        ///
+        /// \note This is valid for one way executors only, it will call
+        ///       exec.execute(f, ts...) if it exists.
+        ///
+        constexpr detail::execute_fn const& execute =
+            detail::static_const<detail::execute_fn>::value;
+
+        // TwoWayExecutor customization points: execution::async_execute,
+        // execution::sync_execute, and execution::then_execute
+
+        /// Customization point for asynchronous execution agent creation.
+        ///
+        /// This asynchronously creates a single function invocation f() using
+        /// the associated executor.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \note Executors have to implement only `async_execute()`. All other
+        ///       functions will be emulated by this `executor_traits` in terms
+        ///       of this single basic primitive. However, some executors will
+        ///       naturally specialize all operations for maximum efficiency.
+        ///
+        /// \note This is valid for one way executors (calls
+        ///       make_ready_future(exec.execute(f, ts...) if it exists) and
+        ///       for two way executors (calls exec.async_execute(f, ts...) if
+        ///       it exists).
+        ///
+        /// \returns f(ts...)'s result through a future
+        ///
+        constexpr detail::async_execute_fn const& async_execute =
+            detail::static_const<detail::async_execute_fn>::value;
+
+        /// Customization point for synchronous execution agent creation.
+        ///
+        /// This synchronously creates a single function invocation f() using
+        /// the associated executor. The execution of the supplied function
+        /// synchronizes with the caller
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \returns f(ts...)'s result
+        ///
+        /// \note This is valid for two way executors (calls
+        ///       exec.sync_execute(f, ts...) if it exists) and for one way
+        ///       executors (calls exec.execute(f, ts...) if it exists).
+        ///
+        constexpr detail::sync_execute_fn const& sync_execute =
+            detail::static_const<detail::sync_execute_fn>::value;
+
+        /// Customization point for synchronous execution agent creation.
+        ///
+        /// This synchronously creates a single function invocation f() using
+        /// the associated executor. The execution of the supplied function
+        /// synchronizes with the caller
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \returns f(ts...)'s result through a future
+        ///
+        /// \note This is valid for two way executors (calls
+        ///       exec.then_execute(f, predecessor, ts...) if it exists) and
+        ///       for one way executors (calls predecessor.then(bind(f, ts...))).
+        ///
+        constexpr detail::then_execute_fn const& then_execute =
+            detail::static_const<detail::then_execute_fn>::value;
+
+        // NonBlockingOneWayExecutor customization point: execution::post
+
+        /// Customization point for asynchronous fire & forget execution
+        /// agent creation.
+        ///
+        /// This asynchronously (fire & forget) creates a single function
+        /// invocation f() using the associated executor.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \note This is valid for two way executors (calls
+        ///       exec.apply_execute(f, ts...), if available, otherwise
+        ///       it calls exec.async_execute(f, ts...) while discarding the
+        ///       returned future), and for non-blocking two way executors
+        ///       (calls exec.post(f, ts...) if it exists).
+        ///
+        constexpr detail::post_fn const& post =
+            detail::static_const<detail::post_fn>::value;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
 

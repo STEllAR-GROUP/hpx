@@ -19,6 +19,10 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+#endif
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -30,6 +34,7 @@
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -262,16 +267,35 @@ namespace hpx { namespace lcos { namespace detail
             hpx::apply(sched, f, std::move(this_), indices_type(), is_void());
         }
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         // handle executors through their executor_traits
         template <typename Executor>
         HPX_FORCEINLINE
-        typename std::enable_if<traits::is_executor<Executor>::value>::type
+        typename std::enable_if<
+            traits::is_executor<Executor>::value
+        >::type
         finalize(Executor& exec)
         {
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             parallel::executor_traits<Executor>::apply_execute(exec,
+                f, std::move(this_), indices_type(), is_void());
+        }
+#endif
+
+        template <typename Executor>
+        HPX_FORCEINLINE
+        typename std::enable_if<
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value
+        >::type
+        finalize(Executor& exec)
+        {
+            execute_function_type f = &dataflow_frame::execute;
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            parallel::execution::post(exec,
                 f, std::move(this_), indices_type(), is_void());
         }
 
