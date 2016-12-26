@@ -39,6 +39,8 @@ particular order):
   implementation and/or API might change in the future. Please see this
   [@http://stellar-group.org/2016/09/vectorized-cpp-parallel-algorithms-with-hpx/ blog-post]
   for more information.
+* Added versions of `hpx::get_ptr` taking client side representations for
+  component instances as their parameter (instead of a global id).
 * Added the helper utility `hpx::performance_countyers::performance_counter_set`
   helping to encapsulate a set of performance counters to be managed concurrently.
 
