@@ -291,9 +291,11 @@ namespace hpx
         naming::id_type const& contgid, naming::id_type const& gid,
         Ts&&... vs);
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     ///////////////////////////////////////////////////////////////////////////
+
+    /// \cond NOINTERNAL
     namespace detail
     {
         template <typename T>
@@ -356,6 +358,7 @@ namespace hpx
             return detail::make_rvalue_impl<T>::call(v);
         }
     }
+    /// \endcond
 
     template <typename Result>
     void set_lco_value(naming::id_type const& id, naming::address && addr,

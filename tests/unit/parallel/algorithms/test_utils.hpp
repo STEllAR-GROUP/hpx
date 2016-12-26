@@ -127,9 +127,9 @@ namespace test
     {
         static void call(ExPolicy, hpx::exception_list const& e)
         {
-            // The static partitioner uses the number of threads/cores for the
-            // number chunks to create.
-            HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
+            // The static partitioner uses four times the number of
+            // threads/cores for the number chunks to create.
+            HPX_TEST_LTE(e.size(), 4 * hpx::get_num_worker_threads());
         }
     };
 

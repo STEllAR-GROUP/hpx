@@ -580,7 +580,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
-    /// \param f            The binary predicate which returns \a true
+    /// \param op           The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
     ///                     \code
