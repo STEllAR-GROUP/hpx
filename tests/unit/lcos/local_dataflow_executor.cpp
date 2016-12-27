@@ -318,13 +318,13 @@ void plain_deferred_arguments(Executor& exec)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
-//     {
-//         hpx::parallel::sequential_executor exec;
-//         function_pointers(exec);
-//         future_function_pointers(exec);
-//         plain_arguments(exec);
-//         plain_deferred_arguments(exec);
-//     }
+    {
+        hpx::parallel::execution::sequenced_executor exec;
+        function_pointers(exec);
+        future_function_pointers(exec);
+        plain_arguments(exec);
+        plain_deferred_arguments(exec);
+    }
 
     {
         hpx::parallel::execution::parallel_executor exec;

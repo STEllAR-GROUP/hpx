@@ -27,25 +27,26 @@ namespace hpx { namespace traits
     {
         struct no_executor {};
 
-        template <typename Executor, typename F, typename Pack,
+        template <typename Executor, typename T, typename Pack,
             typename Enable = void>
         struct executor_future;
 
-        template <typename Executor, typename F, typename ... Ts>
-        struct executor_future<Executor, F, hpx::util::detail::pack<Ts...>,
+        template <typename Executor, typename T, typename ... Ts>
+        struct executor_future<Executor, T, hpx::util::detail::pack<Ts...>,
             typename std::enable_if<
                 hpx::traits::is_two_way_executor<Executor>::value
             >::type>
         {
             using type = decltype(
                 std::declval<Executor const&>().async_execute(
-                    std::declval<F>(), std::declval<Ts>()...));
+                    std::declval<T(*)(Ts...)>(), std::declval<Ts>()...));
         };
 
         template <typename Executor, typename T, typename Pack>
         struct executor_future<Executor, T, Pack,
             typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value
+                hpx::traits::is_one_way_executor<Executor>::value &&
+               !hpx::traits::is_two_way_executor<Executor>::value
             >::type>
         {
             using type = hpx::future<T>;
@@ -60,7 +61,8 @@ namespace hpx { namespace traits
     {};
 
     template <typename Executor, typename T, typename ... Ts>
-    using executor_future_t = typename executor_future<Executor, T, Ts...>::type;
+    using executor_future_t =
+        typename executor_future<Executor, T, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -129,8 +131,11 @@ namespace hpx { namespace traits
                     typename hpx::util::result_of<F(Future, Ts...)>::type
                 >::type>
         {
+            typedef typename hpx::util::result_of<F(Future, Ts...)>::type
+                func_result_type;
+
             typedef typename traits::executor_future<
-                    Executor, F, Future, Ts...
+                    Executor, func_result_type, Future, Ts...
                 >::type cont_result;
 
             // perform unwrapping of future<future<R>>

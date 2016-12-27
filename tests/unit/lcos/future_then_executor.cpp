@@ -57,7 +57,7 @@ void test_return_int(Executor& exec)
     hpx::future<int> f2 = f1.then(exec, &p2);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get()==2);
+        HPX_TEST(f2.get() == 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -95,7 +95,7 @@ void test_implicit_unwrapping(Executor& exec)
     hpx::future<int> f2 = f1.then(exec, &p4);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get()==2);
+        HPX_TEST(f2.get() == 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -110,14 +110,14 @@ template <typename Executor>
 void test_simple_then(Executor& exec)
 {
     hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
-    HPX_TEST(f2.get()==2);
+    HPX_TEST(f2.get() == 2);
 }
 
 template <typename Executor>
 void test_simple_deferred_then(Executor& exec)
 {
     hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
-    HPX_TEST(f2.get()==2);
+    HPX_TEST(f2.get() == 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -126,8 +126,8 @@ void test_complex_then(Executor& exec)
 {
     hpx::future<int> f1 = hpx::async(exec, p1);
     hpx::future<int> f21 = f1.then(exec, &p2);
-    hpx::future<int> f2= f21.then(exec, &p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f2 = f21.then(exec, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,8 +135,8 @@ template <typename Executor>
 void test_complex_then_chain_one(Executor& exec)
 {
     hpx::future<int> f1 = hpx::async(exec, p1);
-    hpx::future<int> f2= f1.then(exec, &p2).then(exec, &p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f2 = f1.then(exec, &p2).then(exec, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,10 +167,10 @@ using boost::program_options::options_description;
 
 int hpx_main(variables_map&)
 {
-//     {
-//         hpx::parallel::execution::sequential_executor exec;
-//         test_then(exec);
-//     }
+    {
+        hpx::parallel::execution::sequenced_executor exec;
+        test_then(exec);
+    }
 
     {
         hpx::parallel::execution::parallel_executor exec;

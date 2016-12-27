@@ -26,8 +26,6 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -89,14 +87,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-
-        template <typename F, typename ... Ts>
-        typename hpx::util::detail::deferred_result_of<F&&(Ts &&...)>::type
-        sync_execute(F && f, Ts &&... ts) const
-        {
-            return hpx::async(l_, std::forward<F>(f),
-                std::forward<Ts>(ts)...).get();
         }
 
         template <typename F, typename Future, typename ... Ts>

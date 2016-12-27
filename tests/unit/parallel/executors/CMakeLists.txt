@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2016 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@ set(tests
     parallel_executor
     parallel_fork_executor
     persistent_executor_parameters
-    sequential_executor
+    sequenced_executor
     service_executors
     shared_parallel_executor
     this_thread_executors
@@ -26,6 +26,14 @@ set(tests
     timed_this_thread_executors
     timed_thread_pool_executors
    )
+
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      parallel_executor_v1
+      parallel_fork_executor_v1
+      sequential_executor_v1
+     )
+endif()
 
 foreach(test ${tests})
   set(sources

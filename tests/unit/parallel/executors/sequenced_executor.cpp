@@ -25,34 +25,28 @@ hpx::thread::id test(int passed_through)
 
 void test_sync()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
-
-    executor exec(hpx::launch::fork);
-    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) !=
+    hpx::parallel::execution::sequenced_executor exec;
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id());
 }
 
 void test_async()
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
-
-    executor exec(hpx::launch::fork);
+    hpx::parallel::execution::sequenced_executor exec;
     HPX_TEST(
-        hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
+        hpx::parallel::execution::async_execute(exec, &test, 42).get() ==
         hpx::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST(tid == hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 void test_bulk_sync()
 {
-//     typedef hpx::parallel::execution::parallel_executor executor;
-//
 //     hpx::thread::id tid = hpx::this_thread::get_id();
 //
 //     std::vector<int> v(107);
@@ -61,7 +55,7 @@ void test_bulk_sync()
 //     using hpx::util::placeholders::_1;
 //     using hpx::util::placeholders::_2;
 //
-//     executor exec(hpx::launch::fork);
+//     hpx::parallel::execution::sequenced_executor exec;
 //     hpx::parallel::execution::bulk_execute(
 //         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
 //     hpx::parallel::execution::bulk_execute(
@@ -70,8 +64,6 @@ void test_bulk_sync()
 
 void test_bulk_async()
 {
-//     typedef hpx::parallel::execution::parallel_executor executor;
-//
 //     hpx::thread::id tid = hpx::this_thread::get_id();
 //
 //     std::vector<int> v(107);
@@ -80,7 +72,7 @@ void test_bulk_async()
 //     using hpx::util::placeholders::_1;
 //     using hpx::util::placeholders::_2;
 //
-//     executor exec(hpx::launch::fork);
+//     hpx::parallel::execution::sequenced_executor exec;
 //     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
 //         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
 //     ).get();

@@ -387,6 +387,11 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_exec_v1(Future const& future, Executor& exec, F && f);
 #endif
 
+    template <typename ContResult, typename Future, typename Executor,
+        typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_exec(Future const& future, Executor const& exec, F && f);
+
     template <typename Executor, typename Future, typename F, typename ... Ts>
     inline typename hpx::traits::future_then_executor_result<
         Executor, Future, F, Ts...
