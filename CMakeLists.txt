@@ -798,8 +798,8 @@ endif()
 
 # HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
-    "Enable old execution policy names in API (default: OFF)"
-    OFF ADVANCED)
+    "Enable old execution policy names in API (default: ON)"
+    ON ADVANCED)
 if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
 endif()
