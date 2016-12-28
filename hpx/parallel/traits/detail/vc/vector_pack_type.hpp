@@ -16,6 +16,8 @@
 
 #include <Vc/Vc>
 
+#if Vc_IS_VERSION_1
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {
@@ -71,6 +73,59 @@ namespace hpx { namespace parallel { namespace traits
         typedef Vc::Scalar::Vector<T> type;
     };
 }}}
+
+#else
+
+#include <Vc/datapar>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parallel { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // specifying both, N and an Abi is not allowed
+        template <typename T, std::size_t N, typename Abi>
+        struct vector_pack_type;
+
+        template <typename T, std::size_t N>
+        struct vector_pack_type<T, N, void>
+        {
+            typedef Vc::datapar<T, Vc::datapar_abi::fixed_size<N> > type;
+        };
+
+        template <typename T, typename Abi>
+        struct vector_pack_type<T, 0, Abi>
+        {
+            typedef typename std::conditional<
+                    std::is_void<Abi>::value, Vc::datapar_abi::native, Abi
+                >::type abi_type;
+
+            typedef Vc::datapar<T, abi_type> type;
+        };
+
+        template <typename T, typename Abi>
+        struct vector_pack_type<T, 1, Abi>
+        {
+            typedef Vc::datapar<T, Vc::datapar_abi::scalar> type;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, std::size_t N, typename Abi>
+    struct vector_pack_type
+      : detail::vector_pack_type<T, N, Abi>
+    {};
+
+    // don't wrap types twice
+    template <typename T, std::size_t N, typename Abi1, typename Abi2>
+    struct vector_pack_type<Vc::datapar<T, Abi1>, N, Abi2>
+    {
+        typedef Vc::datapar<T, Abi1> type;
+    };
+}}}
+
+#endif  // Vc_IS_VERSION_1
 
 #endif
 #endif
