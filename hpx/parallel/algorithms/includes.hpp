@@ -248,7 +248,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the second range the algorithm will be applied to.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
-    /// \param f            The binary predicate which returns true if the
+    /// \param op           The binary predicate which returns true if the
     ///                     elements should be treated as includes. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:

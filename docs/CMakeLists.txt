@@ -44,7 +44,6 @@ set(all_documentation_dependencies
 
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
-    "${PROJECT_SOURCE_DIR}/hpx/hpx_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"

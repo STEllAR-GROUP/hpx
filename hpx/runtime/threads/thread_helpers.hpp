@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -28,11 +29,6 @@ namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
     class thread_init_data;
-
-    namespace executors
-    {
-        struct HPX_EXPORT current_executor;
-    }
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +39,7 @@ namespace hpx { namespace threads
     ///                   be modified for.
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
@@ -83,10 +79,11 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should
     ///                   be modified for.
-    /// \param at_time
+    /// \param abs_time   [in] Absolute point in time for the new thread to be
+    ///                   run
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
@@ -116,10 +113,11 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should
     ///                   be modified for.
-    /// \param after_duration
+    /// \param rel_time   [in] Time duration after which the new thread should
+    ///                   be run
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,

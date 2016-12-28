@@ -16,6 +16,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/iterator_adaptor.hpp>
@@ -1058,6 +1059,17 @@ namespace hpx { namespace traits
             return it.remote();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Data>
+    struct is_value_proxy<hpx::detail::local_vector_value_proxy<T, Data> >
+      : std::true_type
+    {};
+
+    template <typename T, typename Data>
+    struct is_value_proxy<hpx::detail::vector_value_proxy<T, Data> >
+      : std::true_type
+    {};
 }}
 
 #endif //  SEGMENTED_ITERATOR_HPP

@@ -14,6 +14,8 @@
 
 #include <Vc/Vc>
 
+#if Vc_IS_VERSION_1
+
 namespace hpx { namespace parallel { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////
@@ -24,6 +26,23 @@ namespace hpx { namespace parallel { namespace traits
         return mask.count();
     }
 }}}
+
+#else
+
+#include <Vc/datapar>
+
+namespace hpx { namespace parallel { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////
+    template <typename T, typename Abi>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    std::size_t count_bits(Vc::mask<T, Abi> const& mask)
+    {
+        return Vc::popcount(mask);
+    }
+}}}
+
+#endif  // Vc_IS_VERSION_1
 
 #endif
 #endif

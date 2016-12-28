@@ -49,7 +49,10 @@ particular order):
   undergone while being moved to C++17. The old inner_product names can be
   still enabled at configure time by specifying
   `-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On` to __cmake__.
-
+* Added versions of `hpx::get_ptr` taking client side representations for
+  component instances as their parameter (instead of a global id).
+* Added the helper utility `hpx::performance_countyers::performance_counter_set`
+  helping to encapsulate a set of performance counters to be managed concurrently.
 
 [heading Breaking Changes]
 
