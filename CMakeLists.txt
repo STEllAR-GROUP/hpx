@@ -798,8 +798,8 @@ endif()
 
 # HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
-    "Enable old overloads for transform_reduce and inner_product (default: OFF)"
-    OFF ADVANCED)
+    "Enable old overloads for transform_reduce and inner_product (default: ON)"
+    ON ADVANCED)
 if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 endif()
