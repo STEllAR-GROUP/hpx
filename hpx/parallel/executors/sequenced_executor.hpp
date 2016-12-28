@@ -1,9 +1,9 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/sequential_executor.hpp
+/// \file parallel/executors/sequenced_executor.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM)
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
@@ -63,7 +63,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         }
 
         template <typename F, typename ... Ts>
-        static hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+        static hpx::future<
+            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        >
         async_execute(F && f, Ts &&... ts)
         {
             return hpx::async(launch::deferred, std::forward<F>(f),
@@ -72,12 +74,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
         template <typename F, typename S, typename ... Ts>
         static std::vector<hpx::future<
-            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
+            typename detail::async_bulk_execute_result<F, S, Ts...>::type
         > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
+        async_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
             typedef typename
-                    v3::detail::bulk_async_execute_result<F, S, Ts...>::type
+                    detail::async_bulk_execute_result<F, S, Ts...>::type
                 result_type;
             std::vector<hpx::future<result_type> > results;
 
@@ -101,11 +103,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         }
 
         template <typename F, typename S, typename ... Ts>
-        static typename v3::detail::bulk_execute_result<F, S, Ts...>::type
-        bulk_execute(F && f, S const& shape, Ts &&... ts)
+        static typename detail::sync_bulk_execute_result<F, S, Ts...>::type
+        sync_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
             return hpx::util::unwrapped(
-                bulk_async_execute(std::forward<F>(f), shape,
+                async_bulk_execute(std::forward<F>(f), shape,
                     std::forward<Ts>(ts)...));
         }
 
@@ -131,6 +133,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         struct is_one_way_executor<sequenced_executor>
           : std::true_type
         {};
+
+        template <>
+        struct is_bulk_one_way_executor<sequenced_executor>
+          : std::true_type
+        {};
     }
     /// \endcond
 }}}}
@@ -152,6 +159,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         execute(F && f, Ts &&... ts)
         {
             return base_type::sync_execute(std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename S, typename ... Ts>
+        std::vector<hpx::future<
+            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
+        > >
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
+        {
+            return base_type::async_bulk_execute(std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
+        }
+
+        template <typename F, typename S, typename ... Ts>
+        static typename v3::detail::bulk_execute_result<F, S, Ts...>::type
+        bulk_execute(F && f, S const& shape, Ts &&... ts)
+        {
+            return base_type::sync_bulk_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...);
         }
     };

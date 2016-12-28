@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,7 +19,7 @@
 #include <hpx/parallel/executors/default_executor.hpp>
 #include <hpx/parallel/executors/distribution_policy_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
-#include <hpx/parallel/executors/sequential_executor.hpp>
+#include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/parallel/executors/this_thread_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_attached_executors.hpp>

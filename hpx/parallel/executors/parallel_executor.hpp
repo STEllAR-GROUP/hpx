@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -81,34 +81,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
-        hpx::future<typename hpx::util::detail::deferred_result_of<
-            F&&(Ts &&...)
-        >::type>
+        hpx::future<
+            typename hpx::util::detail::deferred_result_of<F&&(Ts&&...)>::type
+        >
         async_execute(F && f, Ts &&... ts) const
         {
             return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-
-        template <typename F, typename Future, typename ... Ts>
-        hpx::future<typename hpx::util::detail::deferred_result_of<
-            F(Future, Ts...)
-        >::type>
-        then_execute(F && f, Future& predecessor, Ts &&... ts) const
-        {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Future, Ts...)
-                >::type result_type;
-
-            auto func = hpx::util::bind(
-                hpx::util::one_shot(std::forward<F>(f)),
-                hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                p = lcos::detail::make_continuation_exec<result_type>(
-                        predecessor, *this, std::move(func));
-
-            return hpx::traits::future_access<hpx::future<result_type> >::
-                create(std::move(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -121,9 +99,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename ... Ts>
         std::vector<hpx::future<
-            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
+            typename detail::async_bulk_execute_result<F, S, Ts...>::type
         > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
+        async_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
             // lazily initialize once
             static std::size_t global_num_tasks =
@@ -133,7 +111,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
 
             typedef std::vector<hpx::future<
-                    typename v3::detail::bulk_async_execute_result<
+                    typename detail::async_bulk_execute_result<
                         F, S, Ts...
                     >::type
                 > > result_type;
@@ -234,6 +212,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         struct is_two_way_executor<parallel_executor>
           : std::true_type
         {};
+
+        template <>
+        struct is_bulk_two_way_executor<parallel_executor>
+          : std::true_type
+        {};
     }
     /// \endcond
 }}}}
@@ -252,6 +235,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : parallel::execution::parallel_executor(l, spread, tasks)
         {}
+
+        template <typename F, typename S, typename ... Ts>
+        std::vector<hpx::future<
+            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
+        > >
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
+        {
+            using base_type = parallel::execution::parallel_executor;
+            return base_type::async_bulk_execute(std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
+        }
     };
 
     namespace detail

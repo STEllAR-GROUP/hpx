@@ -1293,6 +1293,21 @@ namespace hpx { namespace lcos
                 return hpx::util::invoke(conv, f.get());
             });
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    hpx::shared_future<R>
+    make_shared_future(hpx::future<R> f)
+    {
+        return f.share();
+    }
+
+    template <typename R>
+    hpx::shared_future<R>
+    make_shared_future(hpx::shared_future<R> f)
+    {
+        return f;
+    }
 }}
 
 namespace hpx { namespace lcos
@@ -1423,6 +1438,8 @@ namespace hpx
     using lcos::make_ready_future_after;
 
     using lcos::make_future;
+
+    using lcos::make_shared_future;
 }
 
 #define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                     \

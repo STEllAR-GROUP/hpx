@@ -51,42 +51,42 @@ void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 
 void test_bulk_sync()
 {
-//     typedef hpx::parallel::execution::parallel_executor executor;
-//
-//     hpx::thread::id tid = hpx::this_thread::get_id();
-//
-//     std::vector<int> v(107);
-//     std::iota(boost::begin(v), boost::end(v), std::rand());
-//
-//     using hpx::util::placeholders::_1;
-//     using hpx::util::placeholders::_2;
-//
-//     executor exec(hpx::launch::fork);
-//     hpx::parallel::execution::bulk_execute(
-//         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-//     hpx::parallel::execution::bulk_execute(
-//         exec, &bulk_test, v, tid, 42);
+    typedef hpx::parallel::execution::parallel_executor executor;
+
+    hpx::thread::id tid = hpx::this_thread::get_id();
+
+    std::vector<int> v(107);
+    std::iota(boost::begin(v), boost::end(v), std::rand());
+
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
+
+    executor exec(hpx::launch::fork);
+    hpx::parallel::execution::sync_bulk_execute(
+        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::sync_bulk_execute(
+        exec, &bulk_test, v, tid, 42);
 }
 
 void test_bulk_async()
 {
-//     typedef hpx::parallel::execution::parallel_executor executor;
-//
-//     hpx::thread::id tid = hpx::this_thread::get_id();
-//
-//     std::vector<int> v(107);
-//     std::iota(boost::begin(v), boost::end(v), std::rand());
-//
-//     using hpx::util::placeholders::_1;
-//     using hpx::util::placeholders::_2;
-//
-//     executor exec(hpx::launch::fork);
-//     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-//         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
-//     ).get();
-//     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-//         exec, &bulk_test, v, tid, 42)
-//     ).get();
+    typedef hpx::parallel::execution::parallel_executor executor;
+
+    hpx::thread::id tid = hpx::this_thread::get_id();
+
+    std::vector<int> v(107);
+    std::iota(boost::begin(v), boost::end(v), std::rand());
+
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
+
+    executor exec(hpx::launch::fork);
+    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
+        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
+    ).get();
+    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
+        exec, &bulk_test, v, tid, 42)
+    ).get();
 }
 
 int hpx_main(int argc, char* argv[])

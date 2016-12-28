@@ -57,7 +57,7 @@ namespace hpx { namespace traits
     struct executor_future
       : detail::executor_future<
             typename std::decay<Executor>::type,
-            T, hpx::util::detail::pack<Ts...> >
+            T, hpx::util::detail::pack<typename std::decay<Ts>::type...> >
     {};
 
     template <typename Executor, typename T, typename ... Ts>
