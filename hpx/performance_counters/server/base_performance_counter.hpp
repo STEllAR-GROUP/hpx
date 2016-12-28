@@ -49,6 +49,7 @@ namespace hpx { namespace performance_counters { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
                 "get_counter_values_array is not implemented for this counter");
+            return counter_values_array();
         }
 
         virtual bool start()

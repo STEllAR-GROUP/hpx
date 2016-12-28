@@ -12,6 +12,7 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/identity.hpp>
 #include <hpx/util/invoke.hpp>
@@ -45,11 +46,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typename hpx::util::decay<F>::type& f_;
             typename hpx::util::decay<Proj>::type& proj_;
 
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+               !hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                hpx::util::invoke(f_,
+                    hpx::util::invoke(proj_, std::forward<T>(t)));
+            }
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
+                hpx::util::invoke(f_, tmp);
+            }
+
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
             void operator()(Iter curr)
             {
-                hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
+                call(*curr);
             }
         };
 

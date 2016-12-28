@@ -139,7 +139,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            The binary predicate which returns true if the
+    /// \param op           The binary predicate which returns true if the
     ///                     elements should be treated as equal. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:

@@ -725,7 +725,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
-        typedef typename future_data<void>::init_no_addref init_no_addref;
+        typedef future_data<void>::init_no_addref init_no_addref;
 
         void_continuation() {}
 
