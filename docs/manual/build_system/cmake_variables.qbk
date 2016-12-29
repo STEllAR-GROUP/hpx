@@ -79,7 +79,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_BOOST_SIMD] `HPX_WITH_DATAPAR_BOOST_SIMD:BOOL`][Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_LIBFLATARRAY] `HPX_WITH_DATAPAR_LIBFLATARRAY:BOOL`][Enable data parallel algorithm support using the external LibFlatArray (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_VC] `HPX_WITH_DATAPAR_VC:BOOL`][Enable data parallel algorithm support using the external Vc library (default: OFF)]]
-        [[[#build_system.cmake_variables.HPX_WITH_EXECUTION_POLICY_COMPATIBILITY] `HPX_WITH_EXECUTION_POLICY_COMPATIBILITY:BOOL`][Enable old execution policy names in API (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXECUTION_POLICY_COMPATIBILITY] `HPX_WITH_EXECUTION_POLICY_COMPATIBILITY:BOOL`][Enable old execution policy names in API (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_FORTRAN] `HPX_WITH_FORTRAN:BOOL`][Enable or disable the compilation of Fortran examples using HPX]]
         [[[#build_system.cmake_variables.HPX_WITH_FULL_RPATH] `HPX_WITH_FULL_RPATH:BOOL`][Build and link HPX libraries and executables with full RPATHs (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK] `HPX_WITH_GCC_VERSION_CHECK:BOOL`][Don't ignore version reported by gcc (default: ON)]]
