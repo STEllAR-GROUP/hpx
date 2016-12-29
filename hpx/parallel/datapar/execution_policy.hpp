@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution
+namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class dataseq_task_policy is an execution
@@ -1145,7 +1145,10 @@ namespace hpx { namespace parallel { namespace execution
         Parameters params_;
         /// \endcond
     };
+}}}}
 
+namespace hpx { namespace parallel { namespace execution
+{
     ///////////////////////////////////////////////////////////////////////////
     // extensions
     namespace detail

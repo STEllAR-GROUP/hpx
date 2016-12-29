@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-namespace hpx { namespace parallel { namespace execution
+namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     struct dataseq_policy;
@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { namespace execution
 
     template <typename Executor, typename Parameters>
     struct datapar_task_policy_shim;
-}}}
+}}}}
 
 #endif
 #endif
