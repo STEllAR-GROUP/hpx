@@ -43,6 +43,8 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_DATAPAR_BOOST_SIMD HPX_WITH_DATAPAR_BOOST_SIMD]
 * [link build_system.cmake_variables.HPX_WITH_DATAPAR_LIBFLATARRAY HPX_WITH_DATAPAR_LIBFLATARRAY]
 * [link build_system.cmake_variables.HPX_WITH_DATAPAR_VC HPX_WITH_DATAPAR_VC]
+* [link build_system.cmake_variables.HPX_WITH_EXECUTION_POLICY_COMPATIBILITY HPX_WITH_EXECUTION_POLICY_COMPATIBILITY]
+* [link build_system.cmake_variables.HPX_WITH_EXECUTOR_COMPATIBILITY HPX_WITH_EXECUTOR_COMPATIBILITY]
 * [link build_system.cmake_variables.HPX_WITH_FORTRAN HPX_WITH_FORTRAN]
 * [link build_system.cmake_variables.HPX_WITH_FULL_RPATH HPX_WITH_FULL_RPATH]
 * [link build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK HPX_WITH_GCC_VERSION_CHECK]
@@ -96,7 +98,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_SECURITY] `HPX_WITH_SECURITY:BOOL`][Enable security support via libsodium.]]
         [[[#build_system.cmake_variables.HPX_WITH_STATIC_LINKING] `HPX_WITH_STATIC_LINKING:BOOL`][Compile HPX statically linked libraries (Default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_SYCL] `HPX_WITH_SYCL:BOOL`][Enable sycl support (default: OFF)]]
-        [[[#build_system.cmake_variables.HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY] `HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY:BOOL`][Enable old overloads for transform_reduce and inner_product (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY] `HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY:BOOL`][Enable old overloads for transform_reduce and inner_product (default: ON)]]
 ] [/ Generic Options]
 
 [#build_system.cmake_variables.Build_Targets][h3 Build Targets Options]
