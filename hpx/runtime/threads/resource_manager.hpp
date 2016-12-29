@@ -197,7 +197,7 @@ namespace hpx { namespace  threads
         allocation_data_map_type proxies_static_allocation_data;
 
         // stores static allocation data for all schedulers
-        void preprocess_static_allocation(std::size_t min_punits,
+        std::size_t preprocess_static_allocation(std::size_t min_punits,
             std::size_t max_punits);
 
         // constants used for parameters to the release_scheduler API
@@ -214,13 +214,15 @@ namespace hpx { namespace  threads
         // calls release_scheduler_resources
         std::size_t release_cores_on_existing_schedulers(
             std::size_t number_to_free,
-            std::vector<punit_status>& available_punits);
+            std::vector<punit_status>& available_punits,
+            std::size_t new_allocation);
 
         // distribute cores to schedulers proportional to max_punits of
         // the schedulers
         std::size_t redistribute_cores_among_all(std::size_t reserved,
             std::size_t min_punits, std::size_t max_punits,
-            std::vector<punit_status>& available_punits);
+            std::vector<punit_status>& available_punits,
+            std::size_t new_allocation);
 
         void roundup_scaled_allocations(
             allocation_data_map_type &scaled_static_allocation_data,

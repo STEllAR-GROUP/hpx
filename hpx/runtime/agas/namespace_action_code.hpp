@@ -444,15 +444,6 @@ namespace detail
         );
 }
 
-namespace server
-{
-    // forward declarations
-    struct HPX_EXPORT locality_namespace;
-    struct HPX_EXPORT primary_namespace;
-    struct HPX_EXPORT component_namespace;
-    struct HPX_EXPORT symbol_namespace;
-}
-
 }}
 
 #endif // HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB

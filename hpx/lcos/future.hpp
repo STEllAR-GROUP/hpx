@@ -1350,7 +1350,7 @@ namespace hpx { namespace lcos
     inline future<void> make_ready_future()
     {
         typedef lcos::detail::future_data<void> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
+        typedef shared_state::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<shared_state> p(
             new shared_state(hpx::util::unused, init_no_addref()), false);

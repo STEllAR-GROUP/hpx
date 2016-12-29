@@ -20,6 +20,13 @@
 #include <cstdint>
 #include <utility>
 
+namespace hpx
+{
+    /// \cond NOINTERNAL
+    class HPX_EXPORT thread;
+    /// \endcond
+}
+
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL

@@ -71,7 +71,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         PAPI_COUNTER_TERMINATED
     };
 
-    struct papi_counter;
+    class papi_counter;
 
     ///////////////////////////////////////////////////////////////////////////
     struct thread_counters
