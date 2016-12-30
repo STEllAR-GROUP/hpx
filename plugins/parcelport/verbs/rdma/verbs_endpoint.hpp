@@ -599,6 +599,30 @@ namespace verbs
             return 0;
         }
 
+        int handle_time_wait_exit(struct rdma_cm_event *event, bool aborted=false)
+        {
+            LOG_DEVEL_MSG("Current state is " << ToString(state_));
+            if (state_!=connection_state::disconnecting &&
+                state_!=connection_state::terminated &&
+                state_!=connection_state::connected)
+            {
+                rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_disconnect"
+                    << aborted));
+                return -1;
+            }
+
+            state_ = connection_state::disconnected;
+            verbs_event_channel::ack_event(event);
+
+            flush();
+
+            LOG_DEBUG_MSG("Time Wait Exit               "
+                << "from " << sockaddress(&remote_address_)
+                << "( " << sockaddress(&local_address_) << ") "
+                << "Current state is " << ToString(state_));
+            return 0;
+        }
+
         // ---------------------------------------------------------------------------
         int create_srq(verbs_protection_domain_ptr domain)
         {

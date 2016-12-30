@@ -571,6 +571,10 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
     }
     case RDMA_CM_EVENT_TIMEWAIT_EXIT: {
         // do nothing
+        if (event_client->handle_time_wait_exit(cm_event)==-1) {
+            std::terminate();
+        }
+        return 0;
     }
 
     default: {
