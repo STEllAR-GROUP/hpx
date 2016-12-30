@@ -74,8 +74,8 @@ namespace verbs
 
         int cleanup(void);
 
-        int poll_endpoints();
-        int poll_for_completions();
+        int poll_endpoints(bool stopped=false);
+        int poll_for_completions(bool stopped=false);
         int poll_for_events();
 
         verbs_completion_queue *get_shared_receive_queue() {

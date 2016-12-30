@@ -176,10 +176,10 @@ void rdma_controller::refill_client_receives(bool force)
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::poll_endpoints()
+int rdma_controller::poll_endpoints(bool stopped)
 {
     // completions of work requests
-    int handled = poll_for_completions();
+    int handled = poll_for_completions(stopped);
 
     // no need to check for connection events very often
     using namespace std::chrono;
@@ -205,7 +205,7 @@ int rdma_controller::poll_endpoints()
 }
 
 //----------------------------------------------------------------------------
-int rdma_controller::poll_for_completions()
+int rdma_controller::poll_for_completions(bool stopped)
 {
     map_read_lock_type read_lock(connections_started_.read_write_mutex());
     //
@@ -232,7 +232,7 @@ int rdma_controller::poll_for_completions()
             do {
                 struct ibv_wc completion;
                 nc = completionQ->poll_completion(&completion);
-                if (nc > 0) {
+                if (nc > 0 && !stopped) {
                     this->completion_function_(completion, client);
                     ntot++;
                 }
