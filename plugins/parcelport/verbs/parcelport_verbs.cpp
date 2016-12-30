@@ -630,7 +630,7 @@ namespace verbs
 
             // bookkeeping : decrement counter that keeps preposted queue full
             client->pop_receive_count();
-            rdma_controller_->refill_client_receives();
+            rdma_controller_->refill_client_receives(false);
 
             // store details about this parcel so that all memory buffers can be kept
             // until all recv operations have completed.
@@ -1160,7 +1160,7 @@ namespace verbs
 
                 // wait for all clients initiated elsewhere to be disconnected
                 while (rdma_controller_->active() /*&& !hpx::is_stopped()*/) {
-                    rdma_controller_->poll_endpoints();
+                    rdma_controller_->poll_endpoints(true);
                     LOG_TIMED_INIT(disconnect_poll);
                     LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
                         {
@@ -1450,7 +1450,7 @@ namespace verbs
                 // if an event comes in, we may spend time processing/handling it
                 // and another may arrive during this handling,
                 // so keep checking until none are received
-                rdma_controller_->refill_client_receives();
+                rdma_controller_->refill_client_receives(false);
                 done = (rdma_controller_->poll_endpoints() == 0);
             } while (!done);
             return true;

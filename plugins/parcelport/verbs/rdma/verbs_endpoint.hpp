@@ -179,13 +179,13 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        void refill_preposts(unsigned int preposts) {
+        void refill_preposts(unsigned int preposts, bool force=true) {
             //            LOG_DEBUG_MSG("Entering refill size of waiting receives is "
             //                << decnumber(get_receive_count()));
             while (get_receive_count() < preposts) {
                 // if the pool has spare small blocks (just use 0 size) then
                 // refill the queues, but don't wait, just abort if none are available
-                if (this->memory_pool_->can_allocate_unsafe(
+                if (force || this->memory_pool_->can_allocate_unsafe(
                     this->memory_pool_->small_.chunk_size_))
                 {
                     LOG_TRACE_MSG("Pre-Posting a receive to client size "
@@ -197,6 +197,7 @@ namespace verbs
                         region->get_size());
                 }
                 else {
+                    LOG_DEVEL_MSG("aborting refill can_allocate_unsafe false");
                     break; // don't block, if there are no free memory blocks
                 }
             }
@@ -410,7 +411,7 @@ namespace verbs
 
             // make sure client has preposted receives
             // @TODO, when we use a shared receive queue, fix this
-            refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+            refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS, true);
 
             // open the connection between this endpoint and the remote server endpoint
             return connect();

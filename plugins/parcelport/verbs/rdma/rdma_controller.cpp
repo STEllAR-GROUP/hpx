@@ -148,22 +148,29 @@ int rdma_controller::startup()
 }
 
 //----------------------------------------------------------------------------
-void rdma_controller::refill_client_receives()
+void rdma_controller::refill_client_receives(bool force)
 {
     // make sure all clients have a pre-posted receive in their queues
     // @TODO : implement Shared receive queue
     unique_lock lock(controller_mutex_, std::try_to_lock);
-    if (!lock.owns_lock()) return;
+    if (!lock.owns_lock()) {
+        if (!force) {
+            return;
+        }
+        else {
+            lock.lock();
+        }
+    }
     //
     map_read_lock_type read_lock(connections_started_.read_write_mutex());
     //
     std::for_each(connections_started_.begin(), connections_started_.end(),
-        [](const rdma_controller::ClientMapPair &_client) {
+        [force](const rdma_controller::ClientMapPair &_client) {
             if (std::get<0>(_client.second)) {
                 if (std::get<0>(_client.second)->get_state()==
                     verbs_endpoint::connection_state::connected)
                     std::get<0>(_client.second)->
-                        refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+                        refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS, force);
             }
     });
 }
@@ -672,7 +679,7 @@ int rdma_controller::handle_connect_request(
 
     // make sure client has preposted receives
     // @TODO, when we use a shared receive queue, fix this
-    new_client->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS);
+    new_client->refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS, true);
 
     LOG_DEVEL_MSG("CR.Map<ip <endpoint,promise>>from "
         << ipaddress(remote_ip) << "to "
