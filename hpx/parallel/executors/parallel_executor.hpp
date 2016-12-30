@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename ... Ts>
         std::vector<hpx::future<
-            typename detail::async_bulk_execute_result<F, S, Ts...>::type
+            typename detail::bulk_function_result<F, S, Ts...>::type
         > >
         async_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 (num_tasks_ == std::size_t(-1)) ? global_num_tasks : num_tasks_;
 
             typedef std::vector<hpx::future<
-                    typename detail::async_bulk_execute_result<
+                    typename detail::bulk_function_result<
                         F, S, Ts...
                     >::type
                 > > result_type;

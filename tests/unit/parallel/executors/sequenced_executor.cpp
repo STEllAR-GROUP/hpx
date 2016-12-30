@@ -30,14 +30,6 @@ void test_sync()
         hpx::this_thread::get_id());
 }
 
-void test_async()
-{
-    hpx::parallel::execution::sequenced_executor exec;
-    HPX_TEST(
-        hpx::parallel::execution::async_execute(exec, &test, 42).get() ==
-        hpx::this_thread::get_id());
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 {
@@ -85,25 +77,6 @@ void test_bulk_sync()
         exec, &bulk_test, v, tid, 42);
 }
 
-void test_bulk_async()
-{
-    hpx::thread::id tid = hpx::this_thread::get_id();
-
-    std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
-
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-
-    hpx::parallel::execution::sequenced_executor exec;
-    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
-        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
-    ).get();
-    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
-        exec, &bulk_test, v, tid, 42)
-    ).get();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
     int passed_through) //-V813
@@ -144,11 +117,9 @@ void test_bulk_then()
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
-    test_async();
     test_then();
 
     test_bulk_sync();
-    test_bulk_async();
     test_bulk_then();
 
     return hpx::finalize();

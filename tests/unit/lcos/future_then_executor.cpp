@@ -52,7 +52,7 @@ hpx::future<int> p4(hpx::future<int> f)
 template <typename Executor>
 void test_return_int(Executor& exec)
 {
-    hpx::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(&p1);
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(exec, &p2);
     HPX_TEST(f2.valid());
@@ -71,7 +71,7 @@ void test_return_int(Executor& exec)
 template <typename Executor>
 void test_return_void(Executor& exec)
 {
-    hpx::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(&p1);
     HPX_TEST(f1.valid());
     hpx::future<void> f2 = f1.then(exec, &p3);
     HPX_TEST(f2.valid());
@@ -90,7 +90,7 @@ void test_return_void(Executor& exec)
 template <typename Executor>
 void test_implicit_unwrapping(Executor& exec)
 {
-    hpx::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(&p1);
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(exec, &p4);
     HPX_TEST(f2.valid());
@@ -109,14 +109,14 @@ void test_implicit_unwrapping(Executor& exec)
 template <typename Executor>
 void test_simple_then(Executor& exec)
 {
-    hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
+    hpx::future<int> f2 = hpx::async(p1).then(exec, &p2);
     HPX_TEST(f2.get() == 2);
 }
 
 template <typename Executor>
 void test_simple_deferred_then(Executor& exec)
 {
-    hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
+    hpx::future<int> f2 = hpx::async(p1).then(exec, &p2);
     HPX_TEST(f2.get() == 2);
 }
 
@@ -124,7 +124,7 @@ void test_simple_deferred_then(Executor& exec)
 template <typename Executor>
 void test_complex_then(Executor& exec)
 {
-    hpx::future<int> f1 = hpx::async(exec, p1);
+    hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f21 = f1.then(exec, &p2);
     hpx::future<int> f2 = f21.then(exec, &p2);
     HPX_TEST(f2.get() == 4);
@@ -134,7 +134,7 @@ void test_complex_then(Executor& exec)
 template <typename Executor>
 void test_complex_then_chain_one(Executor& exec)
 {
-    hpx::future<int> f1 = hpx::async(exec, p1);
+    hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f2 = f1.then(exec, &p2).then(exec, &p2);
     HPX_TEST(f2.get() == 4);
 }
@@ -144,7 +144,7 @@ template <typename Executor>
 void test_complex_then_chain_two(Executor& exec)
 {
     hpx::future<int> f2 =
-        hpx::async(exec, p1).then(exec, &p2).then(exec, &p2);
+        hpx::async(p1).then(exec, &p2).then(exec, &p2);
     HPX_TEST(f2.get()==4);
 }
 

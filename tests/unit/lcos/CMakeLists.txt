@@ -132,13 +132,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/LCOs")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/LCOs/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/LCOs")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("lcos" ${test} ${${test}_PARAMETERS})
 

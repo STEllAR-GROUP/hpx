@@ -140,11 +140,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         template <typename Executor, typename Enable = void>
         struct post_fn_helper;
 
-        template <typename Executor, typename Enable = void>
-        struct async_bulk_execute_fn_helper;
+        template <typename Executor, typename ... Ts>
+        struct async_bulk_execute_not_callable;
 
         template <typename Executor, typename Enable = void>
-        struct sync_bulk_execute_fn_helper;
+        struct async_bulk_execute_fn_helper
+        {
+            template <typename BulkExecutor, typename ... Ts>
+            auto operator()(BulkExecutor&, Ts &&...) const
+            ->  async_bulk_execute_not_callable<BulkExecutor, Ts...>
+            {
+                return async_bulk_execute_not_callable<BulkExecutor, Ts...>{};
+            }
+        };
+
+        template <typename Executor, typename ... Ts>
+        struct sync_bulk_execute_not_callable;
+
+        template <typename Executor, typename Enable = void>
+        struct sync_bulk_execute_fn_helper
+        {
+            template <typename BulkExecutor, typename ... Ts>
+            auto operator()(BulkExecutor&, Ts &&...) const
+            ->  sync_bulk_execute_not_callable<BulkExecutor, Ts...>
+            {
+                return sync_bulk_execute_not_callable<BulkExecutor, Ts...>{};
+            }
+        };
 
         template <typename Executor, typename Enable = void>
         struct then_bulk_execute_fn_helper;
@@ -155,10 +177,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // default implementation of the execute() customization point
+        template <typename Executor, typename F, typename ... Ts>
+        struct sync_execute_not_callable;
+
+        ///////////////////////////////////////////////////////////////////////
+        // default implementation of the sync_execute() customization point
+        template <typename Executor, typename F, typename ... Ts>
+        HPX_FORCEINLINE auto sync_execute(hpx::traits::detail::wrap_int,
+                Executor& exec, F && f, Ts &&... ts)
+        ->  sync_execute_not_callable<Executor, F, Ts...>
+        {
+            return sync_execute_not_callable<Executor, F, Ts...>{};
+        }
+
         template <typename OneWayExecutor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto execute(OneWayExecutor const& exec, F && f,
-                Ts &&... ts)
+        HPX_FORCEINLINE auto sync_execute(int, OneWayExecutor const& exec,
+                F && f, Ts &&... ts)
         ->  decltype(
                 exec.sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
             )
@@ -176,11 +210,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             template <typename OneWayExecutor, typename F, typename ... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor && exec, F && f,
                     Ts &&... ts)
-            ->  decltype(
-                    execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...)
-                )
+            ->  decltype(sync_execute(
+                    0, exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                ))
             {
-                return execute(exec, std::forward<F>(f),
+                return sync_execute(0, exec, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
         };
@@ -199,52 +233,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////
-        // emulate async_execute() on OneWayExecutors
-        template <typename Executor>
-        struct async_execute_fn_helper<Executor,
-            typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value &&
-               !hpx::traits::is_two_way_executor<Executor>::value
-            >::type>
-        {
-            template <typename OneWayExecutor, typename F, typename ... Ts>
-            HPX_FORCEINLINE static auto call_impl(OneWayExecutor const& exec,
-                    std::false_type, F && f, Ts &&... ts)
-            ->  hpx::future<decltype(execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
-                ))>
-            {
-                return hpx::lcos::make_ready_future(execute(
-                        exec, std::forward<F>(f), std::forward<Ts>(ts)...
-                    ));
-            }
-
-            template <typename OneWayExecutor, typename F, typename ... Ts>
-            HPX_FORCEINLINE static hpx::future<void>
-            call_impl(OneWayExecutor const& exec, std::true_type, F && f,
-                Ts &&... ts)
-            {
-                execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
-                return hpx::lcos::make_ready_future();
-            }
-
-            template <typename OneWayExecutor, typename F, typename ... Ts>
-            HPX_FORCEINLINE static auto call(OneWayExecutor const& exec,
-                    F && f, Ts &&... ts)
-            ->  hpx::future<decltype(execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
-                ))>
-            {
-                typedef std::is_void<decltype(
-                        execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...)
-                    )> is_void;
-
-                return call_impl(exec, is_void(), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
-            }
-        };
-
         // emulate sync_execute() on OneWayExecutors
         template <typename Executor>
         struct sync_execute_fn_helper<Executor,
@@ -256,11 +244,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             template <typename OneWayExecutor, typename F, typename ... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor const& exec,
                     F && f, Ts &&... ts)
-            ->  decltype(execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+            ->  decltype(sync_execute(
+                    0, exec, std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
             {
-                return execute(exec, std::forward<F>(f),
+                return sync_execute(0, exec, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
         };
@@ -276,7 +264,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             template <typename OneWayExecutor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE static
-            hpx::future<typename hpx::util::detail::deferred_result_of<
+            hpx::lcos::future<typename hpx::util::detail::deferred_result_of<
                 F(Future, Ts...)
             >::type>
             call(OneWayExecutor const& exec, F && f, Future& predecessor,
@@ -294,11 +282,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                     p = lcos::detail::make_continuation_exec<result_type>(
                             predecessor, exec, std::move(func));
 
-                return hpx::traits::future_access<hpx::future<result_type> >::
+                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
                     create(std::move(p));
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         // emulate post() on OneWayExecutors
         template <typename Executor>
         struct post_fn_helper<Executor,
@@ -317,7 +306,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 ))
             {
                 // use apply_execute, if exposed
-                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+                return exec.apply_execute(std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
             }
 
             template <typename OneWayExecutor, typename F, typename ... Ts>
@@ -326,7 +316,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 F && f, Ts &&... ts)
             {
                 // execute synchronously
-                execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+                sync_execute(0, exec, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
 
             template <typename OneWayExecutor, typename F, typename ... Ts>
@@ -349,10 +339,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
+        template <typename Executor, typename F, typename ... Ts>
+        struct async_execute_not_callable;
+
+        ///////////////////////////////////////////////////////////////////////
         // default implementation of the async_execute() customization point
+        template <typename Executor, typename F, typename ... Ts>
+        HPX_FORCEINLINE auto async_execute(hpx::traits::detail::wrap_int,
+                Executor& exec, F && f, Ts &&... ts)
+        ->  async_execute_not_callable<Executor, F, Ts...>
+        {
+            return async_execute_not_callable<Executor, F, Ts...>{};
+        }
+
         template <typename TwoWayExecutor, typename F, typename ... Ts>
-        HPX_FORCEINLINE auto async_execute(TwoWayExecutor const& exec, F && f,
-                Ts &&... ts)
+        HPX_FORCEINLINE auto async_execute(int,
+                TwoWayExecutor const& exec, F && f, Ts &&... ts)
         ->  decltype(exec.async_execute(
                 std::forward<F>(f), std::forward<Ts>(ts)...
             ))
@@ -371,10 +373,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             HPX_FORCEINLINE static auto call(TwoWayExecutor const& exec,
                     F && f, Ts &&... ts)
             ->  decltype(async_execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...
+                    0, exec, std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
             {
-                return async_execute(exec, std::forward<F>(f),
+                return async_execute(0, exec, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
         };
@@ -402,8 +404,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         {
             // fall-back: emulate sync_execute using async_execute
             template <typename TwoWayExecutor, typename F, typename ... Ts>
-            HPX_FORCEINLINE static auto call_impl(TwoWayExecutor const& exec,
-                    std::false_type, F && f, Ts &&... ts)
+            HPX_FORCEINLINE static auto call_impl(std::false_type,
+                    TwoWayExecutor const& exec, F && f, Ts &&... ts)
             ->  decltype(hpx::util::invoke(
                     std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
@@ -442,7 +444,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 #endif
 
                     // use async execution, wait for result, propagate exceptions
-                    exec.async_execute(std::ref(wrapper)).get();
+                    async_execute(0, exec, std::ref(wrapper)).get();
                     return std::move(*out);
                 }
                 catch (std::bad_alloc const& ba) {
@@ -456,11 +458,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
 
             template <typename TwoWayExecutor, typename F, typename ... Ts>
-            static void call_impl(TwoWayExecutor const& exec,
-                std::true_type, F && f, Ts &&... ts)
+            static void call_impl(std::true_type,
+                TwoWayExecutor const& exec, F && f, Ts &&... ts)
             {
-                exec.async_execute(
-                    std::forward<F>(f), std::forward<Ts>(ts)...
+                async_execute(
+                    0, exec, std::forward<F>(f), std::forward<Ts>(ts)...
                 ).get();
             }
 
@@ -471,12 +473,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                     std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
             {
-                typedef std::is_void<
+                typedef typename std::is_void<
                         typename hpx::util::detail::deferred_result_of<
                             F(Ts...)
                         >::type
-                    > is_void;
-                return call_impl(exec, is_void(), std::forward<F>(f),
+                    >::type is_void;
+                return call_impl(is_void(), exec, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
 
@@ -557,7 +559,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                     p = lcos::detail::make_continuation_exec<result_type>(
                             predecessor, exec, std::move(func));
 
-                return hpx::traits::future_access<hpx::future<result_type> >::
+                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
                     create(std::move(p));
             }
 
@@ -620,7 +622,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 F && f, Ts &&... ts)
             {
                 // simply discard the returned future
-                async_execute(exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+                async_execute(0, exec, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
             }
 
             template <typename TwoWayExecutor, typename F, typename ... Ts>
@@ -687,6 +690,125 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // Helper facility to avoid ODR violations
+        template <typename T>
+        struct static_const
+        {
+            static T const value;
+        };
+
+        template <typename T>
+        T const static_const<T>::value = T{};
+    }
+    /// \endcond
+
+    namespace
+    {
+        ///////////////////////////////////////////////////////////////////////
+        // OneWayExecutor customization point: execution::execute
+
+        /// Customization point for synchronous execution agent creation.
+        ///
+        /// This synchronously creates a single function invocation f() using
+        /// the associated executor. The execution of the supplied function
+        /// synchronizes with the caller
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \returns f(ts...)'s result
+        ///
+        /// \note This is valid for one way executors only, it will call
+        ///       exec.sync_execute(f, ts...) if it exists.
+        ///
+        constexpr detail::sync_execute_fn const& sync_execute =
+            detail::static_const<detail::sync_execute_fn>::value;
+
+        ///////////////////////////////////////////////////////////////////////
+        // TwoWayExecutor customization points: execution::async_execute,
+        // execution::sync_execute, and execution::then_execute
+
+        /// Customization point for asynchronous execution agent creation.
+        ///
+        /// This asynchronously creates a single function invocation f() using
+        /// the associated executor.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \note Executors have to implement only `async_execute()`. All other
+        ///       functions will be emulated by this `executor_traits` in terms
+        ///       of this single basic primitive. However, some executors will
+        ///       naturally specialize all operations for maximum efficiency.
+        ///
+        /// \note This is valid for one way executors (calls
+        ///       make_ready_future(exec.sync_execute(f, ts...) if it exists)
+        ///       and for two way executors (calls exec.async_execute(f, ts...)
+        ///       if it exists).
+        ///
+        /// \returns f(ts...)'s result through a future
+        ///
+        constexpr detail::async_execute_fn const& async_execute =
+            detail::static_const<detail::async_execute_fn>::value;
+
+        /// Customization point for execution agent creation depending on a
+        /// given future.
+        ///
+        /// This creates a single function invocation f() using the associated
+        /// executor after the given future object has become ready.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param predecessor [in] The future object the execution of the
+        ///             given function depends on.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \returns f(ts...)'s result through a future
+        ///
+        /// \note This is valid for two way executors (calls
+        ///       exec.then_execute(f, predecessor, ts...) if it exists) and
+        ///       for one way executors (calls predecessor.then(bind(f, ts...))).
+        ///
+        constexpr detail::then_execute_fn const& then_execute =
+            detail::static_const<detail::then_execute_fn>::value;
+
+        ///////////////////////////////////////////////////////////////////////
+        // NonBlockingOneWayExecutor customization point: execution::post
+
+        /// Customization point for asynchronous fire & forget execution
+        /// agent creation.
+        ///
+        /// This asynchronously (fire & forget) creates a single function
+        /// invocation f() using the associated executor.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        /// \param ts   [in] Additional arguments to use to invoke \a f.
+        ///
+        /// \note This is valid for two way executors (calls
+        ///       exec.apply_execute(f, ts...), if available, otherwise
+        ///       it calls exec.async_execute(f, ts...) while discarding the
+        ///       returned future), and for non-blocking two way executors
+        ///       (calls exec.post(f, ts...) if it exists).
+        ///
+        constexpr detail::post_fn const& post =
+            detail::static_const<detail::post_fn>::value;
+    }
+
+    /// \cond NOINTERNAL
+    ///////////////////////////////////////////////////////////////////////////
     // customization points for BulkTwoWayExecutor interface
     // async_bulk_execute(), sync_bulk_execute(), then_bulk_execute()
     namespace detail
@@ -694,7 +816,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         ///////////////////////////////////////////////////////////////////////
         // async_bulk_execute()
         template <typename F, typename Shape, typename ... Ts>
-        struct async_bulk_execute_result
+        struct bulk_function_result
         {
             typedef typename
                     boost::range_const_iterator<Shape>::type
@@ -712,7 +834,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         template <typename Executor>
         struct async_bulk_execute_fn_helper<Executor,
             typename std::enable_if<
-                hpx::traits::is_bulk_one_way_executor<Executor>::value ||
                 hpx::traits::is_bulk_two_way_executor<Executor>::value
             >::type>
         {
@@ -724,13 +845,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                     Ts &&... ts)
             ->  std::vector<typename hpx::traits::executor_future<
                         Executor,
-                        typename async_bulk_execute_result<F, Shape, Ts...>::type,
+                        typename bulk_function_result<F, Shape, Ts...>::type,
                         Ts...
                     >::type>
             {
                 std::vector<typename hpx::traits::executor_future<
                         Executor,
-                        typename async_bulk_execute_result<F, Shape, Ts...>::type,
+                        typename bulk_function_result<F, Shape, Ts...>::type,
                         Ts...
                     >::type> results;
 
@@ -745,7 +866,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(async_execute(exec, f, elem, ts...));
+                    results.push_back(
+                        execution::async_execute(exec, f, elem, ts...)
+                    );
                 }
 
                 return results;
@@ -778,6 +901,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
 
+        // async_bulk_execute dispatch point
         struct async_bulk_execute_fn
         {
             template <typename Executor, typename F, typename Shape,
@@ -796,31 +920,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         ///////////////////////////////////////////////////////////////////////
         // sync_bulk_execute()
         template <typename F, typename Shape, bool IsVoid, typename ... Ts>
-        struct sync_bulk_execute_result_impl;
+        struct bulk_execute_result_impl;
 
         template <typename F, typename Shape, typename ... Ts>
-        struct sync_bulk_execute_result_impl<F, Shape, false, Ts...>
+        struct bulk_execute_result_impl<F, Shape, false, Ts...>
         {
-            typedef typename hpx::util::detail::unwrap_impl<
-                    typename async_bulk_execute_result<F, Shape, Ts...>::type
-                >::type type;
+            typedef std::vector<
+                    typename bulk_function_result<F, Shape, Ts...>::type
+                > type;
         };
 
         template <typename F, typename Shape, typename ... Ts>
-        struct sync_bulk_execute_result_impl<F, Shape, true, Ts...>
+        struct bulk_execute_result_impl<F, Shape, true, Ts...>
         {
             typedef void type;
         };
 
         template <typename F, typename Shape, typename ... Ts>
-        struct sync_bulk_execute_result
-          : sync_bulk_execute_result_impl<F, Shape,
+        struct bulk_execute_result
+          : bulk_execute_result_impl<F, Shape,
                 std::is_void<
-                    typename async_bulk_execute_result<F, Shape, Ts...>::type
+                    typename bulk_function_result<F, Shape, Ts...>::type
                 >::value,
                 Ts...>
         {};
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct sync_bulk_result_helper
         {
@@ -833,6 +958,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             typedef void type;
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
         struct sync_bulk_execute_fn_helper<Executor,
             typename std::enable_if<
@@ -843,17 +969,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             // returns void if F returns void
             template <typename BulkExecutor, typename F, typename Shape,
                 typename ... Ts>
-            static auto call_impl(hpx::traits::detail::wrap_int,
+            static auto call_impl(std::false_type,
                     BulkExecutor const& exec, F && f, Shape const& shape,
                     Ts &&... ts)
-            ->  typename sync_bulk_result_helper<decltype(
-                    async_execute(exec, f, *boost::begin(shape), ts...).get()
-                )>::type
+            ->  std::vector<typename bulk_execute_result<
+                        F, Shape, Ts...
+                    >::type>
             {
-                std::vector<typename hpx::traits::executor_future<
-                        Executor,
-                        typename async_bulk_execute_result<F, Shape, Ts...>::type,
-                        Ts...
+                std::vector<typename bulk_execute_result<
+                        F, Shape, Ts...
                     >::type> results;
 
 // Before Boost V1.56 boost::size() does not respect the iterator category of
@@ -868,9 +992,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 try {
                     for (auto const& elem : shape)
                     {
-                        results.push_back(async_execute(exec, f, elem, ts...));
+                        results.push_back(
+                            execution::sync_execute(exec, f, elem, ts...)
+                        );
                     }
-                    return hpx::util::unwrapped(results);
+                    return results;
                 }
                 catch (std::bad_alloc const& ba) {
                     boost::throw_exception(ba);
@@ -880,6 +1006,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                         exception_list(boost::current_exception())
                     );
                 }
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename ... Ts>
+            static void call_impl(std::true_type,
+                BulkExecutor const& exec, F && f, Shape const& shape,
+                Ts &&... ts)
+            {
+                try {
+                    for (auto const& elem : shape)
+                    {
+                        execution::sync_execute(exec, f, elem, ts...);
+                    }
+                }
+                catch (std::bad_alloc const& ba) {
+                    boost::throw_exception(ba);
+                }
+                catch (...) {
+                    boost::throw_exception(
+                        exception_list(boost::current_exception())
+                    );
+                }
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename ... Ts>
+            static auto call_impl(hpx::traits::detail::wrap_int,
+                    BulkExecutor const& exec, F && f, Shape const& shape,
+                    Ts &&... ts)
+            ->  typename sync_bulk_result_helper<
+                        typename bulk_execute_result<F, Shape, Ts...>::type
+                    >::type
+            {
+                typedef typename std::is_void<
+                        typename bulk_execute_result<F, Shape, Ts...>::type
+                    >::type is_void;
+
+                return call_impl(is_void(), exec, std::forward<F>(f), shape,
+                    std::forward<Ts>(ts)...);
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
@@ -949,12 +1114,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 Future& predecessor, hpx::util::detail::pack_c<std::size_t, Is...>,
                 hpx::util::tuple<Ts...> const& args)
         ->  decltype(async_execute(
-                exec, std::forward<F>(f), elem, predecessor,
+                0, exec, std::forward<F>(f), elem, predecessor,
                     std::move(hpx::util::get<Is>(args))...
             ))
         {
-            return async_execute(exec, std::forward<F>(f), elem, predecessor,
-                std::move(hpx::util::get<Is>(args))...);
+            return async_execute(0, exec, std::forward<F>(f), elem,
+                predecessor, std::move(hpx::util::get<Is>(args))...);
         }
 
         template <typename Executor>
@@ -1078,145 +1243,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // Helper facility to avoid ODR violations
-        template <typename T>
-        struct static_const
-        {
-            static T const value;
-        };
-
-        template <typename T>
-        T const static_const<T>::value = T{};
-    }
     /// \endcond
 
     namespace
     {
-        ///////////////////////////////////////////////////////////////////////
-        // OneWayExecutor customization point: execution::execute
-
-        /// Customization point for synchronous execution agent creation.
-        ///
-        /// This synchronously creates a single function invocation f() using
-        /// the associated executor. The execution of the supplied function
-        /// synchronizes with the caller
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns f(ts...)'s result
-        ///
-        /// \note This is valid for one way executors only, it will call
-        ///       exec.execute(f, ts...) if it exists.
-        ///
-        constexpr detail::execute_fn const& execute =
-            detail::static_const<detail::execute_fn>::value;
-
-        ///////////////////////////////////////////////////////////////////////
-        // TwoWayExecutor customization points: execution::async_execute,
-        // execution::sync_execute, and execution::then_execute
-
-        /// Customization point for asynchronous execution agent creation.
-        ///
-        /// This asynchronously creates a single function invocation f() using
-        /// the associated executor.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \note Executors have to implement only `async_execute()`. All other
-        ///       functions will be emulated by this `executor_traits` in terms
-        ///       of this single basic primitive. However, some executors will
-        ///       naturally specialize all operations for maximum efficiency.
-        ///
-        /// \note This is valid for one way executors (calls
-        ///       make_ready_future(exec.execute(f, ts...) if it exists) and
-        ///       for two way executors (calls exec.async_execute(f, ts...) if
-        ///       it exists).
-        ///
-        /// \returns f(ts...)'s result through a future
-        ///
-        constexpr detail::async_execute_fn const& async_execute =
-            detail::static_const<detail::async_execute_fn>::value;
-
-        /// Customization point for synchronous execution agent creation.
-        ///
-        /// This synchronously creates a single function invocation f() using
-        /// the associated executor. The execution of the supplied function
-        /// synchronizes with the caller
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns f(ts...)'s result
-        ///
-        /// \note This is valid for two way executors (calls
-        ///       exec.sync_execute(f, ts...) if it exists) and for one way
-        ///       executors (calls exec.execute(f, ts...) if it exists).
-        ///
-        constexpr detail::sync_execute_fn const& sync_execute =
-            detail::static_const<detail::sync_execute_fn>::value;
-
-        /// Customization point for execution agent creation depending on a
-        /// given future.
-        ///
-        /// This creates a single function invocation f() using the associated
-        /// executor after the given future object has become ready.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param predecessor [in] The future object the execution of the
-        ///             given function depends on.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns f(ts...)'s result through a future
-        ///
-        /// \note This is valid for two way executors (calls
-        ///       exec.then_execute(f, predecessor, ts...) if it exists) and
-        ///       for one way executors (calls predecessor.then(bind(f, ts...))).
-        ///
-        constexpr detail::then_execute_fn const& then_execute =
-            detail::static_const<detail::then_execute_fn>::value;
-
-        ///////////////////////////////////////////////////////////////////////
-        // NonBlockingOneWayExecutor customization point: execution::post
-
-        /// Customization point for asynchronous fire & forget execution
-        /// agent creation.
-        ///
-        /// This asynchronously (fire & forget) creates a single function
-        /// invocation f() using the associated executor.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \note This is valid for two way executors (calls
-        ///       exec.apply_execute(f, ts...), if available, otherwise
-        ///       it calls exec.async_execute(f, ts...) while discarding the
-        ///       returned future), and for non-blocking two way executors
-        ///       (calls exec.post(f, ts...) if it exists).
-        ///
-        constexpr detail::post_fn const& post =
-            detail::static_const<detail::post_fn>::value;
-
         ///////////////////////////////////////////////////////////////////////
         // BulkTwoWayExecutor customization points:
         // execution::async_bulk_execute, execution::sync_bulk_execute,

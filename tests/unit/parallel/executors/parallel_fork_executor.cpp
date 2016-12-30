@@ -43,6 +43,29 @@ void test_async()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+hpx::thread::id test_f(hpx::future<void> f, int passed_through)
+{
+    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+
+    f.get();                    // propagate exceptions
+
+    HPX_TEST_EQ(passed_through, 42);
+    return hpx::this_thread::get_id();
+}
+
+void test_then()
+{
+    typedef hpx::parallel::execution::parallel_executor executor;
+
+    hpx::future<void> f = hpx::make_ready_future();
+
+    executor exec(hpx::launch::fork);
+    HPX_TEST(
+        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
+        hpx::this_thread::get_id());
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 {
     HPX_TEST(tid != hpx::this_thread::get_id());
@@ -89,12 +112,52 @@ void test_bulk_async()
     ).get();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+    int passed_through) //-V813
+{
+    HPX_ASSERT(f.is_ready());   // make sure, future is ready
+
+    f.get();                    // propagate exceptions
+
+    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_EQ(passed_through, 42);
+}
+
+void test_bulk_then()
+{
+    typedef hpx::parallel::execution::parallel_executor executor;
+
+    hpx::thread::id tid = hpx::this_thread::get_id();
+
+    std::vector<int> v(107);
+    std::iota(boost::begin(v), boost::end(v), std::rand());
+
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
+    using hpx::util::placeholders::_3;
+
+    hpx::shared_future<void> f = hpx::make_ready_future();
+
+    executor exec(hpx::launch::fork);
+    hpx::when_all(hpx::parallel::execution::then_bulk_execute(
+        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
+    ).get()).get();
+    hpx::when_all(hpx::parallel::execution::then_bulk_execute(
+        exec, &bulk_test_f, v, f, tid, 42
+    ).get()).get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
     test_sync();
     test_async();
+    test_then();
+
     test_bulk_sync();
     test_bulk_async();
+    test_bulk_then();
 
     return hpx::finalize();
 }

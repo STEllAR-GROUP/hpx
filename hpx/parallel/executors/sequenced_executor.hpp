@@ -74,12 +74,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
         template <typename F, typename S, typename ... Ts>
         static std::vector<hpx::future<
-            typename detail::async_bulk_execute_result<F, S, Ts...>::type
+            typename detail::bulk_function_result<F, S, Ts...>::type
         > >
         async_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
             typedef typename
-                    detail::async_bulk_execute_result<F, S, Ts...>::type
+                    detail::bulk_function_result<F, S, Ts...>::type
                 result_type;
             std::vector<hpx::future<result_type> > results;
 
@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         }
 
         template <typename F, typename S, typename ... Ts>
-        static typename detail::sync_bulk_execute_result<F, S, Ts...>::type
+        static typename detail::bulk_execute_result<F, S, Ts...>::type
         sync_bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
             return hpx::util::unwrapped(

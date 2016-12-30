@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <array>
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
@@ -17,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include <boost/atomic.hpp>
 #include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,8 +49,8 @@ void test_apply(Executor& exec)
     hpx::lcos::local::latch l(2);
     hpx::thread::id id;
 
-    typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::apply_execute(exec, &apply_test, std::ref(l), std::ref(id), 42);
+    hpx::parallel::execution::post(
+        exec, &apply_test, std::ref(l), std::ref(id), 42);
     l.count_down_and_wait();
 
     HPX_TEST(id != hpx::this_thread::get_id());
@@ -57,16 +59,16 @@ void test_apply(Executor& exec)
 template <typename Executor>
 void test_sync(Executor& exec)
 {
-    typedef hpx::parallel::executor_traits<Executor> traits;
-    HPX_TEST(traits::execute(exec, &async_test, 42) != hpx::this_thread::get_id());
+    HPX_TEST(
+        hpx::parallel::execution::sync_execute(exec, &async_test, 42) !=
+        hpx::this_thread::get_id());
 }
 
 template <typename Executor>
 void test_async(Executor& exec)
 {
-    typedef hpx::parallel::executor_traits<Executor> traits;
     HPX_TEST(
-        traits::async_execute(exec, &async_test, 42).get() !=
+        hpx::parallel::execution::async_execute(exec, &async_test, 42).get() !=
         hpx::this_thread::get_id());
 }
 
@@ -81,10 +83,10 @@ void test_bulk_sync(Executor& exec)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::bulk_execute(exec,
+    hpx::parallel::execution::sync_bulk_execute(exec,
         hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42);
-    traits::bulk_execute(exec, &async_bulk_test, v, tid, 42);
+    hpx::parallel::execution::sync_bulk_execute(
+        exec, &async_bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -98,26 +100,39 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    typedef hpx::parallel::executor_traits<Executor> traits;
     hpx::when_all(
-        traits::bulk_async_execute(
+        hpx::parallel::execution::async_bulk_execute(
             exec, hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        traits::bulk_async_execute(exec, &async_bulk_test, v, tid, 42)
+        hpx::parallel::execution::async_bulk_execute(
+            exec, &async_bulk_test, v, tid, 42)
     ).get();
 }
 
+boost::atomic<std::size_t> count_apply(0);
+boost::atomic<std::size_t> count_sync(0);
+boost::atomic<std::size_t> count_async(0);
+boost::atomic<std::size_t> count_bulk_sync(0);
+boost::atomic<std::size_t> count_bulk_async(0);
+
 template <typename Executor>
-void test_executor()
+void test_executor(std::array<std::size_t, 5> expected)
 {
-    typedef typename hpx::parallel::executor_traits<
+    typedef typename hpx::parallel::execution::executor_execution_category<
             Executor
-        >::execution_category execution_category;
+        >::type execution_category;
 
     HPX_TEST((std::is_same<
-            hpx::parallel::parallel_execution_tag, execution_category
+            hpx::parallel::execution::parallel_execution_tag,
+            execution_category
         >::value));
+
+    count_apply.store(0);
+    count_sync.store(0);
+    count_async.store(0);
+    count_bulk_sync.store(0);
+    count_bulk_async.store(0);
 
     Executor exec;
 
@@ -126,36 +141,77 @@ void test_executor()
     test_async(exec);
     test_bulk_sync(exec);
     test_bulk_async(exec);
+
+    HPX_TEST_EQ(expected[0], count_apply.load());
+    HPX_TEST_EQ(expected[1], count_sync.load());
+    HPX_TEST_EQ(expected[2], count_async.load());
+    HPX_TEST_EQ(expected[3], count_bulk_sync.load());
+    HPX_TEST_EQ(expected[4], count_bulk_async.load());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_async_executor2 : hpx::parallel::executor_tag
+struct test_async_executor1
 {
+    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+    static hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
     async_execute(F && f, Ts &&... ts)
     {
+        ++count_async;
         return hpx::async(hpx::launch::async, std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
 };
 
-struct test_async_executor1 : test_async_executor2
+namespace hpx { namespace traits
 {
+    template <>
+    struct is_two_way_executor<test_async_executor1>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<test_async_executor1>
+      : std::true_type
+    {};
+}}
+
+struct test_async_executor2 : test_async_executor1
+{
+    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-    execute(F && f, Ts &&... ts)
+    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    sync_execute(F && f, Ts &&... ts)
     {
+        ++count_sync;
         return hpx::async(hpx::launch::async, std::forward<F>(f),
             std::forward<Ts>(ts)...).get();
     }
 };
 
-struct test_async_executor3 : test_async_executor2
+namespace hpx { namespace traits
 {
+    template <>
+    struct is_two_way_executor<test_async_executor2>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<test_async_executor2>
+      : std::true_type
+    {};
+}}
+
+struct test_async_executor3 : test_async_executor1
+{
+    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+
     template <typename F, typename Shape, typename ... Ts>
-    void bulk_execute(F f, Shape const& shape, Ts &&... ts)
+    static void sync_bulk_execute(F f, Shape const& shape, Ts &&... ts)
     {
+        ++count_bulk_sync;
         std::vector<hpx::future<void> > results;
         for (auto const& elem: shape)
         {
@@ -165,12 +221,28 @@ struct test_async_executor3 : test_async_executor2
     }
 };
 
-struct test_async_executor4 : test_async_executor2
+namespace hpx { namespace traits
 {
+    template <>
+    struct is_two_way_executor<test_async_executor3>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<test_async_executor3>
+      : std::true_type
+    {};
+}}
+
+struct test_async_executor4 : test_async_executor1
+{
+    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+
     template <typename F, typename Shape, typename ... Ts>
-    std::vector<hpx::future<void> >
-    bulk_async_execute(F f, Shape const& shape, Ts &&... ts)
+    static std::vector<hpx::future<void> >
+    async_bulk_execute(F f, Shape const& shape, Ts &&... ts)
     {
+        ++count_bulk_async;
         std::vector<hpx::future<void> > results;
         for (auto const& elem: shape)
         {
@@ -180,23 +252,52 @@ struct test_async_executor4 : test_async_executor2
     }
 };
 
-struct test_async_executor5 : test_async_executor2
+namespace hpx { namespace traits
 {
+    template <>
+    struct is_two_way_executor<test_async_executor4>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<test_async_executor4>
+      : std::true_type
+    {};
+}}
+
+struct test_async_executor5 : test_async_executor1
+{
+    typedef hpx::parallel::execution::parallel_execution_tag execution_category;
+
     template <typename F, typename ... Ts>
-    void apply_execute(F && f, Ts &&... ts)
+    static void apply_execute(F && f, Ts &&... ts)
     {
+        ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_two_way_executor<test_async_executor5>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<test_async_executor5>
+      : std::true_type
+    {};
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    test_executor<test_async_executor1>();
-    test_executor<test_async_executor2>();
-    test_executor<test_async_executor3>();
-    test_executor<test_async_executor4>();
-    test_executor<test_async_executor5>();
+    test_executor<test_async_executor1>({{ 0, 0, 431, 0, 0 }});
+    test_executor<test_async_executor2>({{ 0, 215, 216, 0, 0 }});
+    test_executor<test_async_executor3>({{ 0, 0, 217, 2, 0 }});
+    test_executor<test_async_executor4>({{ 0, 0, 217, 0, 2 }});
+    test_executor<test_async_executor5>({{ 1, 0, 430, 0, 0 }});
 
     return hpx::finalize();
 }
