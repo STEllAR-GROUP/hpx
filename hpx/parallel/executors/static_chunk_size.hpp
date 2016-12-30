@@ -66,8 +66,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             traits::reset_thread_distribution(*this, exec);
 
             // by default use static work distribution over number of
-            // available compute resources
-            return (num_tasks + cores - 1) / cores;
+            // available compute resources, create four times the number of
+            // chunks than we have cores
+            return (num_tasks + 4 * cores - 1) / (4 * cores);   // round up
         }
         /// \endcond
 

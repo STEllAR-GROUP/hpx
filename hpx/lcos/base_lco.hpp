@@ -58,7 +58,11 @@ namespace hpx { namespace lcos
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is
         /// overloaded by the derived concrete LCO.
+#if defined(__CUDACC__)
+        HPX_DEVICE void set_event_nonvirt() {}
+#else
         void set_event_nonvirt();
+#endif
 
         /// The \a function set_exception is called whenever a
         /// \a set_exception_action is applied on a instance of a LCO. This function
@@ -67,7 +71,11 @@ namespace hpx { namespace lcos
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
+#if defined(__CUDACC__)
+        HPX_DEVICE void set_exception_nonvirt(boost::exception_ptr const&) {}
+#else
         void set_exception_nonvirt(boost::exception_ptr const& e);
+#endif
 
         /// The \a function connect_nonvirt is called whenever a
         /// \a connect_action is applied on a instance of a LCO. This function
@@ -75,15 +83,22 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
+#if defined(__CUDACC__)
+        HPX_DEVICE void connect_nonvirt(naming::id_type const & id) {}
+#else
         void connect_nonvirt(naming::id_type const & id);
-
+#endif
         /// The \a function disconnect_nonvirt is called whenever a
         /// \a disconnect_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a disconnect, which is
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
+#if defined(__CUDACC__)
+        HPX_DEVICE void disconnect_nonvirt(naming::id_type const & id) {}
+#else
         void disconnect_nonvirt(naming::id_type const & id);
+#endif
 
     public:
         /// Each of the exposed functions needs to be encapsulated into an action

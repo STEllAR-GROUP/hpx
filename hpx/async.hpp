@@ -133,7 +133,7 @@ namespace hpx { namespace detail
                     hpx::this_thread::yield_to(thread::id(std::move(tid)));
                 }
             }
-            return p.get_future();
+            return p.retrieve_future();
         }
 
         template <typename F, typename ...Ts>
@@ -171,7 +171,7 @@ namespace hpx { namespace detail
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
             p.apply(launch::async);
-            return p.get_future();
+            return p.retrieve_future();
         }
 
         template <typename F, typename ...Ts>
@@ -190,9 +190,10 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(launch::fork);
-            hpx::this_thread::yield();  // make sure this thread is executed last
-            return p.get_future();
+            // make sure this thread is executed last
+            threads::thread_id_type tid = p.apply(launch::fork);
+            hpx::this_thread::yield_to(thread::id(std::move(tid)));
+            return p.retrieve_future();
         }
 
         template <typename F, typename ...Ts>
@@ -211,7 +212,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            return p.get_future();
+            return p.retrieve_future();
         }
     };
 
@@ -259,7 +260,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(sched,
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
             p.apply();
-            return p.get_future();
+            return p.retrieve_future();
         }
     };
 

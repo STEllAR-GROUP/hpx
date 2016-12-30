@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/util/interval_timer.hpp>
 
 #include <cstddef>
@@ -46,22 +47,24 @@ namespace hpx { namespace util
 
     protected:
         void find_counters();
-        bool find_counter(performance_counters::counter_info const& info,
-            error_code& ec);
 
         bool print_raw_counters(bool destination_is_cout, bool reset,
-            char const* description, std::vector<id_type> const& ids,
+            char const* description,
+            std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
         bool print_array_counters(bool destination_is_cout, bool reset,
-            char const* description, std::vector<id_type> const& ids,
+            char const* description,
+            std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
 
         template <typename Stream>
-        void print_headers(Stream& output);
+        void print_headers(Stream& output,
+            std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream, typename Future>
         void print_values(Stream& output, std::vector<Future> &&,
-            std::vector<std::size_t> && indicies);
+            std::vector<std::size_t> && indicies,
+            std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,
@@ -89,13 +92,10 @@ namespace hpx { namespace util
 
     private:
         typedef lcos::local::mutex mutex_type;
-
         mutex_type mtx_;
 
-        std::vector<std::string> names_;      // counter instance names
-        std::vector<naming::id_type> ids_;    // gids of counter instances
-        std::vector<std::string> uoms_;       // units of measure
-        std::vector<performance_counters::counter_type> types_; // counter type
+        std::vector<std::string> names_;
+        performance_counters::performance_counter_set counters_;
 
         std::string destination_;
         std::string format_;

@@ -54,6 +54,7 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
+            typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
                     policy
@@ -63,7 +64,8 @@ namespace hpx { namespace lcos { namespace detail
                             std::forward<Ts>(ts)
                         )...
                     )
-                ));
+                  , init_no_addref()
+                ), false);
             p->do_await();
 
             using traits::future_access;
@@ -135,6 +137,7 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
+            typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
                     sched
@@ -144,7 +147,8 @@ namespace hpx { namespace lcos { namespace detail
                             std::forward<Ts>(ts)
                         )...
                     )
-                ));
+                  , init_no_addref()
+                ), false);
             p->do_await();
 
             using traits::future_access;
@@ -177,6 +181,7 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
+            typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
                     std::forward<Executor_>(exec)
@@ -184,7 +189,8 @@ namespace hpx { namespace lcos { namespace detail
                   , util::forward_as_tuple(
                         traits::acquire_future_disp()(std::forward<Ts>(ts))...
                     )
-                ));
+                  , init_no_addref()
+                ), false);
             p->do_await();
 
             using traits::future_access;

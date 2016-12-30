@@ -56,28 +56,32 @@ void test()
     int rank = hpx::get_locality_id();
 
     std::vector<hpx::id_type> boundingBoxReceivers;
-    std::vector<hpx::id_type> boundingBoxAccepters;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 2; ++i) {
         if (i == rank)
             continue;
 
-        std::string name = gen_name(i, rank);
-        std::cout << "registration: " << name << "\n";
+        for (int j = 0; j < 2; ++j) {
+            std::string name = gen_name(j, rank);
+            std::cout << "registration: " << name << "\n";
 
-        hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
-        hpx::register_with_basename(name, id, 0).get();
-        boundingBoxReceivers.push_back(id);
+            hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
+            hpx::register_with_basename(name, id, 0).get();
+            boundingBoxReceivers.push_back(id);
+        }
     }
 
-    for (int i = 0; i < 4; ++i) {
-        if (i == rank)
+    std::vector<hpx::id_type> boundingBoxAccepters;
+    for (int i = 0; i < 2; ++i) {
+        if (i != rank)
             continue;
 
-        std::string name = gen_name(rank, i);
-        std::cout << "lookup: " << name << "\n";
-        std::vector<hpx::future<hpx::id_type> > ids =
-            hpx::find_all_from_basename(name, 1);
-        boundingBoxAccepters.push_back(ids[0].get());
+        for (int j = 0; j < 2; ++j) {
+            std::string name = gen_name(j, rank);
+            std::cout << "lookup: " << name << "\n";
+            std::vector<hpx::future<hpx::id_type> > ids =
+                hpx::find_all_from_basename(name, 1);
+            boundingBoxAccepters.push_back(ids[0].get());
+        }
     }
 
     std::cout << "all done " << rank << "\n";
@@ -85,10 +89,11 @@ void test()
 
 int hpx_main(int argc, char **argv)
 {
-    // this test must run using 4 localities
-    HPX_TEST_EQ(hpx::get_num_localities().get(), 4u);
+    // this test must run using 2 localities
+    HPX_TEST_EQ(hpx::get_num_localities().get(), 2u);
 
     test();
+
     return hpx::finalize();
 }
 

@@ -86,8 +86,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
                 if (stride != 1)
                 {
+                    // rounding up
                     test_chunk_size = (std::max)(std::size_t(stride),
-                        (test_chunk_size / stride) * stride);
+                        ((test_chunk_size + stride - 1) / stride) * stride);
                 }
 
                 add_ready_future(workitems, f1, begin, test_chunk_size);
@@ -109,12 +110,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         // we should not make chunks smaller than what's determined by the
         // max chunk size
-        chunk_size = (std::max)(chunk_size, count / max_chunks);
+        chunk_size = (std::max)(chunk_size,
+            (count + max_chunks - 1) / max_chunks);
 
         if (stride != 1)
         {
             chunk_size = (std::max)(std::size_t(stride),
-                (chunk_size / stride) * stride);
+                ((chunk_size + stride) / stride - 1) * stride);
         }
 
         typedef parallel::util::detail::chunk_size_iterator<FwdIter> iterator;
@@ -161,12 +163,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
             // we should not make chunks smaller than what's determined by the
             // max chunk size
-            chunk_size = (std::max)(chunk_size, count / max_chunks);
+            chunk_size = (std::max)(chunk_size,
+                (count + max_chunks - 1) / max_chunks);
 
             if (stride != 1)
             {
                 chunk_size = (std::max)(std::size_t(stride),
-                    (chunk_size / stride) * stride);
+                    ((chunk_size + stride) / stride - 1) * stride);
             }
 
             std::size_t chunk = (std::min)(chunk_size, count);
@@ -244,7 +247,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 if (stride != 1)
                 {
                     test_chunk_size = (std::max)(std::size_t(stride),
-                        (test_chunk_size / stride) * stride);
+                        ((test_chunk_size + stride) / stride - 1) * stride);
                 }
 
                 add_ready_future_idx(workitems, f1, begin, base_idx,
@@ -269,12 +272,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         // we should not make chunks smaller than what's determined by the
         // max chunk size
-        chunk_size = (std::max)(chunk_size, count / max_chunks);
+        chunk_size = (std::max)(chunk_size,
+            (count + max_chunks - 1) / max_chunks);
 
         if (stride != 1)
         {
             chunk_size = (std::max)(std::size_t(stride),
-                (chunk_size / stride) * stride);
+                ((chunk_size + stride) / stride - 1) * stride);
         }
 
         typedef parallel::util::detail::chunk_size_idx_iterator<FwdIter> iterator;
@@ -322,12 +326,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
             // we should not make chunks smaller than what's determined by the
             // max chunk size
-            chunk_size = (std::max)(chunk_size, count / max_chunks);
+            chunk_size = (std::max)(chunk_size,
+                (count + max_chunks - 1) / max_chunks);
 
             if (stride != 1)
             {
                 chunk_size = (std::max)(std::size_t(stride),
-                    (chunk_size / stride) * stride);
+                    ((chunk_size + stride) / stride - 1) * stride);
             }
 
             std::size_t chunk = (std::min)(chunk_size, count);

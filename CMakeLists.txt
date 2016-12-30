@@ -1186,6 +1186,10 @@ if(WIN32)
       hpx_add_target_compile_option(-Gw
         CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
       hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+      if(HPX_WITH_DATAPAR_VC)
+        hpx_add_target_compile_option(-std:c++latest)
+        hpx_add_config_define(_HAS_AUTO_PTR_ETC 1)
+      endif()
     endif()
 
     # Exceptions

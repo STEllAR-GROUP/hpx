@@ -1,6 +1,6 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
 //
@@ -50,11 +50,9 @@
 #if defined(__x86_64__)
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
-extern "C" void swapcontext_stack3 (void***, void**) throw();
 #else
 extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
 extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
-extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm(2)));
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

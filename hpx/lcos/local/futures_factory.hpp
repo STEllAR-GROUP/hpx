@@ -36,6 +36,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef Base base_type;
             typedef typename Base::result_type result_type;
+            typedef typename Base::init_no_addref init_no_addref;
 
             F f_;
 
@@ -43,7 +44,7 @@ namespace hpx { namespace lcos { namespace local
               : f_(f)
             {}
 
-            task_object(F&& f)
+            task_object(F && f)
               : f_(std::move(f))
             {}
 
@@ -51,8 +52,26 @@ namespace hpx { namespace lcos { namespace local
               : base_type(sched), f_(f)
             {}
 
-            task_object(threads::executor& sched, F&& f)
+            task_object(threads::executor& sched, F && f)
               : base_type(sched), f_(std::move(f))
+            {}
+
+            task_object(F const& f, init_no_addref no_addref)
+              : base_type(no_addref), f_(f)
+            {}
+
+            task_object(F && f, init_no_addref no_addref)
+              : base_type(no_addref), f_(std::move(f))
+            {}
+
+            task_object(threads::executor& sched, F const& f,
+                    init_no_addref no_addref)
+              : base_type(sched, no_addref), f_(f)
+            {}
+
+            task_object(threads::executor& sched, F && f,
+                    init_no_addref no_addref)
+              : base_type(sched, no_addref), f_(std::move(f))
             {}
 
             void do_run()
@@ -127,12 +146,13 @@ namespace hpx { namespace lcos { namespace local
                     Result, F, lcos::detail::cancelable_task_base<Result>
                 > base_type;
             typedef typename base_type::result_type result_type;
+            typedef typename base_type::init_no_addref init_no_addref;
 
             cancelable_task_object(F const& f)
               : base_type(f)
             {}
 
-            cancelable_task_object(F&& f)
+            cancelable_task_object(F && f)
               : base_type(std::move(f))
             {}
 
@@ -140,8 +160,26 @@ namespace hpx { namespace lcos { namespace local
               : base_type(sched, f)
             {}
 
-            cancelable_task_object(threads::executor& sched, F&& f)
+            cancelable_task_object(threads::executor& sched, F && f)
               : base_type(sched, std::move(f))
+            {}
+
+            cancelable_task_object(F const& f, init_no_addref no_addref)
+              : base_type(f, no_addref)
+            {}
+
+            cancelable_task_object(F && f, init_no_addref no_addref)
+              : base_type(std::move(f), no_addref)
+            {}
+
+            cancelable_task_object(threads::executor& sched, F const& f,
+                    init_no_addref no_addref)
+              : base_type(sched, f, no_addref)
+            {}
+
+            cancelable_task_object(threads::executor& sched, F && f,
+                    init_no_addref no_addref)
+              : base_type(sched, std::move(f), no_addref)
             {}
         };
     }
@@ -160,63 +198,93 @@ namespace hpx { namespace lcos { namespace local
         template <typename Result, bool Cancelable>
         struct create_task_object
         {
-            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+            typedef
+                boost::intrusive_ptr<lcos::detail::task_base<Result> >
                 return_type;
+            typedef
+                typename lcos::detail::future_data_refcnt_base::init_no_addref
+                init_no_addref;
 
             template <typename F>
-            static return_type call(threads::executor& sched, F&& f)
+            static return_type call(threads::executor& sched, F && f)
             {
-                return new task_object<Result, F>(sched, std::forward<F>(f));
+                return return_type(
+                    new task_object<Result, F>(
+                        sched, std::forward<F>(f), init_no_addref()),
+                    false);
             }
 
             template <typename R>
             static return_type call(threads::executor& sched, R (*f)())
             {
-                return new task_object<Result, Result (*)()>(sched, f);
+                return return_type(
+                    new task_object<Result, Result (*)()>(
+                        sched, f, init_no_addref()),
+                    false);
             }
 
             template <typename F>
             static return_type call(F&& f)
             {
-                return new task_object<Result, F>(std::forward<F>(f));
+                return return_type(
+                    new task_object<Result, F>(
+                        std::forward<F>(f), init_no_addref()),
+                    false);
             }
 
             template <typename R>
             static return_type call(R (*f)())
             {
-                return new task_object<Result, Result (*)()>(f);
+                return return_type(
+                    new task_object<Result, Result (*)()>(f, init_no_addref()),
+                    false);
             }
         };
 
         template <typename Result>
         struct create_task_object<Result, true>
         {
-            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+            typedef
+                boost::intrusive_ptr<lcos::detail::task_base<Result> >
                 return_type;
+            typedef
+                typename lcos::detail::future_data_refcnt_base::init_no_addref
+                init_no_addref;
 
             template <typename F>
             static return_type call(threads::executor& sched, F&& f)
             {
-                return new cancelable_task_object<Result, F>(
-                    sched, std::forward<F>(f));
+                return return_type(
+                    new cancelable_task_object<Result, F>(
+                        sched, std::forward<F>(f), init_no_addref()),
+                    false);
             }
 
             template <typename R>
             static return_type call(threads::executor& sched, R (*f)())
             {
-                return new cancelable_task_object<Result, Result (*)()>(sched, f);
+                return return_type(
+                    new cancelable_task_object<Result, Result (*)()>(
+                        sched, f, init_no_addref()),
+                    false);
             }
 
             template <typename F>
             static return_type call(F&& f)
             {
-                return new cancelable_task_object<Result, F>(std::forward<F>(f));
+                return return_type(
+                    new cancelable_task_object<Result, F>(
+                        std::forward<F>(f), init_no_addref()),
+                    false);
             }
 
             template <typename R>
             static return_type call(R (*f)())
             {
-                return new cancelable_task_object<Result, Result (*)()>(f);
+                return return_type(
+                    new cancelable_task_object<Result, Result (*)()>(
+                        f, init_no_addref()),
+                    false);
             }
         };
     }
@@ -331,6 +399,29 @@ namespace hpx { namespace lcos { namespace local
 
             using traits::future_access;
             return future_access<future<Result> >::create(task_);
+        }
+
+        // This is the same as get_future above, except that it moves the
+        // shared state into the returned future.
+        lcos::future<Result> retrieve_future(error_code& ec = throws)
+        {
+            if (!task_) {
+                HPX_THROWS_IF(ec, task_moved,
+                    "futures_factory<Result()>::get_future",
+                    "futures_factory invalid (has it been moved?)");
+                return lcos::future<Result>();
+            }
+            if (future_obtained_) {
+                HPX_THROWS_IF(ec, future_already_retrieved,
+                    "futures_factory<Result()>::get_future",
+                    "future already has been retrieved from this promise");
+                return lcos::future<Result>();
+            }
+
+            future_obtained_ = true;
+
+            using traits::future_access;
+            return future_access<future<Result> >::create(std::move(task_));
         }
 
         bool valid() const HPX_NOEXCEPT

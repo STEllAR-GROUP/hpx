@@ -19,6 +19,7 @@ set(benchmarks
     print_heterogeneous_payloads
     skynet
     timed_task_spawn
+    wait_all_timings
 )
 
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLATARRAY)
@@ -74,6 +75,7 @@ set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_comp
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
+set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})

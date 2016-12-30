@@ -9,11 +9,11 @@
 #define HPX_RUNTIME_RUNTIME_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 namespace hpx
 {
     class HPX_API_EXPORT runtime;
-    class HPX_API_EXPORT thread;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>

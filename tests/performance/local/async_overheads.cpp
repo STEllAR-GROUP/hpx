@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,10 @@ hpx::future<void> spawn_level(std::size_t num_tasks)
             std::size_t sub_spawn = (std::min)(spawn_hierarchically, num_sub_tasks);
             spawn_hierarchically -= sub_spawn;
             num_tasks -= sub_spawn;
-            tasks.push_back(hpx::async(&spawn_level, sub_spawn));
+
+            // force unwrapping
+            hpx::future<void> f = hpx::async(&spawn_level, sub_spawn);
+            tasks.push_back(std::move(f));
         }
     }
 
@@ -63,6 +67,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("tasks"))
         num_tasks = vm["tasks"].as<std::size_t>();
 
+    double seqential_time_per_task = 0;
+
     {
         std::vector<hpx::future<void> > tasks;
         tasks.reserve(num_tasks);
@@ -76,10 +82,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::util::high_resolution_clock::now();
 
+        seqential_time_per_task = (end - start) / 1e9 / num_tasks;
         std::cout << "Elapsed sequential time: "
-                  << (end - start) / 1e9 << " [s]"
+                  << (end - start) / 1e9 << " [s], ("
+                  << seqential_time_per_task << " [s])"
                   << std::endl;
     }
+
+    double hierarchical_time_per_task = 0;
 
     {
         std::uint64_t start = hpx::util::high_resolution_clock::now();
@@ -89,10 +99,17 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::util::high_resolution_clock::now();
 
+        hierarchical_time_per_task = (end - start) / 1e9 / num_tasks;
         std::cout << "Elapsed hierarchical time: "
-                  << (end - start) / 1e9 << " [s]"
+                  << (end - start) / 1e9 << " [s], ("
+                  << hierarchical_time_per_task << " [s])"
                   << std::endl;
     }
+
+    std::cout
+        << "Ratio (speedup): "
+        << seqential_time_per_task / hierarchical_time_per_task
+        << std::endl;
 
     return hpx::finalize();
 }

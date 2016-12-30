@@ -162,55 +162,79 @@ namespace hpx
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////
-    // Launch policies for \a hpx::async etc.
+    /// Launch policies for \a hpx::async etc.
     struct launch : detail::policy_holder
     {
         ///////////////////////////////////////////////////////////////////////
+        /// Default constructor. This creates a launch policy representing all
+        /// possible launch modes
         HPX_CONSTEXPR launch() HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::all}
         {}
 
+        /// \cond NOINTERNAL
         HPX_CONSTEXPR launch(detail::policy_holder ph) HPX_NOEXCEPT
           : detail::policy_holder{ph}
         {}
+        /// \endcond
 
+        /// Create a launch policy representing asynchronous execution
         HPX_CONSTEXPR launch(detail::async_policy) HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::async}
         {}
 
+        /// Create a launch policy representing asynchronous execution. The
+        /// new thread is executed in a preferred way
         HPX_CONSTEXPR launch(detail::fork_policy) HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::fork}
         {}
 
+        /// Create a launch policy representing synchronous execution
         HPX_CONSTEXPR launch(detail::sync_policy) HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::sync}
         {}
 
+        /// Create a launch policy representing deferred execution
         HPX_CONSTEXPR launch(detail::deferred_policy) HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::deferred}
         {}
 
+        /// Create a launch policy representing fire and forget execution
         HPX_CONSTEXPR launch(detail::apply_policy) HPX_NOEXCEPT
           : detail::policy_holder{detail::launch_policy::apply}
         {}
 
         ///////////////////////////////////////////////////////////////////////
+        /// \cond NOINTERNAL
         using async_policy = detail::async_policy;
         using fork_policy = detail::fork_policy;
         using sync_policy = detail::sync_policy;
         using deferred_policy = detail::deferred_policy;
         using apply_policy = detail::apply_policy;
+        /// \endcond
 
         ///////////////////////////////////////////////////////////////////////
+        /// Predefined launch policy representing asynchronous execution
         HPX_EXPORT static const detail::async_policy async;
+
+        /// Predefined launch policy representing asynchronous execution.The
+        /// new thread is executed in a preferred way
         HPX_EXPORT static const detail::fork_policy fork;
+
+        /// Predefined launch policy representing synchronous execution
         HPX_EXPORT static const detail::sync_policy sync;
+
+        /// Predefined launch policy representing deferred execution
         HPX_EXPORT static const detail::deferred_policy deferred;
+
+        /// Predefined launch policy representing fire and forget execution
         HPX_EXPORT static const detail::apply_policy apply;
 
+        /// \cond NOINTERNAL
         HPX_EXPORT static const detail::policy_holder all;
         HPX_EXPORT static const detail::policy_holder sync_policies;
         HPX_EXPORT static const detail::policy_holder async_policies;
+        /// \endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////

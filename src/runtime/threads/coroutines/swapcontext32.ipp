@@ -103,6 +103,5 @@
 
 HPX_COROUTINE_swapcontext(swapcontext_stack);
 HPX_COROUTINE_swapcontext(swapcontext_stack2);
-HPX_COROUTINE_swapcontext(swapcontext_stack3);
 
 #undef HPX_COROUTINE_swapcontext

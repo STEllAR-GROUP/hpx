@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
@@ -64,6 +65,7 @@ namespace detail
     {
     private:
         typedef util::unique_function_nonser<void()> completed_callback_type;
+
     public:
         typedef void has_future_data_refcnt_base;
 
@@ -81,8 +83,13 @@ namespace detail
             delete this;
         }
 
+        // This is a tag type used to convey the information that the caller is
+        // _not_ going to addref the future_data instance
+        struct init_no_addref {};
+
     protected:
         future_data_refcnt_base() : count_(0) {}
+        future_data_refcnt_base(init_no_addref) : count_(1) {}
 
         // reference counting
         friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
@@ -242,6 +249,7 @@ namespace detail
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
+        typedef typename future_data_refcnt_base::init_no_addref init_no_addref;
 
         enum state
         {
@@ -251,12 +259,46 @@ namespace detail
             exception = 4 | ready
         };
 
-    public:
         future_data()
           : state_(empty)
         {}
 
-        ~future_data()
+        future_data(init_no_addref no_addref)
+          : future_data_refcnt_base(no_addref), state_(empty)
+        {}
+
+        template <typename Target>
+        future_data(Target && data, init_no_addref no_addref)
+          : future_data_refcnt_base(no_addref),
+            state_(empty)
+        {
+            result_type* value_ptr =
+                reinterpret_cast<result_type*>(&storage_);
+            ::new ((void*)value_ptr) result_type(
+                future_data_result<Result>::set(std::forward<Target>(data)));
+            state_ = value;
+        }
+
+        future_data(boost::exception_ptr const& e, init_no_addref no_addref)
+          : future_data_refcnt_base(no_addref),
+            state_(empty)
+        {
+            boost::exception_ptr* exception_ptr =
+                reinterpret_cast<boost::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) boost::exception_ptr(e);
+            state_ = exception;
+        }
+        future_data(boost::exception_ptr && e, init_no_addref no_addref)
+          : future_data_refcnt_base(no_addref),
+            state_(empty)
+        {
+            boost::exception_ptr* exception_ptr =
+                reinterpret_cast<boost::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) boost::exception_ptr(std::move(e));
+            state_ = exception;
+        }
+
+        virtual ~future_data() HPX_NOEXCEPT
         {
             reset();
         }
@@ -400,7 +442,7 @@ namespace detail
             std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
-            if (is_ready_locked()) {
+            if (is_ready_locked(l)) {
                 l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_value",
@@ -436,7 +478,7 @@ namespace detail
             std::unique_lock<mutex_type> l(this->mtx_);
 
             // check whether the data has already been set
-            if (is_ready_locked()) {
+            if (is_ready_locked(l)) {
                 l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_exception",
@@ -542,7 +584,7 @@ namespace detail
 
             std::unique_lock<mutex_type> l(this->mtx_);
 
-            if (is_ready_locked()) {
+            if (is_ready_locked(l)) {
 
                 HPX_ASSERT(!on_completed_);
 
@@ -602,11 +644,13 @@ namespace detail
         bool is_ready() const
         {
             std::unique_lock<mutex_type> l(mtx_);
-            return is_ready_locked();
+            return is_ready_locked(l);
         }
 
-        bool is_ready_locked() const
+        template <typename Lock>
+        bool is_ready_locked(Lock& l) const
         {
+            HPX_ASSERT_OWNS_LOCK(l);
             return (state_ & ready) != 0;
         }
 
@@ -684,17 +728,29 @@ namespace detail
     struct task_base : future_data<Result>
     {
     protected:
+        typedef future_data<Result> base_type;
         typedef typename future_data<Result>::mutex_type mutex_type;
         typedef boost::intrusive_ptr<task_base> future_base_type;
         typedef typename future_data<Result>::result_type result_type;
+        typedef typename base_type::init_no_addref init_no_addref;
 
     public:
         task_base()
           : started_(false), sched_(nullptr)
         {}
 
+        task_base(init_no_addref no_addref)
+          : base_type(no_addref), started_(false), sched_(nullptr)
+        {}
+
         task_base(threads::executor& sched)
           : started_(false),
+            sched_(sched ? &sched : nullptr)
+        {}
+
+        task_base(threads::executor& sched, init_no_addref no_addref)
+          : base_type(no_addref),
+            started_(false),
             sched_(sched ? &sched : nullptr)
         {}
 
@@ -739,6 +795,13 @@ namespace detail
         bool started_test_and_set()
         {
             std::lock_guard<mutex_type> l(this->mtx_);
+            return started_test_and_set_locked(l);
+        }
+
+        template <typename Lock>
+        bool started_test_and_set_locked(Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
             if (started_)
                 return true;
 
@@ -749,8 +812,9 @@ namespace detail
     protected:
         void check_started()
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(this->mtx_);
             if (started_) {
+                l.unlock();
                 HPX_THROW_EXCEPTION(task_already_started,
                     "task_base::check_started",
                     "this task has already been started");
@@ -814,6 +878,7 @@ namespace detail
         typedef typename task_base<Result>::mutex_type mutex_type;
         typedef boost::intrusive_ptr<cancelable_task_base> future_base_type;
         typedef typename future_data<Result>::result_type result_type;
+        typedef typename task_base<Result>::init_no_addref init_no_addref;
 
     protected:
         threads::thread_id_type get_thread_id() const
@@ -829,11 +894,19 @@ namespace detail
 
     public:
         cancelable_task_base()
-          : task_base<Result>(), id_(threads::invalid_thread_id)
+          : id_(threads::invalid_thread_id)
+        {}
+
+        cancelable_task_base(init_no_addref no_addref)
+          : task_base<Result>(no_addref), id_(threads::invalid_thread_id)
         {}
 
         cancelable_task_base(threads::executor& sched)
           : task_base<Result>(sched), id_(threads::invalid_thread_id)
+        {}
+
+        cancelable_task_base(threads::executor& sched, init_no_addref no_addref)
+          : task_base<Result>(sched, no_addref), id_(threads::invalid_thread_id)
         {}
 
     private:
@@ -873,7 +946,7 @@ namespace detail
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready_locked())
+                if (this->is_ready_locked(l))
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
@@ -888,6 +961,7 @@ namespace detail
                         "future has been canceled");
                 }
                 else {
+                    l.unlock();
                     HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
                         "task_base<Result>::cancel",
                         "future can't be canceled at this time");

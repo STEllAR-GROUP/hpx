@@ -1,5 +1,5 @@
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -83,7 +83,7 @@
 
 HPX_COROUTINE_SWAPCONTEXT(swapcontext_stack);
 HPX_COROUTINE_SWAPCONTEXT(swapcontext_stack2);
-HPX_COROUTINE_SWAPCONTEXT(swapcontext_stack3);
 
 #undef HPX_COROUTINE_SWAPCONTEXT
+#undef HPX_COROUTINE_TYPE_DIRECTIVE
 
