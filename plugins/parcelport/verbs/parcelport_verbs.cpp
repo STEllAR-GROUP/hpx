@@ -533,8 +533,8 @@ namespace verbs
                     << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
             }
             //
-            ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-            if (ip_it==ip_qp_map.end()) {
+            auto present = ip_qp_map.is_in_map(dest_ip);
+            if (!present.second) {
                 ip_qp_map.insert(std::make_pair(dest_ip, qpinfo));
                 LOG_DEVEL_MSG("handle_verbs_connection OK adding to ip_qp_map "
                     << ipaddress(dest_ip));
@@ -1143,14 +1143,10 @@ namespace verbs
             LOG_DEBUG_MSG("Entering verbs stop ");
             FUNC_START_DEBUG_MSG;
             if (!stopped_) {
-                bool finished = false;
-                do {
-                    finished = active_sends.empty() && active_recvs.empty();
-                    if (!finished) {
-                        LOG_ERROR_MSG("Entering STOP with outstanding parcels");
-                        std::terminate();
-                    }
-                } while (!finished && !hpx::is_stopped());
+                if (!active_sends.empty() || !active_recvs.empty()) {
+                    LOG_ERROR_MSG("Entering STOP with outstanding parcels");
+                    std::terminate();
+                };
 
                 // we don't want multiple threads trying to stop the clients
                 scoped_lock lock(stop_mutex);
@@ -1181,11 +1177,11 @@ namespace verbs
         verbs_endpoint *get_remote_connection(std::uint32_t dest_ip)
         {
             // if a connection exists to this destination, get it
-            ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-            if (ip_it!=ip_qp_map.end()) {
+            auto present = ip_qp_map.is_in_map(dest_ip);
+            if (present.second) {
                 LOG_DEVEL_MSG("Client found connection made from "
                     << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                    << "with QP " << ip_it->second);
+                    << "with QP " << present.first->second);
                 return rdma_controller_->get_endpoint(dest_ip);
             }
 
@@ -1401,7 +1397,7 @@ namespace verbs
                         scoped_lock lock(TagSendCompletionMap_mutex);
 #endif
                         // put the data into a new map which is indexed by the Tag of
-                        // the send zero copy blocks will be released when we are
+                        // the send - zero copy blocks will be released when we are
                         // told this has completed
                         TagSendCompletionMap.insert(
                             std::make_pair(send_data.tag, current_send));
@@ -1619,7 +1615,7 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         static int log_init = false;
         if (!log_init) {
 #if defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING) || \
-    defined(HPX_PARCELPORT_VERBS_ENABLE_DEVEL_MSG)
+    defined(HPX_PARCELPORT_VERBS_HAVE_DEV_MODE)
             std::cout << "Initializing logging " << std::endl;
             boost::log::add_console_log(
             std::clog,
