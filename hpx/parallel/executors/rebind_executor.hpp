@@ -11,20 +11,20 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    struct task_execution_policy_tag
+    struct task_policy_tag
     {
-        task_execution_policy_tag() {}
+        HPX_CONSTEXPR task_policy_tag() {}
     };
-    /// \endcond
 
     /// The execution policy tag \a task can be used to create a execution
     /// policy which forces the given algorithm to be executed in an
     /// asynchronous way.
-    static task_execution_policy_tag const task;
+    static task_policy_tag HPX_CONSTEXPR_OR_CONST task;
+    /// \endcond
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
@@ -50,6 +50,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 executor_type, parameters_type
             >::type type;
     };
+}}}
+
+namespace hpx { namespace parallel { namespace executioon
+{
+    ///////////////////////////////////////////////////////////////////////////
+    using task_execution_policy_tag = parallel::execution::task_policy_tag;
+
+    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
 }}}
 
 #endif

@@ -211,44 +211,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template<>
         struct remove_asynchronous<
-            hpx::parallel::parallel_vector_execution_policy
+            hpx::parallel::execution::parallel_unsequenced_policy
         >
         {
-            typedef hpx::parallel::parallel_execution_policy type;
+            typedef hpx::parallel::execution::parallel_policy type;
         };
 
         template<>
         struct remove_asynchronous<
-            hpx::parallel::sequential_task_execution_policy
+            hpx::parallel::execution::sequenced_task_policy
         >
         {
-            typedef hpx::parallel::sequential_execution_policy type;
+            typedef hpx::parallel::execution::sequenced_policy type;
         };
 
         template <typename Executor, typename Parameters>
         struct remove_asynchronous<
-            hpx::parallel::sequential_task_execution_policy_shim<
+            hpx::parallel::execution::sequenced_task_policy_shim<
                 Executor, Parameters
             >
         >
         {
-            typedef hpx::parallel::sequential_execution_policy type;
+            typedef hpx::parallel::execution::sequenced_policy type;
         };
 
         template<>
-        struct remove_asynchronous<hpx::parallel::parallel_task_execution_policy>
+        struct remove_asynchronous<hpx::parallel::execution::parallel_task_policy>
         {
-            typedef hpx::parallel::parallel_execution_policy type;
+            typedef hpx::parallel::execution::parallel_policy type;
         };
 
         template <typename Executor, typename Parameters>
         struct remove_asynchronous<
-            hpx::parallel::parallel_task_execution_policy_shim<
+            hpx::parallel::execution::parallel_task_policy_shim<
                 Executor, Parameters
             >
         >
         {
-            typedef hpx::parallel::parallel_execution_policy type;
+            typedef hpx::parallel::execution::parallel_policy type;
         };
 
         // -------------------------------------------------------------------
@@ -537,23 +537,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
+    /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a reduce_by_key algorithm returns a
     ///           \a hpx::future<pair<Iter1,Iter2>> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a pair<Iter1,Iter2>
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a pair<Iter1,Iter2>
     ///           otherwise.
     //-----------------------------------------------------------------------------
-
     template<
         typename ExPolicy,
         typename RanIter, typename RanIter2, typename OutIter, typename OutIter2,
@@ -561,14 +560,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
         typename Func = std::plus<
             typename std::iterator_traits<RanIter2>::value_type>,
-        HPX_CONCEPT_REQUIRES_(is_execution_policy<ExPolicy>::value &&
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RanIter>::value &&
             hpx::traits::is_iterator<RanIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_iterator<OutIter2>::value
         )
     >
-
     /// \cond NOINTERNAL
     typename util::detail::algorithm_result<
         ExPolicy, std::pair<OutIter, OutIter2>
@@ -600,7 +599,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(std::make_pair(keys_output, values_output));
         }
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::reduce_by_key<OutIter,OutIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,

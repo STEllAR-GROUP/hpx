@@ -19,11 +19,11 @@ void test_for_each()
 {
     using namespace hpx::parallel;
 
-    test_for_each(dataseq_execution, IteratorTag());
-    test_for_each(datapar_execution, IteratorTag());
+    test_for_each(execution::dataseq, IteratorTag());
+    test_for_each(execution::datapar, IteratorTag());
 
-    test_for_each_async(dataseq_execution(task), IteratorTag());
-    test_for_each_async(datapar_execution(task), IteratorTag());
+    test_for_each_async(execution::dataseq(execution::task), IteratorTag());
+    test_for_each_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void for_each_test()
@@ -39,11 +39,11 @@ void test_for_each_exception()
 {
     using namespace hpx::parallel;
 
-    test_for_each_exception(dataseq_execution, IteratorTag());
-    test_for_each_exception(datapar_execution, IteratorTag());
+    test_for_each_exception(execution::dataseq, IteratorTag());
+    test_for_each_exception(execution::datapar, IteratorTag());
 
-    test_for_each_exception_async(dataseq_execution(task), IteratorTag());
-    test_for_each_exception_async(datapar_execution(task), IteratorTag());
+    test_for_each_exception_async(execution::dataseq(execution::task), IteratorTag());
+    test_for_each_exception_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -59,11 +59,11 @@ void test_for_each_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    test_for_each_bad_alloc(dataseq_execution, IteratorTag());
-    test_for_each_bad_alloc(datapar_execution, IteratorTag());
+    test_for_each_bad_alloc(execution::dataseq, IteratorTag());
+    test_for_each_bad_alloc(execution::datapar, IteratorTag());
 
-    test_for_each_bad_alloc_async(dataseq_execution(task), IteratorTag());
-    test_for_each_bad_alloc_async(datapar_execution(task), IteratorTag());
+    test_for_each_bad_alloc_async(execution::dataseq(execution::task), IteratorTag());
+    test_for_each_bad_alloc_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()

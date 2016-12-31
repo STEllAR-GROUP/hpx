@@ -14,8 +14,6 @@
 
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
-using hpx::parallel::par;
-using hpx::parallel::task;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test()

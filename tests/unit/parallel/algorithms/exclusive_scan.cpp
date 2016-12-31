@@ -33,7 +33,7 @@ void exclusive_scan_benchmark()
       };
 
       hpx::util::high_resolution_timer t;
-      hpx::parallel::exclusive_scan(hpx::parallel::par,
+      hpx::parallel::exclusive_scan(hpx::parallel::execution::par,
         boost::begin(c), boost::end(c), boost::begin(d),
         val, op);
       double elapsed = t.elapsed();
@@ -60,8 +60,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_exclusive_scan1(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -123,20 +123,22 @@ void test_exclusive_scan1()
 {
     using namespace hpx::parallel;
 
-    test_exclusive_scan1(seq, IteratorTag());
-    test_exclusive_scan1(par, IteratorTag());
-    test_exclusive_scan1(par_vec, IteratorTag());
+    test_exclusive_scan1(execution::seq, IteratorTag());
+    test_exclusive_scan1(execution::par, IteratorTag());
+    test_exclusive_scan1(execution::par_unseq, IteratorTag());
 
-    test_exclusive_scan1_async(seq(task), IteratorTag());
-    test_exclusive_scan1_async(par(task), IteratorTag());
+    test_exclusive_scan1_async(execution::seq(execution::task), IteratorTag());
+    test_exclusive_scan1_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_exclusive_scan1(execution_policy(seq), IteratorTag());
-    test_exclusive_scan1(execution_policy(par), IteratorTag());
-    test_exclusive_scan1(execution_policy(par_vec), IteratorTag());
+    test_exclusive_scan1(execution_policy(execution::seq), IteratorTag());
+    test_exclusive_scan1(execution_policy(execution::par), IteratorTag());
+    test_exclusive_scan1(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_exclusive_scan1(execution_policy(seq(task)), IteratorTag());
-    test_exclusive_scan1(execution_policy(par(task)), IteratorTag());
+    test_exclusive_scan1(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_exclusive_scan1(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

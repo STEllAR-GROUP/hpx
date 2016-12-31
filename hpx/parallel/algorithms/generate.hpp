@@ -72,7 +72,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             return detail::generate<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -123,25 +125,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of type \a Ret.
     ///
     /// The assignments in the parallel \a generate algorithm invoked with an
-    /// execution policy object of type \a sequential_execution_policy
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a generate algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
     ///           and returns \a FwdIter otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename FwdIter, typename F,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     generate(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
@@ -234,25 +236,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of type \a Ret.
     ///
     /// The assignments in the parallel \a generate_n algorithm invoked with an
-    /// execution policy object of type \a sequential_execution_policy
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a generate_n algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a replace_if algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
     ///           and returns \a OutIter otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename OutIter, typename Size, typename F,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     generate_n(ExPolicy && policy, OutIter first, Size count, F && f)
@@ -269,7 +271,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 

@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace traits
                     hpx::util::detail::all_of<
                         is_projected_indirect<Projected>...
                     >::value &&
-                    (  !hpx::parallel::is_vectorpack_execution_policy<
+                    (  !hpx::parallel::execution::is_vectorpack_execution_policy<
                             ExPolicy
                         >::value ||
                        !hpx::util::detail::all_of<
@@ -236,7 +236,7 @@ namespace hpx { namespace parallel { namespace traits
                     hpx::util::detail::all_of<
                         is_projected_indirect<Projected>...
                     >::value &&
-                    hpx::parallel::is_vectorpack_execution_policy<
+                    hpx::parallel::execution::is_vectorpack_execution_policy<
                         ExPolicy
                     >::value &&
                     hpx::util::detail::all_of<

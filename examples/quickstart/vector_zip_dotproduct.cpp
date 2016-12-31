@@ -29,14 +29,14 @@ int hpx_main()
 
     double result =
         hpx::parallel::transform_reduce(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
+            0.0,
             [](tuple<double, double> r)
             {
                 return get<0>(r) * get<1>(r);
             },
-            0.0,
             std::plus<double>()
         );
     // print the result

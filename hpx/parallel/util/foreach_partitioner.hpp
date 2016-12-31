@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct foreach_static_partitioner<parallel_task_execution_policy, Result>
+        struct foreach_static_partitioner<execution::parallel_task_policy, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2>
@@ -182,9 +182,9 @@ namespace hpx { namespace parallel { namespace util
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_static_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result>
-          : foreach_static_partitioner<parallel_task_execution_policy, Result>
+          : foreach_static_partitioner<execution::parallel_task_policy, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename Result>
-        struct foreach_partitioner<parallel_task_execution_policy, Result,
+        struct foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -231,7 +231,7 @@ namespace hpx { namespace parallel { namespace util
 
 #if defined(HPX_HAVE_DATAPAR)
         template <typename Result>
-        struct foreach_partitioner<datapar_task_execution_policy, Result,
+        struct foreach_partitioner<execution::datapar_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
                 return foreach_static_partitioner<
-                        parallel_task_execution_policy, Result
+                        execution::parallel_task_policy, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
                         std::forward<F1>(f1), std::forward<F2>(f2));
@@ -250,25 +250,25 @@ namespace hpx { namespace parallel { namespace util
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::static_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::auto_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::default_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 

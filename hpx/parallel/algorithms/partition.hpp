@@ -247,12 +247,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The invocations of \a f in the parallel \a stable_partition algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy executes in sequential order in the
+    /// \a sequenced_policy executes in sequential order in the
     /// calling thread.
     ///
     /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -262,13 +262,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           k in the range [i, last), f(*k) == false
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
-    ///           If the execution policy is of type \a parallel_task_execution_policy
+    ///           If the execution policy is of type \a parallel_task_policy
     ///           the algorithm returns a future<> referring to this iterator.
     ///
     template <typename ExPolicy, typename BidirIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<BidirIter>::value &&
         traits::is_projected<Proj, BidirIter>::value)
 #if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
@@ -287,7 +287,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least bidirectional iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<BidirIter>::value
             > is_seq;
 

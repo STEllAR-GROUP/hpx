@@ -19,11 +19,11 @@ void test_transform()
 {
     using namespace hpx::parallel;
 
-    test_transform(dataseq_execution, IteratorTag());
-    test_transform(datapar_execution, IteratorTag());
+    test_transform(execution::dataseq, IteratorTag());
+    test_transform(execution::datapar, IteratorTag());
 
-    test_transform_async(dataseq_execution(task), IteratorTag());
-    test_transform_async(datapar_execution(task), IteratorTag());
+    test_transform_async(execution::dataseq(execution::task), IteratorTag());
+    test_transform_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_test()
@@ -38,11 +38,11 @@ void test_transform_exception()
 {
     using namespace hpx::parallel;
 
-    test_transform_exception(dataseq_execution, IteratorTag());
-    test_transform_exception(datapar_execution, IteratorTag());
+    test_transform_exception(execution::dataseq, IteratorTag());
+    test_transform_exception(execution::datapar, IteratorTag());
 
-    test_transform_exception_async(dataseq_execution(task), IteratorTag());
-    test_transform_exception_async(datapar_execution(task), IteratorTag());
+    test_transform_exception_async(execution::dataseq(execution::task), IteratorTag());
+    test_transform_exception_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_exception_test()
@@ -58,11 +58,11 @@ void test_transform_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    test_transform_bad_alloc(dataseq_execution, IteratorTag());
-    test_transform_bad_alloc(datapar_execution, IteratorTag());
+    test_transform_bad_alloc(execution::dataseq, IteratorTag());
+    test_transform_bad_alloc(execution::datapar, IteratorTag());
 
-    test_transform_bad_alloc_async(dataseq_execution(task), IteratorTag());
-    test_transform_bad_alloc_async(datapar_execution(task), IteratorTag());
+    test_transform_bad_alloc_async(execution::dataseq(execution::task), IteratorTag());
+    test_transform_bad_alloc_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void transform_bad_alloc_test()

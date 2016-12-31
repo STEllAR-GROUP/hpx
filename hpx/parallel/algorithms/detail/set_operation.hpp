@@ -173,8 +173,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
                 // finally, copy data to destination
                 parallel::util::foreach_partitioner<
-                        hpx::parallel::parallel_execution_policy
-                    >::call(par, chunks.get(), cores,
+                        hpx::parallel::execution::parallel_policy
+                    >::call(execution::par, chunks.get(), cores,
                         [buffer, dest](
                             set_chunk_data* chunk, std::size_t, std::size_t)
                         {

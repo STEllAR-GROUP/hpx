@@ -25,7 +25,8 @@ void test_scan_non_commutative() {
     for (unsigned int i = 0; i < vs.size(); ++i) {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::inclusive_scan(
-            hpx::parallel::par.with(hpx::parallel::static_chunk_size(i)),
+            hpx::parallel::execution::par.with(
+                hpx::parallel::static_chunk_size(i)),
             vs.cbegin(), vs.cend(),
             rs.begin()
         );
@@ -37,7 +38,8 @@ void test_scan_non_commutative() {
     for (unsigned int i = 0; i < vs.size(); ++i) {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::exclusive_scan(
-            hpx::parallel::par.with(hpx::parallel::static_chunk_size(i)),
+            hpx::parallel::execution::par.with(
+                hpx::parallel::static_chunk_size(i)),
             vs.cbegin(), vs.cend(),
             rs.begin(), std::string("0")
         );

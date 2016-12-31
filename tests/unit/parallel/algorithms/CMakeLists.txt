@@ -65,9 +65,6 @@ set(tests
     includes
     inclusive_scan
     inclusive_scan_executors
-    inner_product
-    inner_product_exception
-    inner_product_bad_alloc
     is_partitioned
     is_sorted
     is_sorted_executors
@@ -109,6 +106,9 @@ set(tests
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
+    transform_reduce_binary
+    transform_reduce_binary_exception
+    transform_reduce_binary_bad_alloc
     uninitialized_copy
     uninitialized_copy_executors
     uninitialized_copyn

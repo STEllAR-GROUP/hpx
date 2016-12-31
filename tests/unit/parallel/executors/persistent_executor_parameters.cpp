@@ -29,26 +29,26 @@ void test_persistent_executitor_parameters()
     typedef std::random_access_iterator_tag iterator_tag;
     {
         persistent_auto_chunk_size p;
-        auto policy = par.with(p);
+        auto policy = execution::par.with(p);
         test_for_each(policy, iterator_tag());
     }
 
     {
         persistent_auto_chunk_size p;
-        auto policy = par(task).with(p);
+        auto policy = execution::par(execution::task).with(p);
         test_for_each_async(policy, iterator_tag());
     }
 
     parallel_executor par_exec;
     {
         persistent_auto_chunk_size p;
-        auto policy = par.on(par_exec).with(p);
+        auto policy = execution::par.on(par_exec).with(p);
         test_for_each(policy, iterator_tag());
     }
 
     {
         persistent_auto_chunk_size p;
-        auto policy = par(task).on(par_exec).with(p);
+        auto policy = execution::par(execution::task).on(par_exec).with(p);
         test_for_each_async(policy, iterator_tag());
     }
 }
@@ -61,23 +61,26 @@ void test_persistent_executitor_parameters_ref()
 
     {
         persistent_auto_chunk_size p;
-        test_for_each(par.with(std::ref(p)), iterator_tag());
+        test_for_each(execution::par.with(std::ref(p)), iterator_tag());
     }
 
     {
         persistent_auto_chunk_size p;
-        test_for_each_async(par(task).with(std::ref(p)), iterator_tag());
+        test_for_each_async(execution::par(execution::task).with(std::ref(p)),
+            iterator_tag());
     }
 
     parallel_executor par_exec;
     {
         persistent_auto_chunk_size p;
-        test_for_each(par.on(par_exec).with(std::ref(p)), iterator_tag());
+        test_for_each(execution::par.on(par_exec).with(std::ref(p)),
+            iterator_tag());
     }
 
     {
         persistent_auto_chunk_size p;
-        test_for_each_async(par(task).on(par_exec).with(std::ref(p)),
+        test_for_each_async(
+            execution::par(execution::task).on(par_exec).with(std::ref(p)),
             iterator_tag());
     }
 
