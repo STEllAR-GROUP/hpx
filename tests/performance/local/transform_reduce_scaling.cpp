@@ -33,17 +33,17 @@ void measure_transform_reduce(std::size_t size)
     std::vector<Point> data_representation(size,
         Point{double(std::rand()), double(std::rand())});
 
-    // invoce transform_reduce
+    // invoke transform_reduce
     double result =
-        hpx::parallel::transform_reduce(hpx::parallel::par,
+        hpx::parallel::transform_reduce(hpx::parallel::execution::par,
             boost::begin(data_representation),
             boost::end(data_representation),
             0.0,
-            std::plus<double>(),
             [](Point r)
             {
                 return r.x * r.y;
-            }
+            },
+            std::plus<double>()
         );
     HPX_UNUSED(result);
 }
@@ -53,7 +53,7 @@ void measure_transform_reduce_old(std::size_t size)
     std::vector<Point> data_representation(size,
         Point{double(std::rand()), double(std::rand())});
 
-    //invoce old reduce
+    //invoke old reduce
     Point result =
         hpx::parallel::reduce(hpx::parallel::execution::par,
             boost::begin(data_representation),
@@ -129,6 +129,5 @@ int main(int argc, char* argv[])
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);
-
 }
 

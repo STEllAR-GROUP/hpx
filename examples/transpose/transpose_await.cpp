@@ -316,7 +316,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             auto range = boost::irange(blocks_start, blocks_end);
 
             const std::uint64_t block_size = block_order * block_order;
-            for_each(execution::par, boost::begin(range), boost::end(range),
+            for_each(par, boost::begin(range), boost::end(range),
                 [&](std::uint64_t b)
                 {
                     transpose_phase(A, B, block_order, b,

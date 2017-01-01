@@ -9,15 +9,27 @@
 #define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
-#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
-
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
+#include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <numeric>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -275,15 +287,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
-    /// \note This function is deprecated and is replaced by the binary version
-    ///       of \a transform_reduce.
-    ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter1>::value &&
+        hpx::traits::is_iterator<InIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init)
     {
         static_assert(
@@ -327,9 +337,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     output iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
-    /// \tparam Op1         The type of the binary function object used for
-    ///                     the summation operation.
-    /// \tparam Op2         The type of the binary function object used for
+    /// \tparam Reduce      The type of the binary function object used for
     ///                     the multiplication operation.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -341,22 +349,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param first2       Refers to the beginning of the second sequence of
     ///                     elements the result will be calculated with.
     /// \param init         The initial value for the sum.
-    /// \param op1          Specifies the function (or function object) which
-    ///                     will be invoked for each of the input values
-    ///                     of the sequence. This is a binary predicate. The
-    ///                     signature of this predicate should be equivalent to
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type2 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The type \a Ret must be such that it can be
-    ///                     implicitly converted to an object for the second
-    ///                     argument type of \a op2.
-    /// \param op2          Specifies the function (or function object) which
+    /// \param red_op       Specifies the function (or function object) which
     ///                     will be invoked for the initial value and each
-    ///                     of the return values of \a op1.
+    ///                     of the return values of \a op2.
     ///                     This is a binary predicate. The
     ///                     signature of this predicate should be equivalent to
     ///                     should be equivalent to:
@@ -369,6 +364,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     The type \a Ret must be
     ///                     such that it can be implicitly converted to a type
     ///                     of \a T.
+    /// \param conv_op      Specifies the function (or function object) which
+    ///                     will be invoked for each of the input values
+    ///                     of the sequence. This is a binary predicate. The
+    ///                     signature of this predicate should be equivalent to
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The type \a Ret must be such that it can be
+    ///                     implicitly converted to an object for the second
+    ///                     argument type of \a op1.
     ///
     /// The operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -386,17 +394,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
-    /// \note This function is deprecated and is replaced by the binary version
-    ///       of \a transform_reduce.
-    ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
-        typename Op1, typename Op2>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-    >::type
-    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, T init, Op1 && op1, Op2 && op2)
+        typename Reduce, typename Convert,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter1>::value &&
+        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_callable<
+                Convert(typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Reduce(
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Convert(typename std::iterator_traits<InIter1>::value_type,
+                        typename std::iterator_traits<InIter2>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type
+    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
+        InIter2 first2, T init, Reduce && red_op, Convert && conv_op)
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter1>::value),
@@ -406,16 +427,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;
 
         return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            std::move(init), std::forward<Op1>(op1), std::forward<Op2>(op2));
+            std::move(init),
+            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
     }
 }}}
 
-#endif
 #endif
