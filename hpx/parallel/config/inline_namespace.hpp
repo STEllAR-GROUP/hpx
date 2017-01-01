@@ -21,6 +21,15 @@ namespace hpx { namespace parallel
     using namespace v3;
     using namespace concurrency_v2;
 #endif
+
+    namespace execution
+    {
+        HPX_INLINE_NAMESPACE(v1) {}
+
+#if !defined(HPX_HAVE_CXX11_INLINE_NAMESPACES)
+        using namespace v1;
+#endif
+    }
 }}
 
 #endif

@@ -58,7 +58,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        explicit parallel_executor(launch l = launch::async,
+        HPX_CONSTEXPR explicit parallel_executor(
+                launch l = hpx::detail::async_policy{},
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : l_(l), num_spread_(spread), num_tasks_(tasks)
         {}

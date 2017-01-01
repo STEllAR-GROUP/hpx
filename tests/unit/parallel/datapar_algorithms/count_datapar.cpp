@@ -18,11 +18,11 @@ template <typename IteratorTag>
 void test_count()
 {
     using namespace hpx::parallel;
-    test_count(dataseq_execution, IteratorTag());
-    test_count(datapar_execution, IteratorTag());
+    test_count(execution::dataseq, IteratorTag());
+    test_count(execution::datapar, IteratorTag());
 
-    test_count_async(dataseq_execution(task), IteratorTag());
-    test_count_async(datapar_execution(task), IteratorTag());
+    test_count_async(execution::dataseq(execution::task), IteratorTag());
+    test_count_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void count_test()
@@ -38,11 +38,11 @@ void test_count_exception()
 {
     using namespace hpx::parallel;
 
-    test_count_exception(dataseq_execution, IteratorTag());
-    test_count_exception(datapar_execution, IteratorTag());
+    test_count_exception(execution::dataseq, IteratorTag());
+    test_count_exception(execution::datapar, IteratorTag());
 
-    test_count_exception_async(dataseq_execution(task), IteratorTag());
-    test_count_exception_async(datapar_execution(task), IteratorTag());
+    test_count_exception_async(execution::dataseq(execution::task), IteratorTag());
+    test_count_exception_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void count_exception_test()
@@ -58,11 +58,11 @@ void test_count_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    test_count_bad_alloc(dataseq_execution, IteratorTag());
-    test_count_bad_alloc(datapar_execution, IteratorTag());
+    test_count_bad_alloc(execution::dataseq, IteratorTag());
+    test_count_bad_alloc(execution::datapar, IteratorTag());
 
-    test_count_bad_alloc_async(dataseq_execution(task), IteratorTag());
-    test_count_bad_alloc_async(datapar_execution(task), IteratorTag());
+    test_count_bad_alloc_async(execution::dataseq(execution::task), IteratorTag());
+    test_count_bad_alloc_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void count_bad_alloc_test()

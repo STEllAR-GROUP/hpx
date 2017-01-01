@@ -259,7 +259,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename R, typename Result>
-        struct static_partitioner<parallel_task_execution_policy, R, Result>
+        struct static_partitioner<execution::parallel_task_policy, R, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1, typename F2>
             static hpx::future<R> call(ExPolicy && policy,
@@ -483,9 +483,9 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct static_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result>
-          : static_partitioner<parallel_task_execution_policy, R, Result>
+          : static_partitioner<execution::parallel_task_policy, R, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -540,7 +540,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename R, typename Result>
-        struct partitioner<parallel_task_execution_policy, R, Result,
+        struct partitioner<execution::parallel_task_policy, R, Result,
             parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -585,7 +585,7 @@ namespace hpx { namespace parallel { namespace util
 
 #if defined(HPX_HAVE_DATAPAR)
         template <typename R, typename Result>
-        struct partitioner<datapar_task_execution_policy, R, Result,
+        struct partitioner<execution::datapar_task_policy, R, Result,
             parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -594,7 +594,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
                 return static_partitioner<
-                        parallel_task_execution_policy, R, Result
+                        execution::parallel_task_policy, R, Result
                     >::call(
                         std::forward<ExPolicy>(policy), first, count,
                         std::forward<F1>(f1), std::forward<F2>(f2));
@@ -607,7 +607,7 @@ namespace hpx { namespace parallel { namespace util
                 std::vector<std::size_t> const& chunk_sizes, Data && data)
             {
                 return static_partitioner<
-                        parallel_task_execution_policy, R, Result
+                        execution::parallel_task_policy, R, Result
                     >::call_with_data(
                         std::forward<ExPolicy>(policy), first, count,
                         std::forward<F1>(f1), std::forward<F2>(f2),
@@ -621,7 +621,7 @@ namespace hpx { namespace parallel { namespace util
                 F1 && f1, F2 && f2)
             {
                 return static_partitioner<
-                        parallel_task_execution_policy, R, Result
+                        execution::parallel_task_policy, R, Result
                     >::call_with_index(
                         std::forward<ExPolicy>(policy), first, count, stride,
                         std::forward<F1>(f1), std::forward<F2>(f2));
@@ -632,27 +632,27 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::static_partitioner_tag>
-          : partitioner<parallel_task_execution_policy, R, Result,
+          : partitioner<execution::parallel_task_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::auto_partitioner_tag>
-          : partitioner<parallel_task_execution_policy, R, Result,
+          : partitioner<execution::parallel_task_policy, R, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::default_partitioner_tag>
-          : partitioner<parallel_task_execution_policy, R, Result,
+          : partitioner<execution::parallel_task_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 

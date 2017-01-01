@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace util
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-       !is_vectorpack_execution_policy<ExPolicy>::value,
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
         hpx::util::tuple<InIter1, InIter2, OutIter>
     >::type
     transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { namespace util
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-       !is_vectorpack_execution_policy<ExPolicy>::value,
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
         hpx::util::tuple<InIter1, InIter2, OutIter>
     >::type
     transform_binary_loop(InIter1 first1, InIter1 last1, InIter2 first2,
@@ -137,7 +137,8 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        !is_vectorpack_execution_policy<ExPolicy>::value, std::pair<Iter, OutIter>
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+        std::pair<Iter, OutIter>
     >::type
     transform_loop_n(Iter it, std::size_t count, OutIter dest, F && f)
     {
@@ -173,7 +174,7 @@ namespace hpx { namespace parallel { namespace util
         typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-       !is_vectorpack_execution_policy<ExPolicy>::value,
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
         hpx::util::tuple<InIter1, InIter2, OutIter>
     >::type
     transform_binary_loop_n(InIter1 first1, std::size_t count, InIter2 first2,

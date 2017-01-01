@@ -25,8 +25,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::size_t prefetch_distance_factor = 2;
     std::vector<double> c(10007, 1.0);
@@ -95,8 +95,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef typename hpx::parallel::util::detail::prefetching_iterator<
     std::vector<double>::iterator, double> iterator;
@@ -176,8 +176,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef typename hpx::parallel::util::detail::prefetching_iterator<
     std::vector<double>::iterator, double> iterator;

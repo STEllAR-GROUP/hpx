@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/inner_product.hpp
+/// \file parallel/algorithms/tranform_reduce_binary.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM)
-#define HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM
+#if !defined(HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM)
+#define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
@@ -31,12 +31,12 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // inner_product
+    // transform_reduce
     namespace detail
     {
         /// \cond NOINTERNAL
         template <typename F>
-        struct inner_product_indirect
+        struct transform_reduce_binary_indirect
         {
             typename hpx::util::decay<F>::type& f_;
 
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename Op1, typename Op2, typename T>
-        struct inner_product_partition
+        struct transform_reduce_binary_partition
         {
             typedef typename hpx::util::decay<Op1>::type op1_type;
             typedef typename hpx::util::decay<Op2>::type op2_type;
@@ -70,11 +70,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename T>
-        struct inner_product
-          : public detail::algorithm<inner_product<T>, T>
+        struct transform_reduce_binary
+          : public detail::algorithm<transform_reduce_binary<T>, T>
         {
-            inner_product()
-              : inner_product::algorithm("inner_product")
+            transform_reduce_binary()
+              : transform_reduce_binary::algorithm("transform_reduce_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -91,20 +91,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     util::loop2<ExPolicy>(
                         std::false_type(), first1, last1, first2,
-                        inner_product_partition<Op1, Op2, T>{op1, op2, init});
+                        transform_reduce_binary_partition<Op1, Op2, T>{
+                            op1, op2, init
+                        });
 
                     return init;
                 }
 
                 // loop_step properly advances the iterators
                 auto part_sum = util::loop_step<ExPolicy>(std::true_type(),
-                    inner_product_indirect<Op2>{op2}, first1, first2);
+                    transform_reduce_binary_indirect<Op2>{op2}, first1, first2);
 
                 std::pair<InIter1, InIter2> p = util::loop2<ExPolicy>(
                     std::true_type(), first1, last1, first2,
-                    inner_product_partition<Op1, Op2, decltype(part_sum)>{
-                        op1, op2, part_sum
-                    });
+                    transform_reduce_binary_partition<
+                            Op1, Op2, decltype(part_sum)
+                        >{op1, op2, part_sum});
 
                 // this is to support vectorization, it will call op1 for each
                 // of the elements of a value-pack
@@ -123,9 +125,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     util::loop2<ExPolicy>(
                         std::false_type(), p.first, last1, p.second,
-                        inner_product_partition<Op1, Op2, decltype(result)>{
-                            op1, op2, result
-                        });
+                        transform_reduce_binary_partition<
+                                Op1, Op2, decltype(result)
+                            >{op1, op2, result});
                 }
 
                 return util::detail::extract_value<ExPolicy>(result);
@@ -167,11 +169,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             // loop_step properly advances the iterators
                             auto result = util::loop_step<ExPolicy>(
                                 std::false_type(),
-                                inner_product_indirect<Op2>{op2}, it1, it2);
+                                transform_reduce_binary_indirect<Op2>{op2},
+                                it1, it2);
 
                             util::loop2<ExPolicy>(
                                 std::false_type(), it1, last1, it2,
-                                inner_product_partition<
+                                transform_reduce_binary_partition<
                                         Op1, Op2, decltype(result)
                                     >{op1, op2, result});
 
@@ -181,12 +184,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         // loop_step properly advances the iterators
                         auto part_sum = util::loop_step<ExPolicy>(
                             std::true_type(),
-                            inner_product_indirect<Op2>{op2}, it1, it2);
+                            transform_reduce_binary_indirect<Op2>{op2}, it1, it2);
 
                         std::pair<FwdIter1, FwdIter2> p =
                             util::loop2<ExPolicy>(
                                 std::true_type(), it1, last1, it2,
-                                inner_product_partition<
+                                transform_reduce_binary_partition<
                                         Op1, Op2, decltype(part_sum)
                                     >{op1, op2, part_sum});
 
@@ -205,7 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             util::loop2<ExPolicy>(
                                 std::false_type(), p.first, last1, p.second,
-                                inner_product_partition<
+                                transform_reduce_binary_partition<
                                         Op1, Op2, decltype(result)
                                     >{op1, op2, result});
                         }
@@ -265,29 +268,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     elements the result will be calculated with.
     /// \param init         The initial value for the sum.
     ///
-    /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// The operations in the parallel \a transform_reduce algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// The operations in the parallel \a transform_reduce algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a inner_product algorithm returns a \a hpx::future<T> if
+    /// \returns  The \a transform_reduce algorithm returns a \a hpx::future<T> if
     ///           the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init)
     {
         static_assert(
@@ -298,12 +301,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;
 
-        return detail::inner_product<T>().call(
+        return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
             std::move(init), detail::plus(), detail::multiplies());
     }
@@ -374,30 +377,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     such that it can be implicitly converted to a type
     ///                     of \a T.
     ///
-    /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// The operations in the parallel \a transform_reduce algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The operations in the parallel \a inner_product algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// The operations in the parallel \a transform_reduce algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a inner_product algorithm returns a \a hpx::future<T> if
-    ///           the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    /// \returns  The \a transform_reduce algorithm returns a \a hpx::future<T>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
         typename Op1, typename Op2>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+    transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init, Op1 && op1, Op2 && op2)
     {
         static_assert(
@@ -408,12 +411,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;
 
-        return detail::inner_product<T>().call(
+        return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
             std::move(init), std::forward<Op1>(op1), std::forward<Op2>(op2));
     }

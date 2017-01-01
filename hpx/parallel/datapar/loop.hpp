@@ -35,7 +35,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename Vector>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            is_vectorpack_execution_policy<ExPolicy>::value,
+            execution::is_vectorpack_execution_policy<ExPolicy>::value,
             typename Vector::value_type
         >::type
         extract_value(Vector const& value)
@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename F, typename Vector>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            is_vectorpack_execution_policy<ExPolicy>::value,
+            execution::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<
                 typename hpx::util::decay<Vector>::type::value_type, 1
             >::type
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename F, typename Vector, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            is_vectorpack_execution_policy<ExPolicy>::value,
+            execution::is_vectorpack_execution_policy<ExPolicy>::value,
             typename traits::vector_pack_type<T, 1>::type
         >::type
         accumulate_values(F && f, Vector const& value, T accum)
@@ -302,7 +302,7 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
-            is_vectorpack_execution_policy<ExPolicy>::value
+            execution::is_vectorpack_execution_policy<ExPolicy>::value
         >::type
     >
     HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { namespace util
 
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
         typename U = typename std::enable_if<
-            is_vectorpack_execution_policy<ExPolicy>::value
+            execution::is_vectorpack_execution_policy<ExPolicy>::value
         >::type
     >
     HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -336,7 +336,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        is_vectorpack_execution_policy<ExPolicy>::value, bool
+        execution::is_vectorpack_execution_policy<ExPolicy>::value, bool
     >::type
     loop_optimization(Iter const& first1, Iter const& last1)
     {
@@ -346,14 +346,14 @@ namespace hpx { namespace parallel { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(parallel::v1::datapar_execution_policy, Begin begin, End end, F && f)
+    loop(parallel::execution::datapar_policy, Begin begin, End end, F && f)
     {
         return detail::datapar_loop<Begin>::call(begin, end, std::forward<F>(f));
     }
 
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
-    loop(parallel::v1::datapar_task_execution_policy, Begin begin, End end, F && f)
+    loop(parallel::execution::datapar_task_policy, Begin begin, End end, F && f)
     {
         return detail::datapar_loop<Begin>::call(begin, end, std::forward<F>(f));
     }
@@ -363,7 +363,8 @@ namespace hpx { namespace parallel { namespace util
         typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        is_vectorpack_execution_policy<ExPolicy>::value, std::pair<Iter1, Iter2>
+        execution::is_vectorpack_execution_policy<ExPolicy>::value,
+        std::pair<Iter1, Iter2>
     >::type
     loop2(VecOnly, Iter1 first1, Iter1 last1, Iter2 first2, F && f)
     {
@@ -375,7 +376,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        is_vectorpack_execution_policy<ExPolicy>::value, Iter
+        execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter
     >::type
     loop_n(Iter it, std::size_t count, F && f)
     {

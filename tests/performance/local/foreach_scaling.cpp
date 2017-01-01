@@ -37,7 +37,7 @@ void measure_sequential_foreach(std::size_t size)
         std::rand());
 
     // invoke sequential for_each
-    hpx::parallel::for_each(hpx::parallel::seq,
+    hpx::parallel::for_each(hpx::parallel::execution::seq,
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -56,7 +56,7 @@ void measure_parallel_foreach(std::size_t size)
     hpx::parallel::static_chunk_size cs(chunk_size);
 
     // invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::par.with(cs),
+    hpx::parallel::for_each(hpx::parallel::execution::par.with(cs),
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -78,7 +78,7 @@ hpx::future<void> measure_task_foreach(std::size_t size)
     // invoke parallel for_each
     return
         hpx::parallel::for_each(
-            hpx::parallel::par(hpx::parallel::task).with(cs),
+            hpx::parallel::execution::par(hpx::parallel::execution::task).with(cs),
             boost::begin(*data_representation),
             boost::end(*data_representation),
             [](std::size_t) {
