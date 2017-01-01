@@ -102,7 +102,7 @@ struct stepper
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
         using namespace hpx::parallel;
-        for_each(par, iterator(1), iterator(size-1),
+        for_each(execution::par, iterator(1), iterator(size-1),
             [&next, &middle](std::size_t i)
             {
                 next[i] = heat(middle[i-1], middle[i], middle[i+1]);
@@ -120,7 +120,7 @@ struct stepper
         using hpx::util::unwrapped;
         using hpx::dataflow;
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);

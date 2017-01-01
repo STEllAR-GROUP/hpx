@@ -353,7 +353,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
@@ -604,11 +604,6 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
     std::uint64_t block_order, std::uint64_t tile_size,
     std::uint64_t domain)
 {
-    using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
-    using hpx::util::placeholders::_1;
-
     sub_block const A = Af.get();
     sub_block B = Bf.get();
 
@@ -648,7 +643,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     std::uint64_t blocks_end, std::uint64_t domain)
 {
     using hpx::parallel::transform_reduce;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);

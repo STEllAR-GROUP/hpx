@@ -145,7 +145,7 @@ struct stepper
         // Initial conditions: f(0, i) = i
         std::size_t b = 0;
         auto range = boost::irange(b, np);
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
         hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
             [&U, nx](std::size_t i)
             {

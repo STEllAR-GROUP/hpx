@@ -19,12 +19,12 @@ void test_transform_reduce_binary()
 {
     using namespace hpx::parallel;
 
-    test_transform_reduce_binary(dataseq_execution, IteratorTag());
-    test_transform_reduce_binary(datapar_execution, IteratorTag());
+    test_transform_reduce_binary(execution::dataseq, IteratorTag());
+    test_transform_reduce_binary(execution::datapar, IteratorTag());
 
-    test_transform_reduce_binary_async(dataseq_execution(task),
+    test_transform_reduce_binary_async(execution::dataseq(execution::task),
         IteratorTag());
-    test_transform_reduce_binary_async(datapar_execution(task),
+    test_transform_reduce_binary_async(execution::datapar(execution::task),
         IteratorTag());
 }
 

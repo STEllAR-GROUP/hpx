@@ -36,8 +36,8 @@ template <typename ExPolicy, typename IteratorTag>
 void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -93,8 +93,8 @@ void for_each_zipiter_test()
 {
     using namespace hpx::parallel;
 
-    for_each_zipiter_test(datapar_execution, IteratorTag());
-//     test_for_each_async(datapar_execution(task), IteratorTag());
+    for_each_zipiter_test(execution::datapar, IteratorTag());
+//     test_for_each_async(execution::datapar(execution::task), IteratorTag());
 }
 
 void for_each_zipiter_test()

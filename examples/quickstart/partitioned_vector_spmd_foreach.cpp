@@ -161,7 +161,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
         hpx::parallel::generate(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             view.begin(), view.end(),
             [&]()
             {
@@ -170,7 +170,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // square all numbers in the array
         hpx::parallel::for_each(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             view.begin(), view.end(),
             [](int& val)
             {

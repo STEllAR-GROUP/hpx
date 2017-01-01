@@ -23,8 +23,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -98,18 +98,20 @@ void test_adjacent_find_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_adjacent_find_bad_alloc(seq, IteratorTag());
-    test_adjacent_find_bad_alloc(par, IteratorTag());
+    test_adjacent_find_bad_alloc(execution::seq, IteratorTag());
+    test_adjacent_find_bad_alloc(execution::par, IteratorTag());
 
-    test_adjacent_find_bad_alloc_async(seq(task), IteratorTag());
-    test_adjacent_find_bad_alloc_async(par(task), IteratorTag());
+    test_adjacent_find_bad_alloc_async(execution::seq(execution::task), IteratorTag());
+    test_adjacent_find_bad_alloc_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_adjacent_find_bad_alloc(execution_policy(seq), IteratorTag());
-    test_adjacent_find_bad_alloc(execution_policy(par), IteratorTag());
+    test_adjacent_find_bad_alloc(execution_policy(execution::seq), IteratorTag());
+    test_adjacent_find_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_adjacent_find_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_adjacent_find_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_adjacent_find_bad_alloc(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_adjacent_find_bad_alloc(execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

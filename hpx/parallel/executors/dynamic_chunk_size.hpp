@@ -35,13 +35,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     number of loop iterations to schedule together.
         ///                     The default chunk size is 1.
         ///
-        explicit dynamic_chunk_size(std::size_t chunk_size = 1)
+        HPX_CONSTEXPR explicit dynamic_chunk_size(std::size_t chunk_size = 1)
           : chunk_size_(chunk_size)
         {}
 
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor&, F &&, std::size_t, std::size_t)
+        HPX_CONSTEXPR std::size_t
+        get_chunk_size(Executor&, F &&, std::size_t, std::size_t)
         {
             return chunk_size_;
         }

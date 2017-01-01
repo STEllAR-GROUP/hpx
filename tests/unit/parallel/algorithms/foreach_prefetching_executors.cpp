@@ -44,14 +44,14 @@ void for_each_prefetching_executors_test()
     {
         parallel_executor exec;
 
-        test_prefetching_executors(par.on(exec));
-        test_prefetching_executors_async(par(task).on(exec));
+        test_prefetching_executors(execution::par.on(exec));
+        test_prefetching_executors_async(execution::par(execution::task).on(exec));
     }
 
     {
         sequential_executor exec;
-        test_prefetching_executors(par.on(exec));
-        test_prefetching_executors_async(par(task).on(exec));
+        test_prefetching_executors(execution::par.on(exec));
+        test_prefetching_executors_async(execution::par(execution::task).on(exec));
     }
 }
 

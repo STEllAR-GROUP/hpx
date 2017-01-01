@@ -35,9 +35,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                    !hpx::traits::is_forward_iterator<InIter>::value ||
-                    !hpx::traits::is_forward_iterator<OutIter>::value
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
             return Algo().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -83,8 +85,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //
         // \returns  The \a transfer algorithm returns a \a hpx::future<OutIter> if
         //           the execution policy is of type
-        //           \a sequential_task_execution_policy or
-        //           \a parallel_task_execution_policy and
+        //           \a sequenced_task_policy or
+        //           \a parallel_task_policy and
         //           returns \a OutIter otherwise.
         //           The \a move algorithm returns the output iterator to the
         //           element in the destination range, one past the last element
@@ -93,7 +95,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <typename Algo, typename ExPolicy, typename InIter, typename OutIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::parallel::v1::is_execution_policy<ExPolicy>::value &&
+            hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_iterator<OutIter>::value)>
         typename util::detail::algorithm_result<

@@ -105,18 +105,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The swap operations in the parallel \a swap_ranges algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in
+    /// \a sequenced_policy execute in sequential order in
     /// the calling thread.
     ///
     /// The swap operations in the parallel \a swap_ranges algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
     ///           \a hpx::future<ForwardIter2>  if the execution policy is of
-    ///           type \a parallel_task_execution_policy and returns \a ForwardIter2
+    ///           type \a parallel_task_policy and returns \a ForwardIter2
     ///           otherwise.
     ///           The \a swap_ranges algorithm returns iterator to the element
     ///           past the last element exchanged in the range beginning with
@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, ForwardIter2>::type
     >::type
     swap_ranges(ExPolicy && policy, ForwardIter1 first1, ForwardIter1 last1,
@@ -137,7 +137,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<ForwardIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::swap_ranges<ForwardIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(),

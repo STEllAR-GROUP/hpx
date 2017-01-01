@@ -275,7 +275,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     >::get(std::make_pair(last, dest));
             }
 
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
             return segmented_transfer(Algo(),
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest);

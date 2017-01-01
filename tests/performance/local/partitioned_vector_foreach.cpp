@@ -86,41 +86,52 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
-        std::uint64_t seq_ref = foreach_vector(hpx::parallel::seq, ref);
+        std::uint64_t seq_ref = foreach_vector(
+            hpx::parallel::execution::seq, ref);
         std::uint64_t par_ref = foreach_vector(
-            hpx::parallel::par.with(cs), ref); //-V106
+            hpx::parallel::execution::par.with(cs), ref); //-V106
 
         // sequential hpx::partitioned_vector iteration
         {
             hpx::partitioned_vector<int> v(vector_size);
 
-            hpx::cout << "hpx::partitioned_vector<int>(seq): "
-                << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
+            hpx::cout << "hpx::partitioned_vector<int>(execution::seq): "
+                << foreach_vector(hpx::parallel::execution::seq, v) /
+                        double(seq_ref)
                 << "\n";
-            hpx::cout << "hpx::partitioned_vector<int>(par): "
-                << foreach_vector(hpx::parallel::par.with(cs), v)/double(par_ref) //-V106
+            hpx::cout << "hpx::partitioned_vector<int>(execution::par): "
+                << foreach_vector(hpx::parallel::execution::par.with(cs), v) /
+                        double(par_ref) //-V106
                 << "\n";
         }
 
         {
             hpx::partitioned_vector<int> v(vector_size, hpx::container_layout(2));
 
-            hpx::cout << "hpx::partitioned_vector<int>(seq, container_layout(2)): "
-                << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
+            hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
+                        "container_layout(2)): "
+                << foreach_vector(hpx::parallel::execution::seq, v) /
+                        double(seq_ref)
                 << "\n";
-            hpx::cout << "hpx::partitioned_vector<int>(par, container_layout(2)): "
-                << foreach_vector(hpx::parallel::par.with(cs), v)/double(par_ref) //-V106
+            hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
+                        "container_layout(2)): "
+                << foreach_vector(hpx::parallel::execution::par.with(cs), v) /
+                        double(par_ref) //-V106
                 << "\n";
         }
 
         {
             hpx::partitioned_vector<int> v(vector_size, hpx::container_layout(10));
 
-            hpx::cout << "hpx::partitioned_vector<int>(seq, container_layout(10)): "
-                << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
+            hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
+                            "container_layout(10)): "
+                << foreach_vector(hpx::parallel::execution::seq, v) /
+                        double(seq_ref)
                 << "\n";
-            hpx::cout << "hpx::partitioned_vector<int>(par, container_layout(10)): "
-                << foreach_vector(hpx::parallel::par.with(cs), v)/double(par_ref) //-V106
+            hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
+                            "container_layout(10)): "
+                << foreach_vector(hpx::parallel::execution::par.with(cs), v) /
+                        double(par_ref) //-V106
                 << "\n";
         }
     }

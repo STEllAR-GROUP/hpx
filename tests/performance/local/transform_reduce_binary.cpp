@@ -91,13 +91,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     else
     {
         // warm up caches
-        measure_inner_product(hpx::parallel::par, data1, data2);
+        measure_inner_product(hpx::parallel::execution::par, data1, data2);
 
         // do measurements
         std::uint64_t tr_time_datapar = measure_inner_product(
-            test_count, hpx::parallel::datapar_execution, data1, data2);
+            test_count, hpx::parallel::execution::datapar, data1, data2);
         std::uint64_t tr_time_par = measure_inner_product(
-            test_count, hpx::parallel::par, data1, data2);
+            test_count, hpx::parallel::execution::par, data1, data2);
 
         if (csvoutput)
         {

@@ -22,8 +22,8 @@ template <typename ExPolicy>
 void test_adjacent_difference(ExPolicy policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);
@@ -47,8 +47,8 @@ template <typename ExPolicy>
 void test_adjacent_difference_async(ExPolicy p)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);
@@ -72,20 +72,20 @@ void test_adjacent_difference_async(ExPolicy p)
 void adjacent_difference_test()
 {
     using namespace hpx::parallel;
-    test_adjacent_difference(seq);
-    test_adjacent_difference(par);
-    test_adjacent_difference(par_vec);
+    test_adjacent_difference(execution::seq);
+    test_adjacent_difference(execution::par);
+    test_adjacent_difference(execution::par_unseq);
 
-    test_adjacent_difference_async(seq(task));
-    test_adjacent_difference_async(par(task));
+    test_adjacent_difference_async(execution::seq(execution::task));
+    test_adjacent_difference_async(execution::par(execution::task));
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_adjacent_difference(execution_policy(seq));
-    test_adjacent_difference(execution_policy(par));
-    test_adjacent_difference(execution_policy(par_vec));
+    test_adjacent_difference(execution_policy(execution::seq));
+    test_adjacent_difference(execution_policy(execution::par));
+    test_adjacent_difference(execution_policy(execution::par_unseq));
 
-    test_adjacent_difference(execution_policy(seq(task)));
-    test_adjacent_difference(execution_policy(par(task)));
+    test_adjacent_difference(execution_policy(execution::seq(execution::task)));
+    test_adjacent_difference(execution_policy(execution::par(execution::task)));
 #endif
 }
 

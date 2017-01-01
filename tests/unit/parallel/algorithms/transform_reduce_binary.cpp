@@ -18,27 +18,27 @@ void test_transform_reduce_binary()
 {
     using namespace hpx::parallel;
 
-    test_transform_reduce_binary(seq, IteratorTag());
-    test_transform_reduce_binary(par, IteratorTag());
-    test_transform_reduce_binary(par_vec, IteratorTag());
+    test_transform_reduce_binary(execution::seq, IteratorTag());
+    test_transform_reduce_binary(execution::par, IteratorTag());
+    test_transform_reduce_binary(execution::par_unseq, IteratorTag());
 
-    test_transform_reduce_binary_async(seq(task),
+    test_transform_reduce_binary_async(execution::seq(execution::task),
         IteratorTag());
-    test_transform_reduce_binary_async(par(task),
+    test_transform_reduce_binary_async(execution::par(execution::task),
         IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_reduce_binary(execution_policy(seq),
+    test_transform_reduce_binary(execution_policy(execution::seq),
         IteratorTag());
-    test_transform_reduce_binary(execution_policy(par),
+    test_transform_reduce_binary(execution_policy(execution::par),
         IteratorTag());
-    test_transform_reduce_binary(execution_policy(par_vec),
+    test_transform_reduce_binary(execution_policy(execution::par_unseq),
         IteratorTag());
 
     test_transform_reduce_binary(
-        execution_policy(seq(task)), IteratorTag());
+        execution_policy(execution::seq(execution::task)), IteratorTag());
     test_transform_reduce_binary(
-        execution_policy(par(task)), IteratorTag());
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

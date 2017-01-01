@@ -637,7 +637,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             {
                                 dispatch(traits_out::get_id(out_it),
                                     segmented_scan_void<Algo>(),
-                                    hpx::parallel::seq, std::true_type(),
+                                    hpx::parallel::execution::seq,
+                                    std::true_type(),
                                     get<0>(in_tuple), get<1>(in_tuple),
                                     out, last_value, op);
                             }
