@@ -1426,8 +1426,6 @@ namespace hpx { namespace serialization
     }
 }}
 
-#include <hpx/lcos/local/packaged_continuation.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // hoist names into main namespace
 namespace hpx
@@ -1441,6 +1439,8 @@ namespace hpx
 
     using lcos::make_shared_future;
 }
+
+#include <hpx/lcos/local/packaged_continuation.hpp>
 
 #define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                     \
     hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))     \

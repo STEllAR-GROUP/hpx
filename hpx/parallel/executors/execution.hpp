@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -48,6 +47,16 @@
 #include <boost/optional.hpp>
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+// forward declare wait_all(std::vector<Future>&&) to avoid including
+// wait_all.hpp which creates circular #include dependencies
+namespace hpx { namespace lcos
+{
+    template <typename Future>
+    void wait_all(std::vector<Future>&& values);
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     namespace execution
 {
@@ -1230,7 +1239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                             execution::async_execute(exec, f, elem, ts...)
                         );
                     }
-                    hpx::wait_all(results);
+                    hpx::lcos::wait_all(std::move(results));
                 }
                 catch (std::bad_alloc const& ba) {
                     boost::throw_exception(ba);
