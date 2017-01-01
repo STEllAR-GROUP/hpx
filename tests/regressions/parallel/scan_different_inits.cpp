@@ -79,15 +79,17 @@ void test_async_zero()
             a.begin(), a.end(), e.begin(), 10,
             [](int bar, int baz){ return bar*baz; });
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(par(task), a.begin(), a.end(), f.begin(),
-        10,
-        [](int bar, int baz){ return 2*bar+2*baz; },
-        [](int foo){ return foo - 3; });
+        transform_inclusive_scan(par(execution::task),
+            a.begin(), a.end(), f.begin(),
+            10,
+            [](int bar, int baz){ return 2*bar+2*baz; },
+            [](int foo){ return foo - 3; });
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(par(task), a.begin(), a.end(), g.begin(),
-        10,
-        [](int bar, int baz){ return 2*bar+2*baz; },
-        [](int foo){ return foo - 3; });
+        transform_exclusive_scan(par(execution::task),
+            a.begin(), a.end(), g.begin(),
+            10,
+            [](int bar, int baz){ return 2*bar+2*baz; },
+            [](int foo){ return foo - 3; });
 
 
     HPX_TEST(f_inc_add.get() == b.begin());
@@ -182,11 +184,13 @@ void test_async_one(std::vector<int> a)
         exclusive_scan(execution::par(execution::task),
             a.begin(), a.end(), e.begin(), 10, fun_mult);
     Fut_Iter f_transform_inc =
-        transform_inclusive_scan(par(task), a.begin(), a.end(), f.begin(),
-        10, fun_add, fun_conv);
+        transform_inclusive_scan(par(execution::task),
+            a.begin(), a.end(), f.begin(),
+            10, fun_add, fun_conv);
     Fut_Iter f_transform_exc =
-        transform_exclusive_scan(par(task), a.begin(), a.end(), g.begin(),
-        10, fun_add, fun_conv);
+        transform_exclusive_scan(par(execution::task),
+            a.begin(), a.end(), g.begin(),
+            10, fun_add, fun_conv);
 
     hpx::parallel::v1::detail::sequential_inclusive_scan(
         a.begin(), a.end(), b_ans.begin(), 10, fun_add);
