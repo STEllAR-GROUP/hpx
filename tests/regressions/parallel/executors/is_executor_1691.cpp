@@ -9,10 +9,19 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct my_executor : hpx::parallel::parallel_executor {};
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor<my_executor>
+      : std::true_type
+    {}
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])

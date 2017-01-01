@@ -37,10 +37,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     ///
     struct sequenced_executor
     {
-#if defined(DOXYGEN)
-        /// Create a new sequential executor
-        sequenced_executor() {}
-#endif
+        /// \cond NOINTERNAL
+        bool operator==(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return true;
+        }
+
+        bool operator!=(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return false;
+        }
+
+        sequenced_executor const& context() const HPX_NOEXCEPT
+        {
+            return *this;
+        }
+        /// \endcond
 
         /// \cond NOINTERNAL
         typedef sequenced_execution_tag execution_category;
@@ -136,6 +148,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 
         template <>
         struct is_bulk_one_way_executor<sequenced_executor>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_two_way_executor<sequenced_executor>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_bulk_two_way_executor<sequenced_executor>
           : std::true_type
         {};
     }

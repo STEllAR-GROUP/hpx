@@ -141,12 +141,12 @@ void test_bulk_then()
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executor exec;
-    hpx::when_all(hpx::parallel::execution::then_bulk_execute(
+    hpx::parallel::execution::then_bulk_execute(
         exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
-    ).get()).get();
-    hpx::when_all(hpx::parallel::execution::then_bulk_execute(
+    ).get();
+    hpx::parallel::execution::then_bulk_execute(
         exec, &bulk_test_f, v, f, tid, 42
-    ).get()).get();
+    ).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

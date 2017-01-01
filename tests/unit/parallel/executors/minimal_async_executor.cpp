@@ -170,11 +170,6 @@ namespace hpx { namespace traits
     struct is_two_way_executor<test_async_executor1>
       : std::true_type
     {};
-
-    template <>
-    struct is_bulk_two_way_executor<test_async_executor1>
-      : std::true_type
-    {};
 }}
 
 struct test_async_executor2 : test_async_executor1
@@ -195,11 +190,6 @@ namespace hpx { namespace traits
 {
     template <>
     struct is_two_way_executor<test_async_executor2>
-      : std::true_type
-    {};
-
-    template <>
-    struct is_bulk_two_way_executor<test_async_executor2>
       : std::true_type
     {};
 }}
@@ -225,11 +215,6 @@ namespace hpx { namespace traits
 {
     template <>
     struct is_two_way_executor<test_async_executor3>
-      : std::true_type
-    {};
-
-    template <>
-    struct is_bulk_two_way_executor<test_async_executor3>
       : std::true_type
     {};
 }}
@@ -283,18 +268,13 @@ namespace hpx { namespace traits
     struct is_two_way_executor<test_async_executor5>
       : std::true_type
     {};
-
-    template <>
-    struct is_bulk_two_way_executor<test_async_executor5>
-      : std::true_type
-    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
     test_executor<test_async_executor1>({{ 0, 0, 431, 0, 0 }});
-    test_executor<test_async_executor2>({{ 0, 215, 216, 0, 0 }});
+    test_executor<test_async_executor2>({{ 0, 1, 430, 0, 0 }});
     test_executor<test_async_executor3>({{ 0, 0, 217, 2, 0 }});
     test_executor<test_async_executor4>({{ 0, 0, 217, 0, 2 }});
     test_executor<test_async_executor5>({{ 1, 0, 430, 0, 0 }});

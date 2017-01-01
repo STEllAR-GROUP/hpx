@@ -49,6 +49,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
     /// and a BulkTwoWayExecutor
     struct parallel_executor
     {
+        /// Associate the parallel_execution_tag executor tag type as a default
+        /// with this executor.
+        typedef parallel_execution_tag execution_category;
+
         /// Associate the auto_chunk_size executor parameters type as a default
         /// with this executor.
         typedef static_chunk_size executor_parameters_type;
@@ -76,6 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         {
             return *this;
         }
+        /// \endcond
 
         /// \cond NOINTERNAL
 
@@ -101,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type
         > >
-        async_bulk_execute(F && f, S const& shape, Ts &&... ts)
+        async_bulk_execute(F && f, S const& shape, Ts &&... ts) const
         {
             // lazily initialize once
             static std::size_t global_num_tasks =
@@ -138,7 +143,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         template <typename Result, typename F, typename Iter, typename ... Ts>
         hpx::future<void> spawn(std::vector<hpx::future<Result> >& results,
             std::size_t base, std::size_t size, std::size_t num_tasks,
-            F const& func, Iter it, Ts const&... ts)
+            F const& func, Iter it, Ts const&... ts) const
         {
             if (size > num_tasks)
             {
@@ -152,7 +157,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
                 hpx::future<void> (parallel_executor::*spawn_func)(
                         std::vector<hpx::future<Result> >&, std::size_t,
                         std::size_t, std::size_t, F const&, Iter, Ts const&...
-                    ) = &parallel_executor::spawn;
+                    ) const = &parallel_executor::spawn;
 
                 while (size != 0)
                 {
