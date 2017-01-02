@@ -3,16 +3,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nounnamed
-
 /// \file parallel/executors/execution.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM
 
 #include <hpx/config.hpp>
+#include <hpx/parallel/executors/execution_fwd.hpp>
+
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/execution_fwd.hpp>
 
 #include <iterator>
 #include <functional>
@@ -46,15 +46,6 @@
 #else
 #include <boost/optional.hpp>
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-// forward declare wait_all(std::vector<Future>&&) to avoid including
-// wait_all.hpp which creates circular #include dependencies
-namespace hpx { namespace lcos
-{
-    template <typename Future>
-    void wait_all(std::vector<Future>&& values);
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution
@@ -348,8 +339,9 @@ namespace hpx { namespace parallel { namespace execution
                     p = lcos::detail::make_continuation_exec<result_type>(
                             predecessor, exec, std::move(func));
 
-                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
-                    create(std::move(p));
+                return hpx::traits::future_access<
+                        hpx::lcos::future<result_type>
+                    >::create(std::move(p));
             }
         };
 
@@ -447,7 +439,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct async_execute_fn
+        template <>
+        struct customization_point<async_execute_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             auto operator()(Executor const& exec, F && f, Ts &&... ts) const
@@ -572,7 +565,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct sync_execute_fn
+        template <>
+        struct customization_point<sync_execute_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE auto operator()(Executor const& exec,
@@ -626,8 +620,9 @@ namespace hpx { namespace parallel { namespace execution
                     p = lcos::detail::make_continuation_exec<result_type>(
                             predecessor, exec, std::move(func));
 
-                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
-                    create(std::move(p));
+                return hpx::traits::future_access<
+                        hpx::lcos::future<result_type>
+                    >::create(std::move(p));
             }
 
             template <typename TwoWayExecutor, typename F, typename Future,
@@ -644,7 +639,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct then_execute_fn
+        template <>
+        struct customization_point<then_execute_tag>
         {
             template <typename Executor, typename F, typename Future,
                 typename ... Ts>
@@ -755,7 +751,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct post_fn
+        template <>
+        struct customization_point<post_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE auto operator()(Executor const& exec, F && f,
@@ -769,129 +766,13 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // Helper facility to avoid ODR violations
-        template <typename T>
-        struct static_const
-        {
-            static T const value;
-        };
-
-        template <typename T>
-        T const static_const<T>::value = T{};
-    }
     /// \endcond
 
-    namespace
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // OneWayExecutor customization point: execution::execute
-
-        /// Customization point for synchronous execution agent creation.
-        ///
-        /// This synchronously creates a single function invocation f() using
-        /// the associated executor. The execution of the supplied function
-        /// synchronizes with the caller
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns f(ts...)'s result
-        ///
-        /// \note This is valid for one way executors only, it will call
-        ///       exec.sync_execute(f, ts...) if it exists.
-        ///
-        constexpr detail::sync_execute_fn const& sync_execute =
-            detail::static_const<detail::sync_execute_fn>::value;
-
-        ///////////////////////////////////////////////////////////////////////
-        // TwoWayExecutor customization points: execution::async_execute,
-        // execution::sync_execute, and execution::then_execute
-
-        /// Customization point for asynchronous execution agent creation.
-        ///
-        /// This asynchronously creates a single function invocation f() using
-        /// the associated executor.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \note Executors have to implement only `async_execute()`. All other
-        ///       functions will be emulated by this `executor_traits` in terms
-        ///       of this single basic primitive. However, some executors will
-        ///       naturally specialize all operations for maximum efficiency.
-        ///
-        /// \note This is valid for one way executors (calls
-        ///       make_ready_future(exec.sync_execute(f, ts...) if it exists)
-        ///       and for two way executors (calls exec.async_execute(f, ts...)
-        ///       if it exists).
-        ///
-        /// \returns f(ts...)'s result through a future
-        ///
-        constexpr detail::async_execute_fn const& async_execute =
-            detail::static_const<detail::async_execute_fn>::value;
-
-        /// Customization point for execution agent creation depending on a
-        /// given future.
-        ///
-        /// This creates a single function invocation f() using the associated
-        /// executor after the given future object has become ready.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param predecessor [in] The future object the execution of the
-        ///             given function depends on.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns f(ts...)'s result through a future
-        ///
-        /// \note This is valid for two way executors (calls
-        ///       exec.then_execute(f, predecessor, ts...) if it exists) and
-        ///       for one way executors (calls predecessor.then(bind(f, ts...))).
-        ///
-        constexpr detail::then_execute_fn const& then_execute =
-            detail::static_const<detail::then_execute_fn>::value;
-
-        ///////////////////////////////////////////////////////////////////////
-        // NonBlockingOneWayExecutor customization point: execution::post
-
-        /// Customization point for asynchronous fire & forget execution
-        /// agent creation.
-        ///
-        /// This asynchronously (fire & forget) creates a single function
-        /// invocation f() using the associated executor.
-        ///
-        /// \param exec [in] The executor object to use for scheduling of the
-        ///             function \a f.
-        /// \param f    [in] The function which will be scheduled using the
-        ///             given executor.
-        /// \param ts   [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \note This is valid for two way executors (calls
-        ///       exec.apply_execute(f, ts...), if available, otherwise
-        ///       it calls exec.async_execute(f, ts...) while discarding the
-        ///       returned future), and for non-blocking two way executors
-        ///       (calls exec.post(f, ts...) if it exists).
-        ///
-        constexpr detail::post_fn const& post =
-            detail::static_const<detail::post_fn>::value;
-    }
-
-    /// \cond NOINTERNAL
     ///////////////////////////////////////////////////////////////////////////
     // customization points for BulkTwoWayExecutor interface
     // async_bulk_execute(), sync_bulk_execute(), then_bulk_execute()
+
+    /// \cond NOINTERNAL
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -995,9 +876,9 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE static auto
             call(BulkExecutor const& exec, F && f, Shape const& shape,
                     Ts &&... ts)
-//             ->  decltype(exec.async_bulk_execute(
-//                     std::forward<F>(f), shape, std::forward<Ts>(ts)...
-//                 ))
+            ->  decltype(exec.async_bulk_execute(
+                    std::forward<F>(f), shape, std::forward<Ts>(ts)...
+                ))
             {
                 return exec.async_bulk_execute(std::forward<F>(f), shape,
                     std::forward<Ts>(ts)...);
@@ -1005,15 +886,16 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         // async_bulk_execute dispatch point
-        struct async_bulk_execute_fn
+        template <>
+        struct customization_point<async_bulk_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename ... Ts>
             HPX_FORCEINLINE auto operator()(Executor const& exec, F && f,
                     Shape const& shape, Ts &&... ts) const
-//             ->  decltype(async_bulk_execute_fn_helper<Executor>::call(
-//                     exec, std::forward<F>(f), shape, std::forward<Ts>(ts)...
-//                 ))
+            ->  decltype(async_bulk_execute_fn_helper<Executor>::call(
+                    exec, std::forward<F>(f), shape, std::forward<Ts>(ts)...
+                ))
             {
                 return async_bulk_execute_fn_helper<Executor>::call(exec,
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...);
@@ -1312,7 +1194,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct sync_bulk_execute_fn
+        template <>
+        struct customization_point<sync_bulk_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename ... Ts>
@@ -1328,87 +1211,6 @@ namespace hpx { namespace parallel { namespace execution
         };
     }
     /// \endcond
-
-    namespace
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // BulkTwoWayExecutor customization points:
-        // execution::async_bulk_execute, execution::sync_bulk_execute,
-        // execution::then_bulk_execute
-
-        /// Bulk form of asynchronous execution agent creation.
-        ///
-        /// \note This is deliberately different from the bulk_async_execute
-        ///       customization points specified in P0443.The async_bulk_execute
-        ///       customization point defined here is more generic and is used
-        ///       as the workhorse for implementing the specified APIs.
-        ///
-        /// This asynchronously creates a group of function invocations f(i)
-        /// whose ordering is given by the execution_category associated with
-        /// the executor.
-        ///
-        /// Here \a i takes on all values in the index space implied by shape.
-        /// All exceptions thrown by invocations of f(i) are reported in a
-        /// manner consistent with parallel algorithm execution through the
-        /// returned future.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        /// \param f     [in] The function which will be scheduled using the
-        ///              given executor.
-        /// \param shape [in] The shape objects which defines the iteration
-        ///              boundaries for the arguments to be passed to \a f.
-        /// \param ts    [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns The return type of \a executor_type::async_bulk_execute if
-        ///          defined by \a executor_type. Otherwise a vector
-        ///          of futures holding the returned values of each invocation
-        ///          of \a f.
-        ///
-        /// \note This calls exec.async_bulk_execute(f, shape, ts...) if it
-        ///       exists; otherwise it executes async_execute(f, shape, ts...)
-        ///       as often as needed.
-        ///
-        constexpr detail::async_bulk_execute_fn const& async_bulk_execute =
-            detail::static_const<detail::async_bulk_execute_fn>::value;
-
-        /// Bulk form of synchronous execution agent creation.
-        ///
-        /// \note This is deliberately different from the bulk_sync_execute
-        ///       customization points specified in P0443.The sync_bulk_execute
-        ///       customization point defined here is more generic and is used
-        ///       as the workhorse for implementing the specified APIs.
-        ///
-        /// This synchronously creates a group of function invocations f(i)
-        /// whose ordering is given by the execution_category associated with
-        /// the executor. The function synchronizes the execution of all
-        /// scheduled functions with the caller.
-        ///
-        /// Here \a i takes on all values in the index space implied by shape.
-        /// All exceptions thrown by invocations of f(i) are reported in a
-        /// manner consistent with parallel algorithm execution through the
-        /// returned future.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        /// \param f     [in] The function which will be scheduled using the
-        ///              given executor.
-        /// \param shape [in] The shape objects which defines the iteration
-        ///              boundaries for the arguments to be passed to \a f.
-        /// \param ts    [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns The return type of \a executor_type::sync_bulk_execute
-        ///          if defined by \a executor_type. Otherwise a vector holding
-        ///          the returned values of each invocation of \a f except when
-        ///          \a f returns void, which case void is returned.
-        ///
-        /// \note This calls exec.sync_bulk_execute(f, shape, ts...) if it
-        ///       exists; otherwise it executes sync_execute(f, shape, ts...)
-        ///       as often as needed.
-        ///
-        constexpr detail::sync_bulk_execute_fn const& sync_bulk_execute =
-            detail::static_const<detail::sync_bulk_execute_fn>::value;
-    }
 
     /// \cond NOINTERNAL
     namespace detail
@@ -1709,7 +1511,8 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        struct then_bulk_execute_fn
+        template <>
+        struct customization_point<then_bulk_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename Future, typename ... Ts>
@@ -1727,53 +1530,6 @@ namespace hpx { namespace parallel { namespace execution
         };
     }
     /// \endcond
-
-    namespace
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // BulkTwoWayExecutor customization points:
-        // execution::then_bulk_execute
-
-        /// Bulk form of execution agent creation depending on a given future.
-        ///
-        /// \note This is deliberately different from the then_sync_execute
-        ///       customization points specified in P0443.The then_bulk_execute
-        ///       customization point defined here is more generic and is used
-        ///       as the workhorse for implementing the specified APIs.
-        ///
-        /// This creates a group of function invocations f(i)
-        /// whose ordering is given by the execution_category associated with
-        /// the executor.
-        ///
-        /// Here \a i takes on all values in the index space implied by shape.
-        /// All exceptions thrown by invocations of f(i) are reported in a
-        /// manner consistent with parallel algorithm execution through the
-        /// returned future.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        /// \param f     [in] The function which will be scheduled using the
-        ///              given executor.
-        /// \param shape [in] The shape objects which defines the iteration
-        ///              boundaries for the arguments to be passed to \a f.
-        /// \param predecessor [in] The future object the execution of the
-        ///             given function depends on.
-        /// \param ts    [in] Additional arguments to use to invoke \a f.
-        ///
-        /// \returns The return type of \a executor_type::then_bulk_execute
-        ///          if defined by \a executor_type. Otherwise a vector holding
-        ///          the returned values of each invocation of \a f.
-        ///
-        /// \note This calls exec.then_bulk_execute(f, shape, pred, ts...) if it
-        ///       exists; otherwise it executes
-        ///       sync_execute(f, shape, pred.share(), ts...) (if this executor
-        ///       is also an OneWayExecutor), or
-        ///       async_execute(f, shape, pred.share(), ts...) (if this executor
-        ///       is also a TwoWayExecutor) - as often as needed.
-        ///
-        constexpr detail::then_bulk_execute_fn const& then_bulk_execute =
-            detail::static_const<detail::then_bulk_execute_fn>::value;
-    }
 }}}
 
 #endif
