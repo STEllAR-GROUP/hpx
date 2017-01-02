@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
     struct dataseq_task_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::sequential_executor executor_type;
+        typedef sequenced_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::vector_execution_tag execution_category;
+        typedef unsequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
     struct dataseq_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::sequential_executor executor_type;
+        typedef sequenced_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -333,7 +333,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::vector_execution_tag execution_category;
+        typedef unsequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -606,7 +606,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
     struct datapar_task_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::parallel_executor executor_type;
+        typedef parallel_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -616,7 +616,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::vector_execution_tag execution_category;
+        typedef unsequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -739,7 +739,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
     struct datapar_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::parallel_executor executor_type;
+        typedef parallel_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -749,7 +749,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::vector_execution_tag execution_category;
+        typedef unsequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of

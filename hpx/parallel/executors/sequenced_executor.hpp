@@ -27,8 +27,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
-    namespace execution
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a sequential_executor creates groups of sequential execution agents
@@ -162,7 +161,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         {};
     }
     /// \endcond
-}}}}
+}}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)

@@ -12,8 +12,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
-    namespace execution
+namespace hpx { namespace parallel { namespace execution
 {
     namespace detail
     {
@@ -129,7 +128,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
 //     template <typename T>
 //     constexpr bool is_bulk_two_way_executor_v =
 //         is_bulk_two_way_executor<T>::value;
-}}}}
+}}}
 
 namespace hpx { namespace traits
 {

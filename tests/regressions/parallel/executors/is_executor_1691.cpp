@@ -15,13 +15,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct my_executor : hpx::parallel::parallel_executor {};
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3) { namespace detail
 {
     template <>
     struct is_executor<my_executor>
       : std::true_type
-    {}
-}}
+    {};
+}}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])

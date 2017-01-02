@@ -57,8 +57,7 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
-    namespace execution
+namespace hpx { namespace parallel { namespace execution
 {
     /// \cond NOINTERNAL
 
@@ -1775,7 +1774,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         constexpr detail::then_bulk_execute_fn const& then_bulk_execute =
             detail::static_const<detail::then_bulk_execute_fn>::value;
     }
-}}}}
+}}}
 
 #endif
 

@@ -33,6 +33,10 @@
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// Default sequential execution policy object.
+    static task_policy_tag HPX_CONSTEXPR_OR_CONST task;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequenced_task_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may not
@@ -1434,10 +1438,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     using parallel_vector_execution_policy =
         parallel::execution::parallel_unsequenced_policy;
 
+    using task_execution_policy_tag = parallel::execution::task_policy_tag;
+
     ///////////////////////////////////////////////////////////////////////////
     static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;
-    static parallel_task_execution_policy HPX_CONSTEXPR_OR_CONST par;
+    static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par;
     static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
+
+    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////

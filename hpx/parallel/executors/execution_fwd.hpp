@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
-    namespace execution
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents
@@ -40,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         HPX_CONSTEXPR task_policy_tag() {}
     };
     /// \endcond
-}}}}
+}}}
 
 #endif
 

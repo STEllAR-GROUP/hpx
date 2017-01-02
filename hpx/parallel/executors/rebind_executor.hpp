@@ -12,7 +12,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
-namespace hpx { namespace parallel { namespace execution
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents
@@ -38,9 +38,6 @@ namespace hpx { namespace parallel { namespace execution
     ///       \a parallel_execution_tag.
     using vector_execution_tag =
         parallel::execution::unsequenced_execution_tag;
-
-    /// \cond NOINTERNAL
-    using task_execution_policy_tag = parallel::execution::task_policy_tag;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -97,14 +94,6 @@ namespace hpx { namespace parallel { namespace execution
                 executor_type, parameters_type
             >::type type;
     };
-}}}
-
-namespace hpx { namespace parallel { namespace executioon
-{
-    ///////////////////////////////////////////////////////////////////////////
-    using task_execution_policy_tag = parallel::execution::task_policy_tag;
-
-    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
 }}}
 
 #endif

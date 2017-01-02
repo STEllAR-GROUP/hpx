@@ -13,13 +13,11 @@ namespace hpx { namespace parallel
     HPX_INLINE_NAMESPACE(v1) {}
     HPX_INLINE_NAMESPACE(v2) {}
     HPX_INLINE_NAMESPACE(v3) {}
-    HPX_INLINE_NAMESPACE(concurrency_v2) {}
 
 #if !defined(HPX_HAVE_CXX11_INLINE_NAMESPACES)
     using namespace v1;
     using namespace v2;
     using namespace v3;
-    using namespace concurrency_v2;
 #endif
 
     namespace execution

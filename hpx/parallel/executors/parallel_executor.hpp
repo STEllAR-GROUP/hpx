@@ -36,8 +36,7 @@
 
 #include <boost/range/functions.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
-    namespace execution
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
@@ -225,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(concurrency_v2) {
         {};
     }
     /// \endcond
-}}}}
+}}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
@@ -237,7 +236,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     struct parallel_executor
       : parallel::execution::parallel_executor
     {
-        parallel_executor(launch l = launch::async,
+        HPX_CONSTEXPR parallel_executor(
+                launch l = hpx::detail::async_policy{},
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : parallel::execution::parallel_executor(l, spread, tasks)
         {}
