@@ -64,6 +64,18 @@ namespace hpx { namespace traits
         {
             return t;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Future>
+        struct wait_get_shared_state
+        {
+            HPX_FORCEINLINE
+            typename traits::detail::shared_state_ptr_for<Future>::type const&
+            operator()(Future const& f) const
+            {
+                return traits::detail::get_shared_state(f);
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////

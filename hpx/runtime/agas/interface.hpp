@@ -182,7 +182,8 @@ inline std::uint32_t get_num_localities(
   , error_code& ec = throws
     )
 {
-    return get_num_localities(launch::sync, components::component_invalid, ec);
+    return agas::get_num_localities(launch::sync,
+        components::component_invalid, ec);
 }
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)

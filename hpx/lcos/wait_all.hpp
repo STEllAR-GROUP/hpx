@@ -89,7 +89,6 @@ namespace hpx
 
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_some.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -361,7 +360,7 @@ namespace hpx { namespace lcos
 
         result_type values;
         std::transform(begin, end, std::back_inserter(values),
-            detail::wait_get_shared_state<future_type>());
+            traits::detail::wait_get_shared_state<future_type>());
 
         lcos::wait_all(values);
     }
@@ -379,7 +378,7 @@ namespace hpx { namespace lcos
         result_type values;
         values.reserve(count);
 
-        detail::wait_get_shared_state<future_type> func;
+        traits::detail::wait_get_shared_state<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             values.push_back(func(*begin++));
 
