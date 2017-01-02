@@ -1436,7 +1436,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     ///////////////////////////////////////////////////////////////////////////
     static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;
-    static parallel_task_execution_policy HPX_CONSTEXPR_OR_CONST par;
+    static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par;
     static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
