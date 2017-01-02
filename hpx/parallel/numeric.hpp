@@ -21,4 +21,8 @@
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 #include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
 
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+#include <hpx/parallel/algorithms/inner_product.hpp>
+#endif
+
 #endif

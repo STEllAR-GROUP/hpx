@@ -231,6 +231,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     auto range = boost::irange(start, end);
     double errsq =
         transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
+            [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t b) -> double
             {
                 double errsq = 0.0;
@@ -245,8 +246,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
                     }
                 }
                 return errsq;
-            },
-            [](double lhs, double rhs) { return lhs + rhs; }
+            }
         );
 
     if(verbose)

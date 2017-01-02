@@ -44,6 +44,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_DATAPAR_LIBFLATARRAY HPX_WITH_DATAPAR_LIBFLATARRAY]
 * [link build_system.cmake_variables.HPX_WITH_DATAPAR_VC HPX_WITH_DATAPAR_VC]
 * [link build_system.cmake_variables.HPX_WITH_EXECUTION_POLICY_COMPATIBILITY HPX_WITH_EXECUTION_POLICY_COMPATIBILITY]
+* [link build_system.cmake_variables.HPX_WITH_EXECUTOR_COMPATIBILITY HPX_WITH_EXECUTOR_COMPATIBILITY]
 * [link build_system.cmake_variables.HPX_WITH_FORTRAN HPX_WITH_FORTRAN]
 * [link build_system.cmake_variables.HPX_WITH_FULL_RPATH HPX_WITH_FULL_RPATH]
 * [link build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK HPX_WITH_GCC_VERSION_CHECK]
@@ -61,6 +62,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
 * [link build_system.cmake_variables.HPX_WITH_STATIC_LINKING HPX_WITH_STATIC_LINKING]
 * [link build_system.cmake_variables.HPX_WITH_SYCL HPX_WITH_SYCL]
+* [link build_system.cmake_variables.HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY] `HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY:BOOL`][Enable old style ..._sync/..._async functions in API (default: OFF)]]
@@ -80,6 +82,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_LIBFLATARRAY] `HPX_WITH_DATAPAR_LIBFLATARRAY:BOOL`][Enable data parallel algorithm support using the external LibFlatArray (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_DATAPAR_VC] `HPX_WITH_DATAPAR_VC:BOOL`][Enable data parallel algorithm support using the external Vc library (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_EXECUTION_POLICY_COMPATIBILITY] `HPX_WITH_EXECUTION_POLICY_COMPATIBILITY:BOOL`][Enable old execution policy names in API (default: ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXECUTOR_COMPATIBILITY] `HPX_WITH_EXECUTOR_COMPATIBILITY:BOOL`][Enable old (pre-concurrency TS) executor API (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_FORTRAN] `HPX_WITH_FORTRAN:BOOL`][Enable or disable the compilation of Fortran examples using HPX]]
         [[[#build_system.cmake_variables.HPX_WITH_FULL_RPATH] `HPX_WITH_FULL_RPATH:BOOL`][Build and link HPX libraries and executables with full RPATHs (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_GCC_VERSION_CHECK] `HPX_WITH_GCC_VERSION_CHECK:BOOL`][Don't ignore version reported by gcc (default: ON)]]
@@ -97,6 +100,7 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_SECURITY] `HPX_WITH_SECURITY:BOOL`][Enable security support via libsodium.]]
         [[[#build_system.cmake_variables.HPX_WITH_STATIC_LINKING] `HPX_WITH_STATIC_LINKING:BOOL`][Compile HPX statically linked libraries (Default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_SYCL] `HPX_WITH_SYCL:BOOL`][Enable sycl support (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY] `HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY:BOOL`][Enable old overloads for transform_reduce and inner_product (default: ON)]]
 ] [/ Generic Options]
 
 [#build_system.cmake_variables.Build_Targets][h3 Build Targets Options]
