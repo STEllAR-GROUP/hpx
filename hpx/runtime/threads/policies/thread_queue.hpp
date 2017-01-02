@@ -222,7 +222,8 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
-        std::size_t add_new(std::int64_t add_count, thread_queue* addfrom, bool steal = false)
+        std::size_t add_new(std::int64_t add_count, thread_queue* addfrom,
+            bool steal = false)
         {
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
@@ -294,7 +295,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom, bool steal = false)
+        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
+            bool steal = false)
         {
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);

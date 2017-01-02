@@ -21,6 +21,8 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -169,25 +171,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
             results.resize(size);
 
-
             static std::size_t num_tasks =
                 (std::min)(std::size_t(128), hpx::get_os_thread_count());
-            spawn(sched, results, 0, size, num_tasks, f, boost::begin(shape), ts...).get();
 
-//             for (auto const& elem: shape)
-//             {
-//                 results.push_back(hpx::async(sched, std::forward<F>(f),
-//                     elem, ts...));
-//             }
-
+            spawn(sched, results, 0, size, num_tasks, f, boost::begin(shape),
+                ts...).get();
             return results;
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor_, typename Result, typename F, typename Iter, typename ... Ts>
-        static hpx::future<void> spawn(Executor_ & sched, std::vector<hpx::future<Result> >& results,
-            std::size_t base, std::size_t size, std::size_t num_tasks, F const& func, Iter it,
-            Ts const&... ts)
+        template <typename Executor_, typename Result, typename F,
+            typename Iter, typename ... Ts>
+        static hpx::future<void>
+        spawn(Executor_& sched, std::vector<hpx::future<Result> >& results,
+            std::size_t base, std::size_t size, std::size_t num_tasks,
+            F const& func, Iter it, Ts const&... ts)
         {
             const std::size_t num_spread = 4;
 
@@ -202,7 +200,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 hpx::future<void> (*spawn_func)(
                         Executor_&, std::vector<hpx::future<Result> >&,
-                        std::size_t, std::size_t, std::size_t, F const&, Iter, Ts const&...
+                        std::size_t, std::size_t, std::size_t, F const&, Iter,
+                        Ts const&...
                     ) = &executor_traits::spawn;
 
                 while (size != 0)
@@ -211,7 +210,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                     hpx::future<void> f = hpx::async(
                         spawn_func, std::ref(sched), std::ref(results), base,
-                        curr_chunk_size, num_tasks, std::ref(func), it, std::ref(ts)...);
+                        curr_chunk_size, num_tasks, std::ref(func), it,
+                        std::ref(ts)...);
                     tasks.push_back(std::move(f));
 
                     base += curr_chunk_size;
