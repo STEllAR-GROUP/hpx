@@ -92,7 +92,7 @@
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
-#define MAX_RANKS 64
+#define MAX_RANKS 1024
 
 //----------------------------------------------------------------------------
 // Define this to make memory access asynchronous and return a future
@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 2
+#define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
@@ -156,6 +156,7 @@ typedef struct {
     std::uint64_t threads;
     std::uint64_t semaphore;
     std::string   network;
+    bool          warmup;
     bool          all2all;
     bool          distribution;
     bool          nolocal;
@@ -497,8 +498,7 @@ void test_write(
     DEBUG_OUTPUT(1, "Passed Barrier at start of write on rank " << rank);
     //
     hpx::util::high_resolution_timer timerWrite;
-    hpx::util::simple_profiler level1("Write function");
-
+    hpx::util::simple_profiler level1("Write function", rank==0 && !options.warmup);
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
@@ -667,9 +667,12 @@ void test_write(
         char const* msg = "CSVData, write, network, "
             "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
             "IOPS/s, %6%, BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network
-            % nranks % options.threads % writeMB % options.transfer_size_B
-          % IOPs_s % writeBW ) << std::endl;
+        if (!options.warmup) {
+            std::cout << (boost::format(msg) % options.network
+                % nranks % options.threads % writeMB % options.transfer_size_B
+                % IOPs_s % writeBW ) << std::endl;
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -915,6 +918,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.distribution      = vm["distribution"].as<std::uint64_t>() ? true : false;
     options.nolocal           = vm["no-local"].as<bool>();
     options.semaphore         = vm["semaphore"].as<std::uint64_t>();
+    options.warmup            = false;
 
     //
     if (options.global_storage_MB>0) {
@@ -944,6 +948,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     test_options warmup = options;
     warmup.iterations = 1;
+    warmup.warmup = true;
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, warmup);
     //
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);

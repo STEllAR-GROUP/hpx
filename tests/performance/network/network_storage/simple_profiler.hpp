@@ -30,16 +30,18 @@ class simple_profiler {
     // time, level, count
     typedef std::tuple<double,int,int> valtype;
 
-    simple_profiler(const char *title) {
-        this->_parent = nullptr;
-        this->_title  = title;
-        this->_done   = false;
+    simple_profiler(const char *title, bool output=true) {
+        this->_parent    = nullptr;
+        this->_title     = title;
+        this->_done      = false;
+        this->_output    = output;
     }
 
     simple_profiler(simple_profiler &parent, const char *title) {
-        this->_parent = &parent;
-        this->_title  = title;
-        this->_done   = false;
+        this->_parent    = &parent;
+        this->_title     = title;
+        this->_done      = false;
+        this->_output    = true;
     }
 
     ~simple_profiler() {
@@ -72,14 +74,14 @@ class simple_profiler {
           // print each of the sub nodes
           std::vector<double> level_totals(5,0);
           int last_level = 0;
-          hpx::cout << std::string(58+maxlevel*9,'-') << "\n";
+          if (_output) hpx::cout << std::string(58+maxlevel*9,'-') << "\n";
           for (auto p=this->_profiles.begin(); p!=this->_profiles.end(); ) {
               int &level = std::get<1>(p->second);
               level_totals[level] += std::get<0>(p->second);
               if (level<last_level) {
-                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                if (_output) hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
                     << "------\n";
-                hpx::cout << (boost::format(fmt2)
+                if (_output) hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')
                   % (100.0*level_totals[last_level]/elapsed)) << "\n";
                 last_level = level;
@@ -87,7 +89,7 @@ class simple_profiler {
               else if (level>last_level) {
                 last_level = level;
               }
-              hpx::cout << (boost::format(fmt1)
+              if (_output) hpx::cout << (boost::format(fmt1)
                   % p->first
                   % level
                   % std::get<2>(p->second)
@@ -95,15 +97,15 @@ class simple_profiler {
                   % std::string (level*9, ' ')
                   % (100.0*std::get<0>(p->second)/elapsed)) << "\n";
               if ((++p)==this->_profiles.end()) {
-                hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                if (_output) hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
                     << "------\n";
-                hpx::cout << (boost::format(fmt2)
+                if (_output) hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')
                   % (100.0*level_totals[last_level]/elapsed)) << "\n";
                 last_level = level;
               }
           }
-          hpx::cout << std::string(58+maxlevel*9,'-') << "\n";
+          if (_output) hpx::cout << std::string(58+maxlevel*9,'-') << "\n";
         }
         this->_done = true;
     }
@@ -126,6 +128,7 @@ class simple_profiler {
     const char *                                  _title;
     std::map<const char *, valtype>               _profiles;
     bool                                          _done;
+    bool                                          _output;
 };
 
 } }
