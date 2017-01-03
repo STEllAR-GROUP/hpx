@@ -398,14 +398,15 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
                 << sockaddress(conn_dst)
                 << "and making future ready, qp = " << decnumber(qpnum));
 
-            // make the future ready with the new verbs endpoint
+            // if there is an entry for a locally started connection on this IP
+            // then set the future ready with the verbs endpoint
             auto present = connections_started_.is_in_map(remote_ip);
             if (present.second) {
                 std::get<1>(connections_started_.find(remote_ip)->second).
                     set_value(event_client);
+                // once the future is set, the entry can be removed
+                connections_started_.erase(remote_ip);
             }
-            // @TODO : can they be deleted from the map now
-            connections_started_.erase(remote_ip);
         }
 
         // @TODO remove this aborted event handler once all is working
@@ -474,7 +475,6 @@ int rdma_controller::handle_event(struct rdma_cm_event *cm_event,
         LOG_DEVEL_MSG("Adding new_client to qp_endpoint_map " << decnumber(qpnum)
             << "in start_server_connection");
         qp_endpoint_map_.insert(std::make_pair(qpnum, temp_client));
-        connections_started_.erase(qpnum);
 
         // event acked by handle_route_resolved
         return 0;
@@ -659,6 +659,8 @@ rdma_controller::connect_to_server(uint32_t remote_ip)
     // and an outgoing server connect request from colliding
     scoped_lock lock(controller_mutex_);
 
+    bool delete_connection_on_exit = false;
+
     // has a connection been started from here already?
     bool connection = connections_started_.is_in_map(remote_ip).second;
     LOG_DEVEL_MSG("connect to server : connections_started_.is_in_map " << connection)
@@ -669,7 +671,7 @@ rdma_controller::connect_to_server(uint32_t remote_ip)
             verbs_endpoint *client = client_pair.second.get();
             if (client->get_remote_ip_address() == remote_ip)
             {
-                LOG_DEBUG_MSG("connect_to_server : Found a remote connection ip "
+                LOG_DEVEL_MSG("connect_to_server : Found a remote connection ip "
                     << ipaddress(remote_ip));
                 // we must create a future for this connection as there is no entry
                 // in the connections_started_ map (a connect request from remote ip)
@@ -677,7 +679,18 @@ rdma_controller::connect_to_server(uint32_t remote_ip)
                 hpx::future<verbs_endpoint_ptr>  new_endpoint_future =
                     new_endpoint_promise.get_future();
                 //
-                connections_started_.insert(
+                // if the connection was made by a connection request from outside
+                // it might have already become established/ready but won't have set
+                // the future ready, so do it here
+                if (client->get_state()==verbs_endpoint::connection_state::connected) {
+                    LOG_DEVEL_MSG("state already connected - setting promise"
+                        << ipaddress(remote_ip));
+                    new_endpoint_promise.set_value(client_pair.second);
+                    // once the future is set, the entry can be removed
+                    delete_connection_on_exit = true;
+                }
+
+                auto position = connections_started_.insert(
                     std::make_pair(
                         remote_ip,
                         std::make_tuple(
@@ -699,7 +712,12 @@ rdma_controller::connect_to_server(uint32_t remote_ip)
 
     // the future will become ready when the remote end accepts/rejects our connection
     // or we accept a connection from a remote
-    return std::get<2>(connections_started_.find(remote_ip)->second);
+    auto it = connections_started_.find(remote_ip);
+    hpx::shared_future<verbs_endpoint_ptr> result = std::get<2>(it->second);
+    if (delete_connection_on_exit) {
+        connections_started_.erase(it);
+    }
+    return result;
 }
 
 //----------------------------------------------------------------------------
