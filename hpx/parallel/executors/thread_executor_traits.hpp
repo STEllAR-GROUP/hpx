@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,8 @@
 #define HPX_PARALLEL_THREAD_EXECUTOR_TRAITS_AUG_07_2015_0826AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -226,5 +228,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
     };
 }}}
+
+#endif
 
 #endif

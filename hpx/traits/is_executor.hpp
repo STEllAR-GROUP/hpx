@@ -7,8 +7,8 @@
 #define HPX_TRAITS_IS_EXECUTOR_DEC_23_0759PM
 
 #include <hpx/config.hpp>
-#include <hpx/config/inline_namespace.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/util/detail/pack.hpp>
+#include <hpx/traits/is_executor_v1.hpp>    // backwards compatibility
 
 #include <type_traits>
 
@@ -166,6 +166,20 @@ namespace hpx { namespace traits
     template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : parallel::execution::is_bulk_two_way_executor<T>
+    {};
+
+    // trait testing for any of the above
+    template <typename T, typename Enable = void>
+    struct is_executor_any
+      : util::detail::any_of<
+            is_one_way_executor<T>,
+            is_host_based_one_way_executor<T>,
+            is_non_blocking_one_way_executor<T>,
+            is_bulk_one_way_executor<T>,
+            is_two_way_executor<T>,
+            is_non_blocking_two_way_executor<T>,
+            is_bulk_two_way_executor<T>
+        >
     {};
 }}
 

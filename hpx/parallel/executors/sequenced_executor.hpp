@@ -9,17 +9,16 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/exception_list.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/apply.hpp>
+#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_executor.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
-#endif
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/exception_list.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -164,6 +163,11 @@ namespace hpx { namespace parallel { namespace execution
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     /// \cond NOINTERNAL

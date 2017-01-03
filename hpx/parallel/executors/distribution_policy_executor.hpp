@@ -13,10 +13,6 @@
 #include <hpx/runtime/components/server/invoke_function.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -25,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -66,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///         evaluate to true.
     ///
     template <typename DistPolicy>
-    class distribution_policy_executor : public executor_tag
+    class distribution_policy_executor
     {
     private:
         /// \cond NOINTERNAL
@@ -147,7 +143,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename F, typename ... Ts>
         hpx::future<
-            typename detail::distribution_policy_execute_result<F&&, Ts&&...>::type
+            typename detail::distribution_policy_execute_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts) const
         {
@@ -156,8 +152,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F, typename ... Ts>
-        typename detail::distribution_policy_execute_result<F&&, Ts&&...>::type
-        execute(F && f, Ts &&... ts) const
+        typename detail::distribution_policy_execute_result<F, Ts...>::type
+        sync_execute(F && f, Ts &&... ts) const
         {
             return async_execute_impl(std::forward<F>(f),
                 std::forward<Ts>(ts)...).get();
@@ -182,15 +178,71 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             std::forward<DistPolicy>(policy));
     }
 
+    /// \cond NOINTERNAL
     namespace detail
     {
-        /// \cond NOINTERNAL
+        template <typename DistPolicy>
+        struct is_two_way_executor<distribution_policy_executor<DistPolicy> >
+          : std::true_type
+        {};
+    }
+    /// \endcond
+}}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Compatibility layer
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+{
+    /// \cond NOINTERNAL
+
+    // this must be a type distinct from parallel::execution::parallel_executor
+    // to avoid ambiguities
+    template <typename DistPolicy>
+    struct distribution_policy_executor
+      : execution::distribution_policy_executor<DistPolicy>
+    {
+        template <typename DistPolicy_>
+        distribution_policy_executor(DistPolicy_ && policy)
+          : execution::distribution_policy_executor<DistPolicy>(
+                std::forward<DistPolicy_>(policy))
+        {}
+
+        template <typename F, typename ... Ts>
+        typename execution::detail::distribution_policy_execute_result<
+            F, Ts...
+        >::type
+        execute(F && f, Ts &&... ts) const
+        {
+            return execution::distribution_policy_executor<DistPolicy>::
+                sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    };
+
+    template <typename DistPolicy>
+    distribution_policy_executor<typename hpx::util::decay<DistPolicy>::type>
+    make_distribution_policy_executor(DistPolicy && policy)
+    {
+        typedef typename hpx::util::decay<DistPolicy>::type dist_policy_type;
+        return distribution_policy_executor<dist_policy_type>(
+            std::forward<DistPolicy>(policy));
+    }
+
+    namespace detail
+    {
         template <typename DistPolicy>
         struct is_executor<distribution_policy_executor<DistPolicy> >
           : std::true_type
         {};
-        /// \endcond
     }
+    /// \endcond
 }}}
+
+#endif
 
 #endif

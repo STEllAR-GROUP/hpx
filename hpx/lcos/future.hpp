@@ -387,6 +387,12 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_exec_v1(Future const& future, Executor& exec, F && f);
 #endif
 
+    // create non-unwrapping continuations
+    template <typename ContResult, typename Future, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_thread_exec(Future const& future,
+        threads::executor& sched, F && f);
+
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2015 Daniel Bourgeois
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,8 @@
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
@@ -620,7 +622,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///    is_executor is undefined.
     ///
     template <typename T>
-    struct is_executor;         // defined in hpx/traits/is_executor.hpp
+    struct is_executor;         // defined in hpx/traits/is_executor_v1.hpp
 }}}
+
+#endif
 
 #endif

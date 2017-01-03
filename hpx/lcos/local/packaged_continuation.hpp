@@ -674,6 +674,21 @@ namespace hpx { namespace lcos { namespace detail
     }
 #endif
 
+    template <typename ContResult, typename Future, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_thread_exec(Future const& future,
+        threads::executor& sched, F && f)
+    {
+        typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
+
+        // create a continuation
+        typename traits::detail::shared_state_ptr<ContResult>::type p(
+            new shared_state(std::forward<F>(f), init_no_addref()), false);
+        static_cast<shared_state*>(p.get())->attach(future, sched);
+        return p;
+    }
+
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type

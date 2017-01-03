@@ -36,6 +36,12 @@ set(tests
     partitioned_vector_exclusive_scan
    )
 
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      distribution_policy_executor_v1
+     )
+endif()
+
 # add executable needed for launch_process_test
 add_hpx_executable(launched_process_test
   SOURCES launched_process.cpp
@@ -126,13 +132,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/Components")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/Components/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Components")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("components" ${test} ${${test}_PARAMETERS})
 

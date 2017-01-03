@@ -14,15 +14,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
-#endif
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -227,6 +222,11 @@ namespace hpx { namespace parallel { namespace execution
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     /// \cond NOINTERNAL
