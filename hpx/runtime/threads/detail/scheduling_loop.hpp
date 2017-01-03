@@ -385,7 +385,7 @@ namespace hpx { namespace threads { namespace detail
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
                             scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, is_running_state(this_state.load()),
+                                num_thread, this_state.load() < state_stopping,
                                 idle_loop_count);
                         }
 
@@ -430,7 +430,7 @@ namespace hpx { namespace threads { namespace detail
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        is_running_state(this_state.load()), idle_loop_count))
+                        this_state.load() < state_stopping, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
