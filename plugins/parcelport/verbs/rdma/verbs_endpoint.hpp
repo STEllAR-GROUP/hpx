@@ -452,9 +452,9 @@ namespace verbs
             struct rdma_conn_param param;
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
-            param.initiator_depth = 1;
-//            param.retry_count     = 7; // 7 = special code for infinite retries
-//            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+            param.initiator_depth     = 1;
+            param.retry_count         = 0;  // ignored in accept (connect sets it)
+            param.rnr_retry_count     = 7;  // 7 = special code for infinite retries
             //
             int rc = rdma_accept(cmId_, &param);
             if (rc != 0) {
@@ -517,8 +517,9 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 2;
-//            param.retry_count     = 7; // 7 = special code for infinite retries
-//            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+            // retry_count * 4.096 x 2 ^ qpattr.timeout microseconds
+            param.retry_count     = 0;  // retries before ack timeout signals error
+            param.rnr_retry_count = 7;  // 7 = special code for infinite retries
             //
             int rc = rdma_connect(cmId_, &param);
             if (rc != 0) {
@@ -551,6 +552,34 @@ namespace verbs
                 verbs_event_channel::ack_event(event);
                 LOG_DEVEL_MSG("connected to " << sockaddress(&remote_address_)
                     << "Current state is " << ToString(state_));
+
+/*
+                struct ibv_qp_attr      attr;
+                struct ibv_qp_init_attr init_attr;
+                //
+                if (ibv_query_qp(cmId_->qp, &attr,
+                    IBV_QP_STATE | IBV_QP_TIMEOUT, &init_attr)) {
+                    LOG_DEVEL_MSG("Failed to query QP state\n");
+                    std::terminate();
+                    return -1;
+                }
+                LOG_DEVEL_MSG("Current state is " << attr.qp_state);
+                LOG_DEVEL_MSG("Current timeout is " << int(attr.timeout));
+
+                // set retry counter timeout value
+                // 4.096 x 2 ^ attr.timeout microseconds
+                attr.timeout = 13; // 8589935 usec (8.58 sec);
+                //
+                LOG_DEVEL_MSG("Modifying qp " << decnumber(cmId_->qp->qp_num));
+                if (ibv_modify_qp(cmId_->qp, &attr, IBV_QP_STATE | IBV_QP_TIMEOUT))
+                {
+                    rdma_error e(errno,
+                        LOG_FORMAT_MSG("Failed to set QP timeout : qp "
+                            << decnumber(cmId_->qp->qp_num)));
+                    throw e;
+                }
+*/
+
             }
             else if (event->event == RDMA_CM_EVENT_REJECTED) {
                 if (state_!=connection_state::aborted &&
@@ -805,17 +834,17 @@ namespace verbs
             // Create a queue pair.
             struct ibv_qp_init_attr qpAttributes;
             memset(&qpAttributes, 0, sizeof qpAttributes);
-            qpAttributes.cap.max_send_wr = maxWorkRequests;
-            qpAttributes.cap.max_recv_wr = maxWorkRequests;
+            qpAttributes.cap.max_send_wr  = maxWorkRequests;
+            qpAttributes.cap.max_recv_wr  = maxWorkRequests;
             qpAttributes.cap.max_send_sge = 3; // 6;
             qpAttributes.cap.max_recv_sge = 3; // 6;
-            qpAttributes.qp_context = this;    // Save this pointer
-            qpAttributes.sq_sig_all = signalSendQueue;
-            qpAttributes.qp_type = IBV_QPT_RC;
-            qpAttributes.send_cq = sendCompletionQ->getQueue();
-            qpAttributes.recv_cq = recvCompletionQ->getQueue();
+            qpAttributes.qp_context       = this;    // Save this pointer
+            qpAttributes.sq_sig_all       = signalSendQueue;
+            qpAttributes.qp_type          = IBV_QPT_RC;
+            qpAttributes.send_cq          = sendCompletionQ->getQueue();
+            qpAttributes.recv_cq          = recvCompletionQ->getQueue();
             LOG_DEVEL_MSG("Setting SRQ to " << getsrq());
-            qpAttributes.srq = getsrq();
+            qpAttributes.srq              = getsrq();
             //
             int rc = rdma_create_qp(cmId_, domain->getDomain(), &qpAttributes);
             if (rc != 0) {
