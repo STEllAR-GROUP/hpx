@@ -58,19 +58,6 @@ namespace verbs
             LOG_DEVEL_MSG("created completion queue "
                 << decnumber(completionQ_->handle));
 
-            // Request notification of events on the completion queue.
-            try {
-                request_events();
-            }
-            catch (const rdma_error& e) {
-                LOG_ERROR_MSG("error requesting first completion queue notification: "
-                    << decnumber(completionQ_->handle)
-                    << rdma_error::error_string(e.error_code()));
-                throw e;
-            }
-            LOG_TRACE_MSG(
-                decnumber(completionQ_->handle)
-                << "requested first notification for completion queue");
         }
 
         // ---------------------------------------------------------------------------
