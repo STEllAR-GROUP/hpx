@@ -10,6 +10,7 @@
 
 #include <array>
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <functional>
 #include <numeric>
