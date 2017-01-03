@@ -18,8 +18,8 @@
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
 #include <boost/log/trivial.hpp>
+#include <boost/preprocessor.hpp>
 //
-#define HPX_PARCELPORT_VERBS_ENABLE_DEVEL_MSG
 
 //
 // useful macros for formatting log messages
@@ -66,7 +66,7 @@ namespace detail {
 // This is a special log message that will be output even when logging is not enabled
 // it should only be used in development as a way of triggering selected messages
 // without enabling all of them
-#ifdef HPX_PARCELPORT_VERBS_ENABLE_DEVEL_MSG
+#ifdef HPX_PARCELPORT_VERBS_HAVE_DEV_MODE
 #  include <boost/log/expressions/formatter.hpp>
 #  include <boost/log/expressions/formatters.hpp>
 #  include <boost/log/expressions/formatters/stream.hpp>
@@ -100,30 +100,9 @@ namespace detail {
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
 
-
-#  define LOG_TIMED_INIT(name)                                                      \
-    using namespace std::chrono;                                                    \
-    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
-
-#  define LOG_TIMED_MSG(name, level, delay, x)             \
-    time_point<system_clock> log_timed_now_ ## name =      \
-        system_clock::now();                               \
-    duration<double> log_timed_elapsed_ ## name =          \
-      log_timed_now_ ## name - log_timed_start_ ## name;   \
-    if (log_timed_elapsed_ ## name.count()>delay) {        \
-        LOG_DEVEL_MSG(x);                                  \
-        log_timed_start_ ## name = log_timed_now_ ## name; \
-    }
-
-#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
-    time_point<system_clock> log_timed_now_ ## name =      \
-        system_clock::now();                               \
-    duration<double> log_timed_elapsed_ ## name =          \
-      log_timed_now_ ## name - log_timed_start_ ## name;   \
-    if (log_timed_elapsed_ ## name.count()>delay) {        \
-        log_timed_start_ ## name = log_timed_now_ ## name; \
-        x;                                                 \
-    }
+#  define LOG_TIMED_INIT(name)
+#  define LOG_TIMED_MSG(name, level, delay, x)
+#  define LOG_TIMED_BLOCK(name, level, delay, x)
 
 #else
 //
@@ -141,11 +120,9 @@ namespace detail {
 #  include <boost/log/utility/setup/console.hpp>
 #  include <boost/log/utility/setup/common_attributes.hpp>
 
-#  include <boost/preprocessor.hpp>
 
 #  undef  LOG_DEBUG_MSG
-#  define LOG_TRACE_MSG(x)
-//BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
+#  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug)   << THREAD_ID << " " << x;
 #  define LOG_INFO_MSG(x)  BOOST_LOG_TRIVIAL(info)    << THREAD_ID << " " << x;
 #  define LOG_WARN_MSG(x)  BOOST_LOG_TRIVIAL(warning) << THREAD_ID << " " << x;

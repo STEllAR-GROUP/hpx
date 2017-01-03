@@ -55,6 +55,7 @@ namespace verbs
             (disconnecting)
             (disconnected)
             (terminated)
+            (aborted)
         )
 
         std::atomic<connection_state> state_;
@@ -65,21 +66,24 @@ namespace verbs
         // Every node will create one server endpoint, and then for each connection
         // made to another node a new client endpoint will be constructed.
         // The endpoint constructed here will represent the local node.
-        verbs_endpoint(struct sockaddr_in local_address) : verbs_sender_receiver(nullptr)
+        verbs_endpoint(
+            struct sockaddr_in local_address)
+            : verbs_sender_receiver(nullptr)
          {
             LOG_DEVEL_MSG("verbs_endpoint Listening Server Constructor");
             //
             init();
-            create_id();
+            create_cm_id();
             bind(local_address);
          }
 
         // ---------------------------------------------------------------------------
         // This constructor is used when we have received a connection request and
-        // create a client endpoint represent the remote end of the link.
+        // create a client endpoint to represent the remote end of the link.
         // NB. we only use one CompletionQ, send/recv share the same one.
         // This could be changed if need arises
         verbs_endpoint(
+            struct sockaddr_in localAddress,
             struct rdma_cm_id *cmId,
             verbs_protection_domain_ptr domain,
             verbs_completion_queue_ptr CompletionQ,
@@ -95,12 +99,16 @@ namespace verbs
 
             // Use the input rdma connection management id.
             cmId_             = cmId;
+            local_address_    = localAddress;
             remote_address_   = *(sockaddr_in*)(&cmId->route.addr.dst_addr);
             srq_              = SRQ;
             completion_queue_ = CompletionQ;
             memory_pool_      = pool;
             domain_           = domain;
             event_channel_    = event_channel;
+
+            LOG_DEVEL_MSG("endpoint created with CQ "
+                << hexpointer(completion_queue_.get()));
 
             // Create a queue pair. Both send and receive share a completion queue
             create_queue_pair(domain_, completion_queue_, completion_queue_,
@@ -117,6 +125,7 @@ namespace verbs
             verbs_protection_domain_ptr domain,
             verbs_completion_queue_ptr CompletionQ,
             rdma_memory_pool_ptr pool,
+            verbs_shared_receive_queue_ptr SRQ,
             verbs_event_channel_ptr event_channel) :
                 verbs_sender_receiver(nullptr)
         {
@@ -124,10 +133,11 @@ namespace verbs
                 << sockaddress(&localAddress) << "to "
                 << sockaddress(&remoteAddress));
             //
-            event_channel_    = event_channel;
+            event_channel_        = event_channel;
             init();
-            create_id();
+            create_cm_id();
             //
+            srq_                  = SRQ;
             completion_queue_     = CompletionQ;
             memory_pool_          = pool;
             domain_               = domain;
@@ -193,8 +203,8 @@ namespace verbs
                     verbs_memory_region *region =
                         this->get_free_region(
                             this->memory_pool_->small_.chunk_size_);
-                    this->post_recv_region_as_id_counted(region,
-                        region->get_size());
+                    this->post_recv_region_as_id_counted_srq(region,
+                        region->get_size(), getsrq());
                 }
                 else {
                     LOG_DEVEL_MSG("aborting refill can_allocate_unsafe false");
@@ -285,9 +295,8 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        // resolve_address is called when we wish to make a connection to another node.
-        // This endpoint is created on demand, so it does not share an event channel
-        // between other nodes (unlike server endpoints)
+        // resolve_address is called before we wish to make a connection to another node.
+        // an address resolved event will be generated once this completes
         int resolve_address(
             struct sockaddr_in *localAddr,
             struct sockaddr_in *remoteAddr,
@@ -331,23 +340,18 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int handle_addr_resolved(struct rdma_cm_event *event, bool aborted=false)
+        // called when we receive address resolved event
+        int handle_addr_resolved(struct rdma_cm_event *event)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
             if (state_!=connection_state::resolving_address) {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in resolving_address"
-                    << aborted));
+                rdma_error e(0, "invalid state in resolving_address");
+                std::terminate();
                 return -1;
             }
-            state_ = connection_state::route_resolved;
             verbs_event_channel::ack_event(event);
 
-            // if this connection attempt has been aborted, exit cleanly
-            if (aborted) {
-                LOG_DEBUG_MSG("resolved addr aborted " << sockaddress(&remote_address_));
-                return 0;
-            }
-
+            // set new state
             state_ = connection_state::address_resolved;
 
             LOG_DEVEL_MSG("resolved to " << sockaddress(&remote_address_)
@@ -355,14 +359,17 @@ namespace verbs
 
             // after resolving address, we must resolve route
             resolve_route();
+
             return 0;
         }
 
         // ---------------------------------------------------------------------------
+        // after resolving address and before making connection, we must resolve route
         int resolve_route(void)
         {
             if (state_!=connection_state::address_resolved) {
                 rdma_error e(0, LOG_FORMAT_MSG("invalid state in resolve_route"));
+                std::terminate();
                 throw e;
             }
 
@@ -385,22 +392,17 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int handle_route_resolved(struct rdma_cm_event *event, bool aborted=false)
+        // Handles route_resolved event and starts a connection to the remote endpoint
+        int handle_route_resolved(struct rdma_cm_event *event)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
             if (state_!=connection_state::resolving_route) {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_route_resolved"
-                    << aborted));
+                rdma_error e(0, "invalid state in handle_route_resolved");
+                std::terminate();
                 return -1;
             }
             state_ = connection_state::route_resolved;
             verbs_event_channel::ack_event(event);
-
-            // if this connection attempt has been aborted, exit cleanly
-            if (aborted) {
-                LOG_DEBUG_MSG("resolved route aborted " << sockaddress(&remote_address_));
-                return 0;
-            }
 
             LOG_DEBUG_MSG("resolved route to " << sockaddress(&remote_address_)
                 << "Current state is " << ToString(state_));
@@ -409,12 +411,33 @@ namespace verbs
             create_queue_pair(domain_, completion_queue_, completion_queue_,
                 HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS, false);
 
-            // make sure client has preposted receives
-            // @TODO, when we use a shared receive queue, fix this
-            refill_preposts(HPX_PARCELPORT_VERBS_MAX_PREPOSTS, true);
-
-            // open the connection between this endpoint and the remote server endpoint
+            // open the connection between this endpoint and the remote endpoint
             return connect();
+        }
+
+        // ---------------------------------------------------------------------------
+        // if we start a connection but have to abort it, then this function sets the
+        // aborted state
+        int abort()
+        {
+            LOG_DEVEL_MSG("Current state is " << ToString(state_));
+            if (state_==connection_state::resolving_address ||
+                state_==connection_state::address_resolved ||
+                state_==connection_state::resolving_route ||
+                state_==connection_state::route_resolved ||
+                state_==connection_state::connecting ||
+                state_==connection_state::terminated)
+            {
+                state_ = connection_state::aborted;
+            }
+            else {
+                rdma_error e(0, "invalid state in abort");
+                std::terminate();
+                return -1;
+            }
+            LOG_DEBUG_MSG("Aborted " << sockaddress(&remote_address_)
+                << "Current state is " << ToString(state_));
+            return 0;
         }
 
         // ---------------------------------------------------------------------------
@@ -430,8 +453,8 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 1;
-            param.retry_count     = 7; // 7 = special code for infinite retries
-            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+//            param.retry_count     = 7; // 7 = special code for infinite retries
+//            param.rnr_retry_count = 7; // 7 = special code for infinite retries
             //
             int rc = rdma_accept(cmId_, &param);
             if (rc != 0) {
@@ -494,8 +517,8 @@ namespace verbs
             memset(&param, 0, sizeof(param));
             param.responder_resources = 1;
             param.initiator_depth = 2;
-            param.retry_count     = 7; // 7 = special code for infinite retries
-            param.rnr_retry_count = 7; // 7 = special code for infinite retries
+//            param.retry_count     = 7; // 7 = special code for infinite retries
+//            param.rnr_retry_count = 7; // 7 = special code for infinite retries
             //
             int rc = rdma_connect(cmId_, &param);
             if (rc != 0) {
@@ -512,18 +535,32 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int handle_establish(struct rdma_cm_event *event, bool aborted=false)
+        int handle_establish(struct rdma_cm_event *event)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
-            if (state_!=connection_state::connecting &&
-                state_!=connection_state::accepting)
-            {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_establish "
-                    << aborted));
-                return -1;
+            if (event->event == RDMA_CM_EVENT_ESTABLISHED) {
+                if (state_!=connection_state::connecting &&
+                    state_!=connection_state::accepting)
+                {
+                    rdma_error e(0, "invalid state in handle_establish for "
+                        "RDMA_CM_EVENT_ESTABLISHED");
+                    std::terminate();
+                    return -1;
+                }
+                state_ = connection_state::connected;
+                verbs_event_channel::ack_event(event);
+                LOG_DEVEL_MSG("connected to " << sockaddress(&remote_address_)
+                    << "Current state is " << ToString(state_));
             }
-
-            if (event->event == RDMA_CM_EVENT_REJECTED) {
+            else if (event->event == RDMA_CM_EVENT_REJECTED) {
+                if (state_!=connection_state::aborted &&
+                    state_!=connection_state::connecting)
+                {
+                    rdma_error e(0, "invalid state in handle_establish for "
+                        "RDMA_CM_EVENT_REJECTED");
+                    std::terminate();
+                    return -1;
+                }
                 LOG_DEVEL_MSG("2: Connection rejected for "
                     << sockaddress(&remote_address_)
                     << "( " << sockaddress(&local_address_) << ")");
@@ -532,12 +569,6 @@ namespace verbs
                 LOG_DEVEL_MSG("Current state is " << ToString(state_));
                 return -2;
             }
-            else if (event->event == RDMA_CM_EVENT_ESTABLISHED) {
-                state_ = connection_state::connected;
-                verbs_event_channel::ack_event(event);
-                LOG_DEVEL_MSG("connected to " << sockaddress(&remote_address_)
-                    << "Current state is " << ToString(state_));
-            }
             return 0;
         }
 
@@ -545,9 +576,12 @@ namespace verbs
         int disconnect()
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
-            if (state_!=connection_state::connected)
+            if (state_!=connection_state::connected &&
+                state_!=connection_state::aborted   &&
+                state_!=connection_state::terminated)
             {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in disconnect"));
+                rdma_error e(0, LOG_FORMAT_MSG("invalid state in disconnect "));
+                std::terminate();
                 throw e;
             }
             state_ = connection_state::disconnecting;
@@ -568,26 +602,20 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        int handle_disconnect(struct rdma_cm_event *event, bool aborted=false)
+        int handle_disconnect(struct rdma_cm_event *event)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
             if (state_!=connection_state::disconnecting &&
                 state_!=connection_state::terminated &&
                 state_!=connection_state::connected)
             {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_disconnect"
-                    << aborted));
+                rdma_error e(0, "invalid state in handle_disconnect");
+                std::terminate();
                 return -1;
             }
 
             state_ = connection_state::disconnected;
             verbs_event_channel::ack_event(event);
-
-            // if this connection attempt has been aborted, exit cleanly
-            if (aborted) {
-                LOG_DEBUG_MSG("resolved route aborted " << sockaddress(&remote_address_));
-                return 0;
-            }
 
             flush();
 
@@ -599,15 +627,15 @@ namespace verbs
             return 0;
         }
 
-        int handle_time_wait_exit(struct rdma_cm_event *event, bool aborted=false)
+        // ---------------------------------------------------------------------------
+        int handle_time_wait_exit(struct rdma_cm_event *event)
         {
             LOG_DEVEL_MSG("Current state is " << ToString(state_));
             if (state_!=connection_state::disconnecting &&
                 state_!=connection_state::terminated &&
                 state_!=connection_state::connected)
             {
-                rdma_error e(0, LOG_FORMAT_MSG("invalid state in handle_disconnect"
-                    << aborted));
+                rdma_error e(0, "invalid state in handle_disconnect");
                 return -1;
             }
 
@@ -627,8 +655,7 @@ namespace verbs
         int create_srq(verbs_protection_domain_ptr domain)
         {
             try {
-                srq_ = std::make_shared < verbs_shared_receive_queue
-                    > (cmId_, domain);
+                srq_ = std::make_shared<verbs_shared_receive_queue>(domain);
             }
             catch (...) {
                 return 0;
@@ -680,10 +707,8 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        virtual inline struct ibv_srq *getsrq_() const {
-            if (srq_ == nullptr)
-                return nullptr;
-            return srq_->getsrq_();
+        virtual inline struct ibv_srq *getsrq() const {
+            return srq_ ? srq_->getsrq() : nullptr;
         }
 
         // ---------------------------------------------------------------------------
@@ -706,7 +731,8 @@ namespace verbs
             return event_channel_;
         }
 
-        // Tranaition the qp to an error state
+        // ---------------------------------------------------------------------------
+        // Transition the qp to an error state
         void flush()
         {
             // do noting if the qp was never created
@@ -750,7 +776,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        void create_id(void)
+        void create_cm_id(void)
         {
             // Create the event channel.
             if (!event_channel_->get_verbs_event_channel()) {
@@ -781,24 +807,17 @@ namespace verbs
             memset(&qpAttributes, 0, sizeof qpAttributes);
             qpAttributes.cap.max_send_wr = maxWorkRequests;
             qpAttributes.cap.max_recv_wr = maxWorkRequests;
-            qpAttributes.cap.max_send_sge = 6; // 6;
-            qpAttributes.cap.max_recv_sge = 6; // 6;
-            qpAttributes.qp_context = this; // Save the pointer this object.
+            qpAttributes.cap.max_send_sge = 3; // 6;
+            qpAttributes.cap.max_recv_sge = 3; // 6;
+            qpAttributes.qp_context = this;    // Save this pointer
             qpAttributes.sq_sig_all = signalSendQueue;
             qpAttributes.qp_type = IBV_QPT_RC;
             qpAttributes.send_cq = sendCompletionQ->getQueue();
             qpAttributes.recv_cq = recvCompletionQ->getQueue();
-            LOG_DEBUG_MSG("Setting SRQ to " << getsrq_());
-            qpAttributes.srq = getsrq_();
-
-            int rc = rdma_create_qp(cmId_, domain->getDomain(),
-                &qpAttributes);
-
-            LOG_DEBUG_MSG("After Create QP, SRQ is " << getsrq_());
-
-            //   cmId_->qp = ibv_create_qp(domain->getDomain(), &qpAttributes);
-            //   int rc = (cmId_->qp==nullptr);
-
+            LOG_DEVEL_MSG("Setting SRQ to " << getsrq());
+            qpAttributes.srq = getsrq();
+            //
+            int rc = rdma_create_qp(cmId_, domain->getDomain(), &qpAttributes);
             if (rc != 0) {
                 rdma_error e(errno, "rdma_create_qp() failed");
                 LOG_ERROR_MSG(
@@ -810,7 +829,7 @@ namespace verbs
             }
 
             LOG_DEVEL_MSG("created queue pair " << decnumber(cmId_->qp->qp_num)
-                << " max inline data is " << hexnumber(qpAttributes.cap.max_inline_data));
+                << "max inline data is " << hexnumber(qpAttributes.cap.max_inline_data));
 
             return;
         }

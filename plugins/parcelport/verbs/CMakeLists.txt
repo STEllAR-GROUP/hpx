@@ -31,8 +31,8 @@ find_package(RDMA_CM REQUIRED)
 # Logging
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_WITH_LOGGING BOOL
-  "Enable logging in the Verbs ParcelPort "
-  "(default: OFF - Warning - severely impacts usability when enabled)"
+  "Enable logging in the Verbs ParcelPort \
+   (default: OFF - Warning - severely impacts usability when enabled)"
   OFF CATEGORY "Parcelport" ADVANCED)
 
 if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
@@ -45,8 +45,8 @@ endif()
 # Development mode (extra logging and customizable tweaks)
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_WITH_DEV_MODE BOOL
-  "Enables some extra logging and debug features in the verbs parcelport "
-  "(default: OFF - Warning - severely impacts usability when enabled)"
+  "Enables some extra logging and debug features in the verbs parcelport \
+   (default: OFF - Warning - severely impacts usability when enabled)"
   OFF CATEGORY "Parcelport" ADVANCED)
 
 if (HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
@@ -135,8 +135,8 @@ hpx_add_config_define_namespace(
 # Custom Scheduler options
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER BOOL
-  "Configure the parcelport to use a custom scheduler "
-  "(default: OFF - Warning, experimental, may cause serious program errors)"
+  "Configure the parcelport to use a custom scheduler \
+   (default: OFF - Warning, experimental, may cause serious program errors)"
   OFF CATEGORY "Parcelport" ADVANCED)
 
 if (HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER)
@@ -149,8 +149,8 @@ endif()
 # Lock checking
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_VERBS_DEBUG_LOCKS BOOL
-  "Turn on extra log messages for lock/unlock "
-  "(default: OFF - Warning, severely impacts performance when enabled)"
+  "Turn on extra log messages for lock/unlock \
+   (default: OFF - Warning, severely impacts performance when enabled)"
   OFF CATEGORY "Parcelport" ADVANCED)
 
 if (HPX_PARCELPORT_VERBS_DEBUG_LOCKS)
@@ -211,7 +211,8 @@ hpx_add_config_define_namespace(
 # Hardware checks
 #------------------------------------------------------------------------------
 if (HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
-  message(WARNING "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
+  message(WARNING
+    "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
   hpx_add_config_define_namespace(
       DEFINE HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
       VALUE  1

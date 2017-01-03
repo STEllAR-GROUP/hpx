@@ -28,12 +28,12 @@ namespace verbs
       }
 
       explicit locality(std::uint32_t ip) :
-            ip_(ip), qp_(0xFFFF)
+            ip_(ip)
       {
           LOG_DEBUG_MSG("explicit constructing locality from " << hexuint32(ip))
       }
 
-      locality() : ip_(0xFFFF), qp_(0xFFFF)
+      locality() : ip_(0xFFFF)
       {
           LOG_DEBUG_MSG("constructing locality from " << hexuint32(0xFFFF))
       }
@@ -45,17 +45,15 @@ namespace verbs
 
       void save(serialization::output_archive & ar) const {
         ar << ip_;
-        ar << qp_;
       }
 
       void load(serialization::input_archive & ar) {
         ar >> ip_;
-        ar >> qp_;
       }
 
     private:
       friend bool operator==(locality const & lhs, locality const & rhs) {
-        return (lhs.ip_ == rhs.ip_) && (lhs.qp_ == rhs.qp_);
+        return (lhs.ip_ == rhs.ip_);
       }
 
       friend bool operator<(locality const & lhs, locality const & rhs) {
@@ -64,12 +62,11 @@ namespace verbs
 
       friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
         boost::io::ios_flags_saver ifs(os);
-        os << loc.ip_ << " : " << loc.qp_;
+        os << loc.ip_;
         return os;
       }
     public:
       std::uint32_t ip_;
-      std::uint32_t qp_;
     };
 
 }}}}

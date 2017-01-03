@@ -32,10 +32,10 @@ namespace verbs
         /*
      struct ibv_srq_init_attr {
              void                   *srq_context;    // Associated context of the SRQ
-             struct ibv_srq_attr     attr;           // SRQ attributes
+             struct ibvsrq_attr     attr;           // SRQ attributes
      };
 
-     struct ibv_srq_attr {
+     struct ibvsrq_attr {
              uint32_t                max_wr;
              // Requested max number of outstanding work requests (WRs) in the SRQ
              uint32_t                max_sge;
@@ -46,59 +46,50 @@ namespace verbs
          */
 
         // Default constructor.
-        verbs_shared_receive_queue(struct rdma_cm_id *cmId,
-            verbs_protection_domain_ptr domain)
+        verbs_shared_receive_queue(verbs_protection_domain_ptr domain)
         {
-            _domain = domain;
-            _cmId   = cmId;
-            memset(&_srq_attr, 0, sizeof(ibv_srq_init_attr));
-            _srq_attr.attr.max_wr = VERBS_EP_RX_CNT;
-            _srq_attr.attr.max_sge = 6; // @todo : need to query max before setting this
-
-            int err = rdma_create_srq(_cmId, _domain->getDomain(), &_srq_attr);
-
-            if (err != 0) {
-                rdma_error e(errno, "rdma_create_srq() failed");
+            srq_    = nullptr;
+            domain_ = domain;
+            //
+            struct ibv_srq_init_attr srq_attr;
+            memset(&srq_attr, 0, sizeof(ibv_srq_init_attr));
+            // @todo : need to query max before setting sge
+            srq_attr.attr.max_wr  = VERBS_EP_RX_CNT;
+            srq_attr.attr.max_sge = 3;
+            //
+            srq_ = ibv_create_srq(domain_->getDomain(), &srq_attr);
+            if (srq_ == 0) {
+                rdma_error e(errno, "ibv_create_srq() failed");
                 LOG_ERROR_MSG("error creating shared receive queue : "
                     << rdma_error::error_string(e.error_code()));
                 throw e;
             }
 
-            LOG_DEBUG_MSG("created SRQ shared receive queue "
-                /*<< _cmId->qp->srq*/ << " context " << _srq_attr.srq_context
-                << " max wr " << _srq_attr.attr.max_wr << " max sge "
-                << _srq_attr.attr.max_sge);
+            LOG_DEVEL_MSG("created SRQ shared receive queue "
+                /*<< _cmId->qp->srq*/ << " context " << hexpointer(srq_attr.srq_context)
+                << " max wr " << srq_attr.attr.max_wr << " max sge "
+                << srq_attr.attr.max_sge);
             return;
-    }
+        }
 
         ~verbs_shared_receive_queue()
         {
-            //  if (rdma_destroy_srq(_cmId)) {
-            rdma_destroy_srq(_cmId);
-
-            //    rdma_error e(errno, "rdma_destroy_srq() failed");
-            //    LOG_ERROR_MSG("error deleting shared receive queue : "
-            // << rdma_error::error_string(e.error_code()));
-            //    throw e;
-            //  }
+            if (ibv_destroy_srq(srq_)) {
+                rdma_error e(errno, "ibv_destroy_srq() failed");
+                throw e;
+            }
         }
 
-        inline struct ibv_srq *getsrq_() {
-            if (_cmId->qp == nullptr) {
-                LOG_ERROR_MSG("Trying to access SRQ before QP is ready! ");
-                return nullptr;
-            }
-            return _cmId->qp->srq; }
+        inline struct ibv_srq *getsrq() {
+            return srq_;
+        }
 
     private:
-
-        //! Memory region for inbound messages.
-        verbs_protection_domain_ptr  _domain;
-        struct ibv_srq_init_attr _srq_attr;
-        struct rdma_cm_id       *_cmId;
+        verbs_protection_domain_ptr  domain_;
+        struct ibv_srq *             srq_;
     };
 
-    //! Smart pointer for verbs_shared_receive_queue object.
+    // Smart pointer for verbs_shared_receive_queue object.
     typedef std::shared_ptr<verbs_shared_receive_queue> verbs_shared_receive_queue_ptr;
 
 }}}}

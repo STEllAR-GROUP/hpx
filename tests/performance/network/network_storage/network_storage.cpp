@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 2
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
@@ -119,8 +119,10 @@
     if (DEBUG_LEVEL>=level) {    \
         LOG_DEBUG_MSG(x);        \
     }
+# define DEBUG_ONLY(x) x
 #else
 # define DEBUG_OUTPUT(level,x)
+# define DEBUG_ONLY(x)
 #endif
 
 //----------------------------------------------------------------------------
@@ -358,7 +360,9 @@ namespace Storage {
         );
 
         // allow the storage class to asynchronously copy the data into buffer
+#ifdef ASYNC_MEMORY
         async_mem_result_type fut =
+#endif
             copy_from_local_storage(local_buffer.get(), address, length);
         DEBUG_OUTPUT(6, "create local buffer count " << local_buffer.use_count());
 
@@ -597,7 +601,7 @@ void test_write(
                 ActiveFutures[send_rank].push_back(std::move(temp_future));
             }
         }
-        DEBUG_OUTPUT(2, "Exited transfer loop " << rank);
+        DEBUG_OUTPUT(2, "Exited transfer loop on rank " << rank);
 
 #ifdef USE_CLEANING_THREAD
         int removed = 0;
@@ -629,9 +633,10 @@ void test_write(
         prof_move.done();
         //
         hpx::util::simple_profiler fwait(iteration, "Future wait");
-        int numwait = static_cast<int>(final_list.size());
 
-        DEBUG_OUTPUT(1, "Waiting on future");
+        DEBUG_ONLY(int numwait = static_cast<int>(final_list.size());)
+
+        DEBUG_OUTPUT(1, "Waiting for when_all future on rank " << rank);
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
@@ -640,7 +645,7 @@ void test_write(
         DEBUG_OUTPUT(3, "Future wait, rank " << rank << " waiting on " << numwait);
         fwait.done();
     }
-    DEBUG_OUTPUT(2, "Exited iterations loop " << rank);
+    DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
     hpx::lcos::barrier::synchronize();
@@ -825,18 +830,19 @@ void test_read(
                 std::back_inserter(final_list));
             ActiveFutures[i].clear();
         }
-        double movetime = movetimer.elapsed();
-        //
-        int numwait = static_cast<int>(final_list.size());
+        DEBUG_ONLY(
+            double movetime = movetimer.elapsed();
+            int numwait = static_cast<int>(final_list.size());
+        )
         hpx::util::high_resolution_timer futuretimer;
 
-        DEBUG_OUTPUT(1, "Waiting on future");
+        DEBUG_OUTPUT(1, "Waiting for whena_all future on rank " << rank);
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
         int total = numwait+removed;
 #else
-        int total = numwait;
+        DEBUG_ONLY(int total = numwait;)
 #endif
         DEBUG_OUTPUT(3,
             "Future timer, rank " << rank << " waiting on " << numwait
@@ -875,6 +881,8 @@ void test_read(
 // transmit/receive time to see how well we're doing.
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    DEBUG_OUTPUT(3,"HPX main");
+    //
     hpx::id_type                    here = hpx::find_here();
     uint64_t                        rank = hpx::naming::get_locality_id_from_id(here);
     std::string                     name = hpx::get_locality_name();
@@ -913,7 +921,7 @@ int hpx_main(boost::program_options::variables_map& vm)
       options.local_storage_MB = options.global_storage_MB/nranks;
     }
 
-    DEBUG_OUTPUT(2, "Allocating local storage on " << rank);
+    DEBUG_OUTPUT(2, "Allocating local storage on rank " << rank);
     allocate_local_storage(options.local_storage_MB*1024*1024);
     //
     uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB
@@ -934,12 +942,16 @@ int hpx_main(boost::program_options::variables_map& vm)
         ActiveFutures.push_back(std::vector<hpx::future<int> >());
     }
 
+    test_options warmup = options;
+    warmup.iterations = 1;
+    test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, warmup);
+    //
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
     delete_local_storage();
 
-    DEBUG_OUTPUT(2, "Calling finalize" << rank);
+    DEBUG_OUTPUT(3, "Calling finalize " << rank);
     if (rank==0)
       return hpx::finalize();
     else return 0;
@@ -1029,5 +1041,6 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1"
     };
 
+    DEBUG_OUTPUT(3,"Calling hpx::init");
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

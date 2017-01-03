@@ -29,7 +29,7 @@ namespace verbs
             ibv_comp_channel *completionChannel)
         {
             // Initialize private data.
-            _context = context;
+            context_     = context;
             completionQ_ = nullptr;
 
             // Validate context pointer (since ibv_ functions won't check it).
@@ -41,7 +41,9 @@ namespace verbs
                 throw e;
             }
 
-            LOG_DEVEL_MSG("Creating completion queue with size " << queue_size);
+            LOG_DEVEL_MSG("Creating completion queue with size " << decnumber(queue_size)
+                << "and context " << hexpointer(context_));
+
             completionQ_ = ibv_create_cq(context, queue_size, nullptr,
                 completionChannel, 0);
             if (completionQ_ == nullptr) {
@@ -58,7 +60,7 @@ namespace verbs
 
             // Request notification of events on the completion queue.
             try {
-                requestEvent();
+                request_events();
             }
             catch (const rdma_error& e) {
                 LOG_ERROR_MSG("error requesting first completion queue notification: "
@@ -66,8 +68,9 @@ namespace verbs
                     << rdma_error::error_string(e.error_code()));
                 throw e;
             }
-            LOG_TRACE_MSG("requested first notification for completion queue"
-                << decnumber(completionQ_->handle));
+            LOG_TRACE_MSG(
+                decnumber(completionQ_->handle)
+                << "requested first notification for completion queue");
         }
 
         // ---------------------------------------------------------------------------
@@ -99,7 +102,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        void requestEvent(void)
+        void request_events(void)
         {
             int err = ibv_req_notify_cq(completionQ_, 0);
             if (err != 0) {
@@ -137,7 +140,7 @@ namespace verbs
                         return -1;
                     }
                     LOG_ERROR_MSG(
-                        decnumber(completionQ_->handle)
+                           "CQ " << decnumber(completionQ_->handle)
                         << "work completion status '"
                         << ibv_wc_status_str(completion->status)
                         << "' for operation " << wc_opcode_str(completion->opcode)
@@ -148,15 +151,17 @@ namespace verbs
                     std::terminate();
                 }
                 else {
-                    LOG_TRACE_MSG(decnumber(completionQ_->handle)
+                    LOG_TRACE_MSG(
+                           "CQ " << decnumber(completionQ_->handle)
                         << "work completion status '"
                         << ibv_wc_status_str(completion->status)
                         << "' for operation " << wc_opcode_str(completion->opcode)
                         << " (" << completion->opcode << ")");
                 }
 
-                LOG_TRACE_MSG(decnumber(completionQ_->handle) << " removing "
-                    << hexpointer(completion->wr_id)
+                LOG_TRACE_MSG(
+                       "CQ " << decnumber(completionQ_->handle)
+                    << "removing " << hexpointer(completion->wr_id)
                     << verbs_completion_queue::wc_opcode_str(completion->opcode));
             }
             return nc;
@@ -204,7 +209,7 @@ namespace verbs
         static const int MaxQueueSize = 256;
 
         // Infiniband for IB device.
-        struct ibv_context *_context;
+        struct ibv_context *context_;
 
         // Completion queue.
         struct ibv_cq *completionQ_;

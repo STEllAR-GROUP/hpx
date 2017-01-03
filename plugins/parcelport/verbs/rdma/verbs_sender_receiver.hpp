@@ -59,7 +59,7 @@ namespace verbs
 
         ~verbs_sender_receiver() {
             if (preposted_receives_>0) {
-                LOG_ERROR_MSG("Closing connection with receives still pending "
+                LOG_DEBUG_MSG("(not error) Closing connection with receives still pending "
                     ": implement FLUSH");
             }
         }
@@ -101,7 +101,7 @@ namespace verbs
 
         // ---------------------------------------------------------------------------
         // The number of outstanding work requests
-        inline uint32_t get_receive_count() { return preposted_receives_; }
+        inline uint32_t get_receive_count() const { return preposted_receives_; }
 
         // ---------------------------------------------------------------------------
         // The basic send of a single request operation
@@ -337,6 +337,15 @@ namespace verbs
             return wr_id;
         }
 
+        // ---------------------------------------------------------------------------
+        uint64_t  post_recv_region_as_id_counted_srq(verbs_memory_region *region,
+            uint32_t length, struct ibv_srq* srq)
+        {
+            uint64_t wr_id = post_recv_region_as_id_srq(region, length, srq);
+            push_receive_count();
+            return wr_id;
+        }
+
     private:
         // ---------------------------------------------------------------------------
         uint64_t post_recv_region_as_id(verbs_memory_region *region, uint32_t length)
@@ -371,7 +380,7 @@ namespace verbs
         }
 
         // ---------------------------------------------------------------------------
-        uint64_t post_recv_region_as_id_shared(verbs_memory_region *region,
+        uint64_t post_recv_region_as_id_srq(verbs_memory_region *region,
             uint32_t length, struct ibv_srq* srq)
         {
           // Build scatter/gather element for inbound message.

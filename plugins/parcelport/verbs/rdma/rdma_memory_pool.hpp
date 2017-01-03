@@ -218,6 +218,10 @@ namespace verbs
             return region;
         }
 
+        void decrement_used_count(uint32_t N) {
+            used_ -= N;
+        }
+
         //
         std::size_t                                 chunk_size_;
         std::size_t                                 max_chunks_;
