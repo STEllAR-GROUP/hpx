@@ -49,7 +49,7 @@ namespace hpx { namespace traits
                !hpx::traits::is_two_way_executor<Executor>::value
             >::type>
         {
-            using type = hpx::future<T>;
+            using type = hpx::lcos::future<T>;
         };
     }
 
@@ -112,7 +112,7 @@ namespace hpx { namespace traits
                   , hpx::util::identity<cont_result>
                 >::type result_type;
 
-            typedef hpx::future<result_type> type;
+            typedef hpx::lcos::future<result_type> type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ namespace hpx { namespace traits
                   , hpx::util::identity<cont_result>
                 >::type result_type;
 
-            typedef hpx::future<result_type> type;
+            typedef hpx::lcos::future<result_type> type;
         };
     }
 
