@@ -158,7 +158,8 @@ namespace hpx { namespace traits
     template <typename Executor, typename Future, typename F, typename ... Ts>
     struct future_then_executor_result
       : detail::future_then_executor_result<
-            Executor, Future, F, hpx::util::detail::pack<Ts...> >
+            typename std::decay<Executor>::type, Future, F,
+            hpx::util::detail::pack<Ts...> >
     {};
 }}
 

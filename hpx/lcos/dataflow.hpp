@@ -683,7 +683,7 @@ namespace hpx
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<
-                Action, typename std::decay<F>::type
+                typename std::decay<Action>::type, typename std::decay<F>::type
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }

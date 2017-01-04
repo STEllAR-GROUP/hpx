@@ -161,10 +161,13 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<Executor,
         typename std::enable_if<
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            traits::is_executor<Executor>::value ||
+            traits::is_executor<
+                typename std::decay<Executor>::type>::value ||
 #endif
-            traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_one_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value
         >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>

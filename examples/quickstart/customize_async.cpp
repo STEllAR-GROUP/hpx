@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/parallel_execution.hpp>
 
 #include <algorithm>
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 {
     // run a thread on a large stack
     {
-        hpx::threads::executors::default_executor large_stack_executor(
+        hpx::parallel::execution::default_executor large_stack_executor(
             hpx::threads::thread_stacksize_large);
 
         hpx::future<void> f =
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 
     // run a thread with high priority
     {
-        hpx::threads::executors::default_executor high_priority_executor(
+        hpx::parallel::execution::default_executor high_priority_executor(
             hpx::threads::thread_priority_critical);
 
         hpx::future<void> f =
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
     // combine both
     {
-        hpx::threads::executors::default_executor fancy_executor(
+        hpx::parallel::execution::default_executor fancy_executor(
             hpx::threads::thread_priority_critical,
             hpx::threads::thread_stacksize_large);
 

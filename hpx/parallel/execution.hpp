@@ -6,7 +6,9 @@
 #if !defined(HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM)
 #define HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM
 
+#include <hpx/parallel/executors.hpp>
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
 
 #endif
 

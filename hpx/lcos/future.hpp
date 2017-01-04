@@ -553,13 +553,18 @@ namespace hpx { namespace lcos { namespace detail
         //     returns.
         template <typename F>
         typename util::lazy_enable_if<
-            !hpx::traits::is_launch_policy<F>::value &&
-            !hpx::traits::is_threads_executor<F>::value &&
+            !hpx::traits::is_launch_policy<
+                typename std::decay<F>::type>::value &&
+            !hpx::traits::is_threads_executor<
+                typename std::decay<F>::type>::value &&
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<F>::value &&
+            !hpx::traits::is_executor<
+                typename std::decay<F>::type>::value &&
 #endif
-            !hpx::traits::is_one_way_executor<F>::value &&
-            !hpx::traits::is_two_way_executor<F>::value
+            !hpx::traits::is_one_way_executor<
+                typename std::decay<F>::type>::value &&
+            !hpx::traits::is_two_way_executor<
+                typename std::decay<F>::type>::value
           , hpx::traits::future_then_result<Derived, F>
         >::type
         then(F && f, error_code& ec = throws) const
@@ -665,11 +670,13 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            hpx::traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value
           , hpx::traits::future_then_executor_result<Executor, Derived, F>
         >::type
-        then(Executor const& exec, F && f, error_code& ec = throws)
+        then(Executor && exec, F && f, error_code& ec = throws)
         {
             // simply forward this to executor
             return detail::then_execute_helper(exec, std::forward<F>(f),
@@ -944,13 +951,18 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename util::lazy_enable_if<
-            !hpx::traits::is_launch_policy<F>::value &&
-            !hpx::traits::is_threads_executor<F>::value &&
+            !hpx::traits::is_launch_policy<
+                typename std::decay<F>::type>::value &&
+            !hpx::traits::is_threads_executor<
+                typename std::decay<F>::type>::value &&
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<F>::value &&
+            !hpx::traits::is_executor<
+                typename std::decay<F>::type>::value &&
 #endif
-            !hpx::traits::is_one_way_executor<F>::value &&
-            !hpx::traits::is_two_way_executor<F>::value
+            !hpx::traits::is_one_way_executor<
+                typename std::decay<F>::type>::value &&
+            !hpx::traits::is_two_way_executor<
+                typename std::decay<F>::type>::value
           , hpx::traits::future_then_result<future, F>
         >::type
         then(F && f, error_code& ec = throws)
@@ -990,11 +1002,13 @@ namespace hpx { namespace lcos
 
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            hpx::traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value
           , hpx::traits::future_then_executor_result<Executor, future, F>
         >::type
-        then(Executor const& exec, F && f, error_code& ec = throws)
+        then(Executor && exec, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
             return base_type::then(exec, std::forward<F>(f), ec);

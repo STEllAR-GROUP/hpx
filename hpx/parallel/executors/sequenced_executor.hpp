@@ -135,32 +135,32 @@ namespace hpx { namespace parallel { namespace execution
         }
         /// \endcond
     };
-
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        template <>
-        struct is_one_way_executor<sequenced_executor>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_bulk_one_way_executor<sequenced_executor>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_two_way_executor<sequenced_executor>
-          : std::true_type
-        {};
-
-        template <>
-        struct is_bulk_two_way_executor<sequenced_executor>
-          : std::true_type
-        {};
-    }
-    /// \endcond
 }}}
+
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <>
+    struct is_one_way_executor<parallel::execution::sequenced_executor>
+        : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_one_way_executor<parallel::execution::sequenced_executor>
+        : std::true_type
+    {};
+
+    template <>
+    struct is_two_way_executor<parallel::execution::sequenced_executor>
+        : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<parallel::execution::sequenced_executor>
+        : std::true_type
+    {};
+    /// \endcond
+}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>

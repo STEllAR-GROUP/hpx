@@ -132,6 +132,23 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
+        bool operator==(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return policy_ == rhs.policy_;
+        }
+
+        bool operator!=(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        distribution_policy_executor const& context() const HPX_NOEXCEPT
+        {
+            return *this;
+        }
+        /// \endcond
+
+        /// \cond NOINTERNAL
         typedef parallel_execution_tag execution_category;
 
         template <typename F, typename ... Ts>
@@ -177,17 +194,18 @@ namespace hpx { namespace parallel { namespace execution
         return distribution_policy_executor<dist_policy_type>(
             std::forward<DistPolicy>(policy));
     }
-
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        template <typename DistPolicy>
-        struct is_two_way_executor<distribution_policy_executor<DistPolicy> >
-          : std::true_type
-        {};
-    }
-    /// \endcond
 }}}
+
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <typename DistPolicy>
+    struct is_two_way_executor<
+            parallel::execution::distribution_policy_executor<DistPolicy> >
+      : std::true_type
+    {};
+    /// \endcond
+}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
