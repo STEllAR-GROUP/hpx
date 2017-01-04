@@ -6,6 +6,10 @@
 #if !defined(HPX_INNER_PRODUCT_JULY_16_0830AM)
 #define HPX_INNER_PRODUCT_JULY_16_0830AM
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 #include <hpx/parallel/algorithms/inner_product.hpp>
+#endif
 
 #endif

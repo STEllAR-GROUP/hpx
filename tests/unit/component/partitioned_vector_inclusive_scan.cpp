@@ -236,8 +236,7 @@ template <typename T, typename DistPolicy>
 void inclusive_scan_tests_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, policy);
@@ -267,8 +266,7 @@ template <typename T, typename DistPolicy>
 void inclusive_scan_tests_segmented_out_with_policy(std::size_t size,
     DistPolicy const& in_policy, DistPolicy const& out_policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup partitioned vector to test
     hpx::partitioned_vector<T> in(size, in_policy);
@@ -300,8 +298,7 @@ template <typename T, typename DistPolicy>
 void inclusive_scan_tests_inplace_with_policy(std::size_t size,
     DistPolicy const& policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     // setup verification vector
     std::vector<T> ver(size);
@@ -311,11 +308,13 @@ void inclusive_scan_tests_inplace_with_policy(std::size_t size,
     hpx::parallel::v1::detail::sequential_inclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
-    //sync
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, seq);
-    inclusive_scan_algo_tests_inplace_with_policy<T>(size, policy, ver, par);
+    // sync
+    inclusive_scan_algo_tests_inplace_with_policy<T>(
+        size, policy, ver, seq);
+    inclusive_scan_algo_tests_inplace_with_policy<T>(
+        size, policy, ver, par);
 
-    //async
+    // async
     inclusive_scan_algo_tests_inplace_with_policy_async<T>(
         size, policy, ver, seq(task));
     inclusive_scan_algo_tests_inplace_with_policy_async<T>(
@@ -352,7 +351,6 @@ void inclusive_scan_tests(std::vector<hpx::id_type> &localities)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();

@@ -174,20 +174,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with a sequential execution policy object execute in sequential
-    /// order in the calling thread (\a sequential_execution_policy) or in a
+    /// order in the calling thread (\a sequenced_policy) or in a
     /// single new thread spawned from the current thread
-    /// (for \a sequential_task_execution_policy).
+    /// (for \a sequenced_task_policy).
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a set_union algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a set_union algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename Pred = detail::less>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<InIter1>::value ||
                !hpx::traits::is_random_access_iterator<InIter2>::value ||
                !hpx::traits::is_random_access_iterator<OutIter>::value

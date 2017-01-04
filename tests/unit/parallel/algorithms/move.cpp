@@ -23,8 +23,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_move(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -86,8 +86,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_outiter_move(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef std::back_insert_iterator<std::vector<std::size_t> > outiterator;
@@ -151,37 +151,37 @@ template <typename IteratorTag>
 void test_move()
 {
     using namespace hpx::parallel;
-    test_move(seq, IteratorTag());
-    test_move(par, IteratorTag());
-    test_move(par_vec, IteratorTag());
+    test_move(execution::seq, IteratorTag());
+    test_move(execution::par, IteratorTag());
+    test_move(execution::par_unseq, IteratorTag());
 
-    test_move_async(seq(task), IteratorTag());
-    test_move_async(par(task), IteratorTag());
+    test_move_async(execution::seq(execution::task), IteratorTag());
+    test_move_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move(execution_policy(seq), IteratorTag());
-    test_move(execution_policy(par), IteratorTag());
-    test_move(execution_policy(par_vec), IteratorTag());
+    test_move(execution_policy(execution::seq), IteratorTag());
+    test_move(execution_policy(execution::par), IteratorTag());
+    test_move(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_move(execution_policy(seq(task)), IteratorTag());
-    test_move(execution_policy(par(task)), IteratorTag());
+    test_move(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_move(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 
     // output iterator test
-    test_outiter_move(seq, IteratorTag());
-    test_outiter_move(par, IteratorTag());
-    test_outiter_move(par_vec, IteratorTag());
+    test_outiter_move(execution::seq, IteratorTag());
+    test_outiter_move(execution::par, IteratorTag());
+    test_outiter_move(execution::par_unseq, IteratorTag());
 
-    test_outiter_move_async(seq(task), IteratorTag());
-    test_outiter_move_async(par(task), IteratorTag());
+    test_outiter_move_async(execution::seq(execution::task), IteratorTag());
+    test_outiter_move_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_outiter_move(execution_policy(seq), IteratorTag());
-    test_outiter_move(execution_policy(par), IteratorTag());
-    test_outiter_move(execution_policy(par_vec), IteratorTag());
+    test_outiter_move(execution_policy(execution::seq), IteratorTag());
+    test_outiter_move(execution_policy(execution::par), IteratorTag());
+    test_outiter_move(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_outiter_move(execution_policy(seq(task)), IteratorTag());
-    test_outiter_move(execution_policy(par(task)), IteratorTag());
+    test_outiter_move(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_outiter_move(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -197,8 +197,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_move_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator,IteratorTag> iterator;
@@ -277,18 +277,18 @@ void test_move_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_move_exception(seq, IteratorTag());
-    test_move_exception(par, IteratorTag());
+    test_move_exception(execution::seq, IteratorTag());
+    test_move_exception(execution::par, IteratorTag());
 
-    test_move_exception_async(seq(task), IteratorTag());
-    test_move_exception_async(par(task), IteratorTag());
+    test_move_exception_async(execution::seq(execution::task), IteratorTag());
+    test_move_exception_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_exception(execution_policy(seq), IteratorTag());
-    test_move_exception(execution_policy(par), IteratorTag());
+    test_move_exception(execution_policy(execution::seq), IteratorTag());
+    test_move_exception(execution_policy(execution::par), IteratorTag());
 
-    test_move_exception(execution_policy(seq(task)), IteratorTag());
-    test_move_exception(execution_policy(par(task)), IteratorTag());
+    test_move_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_move_exception(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -304,8 +304,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_move_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -382,18 +382,18 @@ void test_move_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_move_bad_alloc(seq, IteratorTag());
-    test_move_bad_alloc(par, IteratorTag());
+    test_move_bad_alloc(execution::seq, IteratorTag());
+    test_move_bad_alloc(execution::par, IteratorTag());
 
-    test_move_bad_alloc_async(seq(task), IteratorTag());
-    test_move_bad_alloc_async(par(task), IteratorTag());
+    test_move_bad_alloc_async(execution::seq(execution::task), IteratorTag());
+    test_move_bad_alloc_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_move_bad_alloc(execution_policy(seq), IteratorTag());
-    test_move_bad_alloc(execution_policy(par), IteratorTag());
+    test_move_bad_alloc(execution_policy(execution::seq), IteratorTag());
+    test_move_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_move_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_move_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_move_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_move_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

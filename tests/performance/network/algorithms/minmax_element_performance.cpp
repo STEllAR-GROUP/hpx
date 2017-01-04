@@ -55,7 +55,7 @@ double run_min_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */min_element(par, v.begin(), v.end());
+        /*auto iters = */min_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -73,7 +73,7 @@ double run_max_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */max_element(par, v.begin(), v.end());
+        /*auto iters = */max_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -91,7 +91,7 @@ double run_minmax_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */minmax_element(par, v.begin(), v.end());
+        /*auto iters = */minmax_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -115,7 +115,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // initialize data
         using namespace hpx::parallel;
-        generate(par, v.begin(), v.end(), random_fill());
+        generate(execution::par, v.begin(), v.end(), random_fill());
 
         // run benchmark
         double time_minmax = run_minmax_element_benchmark(test_count, v);

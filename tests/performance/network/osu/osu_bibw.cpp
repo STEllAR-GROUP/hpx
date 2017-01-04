@@ -45,8 +45,8 @@ send_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
 
     std::size_t const start = 0;
 
@@ -77,8 +77,8 @@ recv_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
 
     std::size_t const start = 0;
 

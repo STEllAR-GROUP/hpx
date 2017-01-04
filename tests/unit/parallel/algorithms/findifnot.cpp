@@ -22,8 +22,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_find_if_not(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -73,20 +73,20 @@ template <typename IteratorTag>
 void test_find_if_not()
 {
     using namespace hpx::parallel;
-    test_find_if_not(seq, IteratorTag());
-    test_find_if_not(par, IteratorTag());
-    test_find_if_not(par_vec, IteratorTag());
+    test_find_if_not(execution::seq, IteratorTag());
+    test_find_if_not(execution::par, IteratorTag());
+    test_find_if_not(execution::par_unseq, IteratorTag());
 
-    test_find_if_not_async(seq(task), IteratorTag());
-    test_find_if_not_async(par(task), IteratorTag());
+    test_find_if_not_async(execution::seq(execution::task), IteratorTag());
+    test_find_if_not_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if_not(execution_policy(seq), IteratorTag());
-    test_find_if_not(execution_policy(par), IteratorTag());
-    test_find_if_not(execution_policy(par_vec), IteratorTag());
+    test_find_if_not(execution_policy(execution::seq), IteratorTag());
+    test_find_if_not(execution_policy(execution::par), IteratorTag());
+    test_find_if_not(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_find_if_not(execution_policy(seq(task)), IteratorTag());
-    test_find_if_not(execution_policy(par(task)), IteratorTag());
+    test_find_if_not(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_find_if_not(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 

@@ -22,8 +22,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -38,7 +38,7 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
 
     hpx::parallel::transform_exclusive_scan(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-        conv, val, op);
+        val, op, conv);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -65,7 +65,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
     hpx::future<void> f =
         hpx::parallel::transform_exclusive_scan(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-            conv, val, op);
+            val, op, conv);
     f.wait();
 
     // verify values
@@ -81,20 +81,29 @@ void test_transform_exclusive_scan()
 {
     using namespace hpx::parallel;
 
-    test_transform_exclusive_scan(seq, IteratorTag());
-    test_transform_exclusive_scan(par, IteratorTag());
-    test_transform_exclusive_scan(par_vec, IteratorTag());
+    test_transform_exclusive_scan(execution::seq, IteratorTag());
+    test_transform_exclusive_scan(execution::par, IteratorTag());
+    test_transform_exclusive_scan(execution::par_unseq, IteratorTag());
 
-    test_transform_exclusive_scan_async(seq(task), IteratorTag());
-    test_transform_exclusive_scan_async(par(task), IteratorTag());
+    test_transform_exclusive_scan_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_exclusive_scan_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan(execution_policy(seq), IteratorTag());
-    test_transform_exclusive_scan(execution_policy(par), IteratorTag());
-    test_transform_exclusive_scan(execution_policy(par_vec), IteratorTag());
+    test_transform_exclusive_scan(execution_policy(execution::seq),
+        IteratorTag());
+    test_transform_exclusive_scan(execution_policy(execution::par),
+        IteratorTag());
+    test_transform_exclusive_scan(execution_policy(execution::par_unseq),
+        IteratorTag());
 
-    test_transform_exclusive_scan(execution_policy(seq(task)), IteratorTag());
-    test_transform_exclusive_scan(execution_policy(par(task)), IteratorTag());
+    test_transform_exclusive_scan(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_exclusive_scan(
+        execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -110,8 +119,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_transform_exclusive_scan_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -125,12 +134,13 @@ void test_transform_exclusive_scan_exception(ExPolicy policy, IteratorTag)
         hpx::parallel::transform_exclusive_scan(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d),
-            [](std::size_t val) { return val; },
             std::size_t(0),
             [](std::size_t v1, std::size_t v2)
             {
                 return throw std::runtime_error("test"), v1 + v2;
-            });
+            },
+            [](std::size_t val) { return val; }
+        );
 
         HPX_TEST(false);
     }
@@ -162,12 +172,13 @@ void test_transform_exclusive_scan_exception_async(ExPolicy p, IteratorTag)
             hpx::parallel::transform_exclusive_scan(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
-                [](std::size_t val) { return val; },
                 std::size_t(0),
                 [](std::size_t v1, std::size_t v2)
                 {
                     return throw std::runtime_error("test"), v1 + v2;
-                });
+                },
+                [](std::size_t val) { return val; }
+            );
 
         returned_from_algorithm = true;
         f.get();
@@ -194,18 +205,28 @@ void test_transform_exclusive_scan_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_exclusive_scan_exception(seq, IteratorTag());
-    test_transform_exclusive_scan_exception(par, IteratorTag());
+    test_transform_exclusive_scan_exception(execution::seq, IteratorTag());
+    test_transform_exclusive_scan_exception(execution::par, IteratorTag());
 
-    test_transform_exclusive_scan_exception_async(seq(task), IteratorTag());
-    test_transform_exclusive_scan_exception_async(par(task), IteratorTag());
+    test_transform_exclusive_scan_exception_async(
+        execution::seq(execution::task),
+        IteratorTag());
+    test_transform_exclusive_scan_exception_async(
+        execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_exception(execution_policy(seq), IteratorTag());
-    test_transform_exclusive_scan_exception(execution_policy(par), IteratorTag());
+    test_transform_exclusive_scan_exception(execution_policy(execution::seq),
+        IteratorTag());
+    test_transform_exclusive_scan_exception(execution_policy(execution::par),
+        IteratorTag());
 
-    test_transform_exclusive_scan_exception(execution_policy(seq(task)), IteratorTag());
-    test_transform_exclusive_scan_exception(execution_policy(par(task)), IteratorTag());
+    test_transform_exclusive_scan_exception(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_exclusive_scan_exception(
+        execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 
@@ -221,8 +242,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_transform_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -236,12 +257,13 @@ void test_transform_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::parallel::transform_exclusive_scan(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)),
             boost::begin(d),
-            [](std::size_t val) { return val; },
             std::size_t(0),
             [](std::size_t v1, std::size_t v2)
             {
                 return throw std::bad_alloc(), v1 + v2;
-            });
+            },
+            [](std::size_t val) { return val; }
+        );
 
         HPX_TEST(false);
     }
@@ -272,12 +294,13 @@ void test_transform_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
             hpx::parallel::transform_exclusive_scan(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
-                [](std::size_t val) { return val; },
                 std::size_t(0),
                 [](std::size_t v1, std::size_t v2)
                 {
                     return throw std::bad_alloc(), v1 + v2;
-                });
+                },
+                [](std::size_t val) { return val; }
+            );
 
         returned_from_algorithm = true;
         f.get();
@@ -303,18 +326,28 @@ void test_transform_exclusive_scan_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_exclusive_scan_bad_alloc(seq, IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(par, IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(execution::seq, IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(execution::par, IteratorTag());
 
-    test_transform_exclusive_scan_bad_alloc_async(seq(task), IteratorTag());
-    test_transform_exclusive_scan_bad_alloc_async(par(task), IteratorTag());
+    test_transform_exclusive_scan_bad_alloc_async(
+        execution::seq(execution::task),
+        IteratorTag());
+    test_transform_exclusive_scan_bad_alloc_async(
+        execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_bad_alloc(execution_policy(seq), IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(execution_policy(par), IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::seq),
+        IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::par),
+        IteratorTag());
 
-    test_transform_exclusive_scan_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(
+        execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_transform_exclusive_scan_bad_alloc(
+        execution_policy(execution::par(execution::task)),
+        IteratorTag());
 #endif
 }
 

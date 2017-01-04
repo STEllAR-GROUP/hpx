@@ -128,7 +128,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     template <>
-    struct handle_local_exceptions<parallel_vector_execution_policy>
+    struct handle_local_exceptions<execution::parallel_unsequenced_policy>
     {
         ///////////////////////////////////////////////////////////////////////
         HPX_ATTRIBUTE_NORETURN static void call(boost::exception_ptr const&)

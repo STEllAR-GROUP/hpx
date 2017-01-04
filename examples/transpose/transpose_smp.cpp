@@ -52,7 +52,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "Number of iterations  = " << iterations << "\n";
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     const std::uint64_t start = 0;
 
@@ -179,14 +179,15 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
 {
 
     using hpx::parallel::transform_reduce;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     const std::uint64_t start = 0;
 
     auto range = boost::irange(start, order);
     // parallel reduce
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range),
+        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
+            [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t i) -> double
             {
                 double errsq = 0.0;
@@ -197,9 +198,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
                     errsq += diff * diff;
                 }
                 return errsq;
-            },
-            0.0,
-            [](double lhs, double rhs) { return lhs + rhs; }
+            }
         );
 
     if(verbose)

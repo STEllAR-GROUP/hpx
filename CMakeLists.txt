@@ -776,7 +776,7 @@ if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 endif()
 
-# BADBAD: This enables an overload of swap is necessary to work around the
+# BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
 #         only a temporary tuple holding true references.
@@ -797,6 +797,22 @@ hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
     OFF ADVANCED)
 if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
+# HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
+    "Enable old execution policy names in API (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
+endif()
+
+# HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
+    "Enable old overloads for transform_reduce and inner_product (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 endif()
 
 ################################################################################

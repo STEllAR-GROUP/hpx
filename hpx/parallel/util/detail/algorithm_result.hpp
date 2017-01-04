@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     template <typename T>
-    struct algorithm_result_impl<sequential_task_execution_policy, T>
+    struct algorithm_result_impl<execution::sequenced_task_policy, T>
     {
         // The return type of the initiating function.
         typedef hpx::future<T> type;
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     template <>
-    struct algorithm_result_impl<sequential_task_execution_policy, void>
+    struct algorithm_result_impl<execution::sequenced_task_policy, void>
     {
         // The return type of the initiating function.
         typedef hpx::future<void> type;
@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     template <typename T>
-    struct algorithm_result_impl<parallel_task_execution_policy, T>
+    struct algorithm_result_impl<execution::parallel_task_policy, T>
     {
         // The return type of the initiating function.
         typedef hpx::future<T> type;
@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     template <>
-    struct algorithm_result_impl<parallel_task_execution_policy, void>
+    struct algorithm_result_impl<execution::parallel_task_policy, void>
     {
         // The return type of the initiating function.
         typedef hpx::future<void> type;
@@ -164,72 +164,72 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            sequential_task_execution_policy_shim<Executor, Parameters>, T>
-      : algorithm_result_impl<sequential_task_execution_policy, T>
+            execution::sequenced_task_policy_shim<Executor, Parameters>, T>
+      : algorithm_result_impl<execution::sequenced_task_policy, T>
     {};
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            sequential_task_execution_policy_shim<Executor, Parameters>, void>
-      : algorithm_result_impl<sequential_task_execution_policy, void>
+            execution::sequenced_task_policy_shim<Executor, Parameters>, void>
+      : algorithm_result_impl<execution::sequenced_task_policy, void>
     {};
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            parallel_task_execution_policy_shim<Executor, Parameters>, T>
-      : algorithm_result_impl<parallel_task_execution_policy, T>
+            execution::parallel_task_policy_shim<Executor, Parameters>, T>
+      : algorithm_result_impl<execution::parallel_task_policy, T>
     {};
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            parallel_task_execution_policy_shim<Executor, Parameters>, void>
-      : algorithm_result_impl<parallel_task_execution_policy, void>
+            execution::parallel_task_policy_shim<Executor, Parameters>, void>
+      : algorithm_result_impl<execution::parallel_task_policy, void>
     {};
 
 #if defined(HPX_HAVE_DATAPAR)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct algorithm_result_impl<dataseq_task_execution_policy, T>
-      : algorithm_result_impl<sequential_task_execution_policy, T>
+    struct algorithm_result_impl<execution::dataseq_task_policy, T>
+      : algorithm_result_impl<execution::sequenced_task_policy, T>
     {};
 
     template <>
-    struct algorithm_result_impl<dataseq_task_execution_policy, void>
-      : algorithm_result_impl<sequential_task_execution_policy, void>
+    struct algorithm_result_impl<execution::dataseq_task_policy, void>
+      : algorithm_result_impl<execution::sequenced_task_policy, void>
     {};
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            dataseq_task_execution_policy_shim<Executor, Parameters>, T>
-      : algorithm_result_impl<sequential_task_execution_policy, T>
+            execution::dataseq_task_policy_shim<Executor, Parameters>, T>
+      : algorithm_result_impl<execution::sequenced_task_policy, T>
     {};
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            dataseq_task_execution_policy_shim<Executor, Parameters>, void>
-      : algorithm_result_impl<sequential_task_execution_policy, void>
+            execution::dataseq_task_policy_shim<Executor, Parameters>, void>
+      : algorithm_result_impl<execution::sequenced_task_policy, void>
     {};
 
     template <typename T>
-    struct algorithm_result_impl<datapar_task_execution_policy, T>
-      : algorithm_result_impl<parallel_task_execution_policy, T>
+    struct algorithm_result_impl<execution::datapar_task_policy, T>
+      : algorithm_result_impl<execution::parallel_task_policy, T>
     {};
 
     template <>
-    struct algorithm_result_impl<datapar_task_execution_policy, void>
-      : algorithm_result_impl<parallel_task_execution_policy, void>
+    struct algorithm_result_impl<execution::datapar_task_policy, void>
+      : algorithm_result_impl<execution::parallel_task_policy, void>
     {};
 
     template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            datapar_task_execution_policy_shim<Executor, Parameters>, T>
-      : algorithm_result_impl<parallel_task_execution_policy, T>
+            execution::datapar_task_policy_shim<Executor, Parameters>, T>
+      : algorithm_result_impl<execution::parallel_task_policy, T>
     {};
 
     template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            datapar_task_execution_policy_shim<Executor, Parameters>, void>
-      : algorithm_result_impl<parallel_task_execution_policy, void>
+            execution::datapar_task_policy_shim<Executor, Parameters>, void>
+      : algorithm_result_impl<execution::parallel_task_policy, void>
     {};
 #endif
 

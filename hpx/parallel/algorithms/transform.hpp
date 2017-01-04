@@ -212,18 +212,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a f is invoked.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a transform algorithm returns a
     /// \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
-    ///           if the execution policy is of type \a parallel_task_execution_policy
+    ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
     /// \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)> otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value)
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
@@ -491,18 +491,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the actual predicate \a f is invoked.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a transform algorithm returns a
     /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
-    ///           if the execution policy is of type \a parallel_task_execution_policy
+    ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
     /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
     ///           otherwise.
@@ -519,7 +519,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter1>::value &&
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
@@ -555,7 +555,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
@@ -702,12 +702,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the actual predicate \a f is invoked.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The invocations of \a f in the parallel \a transform algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -716,7 +716,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \returns  The \a transform algorithm returns a
     /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
-    ///           if the execution policy is of type \a parallel_task_execution_policy
+    ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
     /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
     ///           otherwise.
@@ -733,7 +733,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter1>::value &&
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
@@ -770,7 +770,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value

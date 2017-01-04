@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_TRANSFORM_REDUCE_JUL_14_2014_0849PM
 
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
 
 #endif

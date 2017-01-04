@@ -18,13 +18,14 @@ struct my_executor : hpx::parallel::parallel_executor {};
 int hpx_main(int argc, char* argv[])
 {
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::par;
 
     my_executor exec;
 
     std::vector<int> v(100);
 
-    for_each(par.on(exec), v.begin(), v.end(), [](int x){ });
+    for_each(par.on(exec),
+        v.begin(), v.end(), [](int x){ });
 
     return hpx::finalize();
 }

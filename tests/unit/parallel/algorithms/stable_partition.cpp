@@ -18,12 +18,12 @@ void test_stable_partition()
 {
     using namespace hpx::parallel;
 
-    test_stable_partition(seq, IteratorTag());
-    test_stable_partition(par, IteratorTag());
-    test_stable_partition(par_vec, IteratorTag());
+    test_stable_partition(execution::seq, IteratorTag());
+    test_stable_partition(execution::par, IteratorTag());
+    test_stable_partition(execution::par_unseq, IteratorTag());
 
-    test_stable_partition_async(seq(task), IteratorTag());
-    test_stable_partition_async(par(task), IteratorTag());
+    test_stable_partition_async(execution::seq(execution::task), IteratorTag());
+    test_stable_partition_async(execution::par(execution::task), IteratorTag());
 }
 
 void stable_partition_test()
@@ -40,11 +40,11 @@ void test_stable_partition_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_stable_partition_exception(seq, IteratorTag());
-    test_stable_partition_exception(par, IteratorTag());
+    test_stable_partition_exception(execution::seq, IteratorTag());
+    test_stable_partition_exception(execution::par, IteratorTag());
 
-    test_stable_partition_exception_async(seq(task), IteratorTag());
-    test_stable_partition_exception_async(par(task), IteratorTag());
+    test_stable_partition_exception_async(execution::seq(execution::task), IteratorTag());
+    test_stable_partition_exception_async(execution::par(execution::task), IteratorTag());
 }
 
 void stable_partition_exception_test()
@@ -62,11 +62,11 @@ void test_stable_partition_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_stable_partition_bad_alloc(seq, IteratorTag());
-    test_stable_partition_bad_alloc(par, IteratorTag());
+    test_stable_partition_bad_alloc(execution::seq, IteratorTag());
+    test_stable_partition_bad_alloc(execution::par, IteratorTag());
 
-    test_stable_partition_bad_alloc_async(seq(task), IteratorTag());
-    test_stable_partition_bad_alloc_async(par(task), IteratorTag());
+    test_stable_partition_bad_alloc_async(execution::seq(execution::task), IteratorTag());
+    test_stable_partition_bad_alloc_async(execution::par(execution::task), IteratorTag());
 }
 
 void stable_partition_bad_alloc_test()

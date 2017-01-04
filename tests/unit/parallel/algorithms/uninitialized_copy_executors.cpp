@@ -46,18 +46,18 @@ void uninitialized_copy_executors_test()
     {
         parallel_executor exec;
 
-        test_executors(par.on(exec));
-        test_executors_async(par(task).on(exec));
+        test_executors(execution::par.on(exec));
+        test_executors_async(execution::par(execution::task).on(exec));
     }
 
     {
         sequential_executor exec;
 
-        test_executors(seq.on(exec));
-        test_executors_async(seq(task).on(exec));
+        test_executors(execution::seq.on(exec));
+        test_executors_async(execution::seq(execution::task).on(exec));
 
-        test_executors(par.on(exec));
-        test_executors_async(par(task).on(exec));
+        test_executors(execution::par.on(exec));
+        test_executors_async(execution::par(execution::task).on(exec));
     }
 }
 

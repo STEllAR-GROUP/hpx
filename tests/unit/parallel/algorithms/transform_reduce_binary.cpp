@@ -5,31 +5,47 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "../algorithms/inner_product_tests.hpp"
+#include "transform_reduce_binary_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_inner_product()
+void test_transform_reduce_binary()
 {
     using namespace hpx::parallel;
 
-    test_inner_product(dataseq_execution, IteratorTag());
-    test_inner_product(datapar_execution, IteratorTag());
+    test_transform_reduce_binary(execution::seq, IteratorTag());
+    test_transform_reduce_binary(execution::par, IteratorTag());
+    test_transform_reduce_binary(execution::par_unseq, IteratorTag());
 
-    test_inner_product_async(dataseq_execution(task), IteratorTag());
-    test_inner_product_async(datapar_execution(task), IteratorTag());
+    test_transform_reduce_binary_async(execution::seq(execution::task),
+        IteratorTag());
+    test_transform_reduce_binary_async(execution::par(execution::task),
+        IteratorTag());
+
+#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
+    test_transform_reduce_binary(execution_policy(execution::seq),
+        IteratorTag());
+    test_transform_reduce_binary(execution_policy(execution::par),
+        IteratorTag());
+    test_transform_reduce_binary(execution_policy(execution::par_unseq),
+        IteratorTag());
+
+    test_transform_reduce_binary(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_transform_reduce_binary(
+        execution_policy(execution::par(execution::task)), IteratorTag());
+#endif
 }
 
-void inner_product_test()
+void transform_reduce_binary_test()
 {
-    test_inner_product<std::random_access_iterator_tag>();
-    test_inner_product<std::forward_iterator_tag>();
+    test_transform_reduce_binary<std::random_access_iterator_tag>();
+    test_transform_reduce_binary<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,7 +58,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    inner_product_test();
+    transform_reduce_binary_test();
 
     return hpx::finalize();
 }
