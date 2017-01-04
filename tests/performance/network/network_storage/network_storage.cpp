@@ -528,8 +528,6 @@ void test_write(
         //
         // Start main message sending loop
         //
-
-        // limit number of tasks we generate at a time so we don't oversubscribe resources
         for (uint64_t i = 0; i < num_transfer_slots; i++) {
             hpx::util::simple_profiler prof_setup(iteration, "Setup slots");
             uint64_t send_rank;
@@ -541,9 +539,9 @@ void test_write(
               }
             }
             else {
-              send_rank = i % nranks;
+              send_rank = static_cast<uint64_t>((rank + i) % nranks);
               while (options.nolocal && send_rank==rank) {
-                  send_rank = (send_rank+1) % nranks;
+                  send_rank = random_rank(gen);
               }
             }
 
@@ -749,9 +747,9 @@ void test_read(
               }
             }
             else {
-              send_rank = static_cast<uint64_t>(i % nranks);
+              send_rank = static_cast<uint64_t>((rank + i) % nranks);
               while (options.nolocal && send_rank==rank) {
-                  send_rank = static_cast<uint64_t>((send_rank+1) % nranks);
+                  send_rank = random_rank(gen);
               }
             }
 
@@ -934,6 +932,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         "num ranks " << nranks << ", num_transfer_slots "
         << num_transfer_slots << " on rank " << rank
     );
+    //
+    if (options.nolocal && nranks==1) {
+        std::cout << "Fatal error, cannot use nolocal with a single rank" << std::endl;
+        std::terminate();
+    }
     //
     boost::random::mt19937 gen;
     boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
