@@ -41,13 +41,15 @@ particular order):
   for more information.
 * Added versions of `hpx::get_ptr` taking client side representations for
   component instances as their parameter (instead of a global id).
-* Added the helper utility `hpx::performance_countyers::performance_counter_set`
+* Added the helper utility `hpx::performance_counters::performance_counter_set`
   helping to encapsulate a set of performance counters to be managed concurrently.
 * All execution policies and related classes have been renamed to be consistent
   with the naming changes applied for C++17. All policies now live in the
-  namespace `hpx::parallel::execution`. The ols names can be still enabled
+  namespace `hpx::parallel::execution`. The old names can be still enabled
   at configure time by specifying `-DHPX_WITH_EXECUTION_POLICY_COMPATIBILITY=On`
   to __cmake__.
+* Added a new facility `hpx::make_shared_future` which turns any type of future
+  into a corresponding shared future.
 
 [heading Breaking Changes]
 

@@ -7,6 +7,10 @@
 #define HPX_PARALLEL_REBIND_EXECUTOR_SEP_07_2016_0658AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/executor_traits.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -82,8 +86,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename hpx::util::decay<Parameters>::type parameters_type;
 
         typedef typename ExecutionPolicy::execution_category category1;
-        typedef typename executor_traits<executor_type>::execution_category
-            category2;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type category2;
 
         static_assert(
             (parallel::v1::detail::is_not_weaker<category2, category1>::value),
@@ -97,5 +102,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type type;
     };
 }}}
+#endif
 
 #endif

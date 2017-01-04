@@ -623,6 +623,59 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     template <typename T>
     struct is_executor;         // defined in hpx/traits/is_executor_v1.hpp
+
+    ///////////////////////////////////////////////////////////////////////////
+    // compatibility layer mapping new customization points onto executor_traits
+
+    // async_execute()
+    template <typename Executor, typename F, typename ... Ts>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value,
+        hpx::lcos::future<
+            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        >
+    >::type
+    async_execute(Executor && exec, F && f, Ts &&... ts)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_traits<executor_type>::async_execute(
+            std::forward<Executor>(exec), std::forward<F>(f),
+            std::forward<Ts>(ts)...);
+    }
+
+    // sync_execute()
+    template <typename Executor, typename F, typename ... Ts>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value,
+        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+    >::type
+    sync_execute(Executor && exec, F && f, Ts &&... ts)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_traits<executor_type>::execute(
+            std::forward<Executor>(exec), std::forward<F>(f),
+            std::forward<Ts>(ts)...);
+    }
+
+    // async_bulk_execute()
+    template <typename Executor, typename F, typename Shape, typename ... Ts>
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value,
+        std::vector<hpx::lcos::future<
+            typename detail::bulk_async_execute_result<
+                F, Shape, Ts...
+            >::type
+        > >
+    >::type
+    async_bulk_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_traits<executor_type>::bulk_async_execute(
+            std::forward<Executor>(exec), std::forward<F>(f), shape,
+            std::forward<Ts>(ts)...);
+    }
 }}}
 
 #endif

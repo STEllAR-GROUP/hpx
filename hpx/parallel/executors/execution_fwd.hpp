@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_FWD_DEC_23_0712PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/traits/executor_traits.hpp>
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -132,9 +132,10 @@ namespace hpx { namespace parallel { namespace execution
         /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note Executors have to implement only `async_execute()`. All other
-        ///       functions will be emulated by this `executor_traits` in terms
-        ///       of this single basic primitive. However, some executors will
-        ///       naturally specialize all operations for maximum efficiency.
+        ///       functions will be emulated by this or other customization
+        ///       points in terms of this single basic primitive. However, some
+        ///       executors will naturally specialize all operations for
+        ///       maximum efficiency.
         ///
         /// \note This is valid for one way executors (calls
         ///       make_ready_future(exec.sync_execute(f, ts...) if it exists)

@@ -8,13 +8,17 @@
 
 #include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
+#endif
 
 #include <hpx/parallel/executors/thread_executor_information_traits.hpp>
 #include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/thread_timed_executor_traits.hpp>
+#endif
 
 #include <hpx/parallel/executors/default_executor.hpp>
 #include <hpx/parallel/executors/distribution_policy_executor.hpp>

@@ -17,8 +17,9 @@
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
 #include <type_traits>
@@ -189,8 +190,9 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -468,8 +470,9 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -877,8 +880,9 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -1020,8 +1024,9 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of

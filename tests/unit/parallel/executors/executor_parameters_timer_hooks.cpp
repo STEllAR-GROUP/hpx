@@ -31,7 +31,7 @@ void chunk_size_test_seq(Parameters && params)
     test_for_each_async(execution::seq(execution::task).with(std::ref(params)),
         iterator_tag());
 
-    sequential_executor seq_exec;
+    execution::sequenced_executor seq_exec;
     test_for_each(execution::seq.on(seq_exec).with(std::ref(params)),
         iterator_tag());
     test_for_each_async(
@@ -49,7 +49,7 @@ void chunk_size_test_par(Parameters && params)
     test_for_each_async(execution::par(execution::task).with(std::ref(params)),
         iterator_tag());
 
-    parallel_executor par_exec;
+    execution::parallel_executor par_exec;
     test_for_each(execution::par.on(par_exec).with(std::ref(params)),
         iterator_tag());
     test_for_each_async(

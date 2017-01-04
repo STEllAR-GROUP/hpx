@@ -19,9 +19,6 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
-#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -33,7 +30,10 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#endif
 #include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>

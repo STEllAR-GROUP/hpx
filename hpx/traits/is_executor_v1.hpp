@@ -7,6 +7,8 @@
 #define HPX_TRAITS_IS_EXECUTOR_MAY_13_2015_1213PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
@@ -53,6 +55,8 @@ namespace hpx { namespace traits
       : parallel::v3::is_executor<Executor>
     {};
 }}
+
+#endif
 
 #endif
 

@@ -36,12 +36,12 @@ void parameters_test_impl(Parameters &&... params)
     test_for_each_async(execution::seq(execution::task).with(params...), iterator_tag());
     test_for_each_async(execution::par(execution::task).with(params...), iterator_tag());
 
-    sequential_executor seq_exec;
+    execution::sequenced_executor seq_exec;
     test_for_each(execution::seq.on(seq_exec).with(params...), iterator_tag());
     test_for_each_async(execution::seq(execution::task).on(seq_exec).with(params...),
         iterator_tag());
 
-    parallel_executor par_exec;
+    execution::parallel_executor par_exec;
     test_for_each(execution::par.on(par_exec).with(params...), iterator_tag());
     test_for_each_async(execution::par(execution::task).on(par_exec).with(params...),
         iterator_tag());

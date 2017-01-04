@@ -1315,16 +1315,32 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // Convert any type of future<T> or shared_future<T> into a corresponding
+    // shared_future<T>.
     template <typename R>
     hpx::shared_future<R>
-    make_shared_future(hpx::future<R> f)
+    make_shared_future(hpx::future<R> && f)
     {
         return f.share();
     }
 
     template <typename R>
-    hpx::shared_future<R>
-    make_shared_future(hpx::shared_future<R> f)
+    hpx::shared_future<R>&
+    make_shared_future(hpx::shared_future<R>& f)
+    {
+        return f;
+    }
+
+    template <typename R>
+    hpx::shared_future<R> &&
+    make_shared_future(hpx::shared_future<R> && f)
+    {
+        return f;
+    }
+
+    template <typename R>
+    hpx::shared_future<R> const&
+    make_shared_future(hpx::shared_future<R> const& f)
     {
         return f;
     }

@@ -150,6 +150,7 @@
 [def __cpp17_n4399__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html N4399]]
 [def __cpp17_n4560__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4560.pdf N4560]]
 [def __cpp20_p0075r1__          [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0075r1.pdf P0075R1]]
+[def __cpp20_p0443__            [@https://github.com/executors/issaquah_2016 P0443]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]

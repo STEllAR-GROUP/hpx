@@ -14,6 +14,7 @@
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
 
@@ -241,5 +242,15 @@ namespace hpx { namespace compute { namespace host
         std::vector<Executor> executors_;
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <typename Executor>
+    struct executor_execution_category<
+        compute::host::block_executor<Executor> >
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
+}}
 
 #endif

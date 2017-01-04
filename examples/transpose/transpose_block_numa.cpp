@@ -132,7 +132,7 @@ struct sub_block
 ///////////////////////////////////////////////////////////////////////////////
 // dirty workaround to avoid serialization of executors
 typedef
-    hpx::threads::executors::local_priority_queue_attached_executor
+    hpx::parallel::execution::local_priority_queue_attached_executor
     executor_type;
 typedef
     std::vector<executor_type>

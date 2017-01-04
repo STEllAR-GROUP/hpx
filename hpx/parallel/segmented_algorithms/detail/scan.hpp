@@ -20,8 +20,9 @@
 #include <hpx/util/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -770,11 +771,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::vector<hpx::future<void>> finalitems;
             finalitems.reserve(results.size());
 
-            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                executor_type;
-            typedef typename hpx::parallel::executor_traits<executor_type>
-                executor_traits;
-
             workitems.push_back(make_ready_future(init));
 
             std::size_t segment_index = 0;
@@ -804,7 +800,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy.executor(),
                         hpx::util::unwrapped(op),
                         workitems.back(),
-                        executor_traits::async_execute(
+                        execution::async_execute(
                             policy.executor(),
                             hpx::util::unwrapped(f2),
                             res

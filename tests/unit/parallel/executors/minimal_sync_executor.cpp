@@ -216,7 +216,7 @@ boost::atomic<std::size_t> count_bulk_sync(0);
 template <typename Executor>
 void test_executor(std::array<std::size_t, 2> expected)
 {
-    typedef typename hpx::parallel::execution::executor_execution_category<
+    typedef typename hpx::traits::executor_execution_category<
             Executor
         >::type execution_category;
 

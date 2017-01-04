@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/decay.hpp>
@@ -137,6 +138,7 @@ namespace hpx { namespace compute { namespace cuda
         // implementation which knows about the specifics of creating the
         // bulk-shape ranges for the accelerator.
         typedef default_executor_parameters executor_parameters_type;
+
         default_executor(cuda::target const& target)
           : target_(target)
         {}
@@ -206,6 +208,15 @@ namespace hpx { namespace compute { namespace cuda
         cuda::target target_;
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct executor_execution_category<compute::cuda::default_executor>
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
+}}
 
 #endif
 #endif
