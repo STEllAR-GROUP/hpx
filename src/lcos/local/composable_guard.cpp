@@ -22,7 +22,6 @@
 namespace hpx { namespace lcos { namespace local
 {
     static void run_composable(detail::guard_task* task);
-    static void run_async(detail::guard_task* task);
 
     static void nothing() {}
 
@@ -101,7 +100,7 @@ namespace hpx { namespace lcos { namespace local
                 free(prev);
             }
         } else {
-            run_async(task);
+            run_composable(task);
         }
     }
 
@@ -171,13 +170,6 @@ namespace hpx { namespace lcos { namespace local
         detail::guard_task* tptr = new detail::guard_task();
         tptr->run = std::move(task);
         run_guarded(guard, tptr);
-    }
-
-    static void run_async(detail::guard_task* task)
-    {
-        HPX_ASSERT(task != nullptr);
-        task->check();
-        hpx::apply(&run_composable, task);
     }
 
     // This class exists so that a destructor is
