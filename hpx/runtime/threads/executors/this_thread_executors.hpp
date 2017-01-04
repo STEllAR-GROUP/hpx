@@ -130,7 +130,6 @@ namespace hpx { namespace threads { namespace executors
             mutex_type mtx_;
         };
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
@@ -149,6 +148,8 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 }}}
+
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 
