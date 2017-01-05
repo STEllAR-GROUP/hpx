@@ -430,8 +430,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
 
 
-    // FIXME : Momentary comment out the is_indirect_callable checking for
-    // bug introspection
+    // FIXME : is_indirect_callable does not work properly when compiling
+    //         Cuda device code
 
     template <typename ExPolicy, typename InIter, typename F,
         typename Proj = util::projection_identity,
@@ -439,10 +439,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         parallel::traits::is_projected<Proj, InIter>::value
-/*        &&
+#if defined(__CUDA_ARCH__)
+        &&
         parallel::traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value*/
+        >::value
+#endif
         )>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f,
