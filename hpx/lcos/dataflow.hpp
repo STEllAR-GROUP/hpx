@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 
@@ -370,8 +371,8 @@ namespace hpx { namespace lcos { namespace detail
             future_type & f_ = util::get<I>(futures_);
 
             await_range<I>(
-                boost::begin(boost::unwrap_ref(f_))
-              , boost::end(boost::unwrap_ref(f_))
+                boost::begin(util::unwrap_ref(f_))
+              , boost::end(util::unwrap_ref(f_))
             );
         }
 
@@ -430,8 +431,15 @@ namespace hpx { namespace lcos { namespace detail
                 typename util::tuple_element<I, Futures>::type
                 future_type;
 
-            typedef traits::is_future<future_type> is_future;
-            typedef traits::is_future_range<future_type> is_range;
+            typedef util::detail::any_of<
+                    traits::is_future<future_type>,
+                    traits::is_ref_wrapped_future<future_type>
+                > is_future;
+
+            typedef util::detail::any_of<
+                    traits::is_future_range<future_type>,
+                    traits::is_ref_wrapped_future_range<future_type>
+                > is_range;
 
             await_next<I>(is_future(), is_range());
         }
