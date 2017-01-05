@@ -151,6 +151,6 @@ namespace hpx { namespace threads { namespace executors
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif // defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#endif
 
-#endif /*HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP*/
+#endif
