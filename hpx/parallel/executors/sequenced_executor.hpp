@@ -55,6 +55,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
         typedef sequenced_execution_tag execution_category;
 
+        // OneWayExecutor interface
         template <typename F, typename ... Ts>
         static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
         sync_execute(F && f, Ts &&... ts)
@@ -72,6 +73,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         }
 
+        // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         static hpx::future<
             typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
@@ -82,6 +84,14 @@ namespace hpx { namespace parallel { namespace execution
                 std::forward<Ts>(ts)...);
         }
 
+        // NonBlockingOneWayExecutor (adapted) interface
+        template <typename F, typename ... Ts>
+        static void apply_execute(F && f, Ts &&... ts)
+        {
+            sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
+        // BulkTwoWayExecutor interface
         template <typename F, typename S, typename ... Ts>
         static std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type
