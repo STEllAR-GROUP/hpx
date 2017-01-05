@@ -11,6 +11,11 @@
 // We adopted the code and HPXifyed it.
 //
 
+#if defined(HPX_MSVC_NVCC)
+// NVCC causes an ICE in MSVC if this is not defined
+#define BOOST_NO_CXX11_ALLOCATOR
+#endif
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/version.hpp>

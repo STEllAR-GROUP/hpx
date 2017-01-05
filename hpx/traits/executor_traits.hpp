@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { namespace execution
 {

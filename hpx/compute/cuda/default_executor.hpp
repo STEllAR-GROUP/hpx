@@ -11,11 +11,12 @@
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/executor_traits.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
+
+#include <hpx/parallel/executors/execution.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor_parameters.hpp>
@@ -76,7 +77,7 @@ namespace hpx { namespace compute { namespace cuda
                         int idx = blockIdx.x * blockDim.x + threadIdx.x;
                         if (idx < count)
                         {
-                            hpx::util::invoke(f, *(p + idx), ts...);
+                            f(*(p + idx), ts...);
                         }
                     },
                     std::forward<F>(f), shape_container.data(), count,
@@ -121,8 +122,7 @@ namespace hpx { namespace compute { namespace cuda
                             int idx = blockIdx.x * blockDim.x + threadIdx.x;
                             if(idx < chunk_size)
                             {
-                                hpx::util::invoke(f,
-                                    value_type(begin + idx, 1, idx), ts...);
+                                f(value_type(begin + idx, 1, idx), ts...);
                             }
                         },
                         std::forward<F>(f), std::forward<Ts>(ts)...
@@ -132,7 +132,7 @@ namespace hpx { namespace compute { namespace cuda
         };
     }
 
-    struct default_executor : hpx::parallel::executor_tag
+    struct default_executor
     {
         // By default, this executor relies on a special executor parameters
         // implementation which knows about the specifics of creating the
@@ -142,6 +142,23 @@ namespace hpx { namespace compute { namespace cuda
         default_executor(cuda::target const& target)
           : target_(target)
         {}
+
+        /// \cond NOINTERNAL
+        bool operator==(default_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return target_ == rhs.target_;
+        }
+
+        bool operator!=(default_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        cuda::target const& context() const HPX_NOEXCEPT
+        {
+            return target_;
+        }
+        /// \endcond
 
         std::size_t processing_units_count() const
         {
@@ -163,7 +180,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename ... Ts>
-        void execute(F && f, Ts &&... ts) const
+        void sync_execute(F && f, Ts &&... ts) const
         {
             apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
             target_.synchronize();
@@ -178,7 +195,7 @@ namespace hpx { namespace compute { namespace cuda
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts) const
+        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
@@ -188,7 +205,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        void bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
+        void sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
             target_.synchronize();
@@ -216,6 +233,26 @@ namespace hpx { namespace traits
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
+
+    template <>
+    struct is_one_way_executor<compute::cuda::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_two_way_executor<compute::cuda::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_one_way_executor<compute::cuda::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<compute::cuda::default_executor>
+      : std::true_type
+    {};
 }}
 
 #endif

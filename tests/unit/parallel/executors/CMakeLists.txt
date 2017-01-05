@@ -30,12 +30,14 @@ set(tests
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
   set(tests ${tests}
       bulk_async_v1
+      created_executor_v1
       minimal_async_executor_v1
       minimal_sync_executor_v1
       parallel_executor_v1
       parallel_fork_executor_v1
       sequential_executor_v1
       service_executors_v1
+      shared_parallel_executor_v1
       this_thread_executors_v1
       thread_pool_attached_executors_v1
       thread_pool_executors_v1

@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/deferred_call.hpp>
 
@@ -16,25 +17,24 @@
 #include <iterator>
 #include <numeric>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/functions.hpp>
 
+using hpx::parallel::parallel_executor;
 using hpx::util::deferred_call;
 typedef std::vector<int>::iterator iter;
 
 ////////////////////////////////////////////////////////////////////////////////
 // A parallel executor that returns void for bulk_execute and hpx::future<void>
 // for bulk_async_execute
-struct void_parallel_executor
-  : hpx::parallel::execution::parallel_executor
+struct void_parallel_executor : parallel_executor
 {
     template <typename F, typename Shape, typename ... Ts>
     std::vector<hpx::future<void> >
-    async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
     {
         std::vector<hpx::future<void> > results;
         for(auto const& elem: shape)
@@ -46,26 +46,13 @@ struct void_parallel_executor
     }
 
     template <typename F, typename Shape, typename ... Ts>
-    void sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+    void bulk_execute(F && f, Shape const& shape, Ts &&... ts)
     {
         return hpx::util::unwrapped(
-            async_bulk_execute(std::forward<F>(f), shape,
+            bulk_async_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...));
     }
 };
-
-namespace hpx { namespace traits
-{
-    template <>
-    struct is_two_way_executor<void_parallel_executor>
-        : std::true_type
-    {};
-
-    template <>
-    struct is_bulk_two_way_executor<void_parallel_executor>
-        : std::true_type
-    {};
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes
@@ -79,6 +66,7 @@ void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 void test_void_bulk_sync()
 {
     typedef void_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -89,15 +77,14 @@ void test_void_bulk_sync()
     using hpx::util::placeholders::_2;
 
     executor exec;
-    hpx::parallel::execution::sync_bulk_execute(
-        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
-        exec, &bulk_test, v, tid, 42);
+    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+    traits::bulk_execute(exec, &bulk_test, v, tid, 42);
 }
 
 void test_void_bulk_async()
 {
     typedef void_parallel_executor executor;
+    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -109,12 +96,10 @@ void test_void_bulk_async()
 
     executor exec;
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(exec,
+        traits::bulk_async_execute(exec,
             hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
     ).get();
-    hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(exec,
-            &bulk_test, v, tid, 42)).get();
+    hpx::when_all(traits::bulk_async_execute(exec, &bulk_test, v, tid, 42)).get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,13 +129,14 @@ split(iter first, iter last, int parts)
 // parallel sum using hpx's parallel executor
 int parallel_sum(iter first, iter last, int num_parts)
 {
-    hpx::parallel::execution::parallel_executor exec;
+    parallel_executor exec;
+    typedef hpx::parallel::executor_traits<parallel_executor> traits;
 
     std::vector<boost::iterator_range<iter> > input =
         split(first, last, num_parts);
 
     std::vector<hpx::future<int> > v =
-        hpx::parallel::execution::async_bulk_execute(exec,
+        traits::bulk_async_execute(exec,
             [](boost::iterator_range<iter> const& rng) -> int
             {
                 return std::accumulate(boost::begin(rng), boost::end(rng), 0);
@@ -169,24 +155,24 @@ int parallel_sum(iter first, iter last, int num_parts)
 int void_parallel_sum(iter first, iter last, int num_parts)
 {
     void_parallel_executor exec;
+    typedef hpx::parallel::executor_traits<void_parallel_executor> traits;
 
     std::vector<int> temp(num_parts + 1, 0);
     std::iota(boost::begin(temp), boost::end(temp), 0);
 
     std::ptrdiff_t section_size = std::distance(first, last) / num_parts;
 
-    std::vector<hpx::future<void> > f =
-        hpx::parallel::execution::async_bulk_execute(exec,
-            [&](const int& i)
-            {
-                iter b = first + i*section_size; //-V104
-                iter e = first + (std::min)(
-                        std::distance(first, last),
-                        static_cast<std::ptrdiff_t>((i+1)*section_size) //-V104
-                    );
-                temp[i] = std::accumulate(b, e, 0); //-V108
-            },
-            temp);
+    std::vector<hpx::future<void> > f = traits::bulk_async_execute(exec,
+        [&](const int& i)
+        {
+            iter b = first + i*section_size; //-V104
+            iter e = first + (std::min)(
+                    std::distance(first, last),
+                    static_cast<std::ptrdiff_t>((i+1)*section_size) //-V104
+                );
+            temp[i] = std::accumulate(b, e, 0); //-V108
+        },
+        temp);
 
     hpx::when_all(f).get();
 
@@ -203,14 +189,15 @@ void sum_test()
     int num_parts = std::rand() % 5 + 3;
 
     // Return futures holding results of parallel_sum and void_parallel_sum
-    hpx::parallel::execution::parallel_executor exec;
+    parallel_executor exec;
 
+    typedef hpx::parallel::executor_traits<parallel_executor> traits;
     hpx::future<int> f_par =
-        hpx::parallel::execution::async_execute(exec, &parallel_sum,
+        traits::async_execute(exec, &parallel_sum,
             boost::begin(vec), boost::end(vec), num_parts);
 
     hpx::future<int> f_void_par =
-        hpx::parallel::execution::async_execute(exec, &void_parallel_sum,
+        traits::async_execute(exec, &void_parallel_sum,
             boost::begin(vec), boost::end(vec), num_parts);
 
     HPX_TEST(f_par.get() == sum);

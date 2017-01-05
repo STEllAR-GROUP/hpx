@@ -38,7 +38,7 @@ namespace hpx { namespace traits
             >::type>
         {
             using type = decltype(
-                std::declval<Executor const&>().async_execute(
+                std::declval<Executor&&>().async_execute(
                     std::declval<T(*)(Ts...)>(), std::declval<Ts>()...));
         };
 
