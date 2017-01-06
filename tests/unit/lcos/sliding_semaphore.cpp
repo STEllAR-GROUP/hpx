@@ -21,8 +21,8 @@ boost::atomic<int> count(0);
 
 void worker(hpx::lcos::local::sliding_semaphore& sem, std::size_t i)
 {
-    sem.signal(i);   // signal main thread
     ++count;
+    sem.signal(i);   // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////

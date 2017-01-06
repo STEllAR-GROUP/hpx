@@ -53,8 +53,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type
             call(T && t)
             {
-                hpx::util::invoke(f_,
-                    hpx::util::invoke(proj_, std::forward<T>(t)));
+                T && tmp = std::forward<T>(t);
+                hpx::util::invoke(f_, hpx::util::invoke(proj_, tmp));
             }
 
             template <typename T>

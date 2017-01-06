@@ -48,8 +48,8 @@ float measure_inner_product(ExPolicy && policy,
             std::end(data1),
             std::begin(data2),
             0.0f,
-            ::plus(),
-            ::multiplies()
+            ::multiplies(),
+            ::plus()
         );
 }
 

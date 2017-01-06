@@ -31,7 +31,7 @@ struct set_42
 struct throw_always
 {
     template <typename T>
-    void operator()(T& v)
+    void operator()(T v)
     {
         throw std::runtime_error("test");
     }
@@ -40,7 +40,7 @@ struct throw_always
 struct throw_bad_alloc
 {
     template <typename T>
-    void operator()(T& v)
+    void operator()(T v)
     {
         throw std::bad_alloc();
     }

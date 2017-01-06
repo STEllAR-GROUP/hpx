@@ -30,7 +30,7 @@ void test_for_loop(executor_type& exec,
     std::vector<int> const& ref)
 {
     hpx::parallel::for_loop_n(
-        hpx::parallel::par.on(exec),
+        hpx::parallel::execution::par.on(exec),
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
         hpx::parallel::induction(d_C.data()),
@@ -41,7 +41,7 @@ void test_for_loop(executor_type& exec,
 
     std::vector<int> h_C(d_C.size());
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         d_C.begin(), d_C.end(), h_C.begin());
 
     HPX_TEST_EQ(h_C.size(), ref.size());
@@ -88,11 +88,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     // copy data to device
     hpx::future<void> f =
         hpx::parallel::copy(
-            hpx::parallel::par(hpx::parallel::task),
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
             h_A.begin(), h_A.end(), d_A.begin());
 
         hpx::parallel::copy(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             h_B.begin(), h_B.end(), d_B.begin());
 
     // synchronize with copy operation to A

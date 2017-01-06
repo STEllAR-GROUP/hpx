@@ -67,8 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         get_chunk_size(Executor && exec, F &&, std::size_t cores,
             std::size_t num_tasks) const
         {
-            std::size_t chunk = (num_tasks + cores - 1) / cores;
-            return (std::max)(min_chunk_size_, chunk);
+            return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }
         /// \endcond
 

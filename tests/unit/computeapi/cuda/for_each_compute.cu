@@ -29,11 +29,11 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 {
     std::vector<int> h_C(d_A.size());
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         d_A.begin(), d_A.end(), h_C.begin());
 
     hpx::parallel::for_each(
-        hpx::parallel::par.on(exec),
+        hpx::parallel::execution::par.on(exec),
         d_A.begin(), d_A.end(),
         [] HPX_DEVICE (int & i)
         {
@@ -69,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // copy data to device
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         h_A.begin(), h_A.end(), d_A.begin());
 
     // create executor
