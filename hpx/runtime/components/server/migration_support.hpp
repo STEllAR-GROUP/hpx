@@ -72,7 +72,7 @@ namespace hpx { namespace components
         }
         void unpin()
         {
-            // make sure to always grab to AGAS lock first
+            // make sure to always grab the AGAS lock first
             agas::mark_as_migrated(this->gid_,
                 [this]() mutable -> std::pair<bool, hpx::future<void> >
                 {
@@ -88,8 +88,12 @@ namespace hpx { namespace components
                             {
                                 was_marked_for_migration_ = false;
 
+                                hpx::lcos::local::promise<void> p;
+                                std::swap(p, trigger_migration_);
+
                                 l.unlock();
-                                trigger_migration_.set_value();
+
+                                p.set_value();
                                 return std::make_pair(true, make_ready_future());
                             }
                         }
@@ -139,9 +143,10 @@ namespace hpx { namespace components
 
                     // delay migrate operation until pin count goes to zero
                     was_marked_for_migration_ = true;
+                    hpx::future<void> f = trigger_migration_.get_future();
 
                     l.unlock();
-                    return std::make_pair(true, trigger_migration_.get_future());
+                    return std::make_pair(true, std::move(f));
                 });
         }
 
@@ -163,7 +168,6 @@ namespace hpx { namespace components
                     lva, std::forward<F>(f)),
                 components::pinned_ptr::create<this_component_type>(lva));
         }
-
 
         // Return whether the given object was migrated, if it was not
         // migrated, it also returns a pinned pointer.
