@@ -614,6 +614,7 @@ int rdma_controller::start_server_connection(uint32_t remote_ip)
     sockaddr_in remote_addr;
     sockaddr_in local_addr;
     //
+    std::memset(&remote_addr, 0, sizeof(remote_addr));
     remote_addr.sin_family      = AF_INET;
     remote_addr.sin_port        = local_addr_.sin_port;
     remote_addr.sin_addr.s_addr = remote_ip;

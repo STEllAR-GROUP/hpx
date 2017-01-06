@@ -32,9 +32,12 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
+    template <bool B, typename T = void>
+    using enable_if_t = typename std::enable_if<B, T>::type;
+
     template <typename T,
         bool enabled=PERFORMANCE_COUNTER_ENABLED,
-        typename Enable = std::enable_if_t<std::is_integral<T>::value>
+        typename Enable = enable_if_t<std::is_integral<T>::value>
     >
     struct performance_counter {};
 

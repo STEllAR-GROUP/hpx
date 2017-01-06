@@ -9,13 +9,11 @@
 #define HPX_CONCURRENT_UNORDERED_MAP
 
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
 #include <plugins/parcelport/verbs/readers_writers_mutex.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
 #include <unordered_map>
 #include <utility>
-#include <shared_mutex>
 
 // A quick wrapper around an unordered_map with a mutex to ensure two
 // threads don't simultaneously write or read during write.
