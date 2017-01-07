@@ -374,8 +374,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
 
-    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
-
     std::string chunker = vm["chunker"].as<std::string>();
 
     std::cout
@@ -499,50 +497,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Commandline handling ...
-//
-std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    if (numa_nodes == 0)
-        numa_nodes = topo.get_number_of_sockets();
-
-    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
-    if (num_numa_domains_str != "all")
-    {
-        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
-    }
-    return numa_nodes;
-}
-
-std::pair<std::size_t, std::size_t> get_num_numa_pus(
-    hpx::threads::topology const& topo, std::size_t numa_nodes,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
-
-    std::string num_threads_str = vm["stream-threads"].as<std::string>();
-    std::size_t pus = numa_pus;
-
-    if(num_threads_str != "all")
-    {
-        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
-    }
-
-    return std::make_pair(numa_pus, pus);
-}
-
-
-// Launch with something like:
-//
-// --stream-numa-domains=2 --stream-threads=6
-//
-// Don't use --hpx:threads or --hpx:bind, those are computed internally.
-//
 int main(int argc, char* argv[])
 {
     using namespace boost::program_options;
@@ -559,12 +513,6 @@ int main(int argc, char* argv[])
         (   "iterations",
             boost::program_options::value<std::size_t>()->default_value(10),
             "number of iterations to repeat each test. (default: 10)")
-        (   "stream-threads",
-            boost::program_options::value<std::string>()->default_value("all"),
-            "number of threads per NUMA domain to use. (default: all)")
-        (   "stream-numa-domains",
-            boost::program_options::value<std::string>()->default_value("all"),
-            "number of NUMA domains to use. (default: all)")
         (   "chunker",
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
@@ -590,39 +538,9 @@ int main(int argc, char* argv[])
     variables_map vm;
     store(opts, vm);
 
-    hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
-    std::pair<std::size_t, std::size_t> pus =
-        get_num_numa_pus(topo, numa_nodes, vm);
-    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
-
-
     std::vector<std::string> cfg = {
-        "hpx.numa_sensitive=2",  // no-cross NUMA stealing
-        // block all cores of requested number of NUMA-domains
-        boost::str(boost::format("hpx.cores=%d") % (numa_nodes * num_cores)),
-        boost::str(boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)),
+        "hpx.numa_sensitive=2"  // no-cross NUMA stealing
     };
-
-    std::string node_name("numanode");
-    if (topo.get_number_of_numa_nodes() == 0)
-        node_name = "socket";
-
-    std::string bind_desc("hpx.bind!=");
-    for (std::size_t i = 0; i != numa_nodes; ++i)
-    {
-        if (i != 0)
-            bind_desc += ";";
-
-        std::size_t base_thread = i * pus.second;
-        bind_desc += boost::str(
-            boost::format("thread:%d-%d=%s:%d.core:0-%d.pu:0")
-              % base_thread % (base_thread+pus.second-1)  // thread:%d-%d
-              % node_name % i                             // %s:%d
-              % (pus.second-1)                            // core:0-%d
-        );
-    }
-    cfg.push_back(bind_desc);
 
     return hpx::init(cmdline, argc, argv, cfg);
 }

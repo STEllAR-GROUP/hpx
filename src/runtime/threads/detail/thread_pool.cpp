@@ -122,6 +122,7 @@ namespace hpx { namespace threads { namespace detail
     {
         topology const& topology_ = get_topology();
         std::size_t cores_used = sched_.Scheduler::init(data, topology_);
+        sched_.setup_stealing();
 
         resize(used_processing_units_, threads::hardware_concurrency());
         for (std::size_t i = 0; i != num_threads; ++i)
