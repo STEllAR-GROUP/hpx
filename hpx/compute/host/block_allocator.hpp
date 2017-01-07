@@ -163,7 +163,7 @@ namespace hpx { namespace compute { namespace host
         {
             auto irange = boost::irange(std::size_t(0), count);
             auto policy =
-                hpx::parallel::parallel_execution_policy()
+                hpx::parallel::execution::parallel_policy()
                     .on(executor_)
                     .with(hpx::parallel::static_chunk_size());
 
@@ -238,7 +238,7 @@ namespace hpx { namespace compute { namespace host
             // keep memory locality, use executor...
             auto irange = boost::irange(std::size_t(0), count);
             hpx::parallel::for_each(
-                hpx::parallel::par
+                hpx::parallel::execution::par
                     .on(executor_)
                     .with(hpx::parallel::static_chunk_size()),
                 boost::begin(irange), boost::end(irange),

@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       types will use 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        auto_chunk_size()
+        HPX_CONSTEXPR auto_chunk_size()
           : min_time_(80000)
         {}
 

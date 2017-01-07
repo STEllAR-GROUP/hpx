@@ -92,20 +92,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
+    /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort_by-key algorithm returns a
     /// \a hpx::future<tagged_pair<tag::in1(KeyIter>, tag::in2(ValueIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a
     ///           \a tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
     ///           otherwise.
     ///           The algorithm returns a pair holding an iterator pointing to

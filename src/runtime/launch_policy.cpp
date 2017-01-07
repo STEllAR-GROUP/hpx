@@ -12,6 +12,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+//#if !defined(HPX_HAVE_CXX11_CONSTEXPR)
     const detail::async_policy launch::async = detail::async_policy{};
     const detail::fork_policy launch::fork = detail::fork_policy{};
     const detail::sync_policy launch::sync = detail::sync_policy{};
@@ -24,6 +25,7 @@ namespace hpx
         detail::policy_holder{detail::launch_policy::sync_policies};
     const detail::policy_holder launch::async_policies =
         detail::policy_holder{detail::launch_policy::async_policies};
+//#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

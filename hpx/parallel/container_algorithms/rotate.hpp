@@ -51,12 +51,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     beginning of the rotated range.
     ///
     /// The assignments in the parallel \a rotate algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a rotate algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a rotate algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)> >
     ///           if the execution policy is of type
-    ///           \a parallel_task_execution_policy and
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
     ///           otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename Rng,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
@@ -119,19 +119,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param dest_first   Refers to the begin of the destination range.
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a parallel_task_execution_policy and
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to the
@@ -139,7 +139,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<

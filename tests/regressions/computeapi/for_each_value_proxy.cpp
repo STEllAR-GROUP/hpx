@@ -177,7 +177,7 @@ int hpx_main()
     hpx::compute::vector<int, test_allocator<int> > v(100);
 
     hpx::parallel::for_each(
-        hpx::parallel::par, v.begin(), v.end(),
+        hpx::parallel::execution::par, v.begin(), v.end(),
         set_42());
 
     HPX_TEST_EQ(std::count(v.begin(), v.end(), 42), std::ptrdiff_t(v.size()));

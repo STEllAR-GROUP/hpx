@@ -33,9 +33,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     struct sequential_executor : executor_tag
     {
-#if defined(DOXYGEN)
+#if !defined(DOXYGEN)
         /// Create a new sequential executor
-        sequential_executor() {}
+        HPX_CONSTEXPR sequential_executor() {}
 #endif
 
         /// \cond NOINTERNAL

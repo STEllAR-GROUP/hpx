@@ -24,8 +24,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_strided(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -117,12 +117,12 @@ void test_for_loop_strided()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_strided(seq, IteratorTag());
-    test_for_loop_strided(par, IteratorTag());
-    test_for_loop_strided(par_vec, IteratorTag());
+    test_for_loop_strided(execution::seq, IteratorTag());
+    test_for_loop_strided(execution::par, IteratorTag());
+    test_for_loop_strided(execution::par_unseq, IteratorTag());
 
-    test_for_loop_strided_async(seq(task), IteratorTag());
-    test_for_loop_strided_async(par(task), IteratorTag());
+    test_for_loop_strided_async(execution::seq(execution::task), IteratorTag());
+    test_for_loop_strided_async(execution::par(execution::task), IteratorTag());
 }
 
 void for_loop_strided_test()
@@ -137,8 +137,8 @@ template <typename ExPolicy>
 void test_for_loop_strided_idx(ExPolicy && policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
@@ -225,12 +225,12 @@ void for_loop_strided_test_idx()
 {
     using namespace hpx::parallel;
 
-    test_for_loop_strided_idx(seq);
-    test_for_loop_strided_idx(par);
-    test_for_loop_strided_idx(par_vec);
+    test_for_loop_strided_idx(execution::seq);
+    test_for_loop_strided_idx(execution::par);
+    test_for_loop_strided_idx(execution::par_unseq);
 
-    test_for_loop_strided_idx_async(seq(task));
-    test_for_loop_strided_idx_async(par(task));
+    test_for_loop_strided_idx_async(execution::seq(execution::task));
+    test_for_loop_strided_idx_async(execution::par(execution::task));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

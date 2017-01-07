@@ -83,9 +83,12 @@ void check_results(std::size_t iterations,
     std::vector<STREAM_TYPE> b(b_res.size());
     std::vector<STREAM_TYPE> c(c_res.size());
 
-    hpx::parallel::copy(hpx::parallel::par, a_res.begin(), a_res.end(), a.begin());
-    hpx::parallel::copy(hpx::parallel::par, b_res.begin(), b_res.end(), b.begin());
-    hpx::parallel::copy(hpx::parallel::par, c_res.begin(), c_res.end(), c.begin());
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        a_res.begin(), a_res.end(), a.begin());
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        b_res.begin(), b_res.end(), b.begin());
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        c_res.begin(), c_res.end(), c.begin());
 
     STREAM_TYPE aj,bj,cj,scalar;
     STREAM_TYPE aSumErr,bSumErr,cSumErr;
@@ -269,7 +272,7 @@ run_benchmark(
     Executor exec(target, targets...);
 
     // Creating the policy used in the parallel algorithms
-    auto policy = hpx::parallel::par.on(exec);
+    auto policy = hpx::parallel::execution::par.on(exec);
 
     // Initialize arrays
     hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);

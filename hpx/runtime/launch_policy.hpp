@@ -234,16 +234,18 @@ namespace hpx
         HPX_EXPORT static const detail::policy_holder all;
         HPX_EXPORT static const detail::policy_holder sync_policies;
         HPX_EXPORT static const detail::policy_holder async_policies;
-        /// \endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     namespace detail
     {
-        HPX_FORCEINLINE bool has_async_policy(launch p) HPX_NOEXCEPT
+        HPX_FORCEINLINE HPX_CONSTEXPR
+        bool has_async_policy(launch p) HPX_NOEXCEPT
         {
-            return bool(p & launch::async_policies);
+            return bool(
+                p & detail::policy_holder{detail::launch_policy::async_policies}
+            );
         }
     }
     /// \endcond

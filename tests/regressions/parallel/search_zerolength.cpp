@@ -14,10 +14,10 @@
 
 void search_zero_dist_test()
 {
-    using hpx::parallel::seq;
-    using hpx::parallel::par;
+    using hpx::parallel::execution::seq;
+    using hpx::parallel::execution::par;
     using hpx::parallel::search;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::task;
 
     typedef std::vector<int>::iterator iterator;
 
@@ -25,10 +25,10 @@ void search_zero_dist_test()
     std::iota(c.begin(), c.end(), 1);
     std::vector<int> h(0);
 
-    hpx::future<iterator> fut_seq = search(seq(task), c.begin(), c.end(),
-        h.begin(), h.end());
-    hpx::future<iterator> fut_par = search(par(task), c.begin(), c.end(),
-        h.begin(), h.end());
+    hpx::future<iterator> fut_seq =
+        search(seq(task), c.begin(), c.end(), h.begin(), h.end());
+    hpx::future<iterator> fut_par =
+        search(par(task), c.begin(), c.end(), h.begin(), h.end());
 
     HPX_TEST(fut_seq.get() == c.begin());
     HPX_TEST(fut_par.get() == c.begin());
