@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -249,7 +249,7 @@ namespace hpx { namespace detail
             traits::is_threads_executor<Executor>::value
         >::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
             traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
@@ -257,13 +257,14 @@ namespace hpx { namespace detail
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
         >::type
-        call(Executor& sched, F&& f, Ts&&... ts)
+        call(Executor_ && sched, F&& f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                     F(Ts&&...)
                 >::type result_type;
 
-            lcos::local::futures_factory<result_type()> p(sched,
+            lcos::local::futures_factory<result_type()> p(
+                std::forward<Executor_>(sched),
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
             p.apply();
             return p.retrieve_future();
@@ -302,7 +303,7 @@ namespace hpx { namespace detail
             traits::is_two_way_executor<Executor>::value
         >::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
             traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
@@ -310,10 +311,11 @@ namespace hpx { namespace detail
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
         >::type
-        call(Executor const& exec, F && f, Ts &&... ts)
+        call(Executor_ && exec, F && f, Ts &&... ts)
         {
             return parallel::execution::async_execute(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::forward<Executor_>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,9 +8,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
@@ -19,6 +18,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <boost/atomic.hpp>
+#include <boost/range/functions.hpp>
 
 using namespace std::chrono;
 
@@ -42,16 +44,14 @@ template <typename Executor>
 void test_timed_apply(Executor& exec)
 {
     {
-        hpx::lcos::local::latch l(3);
+        hpx::lcos::local::latch l(2);
         hpx::thread::id id;
 
-        typedef hpx::parallel::timed_executor_traits<Executor> traits;
-        traits::apply_execute_after(exec, milliseconds(10),
-            hpx::util::bind(&apply_test, std::ref(l), std::ref(id), 42)
-        );
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, milliseconds(10));
 
-        traits::apply_execute_after(exec, milliseconds(10),
-            &apply_test, std::ref(l), std::ref(id), 42);
+        hpx::parallel::execution::post(
+            timed_exec, &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 
@@ -59,17 +59,14 @@ void test_timed_apply(Executor& exec)
     }
 
     {
-        hpx::lcos::local::latch l(3);
+        hpx::lcos::local::latch l(2);
         hpx::thread::id id;
 
-        typedef hpx::parallel::timed_executor_traits<Executor> traits;
-        traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
-            hpx::util::deferred_call(
-                &apply_test, std::ref(l), std::ref(id), 42)
-        );
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, steady_clock::now() + milliseconds(10));
 
-        traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
-            &apply_test, std::ref(l), std::ref(id), 42);
+        hpx::parallel::execution::post(
+            timed_exec, &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 
@@ -80,106 +77,170 @@ void test_timed_apply(Executor& exec)
 template <typename Executor>
 void test_timed_sync(Executor& exec)
 {
-    typedef hpx::parallel::timed_executor_traits<Executor> traits;
-    HPX_TEST(traits::execute_after(exec, milliseconds(10), &sync_test, 42) ==
-        hpx::this_thread::get_id());
-    HPX_TEST(traits::execute_at(
-            exec, steady_clock::now() + milliseconds(10), &sync_test, 42) ==
-        hpx::this_thread::get_id());
+    {
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, milliseconds(10));
+
+        HPX_TEST(
+            hpx::parallel::execution::sync_execute(timed_exec, &sync_test, 42) ==
+            hpx::this_thread::get_id());
+    }
+
+    {
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, steady_clock::now() + milliseconds(10));
+
+        HPX_TEST(
+            hpx::parallel::execution::sync_execute(timed_exec, &sync_test, 42) ==
+            hpx::this_thread::get_id());
+    }
 }
 
 template <typename Executor>
 void test_timed_async(Executor& exec)
 {
-    typedef hpx::parallel::timed_executor_traits<Executor> traits;
-    HPX_TEST(
-        traits::async_execute_after(
-            exec, milliseconds(10), &sync_test, 42
-        ).get() == hpx::this_thread::get_id());
-    HPX_TEST(
-        traits::async_execute_at(
-            exec, steady_clock::now() + milliseconds(10), &sync_test, 42
-        ).get() == hpx::this_thread::get_id());
+    {
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, milliseconds(10));
+
+        HPX_TEST(
+            hpx::parallel::execution::async_execute(
+                timed_exec, &sync_test, 42
+            ).get() == hpx::this_thread::get_id());
+    }
+
+    {
+        hpx::parallel::execution::timed_executor<Executor> timed_exec(
+            exec, steady_clock::now() + milliseconds(10));
+
+        HPX_TEST(
+            hpx::parallel::execution::async_execute(
+                timed_exec, &sync_test, 42
+            ).get() == hpx::this_thread::get_id());
+    }
 }
 
+boost::atomic<std::size_t> count_sync(0);
+boost::atomic<std::size_t> count_apply(0);
+boost::atomic<std::size_t> count_sync_at(0);
+boost::atomic<std::size_t> count_apply_at(0);
+
 template <typename Executor>
-void test_timed_executor()
+void test_timed_executor(std::array<std::size_t, 4> expected)
 {
-    typedef typename hpx::parallel::timed_executor_traits<
+    typedef typename hpx::traits::executor_execution_category<
             Executor
-        >::execution_category execution_category;
+        >::type execution_category;
 
     HPX_TEST((std::is_same<
-            hpx::parallel::sequential_execution_tag, execution_category
+            hpx::parallel::execution::sequenced_execution_tag,
+            execution_category
         >::value));
+
+    count_sync.store(0);
+    count_apply.store(0);
+    count_sync_at.store(0);
+    count_apply_at.store(0);
 
     Executor exec;
 
     test_timed_apply(exec);
     test_timed_sync(exec);
     test_timed_async(exec);
+
+    HPX_TEST_EQ(expected[0], count_sync.load());
+    HPX_TEST_EQ(expected[1], count_apply.load());
+    HPX_TEST_EQ(expected[2], count_sync_at.load());
+    HPX_TEST_EQ(expected[3], count_apply_at.load());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_timed_async_executor2 : hpx::parallel::timed_executor_tag
+struct test_sync_executor1
 {
-    typedef hpx::parallel::sequential_execution_tag execution_category;
-
-    template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
-    async_execute(F && f, Ts &&... ts)
-    {
-        return hpx::async(hpx::launch::sync, std::forward<F>(f),
-            std::forward<Ts>(ts)...);
-    }
-
-    template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
-    async_execute_at(hpx::util::steady_time_point const& abs_time, F && f,
-        Ts &&... ts)
-    {
-        hpx::this_thread::sleep_until(abs_time);
-        return hpx::async(hpx::launch::sync, std::forward<F>(f),
-            std::forward<Ts>(ts)...);
-    }
-
-    std::size_t processing_units_count()
-    {
-        return 1;
-    }
-};
-
-struct test_timed_async_executor1 : test_timed_async_executor2
-{
-    typedef hpx::parallel::sequential_execution_tag execution_category;
+    typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
     typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-    execute_at(hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
+    static sync_execute(F && f, Ts &&... ts)
     {
+        ++count_sync;
+        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+    }
+};
+
+struct test_timed_sync_executor1 : test_sync_executor1
+{
+    typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
+
+    template <typename F, typename ... Ts>
+    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static sync_execute_at(hpx::util::steady_time_point const& abs_time,
+        F && f, Ts &&... ts)
+    {
+        ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
         return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
-struct test_timed_async_executor3 : test_timed_async_executor1
+namespace hpx { namespace traits
 {
-    typedef hpx::parallel::sequential_execution_tag execution_category;
+    template <>
+    struct is_one_way_executor<test_sync_executor1>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_one_way_executor<test_timed_sync_executor1>
+      : std::true_type
+    {};
+}}
+
+struct test_sync_executor2 : test_sync_executor1
+{
+    typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    void apply_execute_at(hpx::util::steady_time_point const& abs_time, F && f,
-        Ts &&... ts)
+    static void apply_execute(F && f, Ts &&... ts)
     {
-        this->execute_at(abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+        ++count_apply;
+        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
+
+struct test_timed_sync_executor2 : test_sync_executor2
+{
+    template <typename F, typename ... Ts>
+    static void apply_execute_at(hpx::util::steady_time_point const& abs_time,
+        F && f, Ts &&... ts)
+    {
+        ++count_apply_at;
+        hpx::this_thread::sleep_until(abs_time);
+        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+    }
+};
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_one_way_executor<test_sync_executor2>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_one_way_executor<test_timed_sync_executor2>
+      : std::true_type
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    test_timed_executor<test_timed_async_executor1>();
-    test_timed_executor<test_timed_async_executor2>();
-    test_timed_executor<test_timed_async_executor3>();
+    test_timed_executor<test_sync_executor1>({{ 6, 0, 0, 0 }});
+    test_timed_executor<test_sync_executor2>({{ 4, 2, 0, 0 }});
+
+    test_timed_executor<test_timed_sync_executor1>({{ 2, 0, 4, 0 }});
+    test_timed_executor<test_timed_sync_executor2>({{ 4, 0, 0, 2 }});
 
     return hpx::finalize();
 }

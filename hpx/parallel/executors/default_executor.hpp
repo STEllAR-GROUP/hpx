@@ -9,13 +9,14 @@
 #define HPX_PARALLEL_EXECUTORS_DEFAULT_EXECUTOR_AUG_24_2015_0624PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/thread_timed_executor.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution
 {
     /// Refers to the currently used base-executor
-    using default_executor = threads::executors::default_executor;
+    using default_executor =
+        thread_timed_executor<threads::executors::default_executor>;
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
