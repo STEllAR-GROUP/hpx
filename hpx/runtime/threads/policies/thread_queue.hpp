@@ -261,6 +261,8 @@ namespace hpx { namespace threads { namespace policies
                         thread_map_.insert(thrd);
 
                     if (HPX_UNLIKELY(!p.second)) {
+                        // unlock lock before throwing...
+                        lk.unlock();
                         HPX_THROW_EXCEPTION(hpx::out_of_memory,
                             "threadmanager::add_new",
                             "Couldn't add new thread to the thread map");
@@ -340,9 +342,6 @@ namespace hpx { namespace threads { namespace policies
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);
 #endif
-
-//             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
-//                 return false;
 
             // create new threads from pending tasks (if appropriate)
             std::int64_t add_count = -1;                  // default is no constraint
@@ -497,9 +496,6 @@ namespace hpx { namespace threads { namespace policies
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
-//             if (terminated_items_count_ == 0)
-//                 return thread_map_count_ == 0;
-
             if (delete_all) {
                 // do not lock mutex while deleting all threads, do it piece-wise
                 bool thread_map_is_empty = false;
@@ -720,6 +716,8 @@ namespace hpx { namespace threads { namespace policies
                             thread_map_.insert(thrd);
 
                         if (HPX_UNLIKELY(!p.second)) {
+                            // unlock lock before throwing exception
+                            lk.unlock();
                             HPX_THROWS_IF(ec, hpx::out_of_memory,
                                 "threadmanager::register_thread",
                                 "Couldn't add new thread to the map of threads");
@@ -827,8 +825,7 @@ namespace hpx { namespace threads { namespace policies
         {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             thread_description* tdesc;
-            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                work_items_.pop(tdesc, steal))
+            if (work_items_.pop(tdesc, steal))
             {
                 --work_items_count_;
 
@@ -844,8 +841,7 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
 #else
-            if (//0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                work_items_.pop(thrd, steal))
+            if (work_items_.pop(thrd, steal))
             {
                 --work_items_count_;
                 return true;
@@ -999,9 +995,6 @@ namespace hpx { namespace threads { namespace policies
                 // just falls through to the cleanup work below (no work is available)
                 // in which case the current thread (which failed to acquire
                 // the lock) will just retry to enter this loop.
-//                 std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
-//                 if (!lk.owns_lock())
-//                     return false;            // avoid long wait on lock
 
                 // stop running after all HPX threads have been terminated
                 thread_queue* addfrom = addfrom_ ? addfrom_ : this;

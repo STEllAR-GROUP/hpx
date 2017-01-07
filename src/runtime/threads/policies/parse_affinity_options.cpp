@@ -392,6 +392,12 @@ namespace hpx { namespace threads { namespace detail
                 {
                     for (std::size_t i = 0; i != socket; ++i)
                     {
+                        // The number of NUMA nodes might be zero if there hwloc
+                        // doesn't detect a NUMA domain. This might be the case
+                        // when there is no NUMA support configured, or when
+                        // there are just sockets, but no direct numa domains.
+                        // The bind description might relate to sockets, not
+                        // NUMA domains.
                         if (t.get_number_of_numa_nodes() == 0)
                             base += t.get_number_of_socket_cores(i);
                         else
