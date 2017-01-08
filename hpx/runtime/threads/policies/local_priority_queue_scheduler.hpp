@@ -128,6 +128,9 @@ namespace hpx { namespace threads { namespace policies
             curr_queue_(0),
             numa_sensitive_(init.numa_sensitive_)
         {
+            victim_threads_.clear();
+            victim_threads_.resize(init.num_queues_);
+
             if (!deferred_initialization)
             {
                 BOOST_ASSERT(init.num_queues_ != 0);
@@ -988,10 +991,10 @@ namespace hpx { namespace threads { namespace policies
                 low_priority_queue_.on_start_thread(num_thread);
 
             queues_[num_thread]->on_start_thread(num_thread);
-        }
-
-        void setup_stealing()
-        {
+//         }
+//
+//         void setup_stealing()
+//         {
             std::size_t num_threads = queues_.size();
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
@@ -1009,10 +1012,8 @@ namespace hpx { namespace threads { namespace policies
             // steal from
             int radius = int((num_threads / 2.0) + 0.5);
 //             if (radius > 128) radius = 128;
-            victim_threads_.clear();
-            victim_threads_.resize(num_threads);
-            for (std::size_t num_thread = 0; num_thread != num_threads; ++num_thread)
-            {
+//             for (std::size_t num_thread = 0; num_thread != num_threads; ++num_thread)
+//             {
                 victim_threads_[num_thread].reserve(num_threads);
                 std::size_t num_pu = get_pu_num(num_thread);
                 mask_cref_type pu_mask =
@@ -1088,7 +1089,7 @@ namespace hpx { namespace threads { namespace policies
                         }
                     );
                 }
-            }
+//             }
         }
 
         void on_stop_thread(std::size_t num_thread)
