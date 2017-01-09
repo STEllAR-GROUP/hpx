@@ -20,18 +20,8 @@ macro(add_parcelport name)
   set(name "parcelport_${name}")
   set(options STATIC)
   set(one_value_args FOLDER)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INCLUDE_DIRECTORIES)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
-  if (_parcelport_${name}_INCLUDE_DIRECTORIES)
-
-    set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name}
-#      ${HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name}}
-      "${${name}_SOURCES}"
-      APPEND PROPERTY INCLUDE_DIRECTORIES
-      "${_parcelport_${name}_INCLUDE_DIRECTORIES}"
-    )
-  endif()
 
   if(${${name}_STATIC})
     hpx_debug("adding static parcelport: ${name}")

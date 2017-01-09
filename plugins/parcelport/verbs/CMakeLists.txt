@@ -254,10 +254,10 @@ set(_verbs_include_dirs
 macro(add_parcelport_verbs_module)
   hpx_debug("add_parcelport_verbs_module")
 
+  include_directories(${_verbs_include_dirs})
+
   add_parcelport(verbs
     STATIC
-    INCLUDE_DIRECTORIES
-        ${_verbs_include_dirs}
     SOURCES
         "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
         "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/rdma/rdma_controller.cpp"
