@@ -20,6 +20,11 @@ set(TBBMALLOC_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
 if(TBBMALLOC_PLATFORM STREQUAL "mic")
   set(TBBMALLOC_PATH_SUFFIX "lib/mic")
 endif()
+if(TBBMALLOC_PLATFORM STREQUAL "mic-knl")
+  set(TBBMALLOC_PATH_SUFFIX "lib/intel64_lin_mic")
+endif()
+
+message("${TBBMALLOC_ROOT} ${TBBMALLOC_PATH_SUFFIX} ${TBBMALLOC_PLATFORM}")
 
 find_library(TBBMALLOC_LIBRARY NAMES tbbmalloc libtbbmalloc
   HINTS

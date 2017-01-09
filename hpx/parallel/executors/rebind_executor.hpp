@@ -52,12 +52,4 @@ namespace hpx { namespace parallel { namespace execution
     };
 }}}
 
-namespace hpx { namespace parallel { namespace executioon
-{
-    ///////////////////////////////////////////////////////////////////////////
-    using task_execution_policy_tag = parallel::execution::task_policy_tag;
-
-    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
-}}}
-
 #endif

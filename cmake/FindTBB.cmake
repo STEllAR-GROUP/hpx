@@ -18,6 +18,9 @@ set(TBB_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
 if(TBB_PLATFORM STREQUAL "mic")
   set(TBB_PATH_SUFFIX "lib/mic")
 endif()
+if(TBB_PLATFORM STREQUAL "mic-knl")
+  set(TBB_PATH_SUFFIX "lib/intel64_lin_mic")
+endif()
 
 find_library(TBB_PROXY_LIBRARY NAMES tbb libtbb
   HINTS
