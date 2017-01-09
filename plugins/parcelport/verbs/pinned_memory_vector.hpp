@@ -32,8 +32,8 @@ namespace verbs
         typedef T value_type;
         typedef value_type & reference;
         typedef const value_type & const_reference;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef const typename std::vector<T>::iterator const_iterator;
+        typedef T * iterator;
+        typedef T const * const_iterator;
         typedef typename std::vector<T>::difference_type difference_type;
         typedef typename std::vector<T>::size_type size_type;
         typedef Allocator allocator_type;
@@ -146,7 +146,7 @@ namespace verbs
             return iterator(&m_array_[0]);
         }
 
-        const iterator end() const {
+        const_iterator end() const {
             return iterator(&m_array_[m_size_]);
         }
 

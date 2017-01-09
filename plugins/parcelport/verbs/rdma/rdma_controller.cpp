@@ -51,9 +51,12 @@ rdma_controller::rdma_controller(const char *device, const char *interface, int 
 rdma_controller::~rdma_controller()
 {
     //
-    memory_pool_->small_.decrement_used_count(
-        server_endpoint_->get_receive_count()
-    );
+    if (memory_pool_ && server_endpoint_)
+    {
+        memory_pool_->small_.decrement_used_count(
+            server_endpoint_->get_receive_count()
+        );
+    }
     //
     LOG_DEVEL_MSG("rdma_controller destructor clearing clients");
     connections_started_.clear();

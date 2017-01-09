@@ -130,7 +130,7 @@ namespace verbs
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
-    class HPX_EXPORT parcelport : public parcelport_impl<parcelport>
+    struct HPX_EXPORT parcelport : public parcelport_impl<parcelport>
     {
     private:
         typedef parcelport_impl<parcelport> base_type;

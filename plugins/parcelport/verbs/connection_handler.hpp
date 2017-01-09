@@ -22,7 +22,7 @@ namespace parcelset {
 namespace policies {
 namespace verbs
 {
-    class HPX_EXPORT parcelport;
+    struct HPX_EXPORT parcelport;
 }}
 
     template <>

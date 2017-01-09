@@ -127,7 +127,11 @@ namespace concurrent {
         , iterator_lock_(mutex_, defer_lock())
         {}
 
-        ~unordered_map() {};
+        ~unordered_map()
+        {
+            write_lock lock(mutex_);
+            map_.clear();
+        };
 
         unordered_map& operator=(const unordered_map& other)
         {

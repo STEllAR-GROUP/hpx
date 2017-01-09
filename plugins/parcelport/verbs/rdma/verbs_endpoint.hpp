@@ -280,7 +280,7 @@ namespace verbs
                 {
                     struct rdma_cm_event *cm_event;
                     int err = event_channel_->get_event(verbs_event_channel::no_ack_event,
-                        rdma_cm_event_type(-1), cm_event);
+                        nullptr, cm_event);
                     if (err != 0) return 0;
                     return f(cm_event);
                 }
@@ -291,7 +291,7 @@ namespace verbs
         int get_event(verbs_event_channel::event_ack_type ack,
             rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
         {
-            return event_channel_->get_event(ack, event, cm_event);
+            return event_channel_->get_event(ack, &event, cm_event);
         }
 
         // ---------------------------------------------------------------------------

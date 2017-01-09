@@ -49,7 +49,8 @@ namespace verbs
                 LOG_TRACE_MSG("destroying rdma event channel "
                     << hexpointer(event_channel_.get())
                     << hexnumber(event_channel_->fd));
-                rdma_destroy_event_channel(event_channel_.get()); // No return code
+                struct rdma_event_channel *event_channel = event_channel_.release();
+                rdma_destroy_event_channel(event_channel); // No return code
             }
             event_channel_ = nullptr;
         }
@@ -127,7 +128,7 @@ namespace verbs
         // Communication event details are returned in the rdma_cm_event structure.
         // It is allocated by the rdma_cm and released by the rdma_ack_cm_event routine.
         int get_event(event_ack_type ack,
-            rdma_cm_event_type event, struct rdma_cm_event *&cm_event)
+            rdma_cm_event_type *event, struct rdma_cm_event *&cm_event)
         {
             return get_event(event_channel_.get(), ack, event, cm_event);
         }
@@ -135,14 +136,22 @@ namespace verbs
         static int get_event(
             struct rdma_event_channel *channel,
             event_ack_type ack,
-            rdma_cm_event_type event,
+            rdma_cm_event_type *event,
             struct rdma_cm_event *&cm_event)
         {
             cm_event = nullptr;
             // This operation can block if there are no pending events available.
             // (So only call it after the event poll says there is an event waiting)
-            LOG_DEVEL_MSG("waiting for " << rdma_event_str(event)
-                << " on event channel " << hexnumber(channel->fd));
+            if (event)
+            {
+                LOG_DEVEL_MSG("waiting for " << rdma_event_str(*event)
+                    << " on event channel " << hexnumber(channel->fd));
+            }
+            else
+            {
+                LOG_DEVEL_MSG("waiting for on event channel " << hexnumber(channel->fd));
+            }
+
             int rc = rdma_get_cm_event(channel, &cm_event);
             if (rc != 0) {
                 int err = errno;
@@ -156,9 +165,9 @@ namespace verbs
                 << ": on qp " << decnumber(qpnum));
 
             // we have to ack events, even when they are not the ones we wanted
-            if (cm_event->event != event && event!=rdma_cm_event_type(-1)) {
+            if (event && cm_event->event != *event) {
                 LOG_ERROR_MSG("mismatch " << rdma_event_str(cm_event->event)
-                    << " not " << rdma_event_str(event));
+                    << " not " << rdma_event_str(*event));
                 if (ack==do_ack_event) ack_event(cm_event);
                 return -1;
             }
