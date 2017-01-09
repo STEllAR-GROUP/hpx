@@ -539,7 +539,10 @@ int rdma_controller::handle_connect_request(
 
         // if a connection to this ip address is already being made, and we have
         // a lower ip than the remote end, reject the incoming connection
-        if (remote_ip>local_addr_.sin_addr.s_addr) {
+        if (remote_ip>local_addr_.sin_addr.s_addr && 
+             std::get<0>(present.first->second)->get_state() != 
+                 verbs_endpoint::connection_state::terminated) 
+         {
             LOG_DEVEL_MSG("Reject connection , priority from "
                 << ipaddress(remote_ip) << "to "
                 << sockaddress(&local_addr_)
