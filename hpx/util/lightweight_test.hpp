@@ -44,12 +44,18 @@ struct fixture
     std::ostream& stream_;
     std::size_t sanity_failures_;
     std::size_t test_failures_;
+#if defined(HPX_HAVE_CXX11_NSDMI)
+    mutex_type mutex_ = BOOST_DETAIL_SPINLOCK_INIT;
+#else
     mutex_type mutex_;
+#endif
 
   public:
     fixture(std::ostream& stream):
-      stream_(stream), sanity_failures_(0), test_failures_(0),
-      mutex_(BOOST_DETAIL_SPINLOCK_INIT)
+      stream_(stream), sanity_failures_(0), test_failures_(0)
+#if !defined(HPX_HAVE_CXX11_NSDMI)
+    , mutex_(BOOST_DETAIL_SPINLOCK_INIT)
+#endif
     {
     }
 
