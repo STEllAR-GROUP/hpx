@@ -61,7 +61,7 @@ namespace hpx { namespace traits
 #endif
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__NVCC__) && \
-#   !defined(__CUDACC__)
+    !defined(__CUDACC__)
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
 #  endif
@@ -71,7 +71,7 @@ namespace hpx { namespace traits
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__NVCC__) && \
-#   !defined(__CUDACC__)
+    !defined(__CUDACC__)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
@@ -94,7 +94,7 @@ namespace hpx { namespace traits
 #endif
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__NVCC__) && \
-#   !defined(__CUDACC__)
+    !defined(__CUDACC__)
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
 #  endif
@@ -104,7 +104,7 @@ namespace hpx { namespace traits
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__NVCC__) && \
-#   !defined(__CUDACC__)
+    !defined(__CUDACC__)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
