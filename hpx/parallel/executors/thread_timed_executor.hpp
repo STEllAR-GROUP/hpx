@@ -60,6 +60,23 @@ namespace hpx { namespace parallel { namespace execution
           : base_(std::forward<Ts>(ts)...)
         {}
 
+        /// \cond NOINTERNAL
+        bool operator==(thread_timed_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return base_ == rhs.base_;
+        }
+
+        bool operator!=(thread_timed_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        thread_timed_executor const& context() const HPX_NOEXCEPT
+        {
+            return *this;
+        }
+        /// \endcond
+
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename ... Ts>
         HPX_FORCEINLINE
