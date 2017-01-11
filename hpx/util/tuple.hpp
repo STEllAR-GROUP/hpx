@@ -76,7 +76,8 @@ namespace hpx { namespace util
               : _value(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
@@ -121,7 +122,8 @@ namespace hpx { namespace util
               : T(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
@@ -214,7 +216,8 @@ namespace hpx { namespace util
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             tuple_impl(tuple_impl const&) = default;
             tuple_impl(tuple_impl&&) = default;
 #else
@@ -408,7 +411,8 @@ namespace hpx { namespace util
           : _impl(std::forward<U>(v), std::forward<Us>(vs)...)
         {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.

@@ -32,7 +32,8 @@ namespace hpx { namespace util
               : F(std::move(f))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             protected_bind(protected_bind const&) = default;
             protected_bind(protected_bind&&) = default;
 #else
