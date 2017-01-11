@@ -481,7 +481,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
-                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX || may_exit)
             {
                 // clean up terminated threads
                 if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
