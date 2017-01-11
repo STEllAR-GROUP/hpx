@@ -9,7 +9,7 @@
 #include <hpx/config/compiler_specific.hpp>
 
 #if !defined(HPX_FORCEINLINE)
-#   if defined(__CUDACC__)
+#   if defined(__NVCC__) || defined(__CUDACC__)
 #       define HPX_FORCEINLINE inline
 #   elif defined(HPX_MSVC)
 #       define HPX_FORCEINLINE __forceinline

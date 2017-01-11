@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : op_(std::forward<Op_>(op))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__CUDACC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && !defined(__CUDACC__)
             count_iteration(count_iteration const&) = default;
             count_iteration(count_iteration&&) = default;
 #else
