@@ -896,11 +896,11 @@ namespace hpx { namespace parallel { namespace execution
         HPX_FORCEINLINE auto
         async_bulk_execute(Executor && exec, F && f, Shape const& shape,
                 Ts &&... ts)
-        ->  decltype(async_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...
-            ))
+//         ->  decltype(async_bulk_execute_fn_helper<
+//                     typename std::decay<Executor>::type
+//                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
+//                     shape, std::forward<Ts>(ts)...
+//             ))
         {
             return async_bulk_execute_fn_helper<
                     typename std::decay<Executor>::type

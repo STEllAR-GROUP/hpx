@@ -61,13 +61,14 @@ namespace hpx { namespace parallel { namespace execution
                         std::forward<F>(f), std::forward<Ts>(ts)...).get()
                 )
             {
+                auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
                     hpx::util::bind(
                         hpx::util::one_shot(sync_execute_at_helper()),
                         hpx::util::placeholders::_1, std::ref(exec),
                         hpx::util::deferred_call(
                             std::forward<F>(f), std::forward<Ts>(ts)...)),
-                    make_ready_future_at(abs_time)).get();
+                    predecessor).get();
             }
 
             template <typename Executor, typename F, typename ... Ts>
@@ -168,13 +169,14 @@ namespace hpx { namespace parallel { namespace execution
                         std::forward<F>(f), std::forward<Ts>(ts)...)
                 )
             {
+                auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
                     hpx::util::bind(
                         hpx::util::one_shot(async_execute_at_helper()),
                         hpx::util::placeholders::_1, std::forward<Executor>(exec),
                         hpx::util::deferred_call(
                             std::forward<F>(f), std::forward<Ts>(ts)...)),
-                    make_ready_future_at(abs_time));
+                    predecessor);
             }
 
             template <typename Executor, typename F, typename ... Ts>
@@ -266,13 +268,14 @@ namespace hpx { namespace parallel { namespace execution
                     std::chrono::steady_clock::time_point const& abs_time,
                     F && f, Ts &&... ts)
             {
+                auto predecessor = make_ready_future_at(abs_time);
                 execution::then_execute(sequenced_executor(),
                     hpx::util::bind(
                         hpx::util::one_shot(apply_execute_at_helper()),
                         hpx::util::placeholders::_1, std::forward<Executor>(exec),
                         hpx::util::deferred_call(std::forward<F>(f),
                             std::forward<Ts>(ts)...)),
-                    make_ready_future_at(abs_time));
+                    predecessor);
             }
 
             template <typename Executor, typename F, typename ... Ts>
