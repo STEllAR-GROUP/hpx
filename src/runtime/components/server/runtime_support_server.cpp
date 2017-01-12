@@ -51,6 +51,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -586,12 +587,9 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        while (tm.get_thread_count() > 1)
+        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
         {
-            // FIXME: this sleep_for is causing very long shutdown times.
-            // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::chrono::millisec(100));
-            this_thread::yield();
+            util::detail::yield_k(k, "runtime_support::dijkstra_termination");
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -625,8 +623,11 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            while (tm.get_thread_count() > 1)
-                this_thread::yield();
+            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            {
+                util::detail::yield_k(k,
+                    "runtime_support::dijkstra_termination_detection");
+            }
 
             return 0;
         }
@@ -681,12 +682,10 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        while (tm.get_thread_count() > 1)
+        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
         {
-            // FIXME: this sleep_for is causing very long shutdown times.
-            // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::chrono::millisec(100));
-            this_thread::yield();
+            util::detail::yield_k(k,
+                "runtime_support::send_dijkstra_termination_token");
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -757,9 +756,10 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            while (tm.get_thread_count() > 1)
+            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
             {
-                this_thread::yield();
+                util::detail::yield_k(k,
+                    "runtime_support::dijkstra_termination_detection");
             }
 
             return 0;
@@ -1085,7 +1085,7 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            while (tm.get_thread_count() > 1)
+            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
             {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
@@ -1097,6 +1097,7 @@ namespace hpx { namespace components { namespace server
                     timed_out = true;
                     break;
                 }
+                util::detail::yield_k(k, "runtime_support::stop");
             }
 
             // If it took longer than expected, kill all suspended threads as
@@ -1104,7 +1105,8 @@ namespace hpx { namespace components { namespace server
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
                 start_time = t.elapsed();
-                while (tm.get_thread_count() > 1)
+
+                for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
                 {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
@@ -1118,6 +1120,7 @@ namespace hpx { namespace components { namespace server
                         // we waited long enough
                         break;
                     }
+                    util::detail::yield_k(k, "runtime_support::stop");
                 }
             }
 
