@@ -455,7 +455,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Functions wrapped by creat_component actions below
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
     template <typename Component>
     HPX_HOST_DEVICE naming::gid_type runtime_support::create_component()
     {

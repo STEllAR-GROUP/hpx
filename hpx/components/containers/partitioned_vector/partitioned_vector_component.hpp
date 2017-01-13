@@ -442,9 +442,12 @@ namespace hpx { namespace server
     HPX_REGISTER_VECTOR_DECLARATION_IMPL(                                     \
         BOOST_PP_CAT(__partitioned_vector_, BOOST_PP_CAT(type, name)), name)  \
 /**/
-
+#ifndef __CUDA_ARCH__
 #define HPX_REGISTER_PARTITIONED_VECTOR(...)                                  \
-    HPX_REGISTER_VECTOR_(__VA_ARGS__)                                         \
+    HPX_REGISTER_VECTOR_(__VA_ARGS__)
+#else
+#define HPX_REGISTER_PARTITIONED_VECTOR(...)
+#endif
 /**/
 #define HPX_REGISTER_VECTOR_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \

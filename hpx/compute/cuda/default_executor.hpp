@@ -75,7 +75,7 @@ namespace hpx { namespace compute { namespace cuda
                         int idx = blockIdx.x * blockDim.x + threadIdx.x;
                         if (idx < count)
                         {
-                            hpx::util::invoke(f, *(p + idx), ts...);
+                            hpx::util::invoke_r<void>(f, *(p + idx), ts...);
                         }
                     },
                     std::forward<F>(f), shape_container.data(), count,
@@ -120,7 +120,7 @@ namespace hpx { namespace compute { namespace cuda
                             int idx = blockIdx.x * blockDim.x + threadIdx.x;
                             if(idx < chunk_size)
                             {
-                                hpx::util::invoke(f,
+                                hpx::util::invoke_r<void>(f,
                                     value_type(begin + idx, 1, idx), ts...);
                             }
                         },
