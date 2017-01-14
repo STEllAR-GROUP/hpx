@@ -33,7 +33,7 @@ struct spinlock
   public:
     spinlock(char const* /*desc*/ = nullptr)
 #if !defined(HPX_HAVE_CXX11_NSDMI)
-      : m(BOOST_DETAIL_SPINLOCK_INIT)
+      : m{BOOST_DETAIL_SPINLOCK_INIT}
 #endif
     {
         HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
