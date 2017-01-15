@@ -474,7 +474,7 @@ namespace hpx { namespace traits
     /// \endcond
 }}
 
-#include <hpx/parallel/executors/thread_timed_executor.hpp>
 #include <hpx/parallel/executors/timed_execution.hpp>
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
 
 #endif

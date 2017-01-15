@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/parallel/executors/thread_timed_executor.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
@@ -23,8 +23,7 @@ namespace hpx { namespace parallel { namespace execution
     ///       one of the OS-threads dedicated for the given thread pool. The
     ///       tasks will not run as HPX-threads.
     ///
-    using service_executor =
-        thread_timed_executor<threads::executors::service_executor>;
+    using service_executor = threads::executors::service_executor;
 
     /// A \a io_pool_executor exposes the predefined HPX IO thread pool
     /// through an executor interface.
@@ -33,8 +32,7 @@ namespace hpx { namespace parallel { namespace execution
     ///       one of the OS-threads dedicated for the IO thread pool. The
     ///       tasks will not run as HPX-threads.
     ///
-    using io_pool_executor =
-        thread_timed_executor<threads::executors::io_pool_executor>;
+    using io_pool_executor = threads::executors::io_pool_executor;
 
     /// A \a io_pool_executor exposes the predefined HPX parcel thread pool
     /// through an executor interface.
@@ -43,8 +41,7 @@ namespace hpx { namespace parallel { namespace execution
     ///       one of the OS-threads dedicated for the parcel thread pool. The
     ///       tasks will not run as HPX-threads.
     ///
-    using parcel_pool_executor =
-        thread_timed_executor<threads::executors::parcel_pool_executor>;
+    using parcel_pool_executor = threads::executors::parcel_pool_executor;
 
     /// A \a io_pool_executor exposes the predefined HPX timer thread pool
     /// through an executor interface.
@@ -53,8 +50,7 @@ namespace hpx { namespace parallel { namespace execution
     ///       one of the OS-threads dedicated for the timer thread pool. The
     ///       tasks will not run as HPX-threads.
     ///
-    using timer_pool_executor =
-        thread_timed_executor<threads::executors::timer_pool_executor>;
+    using timer_pool_executor = threads::executors::timer_pool_executor;
 
     /// A \a io_pool_executor exposes the predefined HPX main thread pool
     /// through an executor interface.
@@ -63,44 +59,8 @@ namespace hpx { namespace parallel { namespace execution
     ///       one of the OS-threads dedicated for the main thread pool. The
     ///       tasks will not run as HPX-threads.
     ///
-    using main_pool_executor =
-        thread_timed_executor<threads::executors::main_pool_executor>;
+    using main_pool_executor = threads::executors::main_pool_executor;
 }}}
-
-namespace hpx { namespace traits
-{
-    // Associate the static_chunk_size executor parameters type as a
-    // default with these executors.
-    template <>
-    struct executor_parameters_type<parallel::execution::service_executor>
-    {
-        typedef parallel::static_chunk_size type;
-    };
-
-    template <>
-    struct executor_parameters_type<parallel::execution::io_pool_executor>
-    {
-        typedef parallel::static_chunk_size type;
-    };
-
-    template <>
-    struct executor_parameters_type<parallel::execution::parcel_pool_executor>
-    {
-        typedef parallel::static_chunk_size type;
-    };
-
-    template <>
-    struct executor_parameters_type<parallel::execution::timer_pool_executor>
-    {
-        typedef parallel::static_chunk_size type;
-    };
-
-    template <>
-    struct executor_parameters_type<parallel::execution::main_pool_executor>
-    {
-        typedef parallel::static_chunk_size type;
-    };
-}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/config/inline_namespace.hpp>
