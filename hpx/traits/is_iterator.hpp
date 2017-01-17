@@ -23,7 +23,7 @@ namespace hpx { namespace traits
         template <typename T>
         struct is_iterator
         {
-#if defined(HPX_MSVC) && defined(__NVCC__)
+#if defined(HPX_MSVC) && defined(__CUDACC__)
             template <typename U>
             static typename U::iterator_category * test(U); // iterator
 

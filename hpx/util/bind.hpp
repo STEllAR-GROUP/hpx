@@ -267,7 +267,8 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else

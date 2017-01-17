@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
@@ -512,6 +513,7 @@ namespace hpx {
                 std::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
+            lcos::barrier::get_global_barrier().release();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();
