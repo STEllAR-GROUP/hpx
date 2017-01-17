@@ -559,6 +559,9 @@ if(HPX_WITH_PARCEL_PROFILING)
 endif()
 
 ## Parcelport related build options
+hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
+  "Enable the ibverbs based parcelport. This is currently an experimental feature"
+  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
   "Enable the MPI based parcelport."
   OFF CATEGORY "Parcelport")
@@ -1114,7 +1117,9 @@ if(WIN32)
   ##############################################################################
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
-  hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  if (NOT Boost_USE_STATIC_LIBS)
+    hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  endif()
   if(NOT CMAKE_CL_64)
     hpx_add_config_define(BOOST_NO_ALIGNMENT)
   endif()
