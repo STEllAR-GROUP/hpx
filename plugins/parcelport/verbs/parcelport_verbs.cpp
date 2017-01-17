@@ -994,6 +994,26 @@ namespace verbs
                 << sockaddress(client->get_remote_address())
                 << verbs_completion_queue::wc_opcode_str(completion.opcode));
 
+            // get the header of the new message/parcel
+
+            LOG_EXCLUSIVE(
+            if (0 && completion.opcode==IBV_WC_RECV) {
+                auto region = (verbs_memory_region *)wr_id;
+                std::stringstream temp;
+                temp << "Completion Buffer "
+                    << verbs_completion_queue::wc_opcode_str(completion.opcode) << ":\n";
+                if (completion.byte_len<1024) {
+                    int P = completion.byte_len;
+                    uintptr_t *ptr = reinterpret_cast<uintptr_t*>(region->get_address());
+                    for(int j=0; j<P/8; ++j) {
+                        temp << dec4(j) << " " << hexuint64(ptr[j]) << "\n";
+                    }
+                }
+                temp << std::endl;
+                std::cout << temp.str().c_str();
+            }
+            )
+
             ++completions_handled;
 
             if (completion.opcode==IBV_WC_SEND) {

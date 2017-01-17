@@ -79,7 +79,8 @@ class simple_profiler {
               int &level = std::get<1>(p->second);
               level_totals[level] += std::get<0>(p->second);
               if (level<last_level) {
-                if (_output) hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                if (_output) hpx::cout << std::string(52,' ')
+                    << std::string (last_level*9, ' ')
                     << "------\n";
                 if (_output) hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')
@@ -97,7 +98,8 @@ class simple_profiler {
                   % std::string (level*9, ' ')
                   % (100.0*std::get<0>(p->second)/elapsed)) << "\n";
               if ((++p)==this->_profiles.end()) {
-                if (_output) hpx::cout << std::string(52,' ') << std::string (last_level*9, ' ')
+                if (_output) hpx::cout << std::string(52,' ')
+                    << std::string (last_level*9, ' ')
                     << "------\n";
                 if (_output) hpx::cout << (boost::format(fmt2)
                   % std::string (last_level*9, ' ')

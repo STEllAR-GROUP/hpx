@@ -29,6 +29,7 @@
 #include <atomic>
 #include <string>
 #include <utility>
+#include <cstdint>
 //
 // @TODO : Remove the client map pair as we have a copy in the verbs_parcelport class
 // that does almost the same job.
@@ -181,7 +182,6 @@ namespace verbs
         // qp is created, and then to hold a future to an endpoint that the parcelport
         // can get and wait on
         hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> connections_started_;
-//        hpx::concurrent::unordered_map<uint32_t, verbs_endpoint_ptr> connections_aborted_;
 
         typedef std::pair<uint32_t, verbs_endpoint_ptr> qp_map_type;
         hpx::concurrent::unordered_map<uint32_t, verbs_endpoint_ptr> qp_endpoint_map_;

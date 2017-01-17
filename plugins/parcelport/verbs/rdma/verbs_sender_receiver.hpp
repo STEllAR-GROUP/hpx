@@ -59,8 +59,8 @@ namespace verbs
 
         ~verbs_sender_receiver() {
             if (preposted_receives_>0) {
-                LOG_DEBUG_MSG("(not error) Closing connection with receives still pending "
-                    ": implement FLUSH");
+                LOG_DEBUG_MSG("(not error) Closing connection with receives pending"
+                    " : implement FLUSH");
             }
         }
 
