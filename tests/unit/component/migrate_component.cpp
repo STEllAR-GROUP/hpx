@@ -48,7 +48,7 @@ struct test_server
     // Components which should be migrated using hpx::migrate<> need to
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
-    // components constructor.
+    // component's constructor.
     test_server(test_server const& rhs)
       : base_type(rhs), data_(rhs.data_)
     {}
@@ -134,7 +134,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
     HPX_TEST_EQ(t1.get_data(), 42);
 
     try {
-        // migrate of t1 to the target
+        // migrate t1 to the target
         test_client t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
@@ -143,7 +143,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
 
-        // the migrated object should life on the target now
+        // the migrated object should live on the target now
         HPX_TEST_EQ(t2.call(), target);
         HPX_TEST_EQ(t2.get_data(), 42);
     }
@@ -170,7 +170,7 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
     hpx::future<void> busy_work = t1.busy_work();
 
     try {
-        // migrate of t1 to the target
+        // migrate t1 to the target
         test_client t2(hpx::components::migrate(t1, target));
 
         HPX_TEST_EQ(t1.get_data(), 42);
@@ -181,7 +181,7 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
 
-        // the migrated object should life on the target now
+        // the migrated object should live on the target now
         HPX_TEST_EQ(t2.call(), target);
         HPX_TEST_EQ(t2.get_data(), 42);
     }
@@ -212,7 +212,7 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
         // times
         for(std::size_t i = 0; i < N; ++i)
         {
-            // migrate of t1 to the target (loc2)
+            // migrate t1 to the target (loc2)
             test_client t2(hpx::components::migrate(t1, target));
 
             HPX_TEST_EQ(t1.get_data(), 42);
@@ -223,7 +223,7 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
 
-            // the migrated object should life on the target now
+            // the migrated object should live on the target now
             HPX_TEST_EQ(t2.call(), target);
             HPX_TEST_EQ(t2.get_data(), 42);
 
@@ -260,7 +260,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
         {
             for(std::size_t i = 0; i < N; ++i)
             {
-                // migrate of t1 to the target (loc2)
+                // migrate t1 to the target (loc2)
                 test_client t2(hpx::components::migrate(t1, target));
 
                 HPX_TEST_EQ(t1.get_data(), 42);
@@ -271,7 +271,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
                 // the migrated object should have the same id as before
                 HPX_TEST_EQ(t1.get_id(), t2.get_id());
 
-                // the migrated object should life on the target now
+                // the migrated object should live on the target now
                 HPX_TEST_EQ(t2.call(), target);
                 HPX_TEST_EQ(t2.get_data(), 42);
 

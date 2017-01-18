@@ -184,42 +184,21 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 #endif
 
-    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
     {
-        for (std::size_t j = 0; j != numbits; ++j)
-        {
-            if (test(lhs, j) != test(rhs, j))
-            {
-                return false;
-            }
-        }
-        return true;
+        return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
     {
-        for (std::size_t j = 0; j != numbits; ++j)
-        {
-            if (test(lhs, j) || test(rhs, j))
-            {
-                return true;
-            }
-        }
-        return false;
+        return (lhs | rhs).any();
     }
 
     // return true if at least one bit is set in both masks
-    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t numbits)
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
     {
-        for (std::size_t j = 0; j != numbits; ++j)
-        {
-            if (test(lhs, j) && test(rhs, j))
-            {
-                return true;
-            }
-        }
-        return false;
+        return (lhs & rhs).any();
     }
 
     // returns the number of bits set

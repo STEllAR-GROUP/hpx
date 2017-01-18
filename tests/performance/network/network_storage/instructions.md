@@ -83,4 +83,24 @@ optional arguments such as the figure size can be found by looking at the script
 The output from the script will be a series of svg and png files for each of the plots
 created.
 
+## Launch notes
+greina14
+bin/network_storage --localMB=1024 --transferKB=16384 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1 --hpx:agas=148.187.83.44:7910 --hpx:hpx=148.187.83.44:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=1 -Ihpx.parcel.bootstrap=tcp
 
+greina15
+bin/network_storage --localMB=1024 --transferKB=16384 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1  --hpx:agas=148.187.83.44:7910 --hpx:worker --hpx:hpx=148.187.83.45:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=1 -Ihpx.parcel.bootstrap=tcp
+
+greina1
+gdb --args /home/biddisco/build/hvtkm/bin/network_storage --localMB=64 --transferKB=1024 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1 --hpx:agas=192.168.3.31:7910 --hpx:hpx=192.168.3.31:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=1 -Ihpx.parcel.bootstrap=tcp --hpx:threads=1
+
+greina2
+gdb --args /home/biddisco/build/hvtkm/bin/network_storage --localMB=64 --transferKB=1024 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1 --hpx:agas=192.168.3.31:7910 --hpx:hpx=192.168.3.32:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=1 -Ihpx.parcel.bootstrap=tcp --hpx:worker --hpx:threads=1
+
+mpi launch
+mpiexec -n 2 -host greina14,greina15 bin/network_storage --localMB=1024 --transferKB=16384 --iterations=10 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.tcp.enable=0 -Ihpx.parcel.mpi.enable=1 -Ihpx.parcel.verbs.enable=0 -Ihpx.parcel.bootstrap=mpi --hpx:threads=12
+ 
+test TCP greina14
+bin/network_storage --localMB=1024 --transferKB=16384 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1 --hpx:agas=148.187.83.44:7910 --hpx:hpx=148.187.83.44:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=0 -Ihpx.parcel.bootstrap=tcp --iterations=10  --hpx:threads=12
+
+test TCP greina15
+bin/network_storage --localMB=1024 --transferKB=16384 --hpx:localities=2 -Ihpx.parcel.tcp.enable=1  --hpx:agas=148.187.83.44:7910 --hpx:worker --hpx:hpx=148.187.83.45:7910 -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.mpi.enable=0 -Ihpx.parcel.verbs.enable=0 -Ihpx.parcel.bootstrap=tcp --iterations=10  --hpx:threads=12

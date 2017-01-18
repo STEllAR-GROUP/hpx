@@ -235,6 +235,13 @@ macro(hpx_check_for_cxx11_noexcept)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_nsdmi)
+  add_hpx_config_test(HPX_WITH_CXX11_NSDMI
+    SOURCE cmake/tests/cxx11_non_static_data_member_initialization.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_nullptr)
   add_hpx_config_test(HPX_WITH_CXX11_NULLPTR
     SOURCE cmake/tests/cxx11_nullptr.cpp

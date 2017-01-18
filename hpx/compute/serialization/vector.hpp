@@ -31,16 +31,22 @@ namespace hpx { namespace serialization
             std::false_type)
         {
             // normal load ...
-            typedef typename compute::vector<T, Allocator>::size_type size_type;
+            typedef typename compute::vector<T, Allocator>::value_type
+                value_type;
+            typedef typename compute::vector<T, Allocator>::size_type
+                size_type;
 
             size_type size;
+            value_type v;
+
             ar >> size; //-V128
             if(size == 0) return;
 
             vs.resize(size);
             for(size_type i = 0; i != size; ++i)
             {
-                ar >> vs[i];
+                ar >> v;
+                vs[i] = v;
             }
         }
 
@@ -65,7 +71,7 @@ namespace hpx { namespace serialization
                 if(size == 0) return;
 
                 v.resize(size);
-                load_binary(ar, &v[0], v.size() * sizeof(value_type));
+                load_binary(ar, v.device_data(), v.size() * sizeof(value_type));
             }
         }
     }
@@ -112,7 +118,7 @@ namespace hpx { namespace serialization
                 // bitwise save ...
                 typedef typename compute::vector<T, Allocator>::value_type
                     value_type;
-                save_binary(ar, &v[0], v.size() * sizeof(value_type));
+                save_binary(ar, v.device_data(), v.size() * sizeof(value_type));
             }
         }
     }
