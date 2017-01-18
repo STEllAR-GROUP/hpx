@@ -73,6 +73,9 @@ particular order):
 * The algorithm `hpx::parallel::inner_product` has been renamed to
   `hpx::parallel::transform_reduce` to match the changes this algorithm has
   undergone while being moved to C++17.
+* the build options `HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY` and
+  `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY` are now disabled by default. Please
+  change your code still depending on the deprecated interfaces.
 
 [heading Bug Fixes (Closed Tickets)]
 

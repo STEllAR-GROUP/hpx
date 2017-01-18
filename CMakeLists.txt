@@ -742,7 +742,7 @@ endif()
 # HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
 endif()
@@ -750,7 +750,7 @@ endif()
 # HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
     "Enable backwards compatibility for component::get_gid() functions"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
@@ -794,7 +794,7 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
     "Enable support for boost::chrono (default: OFF)"
     OFF ADVANCED)
