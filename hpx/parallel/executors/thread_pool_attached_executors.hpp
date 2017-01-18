@@ -10,6 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/thread_execution_information.hpp>
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 
 namespace hpx { namespace parallel { namespace execution

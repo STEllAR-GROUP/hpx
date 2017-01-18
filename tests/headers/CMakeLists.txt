@@ -18,6 +18,7 @@ set(exclude_from_all_headers
 
 set(exclude_from_headers
   "parallel/executors/execution_fwd.hpp"
+  "parallel/executors/execution_information_fwd.hpp"
   "parallel/executors/timed_execution_fwd.hpp"
 )
 

@@ -57,6 +57,5 @@ namespace hpx { namespace traits
 }}
 
 #endif
-
 #endif
 
