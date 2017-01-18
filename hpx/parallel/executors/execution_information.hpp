@@ -13,6 +13,7 @@
 #include <hpx/traits/is_executor.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information_fwd.hpp>
 
 #include <cstddef>
