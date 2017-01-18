@@ -26,7 +26,6 @@ if(EXISTS "${HPX_DIR}")
   )
 
   add_executable(test_executable test.cpp)
-  target_link_libraries(test_executable ${HPX_LIBRARIES} iostreams_component test_component)
   target_compile_definitions(test_executable PUBLIC -DHPX_DEBUG)
   hpx_setup_target(test_executable
     DEPENDENCIES test_component
