@@ -812,8 +812,7 @@ namespace hpx { namespace threads { namespace policies
         {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             thread_description* tdesc;
-            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                work_items_.pop(tdesc, steal))
+            if (work_items_.pop(tdesc, steal))
             {
                 --work_items_count_;
 

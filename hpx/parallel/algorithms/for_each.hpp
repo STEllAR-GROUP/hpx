@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             call(T && t)
             {
                 auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
-                hpx::util::invoke(f_, tmp);
+                hpx::util::invoke_r<void>(f_,tmp);
             }
 
             template <typename Iter>
@@ -92,7 +92,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             for_each_iteration(for_each_iteration const&) = default;
             for_each_iteration(for_each_iteration&&) = default;
 #else
@@ -428,15 +429,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
+
+
+    // FIXME : is_indirect_callable does not work properly when compiling
+    //         Cuda device code
+
     template <typename ExPolicy, typename InIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        parallel::traits::is_projected<Proj, InIter>::value &&
+        parallel::traits::is_projected<Proj, InIter>::value
+#if defined(__CUDA_ARCH__)
+        &&
         parallel::traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value)>
+        >::value
+#endif
+        )>
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f,
         Proj && proj = Proj())

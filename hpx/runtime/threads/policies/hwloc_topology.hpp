@@ -234,8 +234,7 @@ namespace hpx { namespace threads
         }
         mask_type init_core_affinity_mask(std::size_t num_thread) const
         {
-            mask_type default_mask =
-                get_numa_node_affinity_mask(num_thread, false);
+            mask_type default_mask = numa_node_affinity_masks_[num_thread];
             return init_core_affinity_mask_from_core(
                 get_core_number(num_thread), default_mask);
         }

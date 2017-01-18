@@ -18,6 +18,7 @@
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #  if !defined( BOOST_SP_HAS_SYNC )
+#    include <hpx/config/compiler_fence.hpp>
 #    include <boost/detail/interlocked.hpp>
 #  endif
 #else
@@ -73,7 +74,7 @@ namespace hpx { namespace lcos { namespace local
 
 #if !defined( BOOST_SP_HAS_SYNC )
             std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            BOOST_COMPILER_FENCE
+            HPX_COMPILER_FENCE
 #else
             std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
@@ -93,7 +94,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_RELEASING(this);
 
 #if !defined( BOOST_SP_HAS_SYNC )
-            BOOST_COMPILER_FENCE
+            HPX_COMPILER_FENCE
             *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);

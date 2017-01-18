@@ -72,7 +72,7 @@
 #   define HPX_WINDOWS
 #endif
 
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
 #define HPX_DEVICE __device__
 #define HPX_HOST __host__
 #define HPX_CONSTANT __constant__

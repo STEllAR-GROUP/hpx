@@ -339,7 +339,11 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            trigger_pending_work();
+            if (!connection_handler_traits<ConnectionHandler>::
+                send_immediate_parcels::value)
+            {
+                trigger_pending_work();
+            }
             return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
