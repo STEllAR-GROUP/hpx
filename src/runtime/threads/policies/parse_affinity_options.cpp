@@ -391,8 +391,22 @@ namespace hpx { namespace threads { namespace detail
                 if (socket != std::size_t(-1))
                 {
                     for (std::size_t i = 0; i != socket; ++i)
-                        base += t.get_number_of_socket_cores(i);
-                    num_cores = t.get_number_of_socket_cores(socket);
+                    {
+                        // The number of NUMA nodes might be zero if there hwloc
+                        // doesn't detect a NUMA domain. This might be the case
+                        // when there is no NUMA support configured, or when
+                        // there are just sockets, but no direct numa domains.
+                        // The bind description might relate to sockets, not
+                        // NUMA domains.
+                        if (t.get_number_of_numa_nodes() == 0)
+                            base += t.get_number_of_socket_cores(i);
+                        else
+                            base += t.get_number_of_numa_node_cores(i);
+                    }
+                    if (t.get_number_of_numa_nodes() == 0)
+                        num_cores = t.get_number_of_socket_cores(socket);
+                    else
+                        num_cores = t.get_number_of_numa_node_cores(socket);
                 }
                 else
                 {
@@ -448,7 +462,12 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // core number is relative to socket
                     for (std::size_t i = 0; i != socket; ++i)
-                        socket_base += t.get_number_of_socket_cores(i);
+                    {
+                        if (t.get_number_of_numa_nodes() == 0)
+                            socket_base += t.get_number_of_socket_cores(i);
+                        else
+                            socket_base += t.get_number_of_numa_node_cores(i);
+                    }
                 }
 
                 if (std::size_t(-1) != core)
@@ -459,7 +478,6 @@ namespace hpx { namespace threads { namespace detail
                 {
                     num_pus = t.get_number_of_pus();
                 }
-
                 bounds_type bounds = extract_bounds(s, num_pus, ec);
                 if (ec) break;
 

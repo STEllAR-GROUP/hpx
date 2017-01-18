@@ -252,7 +252,11 @@ namespace hpx { namespace compute
         /// allocated on the device.
         T* device_data() const HPX_NOEXCEPT
         {
+#if defined(__NVCC__) || defined(__CUDACC__)
             return data_.device_ptr();
+#else
+            return data_;
+#endif
         }
 
         //

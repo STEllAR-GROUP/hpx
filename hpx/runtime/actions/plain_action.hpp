@@ -26,7 +26,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if defined(__NVCC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
 #include <type_traits>
 #endif
 #include <utility>
@@ -159,7 +159,7 @@ namespace hpx { namespace traits
     HPX_DEFINE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))              \
     /**/
 
-#if defined(__NVCC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
     struct name : hpx::actions::make_action<                                  \
         typename std::add_pointer<                                            \

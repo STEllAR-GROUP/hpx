@@ -1,8 +1,11 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// hpxinspect:nodeprecatedinclude:boost/ref.hpp
+// hpxinspect:nodeprecatedname:boost::reference_wrapper
 
 /// \file lcos/wait_all.hpp
 
@@ -97,12 +100,15 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/functions.hpp>
+#include <boost/ref.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -123,6 +129,16 @@ namespace hpx { namespace lcos
         struct is_future_or_shared_state<
                 boost::intrusive_ptr<future_data<R> > >
           : std::true_type
+        {};
+
+        template <typename R>
+        struct is_future_or_shared_state<std::reference_wrapper<R> >
+          : is_future_or_shared_state<R>
+        {};
+
+        template <typename R>
+        struct is_future_or_shared_state<boost::reference_wrapper<R> >
+          : is_future_or_shared_state<R>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -242,8 +258,8 @@ namespace hpx { namespace lcos
             void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(boost::unwrap_ref(util::get<I>(t_))),
-                    boost::end(boost::unwrap_ref(util::get<I>(t_))));
+                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
+                    boost::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
@@ -295,11 +311,12 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef typename detail::is_future_or_shared_state<future_type>::type
-                    is_future;
-                typedef typename detail::is_future_or_shared_state_range<future_type>
-                      ::type
-                    is_range;
+                typedef typename detail::is_future_or_shared_state<
+                        future_type
+                    >::type is_future;
+                typedef typename detail::is_future_or_shared_state_range<
+                        future_type
+                    >::type is_range;
 
                 await_next<I>(is_future(), is_range());
             }

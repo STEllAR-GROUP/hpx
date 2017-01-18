@@ -626,7 +626,7 @@ namespace hpx { namespace threads
         std::size_t num_socket
         ) const
     {
-        hwloc_obj_t socket_obj;
+        hwloc_obj_t socket_obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
@@ -647,12 +647,18 @@ namespace hpx { namespace threads
         std::size_t numa_node
         ) const
     {
-        hwloc_obj_t node_obj;
+        hwloc_obj_t node_obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            node_obj = hwloc_get_obj_by_type(topo,
-                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+            int const numa_depth =
+                hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_NODE);
+            for (unsigned int i = 0; i != get_number_of_numa_nodes(); ++i) //-V104
+            {
+                node_obj = hwloc_get_obj_by_depth(topo, numa_depth, i);
+                if (node_obj->os_index == numa_node)
+                    break;
+            }
         }
 
         if (node_obj)
@@ -668,7 +674,7 @@ namespace hpx { namespace threads
         std::size_t core
         ) const
     {
-        hwloc_obj_t core_obj;
+        hwloc_obj_t core_obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
@@ -689,7 +695,7 @@ namespace hpx { namespace threads
         std::size_t num_socket
         ) const
     {
-        hwloc_obj_t socket_obj;
+        hwloc_obj_t socket_obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
@@ -710,12 +716,17 @@ namespace hpx { namespace threads
         std::size_t numa_node
         ) const
     {
-        hwloc_obj_t node_obj;
-
+        hwloc_obj_t node_obj = nullptr;
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            node_obj = hwloc_get_obj_by_type(topo,
-                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+            int const numa_depth =
+                hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_NODE);
+            for (unsigned int i = 0; i != get_number_of_numa_nodes(); ++i) //-V104
+            {
+                node_obj = hwloc_get_obj_by_depth(topo, numa_depth, i);
+                if (node_obj->os_index == numa_node)
+                    break;
+            }
         }
 
         if (node_obj)
@@ -729,7 +740,8 @@ namespace hpx { namespace threads
 
     namespace detail
     {
-        void print_info(std::ostream& os, hwloc_obj_t obj, char const* name, bool comma)
+        void print_info(std::ostream& os, hwloc_obj_t obj, char const* name,
+            bool comma)
         {
             if (comma)
                 os << ", ";
@@ -838,12 +850,17 @@ namespace hpx { namespace threads
         if (std::size_t(-1) == num_socket)
             return machine_affinity_mask_;
 
-        hwloc_obj_t socket_obj;
-
+        hwloc_obj_t socket_obj = nullptr;
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            socket_obj = hwloc_get_obj_by_type(topo,
-                HWLOC_OBJ_SOCKET, static_cast<unsigned>(num_socket));
+            int const socket_depth =
+                hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_SOCKET);
+            for (unsigned int i = 0; i != get_number_of_sockets(); ++i) //-V104
+            {
+                socket_obj = hwloc_get_obj_by_depth(topo, socket_depth, i);
+                if (socket_obj->os_index == num_socket)
+                    break;
+            }
         }
 
         if (socket_obj)
@@ -869,12 +886,17 @@ namespace hpx { namespace threads
             return machine_affinity_mask_;
         }
 
-        hwloc_obj_t numa_node_obj;
-
+        hwloc_obj_t numa_node_obj = nullptr;
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            numa_node_obj = hwloc_get_obj_by_type(topo,
-                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+            int const numa_depth =
+                hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_NODE);
+            for (unsigned int i = 0; i != get_number_of_numa_nodes(); ++i) //-V104
+            {
+                numa_node_obj = hwloc_get_obj_by_depth(topo, numa_depth, i);
+                if (numa_node_obj->os_index == numa_node)
+                    break;
+            }
         }
 
         if (numa_node_obj)
@@ -896,7 +918,7 @@ namespace hpx { namespace threads
         if (std::size_t(-1) == core)
             return default_mask;
 
-        hwloc_obj_t core_obj;
+        hwloc_obj_t core_obj = nullptr;
 
         std::size_t num_core = (core + core_offset) % get_number_of_cores();
 
@@ -930,7 +952,7 @@ namespace hpx { namespace threads
 
         std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
 
-        hwloc_obj_t obj;
+        hwloc_obj_t obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
@@ -956,7 +978,7 @@ namespace hpx { namespace threads
         std::size_t num_pu
         ) const
     { // {{{
-        hwloc_obj_t obj;
+        hwloc_obj_t obj = nullptr;
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
@@ -1078,7 +1100,8 @@ namespace hpx { namespace threads
             int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
             for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
-                hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
+                hwloc_obj_t const pu_obj =
+                    hwloc_get_obj_by_depth(topo, pu_depth, i);
                 unsigned idx = static_cast<unsigned>(pu_obj->os_index);
                 if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));

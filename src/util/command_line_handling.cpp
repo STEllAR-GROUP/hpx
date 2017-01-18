@@ -729,8 +729,10 @@ namespace hpx { namespace util
             // otherwise, if the user instructed us to run the AGAS server,
             // we set the AGAS network address to the same value as the HPX
             // network address
-            agas_host = hpx_host;
-            agas_port = hpx_port;
+            if (agas_host == HPX_INITIAL_IP_ADDRESS) {
+                agas_host = hpx_host;
+                agas_port = hpx_port;
+            }
         }
         else if (env.found_batch_environment()) {
             // in batch mode, if the network addresses are different and we

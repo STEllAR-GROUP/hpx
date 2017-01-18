@@ -24,11 +24,17 @@ struct spinlock
     HPX_NON_COPYABLE(spinlock);
 
   private:
+#if defined(HPX_HAVE_CXX11_NSDMI)
+    boost::detail::spinlock m = BOOST_DETAIL_SPINLOCK_INIT;
+#else
     boost::detail::spinlock m;
+#endif
 
   public:
     spinlock(char const* /*desc*/ = nullptr)
+#if !defined(HPX_HAVE_CXX11_NSDMI)
       : m(BOOST_DETAIL_SPINLOCK_INIT)
+#endif
     {
         HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
     }
