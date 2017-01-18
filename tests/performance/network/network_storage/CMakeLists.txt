@@ -11,9 +11,8 @@ add_hpx_executable(network_storage
   AUTOGLOB
   EXCLUDE_FROM_ALL
   HPX_PREFIX ${HPX_BUILD_PREFIX}
+  COMPONENT_DEPENDENCIES iostreams
   FOLDER "Benchmarks/Network/network_storage")
-
-target_link_libraries(network_storage_exe PUBLIC iostreams_component)
 
 # add pseudo-target dependencies
 add_hpx_pseudo_target(
