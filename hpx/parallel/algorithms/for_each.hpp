@@ -439,14 +439,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        parallel::traits::is_projected<Proj, InIter>::value
-#if defined(__CUDA_ARCH__)
-        &&
+        parallel::traits::is_projected<Proj, InIter>::value)
+#if !defined(__CUDA_ARCH__)
+  , HPX_CONCEPT_REQUIRES_(
         parallel::traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value
+        >::value)
 #endif
-        )>
+    >
     typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f,
         Proj && proj = Proj())
