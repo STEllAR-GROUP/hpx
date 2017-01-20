@@ -82,8 +82,8 @@ namespace hpx { namespace compute { namespace cuda
             void init_processing_units();
             friend struct target;
 
-            mutable     mutex_type mtx_;
-            int         device_;
+            mutable mutex_type mtx_;
+            int device_;
             std::size_t processing_units_;
             std::size_t processor_family_;
             std::string processor_name_;

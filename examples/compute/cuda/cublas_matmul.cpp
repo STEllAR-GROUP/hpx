@@ -16,6 +16,16 @@
 // NB. The hpx::threads param only controls how many parallel tasks to use for the CPU
 // comparison/checks and makes no difference to the GPU execution.
 //
+// Note: The hpx::compute::cuda::allocator makes use of device code and if used
+// this example must be compiled with nvcc instead of c++ which requires the following
+// cmake setting
+// set_source_files_properties(cublas_matmul.cpp
+//     PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+// Currently, nvcc does not handle lambda functions properly and it is simpler to use
+// cudaMalloc/cudaMemcpy etc, so we do not #define HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+
+#define BOOST_NO_CXX11_ALLOCATOR
+//
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
@@ -24,15 +34,21 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 //
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/include/compute.hpp>
-
+#include <hpx/compute/cuda/target.hpp>
+#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+# include <hpx/compute/cuda/allocator.hpp>
+#endif
 // CUDA runtime
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
 //
 #include <algorithm>
+#include <cstddef>
+#include <iostream>
+#include <sstream>
+#include <utility>
+#include <vector>
 
 const char *_cudaGetErrorEnum(cublasStatus_t error);
 
@@ -45,8 +61,11 @@ struct cublas_helper
 {
 public:
     using future_type    = hpx::future<void>;
+
+#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     using allocator_type = typename hpx::compute::cuda::allocator<T>;
     using vector_type    = typename hpx::compute::vector<T, allocator_type>;
+#endif
 
     // construct a cublas stream
     cublas_helper(std::size_t device=0) : target_(device) {
@@ -65,7 +84,7 @@ public:
     // that you would use for a cublas call except the cublas handle which is omitted
     // as the wrapper will supply that for you
     template <typename Func, typename ...Args>
-    void cublas_wrapper(Func && cublas_function, Args&&... args)
+    void operator()(Func && cublas_function, Args&&... args)
     {
         // make sure this operation takes place on our stream
         return_ = cublasSetStream(handle_, stream_);
@@ -88,7 +107,15 @@ public:
     static void cublas_error(cublasStatus_t err) {
         if (err != CUBLAS_STATUS_SUCCESS) {
             std::stringstream temp;
-            temp << "cublasDestroy returned error code " << _cudaGetErrorEnum(err);
+            temp << "cublas function returned error code " << _cudaGetErrorEnum(err);
+            throw std::runtime_error(temp.str());
+        }
+    }
+
+    static void cuda_error(cudaError_t err) {
+        if (err != cudaSuccess) {
+            std::stringstream temp;
+            temp << "cuda function returned error code " << cudaGetErrorString(err);
             throw std::runtime_error(temp.str());
         }
     }
@@ -140,7 +167,7 @@ inline bool
 compare_L2_err(const float *reference, const float *data,
                const unsigned int len, const float epsilon)
 {
-    assert(epsilon >= 0);
+    HPX_ASSERT(epsilon >= 0);
 
     float error = 0;
     float ref = 0;
@@ -166,35 +193,32 @@ compare_L2_err(const float *reference, const float *data,
 }
 
 // -------------------------------------------------------------------------
+// not all of these are supported by all cuda/cublas versions
+// comment them out if they cause compiler errors
 const char *_cudaGetErrorEnum(cublasStatus_t error)
 {
-    switch (error)
-    {
+    switch (error) {
         case CUBLAS_STATUS_SUCCESS:
             return "CUBLAS_STATUS_SUCCESS";
-
         case CUBLAS_STATUS_NOT_INITIALIZED:
             return "CUBLAS_STATUS_NOT_INITIALIZED";
-
         case CUBLAS_STATUS_ALLOC_FAILED:
             return "CUBLAS_STATUS_ALLOC_FAILED";
-
         case CUBLAS_STATUS_INVALID_VALUE:
             return "CUBLAS_STATUS_INVALID_VALUE";
-
         case CUBLAS_STATUS_ARCH_MISMATCH:
             return "CUBLAS_STATUS_ARCH_MISMATCH";
-
         case CUBLAS_STATUS_MAPPING_ERROR:
             return "CUBLAS_STATUS_MAPPING_ERROR";
-
         case CUBLAS_STATUS_EXECUTION_FAILED:
             return "CUBLAS_STATUS_EXECUTION_FAILED";
-
         case CUBLAS_STATUS_INTERNAL_ERROR:
             return "CUBLAS_STATUS_INTERNAL_ERROR";
+        case CUBLAS_STATUS_NOT_SUPPORTED:
+            return "CUBLAS_STATUS_NOT_SUPPORTED";
+        case CUBLAS_STATUS_LICENSE_ERROR:
+            return "CUBLAS_STATUS_LICENSE_ERROR";
     }
-
     return "<unknown>";
 }
 
@@ -222,108 +246,152 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
     // create a cublas helper object we'll use to futurize the cuda events
+    cublas_helper<T> cublas(device);
+
+    using cublas_future    = typename cublas_helper<T>::future_type;
+
+#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+    // for convenience
     using device_allocator = typename cublas_helper<T>::allocator_type;
     using device_vector    = typename cublas_helper<T>::vector_type;
-    cublas_helper<T> cublas(device);
+    // The policy used in the parallel algorithms
+    auto policy = hpx::parallel::execution::par;
 
     // Create a cuda allocator
     device_allocator alloc(cublas.target());
 
     // Allocate device memory
-    device_vector d_A(size_A, alloc);
-    device_vector d_B(size_B, alloc);
-    device_vector d_C(size_C, alloc);
-
-    // The policy used in the parallel algorithms, just used default for now
-    auto policy = hpx::parallel::execution::par;
+    device_vector d_vA(size_A, alloc);
+    device_vector d_vB(size_B, alloc);
+    device_vector d_vC(size_C, alloc);
 
     // copy host memory to device
-    hpx::parallel::copy(policy, h_A.begin(), h_A.end(), d_A.begin());
-    hpx::parallel::copy(policy, h_B.begin(), h_B.end(), d_B.begin());
+    hpx::parallel::copy(policy, h_A.begin(), h_A.end(), d_vA.begin());
+    hpx::parallel::copy(policy, h_B.begin(), h_B.end(), d_vB.begin());
 
-    // create and start timer
+    // just to make the rest of code the same for both cases
+    T *d_A=d_vA.device_data();
+    T *d_B=d_vB.device_data();
+    T *d_C=d_vC.device_data();
+
+#else
+    T *d_A, *d_B, *d_C;
+    cublas_helper<T>::cuda_error(
+        cudaMalloc((void **) &d_A, size_A*sizeof(T)));
+
+    cublas_helper<T>::cuda_error(
+        cudaMalloc((void **) &d_B, size_B*sizeof(T)));
+
+    cublas_helper<T>::cuda_error(
+        cudaMalloc((void **) &d_C, size_C*sizeof(T)));
+
+    cublas_helper<T>::cuda_error(
+        cudaMemcpy(d_A, h_A.data(), size_A*sizeof(T), cudaMemcpyHostToDevice));
+
+    cublas_helper<T>::cuda_error(
+        cudaMemcpy(d_B, h_B.data(), size_B*sizeof(T), cudaMemcpyHostToDevice));
+
+#endif
+
     std::cout << "Computing result using CUBLAS...\n";
-    // CUBLAS version 2.0
     const T alpha = 1.0f;
     const T beta  = 0.0f;
-    //
+
     // Perform warmup operation with cublas
     // note cublas is column major ordering : transpose the order
-    //
     hpx::util::high_resolution_timer t1;
     //
-    cublas.cublas_wrapper(
+    std::cout << "calling CUBLAS...\n";
+    cublas(
         &cublasSgemm,
         CUBLAS_OP_N, CUBLAS_OP_N,
         matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA,
         &alpha,
-        d_B.device_data(), matrix_size.uiWB,
-        d_A.device_data(), matrix_size.uiWA,
+        d_B, matrix_size.uiWB,
+        d_A, matrix_size.uiWA,
         &beta,
-        d_C.device_data(), matrix_size.uiWA);
+        d_C, matrix_size.uiWA);
 
+    // wait until the operation completes
     cublas.get_future().get();
-    //            .then(
-    //            [&t1](hpx::future<void> &&f) {
+
     double us1 = t1.elapsed_microseconds();
     std::cout << "warmup: elapsed_microseconds " << us1 << std::endl;
-    //            }
-    //        );
 
-    // create a second stream for the main calculation
-//    cublas_helper<T> cublas2(device);
+    // once the future has been retrieved, the next call to
+    // get_future will create a new event and a new future so
+    // we can reuse the same cublas wrapper object and stream if we want
 
     hpx::util::high_resolution_timer t2;
-    for (int j = 0; j < iterations; j++)
-    {
-        cublas.cublas_wrapper(
+    for (std::size_t j=0; j<iterations; j++) {
+        cublas(
             &cublasSgemm,
             CUBLAS_OP_N, CUBLAS_OP_N,
             matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA,
             &alpha,
-            d_B.device_data(), matrix_size.uiWB,
-            d_A.device_data(), matrix_size.uiWA,
+            d_B, matrix_size.uiWB,
+            d_A, matrix_size.uiWA,
             &beta,
-            d_C.device_data(), matrix_size.uiWA);
+            d_C, matrix_size.uiWA);
     }
 
-    cublas.get_future().get();
-    double us2 = t2.elapsed_microseconds();
-    std::cout << "actual: elapsed_microseconds " << us2
-        << " iterations " << iterations << std::endl;
+    // attach a continuation to the cublas future
+    auto new_future = cublas.get_future().then([&](cublas_future &&f)
+    {
+        double us2 = t2.elapsed_microseconds();
+        std::cout << "actual: elapsed_microseconds " << us2
+            << " iterations " << iterations << std::endl;
 
-    // Compute and print the performance
-    double usecPerMatrixMul = us2 / iterations;
-    double flopsPerMatrixMul = 2.0 * (double)matrix_size.uiWA *
-        (double)matrix_size.uiHA * (double)matrix_size.uiWB;
-    double gigaFlops = (flopsPerMatrixMul * 1.0e-9) / (usecPerMatrixMul / 1e6);
-    printf(
-        "Performance = %.2f GFlop/s, Time = %.3f msec/iteration, Size = %.0f Ops\n",
-        gigaFlops,
-        1e-3*usecPerMatrixMul,
-        flopsPerMatrixMul);
+        // Compute and print the performance
+        double usecPerMatrixMul = us2 / iterations;
+        double flopsPerMatrixMul = 2.0 * (double)matrix_size.uiWA *
+            (double)matrix_size.uiHA * (double)matrix_size.uiWB;
+        double gigaFlops = (flopsPerMatrixMul * 1.0e-9) / (usecPerMatrixMul / 1e6);
+        printf(
+            "Performance = %.2f GFlop/s, Time = %.3f msec/iter, Size = %.0f Ops\n",
+            gigaFlops,
+            1e-3*usecPerMatrixMul,
+            flopsPerMatrixMul);
+        }
+    );
 
-    // copy result from device to host
-    hpx::parallel::copy(policy, d_C.begin(), d_C.end(), h_CUBLAS.begin());
+    // wait for the timing to complete, and then do a CPU comparison
+    auto finished = new_future.then([&](cublas_future &&f) {
+        // compute reference solution on the CPU
+        std::cout << "\nComputing result using host CPU...\n";
+#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+        // copy result from device to host
+        hpx::parallel::copy(policy, d_C.begin(), d_C.end(), h_CUBLAS.begin());
+#else
+        cublas_helper<T>::cuda_error(
+            cudaMemcpy(h_CUBLAS.data(), d_C, size_C*sizeof(T), cudaMemcpyDeviceToHost));
+#endif
 
-    // compute reference solution on the CPU
-    std::cout << "\nComputing result using host CPU...\n";
-    // allocate storage for the CPU result
-    std::vector<T> reference(size_C);
+        // compute reference solution on the CPU
+        // allocate storage for the CPU result
+        std::vector<T> reference(size_C);
 
-    hpx::util::high_resolution_timer t3;
-    matrixMulCPU<T>(reference.data(), h_A.data(), h_B.data(),
-        matrix_size.uiHA, matrix_size.uiWA, matrix_size.uiWB);
-    double us3 = t3.elapsed_microseconds();
-    std::cout << "CPU elapsed_microseconds (1 iteration) " << us3 << std::endl;
+        hpx::util::high_resolution_timer t3;
+        matrixMulCPU<T>(reference.data(), h_A.data(), h_B.data(),
+            matrix_size.uiHA, matrix_size.uiWA, matrix_size.uiWB);
+        double us3 = t3.elapsed_microseconds();
+        std::cout << "CPU elapsed_microseconds (1 iteration) " << us3 << std::endl;
 
-    // check result (CUBLAS)
-    bool resCUBLAS = compare_L2_err(reference.data(), h_CUBLAS.data(), size_C, 1.0e-6f);
-    if (resCUBLAS != true) {
-        throw std::runtime_error("matrix CPU/GPU comparison error");
-    }
-    // if the result was incorrect, we throw an exception, so here it's ok
-    std::cout << "\nComparing CUBLAS Matrix Multiply with CPU results: OK \n";
+        // check result (CUBLAS)
+        bool resCUBLAS = compare_L2_err(reference.data(), h_CUBLAS.data(), size_C, 1e-6);
+        if (resCUBLAS != true) {
+            throw std::runtime_error("matrix CPU/GPU comparison error");
+        }
+        // if the result was incorrect, we throw an exception, so here it's ok
+        std::cout << "\nComparing CUBLAS Matrix Multiply with CPU results: OK \n";
+    });
+
+    finished.get();
+#ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+#endif
 }
 
 // -------------------------------------------------------------------------

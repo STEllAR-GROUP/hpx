@@ -177,7 +177,7 @@ namespace hpx { namespace compute { namespace cuda
         }
         processing_units_ = mp;
         processor_family_ = props.major;
-        processor_name_   = props.name;
+        processor_name_ = props.name;
     }
 
     target::native_handle_type::native_handle_type(int device)
@@ -224,10 +224,10 @@ namespace hpx { namespace compute { namespace cuda
         if (this == &rhs)
             return *this;
 
-        device_           = rhs.device_;
+        device_ = rhs.device_;
         processing_units_ = rhs.processing_units_;
         processor_family_ = rhs.processor_family_;
-        processor_name_   = rhs.processor_name_;
+        processor_name_ = rhs.processor_name_;
         reset();
 
         return *this;
@@ -239,10 +239,10 @@ namespace hpx { namespace compute { namespace cuda
         if (this == &rhs)
             return *this;
 
-        device_           = rhs.device_;
+        device_ = rhs.device_;
         processing_units_ = rhs.processing_units_;
         processor_family_ = rhs.processor_family_;
-        processor_name_   = rhs.processor_name_;
+        processor_name_ = rhs.processor_name_;
         stream_ = rhs.stream_;
         rhs.stream_ = 0;
 
