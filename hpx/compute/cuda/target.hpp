@@ -66,15 +66,27 @@ namespace hpx { namespace compute { namespace cuda
                 return processing_units_;
             }
 
+            HPX_HOST_DEVICE std::size_t processor_family() const
+            {
+                return processor_family_;
+            }
+
+            HPX_HOST_DEVICE std::string processor_name() const
+            {
+                return processor_name_;
+            }
+
             void reset() HPX_NOEXCEPT;
 
         private:
             void init_processing_units();
             friend struct target;
 
-            mutable mutex_type mtx_;
-            int device_;
+            mutable     mutex_type mtx_;
+            int         device_;
             std::size_t processing_units_;
+            std::size_t processor_family_;
+            std::string processor_name_;
             mutable cudaStream_t stream_;
         };
 
