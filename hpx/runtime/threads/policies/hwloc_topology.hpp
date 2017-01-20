@@ -66,14 +66,6 @@ namespace hpx { namespace threads
         }
 
         std::size_t get_pu_number(
-            std::size_t num_thread
-          , error_code& ec = throws
-            ) const
-        {
-            return pu_numbers_[num_thread % num_of_pus_];
-        }
-
-        std::size_t get_pu_number(
             std::size_t num_core
           , std::size_t num_pu
           , error_code& ec = throws
