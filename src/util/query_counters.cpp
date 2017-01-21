@@ -65,9 +65,11 @@ namespace hpx { namespace util
 
             for (auto const& name : names_)
             {
+                std::string real_name =
+                    performance_counters::remove_counter_prefix(name);
                 itt_counters_.insert(
                     value_type(name, util::itt::counter(
-                        name.c_str(), "evaluate_counters",
+                        real_name.c_str(), "evaluate_counters",
                         __itt_metadata_double
                     ))
                 );
