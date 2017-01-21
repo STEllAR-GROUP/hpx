@@ -259,8 +259,8 @@ namespace hpx { namespace threads { namespace detail
 
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name().data());
-//         util::itt::id threadid(domain, this);
-        util::itt::frame_context fctx(domain);
+        util::itt::id threadid(domain, &scheduler);
+//         util::itt::frame_context fctx(domain);
 
         std::int64_t idle_loop_count = 0;
         std::int64_t busy_loop_count = 0;
@@ -315,7 +315,7 @@ namespace hpx { namespace threads { namespace detail
                             {
 #ifdef HPX_HAVE_ITTNOTIFY
                                 util::itt::caller_context cctx(ctx);
-                                util::itt::undo_frame_context undoframe(fctx);
+//                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
 #endif
                                 // Record time elapsed in thread changing state

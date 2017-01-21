@@ -12,9 +12,13 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/util/interval_timer.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <map>
+#endif
 #include <string>
 #include <vector>
 
@@ -80,10 +84,10 @@ namespace hpx { namespace util
             std::string const& name);
 
         template <typename Stream>
-        void print_value_csv(Stream& out,
+        void print_value_csv(Stream& out, std::string const& name,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value_csv(Stream& out,
+        void print_value_csv(Stream& out, std::string const& name,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
@@ -103,6 +107,10 @@ namespace hpx { namespace util
         bool csv_header_;
 
         interval_timer timer_;
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        std::map<std::string, util::itt::counter> itt_counters_;
+#endif
     };
 }}
 

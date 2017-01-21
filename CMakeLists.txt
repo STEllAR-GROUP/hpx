@@ -484,9 +484,6 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
 endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-#if(HPX_WITH_ITTNOTIFY)
-  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-#endif()
 
 ################################################################################
 # Scheduler configuration
@@ -1316,16 +1313,17 @@ if(HPX_WITH_HWLOC)
 endif()
 
 ################################################################################
-# Enable integration with Intel Amplifier and Inspector tools
+# Enable integration with Intel Amplifier
 ################################################################################
-if(WITH_AMPLIFIER)
+if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   find_package(Amplifier)
   if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+    hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
   endif()
   hpx_libraries(${AMPLIFIER_LIBRARIES})
   include_directories(${AMPLIFIER_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+  hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
 endif()
 
 ################################################################################
