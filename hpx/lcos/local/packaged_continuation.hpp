@@ -714,10 +714,17 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_type;
         typedef typename shared_state_type::element_type element_type;
 
+#if BOOST_VERSION >= 105600
         // same as static_pointer_cast, but with addref option
         return shared_state_type(static_cast<element_type*>(
                 traits::detail::get_shared_state(future).get()
             ), addref);
+#else
+        // Boost before 1.56 doesn't support detaching intrusive pointers
+        return boost::static_pointer_cast<element_type>(
+                traits::detail::get_shared_state(future)
+            );
+#endif
     }
 }}}
 

@@ -144,12 +144,14 @@ namespace hpx { namespace traits
             return f.shared_state_;
         }
 
+#if BOOST_VERSION >= 105600
         HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type::element_type*
         detach_shared_state(lcos::future<R> && f)
         {
             return f.shared_state_.detach();
         }
+#endif
     };
 
     template <typename R>
@@ -184,12 +186,14 @@ namespace hpx { namespace traits
             return f.shared_state_;
         }
 
+#if BOOST_VERSION >= 105600
         HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type::element_type*
         detach_shared_state(lcos::shared_future<R> const& f)
         {
             return f.shared_state_.get();
         }
+#endif
     };
 }}
 

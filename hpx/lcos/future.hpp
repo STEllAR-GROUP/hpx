@@ -876,8 +876,13 @@ namespace hpx { namespace lcos
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, false) : nullptr)
         {
+#if BOOST_VERSION >= 105600
             traits::future_access<future<T> >::
                 detach_shared_state(std::move(other));
+#else
+            // Boost before 1.56 doesn't support detaching intrusive pointers
+            other = future<T>();
+#endif
         }
 
         // Effects:
