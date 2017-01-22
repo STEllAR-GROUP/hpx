@@ -449,7 +449,7 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     inline typename hpx::traits::detail::shared_state_ptr<void>::type
-    downcast_to_void(Future& future);
+    downcast_to_void(Future& future, bool addref);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
@@ -873,9 +873,11 @@ namespace hpx { namespace lcos
         template <typename T>
         future(future<T>&& other,
             typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::downcast_to_void(other) : nullptr)
+        ) : base_type(other.valid() ?
+                detail::downcast_to_void(other, false) : nullptr)
         {
-            other = future<T>();
+            traits::future_access<future<T> >::
+                detach_shared_state(std::move(other));
         }
 
         // Effects:
@@ -1172,7 +1174,8 @@ namespace hpx { namespace lcos
         template <typename T>
         shared_future(shared_future<T> const& other,
             typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::downcast_to_void(other) : nullptr)
+        ) : base_type(other.valid() ?
+                detail::downcast_to_void(other, true) : nullptr)
         {}
 
         // Effects:

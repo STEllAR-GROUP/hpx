@@ -317,7 +317,9 @@ namespace detail
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
-        typedef typename future_data<void>::init_no_addref init_no_addref;
+        typedef typename future_data<
+                traits::detail::future_data_void
+            >::init_no_addref init_no_addref;
 
         future_data()
         {}

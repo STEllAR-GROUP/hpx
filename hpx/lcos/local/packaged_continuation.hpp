@@ -708,13 +708,16 @@ namespace hpx { namespace lcos { namespace detail
 {
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<void>::type
-    downcast_to_void(Future& future)
+    downcast_to_void(Future& future, bool addref)
     {
-        typedef typename traits::detail::shared_state_ptr<void>::type::element_type
+        typedef typename traits::detail::shared_state_ptr<void>::type
             shared_state_type;
+        typedef typename shared_state_type::element_type element_type;
 
-        return boost::static_pointer_cast<shared_state_type>(
-            traits::detail::get_shared_state(future));
+        // same as static_pointer_cast, but with addref option
+        return shared_state_type(static_cast<element_type*>(
+                traits::detail::get_shared_state(future).get()
+            ), addref);
     }
 }}}
 

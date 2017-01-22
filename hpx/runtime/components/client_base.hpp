@@ -99,6 +99,13 @@ namespace hpx { namespace traits
             {
                 return client.shared_state_;
             }
+
+            HPX_FORCEINLINE static
+            typename traits::detail::shared_state_ptr<id_type>::type::element_type*
+            detach_shared_state(Derived const& f)
+            {
+                return f.shared_state_.get();
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
