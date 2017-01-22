@@ -1,4 +1,4 @@
-//  Copyright (C) 2012 Hartmut Kaiser
+//  Copyright (C) 2012-2017 Hartmut Kaiser
 //  (C) Copyright 2008-10 Anthony Williams
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -539,7 +539,7 @@ void test_assign_to_void()
     hpx::lcos::future<void> f1 = hpx::lcos::make_ready_future(42);
     f1.get();
 
-    hpx::lcos::shared_future<void> f2 = hpx::lcos::make_ready_future(42);
+    hpx::lcos::shared_future<void> f2 = hpx::lcos::make_ready_future(42).share();
     f2.get();
 }
 

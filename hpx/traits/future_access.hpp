@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -82,10 +82,10 @@ namespace hpx { namespace traits
         template <typename Future>
         struct shared_state_ptr_for<std::vector<Future> >
         {
-            typedef typename traits::future_traits<Future>::type data_type;
-            typedef std::vector<boost::intrusive_ptr<
-                    lcos::detail::future_data<data_type>
-                > > type;
+//             typedef typename traits::future_traits<Future>::type data_type;
+            typedef std::vector<
+                    typename shared_state_ptr_for<Future>::type
+                > type;
         };
     }
 
