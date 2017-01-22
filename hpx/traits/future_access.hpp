@@ -31,10 +31,32 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        struct future_data_void {};
+
+        template <typename Result>
+        struct shared_state_ptr_result
+        {
+            typedef Result type;
+        };
+
+        template <typename Result>
+        struct shared_state_ptr_result<Result&>
+        {
+            typedef Result& type;
+        };
+
+        template <>
+        struct shared_state_ptr_result<void>
+        {
+            typedef future_data_void type;
+        };
+
         template <typename R>
         struct shared_state_ptr
         {
-            typedef boost::intrusive_ptr<lcos::detail::future_data<R> > type;
+            typedef typename shared_state_ptr_result<R>::type result_type;
+            typedef boost::intrusive_ptr<lcos::detail::future_data<result_type> >
+                type;
         };
 
         template <typename Future, typename Enable = void>

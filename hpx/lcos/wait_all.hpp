@@ -223,9 +223,9 @@ namespace hpx { namespace lcos
 
                 for (/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
+                    typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
                         traits::detail::get_shared_state(*next);
 
                     if (!next_future_data->is_ready())
@@ -274,10 +274,10 @@ namespace hpx { namespace lcos
                         future_type
                     >::type future_result_type;
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data = traits::detail::get_shared_state(
-                    util::get<I>(t_));
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(util::get<I>(t_));
 
                 if (!next_future_data->is_ready())
                 {

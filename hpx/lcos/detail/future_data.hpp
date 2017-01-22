@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
@@ -242,14 +243,31 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    struct future_data : future_data_refcnt_base
-    {
-        HPX_NON_COPYABLE(future_data);
+    struct future_data;
 
-        typedef typename future_data_result<Result>::type result_type;
-        typedef util::unique_function_nonser<void()> completed_callback_type;
+    template <>
+    struct future_data<traits::detail::future_data_void> : future_data_refcnt_base
+    {
+        future_data()
+          : state_(empty)
+        {}
+
+        future_data(init_no_addref no_addref)
+          : future_data_refcnt_base(no_addref), state_(empty)
+        {}
+
         typedef lcos::local::spinlock mutex_type;
+        typedef util::unused_type result_type;
         typedef typename future_data_refcnt_base::init_no_addref init_no_addref;
+
+        virtual ~future_data() HPX_NOEXCEPT {}
+        virtual void execute_deferred(error_code& = throws) = 0;
+        virtual bool cancelable() const = 0;
+        virtual void cancel() = 0;
+        virtual result_type* get_result_void(error_code& = throws) = 0;
+        virtual void wait(error_code& = throws) = 0;
+        virtual future_status wait_until(util::steady_clock::time_point const&,
+            error_code& = throws) = 0;
 
         enum state
         {
@@ -259,18 +277,58 @@ namespace detail
             exception = 4 | ready
         };
 
+        /// Return whether or not the data is available for this
+        /// \a future.
+        bool is_ready() const
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            return is_ready_locked(l);
+        }
+
+        template <typename Lock>
+        bool is_ready_locked(Lock& l) const
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            return (state_ & ready) != 0;
+        }
+
+        bool has_value() const
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            return state_ == value;
+        }
+
+        bool has_exception() const
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            return state_ == exception;
+        }
+
+    protected:
+         mutable mutex_type mtx_;
+         state state_;                               // current state
+    };
+
+    template <typename Result>
+    struct future_data : future_data<traits::detail::future_data_void>
+    {
+        HPX_NON_COPYABLE(future_data);
+
+        typedef typename future_data_result<Result>::type result_type;
+        typedef util::unique_function_nonser<void()> completed_callback_type;
+        typedef lcos::local::spinlock mutex_type;
+        typedef typename future_data<void>::init_no_addref init_no_addref;
+
         future_data()
-          : state_(empty)
         {}
 
         future_data(init_no_addref no_addref)
-          : future_data_refcnt_base(no_addref), state_(empty)
+          : future_data<traits::detail::future_data_void>(no_addref)
         {}
 
         template <typename Target>
         future_data(Target && data, init_no_addref no_addref)
-          : future_data_refcnt_base(no_addref),
-            state_(empty)
+          : future_data<traits::detail::future_data_void>(no_addref)
         {
             result_type* value_ptr =
                 reinterpret_cast<result_type*>(&storage_);
@@ -280,8 +338,7 @@ namespace detail
         }
 
         future_data(boost::exception_ptr const& e, init_no_addref no_addref)
-          : future_data_refcnt_base(no_addref),
-            state_(empty)
+          : future_data<traits::detail::future_data_void>(no_addref)
         {
             boost::exception_ptr* exception_ptr =
                 reinterpret_cast<boost::exception_ptr*>(&storage_);
@@ -289,8 +346,7 @@ namespace detail
             state_ = exception;
         }
         future_data(boost::exception_ptr && e, init_no_addref no_addref)
-          : future_data_refcnt_base(no_addref),
-            state_(empty)
+          : future_data<traits::detail::future_data_void>(no_addref)
         {
             boost::exception_ptr* exception_ptr =
                 reinterpret_cast<boost::exception_ptr*>(&storage_);
@@ -373,6 +429,50 @@ namespace detail
                 return nullptr;
             }
             return reinterpret_cast<result_type*>(&storage_);
+        }
+
+        virtual util::unused_type* get_result_void(error_code& ec = throws)
+        {
+            // yields control if needed
+            wait(ec);
+            if (ec) return nullptr;
+
+            // No locking is required. Once a future has been made ready, which
+            // is a postcondition of wait, either:
+            //
+            // - there is only one writer (future), or
+            // - there are multiple readers only (shared_future, lock hurts
+            //   concurrency)
+
+            if (state_ == empty) {
+                // the value has already been moved out of this future
+                HPX_THROWS_IF(ec, no_state,
+                    "future_data::get_result",
+                    "this future has no valid shared state");
+                return nullptr;
+            }
+
+            // the thread has been re-activated by one of the actions
+            // supported by this promise (see promise::set_event
+            // and promise::set_exception).
+            if (state_ == exception)
+            {
+                boost::exception_ptr* exception_ptr =
+                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                // an error has been reported in the meantime, throw or set
+                // the error code
+                if (&ec == &throws) {
+                    boost::rethrow_exception(*exception_ptr);
+                    // never reached
+                }
+                else {
+                    ec = make_error_code(*exception_ptr);
+                }
+                return nullptr;
+            }
+
+            static util::unused_type unused_;
+            return &unused_;
         }
 
         // deferred execution of a given continuation
@@ -639,40 +739,11 @@ namespace detail
             return future_status::ready; //-V110
         }
 
-        /// Return whether or not the data is available for this
-        /// \a future.
-        bool is_ready() const
-        {
-            std::unique_lock<mutex_type> l(mtx_);
-            return is_ready_locked(l);
-        }
-
-        template <typename Lock>
-        bool is_ready_locked(Lock& l) const
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-            return (state_ & ready) != 0;
-        }
-
-        bool has_value() const
-        {
-            std::unique_lock<mutex_type> l(mtx_);
-            return state_ == value;
-        }
-
-        bool has_exception() const
-        {
-            std::unique_lock<mutex_type> l(mtx_);
-            return state_ == exception;
-        }
-
     protected:
-        mutable mutex_type mtx_;
         completed_callback_type on_completed_;
 
     private:
         local::detail::condition_variable cond_;    // threads waiting in read
-        state state_;                               // current state
         typename future_data_storage<Result>::type storage_;
     };
 
