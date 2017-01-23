@@ -346,6 +346,8 @@ namespace hpx { namespace actions
 }}
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+
 namespace hpx { namespace parcelset { namespace detail
 {
     /// \cond NOINTERNAL
