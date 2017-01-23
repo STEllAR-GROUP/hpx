@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -391,6 +391,29 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    struct future_get_result
+    {
+        template <typename SharedState>
+        HPX_FORCEINLINE static R*
+        call(SharedState const& state, error_code& ec = throws)
+        {
+            return state->get_result(ec);
+        }
+    };
+
+    template <>
+    struct future_get_result<util::unused_type>
+    {
+        template <typename SharedState>
+        HPX_FORCEINLINE static util::unused_type*
+        call(SharedState const& state, error_code& ec = throws)
+        {
+            return state->get_result_void(ec);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename ContResult>
     class continuation;
 
@@ -424,11 +447,9 @@ namespace hpx { namespace lcos { namespace detail
     unwrap(Future&& future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    class void_continuation;
-
     template <typename Future>
     inline typename hpx::traits::detail::shared_state_ptr<void>::type
-    make_void_continuation(Future& future);
+    downcast_to_void(Future& future, bool addref);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
@@ -436,7 +457,9 @@ namespace hpx { namespace lcos { namespace detail
     {
     public:
         typedef R result_type;
-        typedef future_data<R> shared_state_type;
+        typedef future_data<
+                typename traits::detail::shared_state_ptr_result<R>::type
+            > shared_state_type;
 
     public:
         future_base() HPX_NOEXCEPT
@@ -526,9 +549,11 @@ namespace hpx { namespace lcos { namespace detail
                     "this future has no valid shared state");
             }
 
+            typedef typename shared_state_type::result_type result_type;
+
             error_code ec(lightweight);
-            this->shared_state_->get_result(ec);
-            if (!ec) return boost::exception_ptr();
+            detail::future_get_result<result_type>::call(this->shared_state_, ec);
+            if (ec) return boost::exception_ptr();
             return hpx::detail::access_exception(ec);
         }
 
@@ -848,9 +873,16 @@ namespace hpx { namespace lcos
         template <typename T>
         future(future<T>&& other,
             typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
+        ) : base_type(other.valid() ?
+                detail::downcast_to_void(other, false) : nullptr)
         {
+#if BOOST_VERSION >= 105600
+            traits::future_access<future<T> >::
+                detach_shared_state(std::move(other));
+#else
+            // Boost before 1.56 doesn't support detaching intrusive pointers
             other = future<T>();
+#endif
         }
 
         // Effects:
@@ -903,7 +935,8 @@ namespace hpx { namespace lcos
             invalidate on_exit(*this);
 
             typedef typename shared_state_type::result_type result_type;
-            result_type* result = this->shared_state_->get_result();
+            result_type* result = detail::future_get_result<result_type>::call(
+                this->shared_state_);
 
             // no error has been reported, return the result
             return detail::future_value<R>::get(std::move(*result));
@@ -923,7 +956,8 @@ namespace hpx { namespace lcos
             invalidate on_exit(*this);
 
             typedef typename shared_state_type::result_type result_type;
-            result_type* result = this->shared_state_->get_result(ec);
+            result_type* result = detail::future_get_result<result_type>::call(
+                this->shared_state_, ec);
             if (ec) return detail::future_value<R>::get_default();
 
             // no error has been reported, return the result
@@ -1145,7 +1179,8 @@ namespace hpx { namespace lcos
         template <typename T>
         shared_future(shared_future<T> const& other,
             typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
-        ) : base_type(other.valid() ? detail::make_void_continuation(other) : nullptr)
+        ) : base_type(other.valid() ?
+                detail::downcast_to_void(other, true) : nullptr)
         {}
 
         // Effects:
@@ -1201,7 +1236,8 @@ namespace hpx { namespace lcos
             }
 
             typedef typename shared_state_type::result_type result_type;
-            result_type* result = this->shared_state_->get_result();
+            result_type* result = detail::future_get_result<result_type>::call(
+                this->shared_state_);
 
             // no error has been reported, return the result
             return detail::future_value<R>::get(*result);
@@ -1219,7 +1255,8 @@ namespace hpx { namespace lcos
                 return res;
             }
 
-            result_type* result = this->shared_state_->get_result(ec);
+            result_type* result = detail::future_get_result<result_type>::call(
+                this->shared_state_, ec);
             if (ec)
             {
                 static result_type res(detail::future_value<R>::get_default());
