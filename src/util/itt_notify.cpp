@@ -183,6 +183,20 @@ bool use_ittnotify_api = false;
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_EVENT_CREATE(name, len)                                  \
+    (use_ittnotify_api && __itt_event_create_ptr) ?                           \
+        __itt_event_create_ptr(name, len) : 0;                                \
+    /**/
+#define HPX_INTERNAL_EVENT_START(e)                                           \
+    (use_ittnotify_api && __itt_event_start_ptr) ?                            \
+        __itt_event_start_ptr(e) : 0                                          \
+    /**/
+#define HPX_INTERNAL_EVENT_END(e)                                             \
+    (use_ittnotify_api && __itt_event_end_ptr) ?                              \
+        __itt_event_end_ptr(e) : 0                                            \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) \
     || defined(__BORLANDC__) \
     || (defined(__MWERKS__) && defined(_WIN32) && (__MWERKS__ >= 0x3000)) \
@@ -423,6 +437,22 @@ void itt_counter_destroy(__itt_counter id)
 void itt_counter_set_value(__itt_counter id, void *value_ptr)
 {
     HPX_INTERNAL_COUNTER_SET_VALUE(id, value_ptr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+__itt_event itt_event_create(char const *name, int namelen)
+{
+    return HPX_INTERNAL_EVENT_CREATE(name, namelen);
+}
+
+int itt_event_start(__itt_event evnt)
+{
+    return HPX_INTERNAL_EVENT_START(evnt);
+}
+
+int itt_event_end(__itt_event evnt)
+{
+    return HPX_INTERNAL_EVENT_END(evnt);
 }
 
 #endif // HPX_HAVE_ITTNOTIFY

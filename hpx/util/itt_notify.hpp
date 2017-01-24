@@ -10,6 +10,7 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
+#include <cstring>
 
 struct ___itt_caller;
 struct ___itt_string_handle;
@@ -140,6 +141,10 @@ HPX_EXPORT ___itt_counter* itt_counter_create(char const*, char const*);
 HPX_EXPORT ___itt_counter* itt_counter_create_typed(char const*, char const*, int);
 HPX_EXPORT void itt_counter_destroy(___itt_counter*);
 HPX_EXPORT void itt_counter_set_value(___itt_counter*, void *);
+
+HPX_EXPORT int itt_event_create(char const *name, int namelen);
+HPX_EXPORT int itt_event_start(int evnt);
+HPX_EXPORT int itt_event_end(int evnt);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -387,6 +392,7 @@ namespace hpx { namespace util { namespace itt
         void* addr_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     struct counter
     {
         counter(char const* name, char const* domain)
@@ -429,6 +435,48 @@ namespace hpx { namespace util { namespace itt
     private:
         ___itt_counter* id_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct event
+    {
+        event(char const* name)
+          : event_(itt_event_create(name, (int)std::strlen(name)))
+        {}
+
+        void start() const
+        {
+            itt_event_start(event_);
+        }
+
+        void end() const
+        {
+            itt_event_end(event_);
+        }
+
+    private:
+        int event_;
+    };
+
+    struct mark_event
+    {
+        mark_event(event const& e)
+          : e_(e)
+        {
+            e_.start();
+        }
+        ~mark_event()
+        {
+            e_.end();
+        }
+
+    private:
+        event e_;
+    };
+
+    inline void event_tick(event const& e)
+    {
+        e.start();
+    }
 }}}
 
 #else
@@ -484,6 +532,10 @@ inline ___itt_counter* itt_counter_create_typed(char const*, char const*, int)
     { return nullptr; }
 inline void itt_counter_destroy(___itt_counter*) {}
 inline void itt_counter_set_value(___itt_counter*, void *) {}
+
+inline int itt_event_create(char const *name, int namelen)  { return 0; }
+inline int itt_event_start(int evnt) { return 0; }
+inline int itt_event_end(int evnt) { return 0; }
 
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -577,6 +629,19 @@ namespace hpx { namespace util { namespace itt
         counter(char const* /*name*/, char const* /*domain*/) {}
         ~counter() {}
     };
+
+    struct event
+    {
+        event(char const*) {}
+    };
+
+    struct mark_event
+    {
+        mark_event(event const&) {}
+        ~mark_event() {}
+    };
+
+    inline void event_tick(event const&) {}
 }}}
 
 #endif // HPX_HAVE_ITTNOTIFY
