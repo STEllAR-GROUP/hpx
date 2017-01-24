@@ -208,21 +208,40 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    struct is_active_wrapper
+    {
+        is_active_wrapper(std::uint8_t& is_active)
+          : is_active_(is_active)
+        {
+            is_active = 1;
+        }
+        ~is_active_wrapper()
+        {
+            is_active_ = 0;
+        }
+
+        std::uint8_t& is_active_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     struct scheduling_counters
     {
         scheduling_counters(std::int64_t& executed_threads,
                 std::int64_t& executed_thread_phases,
-                std::uint64_t& tfunc_time, std::uint64_t& exec_time)
+                std::uint64_t& tfunc_time, std::uint64_t& exec_time,
+                std::uint8_t& is_active)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
-            exec_time_(exec_time)
+            exec_time_(exec_time),
+            is_active_(is_active)
         {}
 
         std::int64_t& executed_threads_;
         std::int64_t& executed_thread_phases_;
         std::uint64_t& tfunc_time_;
         std::uint64_t& exec_time_;
+        std::uint8_t& is_active_;
     };
 
     struct scheduling_callbacks
@@ -313,6 +332,7 @@ namespace hpx { namespace threads { namespace detail
                             // thread returns new required state
                             // store the returned state in the thread
                             {
+                                is_active_wrapper utilization(counters.is_active_);
 #ifdef HPX_HAVE_ITTNOTIFY
                                 util::itt::caller_context cctx(ctx);
                                 util::itt::undo_frame_context undoframe(fctx);
