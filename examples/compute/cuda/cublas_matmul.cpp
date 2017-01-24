@@ -95,6 +95,13 @@ public:
         cublas_error(return_);
     }
 
+    template <typename ...Args>
+    void copy_async(Args&&... args)
+    {
+        cudaError_t ret = cudaMemcpyAsync (std::forward<Args>(args)..., stream_);
+        cuda_error(ret);
+    }
+
     // get the future to synchronize this cublas stream with
     future_type get_future() { return target_.get_future(); }
 
@@ -285,11 +292,20 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
     cublas_helper<T>::cuda_error(
         cudaMalloc((void **) &d_C, size_C*sizeof(T)));
 
-    cublas_helper<T>::cuda_error(
-        cudaMemcpy(d_A, h_A.data(), size_A*sizeof(T), cudaMemcpyHostToDevice));
+    // adding async copy operations into the stream before cublas calls puts
+    // the copies in the queue before the matrix operations.
+    cublas.copy_async(
+        d_A, h_A.data(), size_A*sizeof(T), cudaMemcpyHostToDevice);
 
-    cublas_helper<T>::cuda_error(
-        cudaMemcpy(d_B, h_B.data(), size_B*sizeof(T), cudaMemcpyHostToDevice));
+    cublas.copy_async(
+        d_B, h_B.data(), size_B*sizeof(T), cudaMemcpyHostToDevice);
+
+    // we can call get_future multiple times on the cublas helper.
+    // Each one returns a new future that will be set ready when the stream event
+    // for this point is triggered
+    auto copy_future = cublas.get_future().then([](cublas_future &&f){
+        std::cout << "The async host->device copy operation completed \n";
+    });
 
 #endif
 
@@ -334,9 +350,21 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
             &beta,
             d_C, matrix_size.uiWA);
     }
+    // get a future for when the stream reaches this point (matrix operations complete)
+    auto matrix_finished = cublas.get_future();
+
+#ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
+    // when the matrix operations complete, copy the result to the host
+    cublas.copy_async(
+        h_CUBLAS.data(), d_C, size_C*sizeof(T), cudaMemcpyDeviceToHost);
+
+    // and get another future when the copy back is done
+    auto copy_finished = cublas.get_future();
+
+#endif
 
     // attach a continuation to the cublas future
-    auto new_future = cublas.get_future().then([&](cublas_future &&f)
+    auto new_future = matrix_finished.then([&](cublas_future &&f)
     {
         double us2 = t2.elapsed_microseconds();
         std::cout << "actual: elapsed_microseconds " << us2
@@ -363,8 +391,8 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
         // copy result from device to host
         hpx::parallel::copy(policy, d_C.begin(), d_C.end(), h_CUBLAS.begin());
 #else
-        cublas_helper<T>::cuda_error(
-            cudaMemcpy(h_CUBLAS.data(), d_C, size_C*sizeof(T), cudaMemcpyDeviceToHost));
+        // just wait for the device->host copy to complete if it hasn't already
+        copy_finished.get();
 #endif
 
         // compute reference solution on the CPU
