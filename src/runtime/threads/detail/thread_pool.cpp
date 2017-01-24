@@ -258,6 +258,13 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_scheduler_utilization() const
+    {
+        return (std::accumulate(tasks_active_.begin(), tasks_active_.end(),
+            std::int64_t(0)) * 100) / thread_count_.load();
+    }
+
+    template <typename Scheduler>
     bool thread_pool<Scheduler>::enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state) const
@@ -308,6 +315,8 @@ namespace hpx { namespace threads { namespace detail
         exec_times_.resize(num_threads);
 
         reset_tfunc_times_.resize(num_threads);
+
+        tasks_active_.resize(num_threads);
 
         // scale timestamps to nanoseconds
         std::uint64_t base_timestamp = util::hardware::timestamp();
@@ -613,7 +622,8 @@ namespace hpx { namespace threads { namespace detail
                     detail::scheduling_counters counters(
                         executed_threads_[num_thread],
                         executed_thread_phases_[num_thread],
-                        tfunc_times_[num_thread], exec_times_[num_thread]);
+                        tfunc_times_[num_thread], exec_times_[num_thread],
+                        tasks_active_[num_thread]);
 
                     detail::scheduling_callbacks callbacks(
                         util::bind( //-V107

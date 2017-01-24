@@ -133,6 +133,8 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread, bool reset) const;
 
+        std::int64_t get_scheduler_utilization() const;
+
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
             thread_state_enum state = unknown) const;
@@ -226,6 +228,8 @@ namespace hpx { namespace threads { namespace detail
         // tfunc_impl timers
         std::vector<std::uint64_t> exec_times_, tfunc_times_;
         std::vector<std::uint64_t> reset_tfunc_times_;
+
+        std::vector<std::uint8_t> tasks_active_;
 
         // Stores the mask identifying all processing units used by this
         // thread manager.
