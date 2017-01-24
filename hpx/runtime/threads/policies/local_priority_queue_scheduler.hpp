@@ -991,20 +991,17 @@ namespace hpx { namespace threads { namespace policies
                 low_priority_queue_.on_start_thread(num_thread);
 
             queues_[num_thread]->on_start_thread(num_thread);
-//         }
-//
-//         void setup_stealing()
-//         {
+
             std::size_t num_threads = queues_.size();
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
-            for (std::size_t num_thread = 0; num_thread != num_threads; ++num_thread)
+            for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = get_pu_num(num_thread);
-                numa_masks[num_thread] =
+                std::size_t num_pu = get_pu_num(i);
+                numa_masks[i] =
                     topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
-                core_masks[num_thread] =
+                core_masks[i] =
                     topology_.get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
             }
 
@@ -1012,13 +1009,13 @@ namespace hpx { namespace threads { namespace policies
             // steal from
             std::ptrdiff_t radius =
                 static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
-
             victim_threads_[num_thread].reserve(num_threads);
             std::size_t num_pu = get_pu_num(num_thread);
             mask_cref_type pu_mask =
                 topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
+
             // we allow the thread on the boundary of the NUMA domain to steal
             mask_type first_mask = mask_type();
             resize(first_mask, mask_size(pu_mask));
@@ -1033,16 +1030,16 @@ namespace hpx { namespace threads { namespace policies
             {
                 // check our neighbors in a radial fashion (left and right
                 // alternating, increasing distance each iteration)
-                std::ptrdiff_t i = 1;
+                int i = 1;
                 for (/**/; i < radius; ++i)
                 {
                     std::ptrdiff_t left =
                         (static_cast<std::ptrdiff_t>(num_thread) - i) %
                             static_cast<std::ptrdiff_t>(num_threads);
                     if (left < 0)
-                        left = static_cast<std::ptrdiff_t>(num_threads + left);
+                        left = num_threads + left;
 
-                    if (f(static_cast<std::size_t>(left)))
+                    if (f(std::size_t(left)))
                     {
                         victim_threads_[num_thread].push_back(
                             static_cast<std::size_t>(left));
@@ -1120,6 +1117,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
     protected:
+        boost::mutex void_mtx_;
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue_type*> queues_;
         std::vector<thread_queue_type*> high_priority_queues_;
