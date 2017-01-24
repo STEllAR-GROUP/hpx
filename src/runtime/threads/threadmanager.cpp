@@ -1132,7 +1132,7 @@ namespace hpx { namespace threads
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&ti::scheduler_utilization_counter_creator, this, _1, _2),
               &performance_counters::locality_counter_discoverer,
-              ""
+              "%"
             }
         };
         performance_counters::install_counter_types(
