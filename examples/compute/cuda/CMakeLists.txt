@@ -8,10 +8,13 @@ set(example_programs)
 
 if(HPX_WITH_CUDA)
   set(example_programs ${example_programs}
+      cublas_matmul
       data_copy
       hello_compute
       partitioned_vector
     )
+  set(cublas_matmul_FLAGS DEPENDENCIES cublas)
+#  set_source_files_properties(cublas_matmul.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
   set(data_copy_CUDA On)
   set(hello_compute_CUDA On)
   set(partitioned_vector_CUDA ON)
