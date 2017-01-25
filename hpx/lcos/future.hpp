@@ -551,9 +551,14 @@ namespace hpx { namespace lcos { namespace detail
 
             typedef typename shared_state_type::result_type result_type;
 
+
             error_code ec(lightweight);
             detail::future_get_result<result_type>::call(this->shared_state_, ec);
-            if (ec) return boost::exception_ptr();
+            if (!ec)
+            {
+                HPX_ASSERT(!has_exception());
+                return boost::exception_ptr();
+            }
             return hpx::detail::access_exception(ec);
         }
 
