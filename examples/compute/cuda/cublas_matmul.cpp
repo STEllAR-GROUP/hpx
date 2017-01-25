@@ -71,13 +71,11 @@ public:
     cublas_helper(std::size_t device=0) : target_(device) {
         handle_ = 0;
         stream_ = target_.native_handle().get_stream();
-        return_ = cublasCreate(&handle_);
-        cublas_error(return_);
+        cublas_error(cublasCreate(&handle_));
     }
 
     ~cublas_helper() {
-        return_ = cublasDestroy(handle_);
-        cublas_error(return_);
+        cublas_error(cublasDestroy(handle_));
     }
 
     // This is a simple wrapper for any cublas call, pass in the same arguments
@@ -86,20 +84,24 @@ public:
     template <typename Func, typename ...Args>
     void operator()(Func && cublas_function, Args&&... args)
     {
+        // make sue we run on the correct device
+        cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+
         // make sure this operation takes place on our stream
-        return_ = cublasSetStream(handle_, stream_);
-        cublas_error(return_);
+        cublas_error(cublasSetStream(handle_, stream_));
 
         // insert the cublas handle in the arg list and call the cublas function
-        return_ = cublas_function(handle_, std::forward<Args>(args)...);
-        cublas_error(return_);
+        cublas_error(cublas_function(handle_, std::forward<Args>(args)...));
     }
 
     template <typename ...Args>
     void copy_async(Args&&... args)
     {
-        cudaError_t ret = cudaMemcpyAsync (std::forward<Args>(args)..., stream_);
-        cuda_error(ret);
+        // make sue we run on the correct device
+        cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+
+        // insert the uda stream in the arg list and call the cuda memcpy
+        cuda_error(cudaMemcpyAsync (std::forward<Args>(args)..., stream_));
     }
 
     // get the future to synchronize this cublas stream with
@@ -129,7 +131,6 @@ public:
 
 private:
     cublasHandle_t             handle_;
-    cublasStatus_t             return_;
     cudaStream_t               stream_;
     hpx::compute::cuda::target target_;
 };
@@ -304,7 +305,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
     // Each one returns a new future that will be set ready when the stream event
     // for this point is triggered
     auto copy_future = cublas.get_future().then([](cublas_future &&f){
-        std::cout << "The async host->device copy operation completed \n";
+        std::cout << "The async host->device copy operation completed" << std::endl;
     });
 
 #endif
