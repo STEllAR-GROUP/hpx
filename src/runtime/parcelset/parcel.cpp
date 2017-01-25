@@ -21,9 +21,10 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <hpx/util/atomic_count.hpp>
 
@@ -440,6 +441,11 @@ namespace hpx { namespace parcelset
 
         // continuation support, this is handled in the transfer action
         action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread);
+
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+        static util::itt::event parcel_recv("recv_parcel");
+        util::itt::event_tick(parcel_recv);
+#endif
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
         // tell APEX about the received parcel

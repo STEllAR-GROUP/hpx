@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,6 +31,11 @@
 #include <utility>
 #include <vector>
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <map>
+#include <ittnotify.h>
+#endif
+
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
@@ -52,6 +57,26 @@ namespace hpx { namespace util
     void query_counters::find_counters()
     {
         counters_.add_counters(names_);
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        if (use_ittnotify_api)
+        {
+            typedef std::map<std::string, util::itt::counter>::value_type
+                value_type;
+
+            for (auto const& name : names_)
+            {
+                std::string real_name =
+                    performance_counters::remove_counter_prefix(name);
+                itt_counters_.insert(
+                    value_type(name, util::itt::counter(
+                        real_name.c_str(), "evaluate_counters",
+                        __itt_metadata_double
+                    ))
+                );
+            }
+        }
+#endif
     }
 
     void query_counters::start()
@@ -89,6 +114,16 @@ namespace hpx { namespace util
 
 #ifdef HPX_HAVE_APEX
         apex::sample_value(name.c_str(), val);
+#elif HPX_HAVE_ITTNOTIFY != 0
+        if (use_ittnotify_api)
+        {
+            auto it = itt_counters_.find(name);
+            if (it != itt_counters_.end())
+            {
+                (*it).second.set_value(val);
+            }
+            return;
+        }
 #endif
 
         print_name_csv(out, name);
@@ -134,12 +169,26 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream& out,
+    void query_counters::print_value_csv(Stream& out, std::string const& name,
         performance_counters::counter_value const& value)
     {
         error_code ec(lightweight);
         double val = value.get_value<double>(ec);
+
         if(!ec) {
+#ifdef HPX_HAVE_APEX
+            apex::sample_value(name.c_str(), val);
+#elif HPX_HAVE_ITTNOTIFY != 0
+            if (use_ittnotify_api)
+            {
+                auto it = itt_counters_.find(name);
+                if (it != itt_counters_.end())
+                {
+                    (*it).second.set_value(val);
+                }
+                return;
+            }
+#endif
             out << val;
         }
         else {
@@ -148,7 +197,7 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream& out,
+    void query_counters::print_value_csv(Stream& out, std::string const&,
         performance_counters::counter_values_array const& value)
     {
         bool first = true;
@@ -243,7 +292,7 @@ namespace hpx { namespace util
                 if (!first)
                     output << ",";
                 first = false;
-                print_value_csv(output, values[i]);
+                print_value_csv(output, infos[i].fullname_, values[i]);
             }
             output << "\n";
         }
@@ -353,14 +402,15 @@ namespace hpx { namespace util
         print_headers(output, infos);
         print_values(output, std::move(values), std::move(indicies), infos);
 
-        if (destination_is_cout) {
+        if (destination_is_cout)
+        {
             std::cout << output.str() << std::flush;
         }
-        else {
+        else
+        {
             std::ofstream out(destination_.c_str(), std::ofstream::app);
             out << output.str();
         }
-
         return true;
     }
 
@@ -370,6 +420,11 @@ namespace hpx { namespace util
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        if (use_ittnotify_api)
+            return true;
+#endif
+
         // Query the performance counters.
         std::vector<std::size_t> indicies;
         indicies.reserve(infos.size());

@@ -10,12 +10,14 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
+#include <cstring>
 
 struct ___itt_caller;
 struct ___itt_string_handle;
 struct ___itt_domain;
 struct ___itt_id;
 typedef void* __itt_heap_function;
+struct ___itt_counter;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ITT_SYNC_CREATE(obj, type, name)  itt_sync_create(obj, type, name)
@@ -72,6 +74,17 @@ typedef void* __itt_heap_function;
 #define HPX_ITT_HEAP_INTERNAL_ACCESS_BEGIN()  itt_heap_internal_access_begin()
 #define HPX_ITT_HEAP_INTERNAL_ACCESS_END()    itt_heap_internal_access_end()
 
+#define HPX_ITT_COUNTER_CREATE(name, domain)                                  \
+    itt_counter_create(name, domain)                                          \
+/**/
+#define HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type)                      \
+    itt_counter_create_typed(name, domain, type)                              \
+/**/
+#define HPX_ITT_COUNTER_SET_VALUE(id, value_ptr)                              \
+    itt_counter_set_value(id, value_ptr)                                      \
+/**/
+#define HPX_ITT_COUNTER_DESTROY(id)             itt_counter_destroy(id)
+
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 
@@ -124,6 +137,15 @@ HPX_EXPORT void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
 HPX_EXPORT void itt_heap_internal_access_begin();
 HPX_EXPORT void itt_heap_internal_access_end();
 
+HPX_EXPORT ___itt_counter* itt_counter_create(char const*, char const*);
+HPX_EXPORT ___itt_counter* itt_counter_create_typed(char const*, char const*, int);
+HPX_EXPORT void itt_counter_destroy(___itt_counter*);
+HPX_EXPORT void itt_counter_set_value(___itt_counter*, void *);
+
+HPX_EXPORT int itt_event_create(char const *name, int namelen);
+HPX_EXPORT int itt_event_start(int evnt);
+HPX_EXPORT int itt_event_end(int evnt);
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
 {
@@ -136,7 +158,25 @@ namespace hpx { namespace util { namespace itt
         }
         ~stack_context()
         {
-            HPX_ITT_STACK_DESTROY(itt_context_);
+            if (itt_context_) HPX_ITT_STACK_DESTROY(itt_context_);
+        }
+
+        stack_context(stack_context const& rhs) = delete;
+        stack_context(stack_context && rhs)
+          : itt_context_(rhs.itt_context_)
+        {
+            rhs.itt_context_ = nullptr;
+        }
+
+        stack_context& operator=(stack_context const& rhs) = delete;
+        stack_context& operator=(stack_context && rhs)
+        {
+            if (this != &rhs)
+            {
+                itt_context_ = rhs.itt_context_;
+                rhs.itt_context_ = nullptr;
+            }
+            return *this;
         }
 
         struct ___itt_caller* itt_context_;
@@ -160,9 +200,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        domain(char const* name)
-          : domain_(HPX_ITT_DOMAIN_CREATE(name))
-        {}
+        HPX_EXPORT domain(char const* name);
 
         ___itt_domain* domain_;
     };
@@ -176,7 +214,25 @@ namespace hpx { namespace util { namespace itt
         }
         ~id()
         {
-            HPX_ITT_ID_DESTROY(id_);
+            if (id_) HPX_ITT_ID_DESTROY(id_);
+        }
+
+        id(id const& rhs) = delete;
+        id(id && rhs)
+          : id_(rhs.id_)
+        {
+            rhs.id_ = nullptr;
+        }
+
+        id& operator=(id const& rhs) = delete;
+        id& operator=(id && rhs)
+        {
+            if (this != &rhs)
+            {
+                id_ = rhs.id_;
+                rhs.id_ = nullptr;
+            }
+            return *this;
         }
 
         ___itt_id* id_;
@@ -335,6 +391,92 @@ namespace hpx { namespace util { namespace itt
         heap_function& heap_function_;
         void* addr_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct counter
+    {
+        counter(char const* name, char const* domain)
+          : id_(HPX_ITT_COUNTER_CREATE(name, domain))
+        {
+        }
+        counter(char const* name, char const* domain, int type)
+          : id_(HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type))
+        {
+        }
+        ~counter()
+        {
+            if (id_) HPX_ITT_COUNTER_DESTROY(id_);
+        }
+
+        template <typename T>
+        void set_value(T const& value)
+        {
+            if (id_) HPX_ITT_COUNTER_SET_VALUE(id_, (void*)&value);
+        }
+
+        counter(counter const& rhs) = delete;
+        counter(counter && rhs)
+          : id_(rhs.id_)
+        {
+            rhs.id_ = nullptr;
+        }
+
+        counter& operator=(counter const& rhs) = delete;
+        counter& operator=(counter && rhs)
+        {
+            if (this != &rhs)
+            {
+                id_ = rhs.id_;
+                rhs.id_ = nullptr;
+            }
+            return *this;
+        }
+
+    private:
+        ___itt_counter* id_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct event
+    {
+        event(char const* name)
+          : event_(itt_event_create(name, (int)std::strlen(name)))
+        {}
+
+        void start() const
+        {
+            itt_event_start(event_);
+        }
+
+        void end() const
+        {
+            itt_event_end(event_);
+        }
+
+    private:
+        int event_;
+    };
+
+    struct mark_event
+    {
+        mark_event(event const& e)
+          : e_(e)
+        {
+            e_.start();
+        }
+        ~mark_event()
+        {
+            e_.end();
+        }
+
+    private:
+        event e_;
+    };
+
+    inline void event_tick(event const& e)
+    {
+        e.start();
+    }
 }}}
 
 #else
@@ -384,6 +526,16 @@ inline void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
             std::size_t, int) {}
 inline void itt_heap_internal_access_begin() {}
 inline void itt_heap_internal_access_end() {}
+
+inline ___itt_counter* itt_counter_create(char const*, char const*) { return nullptr; }
+inline ___itt_counter* itt_counter_create_typed(char const*, char const*, int)
+    { return nullptr; }
+inline void itt_counter_destroy(___itt_counter*) {}
+inline void itt_counter_set_value(___itt_counter*, void *) {}
+
+inline int itt_event_create(char const *name, int namelen)  { return 0; }
+inline int itt_event_start(int evnt) { return 0; }
+inline int itt_event_end(int evnt) { return 0; }
 
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
@@ -471,6 +623,25 @@ namespace hpx { namespace util { namespace itt
         heap_internal_access() {}
         ~heap_internal_access() {}
     };
+
+    struct counter
+    {
+        counter(char const* /*name*/, char const* /*domain*/) {}
+        ~counter() {}
+    };
+
+    struct event
+    {
+        event(char const*) {}
+    };
+
+    struct mark_event
+    {
+        mark_event(event const&) {}
+        ~mark_event() {}
+    };
+
+    inline void event_tick(event const&) {}
 }}}
 
 #endif // HPX_HAVE_ITTNOTIFY

@@ -1,15 +1,17 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/util/itt_notify.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 
+#define INTEL_ITTNOTIFY_API_PRIVATE
+
 #include <ittnotify.h>
 #include <legacy/ittnotify.h>
-#include <hpx/util/internal/ittnotify.h>
 
 #include <cstddef>
 
@@ -41,7 +43,7 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_STACK_CREATE()                                       \
     (use_ittnotify_api && __itt_stack_caller_create_ptr) ?                    \
-        __itt_stack_caller_create_ptr() : (__itt_caller)0                     \
+        __itt_stack_caller_create_ptr() : (__itt_caller)nullptr               \
     /**/
 #define HPX_INTERNAL_ITT_STACK_ENTER(ctx)                                     \
     if (use_ittnotify_api && __itt_stack_callee_enter_ptr)                    \
@@ -52,7 +54,8 @@ bool use_ittnotify_api = false;
         __itt_stack_callee_leave_ptr(ctx);                                    \
     /**/
 #define HPX_INTERNAL_ITT_STACK_DESTROY(ctx)                                   \
-    if (use_ittnotify_api && __itt_stack_caller_destroy_ptr && ctx != (__itt_caller)0) \
+    if (use_ittnotify_api && __itt_stack_caller_destroy_ptr &&                \
+            ctx != (__itt_caller)nullptr)                                     \
         __itt_stack_caller_destroy_ptr(ctx);                                  \
     /**/
 
@@ -69,7 +72,7 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_MARK_CREATE(name)                                    \
     (use_ittnotify_api && __itt_mark_create_ptr) ?                            \
-        __itt_mark_create_ptr(name) : 0                                       \
+        __itt_mark_create_ptr(name) : (__itt_mark_type)nullptr                \
     /**/
 #define HPX_INTERNAL_ITT_MARK_OFF(mark)                                       \
     if (use_ittnotify_api && __itt_mark_off_ptr) __itt_mark_off_ptr(mark);    \
@@ -100,12 +103,12 @@ bool use_ittnotify_api = false;
 
 #define HPX_INTERNAL_ITT_DOMAIN_CREATE(name)                                  \
     (use_ittnotify_api && __itt_domain_create_ptr) ?                          \
-        __itt_domain_create_ptr(name) : 0                                     \
+        __itt_domain_create_ptr(name) : nullptr                               \
     /**/
 
 #define HPX_INTERNAL_ITT_STRING_HANDLE_CREATE(name)                           \
     (use_ittnotify_api && __itt_string_handle_create_ptr) ?                   \
-        __itt_string_handle_create_ptr(name) : 0                              \
+        __itt_string_handle_create_ptr(name) : nullptr                        \
     /**/
 
 #define HPX_INTERNAL_ITT_MAKE_ID(id, addr, extra)                             \
@@ -121,7 +124,7 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_HEAP_FUNCTION_CREATE(name, domain)                   \
     (use_ittnotify_api && __itt_heap_function_create_ptr) ?                   \
-        __itt_heap_function_create_ptr(name, domain) : 0                      \
+        __itt_heap_function_create_ptr(name, domain) : nullptr                \
     /**/
 
 #define HPX_INTERNAL_HEAP_ALLOCATE_BEGIN(f, size, init)                       \
@@ -161,6 +164,39 @@ bool use_ittnotify_api = false;
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_COUNTER_CREATE(name, domain)                             \
+    (use_ittnotify_api && __itt_counter_create_ptr) ?                         \
+        __itt_counter_create_ptr(name, domain) : (__itt_counter)nullptr       \
+    /**/
+#define HPX_INTERNAL_COUNTER_CREATE_TYPED(name, domain, type)                 \
+    (use_ittnotify_api && __itt_counter_create_typed_ptr) ?                   \
+        __itt_counter_create_typed_ptr(name, domain, type) :                  \
+            (__itt_counter)nullptr                                            \
+    /**/
+#define HPX_INTERNAL_COUNTER_SET_VALUE(id, value_ptr)                         \
+    if (use_ittnotify_api && __itt_counter_set_value_ptr)                     \
+        __itt_counter_set_value_ptr(id, value_ptr);                           \
+    /**/
+#define HPX_INTERNAL_COUNTER_DESTROY(id)                                      \
+    if (use_ittnotify_api && __itt_counter_destroy_ptr)                       \
+        __itt_counter_destroy_ptr(id);                                        \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_EVENT_CREATE(name, len)                                  \
+    (use_ittnotify_api && __itt_event_create_ptr) ?                           \
+        __itt_event_create_ptr(name, len) : 0;                                \
+    /**/
+#define HPX_INTERNAL_EVENT_START(e)                                           \
+    (use_ittnotify_api && __itt_event_start_ptr) ?                            \
+        __itt_event_start_ptr(e) : 0                                          \
+    /**/
+#define HPX_INTERNAL_EVENT_END(e)                                             \
+    (use_ittnotify_api && __itt_event_end_ptr) ?                              \
+        __itt_event_end_ptr(e) : 0                                            \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) \
     || defined(__BORLANDC__) \
     || (defined(__MWERKS__) && defined(_WIN32) && (__MWERKS__ >= 0x3000)) \
@@ -182,6 +218,16 @@ bool use_ittnotify_api = false;
           ((void)0) //HPX_INTERNAL_ITT_SYNC(sync_released, obj)
 #define HPX_INTERNAL_ITT_SYNC_DESTROY(obj)\
            HPX_INTERNAL_ITT_SYNC(sync_destroy, obj)
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util { namespace itt
+{
+    domain::domain(char const* name)
+      : domain_(HPX_ITT_DOMAIN_CREATE(name))
+    {
+        if (domain_) domain_->flags = 1;    // enable domain
+    }
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_sync_create(void *addr, const char* objtype, const char* objname)
@@ -368,6 +414,45 @@ void itt_heap_internal_access_begin()
 void itt_heap_internal_access_end()
 {
     HPX_INTERNAL_INTERNAL_ACCESS_END();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+__itt_counter itt_counter_create(char const* name, char const* domain)
+{
+    return HPX_INTERNAL_COUNTER_CREATE(name, domain);
+}
+
+__itt_counter itt_counter_create_typed(char const* name, char const* domain,
+    int type)
+{
+    return HPX_INTERNAL_COUNTER_CREATE_TYPED(name, domain,
+        (__itt_metadata_type)type);
+}
+
+void itt_counter_destroy(__itt_counter id)
+{
+    HPX_INTERNAL_COUNTER_DESTROY(id);
+}
+
+void itt_counter_set_value(__itt_counter id, void *value_ptr)
+{
+    HPX_INTERNAL_COUNTER_SET_VALUE(id, value_ptr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+__itt_event itt_event_create(char const *name, int namelen)
+{
+    return HPX_INTERNAL_EVENT_CREATE(name, namelen);
+}
+
+int itt_event_start(__itt_event evnt)
+{
+    return HPX_INTERNAL_EVENT_START(evnt);
+}
+
+int itt_event_end(__itt_event evnt)
+{
+    return HPX_INTERNAL_EVENT_END(evnt);
 }
 
 #endif // HPX_HAVE_ITTNOTIFY
