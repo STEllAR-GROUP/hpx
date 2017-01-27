@@ -60,10 +60,10 @@
 
 // --------------------------------------------------------------------
 #include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/verbs/header.hpp>
 #include <plugins/parcelport/verbs/sender_connection.hpp>
 #include <plugins/parcelport/verbs/connection_handler.hpp>
 #include <plugins/parcelport/verbs/locality.hpp>
-#include <plugins/parcelport/verbs/header.hpp>
 #include <plugins/parcelport/verbs/pinned_memory_vector.hpp>
 #include <plugins/parcelport/verbs/performance_counter.hpp>
 //
@@ -182,6 +182,7 @@ namespace verbs
         }
 
     public:
+
         // These are the types used in the parcelport for locking etc
         // Note that spinlock is the only supported mutex that works on HPX+OS threads
         // and condition_variable_any can be used across HPX/OS threads
@@ -402,6 +403,9 @@ namespace verbs
 #endif
        }
 
+        std::unordered_map<std::uint32_t, std::shared_ptr<sender_connection>>
+            connection_cache;
+
         // --------------------------------------------------------------------
         //  return a sender_connection object back to the parcelport_impl
         // --------------------------------------------------------------------
@@ -416,25 +420,38 @@ namespace verbs
                 << "to " << ipaddress(dest_ip)
                 << "chunk pool " << hexpointer(chunk_pool_.get()));
 
-            verbs_endpoint *client = get_remote_connection(dest_ip);
+            std::shared_ptr<sender_connection> connection;
 
-            LOG_DEVEL_MSG("Create sender_connection     from "
-                << ipaddress(_ibv_ip)
-                << "to " << ipaddress(dest_ip)
-                << "chunk pool " << hexpointer(chunk_pool_.get()));
+            auto it = connection_cache.find(dest_ip);
+            if (it!=connection_cache.end()) {
+                std::shared_ptr<sender_connection> connection = it->second;
+                LOG_DEVEL_MSG("Found sender_connection      from "
+                    << ipaddress(_ibv_ip)
+                    << "to " << ipaddress(dest_ip)
+                    << "chunk pool " << hexpointer(chunk_pool_.get()));
+                return connection;
+            }
+            else {
+                LOG_DEVEL_MSG("Create sender_connection     from "
+                    << ipaddress(_ibv_ip)
+                    << "to " << ipaddress(dest_ip)
+                    << "chunk pool " << hexpointer(chunk_pool_.get()));
 
-            std::shared_ptr<sender_connection> result =
-                std::make_shared<sender_connection>(
-                  this
-                , dest_ip
-                , dest.get<locality>()
-                , client
-                , chunk_pool_.get()
-                , parcels_sent_
-            );
+                verbs_endpoint *client = get_remote_connection(dest_ip);
 
+                connection = std::make_shared<sender_connection>(
+                      this
+                    , dest_ip
+                    , dest.get<locality>()
+                    , client
+                    , chunk_pool_.get()
+                    , parcels_sent_
+                );
+
+                connection_cache.insert(std::make_pair(dest_ip, connection));
+            }
             FUNC_END_DEBUG_MSG;
-            return result;
+            return connection;
         }
 
         // --------------------------------------------------------------------
@@ -1545,33 +1562,13 @@ namespace verbs
     // need the full definition of the verbs PP to come first
     // --------------------------------------------------------------------
     template <typename Handler, typename ParcelPostprocess>
-    void sender_connection::async_write(Handler && handler,
+    inline void sender_connection::async_write(
+        Handler && handler,
         ParcelPostprocess && parcel_postprocess)
     {
-        HPX_ASSERT(!buffer_.data_.empty());
-        //
-        postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
-        //
-        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {
-            // after send has done, setup a fresh buffer for next time
-            LOG_DEBUG_MSG("Wiping buffer 1");
-
-            snd_data_type pinned_vector(chunk_pool_);
-            snd_buffer_type buffer(std::move(pinned_vector), chunk_pool_);
-            buffer_ = std::move(buffer);
-            error_code ec;
-            postprocess_handler_(ec, there_, shared_from_this());
-        }
-        else {
-            // after send has done, setup a fresh buffer for next time
-            LOG_DEBUG_MSG("Wiping buffer 2");
-            snd_data_type pinned_vector(chunk_pool_);
-            snd_buffer_type buffer(std::move(pinned_vector), chunk_pool_);
-            buffer_ = std::move(buffer);
-            error_code ec;
-            postprocess_handler_(ec, there_, shared_from_this());
-        }
-        LOG_DEBUG_MSG("Leaving sender_connection::async_write");
+//        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {}
+//        error_code ec;
+//        parcel_postprocess(ec, there_, shared_from_this());
     }
 
     bool sender_connection::can_send_immediate() const
