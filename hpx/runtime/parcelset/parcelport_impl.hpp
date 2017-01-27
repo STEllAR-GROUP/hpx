@@ -216,7 +216,8 @@ namespace hpx { namespace parcelset
                         send_immediate_parcels::value &&
                     this_.can_send_immediate_impl<ConnectionHandler>())
                 {
-                    this_.send_parcel_immediate(dest_, std::move(p), std::move(f_));
+                    this_.send_immediate_impl<ConnectionHandler>(
+                        this_, dest_, std::move(f_), std::move(p));
                 }
                 else
                 {
@@ -521,6 +522,49 @@ namespace hpx { namespace parcelset
             return false;
         }
 
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            void
+        >::type
+        send_immediate_impl(
+            parcelport_impl &this_, locality &dest_, write_handler_type &&f_, parcel&& p)
+        {
+            error_code ec;
+            connection *sender =
+                this_.connection_handler().get_connection(dest_, ec);
+
+            auto encoded_buffer = sender->get_new_buffer();
+            // encode the parcels
+            std::size_t num_parcels = encode_parcels(this_, &p, 1,
+                encoded_buffer,
+                this_.archive_flags_,
+                this_.get_max_outbound_message_size());
+
+            using hpx::util::placeholders::_1;
+
+            if (sender->parcelport_->async_write(
+                std::move(util::bind(util::one_shot(f_), _1,  std::move(p))),
+                sender,
+                encoded_buffer))
+            {
+                // we don't propagate errors for now
+            }
+        }
+
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            !connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            void
+        >::type
+        send_immediate_impl(
+            parcelport_impl &this_, locality &dest_, write_handler_type &&f_, parcel&& p)
+        {}
+
         ///////////////////////////////////////////////////////////////////////
         std::shared_ptr<connection> get_connection(
             locality const& l, bool force, error_code& ec)
@@ -722,44 +766,6 @@ namespace hpx { namespace parcelset
             return true;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        void send_parcel_immediate(locality const& locality_id, parcel p,
-            write_handler_type handler)
-        {
-            error_code ec;
-            std::shared_ptr<connection> sender_connection =
-                connection_handler().create_connection(locality_id, ec);
-
-#if defined(HPX_DEBUG)
-            // verify the connection points to the right destination
-            HPX_ASSERT(locality_id == sender_connection->destination());
-            sender_connection->verify(locality_id);
-#endif
-
-#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_send_pending);
-#endif
-            // encode the parcels
-            std::size_t num_parcels = encode_parcels(*this, &p, 1,
-                    sender_connection->buffer_,
-                    archive_flags_,
-                    this->get_max_outbound_message_size());
-
-            using hpx::util::placeholders::_1;
-            using hpx::util::placeholders::_2;
-            using hpx::util::placeholders::_3;
-            HPX_ASSERT(num_parcels == 1);
-            {
-                ++operations_in_flight_;
-
-                // send the parcel
-                sender_connection->async_write(
-                    util::bind(util::one_shot(handler),
-                        _1,  std::move(p)),
-                    util::bind(&parcelport_impl::immediate_send_done,
-                        this, _1, _2, _3));
-            }
-        }
 
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
@@ -806,19 +812,6 @@ namespace hpx { namespace parcelset
             // leads to a more effective parcel buffering
 //                 if (hpx::threads::get_self_ptr())
 //                     hpx::this_thread::yield();
-        }
-
-        void immediate_send_done(
-            boost::system::error_code const& ec,
-            locality const& locality_id,
-            std::shared_ptr<connection> sender_connection)
-        {
-            HPX_ASSERT(operations_in_flight_ != 0);
-            --operations_in_flight_;
-
-#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
-#endif
         }
 
 
