@@ -350,10 +350,21 @@ called:
     // print the current number of threads created on locality 0
     hpx::performance_counters::performance_counter count(
         "/threads{locality#0/total}/count/cumulative");
-    hpx::cout << count.get_value<int>() << hpx::endl;
+    hpx::cout << count.get_value<int>().get() << hpx::endl;
 
 For more information about the client component type see
 [classref hpx::performance_counters::performance_counter].
+
+[note In the above example count.get_value() returns a future. In order
+ to print the result we must append .get() to retrieve the value. You
+ could write the above example like this for more clarity:
+ 
+    // print the current number of threads created on locality 0
+    hpx::performance_counters::performance_counter count(
+        "/threads{locality#0/total}/count/cumulative");
+    hpx::future<int> result = count.get_value<int>();
+    hpx::cout << result.get() << hpx::endl; 
+ ]
 
 [endsect]
 
