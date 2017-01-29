@@ -164,6 +164,7 @@ bool use_ittnotify_api = false;
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(__itt_counter_create_typed_ptr) && defined(__itt_counter_set_value_ptr)
 #define HPX_INTERNAL_COUNTER_CREATE(name, domain)                             \
     (use_ittnotify_api && __itt_counter_create_ptr) ?                         \
         __itt_counter_create_ptr(name, domain) : (__itt_counter)nullptr       \
@@ -181,6 +182,19 @@ bool use_ittnotify_api = false;
     if (use_ittnotify_api && __itt_counter_destroy_ptr)                       \
         __itt_counter_destroy_ptr(id);                                        \
     /**/
+#else
+// older itt-notify implementations don't support the typed counter API
+#define HPX_INTERNAL_COUNTER_CREATE(name, domain)                             \
+    (__itt_counter)nullptr                                                    \
+    /**/
+#define HPX_INTERNAL_COUNTER_CREATE_TYPED(name, domain, type)                 \
+    (__itt_counter)nullptr                                                    \
+    /**/
+#define HPX_INTERNAL_COUNTER_SET_VALUE(id, value_ptr)                         \
+    /**/
+#define HPX_INTERNAL_COUNTER_DESTROY(id)                                      \
+    /**/
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_EVENT_CREATE(name, len)                                  \
