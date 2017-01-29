@@ -72,7 +72,7 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_MARK_CREATE(name)                                    \
     (use_ittnotify_api && __itt_mark_create_ptr) ?                            \
-        __itt_mark_create_ptr(name) : (__itt_mark_type)nullptr                \
+        __itt_mark_create_ptr(name) : 0                                       \
     /**/
 #define HPX_INTERNAL_ITT_MARK_OFF(mark)                                       \
     if (use_ittnotify_api && __itt_mark_off_ptr) __itt_mark_off_ptr(mark);    \
