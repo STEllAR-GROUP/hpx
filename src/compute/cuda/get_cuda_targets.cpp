@@ -54,11 +54,6 @@ namespace hpx { namespace compute { namespace cuda
 HPX_PLAIN_ACTION(hpx::compute::cuda::get_local_targets,
     compute_cuda_get_targets_action);
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
-    std::vector<hpx::compute::cuda::target>, vector_compute_cuda_target,
-    hpx::actions::base_lco_with_value_vector_compute_cuda_target_get,
-    hpx::actions::base_lco_with_value_vector_compute_cuda_target_set)
-
 namespace hpx { namespace compute { namespace cuda
 {
     hpx::future<std::vector<target> > get_targets(hpx::id_type const& locality)
