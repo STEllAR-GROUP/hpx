@@ -25,6 +25,14 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::actions::base_lco_with_value_bool_get,
     hpx::actions::base_lco_with_value_bool_set)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<bool>, vector_bool_type,
+    hpx::actions::base_lco_with_value_vector_bool_get,
+    hpx::actions::base_lco_with_value_vector_bool_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<std::uint32_t>, vector_std_uint32_type,
+    hpx::actions::base_lco_with_value_vector_std_uint32_get,
+    hpx::actions::base_lco_with_value_vector_std_uint32_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::util::section, hpx_section,
     hpx::actions::base_lco_with_value_hpx_section_get,
     hpx::actions::base_lco_with_value_hpx_section_set)

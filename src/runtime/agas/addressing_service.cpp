@@ -1691,10 +1691,10 @@ typedef hpx::agas::server::symbol_namespace::on_event_action
     symbol_namespace_on_event_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_on_event_action,
-        symbol_namespace_on_event_action)
+    symbol_namespace_on_event_action)
 HPX_REGISTER_BROADCAST_ACTION_ID(symbol_namespace_on_event_action,
-        symbol_namespace_on_event_action,
-        hpx::actions::broadcast_symbol_namespace_on_event_action_id)
+    symbol_namespace_on_event_action,
+    hpx::actions::broadcast_symbol_namespace_on_event_action_id)
 
 namespace hpx { namespace agas
 {

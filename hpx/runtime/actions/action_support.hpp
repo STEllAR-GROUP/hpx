@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -24,6 +24,9 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/tuple.hpp>
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -140,6 +143,19 @@ namespace hpx { namespace actions
                 "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::type_id<Action>::typeid_.type_id();
         }
+#endif
+
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+        template <typename Action>
+        util::itt::string_handle const& get_action_name_itt()
+#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
+        {
+            static util::itt::string_handle sh = get_action_name<Action>();
+            return sh;
+        }
+#endif
 #endif
     }
 

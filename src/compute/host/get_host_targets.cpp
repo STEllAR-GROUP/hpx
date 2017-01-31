@@ -58,6 +58,11 @@ namespace hpx { namespace compute { namespace host
 HPX_PLAIN_ACTION(hpx::compute::host::get_local_targets,
     compute_host_get_targets_action);
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<hpx::compute::host::target>, vector_compute_host_target,
+    hpx::actions::base_lco_with_value_vector_compute_host_target_get,
+    hpx::actions::base_lco_with_value_vector_compute_host_target_set)
+
 namespace hpx { namespace compute { namespace host
 {
     hpx::future<std::vector<target> > get_targets(hpx::id_type const& locality)

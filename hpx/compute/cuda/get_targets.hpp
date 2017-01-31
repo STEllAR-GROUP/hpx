@@ -12,6 +12,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <vector>
@@ -24,6 +25,9 @@ namespace hpx { namespace compute { namespace cuda
     HPX_EXPORT hpx::future<std::vector<target> >
         get_targets(hpx::id_type const& locality);
 }}}
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::compute::cuda::target>, vector_compute_cuda_target)
 
 #endif
 #endif

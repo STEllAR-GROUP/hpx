@@ -11,6 +11,7 @@
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -465,6 +466,24 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::statistics_counter_action,
     primary_namespace_statistics_counter_action)
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::naming::address, naming_address)
+typedef hpx::util::tuple<
+        hpx::naming::gid_type, hpx::agas::gva, hpx::naming::gid_type
+    > gva_tuple_type;
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    gva_tuple_type, gva_tuple)
+typedef std::pair<hpx::naming::id_type, hpx::naming::address>
+    std_pair_address_id_type;
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std_pair_address_id_type, std_pair_address_id_type)
+typedef std::pair<hpx::naming::gid_type, hpx::naming::gid_type>
+    std_pair_gid_type;
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std_pair_gid_type, std_pair_gid_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<std::int64_t>, vector_std_int64_type)
 
 namespace hpx { namespace traits
 {

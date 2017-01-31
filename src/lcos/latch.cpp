@@ -29,10 +29,8 @@ HPX_REGISTER_ACTION_ID(
     hpx_lcos_server_latch_wait_action,
     hpx::actions::hpx_lcos_server_latch_wait_action_id)
 
-HPX_REGISTER_ACTION_FACTORY_ID(
-    set_value_action_bool_ptrdiff,
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(
+    bool, std::ptrdiff_t, bool_std_ptrdiff,
+    hpx::actions::base_lco_with_value_std_bool_ptrdiff_get,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_set)
-HPX_REGISTER_ACTION_FACTORY_ID(
-    get_value_action_bool_ptrdiff,
-    hpx::actions::base_lco_with_value_std_bool_ptrdiff_get)
 

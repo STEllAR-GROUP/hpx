@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,11 +16,14 @@
 #include <hpx/runtime/naming/name.hpp>
 
 #include <cstdint>
+#include <map>
 #include <string>
 #include <vector>
 
-#include <string>
-#include <vector>
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    parcelset::endpoints_type, parcelset_endpoints_type,
+    hpx::actions::base_lco_with_value_parcelset_endpoints_get,
+    hpx::actions::base_lco_with_value_parcelset_endpoints_set)
 
 namespace hpx { namespace agas { namespace detail
 {

@@ -87,6 +87,27 @@ HPX_REGISTER_ACTION_ID(
     primary_namespace_statistics_counter_action,
     hpx::actions::primary_namespace_statistics_counter_action_id)
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::naming::address, naming_address,
+    hpx::actions::base_lco_with_value_naming_address_get,
+    hpx::actions::base_lco_with_value_naming_address_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    gva_tuple_type, gva_tuple,
+    hpx::actions::base_lco_with_value_gva_tuple_get,
+    hpx::actions::base_lco_with_value_gva_tuple_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std_pair_address_id_type, std_pair_address_id_type,
+    hpx::actions::base_lco_with_value_std_pair_address_id_type_get,
+    hpx::actions::base_lco_with_value_std_pair_address_id_type_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std_pair_gid_type, std_pair_gid_type,
+    hpx::actions::base_lco_with_value_std_pair_gid_type_get,
+    hpx::actions::base_lco_with_value_std_pair_gid_type_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<std::int64_t>, vector_std_int64_type,
+    hpx::actions::base_lco_with_value_vector_std_int64_get,
+    hpx::actions::base_lco_with_value_vector_std_int64_set)
+
 namespace hpx { namespace agas {
 
     naming::gid_type primary_namespace::get_service_instance(
