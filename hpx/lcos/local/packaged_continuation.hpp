@@ -20,6 +20,11 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -105,6 +110,15 @@ namespace hpx { namespace lcos { namespace detail
             typename util::result_of<Func(Future)>::type
         > is_void;
 
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+        char const* name = traits::get_function_annotation<Func>::call(func);
+        if (name != nullptr)
+        {
+            util::itt::task task(hpx::get_thread_itt_domain(), name);
+            invoke_continuation(func, future, cont, is_void());
+        }
+        else
+#endif
         invoke_continuation(func, future, cont, is_void());
     }
 

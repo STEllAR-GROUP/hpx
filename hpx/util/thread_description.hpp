@@ -10,6 +10,7 @@
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
@@ -82,9 +83,22 @@ namespace hpx { namespace util
                 char const* altname = nullptr) HPX_NOEXCEPT
           : type_(data_type_description)
         {
+            char const* name = traits::get_function_annotation<F>::call(f);
+            if (name != nullptr)
+            {
+                altname = name;
+            }
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
-            type_ = data_type_address;
-            data_.addr_ = traits::get_function_address<F>::call(f);
+            if (altname != nullptr)
+            {
+                data_.desc_ = altname;
+            }
+            else
+            {
+                type_ = data_type_address;
+                data_.addr_ = traits::get_function_address<F>::call(f);
+            }
 #else
             init_from_alternative_name(altname);
 #endif

@@ -26,6 +26,12 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/util/thread_description.hpp>
+#endif
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -482,6 +488,17 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+                char const* name = traits::get_function_annotation<
+                        completed_callback_type
+                    >::call(on_completed);
+                if (name != nullptr)
+                {
+                    util::itt::task task(hpx::get_thread_itt_domain(), name);
+                    on_completed();
+                }
+                else
+#endif
                 on_completed();
             }
             catch (...) {
@@ -509,7 +526,12 @@ namespace detail
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
-                on_completed();
+                boost::exception_ptr ptr;
+                if (!run_on_completed(std::move(on_completed), ptr))
+                {
+                    error_code ec(lightweight);
+                    set_exception(hpx::detail::access_exception(ec));
+                }
             }
             else
             {
@@ -552,9 +574,7 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed;
-
-            on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
             result_type* value_ptr =
@@ -588,9 +608,7 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed;
-
-            on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
             boost::exception_ptr* exception_ptr =

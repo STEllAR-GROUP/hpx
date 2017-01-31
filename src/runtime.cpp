@@ -1481,6 +1481,17 @@ namespace hpx
         return runtime::get_thread_name();
     }
 
+    struct itt_domain_tag {};
+    static util::thread_specific_ptr<util::itt::domain, itt_domain_tag> d;
+
+    util::itt::domain const& get_thread_itt_domain()
+    {
+        if (nullptr == d.get())
+            d.reset(new util::itt::domain(get_thread_name().c_str()));
+
+        return *d;
+    }
+
     std::uint64_t get_system_uptime()
     {
         return runtime::get_system_uptime();

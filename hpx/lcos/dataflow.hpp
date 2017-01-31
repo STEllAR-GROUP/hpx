@@ -29,6 +29,12 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/util/thread_description.hpp>
+#endif
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 
@@ -187,8 +193,7 @@ namespace hpx { namespace lcos { namespace detail
         void execute(util::detail::pack_c<std::size_t, Is...>, std::false_type)
         {
             try {
-                result_type res =
-                    util::invoke_fused(func_, std::move(futures_));
+                result_type res = util::invoke_fused(func_, std::move(futures_));
 
                 // reset futures
                 reset_dataflow_future reset;
@@ -231,8 +236,17 @@ namespace hpx { namespace lcos { namespace detail
         {
             if (policy == hpx::launch::sync)
             {
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+                char const* name =
+                    traits::get_function_annotation<Func>::call(func_);
+                if (name != nullptr)
+                {
+                    util::itt::task task(hpx::get_thread_itt_domain(), name);
+                    execute(indices_type(), is_void());
+                }
+                else
+#endif
                 execute(indices_type(), is_void());
-                return;
             }
 
             util::thread_description desc(func_, "dataflow_frame::finalize");
@@ -252,6 +266,16 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE
         void finalize(hpx::detail::sync_policy)
         {
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+            char const* name =
+                traits::get_function_annotation<Func>::call(func_);
+            if (name != nullptr)
+            {
+                util::itt::task task(hpx::get_thread_itt_domain(), name);
+                execute(indices_type(), is_void());
+            }
+            else
+#endif
             execute(indices_type(), is_void());
         }
 
@@ -260,6 +284,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
+
             hpx::apply(sched, f, std::move(this_), indices_type(), is_void());
         }
 

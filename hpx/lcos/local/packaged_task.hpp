@@ -14,6 +14,11 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <boost/exception_ptr.hpp>
 
@@ -29,6 +34,8 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
     {
         HPX_MOVABLE_ONLY(packaged_task);
+
+        typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
         // construction and destruction
@@ -80,6 +87,17 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+            char const* name = traits::get_function_annotation<
+                    function_type
+                >::call(function_);
+            if (name != nullptr)
+            {
+                util::itt::task task(hpx::get_thread_itt_domain(), name);
+                invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
+            }
+            else
+#endif
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -139,7 +157,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        util::unique_function_nonser<R(Ts...)> function_;
+        function_type function_;
         local::promise<R> promise_;
     };
 }}}

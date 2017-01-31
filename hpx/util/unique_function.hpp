@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -111,6 +112,18 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    template <typename Sig, bool Serializable>
+    struct get_function_annotation<util::unique_function<Sig, Serializable> >
+    {
+        static char const*
+            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_annotation();
+        }
+    };
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
