@@ -605,6 +605,11 @@ inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
     ___itt_string_handle* key, void const* data) {}
 
 //////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    struct thread_description;
+}}
+
 namespace hpx { namespace util { namespace itt
 {
     struct stack_context
