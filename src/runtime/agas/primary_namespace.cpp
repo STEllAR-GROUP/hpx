@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <vector>
 
 using hpx::components::component_agas_primary_namespace;
 
