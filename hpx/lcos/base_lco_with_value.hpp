@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -121,15 +121,11 @@ namespace hpx { namespace lcos
         ///               back to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco_with_value,
             set_value_nonvirt, set_value_action);
-        HPX_DEFINE_COMPONENT_ACTION(base_lco_with_value,
-            set_value_nonvirt, set_value_non_direct_action);
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco_with_value,
             get_value_nonvirt, get_value_action);
-        HPX_DEFINE_COMPONENT_ACTION(base_lco_with_value,
-            get_value_nonvirt, get_value_non_direct_action);
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
@@ -187,17 +183,8 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_DECLARATION(                                            \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name))                                  \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
-        BOOST_PP_CAT(set_value_non_direct_action_, Name))                       \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
-        BOOST_PP_CAT(get_value_non_direct_action_, Name))                       \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
@@ -210,17 +197,8 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_DECLARATION(                                            \
         BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
         BOOST_PP_CAT(get_value_action_, Name))                                  \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_non_direct_action,  \
-        BOOST_PP_CAT(set_value_non_direct_action_, Name))                       \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_non_direct_action,  \
-        BOOST_PP_CAT(get_value_non_direct_action_, Name))                       \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
         BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_non_direct_action,  \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
@@ -231,17 +209,8 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION(                                                        \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name))                                  \
-    HPX_REGISTER_ACTION(                                                        \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
-        BOOST_PP_CAT(set_value_non_direct_action_, Name))                       \
-    HPX_REGISTER_ACTION(                                                        \
-        hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
-        BOOST_PP_CAT(get_value_non_direct_action_, Name))                       \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
@@ -253,19 +222,8 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_ID(                                                     \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
-        BOOST_PP_CAT(set_value_non_direct_action_, Name),                       \
-        BOOST_PP_CAT(ActionIdSet, _non_direct))                                 \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        hpx::lcos::base_lco_with_value<Value>::get_value_non_direct_action,     \
-        BOOST_PP_CAT(get_value_non_direct_action_, Name),                       \
-        BOOST_PP_CAT(ActionIdGet, _non_direct))                                 \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        hpx::lcos::base_lco_with_value<Value>::set_value_non_direct_action,     \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(                                   \
@@ -278,19 +236,8 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_ID(                                                     \
         BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
         BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_non_direct_action,  \
-        BOOST_PP_CAT(set_value_non_direct_action_, Name),                       \
-        BOOST_PP_CAT(ActionIdSet, _non_direct))                                 \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_non_direct_action,  \
-        BOOST_PP_CAT(get_value_non_direct_action_, Name),                       \
-        BOOST_PP_CAT(ActionIdGet, _non_direct))                                 \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_non_direct_action,  \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 #endif
