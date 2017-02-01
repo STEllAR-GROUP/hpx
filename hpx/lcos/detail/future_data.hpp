@@ -26,11 +26,16 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+
+#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/itt_notify.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
 #endif
 
 #include <boost/exception_ptr.hpp>
@@ -488,13 +493,17 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
                 char const* name = traits::get_function_annotation<
                         completed_callback_type
                     >::call(on_completed);
                 if (name != nullptr)
                 {
+#if defined(HPX_HAVE_APEX)
+                    util::apex_wrapper apex_profiler(name);
+#else
                     util::itt::task task(hpx::get_thread_itt_domain(), name);
+#endif
                     on_completed();
                 }
                 else

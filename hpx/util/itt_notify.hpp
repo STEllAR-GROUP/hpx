@@ -342,7 +342,7 @@ namespace hpx { namespace util { namespace itt
             return *this;
         }
 
-        operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const HPX_NOEXCEPT
         {
             return handle_ != 0;
         }

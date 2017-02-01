@@ -14,10 +14,15 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+
+#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
 #include <hpx/util/itt_notify.hpp>
+#endif
 #endif
 
 #include <boost/exception_ptr.hpp>
@@ -87,13 +92,17 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
             char const* name = traits::get_function_annotation<
                     function_type
                 >::call(function_);
             if (name != nullptr)
             {
+#if defined(HPX_HAVE_APEX)
+                util::apex_wrapper apex_profiler(name);
+#else
                 util::itt::task task(hpx::get_thread_itt_domain(), name);
+#endif
                 invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
             }
             else
