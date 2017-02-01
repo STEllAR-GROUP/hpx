@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
@@ -33,7 +34,6 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/util/itt_notify.hpp>
-#include <hpx/util/thread_description.hpp>
 #endif
 
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -230,45 +230,10 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        HPX_FORCEINLINE
-        void finalize(launch policy)
-        {
-            if (policy == hpx::launch::sync)
-            {
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
-                char const* name =
-                    traits::get_function_annotation<Func>::call(func_);
-                if (name != nullptr)
-                {
-                    util::itt::task task(hpx::get_thread_itt_domain(), name);
-                    execute(indices_type(), is_void());
-                }
-                else
-#endif
-                execute(indices_type(), is_void());
-            }
-
-            util::thread_description desc(func_, "dataflow_frame::finalize");
-
-            // schedule the final function invocation with high priority
-            execute_function_type f = &dataflow_frame::execute;
-            boost::intrusive_ptr<dataflow_frame> this_(this);
-            threads::register_thread_nullary(
-                util::deferred_call(
-                    f, std::move(this_), indices_type(), is_void())
-              , desc
-              , threads::pending
-              , true
-              , threads::thread_priority_boost);
-        }
-
-        HPX_FORCEINLINE
-        void finalize(hpx::detail::sync_policy)
+        HPX_FORCEINLINE void done()
         {
 #if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
-            char const* name =
-                traits::get_function_annotation<Func>::call(func_);
+            char const* name = traits::get_function_annotation<Func>::call(func_);
             if (name != nullptr)
             {
                 util::itt::task task(hpx::get_thread_itt_domain(), name);
@@ -279,13 +244,61 @@ namespace hpx { namespace lcos { namespace detail
             execute(indices_type(), is_void());
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        HPX_FORCEINLINE
+        void finalize(launch policy)
+        {
+            if (policy == hpx::launch::sync)
+            {
+                done();
+                return;
+            }
+
+            // schedule the final function invocation with high priority
+            util::thread_description desc(func_, "dataflow_frame::finalize");
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            if (policy == launch::fork)
+            {
+                threads::thread_id_type tid = threads::register_thread_nullary(
+                    util::deferred_call(&dataflow_frame::done, std::move(this_))
+                  , desc
+                  , threads::pending_do_not_schedule
+                  , true
+                  , threads::thread_priority_boost
+                  , get_worker_thread_num()
+                  , threads::thread_stacksize_current);
+
+                if (tid)
+                {
+                    // make sure this thread is executed last
+                    hpx::this_thread::yield_to(thread::id(std::move(tid)));
+                }
+                return;
+            }
+
+            // simply schedule new thread
+            threads::register_thread_nullary(
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
+              , desc
+              , threads::pending
+              , true
+              , threads::thread_priority_boost
+              , std::size_t(-1)
+              , threads::thread_stacksize_current);
+        }
+
+        HPX_FORCEINLINE
+        void finalize(hpx::detail::sync_policy)
+        {
+            done();
+        }
+
         HPX_FORCEINLINE
         void finalize(threads::executor& sched)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
-            hpx::apply(sched, f, std::move(this_), indices_type(), is_void());
+            hpx::apply(sched, &dataflow_frame::done, std::move(this_));
         }
 
         // handle executors through their executor_traits
@@ -294,11 +307,9 @@ namespace hpx { namespace lcos { namespace detail
         typename std::enable_if<traits::is_executor<Executor>::value>::type
         finalize(Executor& exec)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
             parallel::executor_traits<Executor>::apply_execute(exec,
-                f, std::move(this_), indices_type(), is_void());
+                &dataflow_frame::done, std::move(this_));
         }
 
         ///////////////////////////////////////////////////////////////////////

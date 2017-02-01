@@ -97,6 +97,10 @@ namespace hpx { namespace threads
     ///       being defined.
     HPX_API_EXPORT std::size_t get_parent_phase();
 
+    /// The function \a get_self_stacksize returns the stack size of the
+    /// current thread (or zero if the current thread is not a HPX thread).
+    HPX_API_EXPORT std::size_t get_self_stacksize();
+
     /// The function \a get_parent_locality_id returns the id of the locality of
     /// the current thread's parent (or zero if the current thread is not a
     /// HPX thread).
