@@ -19,6 +19,7 @@
 #include <hpx/util/thread_description.hpp>
 #endif
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
