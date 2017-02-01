@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -69,27 +69,15 @@ HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
     hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
-    hpx::lcos::base_lco::set_event_non_direct_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(
-    hpx::lcos::base_lco::set_exception_non_direct_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the base LCO actions
 HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_event_action,
     base_set_event_action, hpx::actions::base_set_event_action_id)
-HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_event_non_direct_action,
-    base_set_event_non_direct_action,
-    hpx::actions::base_set_event_action_id_non_direct)
 HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_exception_action,
     base_set_exception_action, hpx::actions::base_set_exception_action_id)
-HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_exception_non_direct_action,
-    base_set_exception_non_direct_action,
-    hpx::actions::base_set_exception_action_id_non_direct)
 HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::connect_action,
     base_connect_action, hpx::actions::base_connect_action_id)
 HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::disconnect_action,
