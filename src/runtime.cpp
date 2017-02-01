@@ -1196,11 +1196,16 @@ namespace hpx
 
     std::size_t get_worker_thread_num()
     {
+        return get_worker_thread_num(throws);
+    }
+
+    std::size_t get_worker_thread_num(error_code& ec)
+    {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(
-                invalid_status,
+            HPX_THROWS_IF(
+                ec, invalid_status,
                 "hpx::get_worker_thread_num",
                 "the runtime system has not been initialized yet");
             return std::size_t(-1);
