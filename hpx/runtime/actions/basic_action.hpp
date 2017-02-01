@@ -912,13 +912,8 @@ namespace hpx { namespace serialization
     HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
 /**/
 #if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
-#define HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                       \
+#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
-        template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_action_name<action>()                                 \
-        {                                                                     \
-            return BOOST_PP_STRINGIZE(actionname);                            \
-        }                                                                     \
         template<> HPX_ALWAYS_EXPORT                                          \
         util::itt::string_handle const& get_action_name_itt<action>()         \
         {                                                                     \
@@ -928,7 +923,11 @@ namespace hpx { namespace serialization
     }}}                                                                       \
 /**/
 #else
+#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)
+#endif
+
 #define HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                       \
+    HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                        \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_action_name<action>()                                 \
@@ -937,7 +936,6 @@ namespace hpx { namespace serialization
         }                                                                     \
     }}}                                                                       \
 /**/
-#endif
 
 #define HPX_REGISTER_ACTION_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
@@ -971,28 +969,18 @@ namespace hpx { namespace serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
     namespace hpx { namespace actions { namespace detail {                    \
-        template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_action_name<action>();                                \
         template <> HPX_ALWAYS_EXPORT                                         \
         util::itt::string_handle const& get_action_name_itt<action>();        \
     }}}                                                                       \
-    HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                            \
-                                                                              \
-    namespace hpx { namespace traits {                                        \
-        template <>                                                           \
-        struct is_action<action>                                              \
-          : std::true_type                                                    \
-        {};                                                                   \
-        template <>                                                           \
-        struct needs_automatic_registration<action>                           \
-          : std::false_type                                                   \
-        {};                                                                   \
-    }}                                                                        \
 /**/
 #else
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)
+#endif
+
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \
@@ -1010,7 +998,6 @@ namespace hpx { namespace serialization
         {};                                                                   \
     }}                                                                        \
 /**/
-#endif
 
 #define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
