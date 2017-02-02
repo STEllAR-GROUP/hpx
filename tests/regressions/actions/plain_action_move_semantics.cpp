@@ -483,12 +483,12 @@ void test_object_direct_actions()
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_direct_action,
                 non_movable_object>(id)
-            ), 1u); // transfer_action
+            ), 3u); // transfer_action + bind + function
 
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_direct_action,
                 non_movable_object>(id)
-            ), 1u); // transfer_action
+            ), 3u); // transfer_action + bind + function
         }
 
         // test std::size_t(movable_object)
@@ -527,12 +527,12 @@ void test_object_direct_actions()
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_value_direct_action,
                 non_movable_object>(id)
-            ), 2u); // transfer_action + call
+            ), 4u); // transfer_action + bind + function + call
 
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_value_direct_action,
                 non_movable_object>(id)
-            ), 2u); // transfer_action + call
+            ), 4u); // transfer_action + bind + function + call
         }
 
         // test movable_object()
