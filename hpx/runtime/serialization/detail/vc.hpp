@@ -14,6 +14,10 @@
 
 #include <cstddef>
 
+#include <Vc/version.h>
+
+#if Vc_IS_VERSION_1
+
 #include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,6 +89,39 @@ namespace hpx { namespace serialization
         ar & make_array((T const*)&v.data(), v.size());
     }
 }}
+
+#else
+
+#include <array>
+
+#include <Vc/datapar>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace serialization
+{
+    template <typename T, typename Abi>
+    void serialize(input_archive & ar, Vc::datapar<T, Abi>& v, unsigned)
+    {
+        std::array<T, Vc::datapar<T, Abi>::size()> data;
+        std::size_t size = 0;
+        ar & size & data;
+        HPX_ASSERT(size == Vc::datapar<T, Abi>::size());
+
+        v.copy_from(data.data(), Vc::vector_aligned);
+    }
+
+    template <typename T, typename Abi>
+    void serialize(output_archive & ar, Vc::datapar<T, Abi> const& v, unsigned)
+    {
+        std::array<T, Vc::datapar<T, Abi>::size()> data;
+        std::size_t size = Vc::datapar<T, Abi>::size();
+        v.copy_to(data.data(), Vc::vector_aligned);
+
+        ar & size & data;
+    }
+}}
+
+#endif  // Vc_IS_VERSION_1
 
 #endif
 #endif

@@ -14,9 +14,11 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <Vc/Vc>
+#include <Vc/version.h>
 
 #if Vc_IS_VERSION_1
+
+#include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
