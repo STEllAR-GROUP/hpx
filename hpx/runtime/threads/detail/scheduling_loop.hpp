@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -279,6 +279,9 @@ namespace hpx { namespace threads { namespace detail
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name().data());
         util::itt::id threadid(domain, &scheduler);
+        util::itt::string_handle task_id("task_id");
+        util::itt::string_handle task_phase("task_phase");
+
 //         util::itt::frame_context fctx(domain);
 
         std::int64_t idle_loop_count = 0;
@@ -333,10 +336,12 @@ namespace hpx { namespace threads { namespace detail
                             // store the returned state in the thread
                             {
                                 is_active_wrapper utilization(counters.is_active_);
-#ifdef HPX_HAVE_ITTNOTIFY
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
 //                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
+                                task.add_metadata(task_id, thrd);
+                                task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

@@ -248,9 +248,13 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::gid_type>, vector_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
     hpx::naming::id_type, hpx::naming::gid_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::naming::id_type, naming_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
     std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>,
-    vector_id_type)
+    vector_id_gid_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::naming::id_type>, vector_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::unused_type, hpx_unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float, float)
@@ -264,6 +268,9 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint32_t, uint32_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<bool>, vector_bool_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<std::uint32_t>, vector_std_uint32_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
 
