@@ -87,6 +87,9 @@ namespace hpx { namespace util
             if (name != nullptr)
             {
                 altname = name;
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+                desc_itt_ = traits::get_function_annotation_itt<F>::call(f);
+#endif
             }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
@@ -101,6 +104,13 @@ namespace hpx { namespace util
             }
 #else
             init_from_alternative_name(altname);
+#endif
+
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+            if (!desc_itt_)
+            {
+                desc_itt_ = util::itt::string_handle(get_description());
+            }
 #endif
         }
 

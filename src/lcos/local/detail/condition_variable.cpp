@@ -63,7 +63,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
     bool condition_variable::notify_one(
-        std::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, threads::thread_priority priority,
+        error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -90,8 +91,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data*>(id)),
-                threads::pending, threads::wait_signaled,
-                threads::thread_priority_default, ec);
+                threads::pending, threads::wait_signaled, priority, ec);
+
             return not_empty;
         }
 
@@ -102,7 +103,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     void condition_variable::notify_all(
-        std::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, threads::thread_priority priority,
+        error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -138,7 +140,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 threads::set_thread_state(threads::thread_id_type(
                         reinterpret_cast<threads::thread_data*>(id)),
                     threads::pending, threads::wait_signaled,
-                    threads::thread_priority_default, local_ec);
+                    priority, local_ec);
 
                 if (local_ec)
                 {

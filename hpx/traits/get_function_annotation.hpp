@@ -7,6 +7,7 @@
 #define HPX_TRAITS_GET_FUNCTION_ANNOTATION_JAN_31_2017_1201PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -22,6 +23,18 @@ namespace hpx { namespace traits
             return nullptr;
         }
     };
+
+#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+    template <typename F, typename Enable = void>
+    struct get_function_annotation_itt
+    {
+        static util::itt::string_handle call(F const& f)
+        {
+            static util::itt::string_handle sh(get_function_annotation<F>::call(f));
+            return sh;
+        }
+    };
+#endif
 }}
 
 #endif

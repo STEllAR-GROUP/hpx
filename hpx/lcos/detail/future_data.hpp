@@ -493,17 +493,19 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
-#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY)
+                util::itt::string_handle const& sh =
+                    traits::get_function_annotation_itt<
+                            completed_callback_type
+                        >::call(on_completed);
+                util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
                 char const* name = traits::get_function_annotation<
                         completed_callback_type
                     >::call(on_completed);
                 if (name != nullptr)
                 {
-#if defined(HPX_HAVE_APEX)
                     util::apex_wrapper apex_profiler(name);
-#else
-                    util::itt::task task(hpx::get_thread_itt_domain(), name);
-#endif
                     on_completed();
                 }
                 else
@@ -593,7 +595,7 @@ namespace detail
             state_ = value;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
+            cond_.notify_all(std::move(l), threads::thread_priority_boost, ec);
 
             // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.

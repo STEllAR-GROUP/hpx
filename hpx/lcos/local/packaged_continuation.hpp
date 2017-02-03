@@ -115,15 +115,15 @@ namespace hpx { namespace lcos { namespace detail
             typename util::result_of<Func(Future)>::type
         > is_void;
 
-#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY)
+        util::itt::string_handle const& sh =
+            traits::get_function_annotation_itt<Func>::call(func);
+        util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
         char const* name = traits::get_function_annotation<Func>::call(func);
         if (name != nullptr)
         {
-#if defined(HPX_HAVE_APEX)
             util::apex_wrapper apex_profiler(name);
-#else
-            util::itt::task task(hpx::get_thread_itt_domain(), name);
-#endif
             invoke_continuation(func, future, cont, is_void());
         }
         else

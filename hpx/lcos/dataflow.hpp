@@ -237,15 +237,15 @@ namespace hpx { namespace lcos { namespace detail
 
         HPX_FORCEINLINE void done()
         {
-#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY)
+            util::itt::string_handle const& sh =
+                traits::get_function_annotation_itt<Func>::call(func_);
+            util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
             char const* name = traits::get_function_annotation<Func>::call(func_);
             if (name != nullptr)
             {
-#if defined(HPX_HAVE_APEX)
                 util::apex_wrapper apex_profiler(name);
-#else
-                util::itt::task task(hpx::get_thread_itt_domain(), name);
-#endif
                 execute(indices_type(), is_void());
             }
             else
