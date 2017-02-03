@@ -107,7 +107,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 status = super_type::ctx_exited_exit;
                 tinfo = boost::current_exception();
                 this->reset();            // reset functor
-            } catch (boost::exception const&) {
+            }
+#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
+            catch (boost::exception const&) {
                 status = super_type::ctx_exited_abnormally;
                 tinfo = boost::current_exception();
                 this->reset();
@@ -120,6 +122,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 tinfo = boost::current_exception();
                 this->reset();
             }
+#endif
 
             this->do_return(status, std::move(tinfo));
 

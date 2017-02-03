@@ -1053,7 +1053,9 @@ namespace hpx
             bool blocking)
         {
             int result = 0;
+#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
             set_error_handlers();
+#endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");
