@@ -24,7 +24,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/tuple.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
@@ -145,7 +145,7 @@ namespace hpx { namespace actions
         }
 #endif
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename Action>
         util::itt::string_handle const& get_action_name_itt()
 #ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION

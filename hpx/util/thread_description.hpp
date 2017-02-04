@@ -12,7 +12,7 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/assert.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
@@ -44,7 +44,7 @@ namespace hpx { namespace util
 
         data_type type_;
         data data_;
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::string_handle desc_itt_;
 #endif
 
@@ -63,7 +63,7 @@ namespace hpx { namespace util
             data_.desc_ = desc;
         }
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         thread_description(char const* desc,
                 util::itt::string_handle const& sh) HPX_NOEXCEPT
           : type_(data_type_description)
@@ -99,7 +99,7 @@ namespace hpx { namespace util
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             desc_itt_ = hpx::actions::detail::get_action_name_itt<Action>();
 #endif
         }
@@ -115,7 +115,7 @@ namespace hpx { namespace util
             return data_.desc_;
         }
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
         {
             HPX_ASSERT(type_ == data_type_description);
@@ -197,7 +197,7 @@ namespace hpx { namespace util
             return "<unknown>";
         }
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
         {
             HPX_ASSERT(type_ == data_type_description);

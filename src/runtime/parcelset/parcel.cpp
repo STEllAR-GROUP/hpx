@@ -442,7 +442,7 @@ namespace hpx { namespace parcelset
         // continuation support, this is handled in the transfer action
         action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread);
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         static util::itt::event parcel_recv("recv_parcel");
         util::itt::event_tick(parcel_recv);
 #endif

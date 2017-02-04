@@ -336,7 +336,7 @@ namespace hpx { namespace threads { namespace detail
                             // store the returned state in the thread
                             {
                                 is_active_wrapper utilization(counters.is_active_);
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
 //                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
