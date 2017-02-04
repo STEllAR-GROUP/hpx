@@ -254,37 +254,11 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_FORCEINLINE
-        void finalize(launch policy)
+        void finalize(hpx::detail::async_policy policy)
         {
-            if (policy == hpx::launch::sync)
-            {
-                done();
-                return;
-            }
-
             // schedule the final function invocation with high priority
             util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
-            if (policy == launch::fork)
-            {
-                threads::thread_id_type tid = threads::register_thread_nullary(
-                    util::deferred_call(&dataflow_frame::done, std::move(this_))
-                  , desc
-                  , threads::pending_do_not_schedule
-                  , true
-                  , threads::thread_priority_boost
-                  , get_worker_thread_num()
-                  , threads::thread_stacksize_current);
-
-                if (tid)
-                {
-                    // make sure this thread is executed last
-                    hpx::this_thread::yield_to(thread::id(std::move(tid)));
-                }
-                return;
-            }
 
             // simply schedule new thread
             threads::register_thread_nullary(
@@ -292,7 +266,7 @@ namespace hpx { namespace lcos { namespace detail
               , desc
               , threads::pending
               , true
-              , threads::thread_priority_boost
+              , policy.priority()
               , std::size_t(-1)
               , threads::thread_stacksize_current);
         }
@@ -301,6 +275,44 @@ namespace hpx { namespace lcos { namespace detail
         void finalize(hpx::detail::sync_policy)
         {
             done();
+        }
+
+        void finalize(hpx::detail::fork_policy policy)
+        {
+            // schedule the final function invocation with high priority
+            util::thread_description desc(func_, "dataflow_frame::finalize");
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            threads::thread_id_type tid = threads::register_thread_nullary(
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
+              , desc
+              , threads::pending_do_not_schedule
+              , true
+              , policy.priority()
+              , get_worker_thread_num()
+              , threads::thread_stacksize_current);
+
+            if (tid)
+            {
+                // make sure this thread is executed last
+                hpx::this_thread::yield_to(thread::id(std::move(tid)));
+            }
+        }
+
+        void finalize(launch policy)
+        {
+            if (policy == launch::sync)
+            {
+                finalize(launch::sync);
+            }
+            else if (policy == launch::fork)
+            {
+                finalize(launch::fork);
+            }
+            else
+            {
+                finalize(launch::async);
+            }
         }
 
         HPX_FORCEINLINE

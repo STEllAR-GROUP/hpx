@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 namespace hpx
@@ -33,8 +34,11 @@ namespace hpx
 
         struct policy_holder
         {
-            HPX_CONSTEXPR explicit policy_holder(launch_policy p) HPX_NOEXCEPT
-              : policy_(p)
+            HPX_CONSTEXPR explicit policy_holder(launch_policy p,
+                    threads::thread_priority priority =
+                        threads::thread_priority_default) HPX_NOEXCEPT
+              : policy_(p),
+                priority_(priority)
             {}
 
             HPX_CONSTEXPR operator launch_policy() const HPX_NOEXCEPT
@@ -47,7 +51,13 @@ namespace hpx
                 return static_cast<int>(policy_) != 0;
             }
 
+            HPX_CONSTEXPR threads::thread_priority priority() const
+            {
+                return priority_;
+            }
+
             launch_policy policy_;
+            threads::thread_priority priority_;
 
         private:
             friend class serialization::access;
@@ -60,16 +70,30 @@ namespace hpx
 
         struct async_policy : policy_holder
         {
-            HPX_CONSTEXPR async_policy() HPX_NOEXCEPT
-              : policy_holder(launch_policy::async)
+            HPX_CONSTEXPR async_policy(threads::thread_priority priority =
+                    threads::thread_priority_default) HPX_NOEXCEPT
+              : policy_holder(launch_policy::async, priority)
             {}
+
+            HPX_CONSTEXPR async_policy operator()(
+                threads::thread_priority priority) const HPX_NOEXCEPT
+            {
+                return async_policy(priority);
+            }
         };
 
         struct fork_policy : policy_holder
         {
-            HPX_CONSTEXPR fork_policy() HPX_NOEXCEPT
-              : policy_holder(launch_policy::fork)
+            HPX_CONSTEXPR fork_policy(threads::thread_priority priority =
+                    threads::thread_priority_boost) HPX_NOEXCEPT
+              : policy_holder(launch_policy::fork, priority)
             {}
+
+            HPX_CONSTEXPR fork_policy operator()(
+                threads::thread_priority priority) const HPX_NOEXCEPT
+            {
+                return fork_policy(priority);
+            }
         };
 
         struct sync_policy : policy_holder

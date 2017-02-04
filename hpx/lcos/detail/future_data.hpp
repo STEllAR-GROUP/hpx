@@ -595,7 +595,7 @@ namespace detail
             state_ = value;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), threads::thread_priority_boost, ec);
+            cond_.notify_all(std::move(l), threads::thread_priority_default, ec);
 
             // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.

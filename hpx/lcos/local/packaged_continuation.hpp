@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail
         void run(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f, error_code& ec)
+            >::type && f, threads::thread_priority, error_code& ec)
         {
             {
                 std::lock_guard<mutex_type> l(this->mtx_);
@@ -275,9 +275,9 @@ namespace hpx { namespace lcos { namespace detail
         void run(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f)
+            >::type && f, threads::thread_priority priority)
         {
-            run(std::move(f), throws);
+            run(std::move(f), priority, throws);
         }
 
         threads::thread_result_type
@@ -297,6 +297,7 @@ namespace hpx { namespace lcos { namespace detail
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f,
+            threads::thread_priority priority,
             error_code& ec)
         {
             {
@@ -319,7 +320,7 @@ namespace hpx { namespace lcos { namespace detail
             applier::register_thread_plain(
                 util::bind(util::one_shot(async_impl_ptr),
                     std::move(this_), std::move(f)),
-                desc);
+                desc, threads::pending, true, priority);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -389,9 +390,10 @@ namespace hpx { namespace lcos { namespace detail
         void async(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f)
+            >::type && f,
+            threads::thread_priority priority)
         {
-            async(std::move(f), throws);
+            async(std::move(f), priority, throws);
         }
 
         void async(
@@ -463,7 +465,8 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&);
+            void (continuation::*cb)(shared_state_ptr &&, threads::thread_priority);
+
             if (policy & launch::sync)
                 cb = &continuation::run;
             else
@@ -480,8 +483,9 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             ptr->execute_deferred();
-            ptr->set_on_completed(
-                util::deferred_call(cb, std::move(this_), std::move(state)));
+            ptr->set_on_completed(util::deferred_call(
+                    cb, std::move(this_), std::move(state), policy.priority()
+                ));
         }
 
         void attach(Future const& future, threads::executor& sched)
