@@ -41,7 +41,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
@@ -836,7 +836,7 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
 /**/
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
@@ -893,7 +893,7 @@ namespace hpx { namespace serialization
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \

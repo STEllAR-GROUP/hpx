@@ -457,7 +457,7 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#ifdef HPX_HAVE_ITTNOTIFY
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -519,7 +519,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#ifdef HPX_HAVE_ITTNOTIFY
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
