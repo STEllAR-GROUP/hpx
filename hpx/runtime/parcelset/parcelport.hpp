@@ -22,6 +22,8 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdint>
@@ -366,6 +368,7 @@ namespace hpx { namespace parcelset
 
         typedef std::set<locality> pending_parcels_destinations;
         pending_parcels_destinations parcel_destinations_;
+        boost::atomic<std::uint32_t> num_parcel_destinations_;
 
         /// The local locality
         locality here_;
