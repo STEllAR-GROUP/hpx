@@ -27,7 +27,7 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
-#if defined(HPX_HAVE_ITTNOTIFY) || defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -493,7 +493,7 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
-#if defined(HPX_HAVE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0
                 util::itt::string_handle const& sh =
                     traits::get_function_annotation_itt<
                             completed_callback_type

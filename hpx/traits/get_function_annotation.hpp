@@ -24,7 +24,7 @@ namespace hpx { namespace traits
         }
     };
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename F, typename Enable = void>
     struct get_function_annotation_itt
     {
