@@ -934,7 +934,6 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
             if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
@@ -1117,7 +1116,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
     protected:
-        boost::mutex void_mtx_;
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue_type*> queues_;
         std::vector<thread_queue_type*> high_priority_queues_;

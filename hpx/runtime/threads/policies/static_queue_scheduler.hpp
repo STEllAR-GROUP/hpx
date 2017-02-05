@@ -17,8 +17,6 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>

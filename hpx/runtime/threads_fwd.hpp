@@ -94,28 +94,6 @@ namespace hpx
             class HPX_EXPORT hierarchy_scheduler;
 #endif
 
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
-                lockfree_fifo, // FIFO pending queuing
-                lockfree_fifo, // FIFO staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > fifo_priority_queue_scheduler;
-
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-            struct lockfree_abp_fifo;
-            struct lockfree_abp_lifo;
-
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
-                lockfree_abp_fifo, // FIFO + ABP pending queuing
-                lockfree_abp_fifo, // FIFO + ABP staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > abp_fifo_priority_queue_scheduler;
-#endif
-
-            // define the default scheduler to use
-            typedef fifo_priority_queue_scheduler queue_scheduler;
-
             class HPX_EXPORT callback_notifier;
         }
 

@@ -19,7 +19,7 @@ information).
 
 [heading Priority Local Scheduling Policy (default policy)]
 
-* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority`] (or `-qpr`)
+* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority-fifo`] (or `-qlo`)
 
 The priority local scheduling policy maintains one queue per operating system
 (OS) thread. The OS thread pulls its work from this queue. By default the number
@@ -37,6 +37,11 @@ sensitivity is turned on work stealing is done from queues associated with the
 same NUMA domain first, only after that work is stolen from other NUMA domains.
 
 This scheduler is enabled at build time by default and will be available always.
+
+This scheduler can be used with two underlying queueing policies (FIFO:
+first-in-first-out, and LIFO: last-in-first-out). The default is FIFO. In order
+to use the LIFO policiy use the command line option
+[hpx_cmdline `--hpx:queuing=local-priority-lifo`].
 
 [heading Static Priority Scheduling Policy]
 
