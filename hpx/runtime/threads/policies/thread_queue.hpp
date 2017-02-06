@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -26,8 +27,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -75,6 +75,33 @@ namespace hpx { namespace threads { namespace policies
     extern bool minimal_deadlock_detection;
 #endif
 
+    namespace detail
+    {
+        inline int get_min_add_new_count()
+        {
+            static int min_add_new_count =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.min_add_new_count", "10"));
+            return min_add_new_count;
+        }
+
+        inline int get_max_add_new_count()
+        {
+            static int max_add_new_count =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.max_add_new_count", "10"));
+            return max_add_new_count;
+        }
+
+        inline int get_max_delete_count()
+        {
+            static int max_delete_count =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.max_delete_count", "1000"));
+            return max_delete_count;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // // Queue back-end interface:
     //
@@ -117,13 +144,14 @@ namespace hpx { namespace threads { namespace policies
         // we use a simple mutex to protect the data members for now
         typedef Mutex mutex_type;
 
-        // Add this number of threads to the work items queue each time the
-        // function \a add_new() is called if the queue is empty.
-        enum {
-            min_add_new_count = 10,
-            max_add_new_count = 10,
-            max_delete_count = 1000
-        };
+        // create at least this amount of threads from tasks
+        int const min_add_new_count;
+
+        // create not more than this amount of threads from tasks
+        int const max_add_new_count;
+
+        // number of terminated threads to discard
+        int const max_delete_count;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef std::unordered_set<thread_id_type> thread_map_type;
@@ -523,7 +551,10 @@ namespace hpx { namespace threads { namespace policies
 
         thread_queue(std::size_t queue_num = std::size_t(-1),
                 std::size_t max_count = max_thread_count)
-          : thread_map_count_(0),
+          : min_add_new_count(detail::get_min_add_new_count()),
+            max_add_new_count(detail::get_max_add_new_count()),
+            max_delete_count(detail::get_max_delete_count()),
+            thread_map_count_(0),
             work_items_(128, queue_num),
             work_items_count_(0),
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
