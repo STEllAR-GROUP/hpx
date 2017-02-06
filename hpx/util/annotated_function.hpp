@@ -31,7 +31,7 @@ namespace hpx { namespace util
         template <typename F>
         struct annotated_function
         {
-            annotated_function()
+            annotated_function() HPX_NOEXCEPT
               : name_(nullptr)
             {}
 
@@ -46,7 +46,7 @@ namespace hpx { namespace util
         private:
             struct reset_name
             {
-                reset_name(annotated_function& f)
+                reset_name(annotated_function& f) HPX_NOEXCEPT
                   : f_(f), desc_()
                 {
                     if (f_.name_)
@@ -91,9 +91,9 @@ namespace hpx { namespace util
                     >::call(f_);
             }
 
-            char const* get_function_annotation() const
+            char const* get_function_annotation() const HPX_NOEXCEPT
             {
-                return name_ ? name_ : "<unknown>";
+                return name_ ? name_ : typeid(f_).name();
             }
 
         private:
@@ -123,7 +123,8 @@ namespace hpx { namespace traits
     template <typename F>
     struct get_function_address<util::detail::annotated_function<F> >
     {
-        static std::size_t call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
+        static std::size_t
+        call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
         {
             return f.get_function_address();
         }
@@ -132,7 +133,8 @@ namespace hpx { namespace traits
     template <typename F>
     struct get_function_annotation<util::detail::annotated_function<F> >
     {
-        static char const* call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
+        static char const*
+        call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
         {
             return f.get_function_annotation();
         }
