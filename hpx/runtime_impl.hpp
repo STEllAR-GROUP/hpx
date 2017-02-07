@@ -366,15 +366,12 @@ namespace hpx
     private:
         void deinit_tss();
 
-        void init_tss_ex(char const* context, std::size_t num,
-            char const* postfix, bool service_thread, error_code& ec);
+        void init_tss_ex(std::string const& locality, char const* context,
+            std::size_t num, char const* postfix, bool service_thread,
+            error_code& ec);
 
         void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread)
-        {
-            error_code ec(lightweight);
-            return init_tss_ex(context, num, postfix, service_thread, ec);
-        }
+            bool service_thread);
 
     private:
         util::unique_id_ranges id_pool_;

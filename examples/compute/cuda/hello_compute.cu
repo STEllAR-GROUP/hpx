@@ -45,10 +45,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::compute::vector<int, allocator_type> d_C(N, alloc);
 
     hpx::parallel::copy(
-        hpx::parallel::seq,
+        hpx::parallel::execution::seq,
         h_A.begin(), h_A.end(), d_A.begin());
     hpx::parallel::copy(
-        hpx::parallel::seq,
+        hpx::parallel::execution::seq,
         h_B.begin(), h_B.end(), d_B.begin());
 
     int threadsPerBlock = 256;
@@ -64,7 +64,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 
     hpx::parallel::copy(
-        hpx::parallel::seq,
+        hpx::parallel::execution::seq,
         d_C.begin(), d_C.end(), h_C.begin());
 
     bool success = true;

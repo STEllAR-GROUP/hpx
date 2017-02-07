@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -41,6 +41,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -741,61 +744,38 @@ namespace hpx { namespace actions
         base_lco_with_value_hpx_counter_info_set,
         base_lco_with_value_hpx_counter_value_get,
         base_lco_with_value_hpx_counter_value_set,
+        base_lco_with_value_hpx_counter_values_array_get,
+        base_lco_with_value_hpx_counter_values_array_set,
         base_lco_with_value_hpx_memory_data_get,
         base_lco_with_value_hpx_memory_data_set,
         base_lco_with_value_std_string_get,
         base_lco_with_value_std_string_set,
         base_lco_with_value_std_bool_ptrdiff_get,
         base_lco_with_value_std_bool_ptrdiff_set,
-
-        base_set_event_action_id_non_direct,
-        base_set_exception_action_id_non_direct,
-        base_lco_with_value_gid_get_non_direct,
-        base_lco_with_value_gid_set_non_direct,
-        base_lco_with_value_vector_gid_get_non_direct,
-        base_lco_with_value_vector_gid_set_non_direct,
-        base_lco_with_value_id_get_non_direct,
-        base_lco_with_value_id_set_non_direct,
-        base_lco_with_value_vector_id_get_non_direct,
-        base_lco_with_value_vector_id_set_non_direct,
-        base_lco_with_value_unused_get_non_direct,
-        base_lco_with_value_unused_set_non_direct,
-        base_lco_with_value_float_get_non_direct,
-        base_lco_with_value_float_set_non_direct,
-        base_lco_with_value_double_get_non_direct,
-        base_lco_with_value_double_set_non_direct,
-        base_lco_with_value_int8_get_non_direct,
-        base_lco_with_value_int8_set_non_direct,
-        base_lco_with_value_uint8_get_non_direct,
-        base_lco_with_value_uint8_set_non_direct,
-        base_lco_with_value_int16_get_non_direct,
-        base_lco_with_value_int16_set_non_direct,
-        base_lco_with_value_uint16_get_non_direct,
-        base_lco_with_value_uint16_set_non_direct,
-        base_lco_with_value_int32_get_non_direct,
-        base_lco_with_value_int32_set_non_direct,
-        base_lco_with_value_uint32_get_non_direct,
-        base_lco_with_value_uint32_set_non_direct,
-        base_lco_with_value_int64_get_non_direct,
-        base_lco_with_value_int64_set_non_direct,
-        base_lco_with_value_uint64_get_non_direct,
-        base_lco_with_value_uint64_set_non_direct,
-        base_lco_with_value_uint128_get_non_direct,
-        base_lco_with_value_uint128_set_non_direct,
-        base_lco_with_value_bool_get_non_direct,
-        base_lco_with_value_bool_set_non_direct,
-        base_lco_with_value_hpx_section_get_non_direct,
-        base_lco_with_value_hpx_section_set_non_direct,
-        base_lco_with_value_hpx_counter_info_get_non_direct,
-        base_lco_with_value_hpx_counter_info_set_non_direct,
-        base_lco_with_value_hpx_counter_value_get_non_direct,
-        base_lco_with_value_hpx_counter_value_set_non_direct,
-        base_lco_with_value_hpx_memory_data_get_non_direct,
-        base_lco_with_value_hpx_memory_data_set_non_direct,
-        base_lco_with_value_std_string_get_non_direct,
-        base_lco_with_value_std_string_set_non_direct,
-        base_lco_with_value_std_bool_ptrdiff_get_non_direct,
-        base_lco_with_value_std_bool_ptrdiff_set_non_direct,
+        base_lco_with_value_vector_bool_get,
+        base_lco_with_value_vector_bool_set,
+        base_lco_with_value_naming_address_get,
+        base_lco_with_value_naming_address_set,
+        base_lco_with_value_gva_tuple_get,
+        base_lco_with_value_gva_tuple_set,
+        base_lco_with_value_std_pair_address_id_type_get,
+        base_lco_with_value_std_pair_address_id_type_set,
+        base_lco_with_value_std_pair_gid_type_get,
+        base_lco_with_value_std_pair_gid_type_set,
+        base_lco_with_value_id_type_get,
+        base_lco_with_value_id_type_set,
+        base_lco_with_value_vector_std_int64_get,
+        base_lco_with_value_vector_std_int64_set,
+        base_lco_with_value_vector_id_gid_get,
+        base_lco_with_value_vector_id_gid_set,
+        base_lco_with_value_vector_std_uint32_get,
+        base_lco_with_value_vector_std_uint32_set,
+        base_lco_with_value_parcelset_endpoints_get,
+        base_lco_with_value_parcelset_endpoints_set,
+        base_lco_with_value_vector_compute_host_target_get,
+        base_lco_with_value_vector_compute_host_target_set,
+        base_lco_with_value_vector_compute_cuda_target_get,
+        base_lco_with_value_vector_compute_cuda_target_set,
 
         // typed continuations...
         typed_continuation_hpx_agas_response,
@@ -856,7 +836,23 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
 /**/
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        util::itt::string_handle const& get_action_name_itt<action>()         \
+        {                                                                     \
+            static util::itt::string_handle sh(BOOST_PP_STRINGIZE(actionname)); \
+            return sh;                                                        \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+#else
+#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)
+#endif
+
 #define HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                       \
+    HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                        \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_action_name<action>()                                 \
@@ -897,7 +893,19 @@ namespace hpx { namespace serialization
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        util::itt::string_handle const& get_action_name_itt<action>();        \
+    }}}                                                                       \
+/**/
+#else
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)
+#endif
+
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \

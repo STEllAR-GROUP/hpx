@@ -33,6 +33,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -395,6 +396,11 @@ namespace hpx { namespace parcelset
 
             // invoke the original handler
             f(ec, p);
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static util::itt::event parcel_send("send_parcel");
+            util::itt::event_tick(parcel_send);
+#endif
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
             // tell APEX about the sent parcel

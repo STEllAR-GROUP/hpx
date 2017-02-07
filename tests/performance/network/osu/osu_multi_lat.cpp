@@ -88,7 +88,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
         typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         std::size_t const start = 0;
 

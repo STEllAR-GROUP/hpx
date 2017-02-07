@@ -3,10 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#define HPX_APPLICATION_NAME partitioned_vector_cu
-#define HPX_APPLICATION_STRING "partitioned_vector_cu"
-#define HPX_APPLICATION_EXPORTS
-
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
@@ -50,12 +46,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::compute::cuda::target_layout(hpx::compute::cuda::get_local_targets());
 
     {
+        using namespace hpx::parallel;
         hpx::partitioned_vector<int, target_vector> v(1000, policy);
-        hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
+        hpx::parallel::for_each(execution::seq, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(execution::par, v.begin(), v.end(), pfo());
+        hpx::parallel::for_each(execution::seq(execution::task),
             v.begin(), v.end(), pfo()).get();
-        hpx::parallel::for_each(hpx::parallel::par(hpx::parallel::task),
+        hpx::parallel::for_each(execution::par(execution::task),
             v.begin(), v.end(), pfo()).get();
     }
 

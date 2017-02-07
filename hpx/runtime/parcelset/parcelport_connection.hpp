@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace parcelset {
 
@@ -25,6 +26,10 @@ namespace hpx { namespace parcelset {
     struct parcelport_connection
       : std::enable_shared_from_this<Connection>
     {
+          ////////////////////////////////////////////////////////////////////////
+          typedef BufferType buffer_type;
+          typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
+
     private:
         HPX_NON_COPYABLE(parcelport_connection);
 
@@ -92,6 +97,15 @@ namespace hpx { namespace parcelset {
         parcelport_connection(typename BufferType::allocator_type const & alloc)
           : buffer_(alloc)
         {}
+
+        parcelport_connection(typename BufferType::allocator_type * alloc)
+          : buffer_(std::move(buffer_type(alloc)),alloc)
+        {}
+
+        parcelport_connection(parcel_buffer_type && buffer)
+          : buffer_(std::move(buffer))
+        {}
+
 #endif
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -102,10 +116,6 @@ namespace hpx { namespace parcelset {
 #endif
 
         virtual ~parcelport_connection() {}
-
-        ////////////////////////////////////////////////////////////////////////
-        typedef BufferType buffer_type;
-        typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
         /// buffer for data
         parcel_buffer_type buffer_;

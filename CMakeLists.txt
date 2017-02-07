@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -249,6 +249,9 @@ if(HPX_WITH_CUDA)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
 endif()
+if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+  hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
+endif()
 hpx_option(HPX_WITH_HCC BOOL
   "Enable hcc support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_SYCL BOOL
@@ -481,9 +484,6 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
 endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-#if(HPX_WITH_ITTNOTIFY)
-  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-#endif()
 
 ################################################################################
 # Scheduler configuration
@@ -556,6 +556,9 @@ if(HPX_WITH_PARCEL_PROFILING)
 endif()
 
 ## Parcelport related build options
+hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
+  "Enable the ibverbs based parcelport. This is currently an experimental feature"
+  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
   "Enable the MPI based parcelport."
   OFF CATEGORY "Parcelport")
@@ -736,7 +739,7 @@ endif()
 # HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
 endif()
@@ -744,7 +747,7 @@ endif()
 # HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
     "Enable backwards compatibility for component::get_gid() functions"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
@@ -773,7 +776,7 @@ if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 endif()
 
-# BADBAD: This enables an overload of swap is necessary to work around the
+# BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
 #         only a temporary tuple holding true references.
@@ -788,12 +791,28 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0
+# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
     "Enable support for boost::chrono (default: OFF)"
     OFF ADVANCED)
 if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
+# HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
+    "Enable old execution policy names in API (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
+endif()
+
+# HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
+    "Enable old overloads for transform_reduce and inner_product (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -927,156 +946,6 @@ if(NOT MSVC)
 endif()
 
 ################################################################################
-# C++ feature tests
-################################################################################
-
-# Check the availability of certain C++11 language features
-hpx_check_for_cxx11_alias_templates(
-  REQUIRED "HPX needs support for C++11 alias templates")
-
-hpx_check_for_cxx11_auto(
-  REQUIRED "HPX needs support for C++11 auto")
-
-hpx_check_for_cxx11_constexpr(
-  DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
-
-hpx_check_for_cxx11_decltype(
-  REQUIRED "HPX needs support for C++11 decltype")
-hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
-
-hpx_check_for_cxx11_decltype_n3276(
-  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE_N3276)
-
-hpx_check_for_cxx11_sfinae_expression(
-  DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
-
-hpx_check_for_cxx11_defaulted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
-
-hpx_check_for_cxx11_deleted_functions(
-  REQUIRED "HPX needs support for C++11 deleted functions")
-
-hpx_check_for_cxx11_explicit_cvt_ops(
-  REQUIRED "HPX needs support for C++11 explicit conversion operators")
-
-hpx_check_for_cxx11_explicit_variadic_templates(
-  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
-
-hpx_check_for_cxx11_extended_friend_declarations(
-  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
-
-hpx_check_for_cxx11_function_template_default_args(
-  REQUIRED "HPX needs support for C++11 defaulted function template arguments")
-
-hpx_check_for_cxx11_inline_namespaces(
-  DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
-
-hpx_check_for_cxx11_lambdas(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
-
-hpx_check_for_cxx11_noexcept(
-  DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
-
-hpx_check_for_cxx11_nullptr(
-  REQUIRED "HPX needs support for C++11 nullptr")
-
-hpx_check_for_cxx11_range_based_for(
-  REQUIRED "HPX needs support for C++11 range-based for-loop")
-
-hpx_check_for_cxx11_rvalue_references(
-  REQUIRED "HPX needs support for C++11 rvalue references")
-
-hpx_check_for_cxx11_scoped_enums(
-  REQUIRED "HPX needs support for C++11 scoped enums")
-
-hpx_check_for_cxx11_static_assert(
-  REQUIRED "HPX needs support for C++11 static_assert")
-
-hpx_check_for_cxx11_variadic_macros(
-  REQUIRED "HPX needs support for C++11 variadic macros")
-
-hpx_check_for_cxx11_variadic_templates(
-  REQUIRED "HPX needs support for C++11 variadic templates")
-
-# Check the availability of certain C++11 library features
-hpx_check_for_cxx11_std_array(
-  DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
-
-hpx_check_for_cxx11_std_chrono(
-  REQUIRED "HPX needs support for C++11 std::chrono")
-
-hpx_check_for_cxx11_std_cstdint(
-  REQUIRED "HPX needs support for C++11 std::[u]intX_t")
-
-hpx_check_for_cxx11_std_initializer_list(
-  REQUIRED "HPX needs support for C++11 std::initializer_list")
-
-hpx_check_for_cxx11_std_is_bind_expression(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
-
-hpx_check_for_cxx11_std_is_placeholder(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
-
-hpx_check_for_cxx11_std_is_trivially_copyable(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
-
-hpx_check_for_cxx11_std_lock_guard(
-  REQUIRED "HPX needs support for C++11 std::lock_guard")
-
-hpx_check_for_cxx11_std_reference_wrapper(
-  REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
-
-hpx_check_for_cxx11_std_shared_ptr(
-  REQUIRED "HPX needs support for C++11 std::shared_ptr")
-
-hpx_check_for_cxx11_std_to_string(
-  REQUIRED "HPX needs support for C++11 std::to_string")
-
-hpx_check_for_cxx11_std_unique_lock(
-  REQUIRED "HPX needs support for C++11 std::unique_lock")
-
-hpx_check_for_cxx11_std_unique_ptr(
-  REQUIRED "HPX needs support for C++11 std::unique_ptr")
-
-hpx_check_for_cxx11_std_unordered_map(
-  REQUIRED "HPX needs support for C++11 std::unordered_map")
-
-hpx_check_for_cxx11_std_unordered_set(
-  REQUIRED "HPX needs support for C++11 std::unordered_set")
-
-hpx_check_for_cxx11_std_type_traits(
-  DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
-
-if(HPX_WITH_CXX1Y)
-  # Check the availability of certain C++14 language features
-  hpx_check_for_cxx14_constexpr(
-    DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
-
-  hpx_check_for_cxx14_lambdas(
-    DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
-
-  # Check the availability of certain C++14 library features
-  hpx_check_for_cxx14_std_integer_sequence(
-    DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
-
-  hpx_check_for_cxx14_std_is_final(
-    DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
-
-  hpx_check_for_cxx14_std_is_null_pointer(
-    DEFINITIONS HPX_HAVE_CXX14_STD_IS_NULL_POINTER)
-
-  hpx_check_for_cxx14_std_result_of_sfinae(
-    DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
-endif()
-
-# check for experimental facilities
-if(HPX_WITH_CXX1Y)
-  # check for experimenta/optional only of in C++14 mode
-  hpx_check_for_cxx_experimental_std_optional(
-    DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
-endif()
-
-################################################################################
 # CUDA features
 ################################################################################
 if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
@@ -1098,6 +967,7 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
   endif()
   set(CUDA_SEPARABLE_COMPILATION ON)
+  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=sm_30)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=sm_35)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=compute_30)
@@ -1115,6 +985,13 @@ if(HPX_WITH_CUDA AND HPX_WITH_CUDA_CLANG)
   hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
   link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 endif()
+
+################################################################################
+# C++ feature tests
+################################################################################
+
+include(HPX_PerformCxxFeatureTests)
+hpx_perform_cxx_feature_tests()
 
 ################################################################################
 # check for miscellaneous things
@@ -1183,6 +1060,10 @@ if(WIN32)
       hpx_add_target_compile_option(-Gw
         CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
       hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+      if(HPX_WITH_DATAPAR_VC)
+        hpx_add_target_compile_option(-std:c++latest)
+        hpx_add_config_define(_HAS_AUTO_PTR_ETC 1)
+      endif()
     endif()
 
     # Exceptions
@@ -1234,7 +1115,9 @@ if(WIN32)
   ##############################################################################
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
-  hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  if (NOT Boost_USE_STATIC_LIBS)
+    hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  endif()
   if(NOT CMAKE_CL_64)
     hpx_add_config_define(BOOST_NO_ALIGNMENT)
   endif()
@@ -1430,16 +1313,17 @@ if(HPX_WITH_HWLOC)
 endif()
 
 ################################################################################
-# Enable integration with Intel Amplifier and Inspector tools
+# Enable integration with Intel Amplifier
 ################################################################################
-if(WITH_AMPLIFIER)
+if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   find_package(Amplifier)
   if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+    hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
   endif()
   hpx_libraries(${AMPLIFIER_LIBRARIES})
   include_directories(${AMPLIFIER_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+  hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
 endif()
 
 ################################################################################

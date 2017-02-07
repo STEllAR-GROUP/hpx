@@ -26,8 +26,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -120,8 +118,13 @@ namespace hpx { namespace threads { namespace policies
         // Add this number of threads to the work items queue each time the
         // function \a add_new() is called if the queue is empty.
         enum {
+            // don't steal if less than this amount of tasks are left
+            min_tasks_to_steal = 10,
+            // create at least this amount of threads from tasks
             min_add_new_count = 10,
+            // create not more than this amount of threads from tasks
             max_add_new_count = 10,
+            // number of terminated threads to discard
             max_delete_count = 1000
         };
 
@@ -264,6 +267,7 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(thrd);
 
                 if (HPX_UNLIKELY(!p.second)) {
+                    lk.unlock();
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
                         "Couldn't add new thread to the thread map");
@@ -292,44 +296,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
-            std::unique_lock<mutex_type> &lk, bool steal = false)
-        {
-            HPX_ASSERT(lk.owns_lock());
-
-#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-            util::tick_counter tc(add_new_time_);
-#endif
-
-            if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
-                return false;
-
-            // create new threads from pending tasks (if appropriate)
-            std::int64_t add_count = -1;                  // default is no constraint
-
-            // if the map doesn't hold max_count threads yet add some
-            // FIXME: why do we have this test? can max_count_ ever be zero?
-            if (HPX_LIKELY(max_count_)) {
-                std::size_t count = thread_map_.size();
-                if (max_count_ >= count + min_add_new_count) { //-V104
-                    HPX_ASSERT(max_count_ - count <
-                        static_cast<std::size_t>((std::numeric_limits
-                            <std::int64_t>::max)()));
-                    add_count = static_cast<std::int64_t>(max_count_ - count);
-                    if (add_count < min_add_new_count)
-                        add_count = min_add_new_count;
-                }
-                else {
-                    return false;
-                }
-            }
-
-            std::size_t addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
             std::unique_lock<mutex_type> &lk, bool steal = false)
         {
@@ -339,11 +305,8 @@ namespace hpx { namespace threads { namespace policies
             util::tick_counter tc(add_new_time_);
 #endif
 
-            if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
-                return false;
-
             // create new threads from pending tasks (if appropriate)
-            std::int64_t add_count = -1;                  // default is no constraint
+            std::int64_t add_count = -1;            // default is no constraint
 
             // if we are desperate (no work in the queues), add some even if the
             // map holds more than max_count
@@ -351,8 +314,9 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) { //-V104
                     HPX_ASSERT(max_count_ - count <
-                        static_cast<std::size_t>((std::numeric_limits
-                            <std::int64_t>::max)()));
+                        static_cast<std::size_t>(
+                            (std::numeric_limits<std::int64_t>::max)()
+                        ));
                     add_count = static_cast<std::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
                         add_count = min_add_new_count;
@@ -812,8 +776,7 @@ namespace hpx { namespace threads { namespace policies
         {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             thread_description* tdesc;
-            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                work_items_.pop(tdesc, steal))
+            if (work_items_.pop(tdesc, steal))
             {
                 --work_items_count_;
 
@@ -969,11 +932,32 @@ namespace hpx { namespace threads { namespace policies
         /// has to be terminated (i.e. no more work has to be done).
         inline bool wait_or_add_new(bool running,
             std::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom_ = nullptr, bool steal = false) HPX_HOT
+            thread_queue* addfrom = nullptr, bool steal = false) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty
-            if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
+            if (0 == work_items_count_.load(boost::memory_order_relaxed))
+            {
+                // see if we can avoid grabbing the lock below
+                if (addfrom)
+                {
+                    // don't try to steal if there are only a few tasks left on
+                    // this queue
+                    if (running && min_tasks_to_steal >=
+                        addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (running &&
+                        0 == new_tasks_count_.load(boost::memory_order_relaxed))
+                    {
+                        return false;
+                    }
+                    addfrom = this;
+                }
 
                 // No obvious work has to be done, so a lock won't hurt too much.
                 //
@@ -989,7 +973,6 @@ namespace hpx { namespace threads { namespace policies
                     return false;            // avoid long wait on lock
 
                 // stop running after all HPX threads have been terminated
-                thread_queue* addfrom = addfrom_ ? addfrom_ : this;
                 bool added_new = add_new_always(added, addfrom, lk, steal);
                 if (!added_new) {
                     // Before exiting each of the OS threads deletes the

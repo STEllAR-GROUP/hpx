@@ -135,17 +135,17 @@ void exclusive_scan_validate()
     std::vector<int> a, b;
     // test scan algorithms using separate array for output
     DEBUG_OUT("\nValidating separate arrays sequential");
-    test_exclusive_scan_validate(hpx::parallel::seq, a, b);
+    test_exclusive_scan_validate(hpx::parallel::execution::seq, a, b);
 
     DEBUG_OUT("\nValidating separate arrays parallel");
-    test_exclusive_scan_validate(hpx::parallel::par, a, b);
+    test_exclusive_scan_validate(hpx::parallel::execution::par, a, b);
 
     // test scan algorithms using same array for input and output
     DEBUG_OUT("\nValidating in_place arrays sequential ");
-    test_exclusive_scan_validate(hpx::parallel::seq, a, a);
+    test_exclusive_scan_validate(hpx::parallel::execution::seq, a, a);
 
     DEBUG_OUT("\nValidating in_place arrays parallel ");
-    test_exclusive_scan_validate(hpx::parallel::par, a, a);
+    test_exclusive_scan_validate(hpx::parallel::execution::par, a, a);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

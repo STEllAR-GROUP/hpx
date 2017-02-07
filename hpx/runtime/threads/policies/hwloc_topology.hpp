@@ -66,14 +66,6 @@ namespace hpx { namespace threads
         }
 
         std::size_t get_pu_number(
-            std::size_t num_thread
-          , error_code& ec = throws
-            ) const
-        {
-            return pu_numbers_[num_thread % num_of_pus_];
-        }
-
-        std::size_t get_pu_number(
             std::size_t num_core
           , std::size_t num_pu
           , error_code& ec = throws
@@ -234,8 +226,7 @@ namespace hpx { namespace threads
         }
         mask_type init_core_affinity_mask(std::size_t num_thread) const
         {
-            mask_type default_mask =
-                get_numa_node_affinity_mask(num_thread, false);
+            mask_type default_mask = numa_node_affinity_masks_[num_thread];
             return init_core_affinity_mask_from_core(
                 get_core_number(num_thread), default_mask);
         }

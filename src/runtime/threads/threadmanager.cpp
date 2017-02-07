@@ -405,6 +405,43 @@ namespace hpx { namespace threads
     }
 #endif
 
+    // scheduler utilization counter creation function
+    template <typename SchedulingPolicy>
+    naming::gid_type threadmanager_impl<SchedulingPolicy>::
+        scheduler_utilization_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_gid;
+
+        // /scheduler{locality#%d/total}/utilization/instantaneous
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_gid;
+        }
+
+        typedef detail::thread_pool<scheduling_policy_type> spt;
+
+        using util::placeholders::_1;
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            util::function_nonser<std::int64_t()> f =
+                util::bind(&spt::get_scheduler_utilization, &pool_);
+            return create_raw_counter(info, std::move(f), ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_gid;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool locality_allocator_counter_discoverer(
         performance_counters::counter_info const& info,
         performance_counters::discover_counter_func const& f,
@@ -1087,8 +1124,16 @@ namespace hpx { namespace threads
               counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""
-            }
+            },
 #endif
+            // scheduler utilization
+            { "/scheduler/utilization/instantaneous", performance_counters::counter_raw,
+              "returns the current scheduler utilization",
+              HPX_PERFORMANCE_COUNTER_V1,
+              util::bind(&ti::scheduler_utilization_counter_creator, this, _1, _2),
+              &performance_counters::locality_counter_discoverer,
+              "%"
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));

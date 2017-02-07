@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename R, typename Result>
-        struct static_partitioner_with_cleanup<parallel_task_execution_policy,
+        struct static_partitioner_with_cleanup<execution::parallel_task_policy,
             R, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -186,10 +186,10 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct static_partitioner_with_cleanup<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result>
           : static_partitioner_with_cleanup<
-              parallel_task_execution_policy, R, Result>
+              execution::parallel_task_policy, R, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename R, typename Result>
-        struct partitioner_with_cleanup<parallel_task_execution_policy, R,
+        struct partitioner_with_cleanup<execution::parallel_task_policy, R,
             Result, parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -239,27 +239,27 @@ namespace hpx { namespace parallel { namespace util
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner_with_cleanup<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::static_partitioner_tag>
-          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+          : partitioner_with_cleanup<execution::parallel_task_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner_with_cleanup<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::auto_partitioner_tag>
-          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+          : partitioner_with_cleanup<execution::parallel_task_policy, R, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename R,
             typename Result>
         struct partitioner_with_cleanup<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 R, Result, parallel::traits::default_partitioner_tag>
-          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+          : partitioner_with_cleanup<execution::parallel_task_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 

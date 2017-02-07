@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include <iostream>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // This example demonstrates the creation and use of different types of
@@ -161,7 +163,11 @@ int main(int argc, char* argv[])
              "number of performance counter queries to perform")
         ;
 
+    std::vector<std::string> cfg = {
+        "hpx.components.sine.enabled! = 1"
+    };
+
     // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
 

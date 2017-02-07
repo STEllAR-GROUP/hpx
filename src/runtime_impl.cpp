@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
@@ -23,6 +24,7 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
@@ -365,6 +367,24 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::string locality_prefix(util::runtime_configuration const& cfg)
+    {
+        std::string localities = cfg.get_entry("hpx.localities", "1");
+        std::size_t num_localities =
+            util::safe_lexical_cast<std::size_t>(localities, 1);
+        if (num_localities > 1)
+        {
+            std::string locality = cfg.get_entry("hpx.locality", "");
+            if (!locality.empty())
+            {
+                locality = "locality#" + locality;
+            }
+            return locality;
+        }
+        return "";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
         boost::mutex& mtx, boost::condition_variable& cond, bool& running)
@@ -376,16 +396,21 @@ namespace hpx {
             cond.notify_all();
         }
 
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
         // register this thread with any possibly active Intel tool
-        HPX_ITT_THREAD_SET_NAME("main-thread#wait_helper");
+        std::string thread_name (locality + "main-thread#wait_helper");
+        HPX_ITT_THREAD_SET_NAME(thread_name.c_str());
 
         // set thread name as shown in Visual Studio
-        util::set_thread_name("main-thread#wait_helper");
+        util::set_thread_name(thread_name.c_str());
 
 #if defined(HPX_HAVE_APEX)
         // not registering helper threads - for now
-        //apex::register_thread("main-thread#wait_helper");
+        //apex::register_thread(thread_name.c_str());
 #endif
+
         // wait for termination
         runtime_support_->wait();
 
@@ -512,6 +537,7 @@ namespace hpx {
                 std::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
+            lcos::barrier::get_global_barrier().release();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();
@@ -627,9 +653,20 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::init_tss(char const* context,
+        std::size_t num, char const* postfix, bool service_thread)
+    {
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
+        error_code ec(lightweight);
+        return init_tss_ex(locality, context, num, postfix, service_thread, ec);
+    }
+
+    template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::init_tss_ex(
-        char const* context, std::size_t num, char const* postfix,
-        bool service_thread, error_code& ec)
+        std::string const& locality, char const* context, std::size_t num,
+        char const* postfix, bool service_thread, error_code& ec)
     {
         // initialize our TSS
         this->runtime::init_tss();
@@ -640,7 +677,10 @@ namespace hpx {
         // set the thread's name, if it's not already set
         if (nullptr == runtime::thread_name_.get())
         {
-            std::string* fullname = new std::string(context);
+            std::string* fullname = new std::string(locality);
+            if (!locality.empty())
+                *fullname += "/";
+            *fullname += context;
             if (postfix && *postfix)
                 *fullname += postfix;
             *fullname += "#" + std::to_string(num);
@@ -775,10 +815,14 @@ namespace hpx {
         if (nullptr != runtime::thread_name_.get())
             return false;       // already registered
 
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), num, nullptr, service_thread, ec);
+        init_tss_ex(locality, thread_name.c_str(), num, nullptr,
+            service_thread, ec);
 
         return !ec ? true : false;
     }

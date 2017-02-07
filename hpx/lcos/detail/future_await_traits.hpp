@@ -110,14 +110,18 @@ namespace std { namespace experimental
                     create(std::move(shared_state));
             }
 
-            std::experimental::suspend_never initial_suspend() { return {}; }
+            std::experimental::suspend_never initial_suspend()
+            {
+                return std::experimental::suspend_never{};
+            }
 
             std::experimental::suspend_if final_suspend()
             {
                 // This gives up the coroutine's reference count on the shared
                 // state. If this was the last reference count, the coroutine
                 // should not suspend before exiting.
-                return {!this->base_type::requires_delete()};
+                return std::experimental::suspend_if{
+                    !this->base_type::requires_delete()};
             }
 
             template <typename U, typename U2 = T, typename V =

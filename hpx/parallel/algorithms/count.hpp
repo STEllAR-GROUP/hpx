@@ -57,7 +57,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : op_(std::forward<Op_>(op))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             count_iteration(count_iteration const&) = default;
             count_iteration(count_iteration&&) = default;
 #else
@@ -165,7 +166,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -211,20 +214,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param value        The value to search for.
     ///
     /// The comparisons in the parallel \a count algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// \note The comparisons in the parallel \a count algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
+    ///       an execution policy object of type \a parallel_policy or
+    ///       \a parallel_task_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count algorithm returns a
     ///           \a hpx::future<difference_type> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
@@ -232,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
@@ -318,7 +321,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -382,19 +387,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     implicitly converted to Type.
     ///
     /// \note The assignments in the parallel \a count_if algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
+    ///       an execution policy object of type \a sequenced_policy
     ///       execute in sequential order in the calling thread.
     /// \note The assignments in the parallel \a count_if algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
+    ///       an execution policy object of type \a parallel_policy or
+    ///       \a parallel_task_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count_if algorithm returns
     ///           \a hpx::future<difference_type> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
@@ -402,7 +407,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type

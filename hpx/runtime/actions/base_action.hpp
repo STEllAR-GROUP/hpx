@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -20,6 +20,9 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <cstdint>
 #include <cstddef>
@@ -123,6 +126,12 @@ namespace hpx { namespace actions
         virtual void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
             std::size_t num_thread) = 0;
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        /// The function \a get_action_name_itt returns the name of this action
+        /// as a ITT string_handle
+        virtual util::itt::string_handle const& get_action_name_itt() const = 0;
+#endif
     };
 }}
 

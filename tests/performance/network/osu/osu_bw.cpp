@@ -79,7 +79,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
             t.restart();
 
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         std::size_t const start = 0;
 

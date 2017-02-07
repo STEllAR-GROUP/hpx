@@ -70,6 +70,7 @@ namespace hpx { namespace lcos {
         /// \a num participate and the local rank is \a rank.
         barrier(std::string const&  base_name, std::size_t num, std::size_t rank);
 
+        /// \cond NOINTERNAL
         barrier(barrier&& other);
         barrier& operator=(barrier&& other);
 

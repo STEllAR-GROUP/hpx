@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/exception.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/traits/is_iterator.hpp>
 

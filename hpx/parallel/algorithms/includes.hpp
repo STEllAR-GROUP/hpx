@@ -248,7 +248,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the second range the algorithm will be applied to.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
-    /// \param f            The binary predicate which returns true if the
+    /// \param op           The binary predicate which returns true if the
     ///                     elements should be treated as includes. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:
@@ -263,19 +263,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a Type1 and \a Type2 respectively
     ///
     /// The comparison operations in the parallel \a includes algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a includes algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a includes algorithm returns a \a hpx::future<bool> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a bool otherwise.
     ///           The \a includes algorithm returns true every element from the
     ///           sorted range [first2, last2) is found within the sorted range
@@ -284,7 +284,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename Pred = detail::less>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
@@ -298,7 +298,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;

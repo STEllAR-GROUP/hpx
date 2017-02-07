@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2016 Hartmut Kaiser
+    Copyright (C) 2007-2017 Hartmut Kaiser
     Copyright (C) 2012 Bryce Adelstein-Lelbach
     Copyright (c) 2012-2016 Adrian Serio
 
@@ -12,7 +12,7 @@
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 1.0.0]
-    [copyright 2011 2012 2013 2014 2015 2016 The STE||AR Group (http://stellar-group.org)]
+    [copyright 2011 2012 2013 2014 2015 2016 2017 The STE||AR Group (http://stellar-group.org)]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
         accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt]

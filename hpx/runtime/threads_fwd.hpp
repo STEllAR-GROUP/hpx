@@ -118,6 +118,11 @@ namespace hpx
 
             class HPX_EXPORT callback_notifier;
         }
+
+        namespace executors
+        {
+            struct HPX_EXPORT current_executor;
+        }
     }
 }
 

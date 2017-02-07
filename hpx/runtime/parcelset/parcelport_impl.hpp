@@ -219,9 +219,8 @@ namespace hpx { namespace parcelset
             void operator()(parcel&& p)
             {
                 if (connection_handler_traits<ConnectionHandler>::
-                    send_immediate_parcels::value &&
-                    this_.can_send_immediate_impl<ConnectionHandler>()
-                    )
+                        send_immediate_parcels::value &&
+                    this_.can_send_immediate_impl<ConnectionHandler>())
                 {
                     this_.send_parcel_immediate(dest_, std::move(p), std::move(f_));
                 }
@@ -317,7 +316,8 @@ namespace hpx { namespace parcelset
             parcel_await_handlers handler(
                 *this, dest, std::move(handlers));
             if (!connection_handler_traits<ConnectionHandler>::
-                send_immediate_parcels::value) {
+                    send_immediate_parcels::value)
+            {
                 handler.parcels_.reserve(parcels.size());
             }
 
@@ -339,7 +339,11 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            trigger_pending_work();
+            if (!connection_handler_traits<ConnectionHandler>::
+                    send_immediate_parcels::value)
+            {
+                trigger_pending_work();
+            }
             return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
@@ -366,7 +370,7 @@ namespace hpx { namespace parcelset
                     util::bind(
                         &parcelport_impl::remove_from_connection_cache,
                         this, loc),
-                    "remove_from_connection_cache",
+                    "remove_from_connection_cache_delayed",
                     threads::pending, true, threads::thread_priority_normal,
                     get_next_num_thread(), threads::thread_stacksize_default,
                     ec);
@@ -489,7 +493,7 @@ namespace hpx { namespace parcelset
 
         template <typename ConnectionHandler_>
         typename std::enable_if<
-            !connection_handler_traits<
+           !connection_handler_traits<
                 ConnectionHandler_
             >::do_background_work::value,
             bool
@@ -513,7 +517,7 @@ namespace hpx { namespace parcelset
 
         template <typename ConnectionHandler_>
         typename std::enable_if<
-            !connection_handler_traits<
+           !connection_handler_traits<
                 ConnectionHandler_
             >::send_immediate_parcels::value,
             bool
@@ -531,7 +535,7 @@ namespace hpx { namespace parcelset
             std::shared_ptr<connection> sender_connection;
 
             if (connection_handler_traits<ConnectionHandler>::
-                send_immediate_parcels::value)
+                    send_immediate_parcels::value)
             {
                 std::terminate();
             }
@@ -583,6 +587,7 @@ namespace hpx { namespace parcelset
             util::get<1>(e).push_back(std::move(f));
 
             parcel_destinations_.insert(locality_id);
+            ++num_parcel_destinations_;
         }
 
         void enqueue_parcels(locality const& locality_id,
@@ -641,6 +646,7 @@ namespace hpx { namespace parcelset
             }
 
             parcel_destinations_.insert(locality_id);
+            ++num_parcel_destinations_;
         }
 
         bool dequeue_parcels(locality const& locality_id,
@@ -681,6 +687,9 @@ namespace hpx { namespace parcelset
 
                 parcel_destinations_.erase(locality_id);
 
+                HPX_ASSERT(0 != num_parcel_destinations_.load());
+                --num_parcel_destinations_;
+
                 return true;
             }
         }
@@ -688,6 +697,9 @@ namespace hpx { namespace parcelset
         bool trigger_pending_work()
         {
             if(hpx::is_stopped()) return true;
+
+            if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
+                return true;
 
             std::vector<locality> destinations;
 

@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename VecOnly, typename F, typename ... Iters>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-       !is_vectorpack_execution_policy<ExPolicy>::value,
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
         typename std::result_of<F&&(Iters...)>::type
     >::type
     loop_step(VecOnly, F && f, Iters& ... its)
@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter>
     HPX_HOST_DEVICE HPX_FORCEINLINE HPX_CONSTEXPR
     typename std::enable_if<
-        !is_vectorpack_execution_policy<ExPolicy>::value, bool
+        !execution::is_vectorpack_execution_policy<ExPolicy>::value, bool
     >::type
     loop_optimization(Iter, Iter)
     {
@@ -125,7 +125,8 @@ namespace hpx { namespace parallel { namespace util
         typename Begin1, typename End1, typename Begin2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-       !is_vectorpack_execution_policy<ExPolicy>::value, std::pair<Begin1, Begin2>
+       !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+        std::pair<Begin1, Begin2>
     >::type
     loop2(VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F && f)
     {
@@ -171,7 +172,8 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            !is_vectorpack_execution_policy<ExPolicy>::value, T const&
+           !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+            T const&
         >::type
         extract_value(T const& v)
         {
@@ -181,7 +183,8 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename F, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            !is_vectorpack_execution_policy<ExPolicy>::value, T const&
+           !execution::is_vectorpack_execution_policy<ExPolicy>::value,
+            T const&
         >::type
         accumulate_values(F &&, T const& v)
         {
@@ -191,7 +194,7 @@ namespace hpx { namespace parallel { namespace util
         template <typename ExPolicy, typename F, typename T, typename T1>
         HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<
-            !is_vectorpack_execution_policy<ExPolicy>::value, T
+            !execution::is_vectorpack_execution_policy<ExPolicy>::value, T
         >::type
         accumulate_values(F && f, T && v, T1 && init)
         {
@@ -203,7 +206,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        !is_vectorpack_execution_policy<ExPolicy>::value, Iter
+        !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter
     >::type
     loop_n(Iter it, std::size_t count, F && f)
     {
@@ -213,7 +216,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename ExPolicy, typename Iter, typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
-        !is_vectorpack_execution_policy<ExPolicy>::value, Iter
+        !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter
     >::type
     loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {

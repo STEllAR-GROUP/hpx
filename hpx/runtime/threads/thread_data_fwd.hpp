@@ -20,11 +20,16 @@
 #include <cstdint>
 #include <utility>
 
-namespace hpx { namespace threads
+namespace hpx
 {
     /// \cond NOINTERNAL
     class HPX_EXPORT thread;
+    /// \endcond
+}
 
+namespace hpx { namespace threads
+{
+    /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
 
     template <typename SchedulingPolicy>

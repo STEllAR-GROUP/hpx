@@ -11,7 +11,7 @@ set(tests
     register_with_basename_1804
    )
 
-set(register_with_basename_1804_PARAMETERS LOCALITIES 4)
+set(register_with_basename_1804_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources

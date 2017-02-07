@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,6 +49,7 @@ namespace hpx { namespace performance_counters { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
                 "get_counter_values_array is not implemented for this counter");
+            return counter_values_array();
         }
 
         virtual bool start()
@@ -224,6 +225,8 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_info, hpx_counter_info)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_value, hpx_counter_value)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::performance_counters::counter_values_array, hpx_counter_values_array)
 
 #endif
 

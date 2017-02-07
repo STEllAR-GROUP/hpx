@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -140,6 +140,7 @@ namespace hpx
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/functions.hpp>
@@ -225,10 +226,10 @@ namespace hpx { namespace lcos
 
                 for(/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
-                        traits::detail::get_shared_state(*next);
+                    typename traits::detail::shared_state_ptr<
+                            future_result_type
+                        >::type next_future_data =
+                            traits::detail::get_shared_state(*next);
 
                     if (!next_future_data->is_ready())
                     {
@@ -271,8 +272,8 @@ namespace hpx { namespace lcos
             void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(boost::unwrap_ref(util::get<I>(t_))),
-                    boost::end(boost::unwrap_ref(util::get<I>(t_))));
+                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
+                    boost::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
@@ -289,10 +290,10 @@ namespace hpx { namespace lcos
 
                 future_type& fut = util::get<I>(t_);
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data =
-                    traits::detail::get_shared_state(fut);
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(fut);
 
                 if (!next_future_data->is_ready())
                 {
@@ -338,8 +339,15 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef traits::is_future<future_type> is_future;
-                typedef traits::is_future_range<future_type> is_range;
+                typedef util::detail::any_of<
+                        traits::is_future<future_type>,
+                        traits::is_ref_wrapped_future<future_type>
+                    > is_future;
+
+                typedef util::detail::any_of<
+                        traits::is_future_range<future_type>,
+                        traits::is_ref_wrapped_future_range<future_type>
+                    > is_range;
 
                 await_next<I>(is_future(), is_range());
             }

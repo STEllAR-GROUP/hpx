@@ -146,11 +146,21 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            std::stringstream out;
-            out << std::hex << std::setw(sizeof(std::size_t)*2)
-                << std::setfill('0')
-                << hpx::get_worker_thread_num();
-            str.prepend_string(out.str());
+            error_code ec(lightweight);
+            std::size_t thread_num = hpx::get_worker_thread_num(ec);
+
+            if (std::size_t(-1) != thread_num)
+            {
+                std::stringstream out;
+                out << std::hex << std::setw(sizeof(std::size_t)*2)
+                    << std::setfill('0')
+                    << thread_num;
+                str.prepend_string(out.str());
+            }
+            else
+            {
+                str.prepend_string(std::string(sizeof(std::size_t)*2, '-'));
+            }
         }
     };
 

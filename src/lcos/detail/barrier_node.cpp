@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (rank_ != 0)
             {
                 HPX_ASSERT(children_.size() == 1);
-                hpx::lcos::base_lco::set_event_non_direct_action action;
+                hpx::lcos::base_lco::set_event_action action;
                 return hpx::async(action, children_[0]);
             }
             else
@@ -146,7 +146,7 @@ namespace hpx { namespace lcos { namespace detail {
                     // everyone that they can leave the barrier
                     for(hpx::id_type& id : this_->children_)
                     {
-                        base_lco::set_event_non_direct_action action;
+                        base_lco::set_event_action action;
                         futures.push_back(hpx::async(action, id));
                     }
 
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos { namespace detail {
         futures.reserve(children_.size());
         for(hpx::id_type& id : children_)
         {
-            base_lco::set_event_non_direct_action action;
+            base_lco::set_event_action action;
             futures.push_back(hpx::async(action, id));
         }
 

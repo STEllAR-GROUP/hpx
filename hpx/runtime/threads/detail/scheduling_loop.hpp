@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -208,21 +208,40 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    struct is_active_wrapper
+    {
+        is_active_wrapper(std::uint8_t& is_active)
+          : is_active_(is_active)
+        {
+            is_active = 1;
+        }
+        ~is_active_wrapper()
+        {
+            is_active_ = 0;
+        }
+
+        std::uint8_t& is_active_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     struct scheduling_counters
     {
         scheduling_counters(std::int64_t& executed_threads,
                 std::int64_t& executed_thread_phases,
-                std::uint64_t& tfunc_time, std::uint64_t& exec_time)
+                std::uint64_t& tfunc_time, std::uint64_t& exec_time,
+                std::uint8_t& is_active)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
-            exec_time_(exec_time)
+            exec_time_(exec_time),
+            is_active_(is_active)
         {}
 
         std::int64_t& executed_threads_;
         std::int64_t& executed_thread_phases_;
         std::uint64_t& tfunc_time_;
         std::uint64_t& exec_time_;
+        std::uint8_t& is_active_;
     };
 
     struct scheduling_callbacks
@@ -259,8 +278,11 @@ namespace hpx { namespace threads { namespace detail
 
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name().data());
-//         util::itt::id threadid(domain, this);
-        util::itt::frame_context fctx(domain);
+        util::itt::id threadid(domain, &scheduler);
+        util::itt::string_handle task_id("task_id");
+        util::itt::string_handle task_phase("task_phase");
+
+//         util::itt::frame_context fctx(domain);
 
         std::int64_t idle_loop_count = 0;
         std::int64_t busy_loop_count = 0;
@@ -313,10 +335,13 @@ namespace hpx { namespace threads { namespace detail
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-#ifdef HPX_HAVE_ITTNOTIFY
+                                is_active_wrapper utilization(counters.is_active_);
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
-                                util::itt::undo_frame_context undoframe(fctx);
+//                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
+                                task.add_metadata(task_id, thrd);
+                                task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
@@ -385,7 +410,7 @@ namespace hpx { namespace threads { namespace detail
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
                             scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, is_running_state(this_state.load()),
+                                num_thread, this_state.load() < state_stopping,
                                 idle_loop_count);
                         }
 
@@ -430,7 +455,7 @@ namespace hpx { namespace threads { namespace detail
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        is_running_state(this_state.load()), idle_loop_count))
+                        this_state.load() < state_stopping, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
@@ -481,7 +506,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
-                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX || may_exit)
             {
                 // clean up terminated threads
                 if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)

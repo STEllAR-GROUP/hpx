@@ -99,7 +99,7 @@ def build_cmd(options, args):
     if options.localities > 1:
         # Selecting the parcelport for hpx via hpx ini confifuration
         select_parcelport = (lambda pp:
-            ['-Ihpx.parcel.ibverbs.enable=1'] if pp == 'ibverbs'
+            ['-Ihpx.parcel.verbs.enable=1'] if pp == 'verbs'
             else ['-Ihpx.parcel.ipc.enable=1'] if pp == 'ipc'
             else ['-Ihpx.parcel.mpi.enable=1', '-Ihpx.parcel.bootstrap=mpi'] if pp == 'mpi'
             else ['-Ihpx.parcel.tcp.enable=1'] if pp == 'tcp'
@@ -140,7 +140,7 @@ def check_options(parser, options, args):
         sys.exit(1)
 
     check_valid_parcelport = (lambda x:
-            x == 'ibverbs' or x == 'ipc' or x == 'mpi' or x == 'tcp');
+            x == 'verbs' or x == 'ipc' or x == 'mpi' or x == 'tcp');
     if not check_valid_parcelport(options.parcelport):
         print('Error: Parcelport option not valid\n', sys.stderr)
         parser.print_help()
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-      , help='Which parcelport to use (Options are: ibverbs, ipc, mpi, tcp) '
+      , help='Which parcelport to use (Options are: verbs, ipc, mpi, tcp) '
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'

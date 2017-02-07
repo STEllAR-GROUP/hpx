@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is
         /// overloaded by the derived concrete LCO.
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
         HPX_DEVICE void set_event_nonvirt() {}
 #else
         void set_event_nonvirt();
@@ -71,7 +71,7 @@ namespace hpx { namespace lcos
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
         HPX_DEVICE void set_exception_nonvirt(boost::exception_ptr const&) {}
 #else
         void set_exception_nonvirt(boost::exception_ptr const& e);
@@ -83,7 +83,7 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
         HPX_DEVICE void connect_nonvirt(naming::id_type const & id) {}
 #else
         void connect_nonvirt(naming::id_type const & id);
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-#if defined(__CUDACC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
         HPX_DEVICE void disconnect_nonvirt(naming::id_type const & id) {}
 #else
         void disconnect_nonvirt(naming::id_type const & id);
@@ -109,8 +109,6 @@ namespace hpx { namespace lcos
         /// LCO instances, it carries no additional parameters.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_event_nonvirt,
             set_event_action);
-        HPX_DEFINE_COMPONENT_ACTION(base_lco, set_event_nonvirt,
-            set_event_non_direct_action);
 
         /// The \a set_exception_action may be used to transfer arbitrary error
         /// information from the remote site to the LCO instance specified as
@@ -121,8 +119,6 @@ namespace hpx { namespace lcos
         ///               to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
             set_exception_action);
-        HPX_DEFINE_COMPONENT_ACTION(base_lco, set_exception_nonvirt,
-            set_exception_non_direct_action);
 
         /// The \a connect_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt,
@@ -139,13 +135,7 @@ namespace hpx { namespace lcos
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_event_action, base_set_event_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco::set_event_non_direct_action,
-    base_set_event_non_direct_action)
-HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, base_set_exception_action)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco::set_exception_non_direct_action,
-    base_set_exception_non_direct_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco::connect_action, base_connect_action)
 HPX_REGISTER_ACTION_DECLARATION(
@@ -156,13 +146,7 @@ HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
-    hpx::lcos::base_lco::set_event_non_direct_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
-HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
-    hpx::lcos::base_lco::set_exception_non_direct_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 
 #endif

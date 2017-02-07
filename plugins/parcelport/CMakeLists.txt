@@ -7,11 +7,13 @@
 # We explicitly disable ibverbs and ipc for now as they don't work currently
 
 set(parcelport_plugins
+  verbs
   mpi
   tcp)
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
+set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES "" CACHE INTERNAL "" FORCE)
 
 macro(add_parcelport name)
   set(name_short ${name})
@@ -20,12 +22,6 @@ macro(add_parcelport name)
   set(one_value_args FOLDER)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
-  set_source_files_properties(
-    ${${name}_SOURCES}
-    PROPERTIES
-    INCLUDE_DIRECTORIES "${${name}_INCLUDE_DIRECTORIES}"
-  )
 
   if(${${name}_STATIC})
     hpx_debug("adding static parcelport: ${name}")
@@ -91,6 +87,7 @@ endforeach()
 macro(add_static_parcelports)
   add_parcelport_tcp_module()
   add_parcelport_mpi_module()
+  add_parcelport_verbs_module()
 endmacro()
 
 macro(add_parcelport_modules)

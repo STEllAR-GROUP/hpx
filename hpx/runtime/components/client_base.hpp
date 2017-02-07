@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -99,6 +99,15 @@ namespace hpx { namespace traits
             {
                 return client.shared_state_;
             }
+
+#if BOOST_VERSION >= 105600
+            HPX_FORCEINLINE static
+            typename traits::detail::shared_state_ptr<id_type>::type::element_type*
+            detach_shared_state(Derived const& f)
+            {
+                return f.shared_state_.get();
+            }
+#endif
         };
 
         ///////////////////////////////////////////////////////////////////////

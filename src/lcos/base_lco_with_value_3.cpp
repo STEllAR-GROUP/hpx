@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     std::int64_t, int64_t,
@@ -24,6 +25,14 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     bool, bool,
     hpx::actions::base_lco_with_value_bool_get,
     hpx::actions::base_lco_with_value_bool_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<bool>, vector_bool_type,
+    hpx::actions::base_lco_with_value_vector_bool_get,
+    hpx::actions::base_lco_with_value_vector_bool_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<std::uint32_t>, vector_std_uint32_type,
+    hpx::actions::base_lco_with_value_vector_std_uint32_get,
+    hpx::actions::base_lco_with_value_vector_std_uint32_set)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::util::section, hpx_section,
     hpx::actions::base_lco_with_value_hpx_section_get,

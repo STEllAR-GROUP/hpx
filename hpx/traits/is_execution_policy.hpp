@@ -13,7 +13,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution
 {
     namespace detail
     {
@@ -135,5 +135,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       : detail::is_vectorpack_execution_policy<typename hpx::util::decay<T>::type>
     {};
 }}}
+
+#if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
+///////////////////////////////////////////////////////////////////////////////
+// Compatibility layer for changes introduced by C++17
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+{
+    template <typename T>
+    using is_execution_policy =
+        execution::is_execution_policy<T>;
+
+    template <typename T>
+    using is_parallel_execution_policy =
+        execution::is_parallel_execution_policy<T>;
+
+    template <typename T>
+    using is_sequential_execution_policy =
+        execution::is_sequential_execution_policy<T>;
+
+    template <typename T>
+    using is_async_execution_policy =
+        execution::is_async_execution_policy<T>;
+
+    template <typename T>
+    using is_rebound_execution_policy =
+        execution::is_rebound_execution_policy<T>;
+
+    template <typename T>
+    using is_vectorpack_execution_policy =
+        execution::is_vectorpack_execution_policy<T>;
+}}}
+#endif
 
 #endif

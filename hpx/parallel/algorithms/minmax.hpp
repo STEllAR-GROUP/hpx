@@ -155,7 +155,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         min_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             return detail::min_element<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -217,19 +219,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a min_element algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparisons in the parallel \a min_element algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a min_element algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a min_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -241,7 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
@@ -384,7 +386,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         max_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             return detail::max_element<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -447,19 +451,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a max_element algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparisons in the parallel \a max_element algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a max_element algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
     ///           and returns \a FwdIter otherwise.
     ///           The \a max_element algorithm returns the iterator to the
     ///           smallest element in the range [first, last). If several
@@ -471,7 +475,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
@@ -638,7 +642,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         minmax_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             return detail::minmax_element<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -703,20 +709,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a minmax_element algorithm returns a
     /// \a hpx::future<tagged_pair<tag::min(FwdIter), tag::max(FwdIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy
     ///           and returns \a tagged_pair<tag::min(FwdIter), tag::max(FwdIter)>
     ///           otherwise.
     ///           The \a minmax_element algorithm returns a pair consisting of
@@ -738,7 +744,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj = util::projection_identity,
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<

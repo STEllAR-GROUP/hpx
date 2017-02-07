@@ -24,20 +24,20 @@ void test_exceptions()
     using namespace hpx::parallel;
 
     // default comparison operator (std::less)
-    test_sort_exception(seq,     int());
-    test_sort_exception(par,     int());
+    test_sort_exception(execution::seq,     int());
+    test_sort_exception(execution::par,     int());
 
     // user supplied comparison operator (std::less)
-    test_sort_exception(seq,     int(), std::less<int>());
-    test_sort_exception(par,     int(), std::less<int>());
+    test_sort_exception(execution::seq,     int(), std::less<int>());
+    test_sort_exception(execution::par,     int(), std::less<int>());
 
     // Async execution, default comparison operator
-    test_sort_exception_async(seq(task), int());
-    test_sort_exception_async(par(task), int());
+    test_sort_exception_async(execution::seq(execution::task), int());
+    test_sort_exception_async(execution::par(execution::task), int());
 
     // Async execution, user comparison operator
-    test_sort_exception_async(seq(task), int(),  std::less<int>());
-    test_sort_exception_async(par(task), int(), std::less<int>());
+    test_sort_exception_async(execution::seq(execution::task), int(),  std::less<int>());
+    test_sort_exception_async(execution::par(execution::task), int(), std::less<int>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
