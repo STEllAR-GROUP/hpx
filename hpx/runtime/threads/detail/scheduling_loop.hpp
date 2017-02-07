@@ -319,7 +319,8 @@ namespace hpx { namespace threads { namespace detail
 
                 detail::write_old_state_log(num_thread, thrd, state_val);
 
-                if (HPX_LIKELY(pending == state_val)) {
+                if (HPX_LIKELY(pending == state_val))
+                {
                     // switch the state of the thread to active and back to
                     // what the thread reports as its return value
 
@@ -406,7 +407,8 @@ namespace hpx { namespace threads { namespace detail
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
-                    if (HPX_UNLIKELY(state_val == pending)) {
+                    if (HPX_UNLIKELY(state_val == pending))
+                    {
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
                             scheduler.SchedulingPolicy::wait_or_add_new(
@@ -418,6 +420,23 @@ namespace hpx { namespace threads { namespace detail
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd,
                             num_thread);
+                        scheduler.SchedulingPolicy::do_some_work(num_thread);
+                    }
+                    else if (HPX_UNLIKELY(state_val == pending_boost))
+                    {
+                        if (HPX_LIKELY(next_thrd == nullptr)) {
+                            // schedule other work
+                            scheduler.SchedulingPolicy::wait_or_add_new(
+                                num_thread, this_state.load() < state_stopping,
+                                idle_loop_count);
+                        }
+
+                        thrd->set_state(pending);
+
+                        // schedule this thread again immediately with boosted
+                        // priority
+                        scheduler.SchedulingPolicy::schedule_thread(thrd,
+                            num_thread, thread_priority_boost);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                 }

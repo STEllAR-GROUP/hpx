@@ -206,14 +206,18 @@ namespace hpx { namespace threads { namespace policies
             }
             HPX_ASSERT(heap);
 
+            if (state == pending_do_not_schedule || state == pending_boost)
+            {
+                state = pending;
+            }
+
             // Check for an unused thread object.
             if (!heap->empty())
             {
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->front();
                 heap->pop_front();
-                thrd->rebind(data,
-                    state == pending_do_not_schedule ? pending : state);
+                thrd->rebind(data, state);
             }
 
             else
@@ -221,9 +225,7 @@ namespace hpx { namespace threads { namespace policies
                 hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
-                thrd = threads::thread_data::create(
-                    data, memory_pool_,
-                    state == pending_do_not_schedule ? pending : state);
+                thrd = threads::thread_data::create(data, memory_pool_, state);
             }
         }
 
