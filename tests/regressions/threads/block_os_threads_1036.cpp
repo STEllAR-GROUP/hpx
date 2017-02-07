@@ -26,7 +26,7 @@ void blocker(
     boost::atomic<std::uint64_t>* entered
   , boost::atomic<std::uint64_t>* started
   , boost::scoped_array<boost::atomic<std::uint64_t> >* blocked_threads
-  , std::size_t worker
+  , std::uint64_t worker
     )
 {
     // reschedule if we are not on the correct OS thread...
@@ -70,7 +70,7 @@ int hpx_main()
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
             blocked_threads[i].store(0);
 
-        std::size_t scheduled = 0;
+        std::uint64_t scheduled = 0;
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (i == hpx::get_worker_thread_num())
