@@ -53,11 +53,11 @@ namespace hpx { namespace util
         void find_counters();
 
         bool print_raw_counters(bool destination_is_cout, bool reset,
-            char const* description,
+            bool no_output, char const* description,
             std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
         bool print_array_counters(bool destination_is_cout, bool reset,
-            char const* description,
+            bool no_output, char const* description,
             std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
 
@@ -66,16 +66,16 @@ namespace hpx { namespace util
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream, typename Future>
-        void print_values(Stream& output, std::vector<Future> &&,
+        void print_values(Stream* output, std::vector<Future> &&,
             std::vector<std::size_t> && indicies,
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
-        void print_value(Stream& out, std::string const& name,
+        void print_value(Stream* out, std::string const& name,
             performance_counters::counter_value const& value,
             std::string const& uom);
         template <typename Stream>
-        void print_value(Stream& out, std::string const& name,
+        void print_value(Stream* out, std::string const& name,
             performance_counters::counter_values_array const& value,
             std::string const& uom);
 
@@ -84,10 +84,10 @@ namespace hpx { namespace util
             std::string const& name);
 
         template <typename Stream>
-        void print_value_csv(Stream& out, std::string const& name,
+        void print_value_csv(Stream* out, std::string const& name,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value_csv(Stream& out, std::string const& name,
+        void print_value_csv(Stream* out, std::string const& name,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>

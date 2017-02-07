@@ -523,7 +523,9 @@ namespace hpx { namespace util
                   "(default: 0, which means print once at shutdown)")
                 ("hpx:print-counter-destination", value<std::string>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
-                  "to the given file (default: console)")
+                  "to the given file (default: console (cout), "
+                  "possible values: 'cout' (console), 'none' (no output), or "
+                  "any file name")
                 ("hpx:list-counters", value<std::string>()->implicit_value("minimal"),
                   "list the names of all registered performance counters, "
                   "possible values:\n"

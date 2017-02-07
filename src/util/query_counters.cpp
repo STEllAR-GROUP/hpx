@@ -106,70 +106,77 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value(Stream& out, std::string const& name,
+    void query_counters::print_value(Stream* out, std::string const& name,
         performance_counters::counter_value const& value, std::string const& uom)
     {
         error_code ec(lightweight);        // do not throw
         double val = value.get_value<double>(ec);
 
+        if(!ec) {
 #ifdef HPX_HAVE_APEX
-        apex::sample_value(name.c_str(), val);
+            apex::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
-        if (use_ittnotify_api)
-        {
-            auto it = itt_counters_.find(name);
-            if (it != itt_counters_.end())
+            if (use_ittnotify_api)
             {
-                (*it).second.set_value(val);
+                auto it = itt_counters_.find(name);
+                if (it != itt_counters_.end())
+                {
+                    (*it).second.set_value(val);
+                }
             }
-            return;
-        }
 #endif
 
-        print_name_csv(out, name);
-        out  << "," << value.count_ << ",";
-        if (!ec) {
+            if (out == nullptr)
+                return;
+
+            print_name_csv(*out, name);
+            *out  << "," << value.count_ << ",";
+
             double elapsed = static_cast<double>(value.time_) * 1e-9;
-            out << boost::str(boost::format("%.6f") % elapsed)
+            *out << boost::str(boost::format("%.6f") % elapsed)
                 << ",[s]," << val;
             if (!uom.empty())
-                out << ",[" << uom << "]";
-            out << "\n";
+                *out << ",[" << uom << "]";
+            *out << "\n";
         }
         else {
-            out << "invalid\n";
+            if (out != nullptr)
+                *out << "invalid\n";
         }
     }
 
     template <typename Stream>
-    void query_counters::print_value(Stream& out, std::string const& name,
+    void query_counters::print_value(Stream* out, std::string const& name,
         performance_counters::counter_values_array const& value,
         std::string const& uom)
     {
+        if (out == nullptr)
+            return;
+
         error_code ec(lightweight);        // do not throw
 
-        print_name_csv(out, name);
-        out << "," << value.count_ << ",";
+        print_name_csv(*out, name);
+        *out << "," << value.count_ << ",";
 
         double elapsed = static_cast<double>(value.time_) * 1e-9;
-        out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
+        *out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
 
         bool first = true;
         for (std::int64_t val : value.values_)
         {
             if (!first)
-                out << ':';
+                *out << ':';
             first = false;
-            out << val;
+            *out << val;
         }
 
         if (!uom.empty())
-            out << ",[" << uom << "]";
-        out << "\n";
+            *out << ",[" << uom << "]";
+        *out << "\n";
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream& out, std::string const& name,
+    void query_counters::print_value_csv(Stream* out, std::string const& name,
         performance_counters::counter_value const& value)
     {
         error_code ec(lightweight);
@@ -189,24 +196,31 @@ namespace hpx { namespace util
                 return;
             }
 #endif
-            out << val;
+            if (out == nullptr)
+                return;
+
+            *out << val;
         }
         else {
-            out << "invalid";
+            if (out != nullptr)
+                *out << "invalid";
         }
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream& out, std::string const&,
+    void query_counters::print_value_csv(Stream* out, std::string const&,
         performance_counters::counter_values_array const& value)
     {
+        if (out == nullptr)
+            return;
+
         bool first = true;
         for (std::int64_t val : value.values_)
         {
             if (!first)
-                out << ':';
+                *out << ':';
             first = false;
-            out << val;
+            *out << val;
         }
     }
 
@@ -280,7 +294,7 @@ namespace hpx { namespace util
     }
 
     template <typename Stream, typename Value>
-    void query_counters::print_values(Stream& output,
+    void query_counters::print_values(Stream* output,
         std::vector<Value> && values, std::vector<std::size_t> && indicies,
         std::vector<performance_counters::counter_info> const& infos)
     {
@@ -289,12 +303,13 @@ namespace hpx { namespace util
             bool first = true;
             for (std::size_t i = 0; i != values.size(); ++i)
             {
-                if (!first)
-                    output << ",";
+                if (!first && output != nullptr)
+                    *output << ",";
                 first = false;
                 print_value_csv(output, infos[i].fullname_, values[i]);
             }
-            output << "\n";
+            if (output != nullptr)
+                *output << "\n";
         }
         else
         {
@@ -371,7 +386,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_raw_counters(bool destination_is_cout,
-        bool reset, char const* description,
+        bool no_output, bool reset, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
@@ -390,7 +405,7 @@ namespace hpx { namespace util
             return false;
 
         std::ostringstream output;
-        if (description)
+        if (description && !no_output)
             output << description << std::endl;
 
         std::vector<performance_counters::counter_value> values =
@@ -399,32 +414,32 @@ namespace hpx { namespace util
         HPX_ASSERT(values.size() == indicies.size());
 
         // Output the performance counter value.
-        print_headers(output, infos);
-        print_values(output, std::move(values), std::move(indicies), infos);
+        if (!no_output)
+            print_headers(output, infos);
+        print_values(no_output ? nullptr : &output, std::move(values),
+            std::move(indicies), infos);
 
-        if (destination_is_cout)
+        if (!no_output)
         {
-            std::cout << output.str() << std::flush;
-        }
-        else
-        {
-            std::ofstream out(destination_.c_str(), std::ofstream::app);
-            out << output.str();
+            if (destination_is_cout)
+            {
+                std::cout << output.str() << std::flush;
+            }
+            else
+            {
+                std::ofstream out(destination_.c_str(), std::ofstream::app);
+                out << output.str();
+            }
         }
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_array_counters(bool destination_is_cout,
-        bool reset, char const* description,
+        bool no_output, bool reset, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        if (use_ittnotify_api)
-            return true;
-#endif
-
         // Query the performance counters.
         std::vector<std::size_t> indicies;
         indicies.reserve(infos.size());
@@ -440,7 +455,7 @@ namespace hpx { namespace util
             return false;
 
         std::ostringstream output;
-        if (description)
+        if (description && !no_output)
             output << description << std::endl;
 
         std::vector<performance_counters::counter_values_array> values =
@@ -449,17 +464,23 @@ namespace hpx { namespace util
         HPX_ASSERT(values.size() == indicies.size());
 
         // Output the performance counter value.
-        print_headers(output, infos);
-        print_values(output, std::move(values), std::move(indicies), infos);
+        if (!no_output)
+            print_headers(output, infos);
+        print_values(no_output ? nullptr : &output, std::move(values),
+            std::move(indicies), infos);
 
-        if (destination_is_cout) {
-            std::cout << output.str() << std::flush;
+        if (!no_output)
+        {
+            if (destination_is_cout)
+            {
+                std::cout << output.str() << std::flush;
+            }
+            else
+            {
+                std::ofstream out(destination_.c_str(), std::ofstream::app);
+                out << output.str();
+            }
         }
-        else {
-            std::ofstream out(destination_.c_str(), std::ofstream::app);
-            out << output.str();
-        }
-
         return true;
     }
 
@@ -474,11 +495,19 @@ namespace hpx { namespace util
         }
 
         bool destination_is_cout = false;
+        bool no_output = false;
 
         {
             std::lock_guard<mutex_type> l(mtx_);
             destination_is_cout = destination_ == "cout";
+            no_output = destination_ == "none";
         }
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        // don't generate any console-output if the ITTNotify API is used
+        if (!no_output && destination_is_cout && use_ittnotify_api)
+            no_output = true;
+#endif
 
         if (counters_.size() == 0)
         {
@@ -490,19 +519,16 @@ namespace hpx { namespace util
         }
 
         bool result = false;
-        if (counters_.size() != 0)
-        {
-            std::vector<performance_counters::counter_info> infos =
-                counters_.get_counter_infos();
+        std::vector<performance_counters::counter_info> infos =
+            counters_.get_counter_infos();
 
-            result = print_raw_counters(destination_is_cout, reset,
-                description, infos, ec);
-            if (ec) return false;
+        result = print_raw_counters(destination_is_cout, no_output, reset,
+            description, infos, ec);
+        if (ec) return false;
 
-            result = print_array_counters(destination_is_cout, reset,
-                description, infos, ec) || result;
-            if (ec) return false;
-        }
+        result = print_array_counters(destination_is_cout, no_output, reset,
+            description, infos, ec) || result;
+        if (ec) return false;
 
         if (&ec != &throws)
             ec = make_success_code();
