@@ -391,7 +391,7 @@
 // Count number of busy thread manager loop executions before forcefully
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
-#  define HPX_BUSY_LOOP_COUNT_MAX 200000
+#  define HPX_BUSY_LOOP_COUNT_MAX 2000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

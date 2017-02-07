@@ -426,7 +426,6 @@ namespace hpx { namespace threads
 
         typedef detail::thread_pool<scheduling_policy_type> spt;
 
-        using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
             // overall counter
@@ -437,6 +436,98 @@ namespace hpx { namespace threads
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_gid;
+    }
+
+    // scheduler utilization counter creation function
+    template <typename SchedulingPolicy>
+    naming::gid_type threadmanager_impl<SchedulingPolicy>::
+        idle_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_gid;
+
+        // /scheduler{locality#%d/total}/utilization/instantaneous
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "idle_loop_count_counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_gid;
+        }
+
+        typedef detail::thread_pool<scheduling_policy_type> spt;
+
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            util::function_nonser<std::int64_t()> f =
+                util::bind(&spt::get_idle_loop_count, &pool_, -1);
+            return create_raw_counter(info, std::move(f), ec);
+        }
+        else if (paths.instancename_ == "worker-thread" &&
+            paths.instanceindex_ >= 0 &&
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
+        {
+            // specific counter
+            using performance_counters::detail::create_raw_counter;
+            util::function_nonser<std::int64_t()> f =
+                util::bind(&spt::get_idle_loop_count, &pool_,
+                    static_cast<std::size_t>(paths.instanceindex_));
+            return create_raw_counter(info, std::move(f), ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "idle_loop_count_counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_gid;
+    }
+
+    // scheduler utilization counter creation function
+    template <typename SchedulingPolicy>
+    naming::gid_type threadmanager_impl<SchedulingPolicy>::
+        busy_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_gid;
+
+        // /scheduler{locality#%d/total}/utilization/instantaneous
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "busy_loop_count_counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_gid;
+        }
+
+        typedef detail::thread_pool<scheduling_policy_type> spt;
+
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            util::function_nonser<std::int64_t()> f =
+                util::bind(&spt::get_busy_loop_count, &pool_, -1);
+            return create_raw_counter(info, std::move(f), ec);
+        }
+        else if (paths.instancename_ == "worker-thread" &&
+            paths.instanceindex_ >= 0 &&
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
+        {
+            // specific counter
+            using performance_counters::detail::create_raw_counter;
+            util::function_nonser<std::int64_t()> f =
+                util::bind(&spt::get_busy_loop_count, &pool_,
+                    static_cast<std::size_t>(paths.instanceindex_));
+            return create_raw_counter(info, std::move(f), ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "busy_loop_count_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
         return naming::invalid_gid;
     }
@@ -1133,6 +1224,24 @@ namespace hpx { namespace threads
               util::bind(&ti::scheduler_utilization_counter_creator, this, _1, _2),
               &performance_counters::locality_counter_discoverer,
               "%"
+            },
+            // idle-loop count
+            { "/scheduler/idle-loop-count/instantaneous",
+                    performance_counters::counter_raw,
+              "returns the current value of the scheduler idle-loop count",
+              HPX_PERFORMANCE_COUNTER_V1,
+              util::bind(&ti::idle_loop_count_counter_creator, this, _1, _2),
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
+            // busy-loop count
+            { "/scheduler/busy-loop-count/instantaneous",
+                    performance_counters::counter_raw,
+              "returns the current value of the scheduler busy-loop count",
+              HPX_PERFORMANCE_COUNTER_V1,
+              util::bind(&ti::busy_loop_count_counter_creator, this, _1, _2),
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(
