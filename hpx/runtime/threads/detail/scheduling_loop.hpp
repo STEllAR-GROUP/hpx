@@ -424,20 +424,40 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else if (HPX_UNLIKELY(state_val == pending_boost))
                     {
-                        if (HPX_LIKELY(next_thrd == nullptr)) {
-                            // schedule other work
-                            scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, this_state.load() < state_stopping,
-                                idle_loop_count);
-                        }
-
                         thrd->set_state(pending);
 
-                        // schedule this thread again immediately with boosted
-                        // priority
-                        scheduler.SchedulingPolicy::schedule_thread(thrd,
-                            num_thread, thread_priority_boost);
-                        scheduler.SchedulingPolicy::do_some_work(num_thread);
+                        if (HPX_LIKELY(next_thrd == nullptr))
+                        {
+                            // reschedule this thread right away if the
+                            // background work will be triggered
+                            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
+                            {
+                                next_thrd = thrd;
+                            }
+                            else
+                            {
+                                // schedule other work
+                                scheduler.SchedulingPolicy::wait_or_add_new(
+                                    num_thread, this_state.load() < state_stopping,
+                                    idle_loop_count);
+
+                                // schedule this thread again immediately with
+                                // boosted priority
+                                scheduler.SchedulingPolicy::schedule_thread(
+                                    thrd, num_thread, thread_priority_boost);
+                                scheduler.SchedulingPolicy::do_some_work(
+                                    num_thread);
+                            }
+                        }
+                        else if (HPX_LIKELY(next_thrd != thrd))
+                        {
+                            // schedule this thread again immediately with
+                            // boosted priority
+                            scheduler.SchedulingPolicy::schedule_thread(
+                                thrd, num_thread, thread_priority_boost);
+                            scheduler.SchedulingPolicy::do_some_work(
+                                num_thread);
+                        }
                     }
                 }
                 else if (HPX_UNLIKELY(active == state_val)) {
