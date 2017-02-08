@@ -1434,11 +1434,19 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<> >;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_fifo
+    > >;
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_lifo
+    > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::abp_fifo_priority_queue_scheduler>;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+    > >;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)

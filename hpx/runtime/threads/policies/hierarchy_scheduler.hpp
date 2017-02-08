@@ -8,7 +8,10 @@
 #define HPX_THREADMANAGER_SCHEDULING_HIERARCHY
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
 #include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -18,6 +21,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -33,12 +37,11 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The hierarchy_scheduler maintains a tree of queues of work items
     /// (threads). Every OS threads walks that tree to obtain new work
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class hierarchy_scheduler : public scheduler_base
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT hierarchy_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -105,14 +108,14 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
-            flag_type & operator=(flag_type const & f) { v.store(f.v.load());
-               return *this; }
+            flag_type & operator=(flag_type const & f)
+                { v.store(f.v.load()); return *this; }
             flag_type & operator=(bool b) { v.store(b); return *this;}
             bool operator==(bool b) { return v == b; }
             operator bool() { return v; }
         };
 
-        typedef std::vector<flag_type > level_flag_type;
+        typedef std::vector<flag_type> level_flag_type;
         typedef std::vector<level_flag_type> flag_tree_type;
         flag_tree_type work_flag_tree;
         flag_tree_type task_flag_tree;
@@ -799,5 +802,6 @@ namespace hpx { namespace threads { namespace policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif
 

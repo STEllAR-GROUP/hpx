@@ -181,7 +181,7 @@ namespace hpx { namespace util
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
-            "scheduler = local-priority",
+            "scheduler = local-priority-fifo",
             "affinity = pu",
             "pu_step = 1",
             "pu_offset = 0",
