@@ -85,8 +85,9 @@ described in the table below:
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
-                                 'local/l', 'local-priority/lo', 'abp/a', 'abp-priority',
-                                 'hierarchy/h', and 'periodic/pe' (default: local-priority/lo)]]
+                                 'local/l', 'local-priority-fifo/lo', 'local-priority-lifo', 'abp/a',
+                                 'abp-priority', 'hierarchy/h', and 'periodic/pe'
+                                 (default: local-priority-fifo/lo)]]
     [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
                                  `--hpx:queuing=hierarchy` only (default: 2)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
