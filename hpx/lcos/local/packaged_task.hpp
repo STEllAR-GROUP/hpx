@@ -15,6 +15,16 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
+#endif
+
 #include <boost/exception_ptr.hpp>
 
 #include <type_traits>
@@ -29,6 +39,8 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
     {
         HPX_MOVABLE_ONLY(packaged_task);
+
+        typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
         // construction and destruction
@@ -80,6 +92,23 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
+#if HPX_HAVE_ITTNOTIFY != 0
+            util::itt::string_handle const& sh =
+                traits::get_function_annotation_itt<
+                    function_type
+                >::call(function_);
+            util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
+            char const* name = traits::get_function_annotation<
+                    function_type
+                >::call(function_);
+            if (name != nullptr)
+            {
+                util::apex_wrapper apex_profiler(name);
+                invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
+            }
+            else
+#endif
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -139,7 +168,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        util::unique_function_nonser<R(Ts...)> function_;
+        function_type function_;
         local::promise<R> promise_;
     };
 }}}

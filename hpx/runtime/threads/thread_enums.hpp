@@ -109,6 +109,8 @@ namespace hpx { namespace threads
         thread_stacksize_large = 3,         ///< use large stack size
         thread_stacksize_huge = 4,          ///< use very large stack size
 
+        thread_stacksize_current = 5,      ///< use size of current thread's stack
+
         thread_stacksize_default = thread_stacksize_small,  ///< use default stack size
         thread_stacksize_minimal = thread_stacksize_small,  ///< use minimally stack size
         thread_stacksize_maximal = thread_stacksize_huge,   ///< use maximally stack size

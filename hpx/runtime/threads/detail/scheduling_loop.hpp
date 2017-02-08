@@ -277,7 +277,7 @@ namespace hpx { namespace threads { namespace detail
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain(get_thread_name().data());
+        util::itt::domain domain = hpx::get_thread_itt_domain();
         util::itt::id threadid(domain, &scheduler);
         util::itt::string_handle task_id("task_id");
         util::itt::string_handle task_phase("task_phase");

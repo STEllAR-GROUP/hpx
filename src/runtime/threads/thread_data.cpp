@@ -172,6 +172,12 @@ namespace hpx { namespace threads
             );
     }
 
+    std::size_t get_self_stacksize()
+    {
+        thread_id_type id = get_self_id();
+        return id ? id->get_stack_size() : 0;
+    }
+
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
     thread_id_repr_type get_parent_id()
     {
