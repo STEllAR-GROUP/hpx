@@ -257,22 +257,34 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t max_background_threads =
                     hpx::util::safe_lexical_cast<std::size_t>(
                         hpx::get_config_entry("hpx.max_background_threads",
-                            (std::numeric_limits<std::size_t>::max)())))
+                            (std::numeric_limits<std::size_t>::max)())),
+                std::size_t max_idle_loop_count =
+                    hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::get_config_entry("hpx.max_idle_loop_count",
+                            HPX_IDLE_LOOP_COUNT_MAX)),
+                std::size_t max_busy_loop_count =
+                    hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::get_config_entry("hpx.max_busy_loop_count",
+                            HPX_BUSY_LOOP_COUNT_MAX)))
           : outer_(std::move(outer)),
             inner_(std::move(inner)),
             background_(std::move(background)),
-            max_background_threads_(max_background_threads)
+            max_background_threads_(max_background_threads),
+            max_idle_loop_count_(max_idle_loop_count),
+            max_busy_loop_count_(max_busy_loop_count)
         {}
 
         callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
-        std::size_t max_background_threads_;
+        std::size_t const max_background_threads_;
+        std::int64_t const max_idle_loop_count_;
+        std::int64_t const max_busy_loop_count_;
     };
 
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        scheduling_counters& counters, scheduling_callbacks& callbacks)
+        scheduling_counters& counters, scheduling_callbacks& params)
     {
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
@@ -430,7 +442,8 @@ namespace hpx { namespace threads { namespace detail
                         {
                             // reschedule this thread right away if the
                             // background work will be triggered
-                            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
+                            if (HPX_UNLIKELY(
+                                busy_loop_count > params.max_busy_loop_count_))
                             {
                                 next_thrd = thrd;
                             }
@@ -515,45 +528,45 @@ namespace hpx { namespace threads { namespace detail
 
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                    num_thread < params.max_background_threads_ &&
+                    !params.background_.empty())
                 {
-                    if (callbacks.background_())
+                    if (params.background_())
                         idle_loop_count = 0;
                 }
 
                 // call back into invoking context
-                if (!callbacks.inner_.empty())
-                    callbacks.inner_();
+                if (!params.inner_.empty())
+                    params.inner_();
             }
 
             // something went badly wrong, give up
             if (HPX_UNLIKELY(this_state.load() == state_terminating))
                 break;
 
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
+            if (busy_loop_count > params.max_busy_loop_count_)
             {
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                    num_thread < params.max_background_threads_ &&
+                    !params.background_.empty())
                 {
-                    if (callbacks.background_())
+                    if (params.background_())
                         idle_loop_count = 0;
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
-                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX || may_exit)
+                idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
                 // clean up terminated threads
-                if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
 
                 // call back into invoking context
-                if (!callbacks.outer_.empty())
-                    callbacks.outer_();
+                if (!params.outer_.empty())
+                    params.outer_();
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)

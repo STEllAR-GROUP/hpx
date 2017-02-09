@@ -60,6 +60,9 @@ by section basis below.
     lock_detection = ${HPX_LOCK_DETECTION:0}
     throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}
     minimal_deadlock_detection = <debug>
+    max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
+    max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
+    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -115,6 +118,21 @@ by section basis below.
       RelWithDebInfo, RelMinSize builds), this setting is effective only if
       `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
+    [[`hpx.max_background_threads`]
+     [This setting defines the maximum value of the idle-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_IDLE_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+    [[`hpx.max_idle_loop_count`]
+     [This setting defines the maximum value of the busy-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+    [[`hpx.max_busy_loop_count`]
+     [This setting defines the number of threads in the scheduler which are used
+      to execute background work. By default this is the same as the number of
+      cores used for the scheduler.]]
+
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
@@ -540,7 +558,7 @@ to `ON`).
     [[`hpx.parcel.mpi.multithreaded`]
      [This property is used to determine what threading mode to use when
       initializing MPI. If this setting is `0`, __hpx__ will initialize MPI
-      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will 
+      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will
       initialize MPI with `MPI_THREAD_MULTI`.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]]
