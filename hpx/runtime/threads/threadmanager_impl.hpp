@@ -316,6 +316,11 @@ namespace hpx { namespace threads
         naming::gid_type scheduler_utilization_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 
+        naming::gid_type idle_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::gid_type busy_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+
     private:
         mutable mutex_type mtx_;   // mutex protecting the members
 

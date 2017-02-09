@@ -229,11 +229,14 @@ namespace hpx { namespace threads { namespace detail
         scheduling_counters(std::int64_t& executed_threads,
                 std::int64_t& executed_thread_phases,
                 std::uint64_t& tfunc_time, std::uint64_t& exec_time,
+                std::int64_t& idle_loop_count, std::int64_t& busy_loop_count,
                 std::uint8_t& is_active)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
             exec_time_(exec_time),
+            idle_loop_count_(idle_loop_count),
+            busy_loop_count_(busy_loop_count),
             is_active_(is_active)
         {}
 
@@ -241,6 +244,8 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t& executed_thread_phases_;
         std::uint64_t& tfunc_time_;
         std::uint64_t& exec_time_;
+        std::int64_t& idle_loop_count_;
+        std::int64_t& busy_loop_count_;
         std::uint8_t& is_active_;
     };
 
@@ -284,8 +289,8 @@ namespace hpx { namespace threads { namespace detail
 
 //         util::itt::frame_context fctx(domain);
 
-        std::int64_t idle_loop_count = 0;
-        std::int64_t busy_loop_count = 0;
+        std::int64_t& idle_loop_count = counters.idle_loop_count_;
+        std::int64_t& busy_loop_count = counters.busy_loop_count_;
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
