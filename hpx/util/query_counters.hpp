@@ -34,6 +34,7 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
+            std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest,
             std::string const& form, std::vector<std::string> const& shortnames,
             bool csv_header);
@@ -99,6 +100,7 @@ namespace hpx { namespace util
         mutex_type mtx_;
 
         std::vector<std::string> names_;
+        std::vector<std::string> reset_names_;
         performance_counters::performance_counter_set counters_;
 
         std::string destination_;
