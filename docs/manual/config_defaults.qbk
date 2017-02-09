@@ -166,6 +166,40 @@ by section basis below.
       the internal timer thread pool.]]
 ]
 
+['[*The `hpx.thread_queue` Configuration Section]]
+
+[important These setting control internal values used by the thread scheduling
+    queues in the __hpx__ scheduler. You should not modify these settings except
+    if you know exactly what you are doing]
+
+[teletype]
+``
+    [hpx.thread_queue]
+    min_tasks_to_steal = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL:10}
+    min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}
+    max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}
+    max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}
+``
+[c++]
+
+[table:ini_hpx_thread_queue
+    [[Property]                 [Description]]
+    [[`hpx.thread_queue.min_tasks_to_steal`]
+     [The value of this property defines the number __hpx__ tasks have to be
+      available before neighboring cores are allowed to steal work.]]
+    [[`hpx.thread_queue.min_add_new_count`]
+     [The value of this property defines the minimal number tasks to be
+      converted into __hpx__ threads whenever the thread queues for a core have
+      run empty.]]
+    [[`hpx.thread_queue.max_add_new_count`]
+     [The value of this property defines the maximal number tasks to be
+      converted into __hpx__ threads whenever the thread queues for a core have
+      run empty.]]
+    [[`hpx.thread_queue.max_delete_count`]
+     [The value of this property defines the number number of terminated __hpx__
+      threads to discard during each invocation of the corresponding function.]]
+]
+
 ['[*The `hpx.components` Configuration Section]]
 
 [teletype]
@@ -540,7 +574,7 @@ to `ON`).
     [[`hpx.parcel.mpi.multithreaded`]
      [This property is used to determine what threading mode to use when
       initializing MPI. If this setting is `0`, __hpx__ will initialize MPI
-      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will 
+      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will
       initialize MPI with `MPI_THREAD_MULTI`.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]]

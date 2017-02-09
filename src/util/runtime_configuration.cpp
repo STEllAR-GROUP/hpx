@@ -218,6 +218,12 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
+            "[hpx.thread_queue]",
+            "min_tasks_to_steal = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL:10}",
+            "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
+            "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
+            "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
+
             "[hpx.commandline]",
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
