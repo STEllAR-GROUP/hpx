@@ -285,7 +285,7 @@ namespace hpx { namespace threads { namespace policies
         virtual bool destroy_thread(threads::thread_data* thrd,
             std::int64_t& busy_count) = 0;
 
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        virtual thread_id_type wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count) = 0;
 
         virtual void on_start_thread(std::size_t num_thread) = 0;

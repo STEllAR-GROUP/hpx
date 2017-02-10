@@ -267,8 +267,6 @@ namespace hpx { namespace threads { namespace policies
 
             else
             {
-                hpx::util::unlock_guard<Lock> ull(lk);
-
                 // Allocate a new thread object.
                 thrd = threads::thread_data::create(data, memory_pool_, state);
             }
@@ -276,17 +274,14 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
-        std::size_t add_new(std::int64_t add_count, thread_queue* addfrom,
-            std::unique_lock<mutex_type> &lk, bool steal = false)
+        thread_id_type add_new(thread_queue* addfrom, bool steal = false)
         {
-            HPX_ASSERT(lk.owns_lock());
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+            util::tick_counter tc(add_new_time_);
+#endif
 
-            if (HPX_UNLIKELY(0 == add_count))
-                return 0;
-
-            std::size_t added = 0;
             task_description* task = nullptr;
-            while (add_count-- && addfrom->new_tasks_.pop(task, steal))
+            if (addfrom->new_tasks_.pop(task, steal))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
@@ -296,6 +291,14 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
                 --addfrom->new_tasks_count_;
+
+                std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
+                if (!lk.owns_lock())
+                {
+                    ++new_tasks_count_;
+                    new_tasks_.push(task, steal);
+                    return nullptr;            // avoid long wait on lock
+                }
 
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
@@ -322,66 +325,19 @@ namespace hpx { namespace threads { namespace policies
                 }
                 ++thread_map_count_;
 
-                // only insert the thread into the work-items queue if it is in
-                // pending state
-                if (state == pending) {
-                    // pushing the new thread into the pending queue of the
-                    // specified thread_queue
-                    ++added;
-                    schedule_thread(thrd.get());
-                }
-
                 // this thread has to be in the map now
                 HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                 HPX_ASSERT(thrd->get_pool() == &memory_pool_);
+
+                LTM_(debug) << "add_new: added new task to queues"; //-V128
+
+                HPX_ASSERT(state == pending);
+                // only return the thread into the work-items queue if it is in
+                // pending state
+                return thrd;
             }
 
-            if (added) {
-                LTM_(debug) << "add_new: added " << added << " tasks to queues"; //-V128
-            }
-            return added;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        bool add_new_always(std::size_t& added, thread_queue* addfrom,
-            std::unique_lock<mutex_type> &lk, bool steal = false)
-        {
-            HPX_ASSERT(lk.owns_lock());
-
-#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-            util::tick_counter tc(add_new_time_);
-#endif
-
-            // create new threads from pending tasks (if appropriate)
-            std::int64_t add_count = -1;            // default is no constraint
-
-            // if we are desperate (no work in the queues), add some even if the
-            // map holds more than max_count
-            if (HPX_LIKELY(max_count_)) {
-                std::size_t count = thread_map_.size();
-                if (max_count_ >= count + min_add_new_count) { //-V104
-                    HPX_ASSERT(max_count_ - count <
-                        static_cast<std::size_t>(
-                            (std::numeric_limits<std::int64_t>::max)()
-                        ));
-                    add_count = static_cast<std::int64_t>(max_count_ - count);
-                    if (add_count < min_add_new_count)
-                        add_count = min_add_new_count;
-                    if (add_count > max_add_new_count)
-                        add_count = max_add_new_count;
-                }
-                else if (work_items_.empty()) {
-                    add_count = min_add_new_count;    // add this number of threads
-                    max_count_ += min_add_new_count;  // increase max_count //-V101
-                }
-                else {
-                    return false;
-                }
-            }
-
-            std::size_t addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
+            return nullptr;
         }
 
         void recycle_thread(thread_id_type thrd)
@@ -989,9 +945,9 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(bool running,
-            std::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom = nullptr, bool steal = false) HPX_HOT
+        inline thread_id_type wait_or_add_new(bool running,
+            std::int64_t& idle_loop_count, thread_queue* addfrom = nullptr,
+            bool steal = false) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty
@@ -1005,7 +961,7 @@ namespace hpx { namespace threads { namespace policies
                     if (running && min_tasks_to_steal_staged >
                         addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                     {
-                        return false;
+                        return nullptr;
                     }
                 }
                 else
@@ -1013,42 +969,14 @@ namespace hpx { namespace threads { namespace policies
                     if (running &&
                         0 == new_tasks_count_.load(boost::memory_order_relaxed))
                     {
-                        return false;
+                        return nullptr;
                     }
                     addfrom = this;
                 }
 
-                // No obvious work has to be done, so a lock won't hurt too much.
-                //
-                // We prefer to exit this function (some kind of very short
-                // busy waiting) to blocking on this lock. Locking fails either
-                // when a thread is currently doing thread maintenance, which
-                // means there might be new work, or the thread owning the lock
-                // just falls through to the cleanup work below (no work is available)
-                // in which case the current thread (which failed to acquire
-                // the lock) will just retry to enter this loop.
-                std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
-                if (!lk.owns_lock())
-                    return false;            // avoid long wait on lock
-
-                // stop running after all HPX threads have been terminated
-                bool added_new = add_new_always(added, addfrom, lk, steal);
-                if (!added_new) {
-                    // Before exiting each of the OS threads deletes the
-                    // remaining terminated HPX threads
-                    // REVIEW: Should we be doing this if we are stealing?
-                    bool canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit) {
-                        // we don't have any registered work items anymore
-                        //do_some_work();       // notify possibly waiting threads
-                        return true;            // terminate scheduling loop
-                    }
-                    return false;
-                }
-
-                cleanup_terminated_locked();
+                return add_new(addfrom, steal);
             }
-            return false;
+            return nullptr;
         }
 
         ///////////////////////////////////////////////////////////////////////

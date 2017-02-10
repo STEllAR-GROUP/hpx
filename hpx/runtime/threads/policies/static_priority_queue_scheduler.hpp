@@ -107,24 +107,27 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running,
+        thread_id_type wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count)
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 
-            std::size_t added = 0;
-            bool result = true;
+            thread_id_type next_thrd = nullptr;
 
             if (num_thread < this->high_priority_queues_.size())
             {
-                result = this->high_priority_queues_[num_thread]->
-                    wait_or_add_new(running, idle_loop_count, added) && result;
-                if (0 != added) return result;
+                next_thrd = this->high_priority_queues_[num_thread]->
+                    wait_or_add_new(running, idle_loop_count);
+                if (next_thrd) return next_thrd;
             }
 
-            result = this->queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
+            next_thrd = this->queues_[num_thread]->wait_or_add_new(running,
+                idle_loop_count);
+            if (next_thrd) return next_thrd;
+
+            next_thrd = this->low_priority_queue_.wait_or_add_new(running,
+                idle_loop_count);
+            if (next_thrd) return next_thrd;
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
@@ -154,11 +157,7 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = this->low_priority_queue_.wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
-
-            return result;
+            return next_thrd;
         }
     };
 }}}

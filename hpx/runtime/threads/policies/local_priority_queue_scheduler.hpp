@@ -881,11 +881,10 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        virtual thread_id_type wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count)
         {
-            std::size_t added = 0;
-            bool result = true;
+            thread_id_type next_thrd = nullptr;
 
             std::size_t high_priority_queues = high_priority_queues_.size();
             thread_queue_type* this_high_priority_queue = nullptr;
@@ -894,15 +893,14 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues)
             {
                 this_high_priority_queue = high_priority_queues_[num_thread];
-                result = this_high_priority_queue->wait_or_add_new(running,
-                            idle_loop_count, added)
-                        && result;
-                if (0 != added) return result;
+                next_thrd = this_high_priority_queue->wait_or_add_new(running,
+                            idle_loop_count);
+                if (next_thrd) return next_thrd;
             }
 
-            result = this_queue->wait_or_add_new(
-                running, idle_loop_count, added) && result;
-            if (0 != added) return result;
+            next_thrd = this_queue->wait_or_add_new(
+                running, idle_loop_count);
+            if (next_thrd) return next_thrd;
 
             for (std::size_t idx: victim_threads_[num_thread])
             {
@@ -912,27 +910,25 @@ namespace hpx { namespace threads { namespace policies
                     num_thread < high_priority_queues)
                 {
                     thread_queue_type* q =  high_priority_queues_[idx];
-                    result = this_high_priority_queue->
-                        wait_or_add_new(running, idle_loop_count,
-                            added, q)
-                      && result;
+                    next_thrd = this_high_priority_queue->
+                        wait_or_add_new(running, idle_loop_count, q);
 
-                    if (0 != added)
+                    if (next_thrd)
                     {
-                        q->increment_num_stolen_from_staged(added);
+                        q->increment_num_stolen_from_staged(1);
                         this_high_priority_queue->
-                            increment_num_stolen_to_staged(added);
-                        return result;
+                            increment_num_stolen_to_staged(1);
+                        return next_thrd;
                     }
                 }
 
-                result = this_queue->wait_or_add_new(running,
-                    idle_loop_count, added, queues_[idx]) && result;
-                if (0 != added)
+                next_thrd = this_queue->wait_or_add_new(running,
+                    idle_loop_count, queues_[idx]);
+                if (next_thrd)
                 {
-                    queues_[idx]->increment_num_stolen_from_staged(added);
-                    this_queue->increment_num_stolen_to_staged(added);
-                    return result;
+                    queues_[idx]->increment_num_stolen_from_staged(1);
+                    this_queue->increment_num_stolen_to_staged(1);
+                    return next_thrd;
                 }
             }
 
@@ -963,11 +959,10 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = low_priority_queue_.wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
+            next_thrd = low_priority_queue_.wait_or_add_new(running,
+                idle_loop_count);
 
-            return result;
+            return next_thrd;
         }
 
         ///////////////////////////////////////////////////////////////////////

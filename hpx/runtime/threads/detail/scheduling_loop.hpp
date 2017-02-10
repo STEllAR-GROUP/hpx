@@ -454,8 +454,8 @@ namespace hpx { namespace threads { namespace detail
                     {
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
-                            scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, running, idle_loop_count);
+                            next_thrd = scheduler.SchedulingPolicy::wait_or_add_new(
+                                num_thread, running, idle_loop_count).get();
                         }
 
                         // schedule this thread again, make sure it ends up at
@@ -515,7 +515,13 @@ namespace hpx { namespace threads { namespace detail
                     //
                     // REVIEW: Passing a specific target thread may set off
                     // the round robin queuing.
-                    scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
+                    if (HPX_LIKELY(next_thrd == nullptr)) {
+                        next_thrd = thrd;
+                    }
+                    else
+                    {
+                        scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
+                    }
                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
@@ -533,13 +539,16 @@ namespace hpx { namespace threads { namespace detail
 
             // if nothing else has to be done either wait or terminate
             else {
-                ++idle_loop_count;
+                HPX_ASSERT(next_thrd == nullptr);
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(
-                        num_thread, running, idle_loop_count))
+                next_thrd = scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
+                    running, idle_loop_count).get();
+
+                if (next_thrd == nullptr)
                 {
+                    ++idle_loop_count;
                     // clean up terminated threads one more time before existing
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    if (!running && scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
