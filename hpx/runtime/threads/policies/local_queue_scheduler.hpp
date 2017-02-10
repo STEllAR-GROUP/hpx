@@ -319,7 +319,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -368,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -397,7 +397,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -418,7 +418,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     thread_queue_type* q = queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();

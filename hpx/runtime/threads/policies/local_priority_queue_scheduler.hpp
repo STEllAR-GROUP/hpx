@@ -490,7 +490,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -503,7 +503,8 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues)
             {
                 this_high_priority_queue = high_priority_queues_[num_thread];
-                bool result = this_high_priority_queue->get_next_thread(thrd);
+                bool result =
+                    this_high_priority_queue->get_next_thread(thrd);
 
                 this_high_priority_queue->increment_num_pending_accesses();
                 if (result)
@@ -535,7 +536,7 @@ namespace hpx { namespace threads { namespace policies
                     num_thread < high_priority_queues)
                 {
                     thread_queue_type* q = high_priority_queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         this_high_priority_queue->
@@ -544,7 +545,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-                if (queues_[idx]->get_next_thread(thrd))
+                if (queues_[idx]->get_next_thread(thrd, running))
                 {
                     queues_[idx]->increment_num_stolen_from_pending();
                     this_queue->increment_num_stolen_to_pending();

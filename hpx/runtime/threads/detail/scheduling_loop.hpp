@@ -305,9 +305,12 @@ namespace hpx { namespace threads { namespace detail
         while (true) {
             // Get the next HPX thread from the queue
             thrd = next_thrd;
+            bool running =
+                this_state.load(boost::memory_order_relaxed) < state_stopping;
+
             if (HPX_LIKELY(thrd ||
-                    scheduler.SchedulingPolicy::get_next_thread(num_thread,
-                        idle_loop_count, thrd)))
+                    scheduler.SchedulingPolicy::get_next_thread(
+                        num_thread, running, idle_loop_count, thrd)))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -415,8 +418,7 @@ namespace hpx { namespace threads { namespace detail
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
                             scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, this_state.load() < state_stopping,
-                                idle_loop_count);
+                                num_thread, running, idle_loop_count);
                         }
 
                         // schedule this thread again, make sure it ends up at
@@ -459,8 +461,8 @@ namespace hpx { namespace threads { namespace detail
             else {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        this_state.load() < state_stopping, idle_loop_count))
+                if (scheduler.SchedulingPolicy::wait_or_add_new(
+                        num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
