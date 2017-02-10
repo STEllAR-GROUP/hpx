@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,17 +7,25 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/parallel_executors.hpp>
 
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct hello_world_server
-  : hpx::components::component_base<hello_world_server>
+  : hpx::components::executor_component<
+        hpx::parallel::local_priority_queue_executor,
+        hpx::components::component_base<hello_world_server> >
 {
+    typedef hpx::parallel::local_priority_queue_executor executor_type;
+    typedef hpx::components::executor_component<
+            executor_type, hpx::components::component_base<hello_world_server>
+        > base_type;
+
+    // run on all available cores
     hello_world_server()
-      : sched_(hpx::get_num_worker_threads())   // run on all available cores
+      : base_type(executor_type(hpx::get_num_worker_threads()))
     {}
 
     void print() const
@@ -26,34 +34,6 @@ struct hello_world_server
     }
 
     HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // wrap given function into a nullary function as expected by the executor
-    static void func(hpx::threads::thread_function_type f)
-    {
-        f(hpx::threads::wait_signaled);
-    }
-
-    /// This is the default hook implementation for schedule_thread which
-    /// forwards to the default scheduler.
-    static void schedule_thread(hpx::naming::address::address_type lva,
-        hpx::threads::thread_init_data& data,
-        hpx::threads::thread_state_enum initial_state)
-    {
-        hpx::util::thread_description desc(&hello_world_server::func);
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-        desc = data.description;
-#endif
-
-        hpx::get_lva<hello_world_server>::call(lva)->sched_.add(
-            hpx::util::bind(
-                hpx::util::one_shot(&hello_world_server::func),
-                std::move(data.func)),
-            desc, initial_state);
-    }
-
-private:
-    hpx::threads::executors::local_priority_queue_executor sched_;
 };
 
 typedef hpx::components::component<hello_world_server> server_type;
