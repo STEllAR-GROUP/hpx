@@ -74,23 +74,12 @@ namespace hpx { namespace util
             typedef std::map<std::string, util::itt::counter>::value_type
                 value_type;
 
-            for (auto const& name : names_)
+            for (auto const& info : counters_.get_counter_infos())
             {
                 std::string real_name =
-                    performance_counters::remove_counter_prefix(name);
+                    performance_counters::remove_counter_prefix(info.fullname_);
                 itt_counters_.insert(
-                    value_type(name, util::itt::counter(
-                        real_name.c_str(), hpx::get_thread_name().c_str(),
-                        __itt_metadata_double
-                    ))
-                );
-            }
-            for (auto const& name : reset_names_)
-            {
-                std::string real_name =
-                    performance_counters::remove_counter_prefix(name);
-                itt_counters_.insert(
-                    value_type(name, util::itt::counter(
+                    value_type(info.fullname_, util::itt::counter(
                         real_name.c_str(), hpx::get_thread_name().c_str(),
                         __itt_metadata_double
                     ))
