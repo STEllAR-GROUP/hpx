@@ -193,7 +193,6 @@ namespace hpx { namespace util
                 {
                     (*it).second.set_value(val);
                 }
-                return;
             }
 #endif
             if (out == nullptr)
