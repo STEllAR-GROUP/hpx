@@ -175,7 +175,8 @@ by section basis below.
 [teletype]
 ``
     [hpx.thread_queue]
-    min_tasks_to_steal = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL:10}
+    min_tasks_to_steal_pending = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}
+    min_tasks_to_steal_staged = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}
     min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}
     max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}
     max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}
@@ -184,9 +185,15 @@ by section basis below.
 
 [table:ini_hpx_thread_queue
     [[Property]                 [Description]]
-    [[`hpx.thread_queue.min_tasks_to_steal`]
-     [The value of this property defines the number __hpx__ tasks have to be
-      available before neighboring cores are allowed to steal work.]]
+    [[`hpx.thread_queue.min_tasks_to_steal_pending`]
+     [The value of this property defines the number of pending __hpx__ threads
+      which have to be available before neighboring cores are allowed to steal
+      work. The default is to allow stealing always.]]
+    [[`hpx.thread_queue.min_tasks_to_steal_staged`]
+     [The value of this property defines the number of staged __hpx__ tasks have
+      which to be available before neighboring cores are allowed to steal work.
+      The default is to allow stealing only if there are more tan 10 tasks
+      available.]]
     [[`hpx.thread_queue.min_add_new_count`]
      [The value of this property defines the minimal number tasks to be
       converted into __hpx__ threads whenever the thread queues for a core have
