@@ -119,19 +119,19 @@ by section basis below.
       `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
     [[`hpx.max_background_threads`]
+     [This setting defines the number of threads in the scheduler which are used
+      to execute background work. By default this is the same as the number of
+      cores used for the scheduler.]]
+    [[`hpx.max_idle_loop_count`]
      [This setting defines the maximum value of the idle-loop counter in the
       scheduler. By default this is defined by the preprocessor constant
       `HPX_IDLE_LOOP_COUNT_MAX`. This is an internal setting which you should
       change only if you know exactly what you are doing.]]
-    [[`hpx.max_idle_loop_count`]
+    [[`hpx.max_busy_loop_count`]
      [This setting defines the maximum value of the busy-loop counter in the
       scheduler. By default this is defined by the preprocessor constant
       `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
       change only if you know exactly what you are doing.]]
-    [[`hpx.max_busy_loop_count`]
-     [This setting defines the number of threads in the scheduler which are used
-      to execute background work. By default this is the same as the number of
-      cores used for the scheduler.]]
 
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
