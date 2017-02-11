@@ -595,7 +595,7 @@ namespace detail
             state_ = value;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), threads::thread_priority_default, ec);
+            cond_.notify_all(std::move(l), threads::thread_priority_boost, ec);
 
             // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
@@ -803,7 +803,7 @@ namespace detail
                     std::move(this_),
                     future_data_result<Result>::set(std::forward<Result_>(init))),
                 "timed_future_data<Result>::timed_future_data",
-                threads::suspended, true, threads::thread_priority_normal,
+                threads::suspended, true, threads::thread_priority_boost,
                 std::size_t(-1), threads::thread_stacksize_current, ec);
             if (ec) {
                 // thread creation failed, report error to the new future

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -139,8 +139,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 error_code local_ec;
                 threads::set_thread_state(threads::thread_id_type(
                         reinterpret_cast<threads::thread_data*>(id)),
-                    threads::pending, threads::wait_signaled,
-                    priority, local_ec);
+                    threads::pending, threads::wait_signaled, priority, local_ec);
 
                 if (local_ec)
                 {
