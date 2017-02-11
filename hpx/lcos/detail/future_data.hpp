@@ -597,7 +597,7 @@ namespace detail
             // handle all threads waiting for the future to become ready
 
             // Note: we use notify_one repeatedly instead of notify_all as we
-            //       know: a) that most of the time have at most one thread
+            //       know: a) that most of the time we have at most one thread
             //       waiting on the future (most futures are not shared), and
             //       b) our implementation of condition_variable::notify_one
             //       relinquishes the lock before resuming the waiting thread
@@ -642,7 +642,7 @@ namespace detail
             // handle all threads waiting for the future to become ready
 
             // Note: we use notify_one repeatedly instead of notify_all as we
-            //       know: a) that most of the time have at most one thread
+            //       know: a) that most of the time we have at most one thread
             //       waiting on the future (most futures are not shared), and
             //       b) our implementation of condition_variable::notify_one
             //       relinquishes the lock before resuming the waiting thread
