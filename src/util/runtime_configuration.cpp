@@ -166,11 +166,11 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
 #else
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
 #endif
-            "spinlick_deadlock_detection_limit = "
+            "spinlock_deadlock_detection_limit = "
                 "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
 #endif
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
@@ -835,7 +835,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "spinlick_deadlock_detection_limit", "1000000");
+                    *sec, "spinlock_deadlock_detection_limit", "1000000");
             }
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
