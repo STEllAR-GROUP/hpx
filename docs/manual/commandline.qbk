@@ -130,6 +130,10 @@ described in the table below:
     [[`--hpx:print-counter`]    [print the specified performance counter either
         repeatedly and/or at the times specified by `--hpx:print-counter-at`
         (see also option `--hpx:print-counter-interval`)]]
+    [[`--hpx:print-counter-reset`] [print the specified performance counter either
+        repeatedly and/or at the times specified by `--hpx:print-counter-at`,
+        reset the counter after the value is queried.
+        (see also option `--hpx:print-counter-interval`)]]
     [[`--hpx:print-counter-interval`][print the performance counter(s)
         specified with `--hpx:print-counter` repeatedly after the time interval
         (specified in milliseconds), (default: 0, which means print once at
@@ -156,8 +160,12 @@ described in the table below:
     [[`--hpx:printer-counter-at arg`][print the performance counter(s)
         specified with `--hpx:print-counter` at the given point in time,
         possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
-    [[`--hpx:reset-counters`][reset the performance counter(s) specified with
+    [[`--hpx:reset-counters`][reset all performance counter(s) specified with
         `--hpx:print-counter` after they have been evaluated]]
+    [[`--hpx:print-counter-at`][print the performance counter(s) specified with
+        `--hpx:print-counter` (or `--hpx:print-counter-reset`) at the given
+        point in time, possible argument are values: 'startup',
+        'shutdown' (default), 'noshutdown'.]]
 ]
 
 [heading Command Line Argument Shortcuts]
