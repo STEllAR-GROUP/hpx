@@ -21,6 +21,16 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
+#endif
+
 #include <boost/intrusive_ptr.hpp>
 
 #include <functional>
@@ -105,6 +115,19 @@ namespace hpx { namespace lcos { namespace detail
             typename util::result_of<Func(Future)>::type
         > is_void;
 
+#if HPX_HAVE_ITTNOTIFY != 0
+        util::itt::string_handle const& sh =
+            traits::get_function_annotation_itt<Func>::call(func);
+        util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
+        char const* name = traits::get_function_annotation<Func>::call(func);
+        if (name != nullptr)
+        {
+            util::apex_wrapper apex_profiler(name);
+            invoke_continuation(func, future, cont, is_void());
+        }
+        else
+#endif
         invoke_continuation(func, future, cont, is_void());
     }
 
@@ -230,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail
         void run(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f, error_code& ec)
+            >::type && f, threads::thread_priority, error_code& ec)
         {
             {
                 std::lock_guard<mutex_type> l(this->mtx_);
@@ -252,9 +275,9 @@ namespace hpx { namespace lcos { namespace detail
         void run(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f)
+            >::type && f, threads::thread_priority priority)
         {
-            run(std::move(f), throws);
+            run(std::move(f), priority, throws);
         }
 
         threads::thread_result_type
@@ -274,6 +297,7 @@ namespace hpx { namespace lcos { namespace detail
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f,
+            threads::thread_priority priority,
             error_code& ec)
         {
             {
@@ -296,7 +320,7 @@ namespace hpx { namespace lcos { namespace detail
             applier::register_thread_plain(
                 util::bind(util::one_shot(async_impl_ptr),
                     std::move(this_), std::move(f)),
-                desc);
+                desc, threads::pending, true, priority);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -366,9 +390,10 @@ namespace hpx { namespace lcos { namespace detail
         void async(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f)
+            >::type && f,
+            threads::thread_priority priority)
         {
-            async(std::move(f), throws);
+            async(std::move(f), priority, throws);
         }
 
         void async(
@@ -440,7 +465,8 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&);
+            void (continuation::*cb)(shared_state_ptr &&, threads::thread_priority);
+
             if (policy & launch::sync)
                 cb = &continuation::run;
             else
@@ -457,8 +483,9 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             ptr->execute_deferred();
-            ptr->set_on_completed(
-                util::deferred_call(cb, std::move(this_), std::move(state)));
+            ptr->set_on_completed(util::deferred_call(
+                    cb, std::move(this_), std::move(state), policy.priority()
+                ));
         }
 
         void attach(Future const& future, threads::executor& sched)

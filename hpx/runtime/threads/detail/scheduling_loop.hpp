@@ -229,11 +229,14 @@ namespace hpx { namespace threads { namespace detail
         scheduling_counters(std::int64_t& executed_threads,
                 std::int64_t& executed_thread_phases,
                 std::uint64_t& tfunc_time, std::uint64_t& exec_time,
+                std::int64_t& idle_loop_count, std::int64_t& busy_loop_count,
                 std::uint8_t& is_active)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
             exec_time_(exec_time),
+            idle_loop_count_(idle_loop_count),
+            busy_loop_count_(busy_loop_count),
             is_active_(is_active)
         {}
 
@@ -241,6 +244,8 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t& executed_thread_phases_;
         std::uint64_t& tfunc_time_;
         std::uint64_t& exec_time_;
+        std::int64_t& idle_loop_count_;
+        std::int64_t& busy_loop_count_;
         std::uint8_t& is_active_;
     };
 
@@ -289,15 +294,15 @@ namespace hpx { namespace threads { namespace detail
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain(get_thread_name().data());
+        util::itt::domain domain = hpx::get_thread_itt_domain();
         util::itt::id threadid(domain, &scheduler);
         util::itt::string_handle task_id("task_id");
         util::itt::string_handle task_phase("task_phase");
 
 //         util::itt::frame_context fctx(domain);
 
-        std::int64_t idle_loop_count = 0;
-        std::int64_t busy_loop_count = 0;
+        std::int64_t& idle_loop_count = counters.idle_loop_count_;
+        std::int64_t& busy_loop_count = counters.busy_loop_count_;
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
@@ -312,9 +317,12 @@ namespace hpx { namespace threads { namespace detail
         while (true) {
             // Get the next HPX thread from the queue
             thrd = next_thrd;
+            bool running =
+                this_state.load(boost::memory_order_relaxed) < state_stopping;
+
             if (HPX_LIKELY(thrd ||
-                    scheduler.SchedulingPolicy::get_next_thread(num_thread,
-                        idle_loop_count, thrd)))
+                    scheduler.SchedulingPolicy::get_next_thread(
+                        num_thread, running, idle_loop_count, thrd)))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -424,8 +432,7 @@ namespace hpx { namespace threads { namespace detail
                         if (HPX_LIKELY(next_thrd == nullptr)) {
                             // schedule other work
                             scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, this_state.load() < state_stopping,
-                                idle_loop_count);
+                                num_thread, running, idle_loop_count);
                         }
 
                         // schedule this thread again, make sure it ends up at
@@ -506,8 +513,8 @@ namespace hpx { namespace threads { namespace detail
             else {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        this_state.load() < state_stopping, idle_loop_count))
+                if (scheduler.SchedulingPolicy::wait_or_add_new(
+                        num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))

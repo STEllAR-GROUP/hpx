@@ -10,6 +10,7 @@
 #define HPX_RUNTIME_GET_THREAD_NAME_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <string>
 
@@ -22,6 +23,10 @@ namespace hpx
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, the result will be "<unknown>".
     HPX_API_EXPORT std::string get_thread_name();
+
+    /// \cond NOINTERNAL
+    HPX_API_EXPORT hpx::util::itt::domain const& get_thread_itt_domain();
+    /// \endcond
 }
 
 #endif

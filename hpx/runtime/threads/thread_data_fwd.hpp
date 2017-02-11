@@ -13,6 +13,8 @@
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -96,6 +98,10 @@ namespace hpx { namespace threads
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
     HPX_API_EXPORT std::size_t get_parent_phase();
+
+    /// The function \a get_self_stacksize returns the stack size of the
+    /// current thread (or zero if the current thread is not a HPX thread).
+    HPX_API_EXPORT std::size_t get_self_stacksize();
 
     /// The function \a get_parent_locality_id returns the id of the locality of
     /// the current thread's parent (or zero if the current thread is not a

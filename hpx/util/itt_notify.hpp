@@ -330,7 +330,7 @@ namespace hpx { namespace util { namespace itt
           : handle_(0)
         {}
         string_handle(char const* s)
-          : handle_(HPX_ITT_STRING_HANDLE_CREATE(s))
+          : handle_(s == nullptr ? 0 : HPX_ITT_STRING_HANDLE_CREATE(s))
         {}
         string_handle(___itt_string_handle* h) HPX_NOEXCEPT
           : handle_(h)
@@ -342,7 +342,7 @@ namespace hpx { namespace util { namespace itt
             return *this;
         }
 
-        operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const HPX_NOEXCEPT
         {
             return handle_ != 0;
         }
@@ -354,6 +354,8 @@ namespace hpx { namespace util { namespace itt
     struct task
     {
         HPX_EXPORT task(domain const&, util::thread_description const&);
+        HPX_EXPORT task(domain const&, string_handle const&);
+
         ~task()
         {
             HPX_ITT_TASK_END(domain_.domain_);
@@ -627,7 +629,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        domain(char const*) {}
+        HPX_EXPORT domain(char const*) {}
         ~domain() {}
     };
 
@@ -672,7 +674,9 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const&, util::thread_description const&) {}
+        HPX_EXPORT task(domain const&, util::thread_description const&) {}
+        HPX_EXPORT task(domain const&, string_handle const&) {}
+
         ~task() {}
     };
 

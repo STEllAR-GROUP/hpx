@@ -135,6 +135,10 @@ namespace hpx { namespace threads { namespace detail
 
         std::int64_t get_scheduler_utilization() const;
 
+        std::int64_t get_idle_loop_count(std::size_t num) const;
+        std::int64_t get_busy_loop_count(std::size_t num) const;
+
+        ///////////////////////////////////////////////////////////////////////
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
             thread_state_enum state = unknown) const;
@@ -228,6 +232,8 @@ namespace hpx { namespace threads { namespace detail
         // tfunc_impl timers
         std::vector<std::uint64_t> exec_times_, tfunc_times_;
         std::vector<std::uint64_t> reset_tfunc_times_;
+
+        std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
 
         std::vector<std::uint8_t> tasks_active_;
 

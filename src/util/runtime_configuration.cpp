@@ -181,7 +181,7 @@ namespace hpx { namespace util
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
-            "scheduler = local-priority",
+            "scheduler = local-priority-fifo",
             "affinity = pu",
             "pu_step = 1",
             "pu_offset = 0",
@@ -223,6 +223,15 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
+
+            "[hpx.thread_queue]",
+            "min_tasks_to_steal_pending = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}",
+            "min_tasks_to_steal_staged = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}",
+            "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
+            "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
+            "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
 
             "[hpx.commandline]",
             // enable aliasing
