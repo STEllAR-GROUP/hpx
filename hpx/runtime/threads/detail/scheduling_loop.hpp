@@ -302,6 +302,25 @@ namespace hpx { namespace threads { namespace detail
         thread_data* thrd = nullptr;
         thread_data* next_thrd = nullptr;
 
+        thread_init_data background_init(
+            [&](thread_state_ex_enum) -> thread_result_type
+            {
+                while(true)
+                {
+                    if(callbacks.background_())
+                        idle_loop_count = 0;
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "background_work");
+                }
+                return std::make_pair(terminated, nullptr);
+            },
+            hpx::util::thread_description("background_work"));
+        thread_id_type background_thread = nullptr;
+
+        if (!callbacks.background_.empty())
+            background_thread.reset(
+                new thread_data(background_init, nullptr, pending));
+
         while (true) {
             // Get the next HPX thread from the queue
             thrd = next_thrd;
@@ -484,10 +503,19 @@ namespace hpx { namespace threads { namespace detail
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
                     num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                    background_thread)
                 {
-                    if (callbacks.background_())
-                        idle_loop_count = 0;
+                    thread_result_type background_result = (*background_thread)();
+                    if (next_thrd == nullptr)
+                    {
+                        next_thrd = background_result.second.get();
+                    }
+                    else if(background_result.second != nullptr &&
+                        background_result.second != background_thread)
+                    {
+                        scheduler.SchedulingPolicy::schedule_thread(
+                            background_result.second.get(), num_thread);
+                    }
                 }
 
                 // call back into invoking context
@@ -506,10 +534,19 @@ namespace hpx { namespace threads { namespace detail
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
                     num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                    background_thread)
                 {
-                    if (callbacks.background_())
-                        idle_loop_count = 0;
+                    thread_result_type background_result = (*background_thread)();
+                    if (next_thrd == nullptr)
+                    {
+                        next_thrd = background_result.second.get();
+                    }
+                    else if(background_result.second != nullptr &&
+                        background_result.second != background_thread)
+                    {
+                        scheduler.SchedulingPolicy::schedule_thread(
+                            background_result.second.get(), num_thread);
+                    }
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
