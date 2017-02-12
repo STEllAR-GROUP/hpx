@@ -36,6 +36,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*list\\b)", "std::list", "list" },
       { "(\\bstd\\s*::\\s*string\\b)", "std::string", "string" },
       { "(\\bstd\\s*::\\s*vector\\b)", "std::vector", "vector" },
+      { "(\\bstd\\s*::\\s*array\\b)", "std::array", "array" },
       { "(\\bstd\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper", "functional" },
       { "(\\bstd\\s*::\\s*(c?ref)\\b)", "std::\\2", "functional" },
       { "(\\bstd\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2", "cstdint" },
