@@ -157,10 +157,10 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Actions to create new objects
         template <typename Component>
-        HPX_HOST_DEVICE naming::gid_type create_component();
+        naming::gid_type create_component();
 
         template <typename Component, typename T, typename ...Ts>
-        HPX_HOST_DEVICE naming::gid_type create_component(T v, Ts... vs);
+        naming::gid_type create_component(T v, Ts... vs);
 
         template <typename Component>
         std::vector<naming::gid_type> bulk_create_component(std::size_t count);
@@ -449,13 +449,13 @@ namespace hpx { namespace components { namespace server
     // Functions wrapped by creat_component actions below
 #if defined(__NVCC__) || defined(__CUDACC__)
     template <typename Component>
-    HPX_HOST_DEVICE naming::gid_type runtime_support::create_component()
+    HPX_DEVICE naming::gid_type runtime_support::create_component()
     {
         return naming::gid_type();
     }
 
     template <typename Component, typename T, typename ...Ts>
-    HPX_HOST_DEVICE naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    HPX_DEVICE naming::gid_type runtime_support::create_component(T v, Ts... vs)
     {
         return naming::gid_type();
     }
