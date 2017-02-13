@@ -447,16 +447,18 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Functions wrapped by creat_component actions below
-#if defined(__NVCC__) || defined(__CUDACC__)
+#if defined(__NVCC__)
     template <typename Component>
-    HPX_DEVICE naming::gid_type runtime_support::create_component()
+    naming::gid_type runtime_support::create_component()
     {
+        HPX_ASSERT(false);
         return naming::gid_type();
     }
 
     template <typename Component, typename T, typename ...Ts>
-    HPX_DEVICE naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    naming::gid_type runtime_support::create_component(T v, Ts... vs)
     {
+        HPX_ASSERT(false);
         return naming::gid_type();
     }
 #else
