@@ -60,6 +60,8 @@ by section basis below.
     lock_detection = ${HPX_LOCK_DETECTION:0}
     throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}
     minimal_deadlock_detection = <debug>
+    spinlock_deadlock_detection = <debug>
+    spinlock_deadlock_detection_limit = ${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}
     max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
     max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
     max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
@@ -118,6 +120,17 @@ by section basis below.
       RelWithDebInfo, RelMinSize builds), this setting is effective only if
       `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
+    [[`hpx.spinlock_deadlock_detection`]
+     [This setting verifies that spinlocks don't spin longer than specified using
+      the `hpx.spinlock_deadlock_detection_limit`. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1` (for Debug builds) or to `0` (for Release,
+      RelWithDebInfo, RelMinSize builds).]]
+    [[`hpx.spinlock_deadlock_detection_limit`]
+     [This setting specifies the upper limit of allowed number of spins that
+      spinlocks are allowed to perform. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1000000`.]]
     [[`hpx.max_background_threads`]
      [This setting defines the number of threads in the scheduler which are used
       to execute background work. By default this is the same as the number of
