@@ -224,7 +224,8 @@ namespace hpx { namespace lcos
             {
                 std::size_t counter =
                     wait_.count_.load(boost::memory_order_seq_cst);
-                if (counter < wait_.needed_count_ && !shared_state->is_ready())
+                if (counter < wait_.needed_count_ &&
+                    shared_state.get() != nullptr && !shared_state->is_ready())
                 {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
