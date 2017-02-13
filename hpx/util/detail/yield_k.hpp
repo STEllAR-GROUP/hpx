@@ -40,7 +40,8 @@ namespace hpx { namespace util { namespace detail {
             }
             else
             {
-                hpx::this_thread::suspend(hpx::threads::pending, thread_name);
+                hpx::this_thread::suspend(hpx::threads::pending_boost,
+                    thread_name);
             }
         }
         else

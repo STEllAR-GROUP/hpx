@@ -595,9 +595,20 @@ namespace detail
             state_ = value;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), threads::thread_priority_boost, ec);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
+            // Note: we use notify_one repeatedly instead of notify_all as we
+            //       know: a) that most of the time we have at most one thread
+            //       waiting on the future (most futures are not shared), and
+            //       b) our implementation of condition_variable::notify_one
+            //       relinquishes the lock before resuming the waiting thread
+            //       which avoids suspension of this thread when it tries to
+            //       re-lock the mutex while exiting from condition_variable::wait
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            {
+                l = std::unique_lock<mutex_type>(this->mtx_);
+            }
+
+            // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function
@@ -629,9 +640,20 @@ namespace detail
             state_ = exception;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
+            // Note: we use notify_one repeatedly instead of notify_all as we
+            //       know: a) that most of the time we have at most one thread
+            //       waiting on the future (most futures are not shared), and
+            //       b) our implementation of condition_variable::notify_one
+            //       relinquishes the lock before resuming the waiting thread
+            //       which avoids suspension of this thread when it tries to
+            //       re-lock the mutex while exiting from condition_variable::wait
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            {
+                l = std::unique_lock<mutex_type>(this->mtx_);
+            }
+
+            // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function

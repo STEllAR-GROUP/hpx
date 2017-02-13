@@ -28,6 +28,7 @@ namespace hpx { namespace threads { namespace detail
         switch (initial_state) {
         case pending:
         case pending_do_not_schedule:
+        case pending_boost:
         case suspended:
             break;
 
