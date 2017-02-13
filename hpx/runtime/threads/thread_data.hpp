@@ -146,7 +146,8 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state_enum state, thread_state_ex_enum state_ex)
+        thread_state set_state(thread_state_enum state,
+            thread_state_ex_enum state_ex = wait_unknown)
         {
             thread_state prev_state =
                 current_state_.load(boost::memory_order_acquire);
@@ -158,6 +159,9 @@ namespace hpx { namespace threads
                 std::int64_t tag = tmp.tag();
                 if (state != tmp.state())
                     ++tag;
+
+                if (state_ex == wait_unknown)
+                    state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
                         thread_state(state, state_ex, tag))))
