@@ -319,7 +319,7 @@ namespace hpx { namespace threads { namespace detail
             {
                 while(true)
                 {
-                    if(callbacks.background_())
+                    if (params.background_())
                         idle_loop_count = 0;
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
@@ -327,17 +327,21 @@ namespace hpx { namespace threads { namespace detail
                 return std::make_pair(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"));
-        thread_id_type background_thread = nullptr;
 
-        if (!callbacks.background_.empty())
+        thread_id_type background_thread = nullptr;
+        if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+            num_thread < params.max_background_threads_ &&
+            !params.background_.empty())
+        {
             background_thread.reset(
                 new thread_data(background_init, nullptr, pending));
+        }
 
         while (true) {
             // Get the next HPX thread from the queue
             thrd = next_thrd;
-            bool running =
-                this_state.load(boost::memory_order_relaxed) < state_stopping;
+            bool running = this_state.load(
+                boost::memory_order_relaxed) < state_stopping;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
@@ -477,8 +481,7 @@ namespace hpx { namespace threads { namespace detail
                             {
                                 // schedule other work
                                 scheduler.SchedulingPolicy::wait_or_add_new(
-                                    num_thread, this_state.load() < state_stopping,
-                                    idle_loop_count);
+                                    num_thread, running, idle_loop_count);
 
                                 // schedule this thread again immediately with
                                 // boosted priority
@@ -553,21 +556,11 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < params.max_background_threads_ &&
-                    background_thread)
+                if (HPX_UNLIKELY(background_thread))
                 {
                     thread_result_type background_result = (*background_thread)();
-                    if (next_thrd == nullptr)
-                    {
-                        next_thrd = background_result.second.get();
-                    }
-                    else if(background_result.second != nullptr &&
-                        background_result.second != background_thread)
-                    {
-                        scheduler.SchedulingPolicy::schedule_thread(
-                            background_result.second.get(), num_thread);
-                    }
+                    (void)background_result;
+                    HPX_ASSERT(background_result.second == nullptr);
                 }
 
                 // call back into invoking context
@@ -584,21 +577,11 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < params.max_background_threads_ &&
-                    background_thread)
+                if (HPX_UNLIKELY(background_thread))
                 {
                     thread_result_type background_result = (*background_thread)();
-                    if (next_thrd == nullptr)
-                    {
-                        next_thrd = background_result.second.get();
-                    }
-                    else if(background_result.second != nullptr &&
-                        background_result.second != background_thread)
-                    {
-                        scheduler.SchedulingPolicy::schedule_thread(
-                            background_result.second.get(), num_thread);
-                    }
+                    (void)background_result;
+                    HPX_ASSERT(background_result.second == nullptr);
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
