@@ -559,8 +559,18 @@ namespace hpx { namespace threads { namespace detail
                 if (HPX_UNLIKELY(background_thread))
                 {
                     thread_result_type background_result = (*background_thread)();
-                    (void)background_result;
-                    HPX_ASSERT(background_result.second == nullptr);
+                    if (background_result.second.get() != nullptr)
+                    {
+                        if (next_thrd == nullptr)
+                        {
+                            next_thrd = background_result.second.get();
+                        }
+                        else if(background_result.second != background_thread)
+                        {
+                            scheduler.SchedulingPolicy::schedule_thread(
+                                background_result.second.get(), num_thread);
+                        }
+                    }
                 }
 
                 // call back into invoking context
@@ -580,8 +590,18 @@ namespace hpx { namespace threads { namespace detail
                 if (HPX_UNLIKELY(background_thread))
                 {
                     thread_result_type background_result = (*background_thread)();
-                    (void)background_result;
-                    HPX_ASSERT(background_result.second == nullptr);
+                    if (background_result.second.get() != nullptr)
+                    {
+                        if (next_thrd == nullptr)
+                        {
+                            next_thrd = background_result.second.get();
+                        }
+                        else if(background_result.second != background_thread)
+                        {
+                            scheduler.SchedulingPolicy::schedule_thread(
+                                background_result.second.get(), num_thread);
+                        }
+                    }
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
