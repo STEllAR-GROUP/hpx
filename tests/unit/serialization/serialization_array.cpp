@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/multi_array.hpp>
@@ -14,6 +17,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <array>
 #include <cstddef>
 #include <numeric>
 #include <vector>
@@ -328,3 +332,5 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#endif

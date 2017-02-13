@@ -18,6 +18,9 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -68,11 +71,13 @@ namespace hpx { namespace util
             typedef std::vector<New> type;
         };
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         template <typename T, std::size_t N, typename New>
         struct rebind_range<std::array<T, N>, New>
         {
             typedef std::array<New, N> type;
         };
+#endif
 
         template <typename T>
         struct unwrap_impl<
