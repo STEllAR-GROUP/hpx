@@ -372,26 +372,42 @@ namespace hpx
                 rt.add_startup_function(&list_component_types);
             }
 
-            if (vm.count("hpx:print-counter")) {
+            if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
+            {
                 std::size_t interval = 0;
                 if (vm.count("hpx:print-counter-interval"))
                     interval = vm["hpx:print-counter-interval"].as<std::size_t>();
 
-                std::vector<std::string> counters =
-                    vm["hpx:print-counter"].as<std::vector<std::string> >();
+                std::vector<std::string> counters;
+                if (vm.count("hpx:print-counter"))
+                {
+                    counters = vm["hpx:print-counter"]
+                        .as<std::vector<std::string> >();
+                }
+                std::vector<std::string> reset_counters;
+                if (vm.count("hpx:print-counter-reset"))
+                {
+                    reset_counters = vm["hpx:print-counter-reset"]
+                        .as<std::vector<std::string> >();
+                }
 
                 std::vector<std::string> counter_shortnames;
                 std::string counter_format("normal");
                 if (vm.count("hpx:print-counter-format")) {
                     counter_format = vm["hpx:print-counter-format"].as<std::string>();
                     if (counter_format == "csv-short"){
-                        for (std::size_t i=0; i< counters.size() ; ++i) {
+                        for (std::size_t i = 0; i != counters.size() ; ++i) {
                             std::vector<std::string> entry;
                             boost::algorithm::split(entry, counters[i],
-                            boost::algorithm::is_any_of(","),
-                            boost::algorithm::token_compress_on);
+                                boost::algorithm::is_any_of(","),
+                                boost::algorithm::token_compress_on);
 
-                            HPX_ASSERT(entry.size() == 2);
+                            if (entry.size() != 2)
+                            {
+                                throw detail::command_line_error(
+                                    "Invalid format for command line option "
+                                    "--hpx:print-counter-format=csv-short");
+                            }
 
                             counter_shortnames.push_back(entry[0]);
                             counters[i] = entry[1];
@@ -411,8 +427,8 @@ namespace hpx
                 // itself to run after the given interval
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
-                        std::ref(counters), interval, destination, counter_format,
-                        counter_shortnames, csv_header);
+                        std::ref(counters), std::ref(reset_counters), interval,
+                        destination, counter_format, counter_shortnames, csv_header);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")

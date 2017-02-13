@@ -186,7 +186,13 @@ namespace hpx { namespace util
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
-            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+            "max_background_threads = "
+                "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+
+            "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_IDLE_LOOP_COUNT_MAX) "}",
+            "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_BUSY_LOOP_COUNT_MAX) "}",
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",

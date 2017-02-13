@@ -62,6 +62,9 @@ by section basis below.
     minimal_deadlock_detection = <debug>
     spinlock_deadlock_detection = <debug>
     spinlock_deadlock_detection_limit = ${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}
+    max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
+    max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
+    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -128,6 +131,20 @@ by section basis below.
       spinlocks are allowed to perform. This setting is applicable only
       if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
       CMake. By default this is set to `1000000`.]]
+    [[`hpx.max_background_threads`]
+     [This setting defines the number of threads in the scheduler which are used
+      to execute background work. By default this is the same as the number of
+      cores used for the scheduler.]]
+    [[`hpx.max_idle_loop_count`]
+     [This setting defines the maximum value of the idle-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_IDLE_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+    [[`hpx.max_busy_loop_count`]
+     [This setting defines the maximum value of the busy-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
 
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.

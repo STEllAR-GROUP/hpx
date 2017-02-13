@@ -16,6 +16,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -36,14 +37,17 @@ namespace hpx { namespace performance_counters
 
         /// Create a set of performance counters from a name, possibly
         /// containing wild-card characters
-        performance_counter_set(std::string const& names);
-        performance_counter_set(std::vector<std::string> const& names);
+        explicit performance_counter_set(std::string const& names,
+            bool reset = false);
+        explicit performance_counter_set(std::vector<std::string> const& names,
+            bool reset = false);
 
         /// Add more performance counters to the set based on the given name,
         /// possibly containing wild-card characters
-        void add_counters(std::string const& names, error_code& ec = throws);
-        void add_counters(std::vector<std::string> const& names,
+        void add_counters(std::string const& names, bool reset = false,
             error_code& ec = throws);
+        void add_counters(std::vector<std::string> const& names,
+            bool reset = false, error_code& ec = throws);
 
         /// Retrieve the counter infos for all counters in this set
         std::vector<counter_info> get_counter_infos() const;
@@ -95,7 +99,7 @@ namespace hpx { namespace performance_counters
         }
 
     protected:
-        bool find_counter(counter_info const& info, error_code& ec);
+        bool find_counter(counter_info const& info, bool reset, error_code& ec);
 
         template <typename T>
         static std::vector<T> extract_values(
@@ -113,6 +117,7 @@ namespace hpx { namespace performance_counters
 
         std::vector<counter_info> infos_;     // counter instance names
         std::vector<naming::id_type> ids_;    // global ids of counter instances
+        std::vector<std::uint8_t> reset_;     // != 0 if counter should be reset
     };
 }}
 
