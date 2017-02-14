@@ -104,8 +104,6 @@ namespace hpx { namespace actions
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_.get_id() << ")";
 
-                typedef typename Action::local_result_type local_result_type;
-
                 actions::trigger(std::move(cont_), f_);
                 return threads::thread_result_type(threads::terminated, nullptr);
             }
