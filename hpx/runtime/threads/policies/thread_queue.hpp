@@ -77,12 +77,20 @@ namespace hpx { namespace threads { namespace policies
 
     namespace detail
     {
-        inline int get_min_tasks_to_steal()
+        inline int get_min_tasks_to_steal_pending()
         {
-            static int min_tasks_to_steal =
+            static int min_tasks_to_steal_pending =
                 boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_tasks_to_steal", "10"));
-            return min_tasks_to_steal;
+                    "hpx.thread_queue.min_tasks_to_steal_pending", "0"));
+            return min_tasks_to_steal_pending;
+        }
+
+        inline int get_min_tasks_to_steal_staged()
+        {
+            static int min_tasks_to_steal_staged =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.min_tasks_to_steal_staged", "10"));
+            return min_tasks_to_steal_staged;
         }
 
         inline int get_min_add_new_count()
@@ -153,7 +161,8 @@ namespace hpx { namespace threads { namespace policies
         typedef Mutex mutex_type;
 
         // don't steal if less than this amount of tasks are left
-        int const min_tasks_to_steal;
+        int const min_tasks_to_steal_pending;
+        int const min_tasks_to_steal_staged;
 
         // create at least this amount of threads from tasks
         int const min_add_new_count;
@@ -242,14 +251,18 @@ namespace hpx { namespace threads { namespace policies
             }
             HPX_ASSERT(heap);
 
+            if (state == pending_do_not_schedule || state == pending_boost)
+            {
+                state = pending;
+            }
+
             // Check for an unused thread object.
             if (!heap->empty())
             {
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->front();
                 heap->pop_front();
-                thrd->rebind(data,
-                    state == pending_do_not_schedule ? pending : state);
+                thrd->rebind(data, state);
             }
 
             else
@@ -257,9 +270,7 @@ namespace hpx { namespace threads { namespace policies
                 hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
-                thrd = threads::thread_data::create(
-                    data, memory_pool_,
-                    state == pending_do_not_schedule ? pending : state);
+                thrd = threads::thread_data::create(data, memory_pool_, state);
             }
         }
 
@@ -523,7 +534,8 @@ namespace hpx { namespace threads { namespace policies
 
         thread_queue(std::size_t queue_num = std::size_t(-1),
                 std::size_t max_count = max_thread_count)
-          : min_tasks_to_steal(detail::get_min_tasks_to_steal()),
+          : min_tasks_to_steal_pending(detail::get_min_tasks_to_steal_pending()),
+            min_tasks_to_steal_staged(detail::get_min_tasks_to_steal_staged()),
             min_add_new_count(detail::get_min_add_new_count()),
             max_add_new_count(detail::get_max_add_new_count()),
             max_delete_count(detail::get_max_delete_count()),
@@ -812,11 +824,19 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(threads::thread_data*& thrd,
-            bool steal = false) HPX_HOT
+            bool allow_stealing = false, bool steal = false) HPX_HOT
         {
+            std::int64_t work_items_count =
+                work_items_count_.load(boost::memory_order_relaxed);
+
+            if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
+            {
+                return false;
+            }
+
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             thread_description* tdesc;
-            if (work_items_.pop(tdesc, steal))
+            if (0 != work_items_count && work_items_.pop(tdesc, steal))
             {
                 --work_items_count_;
 
@@ -832,8 +852,7 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
 #else
-            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                work_items_.pop(thrd, steal))
+            if (0 != work_items_count && work_items_.pop(thrd, steal))
             {
                 --work_items_count_;
                 return true;
@@ -983,7 +1002,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     // don't try to steal if there are only a few tasks left on
                     // this queue
-                    if (running && min_tasks_to_steal >=
+                    if (running && min_tasks_to_steal_staged >
                         addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                     {
                         return false;

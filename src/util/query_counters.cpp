@@ -10,6 +10,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/apex.hpp>
@@ -39,9 +40,11 @@
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
+            std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest, std::string const& form,
             std::vector<std::string> const& shortnames, bool csv_header)
-      : names_(names), destination_(dest), format_(form),
+      : names_(names), reset_names_(reset_names),
+        destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
         timer_(util::bind(&query_counters::evaluate, this_()),
             util::bind(&query_counters::terminate, this_()),
@@ -52,11 +55,18 @@ namespace hpx { namespace util
         {
             performance_counters::ensure_counter_prefix(name);
         }
+        for (std::string& name : reset_names_)
+        {
+            performance_counters::ensure_counter_prefix(name);
+        }
     }
 
     void query_counters::find_counters()
     {
-        counters_.add_counters(names_);
+        if (!names_.empty())
+            counters_.add_counters(names_);
+        if (!reset_names_.empty())
+            counters_.add_counters(reset_names_, true);
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         if (use_ittnotify_api)
@@ -64,13 +74,13 @@ namespace hpx { namespace util
             typedef std::map<std::string, util::itt::counter>::value_type
                 value_type;
 
-            for (auto const& name : names_)
+            for (auto const& info : counters_.get_counter_infos())
             {
                 std::string real_name =
-                    performance_counters::remove_counter_prefix(name);
+                    performance_counters::remove_counter_prefix(info.fullname_);
                 itt_counters_.insert(
-                    value_type(name, util::itt::counter(
-                        real_name.c_str(), "evaluate_counters",
+                    value_type(info.fullname_, util::itt::counter(
+                        real_name.c_str(), hpx::get_thread_name().c_str(),
                         __itt_metadata_double
                     ))
                 );

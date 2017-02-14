@@ -464,6 +464,14 @@ hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+hpx_option(HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
+  "Enable spinlock deadlock detection (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
+
+if(HPX_WITH_SPINLOCK_DEADLOCK_DETECTION)
+  hpx_add_config_define(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
+endif()
+
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")

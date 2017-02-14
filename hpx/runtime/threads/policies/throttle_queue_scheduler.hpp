@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             bool ret = throttle(num_thread, apex_current_threads_ <
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace policies
 
             // grab work if available
             return this->base_type::get_next_thread(
-                num_thread, idle_loop_count, thrd);
+                num_thread, running, idle_loop_count, thrd);
         }
 
     protected:

@@ -60,6 +60,11 @@ by section basis below.
     lock_detection = ${HPX_LOCK_DETECTION:0}
     throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}
     minimal_deadlock_detection = <debug>
+    spinlock_deadlock_detection = <debug>
+    spinlock_deadlock_detection_limit = ${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}
+    max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
+    max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
+    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -115,6 +120,32 @@ by section basis below.
       RelWithDebInfo, RelMinSize builds), this setting is effective only if
       `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
+    [[`hpx.spinlock_deadlock_detection`]
+     [This setting verifies that spinlocks don't spin longer than specified using
+      the `hpx.spinlock_deadlock_detection_limit`. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1` (for Debug builds) or to `0` (for Release,
+      RelWithDebInfo, RelMinSize builds).]]
+    [[`hpx.spinlock_deadlock_detection_limit`]
+     [This setting specifies the upper limit of allowed number of spins that
+      spinlocks are allowed to perform. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1000000`.]]
+    [[`hpx.max_background_threads`]
+     [This setting defines the number of threads in the scheduler which are used
+      to execute background work. By default this is the same as the number of
+      cores used for the scheduler.]]
+    [[`hpx.max_idle_loop_count`]
+     [This setting defines the maximum value of the idle-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_IDLE_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+    [[`hpx.max_busy_loop_count`]
+     [This setting defines the maximum value of the busy-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
@@ -175,7 +206,8 @@ by section basis below.
 [teletype]
 ``
     [hpx.thread_queue]
-    min_tasks_to_steal = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL:10}
+    min_tasks_to_steal_pending = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}
+    min_tasks_to_steal_staged = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}
     min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}
     max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}
     max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}
@@ -184,9 +216,15 @@ by section basis below.
 
 [table:ini_hpx_thread_queue
     [[Property]                 [Description]]
-    [[`hpx.thread_queue.min_tasks_to_steal`]
-     [The value of this property defines the number __hpx__ tasks have to be
-      available before neighboring cores are allowed to steal work.]]
+    [[`hpx.thread_queue.min_tasks_to_steal_pending`]
+     [The value of this property defines the number of pending __hpx__ threads
+      which have to be available before neighboring cores are allowed to steal
+      work. The default is to allow stealing always.]]
+    [[`hpx.thread_queue.min_tasks_to_steal_staged`]
+     [The value of this property defines the number of staged __hpx__ tasks have
+      which to be available before neighboring cores are allowed to steal work.
+      The default is to allow stealing only if there are more tan 10 tasks
+      available.]]
     [[`hpx.thread_queue.min_add_new_count`]
      [The value of this property defines the minimal number tasks to be
       converted into __hpx__ threads whenever the thread queues for a core have

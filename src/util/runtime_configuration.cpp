@@ -166,11 +166,11 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
 #else
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
 #endif
-            "spinlick_deadlock_detection_limit = "
+            "spinlock_deadlock_detection_limit = "
                 "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
 #endif
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
@@ -186,7 +186,13 @@ namespace hpx { namespace util
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
-            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+            "max_background_threads = "
+                "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+
+            "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_IDLE_LOOP_COUNT_MAX) "}",
+            "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_BUSY_LOOP_COUNT_MAX) "}",
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
@@ -219,7 +225,10 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
             "[hpx.thread_queue]",
-            "min_tasks_to_steal = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL:10}",
+            "min_tasks_to_steal_pending = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}",
+            "min_tasks_to_steal_staged = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}",
             "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
             "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
             "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
@@ -832,7 +841,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "spinlick_deadlock_detection_limit", "1000000");
+                    *sec, "spinlock_deadlock_detection_limit", "1000000");
             }
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
