@@ -45,8 +45,13 @@ namespace hpx { namespace threads
         if (0 == --p->count_)
         {
             thread_data::pool_type* pool = p->get_pool();
-            p->~thread_data();
-            pool->deallocate(p);
+            if (pool == nullptr)
+                delete p;
+            else
+            {
+                p->~thread_data();
+                pool->deallocate(p);
+            }
         }
     }
 

@@ -109,7 +109,7 @@ namespace hpx { namespace threads
             using namespace std;    // some systems have memset in namespace std
             memset (ret, initial_value, sizeof(thread_data));
 #endif
-            return new (ret) thread_data(init_data, pool, newstate);
+            return new (ret) thread_data(init_data, &pool, newstate);
         }
 
         ~thread_data()
@@ -566,10 +566,9 @@ namespace hpx { namespace threads
         friend HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
         friend HPX_EXPORT void intrusive_ptr_release(thread_data* p);
 
-    private:
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data,
-                pool_type& pool, thread_state_enum newstate)
+            pool_type* pool, thread_state_enum newstate)
           : current_state_(thread_state(newstate, wait_signaled)),
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_(init_data.lva),
@@ -598,7 +597,7 @@ namespace hpx { namespace threads
             stacksize_(init_data.stacksize),
             coroutine_(std::move(init_data.func),
                 this_(), init_data.stacksize),
-            pool_(&pool)
+            pool_(pool)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -621,6 +620,7 @@ namespace hpx { namespace threads
             HPX_ASSERT(coroutine_.is_ready());
         }
 
+    private:
         void rebind_base(thread_init_data& init_data, thread_state_enum newstate)
         {
             free_thread_exit_callbacks();
