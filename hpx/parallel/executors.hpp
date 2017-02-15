@@ -20,6 +20,7 @@
 #include <hpx/parallel/executors/distribution_policy_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/sequential_executor.hpp>
+#include <hpx/parallel/executors/seq_exec.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/parallel/executors/this_thread_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_attached_executors.hpp>

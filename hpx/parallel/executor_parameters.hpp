@@ -8,6 +8,7 @@
 
 #include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/parallel/executors/dynamic_chunk_size.hpp>
+#include <hpx/parallel/executors/adaptive_chunk_size.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/executors/guided_chunk_size.hpp>
 #include <hpx/parallel/executors/persistent_auto_chunk_size.hpp>

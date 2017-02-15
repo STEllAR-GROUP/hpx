@@ -460,7 +460,7 @@ namespace hpx { namespace parallel { namespace execution
 
     /// Default sequential execution policy object.
     static sequenced_policy HPX_CONSTEXPR_OR_CONST seq;
-
+    
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// require that a parallel algorithm's execution may not be parallelized.
@@ -1221,6 +1221,170 @@ namespace hpx { namespace parallel { namespace execution
     static parallel_unsequenced_policy HPX_CONSTEXPR_OR_CONST par_unseq;
 
     ///////////////////////////////////////////////////////////////////////////
+    // The class prefetching_policy is an execution policy type 
+    // for implementing prefetching method
+    template<typename ... Ts>
+    struct prefetching_policy
+    {
+        // As in this method parallel_policy will be used as an execution policy
+        // during prefetching data, so the executors and parameters 
+        // are the same as for parallel_policy
+
+        /// The type of the executor associated with this execution policy
+        typedef parallel::parallel_executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
+        typedef parallel::parallel_execution_tag execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor_, typename Parameters_>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef parallel_policy_shim<
+                    Executor_, Parameters_
+                > type;
+        };
+
+        typedef hpx::util::tuple<std::reference_wrapper<Ts>...> ranges_type;
+
+        /// \cond NOINTERNAL
+        HPX_CONSTEXPR prefetching_policy(std::size_t dist_f, ranges_type const& rngs) :
+        prefetching_distance_factor_(dist_f), ranges_(rngs) 
+        {}
+        /// \endcond
+
+        /// Create a new prefetching_policy referencing a chunk size.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new prefetching_policy
+        ///
+        HPX_CONSTEXPR parallel_task_policy operator()(
+            task_policy_tag tag) const
+        {
+            return parallel_task_policy();
+        }
+
+        /// Create a new prefetching_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new prefetching_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            prefetching_policy, Executor, executor_parameters_type
+        >::type
+        on(Executor && exec) const
+        {
+            static_assert(
+                hpx::traits::is_executor<Executor>::value ||
+                hpx::traits::is_threads_executor<Executor>::value,
+                "hpx::traits::is_executor<Executor>::value || "
+                "hpx::traits::is_threads_executor<Executor>::value");
+
+            typedef typename rebind_executor<
+                prefetching_policy, Executor, executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(std::forward<Executor>(exec), parameters());
+        }
+
+        /// Create a new prefetching_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new prefetching_policy
+        ///
+        template <typename... Parameters, typename ParametersType =
+            typename executor_parameters_join<Parameters...>::type>
+        typename rebind_executor<
+            prefetching_policy, executor_type, ParametersType
+        >::type
+        with(Parameters &&... params) const
+        {
+            typedef typename rebind_executor<
+                prefetching_policy, executor_type, ParametersType
+            >::type rebound_type;
+            return rebound_type(executor(),
+                join_executor_parameters(std::forward<Parameters>(params)...));
+        }
+
+    public:
+        
+        /// Returning prefetching_distance_factor
+        std::size_t get_prefetching_distance_factor() 
+        { 
+            return prefetching_distance_factor_; 
+        }        
+        // Returning ranges
+        ranges_type get_ranges() { return ranges_; }
+
+        /// Return the associated executor object.
+        executor_type& executor() { return exec_; }
+        /// Return the associated executor object.
+        HPX_CONSTEXPR executor_type const& executor() const { return exec_; }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        HPX_CONSTEXPR executor_parameters_type const& parameters() const
+            { return params_; }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+        }
+
+    private:
+
+        std::size_t prefetching_distance_factor_;
+        ranges_type ranges_;
+
+        executor_type exec_;
+        executor_parameters_type params_;
+    };
+
+    // Helper function for creating prefetching_policy
+    template<typename ... Ts>
+    prefetching_policy<Ts const...>
+    make_prefetcher_policy(std::size_t dist_f, Ts const& ... rngs)
+    {
+        static_assert(
+            hpx::util::detail::all_of<hpx::traits::is_range<Ts>...>::value,
+            "All variadic parameters have to represent ranges");
+
+        typedef hpx::util::tuple<std::reference_wrapper<Ts const>...> ranges_type;
+
+        auto && ranges = ranges_type(std::cref(rngs)...);
+        return prefetching_policy<Ts const...>(dist_f, std::move(ranges));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Allow to detect execution policies which were created as a result
     // of a rebind operation. This information can be used to inhibit the
     // construction of a generic execution_policy from any of the rebound
@@ -1258,6 +1422,11 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
         template <>
         struct is_execution_policy<parallel_policy>
+          : std::true_type
+        {};
+
+        template <typename ... Ts>
+        struct is_execution_policy<prefetching_policy<Ts...>>
           : std::true_type
         {};
 
@@ -1314,6 +1483,11 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
         template <>
         struct is_parallel_execution_policy<parallel_policy>
+          : std::true_type
+        {};
+
+        template <typename ... Ts>
+        struct is_parallel_execution_policy<prefetching_policy<Ts...>>
           : std::true_type
         {};
 
@@ -1437,10 +1611,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     using task_execution_policy_tag = parallel::execution::task_policy_tag;
 
     ///////////////////////////////////////////////////////////////////////////
-    static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;
+    static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;    
     static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par;
-    static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
 
+    // Applying machine learning techniques for policy determination by using par_if
+    static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par_if;
+
+    static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
     static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
@@ -1687,7 +1864,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return extract_launch_policy<ExPolicy>::call();
         }
         /// \endcond
-    }
+    }   
+
 #endif
 }}}
 #endif

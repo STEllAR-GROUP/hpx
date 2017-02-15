@@ -9,6 +9,9 @@
 
 #include <hpx/config.hpp>
 
+// // Applting machine learning techniques on HPX algorithms
+#include <hpx/parallel/seq_or_par.hpp>
+
 /// See N4310: 1.3/3
 #include <algorithm>
 
