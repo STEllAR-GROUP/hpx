@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,6 +38,7 @@ set(tests
     local_barrier
     local_dataflow
     local_dataflow_executor
+    local_dataflow_std_array
     local_event
     local_mutex
     make_future
@@ -50,9 +51,14 @@ set(tests
     shared_future
     sliding_semaphore
     unwrapped
+    wait_all_std_array
+    wait_any_std_array
     when_all
+    when_all_std_array
     when_any
+    when_any_std_array
     when_some
+    when_some_std_array
    )
 
 if(NOT MSVC12)

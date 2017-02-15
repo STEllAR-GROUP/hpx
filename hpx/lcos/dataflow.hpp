@@ -393,7 +393,8 @@ namespace hpx { namespace lcos { namespace detail
                     >::type next_future_data =
                         traits::detail::get_shared_state(*next);
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 
@@ -452,7 +453,8 @@ namespace hpx { namespace lcos { namespace detail
                 >::type next_future_data =
                     traits::detail::get_shared_state(f_);
 
-            if(!next_future_data->is_ready())
+            if (next_future_data.get() != nullptr &&
+                !next_future_data->is_ready())
             {
                 next_future_data->execute_deferred();
 
