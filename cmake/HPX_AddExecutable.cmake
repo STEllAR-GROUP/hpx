@@ -121,7 +121,9 @@ macro(add_hpx_executable name)
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
         message(${extension})
-        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES LANGUAGE CXX)
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
+          LANGUAGE CXX
+          COMPILE_FLAGS --cuda-gpu-arch=${HPX_CUDA_ARCH})
       endif()
     endforeach()
   endif()
