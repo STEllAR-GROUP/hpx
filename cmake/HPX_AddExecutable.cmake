@@ -123,7 +123,7 @@ macro(add_hpx_executable name)
         message(${extension})
         SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
           LANGUAGE CXX
-          COMPILE_FLAGS --cuda-gpu-arch=${HPX_CUDA_ARCH})
+          COMPILE_FLAGS ${HPX_CUDA_CLANG_FLAGS})
       endif()
     endforeach()
   endif()
