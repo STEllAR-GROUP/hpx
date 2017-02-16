@@ -212,7 +212,10 @@ namespace hpx { namespace iostreams
         ostream& streaming_operator_sync(T const& subject, Lock& l)
         { // {{{
             // apply the subject to the local stream
-            *static_cast<stream_base_type*>(this) << subject;
+            {
+                hpx::util::unlock_guard<Lock> ul(l);
+                *static_cast<stream_base_type*>(this) << subject;
+            }
 
             // If the buffer isn't empty, send it to the destination.
             if (!this->detail::buffer::empty())

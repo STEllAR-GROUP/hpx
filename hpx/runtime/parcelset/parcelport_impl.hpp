@@ -656,7 +656,9 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::iterator iterator;
 
             {
-                std::lock_guard<lcos::local::spinlock> l(mtx_);
+                std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
+
+                if (!l) return false;
 
                 iterator it = pending_parcels_.find(locality_id);
 
