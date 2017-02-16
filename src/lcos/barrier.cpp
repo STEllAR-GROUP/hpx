@@ -3,8 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/state.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/detail/barrier_node.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -81,14 +83,23 @@ namespace hpx { namespace lcos {
     {
         if (node_)
         {
-            if (hpx::get_runtime_ptr() != nullptr)
+            if (hpx::get_runtime_ptr() != nullptr && hpx::threads::threadmanager_is(state_running))
             {
+                hpx::future<void> f;
                 if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-                    hpx::unregister_with_basename(
-                        (*node_)->base_name_, (*node_)->rank_).get();
+                    f = hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_);
 
-                // we need to wait on everyone to have its name unregistered...
-                wait();
+                // we need to wait on everyone to have its name unregistered,
+                // and hold on to our node long enough...
+                boost::intrusive_ptr<wrapping_type> node = node_;
+                hpx::when_all(f, wait(hpx::launch::async)).then(
+                    hpx::launch::sync,
+                    [node](hpx::future<void> f)
+                    {
+                        f.get();
+                    }
+                ).get();
             }
             node_.reset();
         }
