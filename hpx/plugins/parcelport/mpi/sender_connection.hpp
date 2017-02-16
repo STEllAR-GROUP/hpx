@@ -248,8 +248,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 chunks_idx_++;
             }
 
-            if(!request_done()) return false;
-
             state_ = sent_chunks;
 
             return done();
@@ -266,6 +264,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             pp_->add_sent_data(buffer_.data_point_);
             buffer_.clear();
 
+            state_ = initialized;
+
             return true;
         }
 
@@ -281,7 +281,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             int ret = 0;
             ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
+            if(completed)
             {
                 request_ptr_ = nullptr;
                 return true;
