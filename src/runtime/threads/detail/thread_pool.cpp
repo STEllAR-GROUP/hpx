@@ -23,6 +23,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/atomic.hpp>
