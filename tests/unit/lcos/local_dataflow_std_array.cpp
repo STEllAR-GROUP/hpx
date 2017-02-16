@@ -177,7 +177,7 @@ void future_function_pointers()
     future<int> f5 = dataflow(&future_int_f_vector, std::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
-    HPX_TEST_EQ(int_f1_count, 11u);
+    HPX_TEST_EQ(future_int_f1_count, 10u);
     HPX_TEST_EQ(future_int_f_vector_count, 1u);
 }
 
