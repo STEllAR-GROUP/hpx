@@ -65,7 +65,28 @@ namespace hpx { namespace compute { namespace cuda
 #else
         operator T() const
         {
-            return access_target::read(*target_, p_);
+            HPX_ASSERT(false);
+            return T();
+        }
+#endif
+
+
+        // Note: The code duplication below allows Cuda Clang to not see
+        //       the host side implicit cast during the device code
+        //       compilation. Without this, wrong template parameter
+        //       deduction can occur if a value_proxy is given in the arg
+        //       list of invoke()
+
+#if defined(__CUDA_ARCH__)
+        HPX_DEVICE operator T&()
+        {
+            return *p_;
+        }
+#else
+        HPX_HOST operator T&()
+        {
+            HPX_ASSERT(false);
+            return *p_;
         }
 #endif
 
