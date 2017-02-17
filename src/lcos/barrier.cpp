@@ -12,6 +12,8 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+
 #include <cstddef>
 #include <string>
 #include <utility>
@@ -83,7 +85,8 @@ namespace hpx { namespace lcos {
     {
         if (node_)
         {
-            if (hpx::get_runtime_ptr() != nullptr && hpx::threads::threadmanager_is(state_running))
+            if (hpx::get_runtime_ptr() != nullptr &&
+                hpx::threads::threadmanager_is(state_running))
             {
                 hpx::future<void> f;
                 if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
