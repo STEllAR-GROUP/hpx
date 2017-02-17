@@ -72,7 +72,7 @@ namespace hpx { namespace compute { namespace cuda
                     [] HPX_DEVICE
                         (F f, value_type* p, std::size_t count, Ts&... ts)
                     {
-                        int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                        std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                         if (idx < count)
                         {
                             hpx::util::invoke_r<void>(f, *(p + idx), ts...);
@@ -117,7 +117,8 @@ namespace hpx { namespace compute { namespace cuda
                         [begin, chunk_size]
                         HPX_DEVICE (F f, Ts&... ts)
                         {
-                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            std::size_t idx
+                                = blockIdx.x * blockDim.x + threadIdx.x;
                             if(idx < chunk_size)
                             {
                                 hpx::util::invoke_r<void>(f,
