@@ -74,7 +74,7 @@ namespace hpx { namespace applier { namespace detail
             data.lva = lva;
 #endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             data.description = util::thread_description(
                 actions::detail::get_action_name<Action>(),
                 actions::detail::get_action_name_itt<Action>());
@@ -113,7 +113,7 @@ namespace hpx { namespace applier { namespace detail
             data.lva = lva;
 #endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             data.description = util::thread_description(
                 actions::detail::get_action_name<Action>(),
                 actions::detail::get_action_name_itt<Action>());

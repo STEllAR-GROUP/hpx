@@ -674,7 +674,7 @@ namespace hpx { namespace util
         }
 
         // handle setting related to schedulers
-        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority");
+        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority-fifo");
         ini_config += "hpx.scheduler=" + queuing_;
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
@@ -870,7 +870,7 @@ namespace hpx { namespace util
         }
 
         // if any counters have to be evaluated, always print at the end
-        if (vm.count("hpx:print-counter"))
+        if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
         {
             if (!noshutdown_evaluate)
                 ini_config += "hpx.print_counter.shutdown!=1";

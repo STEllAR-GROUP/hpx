@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -20,6 +21,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -51,12 +53,11 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class local_priority_queue_scheduler : public scheduler_base
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT local_priority_queue_scheduler : public scheduler_base
     {
     protected:
         // The maximum number of active threads this thread manager should
@@ -489,7 +490,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -502,7 +503,8 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues)
             {
                 this_high_priority_queue = high_priority_queues_[num_thread];
-                bool result = this_high_priority_queue->get_next_thread(thrd);
+                bool result =
+                    this_high_priority_queue->get_next_thread(thrd);
 
                 this_high_priority_queue->increment_num_pending_accesses();
                 if (result)
@@ -534,7 +536,7 @@ namespace hpx { namespace threads { namespace policies
                     num_thread < high_priority_queues)
                 {
                     thread_queue_type* q = high_priority_queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         this_high_priority_queue->
@@ -543,7 +545,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-                if (queues_[idx]->get_next_thread(thrd))
+                if (queues_[idx]->get_next_thread(thrd, running))
                 {
                     queues_[idx]->increment_num_stolen_from_pending();
                     this_queue->increment_num_stolen_to_pending();
@@ -934,7 +936,6 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
             if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
@@ -1117,7 +1118,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
     protected:
-        boost::mutex void_mtx_;
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue_type*> queues_;
         std::vector<thread_queue_type*> high_priority_queues_;

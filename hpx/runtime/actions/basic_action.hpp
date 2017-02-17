@@ -41,7 +41,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
@@ -103,8 +103,6 @@ namespace hpx { namespace actions
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_.get_id() << ")";
-
-                typedef typename Action::local_result_type local_result_type;
 
                 actions::trigger(std::move(cont_), f_);
                 return threads::thread_result_type(threads::terminated, nullptr);
@@ -836,7 +834,7 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
     HPX_DEFINE_GET_ACTION_NAME_(action, action)                               \
 /**/
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
@@ -893,7 +891,7 @@ namespace hpx { namespace serialization
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \

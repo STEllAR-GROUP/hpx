@@ -29,6 +29,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/has_xxx.hpp>

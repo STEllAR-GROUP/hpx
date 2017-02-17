@@ -136,7 +136,7 @@ namespace hpx { namespace actions
             return detail::get_action_name<derived_type>();
         }
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         /// The function \a get_action_name_itt returns the name of this action
         /// as a ITT string_handle
         util::itt::string_handle const& get_action_name_itt() const

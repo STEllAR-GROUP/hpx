@@ -280,6 +280,15 @@ namespace hpx { namespace util { namespace itt
             add_metadata(sh_.handle_, name.get_address());
         }
     }
+
+    task::task(domain const& domain, string_handle const& name)
+      : domain_(domain), id_(0), sh_(name)
+    {
+        id_ = HPX_ITT_MAKE_ID(domain_.domain_,
+            reinterpret_cast<std::size_t>(sh_.handle_));
+
+        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+    }
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,17 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
+#endif
+
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -482,6 +493,23 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
+#if HPX_HAVE_ITTNOTIFY != 0
+                util::itt::string_handle const& sh =
+                    traits::get_function_annotation_itt<
+                            completed_callback_type
+                        >::call(on_completed);
+                util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
+                char const* name = traits::get_function_annotation<
+                        completed_callback_type
+                    >::call(on_completed);
+                if (name != nullptr)
+                {
+                    util::apex_wrapper apex_profiler(name);
+                    on_completed();
+                }
+                else
+#endif
                 on_completed();
             }
             catch (...) {
@@ -509,7 +537,12 @@ namespace detail
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
-                on_completed();
+                boost::exception_ptr ptr;
+                if (!run_on_completed(std::move(on_completed), ptr))
+                {
+                    error_code ec(lightweight);
+                    set_exception(hpx::detail::access_exception(ec));
+                }
             }
             else
             {
@@ -552,9 +585,7 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed;
-
-            on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
             result_type* value_ptr =
@@ -564,9 +595,20 @@ namespace detail
             state_ = value;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
+            // Note: we use notify_one repeatedly instead of notify_all as we
+            //       know: a) that most of the time we have at most one thread
+            //       waiting on the future (most futures are not shared), and
+            //       b) our implementation of condition_variable::notify_one
+            //       relinquishes the lock before resuming the waiting thread
+            //       which avoids suspension of this thread when it tries to
+            //       re-lock the mutex while exiting from condition_variable::wait
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            {
+                l = std::unique_lock<mutex_type>(this->mtx_);
+            }
+
+            // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function
@@ -588,9 +630,7 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed;
-
-            on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
             boost::exception_ptr* exception_ptr =
@@ -600,9 +640,20 @@ namespace detail
             state_ = exception;
 
             // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
+            // Note: we use notify_one repeatedly instead of notify_all as we
+            //       know: a) that most of the time we have at most one thread
+            //       waiting on the future (most futures are not shared), and
+            //       b) our implementation of condition_variable::notify_one
+            //       relinquishes the lock before resuming the waiting thread
+            //       which avoids suspension of this thread when it tries to
+            //       re-lock the mutex while exiting from condition_variable::wait
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            {
+                l = std::unique_lock<mutex_type>(this->mtx_);
+            }
+
+            // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function
@@ -774,8 +825,8 @@ namespace detail
                     std::move(this_),
                     future_data_result<Result>::set(std::forward<Result_>(init))),
                 "timed_future_data<Result>::timed_future_data",
-                threads::suspended, true, threads::thread_priority_normal,
-                std::size_t(-1), threads::thread_stacksize_default, ec);
+                threads::suspended, true, threads::thread_priority_boost,
+                std::size_t(-1), threads::thread_stacksize_current, ec);
             if (ec) {
                 // thread creation failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));

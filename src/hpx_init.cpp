@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -372,26 +372,42 @@ namespace hpx
                 rt.add_startup_function(&list_component_types);
             }
 
-            if (vm.count("hpx:print-counter")) {
+            if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
+            {
                 std::size_t interval = 0;
                 if (vm.count("hpx:print-counter-interval"))
                     interval = vm["hpx:print-counter-interval"].as<std::size_t>();
 
-                std::vector<std::string> counters =
-                    vm["hpx:print-counter"].as<std::vector<std::string> >();
+                std::vector<std::string> counters;
+                if (vm.count("hpx:print-counter"))
+                {
+                    counters = vm["hpx:print-counter"]
+                        .as<std::vector<std::string> >();
+                }
+                std::vector<std::string> reset_counters;
+                if (vm.count("hpx:print-counter-reset"))
+                {
+                    reset_counters = vm["hpx:print-counter-reset"]
+                        .as<std::vector<std::string> >();
+                }
 
                 std::vector<std::string> counter_shortnames;
                 std::string counter_format("normal");
                 if (vm.count("hpx:print-counter-format")) {
                     counter_format = vm["hpx:print-counter-format"].as<std::string>();
                     if (counter_format == "csv-short"){
-                        for (std::size_t i=0; i< counters.size() ; ++i) {
+                        for (std::size_t i = 0; i != counters.size() ; ++i) {
                             std::vector<std::string> entry;
                             boost::algorithm::split(entry, counters[i],
-                            boost::algorithm::is_any_of(","),
-                            boost::algorithm::token_compress_on);
+                                boost::algorithm::is_any_of(","),
+                                boost::algorithm::token_compress_on);
 
-                            HPX_ASSERT(entry.size() == 2);
+                            if (entry.size() != 2)
+                            {
+                                throw detail::command_line_error(
+                                    "Invalid format for command line option "
+                                    "--hpx:print-counter-format=csv-short");
+                            }
 
                             counter_shortnames.push_back(entry[0]);
                             counters[i] = entry[1];
@@ -411,8 +427,8 @@ namespace hpx
                 // itself to run after the given interval
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
-                        std::ref(counters), interval, destination, counter_format,
-                        counter_shortnames, csv_header);
+                        std::ref(counters), std::ref(reset_counters), interval,
+                        destination, counter_format, counter_shortnames, csv_header);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
@@ -899,6 +915,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // local scheduler with priority queue (one queue for each OS threads
         // plus one separate queue for high priority HPX-threads)
+        template <typename Queuing>
         int run_priority_local(startup_function_type startup,
             shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
@@ -915,9 +932,11 @@ namespace hpx
                 get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
-            typedef hpx::threads::policies:: local_priority_queue_scheduler<>
-                local_queue_policy;
-            local_queue_policy::init_parameter_type init(
+            typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    boost::mutex, Queuing
+                > local_queue_policy;
+
+            typename local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
                 numa_sensitive, "core-local_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
@@ -934,7 +953,7 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // priority abp scheduler: local priority deques for each OS thread,
+        // priority abp scheduler: local priority dequeues for each OS thread,
         // with work stealing from the "bottom" of each.
         int run_priority_abp(startup_function_type startup,
             shutdown_function_type shutdown,
@@ -948,8 +967,10 @@ namespace hpx
                 get_num_high_priority_queues(cfg);
 
             // scheduling policy
-            typedef hpx::threads::policies::abp_fifo_priority_queue_scheduler
-                abp_priority_queue_policy;
+            typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    boost::mutex, hpx::threads::policies::lockfree_fifo
+                > abp_priority_queue_policy;
+
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
                 cfg.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
@@ -1110,14 +1131,25 @@ namespace hpx
                     result = run_static(std::move(startup), std::move(shutdown),
                         cfg, blocking);
                 }
-                else if (0 == std::string("local-priority").find(cfg.queuing_))
+                else if (0 == std::string("local-priority-fifo").find(cfg.queuing_))
                 {
                     // local scheduler with priority queue (one queue for each
                     // OS thread plus separate dequeues for low/high priority
                     /// HPX-threads)
-                    cfg.queuing_ = "local-priority";
-                    result = run_priority_local(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
+                    cfg.queuing_ = "local-priority-fifo";
+                    result = run_priority_local<
+                            hpx::threads::policies::lockfree_fifo
+                        >(std::move(startup), std::move(shutdown), cfg, blocking);
+                }
+                else if (0 == std::string("local-priority-lifo").find(cfg.queuing_))
+                {
+                    // local scheduler with priority queue (one queue for each
+                    // OS thread plus separate dequeues for low/high priority
+                    /// HPX-threads)
+                    cfg.queuing_ = "local-priority-lifo";
+                    result = run_priority_local<
+                            hpx::threads::policies::lockfree_lifo
+                        >(std::move(startup), std::move(shutdown), cfg, blocking);
                 }
                 else if (0 == std::string("static-priority").find(cfg.queuing_))
                 {

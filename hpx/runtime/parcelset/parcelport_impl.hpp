@@ -587,6 +587,7 @@ namespace hpx { namespace parcelset
             util::get<1>(e).push_back(std::move(f));
 
             parcel_destinations_.insert(locality_id);
+            ++num_parcel_destinations_;
         }
 
         void enqueue_parcels(locality const& locality_id,
@@ -645,6 +646,7 @@ namespace hpx { namespace parcelset
             }
 
             parcel_destinations_.insert(locality_id);
+            ++num_parcel_destinations_;
         }
 
         bool dequeue_parcels(locality const& locality_id,
@@ -654,7 +656,9 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::iterator iterator;
 
             {
-                std::lock_guard<lcos::local::spinlock> l(mtx_);
+                std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
+
+                if (!l) return false;
 
                 iterator it = pending_parcels_.find(locality_id);
 
@@ -685,6 +689,9 @@ namespace hpx { namespace parcelset
 
                 parcel_destinations_.erase(locality_id);
 
+                HPX_ASSERT(0 != num_parcel_destinations_.load());
+                --num_parcel_destinations_;
+
                 return true;
             }
         }
@@ -692,6 +699,9 @@ namespace hpx { namespace parcelset
         bool trigger_pending_work()
         {
             if(hpx::is_stopped()) return true;
+
+            if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
+                return true;
 
             std::vector<locality> destinations;
 
