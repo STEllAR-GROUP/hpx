@@ -10,6 +10,7 @@ set(parcelport_plugins)
 
 if(HPX_WITH_NETWORKING)
   set(parcelport_plugins ${parcelport_plugins}
+    libfabric
     verbs
     mpi
     tcp)
@@ -93,6 +94,7 @@ macro(add_static_parcelports)
     add_parcelport_tcp_module()
     add_parcelport_mpi_module()
     add_parcelport_verbs_module()
+    add_parcelport_libfabric_module()
   endif()
 endmacro()
 
