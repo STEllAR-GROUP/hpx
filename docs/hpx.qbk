@@ -50,7 +50,7 @@
 [def __stellar_hpx_download__   [@http://stellar-group.org/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
 [def __stellar_hpx_github_issues__     [@http://github.com/STEllAR-GROUP/hpx/issues __hpx__ Issues]]
-[def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ __hpx__ Buildbot Website]]
+[def __stellar_hpx_buildbot__   [@http://rostam.cct.lsu.edu/ __hpx__ Buildbot Website]]
 [def __stellar_support__        [@http://stellar.cct.lsu.edu/support/ Support Website]]
 
 [def __hpxpi__                  [@http://github.com/STEllAR-GROUP/hpxpi/ HPXPI]]
