@@ -573,6 +573,9 @@ if(HPX_WITH_PARCEL_PROFILING)
 endif()
 
 ## Parcelport related build options
+hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
+  "Enable the libfabric based parcelport. This is currently an experimental feature"
+  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
   "Enable the ibverbs based parcelport. This is currently an experimental feature"
   OFF CATEGORY "Parcelport" ADVANCED)
