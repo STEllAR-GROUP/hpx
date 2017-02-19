@@ -51,7 +51,7 @@ namespace libfabric
         pinned_memory_vector(allocator_type* alloc) :
         m_array_(0), m_size_(0), m_cb_(0), m_alloc_(alloc), m_region_(0)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector constructed (alloc) "
+            LOG_DEBUG_MSG("pinned_memory_vector alloc "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
@@ -63,7 +63,7 @@ namespace libfabric
             allocator_type* alloc, libfabric_memory_region *r) :
                 m_array_(p), m_size_(s), m_cb_(cb), m_alloc_(alloc), m_region_(r)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector constructed "
+            LOG_DEBUG_MSG("pinned_memory_vector exist "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
@@ -76,7 +76,7 @@ namespace libfabric
             m_cb_(other.m_cb_), m_alloc_(std::move(other.m_alloc_)),
             m_region_(other.m_region_)
         {
-            LOG_DEBUG_MSG("pinned_memory_vector moved into "
+            LOG_DEBUG_MSG("pinned_memory_vector moved "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
@@ -90,7 +90,7 @@ namespace libfabric
 
         ~pinned_memory_vector() {
             if (m_array_ && m_cb_) {
-                LOG_DEBUG_MSG("pinned_memory_vector calling delete callback, "
+                LOG_DEBUG_MSG("pinned_memory_vector delete "
                     << "size " << hexuint32(m_size_)
                     << "array " << hexpointer(m_array_)
                     << "region " << hexpointer(m_region_)
@@ -107,7 +107,7 @@ namespace libfabric
             m_cb_     = other.m_cb_;
             m_alloc_  = other.m_alloc_;
             m_region_ = other.m_region_;
-            LOG_DEBUG_MSG("pinned_memory_vector copied into "
+            LOG_DEBUG_MSG("pinned_memory_vector copied "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)

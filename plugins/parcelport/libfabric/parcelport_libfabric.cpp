@@ -276,9 +276,6 @@ namespace libfabric
         memory_pool_ptr_type      chunk_pool_;
         libfabric::tag_provider   tag_provider_;
 
-#if HPX_PARCELPORT_LIBFABRIC_USE_SPECIALIZED_SCHEDULER
-        custom_scheduler          parcelport_scheduler;
-#endif
         // performance_counters::parcels::gatherer& parcels_sent_;
 
 #if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
@@ -427,22 +424,7 @@ namespace libfabric
                 }
             }
 
-#if HPX_PARCELPORT_LIBFABRIC_USE_SPECIALIZED_SCHEDULER
-            // initialize our custom scheduler
-            parcelport_scheduler.init();
-            //
-            hpx::error_code ec(hpx::lightweight);
-            parcelport_scheduler.register_thread_nullary(
-                    util::bind(&parcelport::background_work_scheduler_thread, this),
-                    "background_work_scheduler_thread",
-                    threads::pending, true, threads::thread_priority_critical,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
-
-            FUNC_END_DEBUG_MSG;
-            return ec ? false : true;
-#else
             return true;
-#endif
        }
 
         std::unordered_map<std::uint32_t, std::shared_ptr<sender_connection>>
@@ -1358,7 +1340,7 @@ namespace libfabric
 
                 // grab a memory block from the pinned pool to use for the header
                 send_data.header_region =
-                    chunk_pool_->allocate_region(chunk_pool_->small_.chunk_size_);
+                    chunk_pool_->allocate_region(chunk_pool_->small_.chunk_size());
                 char *header_memory = (char*)(send_data.header_region->get_address());
 
                 // create the header in the pinned memory block
@@ -1505,23 +1487,6 @@ namespace libfabric
             //
             return background_work_OS_thread();
         }
-
-
-        // --------------------------------------------------------------------
-        // Background work, separate thread version, used on custom scheduler
-        // to poll in an OS background thread which is pre-emtive and therefore
-        // could help reduce latencies (when hpx threads are all doing work).
-        // --------------------------------------------------------------------
-#if HPX_PARCELPORT_LIBFABRIC_USE_SPECIALIZED_SCHEDULER
-        void background_work_scheduler_thread()
-        {
-            // repeat until no more parcels are to be sent
-            while (!stopped_ || !hpx::is_stopped()) {
-                background_work_hpx_thread();
-            }
-            LOG_DEBUG_MSG("hpx background work thread stopped");
-        }
-#endif
 
         // --------------------------------------------------------------------
         // Background work
