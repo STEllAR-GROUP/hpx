@@ -6,7 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
