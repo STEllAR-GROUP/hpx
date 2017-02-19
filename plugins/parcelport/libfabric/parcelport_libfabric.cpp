@@ -46,7 +46,7 @@
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
 // --------------------------------------------------------------------
-#include <plugins/parcelport/libfabric/unordered_map.hpp>
+#include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
 

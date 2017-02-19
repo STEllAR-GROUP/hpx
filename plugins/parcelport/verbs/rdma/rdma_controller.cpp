@@ -8,13 +8,14 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
+#include <plugins/parcelport/readers_writers_mutex.hpp>
+//
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_event_channel.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_controller.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_completion_queue.hpp>
-#include <plugins/parcelport/verbs/readers_writers_mutex.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 //
 #include <boost/lexical_cast.hpp>
