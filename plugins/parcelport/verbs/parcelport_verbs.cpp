@@ -57,7 +57,7 @@
 #undef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
 
 // --------------------------------------------------------------------
-#include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/verbs/header.hpp>
 #include <plugins/parcelport/verbs/sender_connection.hpp>
 #include <plugins/parcelport/verbs/connection_handler.hpp>

@@ -9,7 +9,7 @@
 #define HPX_CONCURRENT_UNORDERED_MAP
 
 #include <hpx/lcos/local/mutex.hpp>
-#include <plugins/parcelport/libfabric/readers_writers_mutex.hpp>
+#include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 //
 #include <unordered_map>
