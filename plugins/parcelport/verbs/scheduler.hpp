@@ -14,7 +14,7 @@
 //
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
 #include <cstddef>

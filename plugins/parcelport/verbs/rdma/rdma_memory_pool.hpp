@@ -20,7 +20,7 @@
 //
 #include <hpx/config/parcelport_verbs_defines.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>

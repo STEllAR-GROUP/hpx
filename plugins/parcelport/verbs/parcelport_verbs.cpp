@@ -72,7 +72,7 @@
 #endif
 //
 // rdma verbs utilities
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_chunk_pool.hpp>
