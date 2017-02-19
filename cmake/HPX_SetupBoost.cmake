@@ -128,8 +128,10 @@ endif()
 # Boost preprocessor definitions
 hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
 if(MSVC)
-  HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
-  if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
+  hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
+    "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
+    OFF ADVANCED)
+  if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
     hpx_add_config_define(BOOST_ALL_DYN_LINK)
   endif()
 else()
@@ -146,7 +148,7 @@ endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   hpx_libraries(${Boost_LIBRARIES})
 else()
   hpx_library_dir(${Boost_LIBRARY_DIRS})
