@@ -18,7 +18,7 @@
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
 //
-#include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/unordered_map.hpp>
 //
 #include <memory>
 #include <deque>
