@@ -27,7 +27,6 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <unordered_map>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -39,7 +38,7 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::unordered_map<naming::gid_type, naming::gid_type> split_gids_type;
+        typedef std::map<naming::gid_type, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
