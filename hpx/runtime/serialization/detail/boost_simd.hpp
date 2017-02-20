@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR_BOOST_SIMD)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
 
@@ -32,6 +33,14 @@ namespace hpx { namespace serialization
     {
         ar & make_array((T const*)&v.storage(), v.size());
     }
+}}
+
+namespace hpx { namespace traits
+{
+    template <typename T, std::size_t N, typename Abi>
+    struct is_bitwise_serializable<boost::simd::pack<T, N, Abi> >
+      : is_bitwise_serializable<T>
+    {};
 }}
 
 #endif

@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR_LIBFLATARRAY)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <array>
 #include <cstddef>
@@ -39,6 +40,14 @@ namespace hpx { namespace serialization
     }
 }}
 
+
+namespace hpx { namespace traits
+{
+    template <typename T, std::size_t N>
+    struct is_bitwise_serializable<LibFlatArray::short_vec<T, N> >
+      : is_bitwise_serializable<T>
+    {};
+}}
 #endif
 #endif
 
