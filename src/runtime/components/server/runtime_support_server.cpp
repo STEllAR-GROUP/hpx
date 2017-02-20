@@ -587,7 +587,9 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::size_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
             util::detail::yield_k(k, "runtime_support::dijkstra_termination");
         }
@@ -623,7 +625,9 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 util::detail::yield_k(k,
                     "runtime_support::dijkstra_termination_detection");
@@ -682,7 +686,9 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
             util::detail::yield_k(k,
                 "runtime_support::send_dijkstra_termination_token");
@@ -756,7 +762,9 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 util::detail::yield_k(k,
                     "runtime_support::dijkstra_termination_detection");
@@ -1085,7 +1093,9 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
@@ -1106,7 +1116,9 @@ namespace hpx { namespace components { namespace server
                 // now we have to wait for all threads to be aborted
                 start_time = t.elapsed();
 
-                for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+                for (std::size_t k = 0;
+                    tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                    ++k)
                 {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
