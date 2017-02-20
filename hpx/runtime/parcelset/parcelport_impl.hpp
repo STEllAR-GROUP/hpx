@@ -44,7 +44,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    bool is_starting();
     bool is_stopped();
 }
 
@@ -809,31 +808,10 @@ namespace hpx { namespace parcelset
                 }
 
                 // send parcels if they didn't get sent by another connection
-                if (!hpx::is_starting())
-                {
-                    // Re-schedule if this is not executed by an HPX thread
-                    hpx::applier::register_thread_nullary(
-                        hpx::util::bind(
-                            hpx::util::one_shot(&parcelport_impl
-                                ::send_pending_parcels)
-                          , this
-                          , locality_id
-                          , sender_connection
-                          , std::move(parcels)
-                          , std::move(handlers)
-                        )
-                      , "parcelport_impl::send_pending_parcels"
-                      , threads::pending, true, threads::thread_priority_boost,
-                        get_next_num_thread(), threads::thread_stacksize_default
-                    );
-                }
-                else
-                {
-                    send_pending_parcels(
-                        locality_id,
-                        sender_connection, std::move(parcels),
-                        std::move(handlers));
-                }
+                send_pending_parcels(
+                    locality_id,
+                    sender_connection, std::move(parcels),
+                    std::move(handlers));
 
                 // We yield here for a short amount of time to give another
                 // HPX thread the chance to put a subsequent parcel which
