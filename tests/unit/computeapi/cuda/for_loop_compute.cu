@@ -34,7 +34,7 @@ void test_for_loop(executor_type& exec,
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
         hpx::parallel::induction(d_C.data()),
-        [] HPX_DEVICE (int* A, int* B, int* C)
+        [] HPX_HOST_DEVICE (int* A, int* B, int* C)
         {
             *C = *A + 3.0 * *B;
         });

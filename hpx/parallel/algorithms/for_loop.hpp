@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
         {
-            hpx::util::invoke(std::forward<F>(f), part_begin,
+            hpx::util::invoke_r<void>(std::forward<F>(f), part_begin,
                 hpx::util::get<Is>(args).iteration_value()...);
         }
 
