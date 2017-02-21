@@ -14,6 +14,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 #include <boost/simd.hpp>
 
@@ -39,7 +40,7 @@ namespace hpx { namespace traits
 {
     template <typename T, std::size_t N, typename Abi>
     struct is_bitwise_serializable<boost::simd::pack<T, N, Abi> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 }}
 

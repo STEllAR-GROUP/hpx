@@ -8,7 +8,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/io/ios_state.hpp>
 

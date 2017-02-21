@@ -1012,7 +1012,9 @@ namespace hpx { namespace traits
     struct is_bitwise_serializable<
         ::hpx::util::detail::tuple_impl<Is, Ts...>
     > : ::hpx::util::detail::all_of<
-            hpx::traits::is_bitwise_serializable<Ts>...
+            hpx::traits::is_bitwise_serializable<
+                typename std::remove_const<Ts>::type
+            >...
         >
     {};
 }}
