@@ -14,6 +14,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 #include <Vc/Vc>
 
@@ -91,17 +92,17 @@ namespace hpx { namespace traits
 {
     template <typename T, typename Abi>
     struct is_bitwise_serializable<Vc::Vector<T, Abi> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 
     template <typename T>
     struct is_bitwise_serializable<Vc::Scalar::Vector<T> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 
     template <typename T, std::size_t N, typename V, std::size_t W>
     struct is_bitwise_serializable<Vc::SimdArray<T, N, V, W> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 }}
 

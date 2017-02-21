@@ -15,6 +15,7 @@
 
 #include <array>
 #include <cstddef>
+#include <type_traits>
 
 #include <libflatarray/flat_array.hpp>
 
@@ -45,7 +46,7 @@ namespace hpx { namespace traits
 {
     template <typename T, std::size_t N>
     struct is_bitwise_serializable<LibFlatArray::short_vec<T, N> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 }}
 #endif
