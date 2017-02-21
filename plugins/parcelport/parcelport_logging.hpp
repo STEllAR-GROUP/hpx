@@ -18,6 +18,7 @@
 #include <hpx/config/parcelport_defines.hpp>
 //
 #include <boost/preprocessor.hpp>
+
 //
 // useful macros for formatting log messages
 //
@@ -31,10 +32,10 @@
 #define decimal(n)    std::setfill('0') << std::setw(n) << std::noshowbase << std::dec
 #define decnumber(p)  std::dec << p << " "
 #define dec4(p)       decimal(4) << p << " "
-#define ipaddress(p)  std::dec << (int) ((uint8_t*) &p)[0] << "." \
-                               << (int) ((uint8_t*) &p)[1] << "." \
-                               << (int) ((uint8_t*) &p)[2] << "." \
-                               << (int) ((uint8_t*) &p)[3] << " "
+#define ipaddress(p)  std::dec << (int)(reinterpret_cast<const uint8_t*>(&p))[0] << "." \
+                               << (int)(reinterpret_cast<const uint8_t*>(&p))[1] << "." \
+                               << (int)(reinterpret_cast<const uint8_t*>(&p))[2] << "." \
+                               << (int)(reinterpret_cast<const uint8_t*>(&p))[3] << " "
 #define sockaddress(p) ipaddress(((struct sockaddr_in*)(p))->sin_addr.s_addr)
 
 namespace hpx {
@@ -67,10 +68,10 @@ namespace detail {
 //
 // If any log options are ON then we must include the boost log files
 //
-#if defined(HPX_PARCELPORT_VERBS_HAVE_DEV_MODE) ||     \
+#if defined(HPX_PARCELPORT_VERBS_HAVE_DEV_MODE)     || \
+    defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING)      || \
     defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE) || \
-    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING) ||  \
-    defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING)
+    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
 
 #  include <boost/log/trivial.hpp>
 #  include <boost/log/expressions/formatter.hpp>
@@ -141,11 +142,11 @@ namespace detail {
 #  define LOG_TRACE_MSG(x)
 #  define LOG_INFO_MSG(x)
 #  define LOG_WARN_MSG(x)
-#  define LOG_ERROR_MSG(x) std::cout << "00: <ERROR> " << THREAD_ID << " " << x << " " \
-    << __FILE__ << " " << std::dec << __LINE__ << std::endl;
+#  define LOG_ERROR_MSG(x) std::cout << "00: <ERROR> " << THREAD_ID << " " \
+	<< x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
 #  define LOG_FORMAT_MSG(x) ""
 #  define LOG_EXCLUSIVE(x)
-//
+
 #  define FUNC_START_DEBUG_MSG
 #  define FUNC_END_DEBUG_MSG
 
@@ -158,14 +159,16 @@ namespace detail {
 // but still show some that have been specially marked
 //
 #if defined(HPX_PARCELPORT_VERBS_HAVE_DEV_MODE) || \
-      defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
+    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
+#  undef  LOG_TRACE_MSG
 #  undef  LOG_DEVEL_MSG
 #  undef  LOG_DEBUG_MSG
 #  undef  LOG_EXCLUSIVE
+#  define LOG_EXCLUSIVE(x) x
 #  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace) << "" << THREAD_ID << " " << x;
 #  define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
-#  define LOG_EXCLUSIVE(x) x
+#  define LOG_BOOST_MSG(x,y) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << boost::format(x) y;
 #endif
 
 //

@@ -22,7 +22,6 @@
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/libfabric_domain.hpp>
 #include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
 
 // the default memory chunk size in bytes
@@ -31,10 +30,10 @@
 #define RDMA_POOL_MEDIUM_CHUNK_SIZE 0x040*0x0400 // 64KB
 #define RDMA_POOL_LARGE_CHUNK_SIZE  0x400*0x0400 //  1MB
 
-#define RDMA_POOL_MAX_1K_CHUNKS     1024
-#define RDMA_POOL_MAX_SMALL_CHUNKS  1024
-#define RDMA_POOL_MAX_MEDIUM_CHUNKS 64
-#define RDMA_POOL_MAX_LARGE_CHUNKS  32
+#define RDMA_POOL_MAX_1K_CHUNKS     16
+#define RDMA_POOL_MAX_SMALL_CHUNKS  16
+#define RDMA_POOL_MAX_MEDIUM_CHUNKS 4
+#define RDMA_POOL_MAX_LARGE_CHUNKS  2
 
 // if the HPX configuration has set a different value, use it
 #if defined(HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE)
@@ -106,7 +105,7 @@ namespace libfabric
     {
         memory_region_allocator() {}
 
-        static libfabric_memory_region_ptr malloc(libfabric_domain_ptr pd,
+        static libfabric_memory_region_ptr malloc(struct fid_domain *pd,
             const std::size_t bytes)
         {
             libfabric_memory_region_ptr region =
@@ -132,7 +131,7 @@ namespace libfabric
     struct pool_container
     {
         // ------------------------------------------------------------------------
-        pool_container(libfabric_domain_ptr pd, std::size_t num_chunks) :
+        pool_container(struct fid_domain * pd, std::size_t num_chunks) :
         	used_(0), pd_(pd)
         {
         }
@@ -253,7 +252,7 @@ namespace libfabric
         constexpr std::size_t chunk_size() const { return ChunkSize; }
         //
         std::atomic<int>                                              used_;
-        libfabric_domain_ptr 										  pd_;
+        struct fid_domain * 										  pd_;
         std::unordered_map<const char *, libfabric_memory_region_ptr> block_list_;
         std::array<libfabric_memory_region, MaxChunks>               region_list_;
         bl::stack<libfabric_memory_region*, bl::capacity<MaxChunks>> free_list_;
@@ -269,12 +268,12 @@ namespace libfabric
 
         //----------------------------------------------------------------------------
         // constructor
-        rdma_memory_pool(libfabric_domain_ptr pd) :
+        rdma_memory_pool(struct fid_domain * pd) :
             protection_domain_(pd),
-            tiny_  (pd, 1024 ),
-            small_ (pd, 1024 ),
-            medium_(pd, 64 ),
-            large_ (pd, 32 ),
+            tiny_  (pd, RDMA_POOL_MAX_1K_CHUNKS ),
+            small_ (pd, RDMA_POOL_MAX_SMALL_CHUNKS ),
+            medium_(pd, RDMA_POOL_MAX_MEDIUM_CHUNKS ),
+            large_ (pd, RDMA_POOL_MAX_LARGE_CHUNKS ),
             temp_regions(0),
             user_regions(0)
         {
@@ -437,7 +436,7 @@ namespace libfabric
 
         //----------------------------------------------------------------------------
         // protection domain that memory is registered with
-        libfabric_domain_ptr protection_domain_;
+        struct fid_domain * protection_domain_;
 
         // maintain 4 pools of thread safe pre-allocated regions of fixed size.
         pool_container<memory_region_allocator, pool_tiny,

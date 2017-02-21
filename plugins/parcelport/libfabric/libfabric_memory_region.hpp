@@ -8,7 +8,6 @@
 
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/fabric_error.hpp>
-#include <plugins/parcelport/libfabric/libfabric_domain.hpp>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_cm.h>
@@ -42,7 +41,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
-        libfabric_memory_region(libfabric_domain_ptr pd,
+        libfabric_memory_region(struct fid_domain *pd,
             const void *buffer, const uint64_t length)
         {
             address_    = static_cast<char *>(const_cast<void *>(buffer));
@@ -51,7 +50,7 @@ namespace libfabric
             used_space_ = length;
             flags_      = BLOCK_USER;
 
-            int ret = fi_mr_reg(pd->getDomain(),
+            int ret = fi_mr_reg(pd,
                     const_cast<void*>(buffer), length,
                     FI_READ | FI_WRITE | FI_RECV | FI_SEND |
                     FI_REMOTE_READ | FI_REMOTE_WRITE,
@@ -75,7 +74,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // allocate a block of size length and register it
-        int allocate(libfabric_domain_ptr pd, uint64_t length)
+        int allocate(struct fid_domain * pd, uint64_t length)
         {
             // Allocate storage for the memory region.
             void *buffer = new char[length];
@@ -88,7 +87,7 @@ namespace libfabric
             size_       = length;
             used_space_ = 0;
 
-            int ret = fi_mr_reg(pd->getDomain(),
+            int ret = fi_mr_reg(pd,
                     buffer, length,
                     FI_READ | FI_WRITE |
                     FI_RECV | FI_SEND |
@@ -181,17 +180,17 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        // Get the local key of the memory region.
+        // Get the local descriptor of the memory region.
         inline void * get_desc(void) const {
             return fi_mr_desc(region_);
         }
-/*
+
         // --------------------------------------------------------------------
         // Get the remote key of the memory region.
-        inline uint32_t get_remote_key(void) const {
-            return region_->rkey;
+        inline uint64_t get_remote_key(void) const {
+            return fi_mr_key(region_);
         }
-*/
+
         // --------------------------------------------------------------------
         // Set the size used by a message in the memory region.
         inline void set_message_length(uint32_t length) {
