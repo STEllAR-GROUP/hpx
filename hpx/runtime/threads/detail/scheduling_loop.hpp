@@ -311,7 +311,7 @@ namespace hpx { namespace threads { namespace detail
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
                 }
-                return std::make_pair(terminated, nullptr);
+                return thread_result_type(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"),
             0,
@@ -320,8 +320,10 @@ namespace hpx { namespace threads { namespace detail
             std::size_t(-1),
             &scheduler);
 
-        scheduler.create_thread(background_init, &background_thread, suspended,
-            true, hpx::throws, num_thread);
+        // Create in suspended to prevent the thread from being scheduled
+        // directly...
+        scheduler.SchedulingPolicy::create_thread(background_init,
+            &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);
         // We can now set the state to pending
         background_thread->set_state(pending);
@@ -377,7 +379,8 @@ namespace hpx { namespace threads { namespace detail
                     else if(terminated == state_val)
                     {
                         std::int64_t busy_count = 0;
-                        scheduler.destroy_thread(background_thread.get(), busy_count);
+                        scheduler.SchedulingPolicy::destroy_thread(
+                            background_thread.get(), busy_count);
                         background_thread.reset();
                     }
                     else if(suspended == state_val)
@@ -660,11 +663,10 @@ namespace hpx { namespace threads { namespace detail
                     num_thread, running))
                 {
                     // Let the current background thread terminate as soon as
-                    // possible and give it back to the scheduler.
+                    // possible. No need to reschedule, as another LCO will
+                    // set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
                     *background_running = false;
-                    scheduler.schedule_thread(
-                        background_thread.get(), num_thread,
-                        thread_priority_critical);
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -690,11 +692,10 @@ namespace hpx { namespace threads { namespace detail
                     num_thread, running))
                 {
                     // Let the current background thread terminate as soon as
-                    // possible and give it back to the scheduler.
+                    // possible. No need to reschedule, as another LCO will
+                    // set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
                     *background_running = false;
-                    scheduler.schedule_thread(
-                        background_thread.get(), num_thread,
-                        thread_priority_critical);
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.

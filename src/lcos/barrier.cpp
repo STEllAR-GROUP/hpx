@@ -18,6 +18,12 @@
 #include <string>
 #include <utility>
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_stopped_or_shutting_down();
+}
+
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
       : node_(new wrapping_type(new wrapped_type(
@@ -86,7 +92,8 @@ namespace hpx { namespace lcos {
         if (node_)
         {
             if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(state_running))
+                hpx::threads::threadmanager_is(state_running) &&
+                !hpx::is_stopped_or_shutting_down())
             {
                 hpx::future<void> f;
                 if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
