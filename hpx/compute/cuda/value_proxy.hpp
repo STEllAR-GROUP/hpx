@@ -51,44 +51,18 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        // Note: The code duplication below allows Cuda Clang to not see
-        //       the host side implicit cast during the device code
-        //       compilation. Without this, wrong template parameter
-        //       deduction can occur if a value_proxy is given in the arg
-        //       list of invoke()
+        // Note: The difference of signature allows to define proper
+        //       implicit casts for device code and host code
 
-#if defined(__CUDA_ARCH__)
-        HPX_DEVICE operator T() const
-        {
-            return access_target::read(*target_, p_);
-        }
-#else
-        operator T() const
-        {
-            HPX_ASSERT(false);
-            return T();
-        }
-#endif
-
-
-        // Note: The code duplication below allows Cuda Clang to not see
-        //       the host side implicit cast during the device code
-        //       compilation. Without this, wrong template parameter
-        //       deduction can occur if a value_proxy is given in the arg
-        //       list of invoke()
-
-#if defined(__CUDA_ARCH__)
         HPX_DEVICE operator T&()
         {
             return *p_;
         }
-#else
-        HPX_HOST operator T&()
+
+        HPX_HOST operator T() const
         {
-            HPX_ASSERT(false);
-            return *p_;
+            return access_target::read(*target_, p_);
         }
-#endif
 
         T* operator &() const
         {
@@ -129,23 +103,10 @@ namespace hpx { namespace compute { namespace cuda
           , target_(other.target())
         {}
 
-        // Note: The code duplication below allows Cuda Clang to not see
-        //       the host side implicit cast during the device code
-        //       compilation. Without this, wrong template parameter
-        //       deduction can occur if a value_proxy is given in the arg
-        //       list of invoke()
-
-#if defined(__CUDA_ARCH__)
-        HPX_DEVICE operator T() const
+        HPX_HOST_DEVICE operator T() const
         {
             return access_target::read(target_, p_);
         }
-#else
-        operator T() const
-        {
-            return access_target::read(target_, p_);
-        }
-#endif
 
         T* device_ptr() const HPX_NOEXCEPT
         {
