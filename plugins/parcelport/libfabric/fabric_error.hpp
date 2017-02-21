@@ -25,10 +25,11 @@ class fabric_error : public std::runtime_error
 public:
     // --------------------------------------------------------------------
     fabric_error(int err, const std::string &msg)
-        : std::runtime_error(msg),
+        : std::runtime_error(std::string(fi_strerror(err)) + msg),
           error_(err)
     {
-        LOG_ERROR_MSG(msg << " : " << error_string(err));
+        LOG_ERROR_MSG(msg << " : " << fi_strerror(err));
+        std::terminate();
     }
 
     fabric_error(int err)
@@ -36,6 +37,7 @@ public:
           error_(err)
     {
         LOG_ERROR_MSG(what());
+        std::terminate();
     }
 
     // --------------------------------------------------------------------
