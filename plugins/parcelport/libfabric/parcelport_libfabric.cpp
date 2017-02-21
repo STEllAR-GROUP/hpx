@@ -117,74 +117,6 @@ namespace libfabric
         std::atomic<uint32_t> next_tag_;
     };
 
-    struct libfabric_device {
-        static parcelset::locality get_device_info(std::string provider,
-                std::string domain, std::string endpoint_type)
-        {
-        	struct fi_info *fi = nullptr;
-            struct fi_info *hints = fi_allocinfo();
-            if (!hints) {
-                throw fabric_error(-1, "Failed to allocate fabric hints");
-            }
-            // we require message and RMA support, so ask for them
-            hints->caps 				  = FI_MSG | FI_RMA;
-            hints->mode 				  = ~0; // FI_CONTEXT | FI_LOCAL_MR;
-            hints->fabric_attr->prov_name = strdup(provider.c_str());
-            hints->domain_attr->name      = strdup(domain.c_str());
-
-            if (endpoint_type=="msg") {
-                hints->ep_attr->type = FI_EP_MSG;
-            } else if (endpoint_type=="rdm") {
-                hints->ep_attr->type = FI_EP_RDM;
-            } else if (endpoint_type=="dgram") {
-                hints->ep_attr->type = FI_EP_DGRAM;
-            }
-
-            uint64_t flags = 0;
-            LOG_DEBUG_MSG("Getting info about fabric using passive endpoint");
-            int ret = fi_getinfo(PP_FIVERSION, NULL, NULL, flags, hints, &fi);
-            if (ret) {
-                throw fabric_error(ret, "Failed to get fabric info");
-            }
-
-            struct fid_fabric *fabric;
-            ret = fi_fabric(fi->fabric_attr, &fabric, NULL);
-            if (ret) {
-                throw fabric_error(ret, "Failed to get fi_fabric");
-            }
-
-            struct fid_pep *pep;
-            ret = fi_passive_ep(fabric, fi, &(pep), NULL);
-            if (ret) {
-                throw fabric_error(ret, "Failed to get fi_passive_ep");
-            }
-
-            LOG_DEBUG_MSG("Fetching local address");
-            struct fid *endpoint = &pep->fid;
-
-            locality::locality_data local_info;
-            std::size_t addrlen = sizeof(local_info);
-            ret = fi_getname(endpoint, local_info.data(), &addrlen);
-            if (ret || (addrlen>sizeof(local_info))) {
-                fabric_error(ret, "fi_getname - size error or other problem");
-            }
-
-            locality locale(local_info);
-            LOG_DEBUG_MSG("Name length " << decnumber(addrlen));
-            LOG_DEBUG_MSG("address info is "
-                    << ipaddress(local_info[0]) << " "
-                    << ipaddress(local_info[1]) << " "
-                    << ipaddress(local_info[2]) << " "
-                    << ipaddress(local_info[3]) << " ");
-
-			// clean up
-            fi_freeinfo(fi);
-            fi_freeinfo(hints);
-            //
-            return parcelset::locality(locale);
-        }
-    };
-
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
@@ -192,37 +124,6 @@ namespace libfabric
     {
     private:
         typedef parcelport_impl<parcelport> base_type;
-
-        // --------------------------------------------------------------------
-        // returns a locality object that represents 'this' locality
-        // --------------------------------------------------------------------
-        static parcelset::locality here(util::runtime_configuration const& ini)
-        {
-            FUNC_START_DEBUG_MSG;
-
-            bool enabled = hpx::util::get_entry_as<bool>(ini, "hpx.parcel.libfabric.enable", 0);
-            std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
-                    HPX_PARCELPORT_LIBFABRIC_PROVIDER);
-            std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
-                   HPX_PARCELPORT_LIBFABRIC_DOMAIN);
-            std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
-                   HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
-            LOG_DEBUG_MSG("here function using "
-                    << provider << " " << domain << " " << endpoint);
-
-            _port = hpx::util::get_entry_as<std::uint16_t>(ini,
-                "hpx.agas.port", HPX_INITIAL_IP_PORT);
-            LOG_DEBUG_MSG("libfabric hpx.agas port number " << decnumber(_port));
-
-            std::uint16_t port_p = hpx::util::get_entry_as<std::uint16_t>(ini,
-                "hpx.parcel.port", HPX_INITIAL_IP_PORT);
-            LOG_DEBUG_MSG("libfabric hpx.parcel port number " << decnumber(port_p));
-
-            auto locale = libfabric_device::get_device_info(provider, domain, endpoint);
-
-            FUNC_END_DEBUG_MSG;
-            return locale;
-        }
 
     public:
 
@@ -247,6 +148,7 @@ namespace libfabric
         // Not currently working, we support bootstrapping, but when not enabled
         // we should be able to skip it
         bool bootstrap_enabled_;
+        bool parcelport_enabled_;
 
         // to quickly lookup a queue-pair (QP) from a destination ip address
         typedef hpx::concurrent::unordered_map<std::uint32_t, libfabric_endpoint_ptr> ip_map;
@@ -344,10 +246,10 @@ namespace libfabric
         mutex_type              active_recv_mutex;
 
         // a count of all receives, for debugging/performance measurement
-        performance_counter<unsigned int>   sends_posted;
-        performance_counter<unsigned int>   handled_receives;
-        performance_counter<unsigned int>   completions_handled;
-        performance_counter<unsigned int>   total_reads;
+        performance_counter<unsigned int> sends_posted;
+        performance_counter<unsigned int> handled_receives;
+        performance_counter<unsigned int> completions_handled;
+        performance_counter<unsigned int> total_reads;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -355,7 +257,7 @@ namespace libfabric
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
-            : base_type(ini, here(ini), on_start_thread, on_stop_thread)
+            : base_type(ini, locality(), on_start_thread, on_stop_thread)
             , active_send_count_(0)
             , immediate_send_allowed_(true)
             , stopped_(false)
@@ -365,33 +267,53 @@ namespace libfabric
             , total_reads(0)
         {
             FUNC_START_DEBUG_MSG;
+
+            // if we are not enabled, then skip allocating resources
+            parcelport_enabled_ = hpx::util::get_entry_as<bool>(ini,
+            	"hpx.parcel.libfabric.enable", 0);
+			LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
+
+			bootstrap_enabled_ = ("libfabric" ==
+				hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
+			LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
+
             // we need this for background OS threads to get 'this' pointer
-            parcelport::_parcelport_instance = this;
-            // port number is set during locality initialization in 'here()'
-            libfabric_controller_ = std::make_shared<libfabric_controller>
-            (_iblibfabric_device.c_str(), _iblibfabric_interface.c_str(), "msg", _port);
+            parcelport::parcelport_instance_ = this;
 
-            if (ini.has_section("hpx.parcel")) {
-                util::section const* sec = ini.get_section("hpx.parcel");
-                if (nullptr != sec) {
-                    bootstrap_enabled_ = ("libfabric" ==
-                        hpx::util::get_entry_as<std::string>(*sec, "bootstrap", ""));
-                    LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
+            // Get parameters that determine our fabric selection
+            std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
+            	HPX_PARCELPORT_LIBFABRIC_PROVIDER);
+            std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
+                HPX_PARCELPORT_LIBFABRIC_DOMAIN);
+            std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
+                HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
 
-                }
-            }
-            //
+            LOG_DEBUG_MSG("libfabric parcelport function using attributes "
+                << provider << " " << domain << " " << endpoint);
+
+            _port = hpx::util::get_entry_as<std::uint16_t>(ini,
+                "hpx.agas.port", HPX_INITIAL_IP_PORT);
+            std::uint16_t port_p = hpx::util::get_entry_as<std::uint16_t>(ini,
+                "hpx.parcel.port", HPX_INITIAL_IP_PORT);
+
+            LOG_DEBUG_MSG("libfabric hpx.agas port number " << decnumber(_port));
+            LOG_DEBUG_MSG("libfabric hpx.parcel port number " << decnumber(port_p));
+
+            // create our main fabric control structure
+            libfabric_controller_ = std::make_shared<libfabric_controller>(
+            	provider, domain, endpoint, _port);
+
+            // get 'this' locality from the controller
+            LOG_DEBUG_MSG("Getting local locality object");
+            const locality & local = libfabric_controller_->here();
+            LOG_DEBUG_MSG("Setting parcelset locality object");
+            here_   = parcelset::locality(local);
+            // and make a note of our ip address for convenience
+            LOG_DEBUG_MSG("Getting ip address");
+            _ibv_ip = local.ip_address();
+            LOG_DEBUG_MSG("Done");
+
             FUNC_END_DEBUG_MSG;
-        }
-
-        void io_service_work()
-        {
-            // We only execute work on the IO service while HPX is starting
-            while (hpx::is_starting())
-            {
-                background_work(0);
-            }
-            LOG_DEBUG_MSG("io service task completed");
         }
 
         // Start the handling of connections.
@@ -414,16 +336,6 @@ namespace libfabric
                 std::placeholders::_1, std::placeholders::_2);
             libfabric_controller_->setCompletionFunction(completion_function);
 
-            if (HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING() && bootstrap_enabled_) {
-                for (std::size_t i=0; i!=io_service_pool_.size(); ++i) {
-                    io_service_pool_.get_io_service(int(i)).post(
-                        hpx::util::bind(
-                            &parcelport::io_service_work, this
-                        )
-                    );
-                }
-            }
-
             return true;
        }
 
@@ -437,8 +349,8 @@ namespace libfabric
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
-
-            std::uint32_t dest_ip = dest.get<locality>().ip_address();
+			const locality &dest_fabric = dest.get<locality>();
+            std::uint32_t dest_ip = dest_fabric.ip_address();
             LOG_DEVEL_MSG("get_remote_connection        from "
                 << ipaddress(_ibv_ip)
                 << "to " << ipaddress(dest_ip)
@@ -461,7 +373,7 @@ namespace libfabric
                     << "to " << ipaddress(dest_ip)
                     << "chunk pool " << hexpointer(chunk_pool_.get()));
 
-                libfabric_endpoint *client = get_remote_connection(dest_ip);
+                libfabric_endpoint *client = get_remote_connection(dest_fabric);
 
                 connection = std::make_shared<sender_connection>(
                       this
@@ -1202,18 +1114,17 @@ namespace libfabric
         // find the client object that is at the destination ip address
         // if no connection has been made yet, make one.
         // --------------------------------------------------------------------
-        libfabric_endpoint *get_remote_connection(std::uint32_t dest_ip)
+        libfabric_endpoint *get_remote_connection(const locality &dest_fabric)
         {
+        	uint32_t dest_ip = dest_fabric.ip_address();
             // if a connection exists to this destination, get it
             auto present = ip_endpoint_map.is_in_map(dest_ip);
             if (present.second) {
-/*
                 LOG_DEVEL_MSG("Client found connection made from "
-                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                    << "with QP " << present.first->second->get_qp_num());
+                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip));
+//                    << "with QP " << present.first->second->get_qp_num());
                 return present.first->second.get();
-*/
-                }
+            }
 
             // Didn't find a connection. We must create a new one
             LOG_DEVEL_MSG("Starting new connect request from "
@@ -1221,7 +1132,7 @@ namespace libfabric
                 << "( " << ipaddress(_ibv_ip) << ")");
 
             hpx::shared_future<libfabric_endpoint_ptr> client_future =
-                libfabric_controller_->connect_to_server(dest_ip);
+                libfabric_controller_->connect_to_server(dest_fabric);
 
             LOG_DEVEL_MSG("About to wait client future  from "
                 << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
@@ -1322,7 +1233,7 @@ namespace libfabric
                         else {
                             // create a memory region from the pointer
                             zero_copy_region = new libfabric_memory_region(
-                                    libfabric_controller_->get_protection_domain(),
+                                    libfabric_controller_->get_domain(),
                                     c.data_.cpos_, (std::max)(c.size_,
                                         (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
 //                            LOG_DEBUG_MSG("Time to register memory (ns) "
@@ -1557,10 +1468,10 @@ namespace libfabric
 
         static parcelport *get_singleton()
         {
-            return _parcelport_instance;
+            return parcelport_instance_;
         }
 
-        static parcelport *_parcelport_instance;
+        static parcelport *parcelport_instance_;
 
     };
 
@@ -1665,7 +1576,7 @@ std::uint32_t  hpx::parcelset::policies::libfabric::parcelport::_port;
 hpx::parcelset::policies::libfabric::libfabric_controller_ptr
     hpx::parcelset::policies::libfabric::parcelport::libfabric_controller_;
 hpx::parcelset::policies::libfabric::parcelport *
-    hpx::parcelset::policies::libfabric::parcelport::_parcelport_instance;
+    hpx::parcelset::policies::libfabric::parcelport::parcelport_instance_;
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric);
 
