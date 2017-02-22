@@ -151,7 +151,7 @@ namespace libfabric
         bool parcelport_enabled_;
 
         // to quickly lookup a queue-pair (QP) from a destination ip address
-        typedef hpx::concurrent::unordered_map<std::uint32_t, libfabric_endpoint_ptr> ip_map;
+        typedef hpx::concurrent::unordered_map<std::uint32_t, struct fid_ep *> ip_map;
         typedef ip_map::iterator ip_map_iterator;
         ip_map ip_endpoint_map;
 
@@ -327,7 +327,9 @@ namespace libfabric
 
             LOG_DEBUG_MSG("Setting Connection function");
             auto connection_function = std::bind(
-                &parcelport::handle_libfabric_connection, this, std::placeholders::_1);
+                &parcelport::handle_libfabric_connection, this,
+				std::placeholders::_1, std::placeholders::_2
+			);
             libfabric_controller_->setConnectionFunction(connection_function);
 
             LOG_DEBUG_MSG("Setting Completion function");
@@ -373,7 +375,7 @@ namespace libfabric
                     << "to " << ipaddress(dest_ip)
                     << "chunk pool " << hexpointer(chunk_pool_.get()));
 
-                libfabric_endpoint *client = get_remote_connection(dest_fabric);
+                struct fid_ep *client = get_remote_connection(dest_fabric);
 
                 connection = std::make_shared<sender_connection>(
                       this
@@ -471,14 +473,12 @@ namespace libfabric
         // updated accordingly, but when another locality connects to us,
         // we must do it manually via this callback
         // --------------------------------------------------------------------
-        void handle_libfabric_connection(libfabric_endpoint_ptr client)
+        void handle_libfabric_connection(struct fid_ep *client, uint32_t dest_ip)
         {
-/*
-            std::uint32_t dest_ip = client->get_remote_address()->sin_addr.s_addr;
-            if (client->is_client_endpoint()) {
-                LOG_DEVEL_MSG("Connection established       from "
-                    << ipaddress(_ibv_ip) << "to "
-                    << ipaddress(dest_ip) << "( " << ipaddress(_ibv_ip) << ")");
+        	if (1) {
+            LOG_DEVEL_MSG("Connection established       from "
+                << ipaddress(_ibv_ip) << "to "
+                << ipaddress(dest_ip) << "( " << ipaddress(_ibv_ip) << ")");
             }
             else {
                 LOG_DEVEL_MSG("Connection established       from "
@@ -496,7 +496,6 @@ namespace libfabric
                 throw std::runtime_error("libfabric parcelport "
                     ": should not be receiving a connection more than once");
             }
-            */
         }
 
         // --------------------------------------------------------------------
@@ -1114,7 +1113,7 @@ namespace libfabric
         // find the client object that is at the destination ip address
         // if no connection has been made yet, make one.
         // --------------------------------------------------------------------
-        libfabric_endpoint *get_remote_connection(const locality &dest_fabric)
+        struct fid_ep *get_remote_connection(const locality &dest_fabric)
         {
         	uint32_t dest_ip = dest_fabric.ip_address();
             // if a connection exists to this destination, get it
@@ -1123,7 +1122,7 @@ namespace libfabric
                 LOG_DEVEL_MSG("Client found connection made from "
                     << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip));
 //                    << "with QP " << present.first->second->get_qp_num());
-                return present.first->second.get();
+                return present.first->second;
             }
 
             // Didn't find a connection. We must create a new one
@@ -1131,7 +1130,7 @@ namespace libfabric
                 << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
                 << "( " << ipaddress(_ibv_ip) << ")");
 
-            hpx::shared_future<libfabric_endpoint_ptr> client_future =
+            hpx::shared_future<struct fid_ep*> client_future =
                 libfabric_controller_->connect_to_server(dest_fabric);
 
             LOG_DEVEL_MSG("About to wait client future  from "
@@ -1139,14 +1138,14 @@ namespace libfabric
                 << "( " << ipaddress(_ibv_ip) << ")");
 
             // block until a connection is available
-            libfabric_endpoint_ptr client = client_future.get();
+            struct fid_ep* client = client_future.get();
 /*
             LOG_DEVEL_MSG("Client future ("
                 << decnumber(client->get_qp_num()) << ") from "
                 << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
                 << "( " << ipaddress(_ibv_ip) << ")");
 */
-            return client.get();
+            return client;
         }
 
         bool can_send_immediate() {
