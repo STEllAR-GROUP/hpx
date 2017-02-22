@@ -103,10 +103,7 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, Vc::datapar<T, Abi>& v, unsigned)
     {
         std::array<T, Vc::datapar<T, Abi>::size()> data;
-        std::size_t size = 0;
-        ar & size & data;
-        HPX_ASSERT(size == Vc::datapar<T, Abi>::size());
-
+        ar & data;
         v.copy_from(data.data(), Vc::vector_aligned);
     }
 
@@ -114,10 +111,8 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, Vc::datapar<T, Abi> const& v, unsigned)
     {
         std::array<T, Vc::datapar<T, Abi>::size()> data;
-        std::size_t size = Vc::datapar<T, Abi>::size();
         v.copy_to(data.data(), Vc::vector_aligned);
-
-        ar & size & data;
+        ar & data;
     }
 }}
 
