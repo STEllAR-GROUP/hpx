@@ -15,7 +15,7 @@
 #include <iterator>
 #include <memory>
 
-#include <Vc/version.h>
+#include <Vc/global.h>
 
 #if Vc_IS_VERSION_1
 

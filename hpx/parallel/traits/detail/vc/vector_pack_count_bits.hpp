@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_DATAPAR_VC)
 #include <cstddef>
 
-#include <Vc/version.h>
+#include <Vc/global.h>
 
 #if Vc_IS_VERSION_1
 
