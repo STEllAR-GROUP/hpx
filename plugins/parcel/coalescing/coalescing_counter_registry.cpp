@@ -14,6 +14,7 @@
 #include <boost/regex.hpp>
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -41,6 +42,8 @@ namespace hpx { namespace plugins { namespace parcel
                 "coalescing_counter_registry::register_action",
                 "Cannot register an action with an empty name");
         }
+
+        std::lock_guard<mutex_type> l(mtx_);
 
         auto it = map_.find(name);
         if (it == map_.end())
@@ -86,6 +89,8 @@ namespace hpx { namespace plugins { namespace parcel
                 "Cannot register an action with an empty name");
         }
 
+        std::lock_guard<mutex_type> l(mtx_);
+
         auto it = map_.find(name);
         if (it == map_.end())
         {
@@ -98,9 +103,12 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_counter_registry::get_parcels_counter(
             std::string const& name) const
     {
+        std::unique_lock<mutex_type> l(mtx_);
+
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::get_num_parcels_counter",
                 "unknown action type");
@@ -113,9 +121,12 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_counter_registry::get_messages_counter(
             std::string const& name) const
     {
+        std::unique_lock<mutex_type> l(mtx_);
+
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
@@ -128,9 +139,12 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_counter_registry::get_parcels_per_message_counter(
             std::string const& name) const
     {
+        std::unique_lock<mutex_type> l(mtx_);
+
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
@@ -143,9 +157,12 @@ namespace hpx { namespace plugins { namespace parcel
         coalescing_counter_registry::get_average_time_between_parcels_counter(
             std::string const& name) const
     {
+        std::unique_lock<mutex_type> l(mtx_);
+
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::"
                     "get_average_time_between_parcels_counter",
@@ -160,9 +177,12 @@ namespace hpx { namespace plugins { namespace parcel
             std::string const& name, std::int64_t min_boundary,
             std::int64_t max_boundary, std::int64_t num_buckets)
     {
+        std::unique_lock<mutex_type> l(mtx_);
+
         map_type::iterator it = map_.find(name);
         if (it == map_.end())
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::"
                     "get_time_between_parcels_histogram_counter",
@@ -244,38 +264,47 @@ namespace hpx { namespace plugins { namespace parcel
             bool found_one = false;
             boost::regex rx(str_rx, boost::regex::perl);
 
-            map_type::const_iterator end = map_.end();
-            for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+            std::unique_lock<mutex_type> l(mtx_);
+
             {
-                if (!boost::regex_match((*it).first, rx))
-                    continue;
-                found_one = true;
+                map_type::const_iterator end = map_.end();
+                for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+                {
+                    if (!boost::regex_match((*it).first, rx))
+                        continue;
+                    found_one = true;
 
-                // propagate parameters
-                std::string fullname;
-                performance_counters::counter_path_elements cp = p;
-                cp.parameters_ = (*it).first;
-                if (!additional_parameters.empty())
-                    cp.parameters_ += additional_parameters;
+                    // propagate parameters
+                    std::string fullname;
+                    performance_counters::counter_path_elements cp = p;
+                    cp.parameters_ = (*it).first;
+                    if (!additional_parameters.empty())
+                        cp.parameters_ += additional_parameters;
 
-                performance_counters::get_counter_name(cp, fullname, ec);
-                if (ec) return false;
+                    performance_counters::get_counter_name(cp, fullname, ec);
+                    if (ec) return false;
 
-                performance_counters::counter_info cinfo = info;
-                cinfo.fullname_ = fullname;
+                    performance_counters::counter_info cinfo = info;
+                    cinfo.fullname_ = fullname;
 
-                if (!f(cinfo, ec) || ec)
-                    return false;
+                    if (!f(cinfo, ec) || ec)
+                        return false;
+                }
             }
 
             if (!found_one)
             {
                 // compose a list of known action types
                 std::string types;
-                map_type::const_iterator end = map_.end();
-                for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+
                 {
-                    types += "  " + (*it).first + "\n";
+                    std::unique_lock<mutex_type> l(mtx_);
+                    map_type::const_iterator end = map_.end();
+                    for (map_type::const_iterator it = map_.begin(); it != end;
+                         ++it)
+                    {
+                        types += "  " + (*it).first + "\n";
+                    }
                 }
 
                 HPX_THROWS_IF(ec, bad_parameter,
@@ -292,24 +321,29 @@ namespace hpx { namespace plugins { namespace parcel
             return true;
         }
 
-        // use given action type directly
-        map_type::const_iterator it = map_.find(parameters);
-        if (it == map_.end())
         {
-            // compose a list of known action types
-            std::string types;
-            map_type::const_iterator end = map_.end();
-            for (map_type::const_iterator it = map_.begin(); it != end; ++it)
-            {
-                types += "  " + (*it).first + "\n";
-            }
+            std::unique_lock<mutex_type> l(mtx_);
 
-            HPX_THROWS_IF(ec, bad_parameter,
-                "coalescing_counter_registry::counter_discoverer",
-                boost::str(boost::format(
-                    "action type %s does not match any known type, "
-                    "known action types: \n%s") % p.parameters_ % types));
-            return false;
+            // use given action type directly
+            map_type::const_iterator it = map_.find(parameters);
+            if (it == map_.end())
+            {
+                // compose a list of known action types
+                std::string types;
+                map_type::const_iterator end = map_.end();
+                for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+                {
+                    types += "  " + (*it).first + "\n";
+                }
+
+                l.unlock();
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "coalescing_counter_registry::counter_discoverer",
+                    boost::str(boost::format(
+                        "action type %s does not match any known type, "
+                        "known action types: \n%s") % p.parameters_ % types));
+                return false;
+            }
         }
 
         // propagate parameters
