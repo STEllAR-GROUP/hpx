@@ -262,10 +262,14 @@ namespace hpx { namespace plugins { namespace parcel
         if (!stopped_ && stop_buffering)
         {
             stopped_ = true;
-            timer_.stop();              // interrupt timer
+            {
+                hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                timer_.stop();              // interrupt timer
+            }
         }
         else if (cancel_timer)
         {
+            hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
 

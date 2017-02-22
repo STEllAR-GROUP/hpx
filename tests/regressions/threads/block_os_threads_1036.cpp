@@ -26,11 +26,24 @@ void blocker(
     boost::atomic<std::uint64_t>* entered
   , boost::atomic<std::uint64_t>* started
   , boost::scoped_array<boost::atomic<std::uint64_t> >* blocked_threads
+  , std::uint64_t worker
     )
 {
+    // reschedule if we are not on the correct OS thread...
+    if (worker != hpx::get_worker_thread_num())
+    {
+        hpx::threads::register_work(
+            hpx::util::bind(&blocker, entered, started, blocked_threads, worker),
+            "blocker", hpx::threads::pending,
+            hpx::threads::thread_priority_normal, worker);
+        return;
+    }
+
     (*blocked_threads)[hpx::get_worker_thread_num()].fetch_add(1);
 
     entered->fetch_add(1);
+
+    HPX_TEST_EQ(worker, hpx::get_worker_thread_num());
 
     while (started->load() != 1)
         continue;
@@ -57,13 +70,20 @@ int hpx_main()
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
             blocked_threads[i].store(0);
 
-        for (std::uint64_t i = 0; i < (os_thread_count - 1); ++i)
+        std::uint64_t scheduled = 0;
+        for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
+            if (i == hpx::get_worker_thread_num())
+                continue;
+
             hpx::threads::register_work(
-                hpx::util::bind(&blocker, &entered, &started, &blocked_threads),
+                hpx::util::bind(&blocker, &entered, &started, &blocked_threads, i),
                 "blocker", hpx::threads::pending,
-                hpx::threads::thread_priority_normal);
+                hpx::threads::thread_priority_normal, i);
+            ++scheduled;
         }
+        HPX_TEST_EQ(scheduled, os_thread_count - 1);
+
 
         while (entered.load() != (os_thread_count - 1))
             continue;

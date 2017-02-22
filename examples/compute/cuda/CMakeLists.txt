@@ -13,8 +13,13 @@ if(HPX_WITH_CUDA)
       hello_compute
       partitioned_vector
     )
-  set(cublas_matmul_FLAGS DEPENDENCIES cublas)
-#  set_source_files_properties(cublas_matmul.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+
+  include_directories(${CUDA_INCLUDE_DIRS})
+
+  set(cublas_matmul_FLAGS
+      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+
+  set(cublas_matmul_CUDA Off)
   set(data_copy_CUDA On)
   set(hello_compute_CUDA On)
   set(partitioned_vector_CUDA ON)

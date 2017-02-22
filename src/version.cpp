@@ -200,7 +200,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_HWLOC=OFF\n";
 #endif
-#if defined(HPX_HAVE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0
         strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
 #else
         strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";

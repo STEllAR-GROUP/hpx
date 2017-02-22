@@ -47,9 +47,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             HPX_ASSERT(tag > 1);
             std::lock_guard<mutex_type> l(mtx_);
-            HPX_ASSERT(tag <= next_tag_);
-
-            if(tag == next_tag_) return;
+            HPX_ASSERT(tag < next_tag_);
 
             free_tags_.push_back(tag);
         }

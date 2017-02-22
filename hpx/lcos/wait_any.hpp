@@ -67,6 +67,30 @@ namespace hpx
     /// OR-composes all future objects given and returns after one future of
     /// that list finishes execution.
     ///
+    /// \param futures  [in] Amn array holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a wait_any should
+    ///                 wait.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \note The function \a wait_any returns after at least one future has
+    ///       become ready. All input futures are still valid after \a wait_any
+    ///       returns.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           \a hpx::exception.
+    ///
+    /// \note     None of the futures in the input sequence are invalidated.
+    template <typename R, std:;size_t N>
+    void wait_any(std::array<future<R>, N>& futures, error_code& ec = throws);
+
+    /// The function \a wait_any is a non-deterministic choice operator. It
+    /// OR-composes all future objects given and returns after one future of
+    /// that list finishes execution.
+    ///
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
     ///                 \a wait_any should wait.
@@ -139,7 +163,6 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/always_void.hpp>
@@ -148,6 +171,9 @@ namespace hpx
 
 #include <boost/utility/swap.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -176,6 +202,30 @@ namespace hpx { namespace lcos
             const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, std::size_t N>
+    void wait_any(std::array<Future, N> const& futures, error_code& ec = throws)
+    {
+        return lcos::wait_some(1, futures, ec);
+    }
+
+    template <typename Future, std::size_t N>
+    void wait_any(std::array<Future, N>& lazy_values, error_code& ec = throws)
+    {
+        return lcos::wait_any(
+            const_cast<std::array<Future, N> const&>(lazy_values), ec);
+    }
+
+    template <typename Future, std::size_t N>
+    void wait_any(std::array<Future, N> && lazy_values, error_code& ec = throws)
+    {
+        return lcos::wait_any(
+            const_cast<std::array<Future, N> const&>(lazy_values), ec);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type

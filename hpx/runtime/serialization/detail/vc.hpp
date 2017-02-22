@@ -11,8 +11,10 @@
 #if defined(HPX_HAVE_DATAPAR_VC)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 #include <Vc/version.h>
 
@@ -90,6 +92,24 @@ namespace hpx { namespace serialization
     }
 }}
 
+namespace hpx { namespace traits
+{
+    template <typename T, typename Abi>
+    struct is_bitwise_serializable<Vc::Vector<T, Abi> >
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {};
+
+    template <typename T>
+    struct is_bitwise_serializable<Vc::Scalar::Vector<T> >
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {};
+
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct is_bitwise_serializable<Vc::SimdArray<T, N, V, W> >
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {};
+}}
+
 #else
 
 #include <array>
@@ -114,6 +134,14 @@ namespace hpx { namespace serialization
         v.copy_to(data.data(), Vc::vector_aligned);
         ar & data;
     }
+}}
+
+namespace hpx { namespace traits
+{
+    template <typename T, typename Abi>
+    struct is_bitwise_serializable<Vc::datapar<T, Abi> >
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {};
 }}
 
 #endif  // Vc_IS_VERSION_1

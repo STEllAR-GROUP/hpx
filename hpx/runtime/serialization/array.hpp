@@ -66,7 +66,9 @@ namespace hpx { namespace serialization
         void serialize(Archive& ar, unsigned int v)
         {
             typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+                hpx::traits::is_bitwise_serializable<
+                    typename std::remove_const<T>::type
+                >::value> use_optimized;
 
 #ifdef BOOST_BIG_ENDIAN
             bool archive_endianess_differs = ar.endian_little();

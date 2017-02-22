@@ -397,7 +397,7 @@ namespace hpx { namespace parcelset
             // invoke the original handler
             f(ec, p);
 
-#if defined(HPX_HAVE_ITTNOTIFY) && !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             static util::itt::event parcel_send("send_parcel");
             util::itt::event_tick(parcel_send);
 #endif

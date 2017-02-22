@@ -45,8 +45,13 @@ namespace hpx { namespace threads
         if (0 == --p->count_)
         {
             thread_data::pool_type* pool = p->get_pool();
-            p->~thread_data();
-            pool->deallocate(p);
+            if (pool == nullptr)
+                delete p;
+            else
+            {
+                p->~thread_data();
+                pool->deallocate(p);
+            }
         }
     }
 
@@ -170,6 +175,12 @@ namespace hpx { namespace threads
         return thread_id_type(
                 reinterpret_cast<thread_data*>(self->get_thread_id())
             );
+    }
+
+    std::size_t get_self_stacksize()
+    {
+        thread_id_type id = get_self_id();
+        return id ? id->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE

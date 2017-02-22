@@ -18,6 +18,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <array>
 #include <cstddef>
 #include <utility>
 #include <vector>

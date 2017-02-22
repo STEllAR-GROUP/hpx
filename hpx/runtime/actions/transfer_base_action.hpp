@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Thomas Heller
 //
@@ -135,6 +135,15 @@ namespace hpx { namespace actions
         {
             return detail::get_action_name<derived_type>();
         }
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        /// The function \a get_action_name_itt returns the name of this action
+        /// as a ITT string_handle
+        util::itt::string_handle const& get_action_name_itt() const
+        {
+            return detail::get_action_name_itt<derived_type>();
+        }
+#endif
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.

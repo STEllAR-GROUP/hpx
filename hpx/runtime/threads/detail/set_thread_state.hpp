@@ -170,6 +170,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 break;
             case pending:
+            case pending_boost:
                 if (suspended == new_state) {
                     // we do not allow explicit resetting of a state to suspended
                     // without the thread being executed.

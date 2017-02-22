@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,9 +7,9 @@
 #define HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 
 struct ___itt_caller;
@@ -45,10 +45,11 @@ struct ___itt_counter;
 #define HPX_ITT_THREAD_IGNORE()               itt_thread_ignore()
 
 #define HPX_ITT_TASK_BEGIN(domain, name)      itt_task_begin(domain, name)
+#define HPX_ITT_TASK_BEGIN_ID(domain, id, name) itt_task_begin(domain, id, name)
 #define HPX_ITT_TASK_END(domain)              itt_task_end(domain)
 
 #define HPX_ITT_DOMAIN_CREATE(name)           itt_domain_create(name)
-#define HPX_ITT_TASK_HANDLE_CREATE(name)      itt_task_handle_create(name)
+#define HPX_ITT_STRING_HANDLE_CREATE(name)    itt_string_handle_create(name)
 
 #define HPX_ITT_MAKE_ID(addr, extra)          itt_make_id(addr, extra)
 #define HPX_ITT_ID_CREATE(domain, id)         itt_id_create(domain, id)
@@ -85,6 +86,10 @@ struct ___itt_counter;
 /**/
 #define HPX_ITT_COUNTER_DESTROY(id)             itt_counter_destroy(id)
 
+#define HPX_ITT_METADATA_ADD(domain, id, key, data)                           \
+    itt_metadata_add(domain, id, key, data)                                   \
+/**/
+
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 
@@ -117,12 +122,14 @@ HPX_EXPORT void itt_thread_set_name(char const*);
 HPX_EXPORT void itt_thread_ignore();
 
 HPX_EXPORT void itt_task_begin(___itt_domain const*, ___itt_string_handle*);
+HPX_EXPORT void itt_task_begin(___itt_domain const*, ___itt_id*,
+    ___itt_string_handle*);
 HPX_EXPORT void itt_task_end(___itt_domain const*);
 
 HPX_EXPORT ___itt_domain* itt_domain_create(char const*);
-HPX_EXPORT ___itt_string_handle* itt_task_handle_create(char const*);
+HPX_EXPORT ___itt_string_handle* itt_string_handle_create(char const*);
 
-HPX_EXPORT ___itt_id* itt_make_id(void*, unsigned long);
+HPX_EXPORT ___itt_id* itt_make_id(void*, std::size_t);
 HPX_EXPORT void itt_id_create(___itt_domain const*, ___itt_id* id);
 HPX_EXPORT void itt_id_destroy(___itt_id* id);
 
@@ -146,7 +153,21 @@ HPX_EXPORT int itt_event_create(char const *name, int namelen);
 HPX_EXPORT int itt_event_start(int evnt);
 HPX_EXPORT int itt_event_end(int evnt);
 
+HPX_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, std::uint64_t const& data);
+HPX_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, double const& data);
+HPX_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, char const* data);
+HPX_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, void const* data);
+
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    struct thread_description;
+}}
+
 namespace hpx { namespace util { namespace itt
 {
     struct stack_context
@@ -214,7 +235,7 @@ namespace hpx { namespace util { namespace itt
         }
         ~id()
         {
-            if (id_) HPX_ITT_ID_DESTROY(id_);
+            HPX_ITT_ID_DESTROY(id_);
         }
 
         id(id const& rhs) = delete;
@@ -302,29 +323,66 @@ namespace hpx { namespace util { namespace itt
         mark_context& mark_;
     };
 
-    //////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    struct string_handle
+    {
+        string_handle() HPX_NOEXCEPT
+          : handle_(0)
+        {}
+        string_handle(char const* s)
+          : handle_(s == nullptr ? 0 : HPX_ITT_STRING_HANDLE_CREATE(s))
+        {}
+        string_handle(___itt_string_handle* h) HPX_NOEXCEPT
+          : handle_(h)
+        {}
+
+        string_handle& operator=(___itt_string_handle* h) HPX_NOEXCEPT
+        {
+            handle_ = h;
+            return *this;
+        }
+
+        explicit operator bool() const HPX_NOEXCEPT
+        {
+            return handle_ != 0;
+        }
+
+        ___itt_string_handle* handle_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const& domain, util::thread_description name)
-          : domain_(domain)
-        {
-            if (name.kind() == util::thread_description::data_type_description)
-            {
-                HPX_ITT_TASK_BEGIN(domain_.domain_,
-                    HPX_ITT_TASK_HANDLE_CREATE(name.get_description()));
-            }
-            else
-            {
-                HPX_ITT_TASK_BEGIN(domain_.domain_,
-                    HPX_ITT_TASK_HANDLE_CREATE("address"));
-            }
-        }
+        HPX_EXPORT task(domain const&, util::thread_description const&);
+        HPX_EXPORT task(domain const&, string_handle const&);
+
         ~task()
         {
             HPX_ITT_TASK_END(domain_.domain_);
         }
 
+        void add_metadata(string_handle const& name, std::uint64_t val)
+        {
+            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+        }
+        void add_metadata(string_handle const& name, double val)
+        {
+            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+        }
+        void add_metadata(string_handle const& name, char const* val)
+        {
+            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+        }
+        template <typename T>
+        void add_metadata(string_handle const& name, T const& val)
+        {
+            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_,
+                static_cast<void const*>(&val));
+        }
+
         domain const& domain_;
+        ___itt_id* id_;
+        string_handle sh_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -506,10 +564,12 @@ inline void itt_thread_set_name(char const*) {}
 inline void itt_thread_ignore() {}
 
 inline void itt_task_begin(___itt_domain const*, ___itt_string_handle*) {}
+inline void itt_task_begin(___itt_domain const*, ___itt_id*,
+    ___itt_string_handle*) {}
 inline void itt_task_end(___itt_domain const*) {}
 
 inline ___itt_domain* itt_domain_create(char const*) { return nullptr; }
-inline ___itt_string_handle* itt_task_handle_create(char const*) { return nullptr; }
+inline ___itt_string_handle* itt_string_handle_create(char const*) { return nullptr; }
 
 inline ___itt_id* itt_make_id(void*, unsigned long) { return nullptr; }
 inline void itt_id_create(___itt_domain const*, ___itt_id*) {}
@@ -537,7 +597,21 @@ inline int itt_event_create(char const *name, int namelen)  { return 0; }
 inline int itt_event_start(int evnt) { return 0; }
 inline int itt_event_end(int evnt) { return 0; }
 
+inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, std::uint64_t const& data) {}
+inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, double const& data) {}
+inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, char const* data) {}
+inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
+    ___itt_string_handle* key, void const* data) {}
+
 //////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util
+{
+    struct thread_description;
+}}
+
 namespace hpx { namespace util { namespace itt
 {
     struct stack_context
@@ -555,7 +629,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        domain(char const*) {}
+        HPX_EXPORT domain(char const*) {}
         ~domain() {}
     };
 
@@ -591,10 +665,18 @@ namespace hpx { namespace util { namespace itt
         ~undo_mark_context() {}
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct string_handle
+    {
+        string_handle(char const* s) {}
+    };
+
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        task(domain const&, util::thread_description const&) {}
+        HPX_EXPORT task(domain const&, util::thread_description const&) {}
+        HPX_EXPORT task(domain const&, string_handle const&) {}
+
         ~task() {}
     };
 

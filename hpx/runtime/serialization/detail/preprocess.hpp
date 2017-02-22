@@ -19,8 +19,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <cstddef>
+#include <map>
 #include <mutex>
-#include <unordered_map>
 #include <utility>
 
 namespace hpx { namespace serialization { namespace detail
@@ -31,7 +31,7 @@ namespace hpx { namespace serialization { namespace detail
     class preprocess
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::unordered_map<naming::gid_type, naming::gid_type> split_gids_map;
+        typedef std::map<naming::gid_type, naming::gid_type> split_gids_map;
     public:
         preprocess()
           : size_(0)

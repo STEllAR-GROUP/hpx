@@ -229,7 +229,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             int ret = 0;
             ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
+            if(completed)
             {
                 request_ptr_ = nullptr;
                 return true;

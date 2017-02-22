@@ -1196,11 +1196,16 @@ namespace hpx
 
     std::size_t get_worker_thread_num()
     {
+        return get_worker_thread_num(throws);
+    }
+
+    std::size_t get_worker_thread_num(error_code& ec)
+    {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(
-                invalid_status,
+            HPX_THROWS_IF(
+                ec, invalid_status,
                 "hpx::get_worker_thread_num",
                 "the runtime system has not been initialized yet");
             return std::size_t(-1);
@@ -1357,6 +1362,9 @@ namespace hpx { namespace threads
     // shortcut for runtime_configuration::get_stack_size
     std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize)
     {
+        if (stacksize == threads::thread_stacksize_current)
+            return threads::get_self_stacksize();
+
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 
@@ -1479,6 +1487,17 @@ namespace hpx
     std::string get_thread_name()
     {
         return runtime::get_thread_name();
+    }
+
+    struct itt_domain_tag {};
+    static util::thread_specific_ptr<util::itt::domain, itt_domain_tag> d;
+
+    util::itt::domain const& get_thread_itt_domain()
+    {
+        if (nullptr == d.get())
+            d.reset(new util::itt::domain(get_thread_name().c_str()));
+
+        return *d;
     }
 
     std::uint64_t get_system_uptime()

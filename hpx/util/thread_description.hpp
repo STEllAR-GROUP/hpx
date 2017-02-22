@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,8 +10,12 @@
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/assert.hpp>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <cstddef>
 #include <iosfwd>
@@ -41,6 +45,9 @@ namespace hpx { namespace util
 
         data_type type_;
         data data_;
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        util::itt::string_handle desc_itt_;
+#endif
 
         HPX_EXPORT void init_from_alternative_name(char const* altname);
 
@@ -57,6 +64,16 @@ namespace hpx { namespace util
             data_.desc_ = desc;
         }
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        thread_description(char const* desc,
+                util::itt::string_handle const& sh) HPX_NOEXCEPT
+          : type_(data_type_description)
+        {
+            data_.desc_ = desc;
+            desc_itt_ = sh;
+        }
+#endif
+
         template <typename F, typename =
             typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
@@ -66,11 +83,34 @@ namespace hpx { namespace util
                 char const* altname = nullptr) HPX_NOEXCEPT
           : type_(data_type_description)
         {
+            char const* name = traits::get_function_annotation<F>::call(f);
+            if (name != nullptr)
+            {
+                altname = name;
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                desc_itt_ = traits::get_function_annotation_itt<F>::call(f);
+#endif
+            }
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
-            type_ = data_type_address;
-            data_.addr_ = traits::get_function_address<F>::call(f);
+            if (altname != nullptr)
+            {
+                data_.desc_ = altname;
+            }
+            else
+            {
+                type_ = data_type_address;
+                data_.addr_ = traits::get_function_address<F>::call(f);
+            }
 #else
             init_from_alternative_name(altname);
+#endif
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            if (!desc_itt_)
+            {
+                desc_itt_ = util::itt::string_handle(get_description());
+            }
 #endif
         }
 
@@ -83,6 +123,9 @@ namespace hpx { namespace util
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            desc_itt_ = hpx::actions::detail::get_action_name_itt<Action>();
+#endif
         }
 
         data_type kind() const HPX_NOEXCEPT
@@ -95,6 +138,15 @@ namespace hpx { namespace util
             HPX_ASSERT(type_ == data_type_description);
             return data_.desc_;
         }
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
+        {
+            HPX_ASSERT(type_ == data_type_description);
+            return desc_itt_ ? desc_itt_ :
+                util::itt::string_handle(get_description());
+        }
+#endif
 
         std::size_t get_address() const HPX_NOEXCEPT
         {
@@ -168,6 +220,14 @@ namespace hpx { namespace util
         {
             return "<unknown>";
         }
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
+        {
+            HPX_ASSERT(type_ == data_type_description);
+            return util::itt::string_handle(get_description());
+        }
+#endif
 
         std::size_t get_address() const HPX_NOEXCEPT
         {

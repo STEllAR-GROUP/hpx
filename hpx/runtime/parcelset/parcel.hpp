@@ -21,10 +21,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
-#include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -75,7 +75,7 @@ namespace hpx { namespace parcelset
     private:
 
         typedef
-            std::unordered_map<naming::gid_type, naming::gid_type>
+            std::map<naming::gid_type, naming::gid_type>
             split_gids_type;
 
 #if defined(HPX_DEBUG)
