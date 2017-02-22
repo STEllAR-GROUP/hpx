@@ -169,6 +169,31 @@ namespace detail {
 #  define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #  define LOG_DEBUG_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #  define LOG_BOOST_MSG(x,y) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << boost::format(x) y;
+
+#  define LOG_TIMED_INIT(name)                                                      \
+    using namespace std::chrono;                                                    \
+    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
+
+#  define LOG_TIMED_MSG(name, level, delay, x)             \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        LOG_DEVEL_MSG(x);                                  \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+    }
+
+#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
+    time_point<system_clock> log_timed_now_ ## name =      \
+        system_clock::now();                               \
+    duration<double> log_timed_elapsed_ ## name =          \
+      log_timed_now_ ## name - log_timed_start_ ## name;   \
+    if (log_timed_elapsed_ ## name.count()>delay) {        \
+        log_timed_start_ ## name = log_timed_now_ ## name; \
+        x;                                                 \
+    }
+
 #endif
 
 //
