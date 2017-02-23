@@ -159,11 +159,11 @@ namespace hpx { namespace parcelset
 
         std::size_t & size();
 
-        void schedule_action();
+        void schedule_action(std::size_t num_thread = std::size_t(-1));
 
         // returns true if parcel was migrated, false if scheduled locally
         bool load_schedule(serialization::input_archive & ar,
-            std::size_t num_thread);
+            std::size_t num_thread, bool& deferred_schedule);
 
         // generate unique parcel id
         static naming::gid_type generate_unique_id(

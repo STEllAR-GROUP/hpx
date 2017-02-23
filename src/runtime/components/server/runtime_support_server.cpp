@@ -1355,7 +1355,7 @@ namespace hpx { namespace components { namespace server
                     rt.report_error(boost::current_exception());
                 }
             }
-            lcos::barrier::get_global_barrier().release();
+            lcos::barrier::get_global_barrier().detach();
         }
     }
 
