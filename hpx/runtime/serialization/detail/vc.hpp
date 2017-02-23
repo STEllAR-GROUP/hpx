@@ -16,6 +16,10 @@
 #include <cstddef>
 #include <type_traits>
 
+#include <Vc/version.h>
+
+#if Vc_IS_VERSION_1
+
 #include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,6 +109,42 @@ namespace hpx { namespace traits
       : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 }}
+
+#else
+
+#include <array>
+
+#include <Vc/datapar>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace serialization
+{
+    template <typename T, typename Abi>
+    void serialize(input_archive & ar, Vc::datapar<T, Abi>& v, unsigned)
+    {
+        std::array<T, Vc::datapar<T, Abi>::size()> data;
+        ar & data;
+        v.copy_from(data.data(), Vc::vector_aligned);
+    }
+
+    template <typename T, typename Abi>
+    void serialize(output_archive & ar, Vc::datapar<T, Abi> const& v, unsigned)
+    {
+        std::array<T, Vc::datapar<T, Abi>::size()> data;
+        v.copy_to(data.data(), Vc::vector_aligned);
+        ar & data;
+    }
+}}
+
+namespace hpx { namespace traits
+{
+    template <typename T, typename Abi>
+    struct is_bitwise_serializable<Vc::datapar<T, Abi> >
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {};
+}}
+
+#endif  // Vc_IS_VERSION_1
 
 #endif
 #endif
