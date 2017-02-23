@@ -33,7 +33,7 @@
 #include <boost/range/irange.hpp>
 #include <boost/throw_exception.hpp>
 
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>
 #else
 #include <boost/optional.hpp>
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     auto && args =
                         hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
 
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
                     std::experimental::optional<result_type> out;
                     auto && wrapper =
                         [&]() mutable

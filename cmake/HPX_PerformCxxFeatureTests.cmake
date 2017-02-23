@@ -130,7 +130,7 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_type_traits(
     DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
 
-  if(HPX_WITH_CXX1Y)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -153,10 +153,11 @@ macro(hpx_perform_cxx_feature_tests)
   endif()
 
   # check for experimental facilities
-  if(HPX_WITH_CXX1Y)
-    # check for experimenta/optional only of in C++14 mode
-    hpx_check_for_cxx_experimental_std_optional(
-      DEFINITIONS HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
+    # check for Library Fundamentals TS v2's experimental/optional only if in
+    # C++1y or C++14 mode.
+    hpx_check_for_libfun_std_experimental_optional(
+      DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
   endif()
 endmacro()
 
