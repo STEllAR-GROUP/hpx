@@ -270,19 +270,19 @@ namespace libfabric
 
             // if we are not enabled, then skip allocating resources
             parcelport_enabled_ = hpx::util::get_entry_as<bool>(ini,
-            	"hpx.parcel.libfabric.enable", 0);
-			LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
+                "hpx.parcel.libfabric.enable", 0);
+            LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
 
-			bootstrap_enabled_ = ("libfabric" ==
-				hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
-			LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
+            bootstrap_enabled_ = ("libfabric" ==
+                hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
+            LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
 
             // we need this for background OS threads to get 'this' pointer
             parcelport::parcelport_instance_ = this;
 
             // Get parameters that determine our fabric selection
             std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
-            	HPX_PARCELPORT_LIBFABRIC_PROVIDER);
+                HPX_PARCELPORT_LIBFABRIC_PROVIDER);
             std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
                 HPX_PARCELPORT_LIBFABRIC_DOMAIN);
             std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
@@ -301,7 +301,7 @@ namespace libfabric
 
             // create our main fabric control structure
             libfabric_controller_ = std::make_shared<libfabric_controller>(
-            	provider, domain, endpoint, _port);
+                provider, domain, endpoint, _port);
 
             // get 'this' locality from the controller
             LOG_DEBUG_MSG("Getting local locality object");
@@ -328,8 +328,8 @@ namespace libfabric
             LOG_DEBUG_MSG("Setting Connection function");
             auto connection_function = std::bind(
                 &parcelport::handle_libfabric_connection, this,
-				std::placeholders::_1, std::placeholders::_2
-			);
+                std::placeholders::_1, std::placeholders::_2
+            );
             libfabric_controller_->setConnectionFunction(connection_function);
 
             LOG_DEBUG_MSG("Setting Completion function");
@@ -351,7 +351,7 @@ namespace libfabric
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
-			const locality &dest_fabric = dest.get<locality>();
+            const locality &dest_fabric = dest.get<locality>();
             std::uint32_t dest_ip = dest_fabric.ip_address();
             LOG_DEVEL_MSG("get_remote_connection        from "
                 << ipaddress(_ibv_ip)
@@ -475,7 +475,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         void handle_libfabric_connection(struct fid_ep *client, uint32_t dest_ip)
         {
-        	if (1) {
+            if (1) {
             LOG_DEVEL_MSG("Connection established       from "
                 << ipaddress(_ibv_ip) << "to "
                 << ipaddress(dest_ip) << "( " << ipaddress(_ibv_ip) << ")");
@@ -1115,7 +1115,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         struct fid_ep *get_remote_connection(const locality &dest_fabric)
         {
-        	uint32_t dest_ip = dest_fabric.ip_address();
+            uint32_t dest_ip = dest_fabric.ip_address();
             // if a connection exists to this destination, get it
             auto present = ip_endpoint_map.is_in_map(dest_ip);
             if (present.second) {
@@ -1139,12 +1139,12 @@ namespace libfabric
 
             // block until a connection is available
             struct fid_ep* client = client_future.get();
-/*
+
             LOG_DEVEL_MSG("Client future ("
-                << decnumber(client->get_qp_num()) << ") from "
+                << hexpointer(client) << ") from "
                 << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
                 << "( " << ipaddress(_ibv_ip) << ")");
-*/
+
             return client;
         }
 
@@ -1238,7 +1238,7 @@ namespace libfabric
 //                            LOG_DEBUG_MSG("Time to register memory (ns) "
 //                                << decnumber(regtimer.elapsed_nanoseconds()));
                         }
-//                        c.rkey_  = zero_copy_region->get_remote_key();
+                        c.rkey_  = zero_copy_region->get_remote_key();
                         LOG_DEBUG_MSG("Zero-copy rdma Get region "
                             << decnumber(index) << " created for address "
                             << hexpointer(zero_copy_region->get_address())

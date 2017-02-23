@@ -56,8 +56,30 @@ namespace libfabric
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
 
-        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_map_;
-        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_tmp_;
+        // when a new connection is requested, it will be completed asynchronously
+        // we need a promise/future for each endpoint so that we can set the new
+        // endpoint when the connection completes and is ready
+        // Note - only used during connection, then deleted
+        typedef std::tuple<
+            fid_ep *,
+            hpx::promise<fid_ep *>,
+            hpx::shared_future<fid_ep *>
+        > promise_tuple_type;
+
+        // used in map of ipaddress->promise_tuple_type
+        typedef std::pair<const uint32_t, promise_tuple_type> ClientMapPair;
+
+        // lock types for maps
+        typedef hpx::concurrent::unordered_map<uint32_t, promise_tuple_type>
+            ::map_read_lock_type map_read_lock_type;
+        typedef hpx::concurrent::unordered_map<uint32_t, promise_tuple_type>
+            ::map_write_lock_type map_write_lock_type;
+
+        // Map of connections started, needed until connection is completed
+        hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> endpoint_tmp_;
+
+//        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_map_;
+//        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_tmp_;
 
         locality here_;
 
@@ -272,7 +294,8 @@ namespace libfabric
         // --------------------------------------------------------------------
         // returns true when all connections have been disconnected and none are active
         bool isTerminated() {
-            return (qp_endpoint_map_.size() == 0);
+            return false;
+            //return (qp_endpoint_map_.size() == 0);
         }
 
         // types we need for connection and disconnection callback functions
@@ -353,24 +376,18 @@ namespace libfabric
                     {
                         scoped_lock lock(endpoint_map_mutex_);
                         auto present1 = endpoint_tmp_.is_in_map(addr[1]);
-                        auto present2 = endpoint_map_.is_in_map(addr[1]);
-                        if (!present1.second && !present2.second)
-                        {
-                            uintptr_t ep_data = *reinterpret_cast<uintptr_t*>(cm_entry->data);
-                            LOG_DEBUG_MSG("Got data from FI_CONNREQ " << hexpointer(ep_data));
-                            //
-                            new_endpoint_active(cm_entry->info, &new_ep);
-                            LOG_DEBUG_MSG("Accepted a connection - inserting endpoint "
-                                    << ipaddress(addr[1]) << hexpointer(new_ep));
-                            // can call fi_reject instead if we want
-                            endpoint_tmp_.insert(std::make_pair(addr[1], new_ep));
+                        // auto present2 = endpoint_map_.is_in_map(addr[1]);
+                        if (present1.second /*&& !present2.second*/) {
+                            throw fabric_error(0, "FI_CONNREQ Duplicate request");
                         }
-                        else {
-                            throw fabric_error(0, "Duplicate/erroneous connection request");
-                        }
+                        // create a new endpoint for this request
+                        new_endpoint_active(cm_entry->info, &new_ep);
+
+                        // @TODO : support reject of connection request
+                        hpx::shared_future<struct fid_ep*> result =
+                            insert_new_future(addr[1], new_ep);
                     }
                     fi_freeinfo(cm_entry->info);
-                    handle_connect_request(reinterpret_cast<fi_eq_cm_entry*>(buffer.data()));
                     break;
                 case FI_CONNECTED:
                 {
@@ -381,18 +398,25 @@ namespace libfabric
                     fi_getpeer(new_ep, address.data(), &len);
                     //
                     auto present1 = endpoint_tmp_.is_in_map(address[1]);
-                    auto present2 = endpoint_map_.is_in_map(address[1]);
-                    LOG_DEBUG_MSG("present " << present1.second << " " << present2.second);
-                    if (!present1.second || present2.second) {
-                        throw fabric_error(0, "Connection made, endpoint map error");
+                    if (!present1.second) {
+                        throw fabric_error(0, "FI_CONNECTED, endpoint map error");
                     }
-                    LOG_DEBUG_MSG("FI_CONNECTED to endpoint " << hexpointer(new_ep) << ipaddress(address[1]));
+                    LOG_DEBUG_MSG("FI_CONNECTED to endpoint "
+                        << hexpointer(new_ep) << ipaddress(address[1]));
                     //
-                    endpoint_map_.insert(std::make_pair(address[1], new_ep));
-                    endpoint_tmp_.erase(present1.first);
+                    // endpoint_map_.insert(std::make_pair(address[1], new_ep));
+                    // call parcelport connection function before setting future
                     connection_function_(new_ep, address[1]);
-                    //
-                    handle_connect_request(reinterpret_cast<fi_eq_cm_entry*>(buffer.data()));
+
+                    // if there is an entry for a locally started connection on this IP
+                    // then set the future ready with the verbs endpoint
+                    LOG_DEBUG_MSG("FI_CONNECTED setting future "
+                        << ipaddress(address[1]));
+                    std::get<1>(endpoint_tmp_.find(address[1])->second).
+                        set_value(new_ep);
+
+                    // once the future is set, the entry can be removed
+                    endpoint_tmp_.erase(present1.first);
                 }
                 break;
                 case FI_NOTIFY:
@@ -435,10 +459,9 @@ namespace libfabric
             return this->fabric_domain_;
         }
 
-        libfabric_endpoint* get_endpoint(uint32_t remote_ip) {
-            return (std::get<0>(connections_started_.find(remote_ip)->second)).get();
-
-        }
+//        libfabric_endpoint* get_endpoint(uint32_t remote_ip) {
+//           return (std::get<0>(connections_started_.find(remote_ip)->second)).get();
+//        }
 
         inline rdma_memory_pool_ptr get_memory_pool() {
             return memory_pool_;
@@ -492,23 +515,59 @@ namespace libfabric
 
         }
 
+        hpx::shared_future<struct fid_ep*> insert_new_future(
+            uint32_t remote_ip, struct fid_ep *new_endpoint)
+        {
+            hpx::promise<struct fid_ep*> new_endpoint_promise;
+            hpx::future<struct fid_ep*>  new_endpoint_future =
+                new_endpoint_promise.get_future();
+
+            LOG_DEBUG_MSG("Inserting endpoint future/promise into map "
+                    << ipaddress(remote_ip) << hexpointer(new_endpoint));
+            auto it = endpoint_tmp_.insert(
+                std::make_pair(
+                    remote_ip,
+                    std::make_tuple(
+                        new_endpoint,
+                        std::move(new_endpoint_promise),
+                        std::move(new_endpoint_future))));
+
+            // the future will become ready when the remote end accepts/rejects our connection
+            // or we accept a connection from a remote
+            // auto it = endpoint_tmp_.find(remote_ip);
+            hpx::shared_future<struct fid_ep*> result = std::get<2>(it.first->second);
+            return result;
+        }
+
         // --------------------------------------------------------------------
         hpx::shared_future<struct fid_ep*> connect_to_server(const locality &remote)
         {
-            int ret;
-            LOG_DEBUG_MSG("Setting info object with destination address size " << locality::array_size);
+            const uint32_t &remote_ip = remote.ip_address();
+
+            // has a connection been started from here already?
+            auto connection = endpoint_tmp_.is_in_map(remote_ip);
+
+            // if a connection is already underway, just return the future
+            if (connection.second) {
+                LOG_DEVEL_MSG("connect to server : returning existing future");
+                // the future will become ready when the remote end accepts/rejects
+                // our connection - or we accept a connection from a remote
+                auto it = connection.first;
+                // auto it = endpoint_tmp_.find(remote_ip);
+                return std::get<2>(it->second);
+            }
 
             // convert remote ip address to a string to pass to getinfo
             char addr_str[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, &remote.ip_address(), addr_str, INET_ADDRSTRLEN);
+            inet_ntop(AF_INET, &remote_ip, addr_str, INET_ADDRSTRLEN);
             std::string port_str = std::to_string(remote.port());
-            LOG_DEBUG_MSG("IP address " << addr_str << ":" << port_str);
+            LOG_DEBUG_MSG("Generated IP address " << addr_str << ":" << port_str);
 
             uint64_t flags = 0;
             struct fi_info *fabric_info_active_;
 
-            ret = fi_getinfo(FI_VERSION(1,4), addr_str, port_str.c_str(),
-                    flags, fabric_hints_, &fabric_info_active_);
+            int ret = fi_getinfo(FI_VERSION(1,4), addr_str, port_str.c_str(),
+                flags, fabric_hints_, &fabric_info_active_);
 
             setup_queues(fabric_info_active_);
 
@@ -554,9 +613,13 @@ namespace libfabric
             ret = fi_enable(new_endpoint);
             if (ret) throw fabric_error(ret, "fi_enable");
 
+            LOG_DEBUG_MSG("Deleting new endpoint info structure");
+            fi_freeinfo(fabric_info_active_);
+
+            // prepost a receive to the new endpoint
             auto region = memory_pool_->allocate_region(0);
             void *desc = region->get_desc();
-            LOG_DEBUG_MSG("Posting recv memory descriptor " << hexpointer(desc));
+            LOG_DEBUG_MSG("Preposting recv memory descriptor " << hexpointer(desc));
 
             ret = fi_recv(new_endpoint, region->get_address(), region->get_size(), desc, 0, NULL);
             if (ret!=0) {
@@ -567,17 +630,17 @@ namespace libfabric
                 }
             }
 
-            LOG_DEBUG_MSG("Calling fi_connect with ep data "
-                    << decnumber(sizeof(uint32_t)) << ipaddress(here_.ip_address()));
-            ret = fi_connect(new_endpoint, remote.fabric_data(), &here_.ip_address(), sizeof(uint32_t));
+            // create a future for this connection, do this before calling fi_connect
+            // to ensure a connection completion does not arrive before we are ready
+            hpx::shared_future<struct fid_ep*> result =
+                insert_new_future(remote_ip, new_endpoint);
+
+            // now it is safe to call connect
+            LOG_DEBUG_MSG("Calling fi_connect ");
+            ret = fi_connect(new_endpoint, remote.fabric_data(), nullptr, 0);
             if (ret) throw fabric_error(ret, "fi_connect");
 
-            LOG_DEBUG_MSG("Created a connection - inserting endpoint "
-                    << ipaddress(remote.ip_address()) << hexpointer(new_endpoint));
-            endpoint_tmp_.insert(std::make_pair(remote.ip_address(), new_endpoint));
-            fi_freeinfo(fabric_info_active_);
-
-            return hpx::make_ready_future<struct fid_ep*>(nullptr);
+            return result;
         }
 
         void disconnect_from_server(libfabric_endpoint_ptr client) {}
@@ -622,31 +685,6 @@ namespace libfabric
         // only allow one thread to handle connect/disconnect events etc
         mutex_type            initialization_mutex_;
         mutex_type            endpoint_map_mutex_;
-
-        typedef std::tuple<
-            libfabric_endpoint_ptr,
-            hpx::promise<libfabric_endpoint_ptr>,
-            hpx::shared_future<libfabric_endpoint_ptr>
-        > promise_tuple_type;
-        //
-        typedef std::pair<const uint32_t, promise_tuple_type> ClientMapPair;
-        typedef std::pair<const uint32_t, libfabric_endpoint_ptr> QPMapPair;
-
-        // Map of all active clients indexed by queue pair number.
-//        hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> clients_;
-
-        typedef hpx::concurrent::unordered_map<uint32_t, promise_tuple_type>
-            ::map_read_lock_type map_read_lock_type;
-        typedef hpx::concurrent::unordered_map<uint32_t, promise_tuple_type>
-            ::map_write_lock_type map_write_lock_type;
-
-        // Map of connections started, needed during address resolution until
-        // qp is created, and then to hold a future to an endpoint that the parcelport
-        // can get and wait on
-        hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> connections_started_;
-
-        typedef std::pair<uint32_t, libfabric_endpoint_ptr> qp_map_type;
-        hpx::concurrent::unordered_map<uint32_t, libfabric_endpoint_ptr> qp_endpoint_map_;
 
         // used to skip polling event channel too frequently
         typedef std::chrono::time_point<std::chrono::system_clock> time_type;
