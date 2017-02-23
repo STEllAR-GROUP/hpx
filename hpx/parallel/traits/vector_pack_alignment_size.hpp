@@ -23,6 +23,9 @@ namespace hpx { namespace parallel { namespace traits
     struct is_vector_pack : std::false_type {};
 
     template <typename T, typename Enable = void>
+    struct is_scalar_vector_pack;
+
+    template <typename T, typename Enable>
     struct is_scalar_vector_pack : std::false_type {};
 
     template <typename T, typename Enable = void>
