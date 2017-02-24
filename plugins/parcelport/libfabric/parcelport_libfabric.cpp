@@ -76,10 +76,6 @@
 #include <utility>
 #include <vector>
 
-#define HPX_PARCELPORT_LIBFABRIC_PROVIDER "verbs"
-#define HPX_PARCELPORT_LIBFABRIC_DOMAIN   "mlx5_0"
-#define HPX_PARCELPORT_LIBFABRIC_ENDPOINT "msg"
-
 using namespace hpx::parcelset::policies;
 
 namespace hpx {
@@ -1528,17 +1524,14 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
         FUNC_END_DEBUG_MSG;
         // @TODO : check which of these are obsolete after recent changes
         return
-            "device = ${HPX_PARCELPORT_LIBFABRIC_DEVICE:" HPX_PARCELPORT_LIBFABRIC_DEVICE "}\n"
-            "interface = ${HPX_PARCELPORT_LIBFABRIC_INTERFACE:"
-            HPX_PARCELPORT_LIBFABRIC_INTERFACE "}\n"
-            "memory_chunk_size = ${HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE:"
-            BOOST_PP_STRINGIZE(HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE) "}\n"
-            "max_memory_chunks = ${HPX_PARCELPORT_LIBFABRIC_MAX_MEMORY_CHUNKS:"
-            BOOST_PP_STRINGIZE(HPX_PARCELPORT_LIBFABRIC_MAX_MEMORY_CHUNKS) "}\n"
-            "zero_copy_optimization = 1\n"
-            "io_pool_size = 2\n"
-            "use_io_pool = 1\n"
-            "enable = 0";
+        "zero_copy_optimization = 1\n"
+        "provider = ${HPX_PARCELPORT_LIBFABRIC_PROVIDER:"
+                HPX_PARCELPORT_LIBFABRIC_PROVIDER "}\n"
+        "domain = ${HPX_PARCELPORT_LIBFABRIC_DOMAIN:"
+                HPX_PARCELPORT_LIBFABRIC_DOMAIN "}\n"
+        "endpoint = ${HPX_PARCELPORT_LIBFABRIC_ENDPOINT:"
+                HPX_PARCELPORT_LIBFABRIC_ENDPOINT "}\n"
+        ;
     }
 };
 }}

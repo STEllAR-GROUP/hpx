@@ -12,7 +12,15 @@
 #include <cstdint>
 #include <array>
 
-#define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 16
+// Different providers use different address formats that we must accomodate
+// in our locality object.
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+# define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 48
+#endif
+
+#ifdef HPX_PARCELPORT_LIBFABRIC_VERBS
+# define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 16
+#endif
 
 namespace hpx {
 namespace parcelset {
@@ -32,7 +40,7 @@ struct locality {
 
     // the number of 32bit ints stored in our array
     static const uint32_t array_length = HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE/4;
-	static const uint32_t array_size = HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE;
+    static const uint32_t array_size = HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE;
 
     // array type of our locality data
     typedef std::array<uint32_t, array_length> locality_data;
@@ -61,25 +69,31 @@ struct locality {
     }
 
     locality & operator = (const locality &other) {
-    	data_            = other.data_;
+        data_            = other.data_;
         LOG_DEBUG_MSG("copy operator locality with " << ipaddress(ip_address()) << ":" << decnumber(port()));
         return *this;
     }
 
     const uint32_t & ip_address() const {
-        return data_[1];
+#if defined (HPX_PARCELPORT_LIBFABRIC_VERBS)
+        return reinterpret_cast<const struct sockaddr_in*>
+            (data_.data())->sin_addr.s_addr;
+#elif defined(HPX_PARCELPORT_LIBFABRIC_GNI)
+        return data_[0];
+#else
+        throw fabric_error(0, "unsupported provider, please fix ASAP");
+#endif
     }
 
-	uint16_t port() const {
+    uint16_t port() const {
         uint16_t port = 256*reinterpret_cast<const uint8_t*>(data_.data())[2]
-			+ reinterpret_cast<const uint8_t*>(data_.data())[3];
+            + reinterpret_cast<const uint8_t*>(data_.data())[3];
         return port;
-	}
+    }
 
     // some condition marking this locality as valid
     explicit operator bool() const {
-        const uint32_t &ipaddr = data_[1];
-        return (ipaddr != 0);
+        return (ip_address() != 0);
     }
 
     void save(serialization::output_archive & ar) const {
@@ -91,6 +105,8 @@ struct locality {
     }
 
     const void *fabric_data() const { return data_.data(); }
+
+    bool valid() { return true; }
 
 private:
     friend bool operator==(locality const & lhs, locality const & rhs) {
