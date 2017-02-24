@@ -24,6 +24,7 @@ namespace libfabric
 {
     struct sender_connection;
     struct parcelport;
+    typedef void* RdmaKeyType;
 
     typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
     static constexpr unsigned int header_size = header_type::header_block_size;
@@ -31,7 +32,8 @@ namespace libfabric
     typedef rdma_memory_pool                                 memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>                memory_pool_ptr_type;
     typedef pinned_memory_vector<char, header_size>          snd_data_type;
-    typedef parcel_buffer<snd_data_type, serialization::serialization_chunk> snd_buffer_type;
+    typedef parcel_buffer<snd_data_type,serialization::serialization_chunk>
+        snd_buffer_type;
 
     struct sender_connection : std::enable_shared_from_this<sender_connection>
     {
@@ -45,7 +47,7 @@ namespace libfabric
               parcelport * pp
             , std::uint32_t dest
             , locality there
-//            , libfabric_endpoint *client
+            , struct fid_ep *client
             , memory_pool_type * chunk_pool
             , performance_counters::parcels::gatherer & parcels_sent
         )
@@ -53,7 +55,7 @@ namespace libfabric
         , parcelport_(pp)
         , dest_ip_(dest)
         , there_(there)
-//        , client_(client)
+        , client_(client)
         , chunk_pool_(chunk_pool)
         , parcels_sent_(parcels_sent)
         {}
@@ -80,7 +82,7 @@ namespace libfabric
         parcelport          *parcelport_;
         std::uint32_t        dest_ip_;
         parcelset::locality  there_;
-//        libfabric_endpoint      *client_;
+        struct fid_ep       *client_;
         memory_pool_type    *chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;
     };

@@ -45,6 +45,8 @@
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
+#define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
+
 // --------------------------------------------------------------------
 #include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
@@ -203,12 +205,13 @@ namespace libfabric
         // struct we use to keep track of all memory regions used during a recv,
         // they must be held onto until all transfers of data are complete.
         // --------------------------------------------------------------------
+        typedef serialization::serialization_chunk chunk_struct;
         typedef struct {
-            std::atomic<unsigned int>                        rdma_count;
-            uint32_t                                         tag;
-            std::vector<serialization::serialization_chunk>  chunks;
-            libfabric_memory_region              *header_region, *message_region;
-            zero_copy_vector                                 zero_copy_regions;
+            std::atomic<unsigned int>   rdma_count;
+            uint32_t                    tag;
+            std::vector<chunk_struct>   chunks;
+            libfabric_memory_region    *header_region, *message_region;
+            zero_copy_vector            zero_copy_regions;
         } parcel_recv_data;
 
         typedef std::list<parcel_send_data>      active_send_list_type;
@@ -219,9 +222,9 @@ namespace libfabric
 
 #if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
         // map send/recv parcel wr_id to all info needed on completion
-        typedef hpx::concurrent::unordered_map<uint64_t, active_send_iterator>
+        typedef hpx::concurrent::unordered_map<void*, active_send_iterator>
             send_wr_map;
-        typedef hpx::concurrent::unordered_map<uint64_t, active_recv_iterator>
+        typedef hpx::concurrent::unordered_map<void*, active_recv_iterator>
             recv_wr_map;
 #else
         mutex_type  ReadCompletionMap_mutex;
@@ -229,8 +232,8 @@ namespace libfabric
         mutex_type  TagSendCompletionMap_mutex;
 
         // map send/recv parcel wr_id to all info needed on completion
-        typedef std::unordered_map<uint64_t, active_send_iterator> send_wr_map;
-        typedef std::unordered_map<uint64_t, active_recv_iterator> recv_wr_map;
+        typedef std::unordered_map<void*, active_send_iterator> send_wr_map;
+        typedef std::unordered_map<void*, active_recv_iterator> recv_wr_map;
 #endif
         // store received objects using a map referenced by libfabric work request ID
         send_wr_map SendCompletionMap;
@@ -332,11 +335,16 @@ namespace libfabric
             );
             libfabric_controller_->setConnectionFunction(connection_function);
 
-            LOG_DEBUG_MSG("Setting Completion function");
-            auto completion_function = std::bind(
-                &parcelport::handle_libfabric_completion, this,
+            LOG_DEBUG_MSG("Setting Completion functions");
+            auto send_completion_function = std::bind(
+                &parcelport::handle_send_completion, this,
                 std::placeholders::_1, std::placeholders::_2);
-            libfabric_controller_->setCompletionFunction(completion_function);
+            libfabric_controller_->setSendCompletionFunction(send_completion_function);
+
+            auto recv_completion_function = std::bind(
+                &parcelport::handle_recv_completion, this,
+                std::placeholders::_1, std::placeholders::_2);
+            libfabric_controller_->setRecvCompletionFunction(recv_completion_function);
 
             return true;
        }
@@ -381,7 +389,7 @@ namespace libfabric
                       this
                     , dest_ip
                     , dest.get<locality>()
-//                    , client
+                    , client
                     , chunk_pool_.get()
                     , parcels_sent_
                 );
@@ -505,7 +513,7 @@ namespace libfabric
         // If there are zero copy chunks to be RDMA GET from the remote end, then
         // we hold onto data until they have completed.
         // --------------------------------------------------------------------
-        void handle_send_completion(uint64_t wr_id)
+        void handle_send_completion(void* wr_id, struct fid_ep* client)
         {
             bool                 found_wr_id = false;
             active_send_iterator current_send;
@@ -539,7 +547,7 @@ namespace libfabric
 #endif
                 else {
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                    handle_tag_send_completion(wr_id);
+                    //handle_tag_send_completion(wr_id);
                     return;
 #else
                     LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
@@ -576,7 +584,7 @@ namespace libfabric
         // If there are zero copy chunks to be RDMA GET'ed from the remote end,
         // then we hold onto data until they have completed.
         // --------------------------------------------------------------------
-        void handle_recv_completion(uint64_t wr_id, libfabric_endpoint* client)
+        void handle_recv_completion(void* wr_id, struct fid_ep* client)
         {
             util::high_resolution_timer timer;
 
@@ -628,7 +636,7 @@ namespace libfabric
                 // all the info about chunks we need is stored inside the header
                 recv_data.chunks.resize(h->num_chunks().first + h->num_chunks().second);
                 size_t chunkbytes =
-                    recv_data.chunks.size() * sizeof(serialization::serialization_chunk);
+                    recv_data.chunks.size() * sizeof(chunk_struct);
                 std::memcpy(recv_data.chunks.data(), chunk_data, chunkbytes);
                 LOG_DEBUG_MSG("Copied chunk data from header : size "
                     << decnumber(chunkbytes));
@@ -638,7 +646,7 @@ namespace libfabric
                     parcel_complete = false;
                     int index = 0;
                     LOG_EXCLUSIVE(
-                    for (const serialization::serialization_chunk &c : recv_data.chunks)
+                    for (const chunk_struct &c : recv_data.chunks)
                     {
                         LOG_DEBUG_MSG("recv : chunk : size " << hexnumber(c.size_)
                                 << " type " << decnumber((uint64_t)c.type_)
@@ -647,7 +655,7 @@ namespace libfabric
                                 << " pos " << hexpointer(c.data_.pos_)
                                 << " index " << decnumber(c.data_.index_));
                     })
-                    for (serialization::serialization_chunk &c : recv_data.chunks) {
+                    for (chunk_struct &c : recv_data.chunks) {
                         if (c.type_ == serialization::chunk_type_pointer) {
                             libfabric_memory_region *get_region =
                                 chunk_pool_->allocate_region(c.size_);
@@ -666,11 +674,11 @@ namespace libfabric
                             {
 #if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                                 ReadCompletionMap.insert(
-                                    std::make_pair((uint64_t)get_region, current_recv));
+                                    std::make_pair(get_region, current_recv));
 #else
                                 scoped_lock lock(ReadCompletionMap_mutex);
                                 ReadCompletionMap.insert(
-                                    std::make_pair((uint64_t)get_region, current_recv));
+                                    std::make_pair(get_region, current_recv));
 #endif
                             }
                             // overwrite the serialization data to account for the
@@ -723,18 +731,18 @@ namespace libfabric
 
 #if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                     ReadCompletionMap.insert(
-                        std::make_pair((uint64_t)get_region, current_recv));
+                        std::make_pair(get_region, current_recv));
 #else
                     scoped_lock lock(ReadCompletionMap_mutex);
                     ReadCompletionMap.insert(
-                        std::make_pair((uint64_t)get_region, current_recv));
+                        std::make_pair(get_region, current_recv));
 #endif
                 }
                 const void *remoteAddr = h->get_message_rdma_addr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
                 recv_data.chunks.push_back(
                     hpx::serialization::create_pointer_chunk(get_region->get_address(),
-                        size, h->get_message_rdma_key()));
+                        size, reinterpret_cast<uint64_t>(h->get_message_rdma_key())));
                 ++total_reads;
 //                client->post_read(get_region, h->get_message_rdma_key(), remoteAddr,
 //                    h->get_message_rdma_size());
@@ -760,9 +768,10 @@ namespace libfabric
         }
 #endif
 
-        void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag,
-            const libfabric_endpoint *client)
+        void handle_tag_recv_completion(void* wr_id, uint32_t tag,
+            const struct fid_ep *client)
         {
+/*
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
             tag = *((uint32_t*) (region->get_address()));
@@ -810,9 +819,10 @@ namespace libfabric
             LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
                     << " total receives " << decnumber(handled_receives)
             );
+*/
         }
 
-        void handle_rdma_get_completion(uint64_t wr_id, libfabric_endpoint *client)
+        void handle_rdma_get_completion(void *wr_id, struct fid_ep *client)
         {
             bool                 found_wr_id;
             active_recv_iterator current_recv;
@@ -861,7 +871,7 @@ namespace libfabric
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
-                client->post_send(tag_region, true, false, 0);
+//                client->post_send(tag_region, true, false, 0);
 #else
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
                     << " has completed : posting zero byte ack to origin");
@@ -913,7 +923,7 @@ namespace libfabric
                 LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
 
                 LOG_EXCLUSIVE(
-                for (serialization::serialization_chunk &c : recv_data.chunks) {
+                for (chunk_struct &c : recv_data.chunks) {
                     LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
                             << " rkey " << decnumber(c.rkey_)
@@ -941,7 +951,7 @@ namespace libfabric
         // or receives finish.
         // --------------------------------------------------------------------
         int handle_libfabric_completion(const struct fi_cq_msg_entry completion,
-            libfabric_endpoint *client)
+                struct fid_ep *client)
         {
 /*
             uint64_t wr_id = completion.wr_id;
@@ -1200,7 +1210,7 @@ namespace libfabric
 
                 // for each zerocopy chunk, we must create a memory region for the data
                 LOG_EXCLUSIVE(
-                    for (serialization::serialization_chunk &c : buffer.chunks_) {
+                    for (chunk_struct &c : buffer.chunks_) {
                     LOG_DEBUG_MSG("write : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
                             << " rkey " << decnumber(c.rkey_)
@@ -1211,7 +1221,7 @@ namespace libfabric
 
                 // for each zerocopy chunk, we must create a memory region for the data
                 int index = 0;
-                for (serialization::serialization_chunk &c : buffer.chunks_) {
+                for (chunk_struct &c : buffer.chunks_) {
                     if (c.type_ == serialization::chunk_type_pointer) {
                         send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
@@ -1278,8 +1288,23 @@ namespace libfabric
 
                 // header region is always sent, message region is usually piggybacked
                 int num_regions = 1;
-                libfabric_memory_region *region_list[2] =
-                    { send_data.header_region, send_data.message_region };
+/*
+                struct iovec {
+                    void  *iov_base;    // Starting address
+                    size_t iov_len;     // Number of bytes to transfer
+                };
+*/
+
+                struct iovec region_list[2] = {
+                    { send_data.header_region->get_address(),
+                        send_data.header_region->get_message_length() },
+                    { send_data.message_region->get_address(),
+                        send_data.message_region->get_message_length() } };
+
+                void *desc[2] = {
+                    send_data.header_region->get_desc(),
+                    send_data.message_region->get_desc() };
+
                 if (h->chunk_data()) {
                     LOG_DEBUG_MSG("Chunk info is piggybacked");
                 }
@@ -1295,21 +1320,21 @@ namespace libfabric
                 else {
                     LOG_DEBUG_MSG("Main message NOT piggybacked ");
                     h->set_message_rdma_size(h->size());
-//                    h->set_message_rdma_key(send_data.message_region->get_local_key());
+                    h->set_message_rdma_key(send_data.message_region->get_desc());
                     h->set_message_rdma_addr(send_data.message_region->get_address());
                     send_data.zero_copy_regions.push_back(send_data.message_region);
                     send_data.has_zero_copy  = true;
-/*
+
                     LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer.data_.size())
-                        << "rkey " << decnumber(send_data.message_region->get_local_key())
+                        << "desc " << hexpointer(send_data.message_region->get_desc())
                         << "pos " << hexpointer(send_data.message_region->get_address()));
-*/
+
                     // do not delete twice, clear the message block pointer as it
                     // is also used in the zero_copy_regions list
                     send_data.message_region = nullptr;
                 }
 
-                uint64_t wr_id = (uint64_t)(send_data.header_region);
+                void *wr_id = send_data.header_region;
                 {
                     // add wr_id's to completion map
                     // put everything into map to be retrieved when send completes
@@ -1336,10 +1361,13 @@ namespace libfabric
                         // put the data into a new map which is indexed by the Tag of
                         // the send - zero copy blocks will be released when we are
                         // told this has completed
-                        TagSendCompletionMap.insert(
-                            std::make_pair(send_data.tag, current_send));
+//                        TagSendCompletionMap.insert(
+//                            std::make_pair(send_data.tag, current_send));
                     }
                 }
+
+                ++sends_posted;
+                send_data.header_region->set_user_data(sender->client_);
 
                 // send the header/main_chunk to the destination,
                 // wr_id is header_region (entry 0 in region_list)
@@ -1352,9 +1380,16 @@ namespace libfabric
                     "Block message_region "
                     << " buffer " << hexpointer(send_data.message_region->get_address())
                     << " region " << hexpointer(send_data.message_region));
+                    int ret = fi_sendv(sender->client_, region_list,
+                        desc, num_regions, fi_addr_t(), send_data.header_region);
+                    if (ret) throw fabric_error(ret, "fi_sendv");
                 }
-                ++sends_posted;
-//                sender->client_->post_send_xN(region_list, num_regions, true, false, 0);
+                else {
+                    int ret = fi_send(sender->client_,
+                        region_list[0].iov_base, region_list[0].iov_len,
+                        desc[0], fi_addr_t(), send_data.header_region);
+                    if (ret) throw fabric_error(ret, "fi_sendv");
+                }
 
                 // log the time spent in performance counter
 //                buffer.data_point_.time_ =
