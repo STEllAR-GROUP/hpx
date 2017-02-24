@@ -28,7 +28,7 @@ namespace libfabric
     namespace detail {
         struct rdma_region {
             std::size_t  size;
-            uint32_t     key;
+            void       * key;
             const void * addr;
         };
 
@@ -156,11 +156,11 @@ namespace libfabric
                 return sizeof(detail::header_block);
         }
 
-        inline void set_message_rdma_key(uint32_t v) {
+        inline void set_message_rdma_key(void* v) {
             message_header.chunk_info.region.key = v;
         }
 
-        inline uint32_t get_message_rdma_key() const {
+        inline void* get_message_rdma_key() const {
             return message_header.chunk_info.region.key;
         }
 
