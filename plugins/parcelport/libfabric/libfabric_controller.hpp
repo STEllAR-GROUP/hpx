@@ -162,7 +162,11 @@ namespace libfabric
             fabric_hints_->caps                   = FI_MSG | FI_RMA;
             fabric_hints_->mode                   = ~0; // FI_CONTEXT | FI_LOCAL_MR;
             fabric_hints_->fabric_attr->prov_name = strdup(provider.c_str());
-            fabric_hints_->domain_attr->name      = strdup(domain.c_str());
+            LOG_DEBUG_MSG("fabric provider " << fabric_hints_->fabric_attr->prov_name);
+            if (domain.size()>0) {
+                fabric_hints_->domain_attr->name  = strdup(domain.c_str());
+                LOG_DEBUG_MSG("fabric domain "   << fabric_hints_->domain_attr->name);
+            }
 
             // use infiniband type basic registration for now
             fabric_hints_->domain_attr->mr_mode   = FI_MR_BASIC;
@@ -183,9 +187,6 @@ namespace libfabric
 
             // no idea why this is here.
             //eq_attr.wait_obj = FI_WAIT_UNSPEC;
-
-            LOG_DEBUG_MSG("fabric provider " << fabric_hints_->fabric_attr->prov_name);
-            LOG_DEBUG_MSG("fabric domain "   << fabric_hints_->domain_attr->name);
 
             uint64_t flags = 0;
             LOG_DEBUG_MSG("Getting info about fabric using passive endpoint");
@@ -209,11 +210,11 @@ namespace libfabric
                 throw fabric_error(ret, "Failed to get fi_passive_ep");
             }
 
-            LOG_DEBUG_MSG("Fetching local address");
             locality::locality_data local_addr;
-            std::size_t addrlen = sizeof(local_addr);
+            std::size_t addrlen = locality::array_size;
+            LOG_DEBUG_MSG("Fetching local address using size " << decnumber(addrlen));
             ret = fi_getname(&ep_passive_->fid, local_addr.data(), &addrlen);
-            if (ret || (addrlen>sizeof(local_addr))) {
+            if (ret || (addrlen>locality::array_size)) {
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
 
@@ -221,11 +222,13 @@ namespace libfabric
             LOG_DEBUG_MSG("Fabric supports immediate data " << immediate_);
 
             LOG_DEBUG_MSG("Name length " << decnumber(addrlen));
-            LOG_DEBUG_MSG("address info is "
-                    << ipaddress(local_addr[0]) << " "
-                    << ipaddress(local_addr[1]) << " "
-                    << ipaddress(local_addr[2]) << " "
-                    << ipaddress(local_addr[3]) << " ");
+            LOG_EXCLUSIVE(
+                std::stringstream temp;
+                for (std::size_t i=0; i<locality::array_length; ++i) {
+                    temp << ipaddress(local_addr[i]);
+                }
+                LOG_DEBUG_MSG("address info is " << temp.str().c_str());
+            );
 
             fi_freeinfo(fabric_hints_);
             return locality(local_addr);
