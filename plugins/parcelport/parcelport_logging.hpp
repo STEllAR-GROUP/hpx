@@ -143,7 +143,7 @@ namespace detail {
 #  define LOG_INFO_MSG(x)
 #  define LOG_WARN_MSG(x)
 #  define LOG_ERROR_MSG(x) std::cout << "00: <ERROR> " << THREAD_ID << " " \
-	<< x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
+    << x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
 #  define LOG_FORMAT_MSG(x) ""
 #  define LOG_EXCLUSIVE(x)
 
@@ -164,6 +164,9 @@ namespace detail {
 #  undef  LOG_DEVEL_MSG
 #  undef  LOG_DEBUG_MSG
 #  undef  LOG_EXCLUSIVE
+#  undef  LOG_TIMED_INIT
+#  undef  LOG_TIMED_MSG
+#  undef  LOG_TIMED_BLOCK
 #  define LOG_EXCLUSIVE(x) x
 #  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace) << "" << THREAD_ID << " " << x;
 #  define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
