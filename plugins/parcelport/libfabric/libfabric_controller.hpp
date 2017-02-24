@@ -16,7 +16,6 @@
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
-#include <plugins/parcelport/libfabric/libfabric_endpoint.hpp>
 //
 #include <plugins/parcelport/unordered_map.hpp>
 //
@@ -87,12 +86,13 @@ namespace libfabric
         struct fi_info    *fabric_info_;
         struct fid_fabric *fabric_;
         struct fid_domain *fabric_domain_;
+        // Server/Listener for RDMA connections.
         struct fid_pep    *ep_passive_;
 
         // we will use just one event queue for all connections
         struct fid_eq     *event_queue_;
-        struct fid_cq *txcq, *rxcq;
-        struct fid_av *av;
+        struct fid_cq     *txcq, *rxcq;
+        struct fid_av     *av;
 
         struct fi_context tx_ctx, rx_ctx;
         uint64_t remote_cq_data;
@@ -102,38 +102,6 @@ namespace libfabric
         struct fi_av_attr av_attr;
         struct fi_eq_attr eq_attr;
         struct fi_cq_attr cq_attr;
-
-
-        void display_fabric_info()
-        {
-            LOG_BOOST_MSG(
-                "Running pingpong test with the %s endpoint through a %s provider", %
-                fi_tostr(&fabric_info_->ep_attr->type , FI_TYPE_EP_TYPE) %
-                fabric_info_->fabric_attr->prov_name);
-            LOG_BOOST_MSG(" * Fabric Attributes:",);
-            LOG_BOOST_MSG("  - %-20s: %s", % "name" % fabric_info_->fabric_attr->name);
-            LOG_BOOST_MSG("  - %-20s: %s", % "prov_name" %
-                 fabric_info_->fabric_attr->prov_name);
-            LOG_BOOST_MSG("  - %-20s: %u", % "prov_version" %
-                 fabric_info_->fabric_attr->prov_version);
-            LOG_BOOST_MSG(" * Domain Attributes:",);
-            LOG_BOOST_MSG("  - %-20s: %s", % "name" % fabric_info_->domain_attr->name);
-            LOG_BOOST_MSG("  - %-20s: %u", % "cq_cnt" % fabric_info_->domain_attr->cq_cnt);
-            LOG_BOOST_MSG("  - %-20s: %u", % "cq_data_size" %
-                 fabric_info_->domain_attr->cq_data_size);
-            LOG_BOOST_MSG("  - %-20s: %u", % "ep_cnt" % fabric_info_->domain_attr->ep_cnt);
-            LOG_BOOST_MSG(" * Endpoint Attributes:",);
-            LOG_BOOST_MSG("  - %-20s: %s", % "type" %
-                 fi_tostr(&fabric_info_->ep_attr->type , FI_TYPE_EP_TYPE));
-            LOG_BOOST_MSG("  - %-20s: %u", % "protocol" %
-                 fabric_info_->ep_attr->protocol);
-            LOG_BOOST_MSG("  - %-20s: %u", % "protocol_version" %
-                 fabric_info_->ep_attr->protocol_version);
-            LOG_BOOST_MSG("  - %-20s: %u", % "max_msg_size" %
-                 fabric_info_->ep_attr->max_msg_size);
-            LOG_BOOST_MSG("  - %-20s: %u", % "max_order_raw_size" %
-                 fabric_info_->ep_attr->max_order_raw_size);
-        }
 
         // --------------------------------------------------------------------
         // constructor gets info from device and sets up all necessary
@@ -230,7 +198,7 @@ namespace libfabric
                 throw fabric_error(ret, "Failed to get fabric info");
             }
 
-            display_fabric_info();
+            LOG_DEBUG_MSG("Fabric info " << fi_tostr(fabric_info_, FI_TYPE_INFO));
 
             LOG_DEBUG_MSG("Creating fabric object");
             ret = fi_fabric(fabric_info_->fabric_attr, &fabric_, NULL);
@@ -317,53 +285,150 @@ namespace libfabric
             this->disconnection_function_ = f;
         }
 
-        void new_endpoint_active(struct fi_info *info, struct fid_ep **new_ep)
+        // --------------------------------------------------------------------
+        void new_endpoint_active(struct fi_info *info, struct fid_ep **new_endpoint)
         {
-            LOG_DEBUG_MSG("Creating new active endpoint");
-            int ret;
-            ret = fi_endpoint(fabric_domain_, info, new_ep, NULL);
-            if (ret) throw fabric_error(ret, "new active fi_endpoint");
+            // create an 'active' endpoint that can be used for sending/receiving
+            LOG_DEBUG_MSG("Creating active endpoint");
+            int ret = fi_endpoint(fabric_domain_, info, new_endpoint, NULL);
+            if (ret) throw fabric_error(ret, "fi_endpoint");
 
-            // Bind the EQ to the endpoint
-            ret = fi_ep_bind(*new_ep, &event_queue_->fid, 0);
-            if (ret) throw fabric_error(ret, "bind new_ep to event_queue_");
+            if (info->ep_attr->type == FI_EP_MSG) {
+                if (event_queue_) {
+                    LOG_DEBUG_MSG("Binding endpoint to EQ");
+                    ret = fi_ep_bind(*new_endpoint, &event_queue_->fid, 0);
+                    if (ret) throw fabric_error(ret, "bind event_queue_");
+                }
+            }
 
-               setup_queues(info);
+            setup_queues(info);
+
+            if (av) {
+                LOG_DEBUG_MSG("Binding endpoint to AV");
+                ret = fi_ep_bind(*new_endpoint, &av->fid, 0);
+                if (ret) throw fabric_error(ret, "bind event_queue_");
+            }
 
             if (txcq) {
                 LOG_DEBUG_MSG("Binding endpoint to TX CQ");
-                ret = fi_ep_bind(*new_ep, &txcq->fid, FI_TRANSMIT);
-                if (ret) throw fabric_error(ret, "bind new_ep to  txcq");
+                ret = fi_ep_bind(*new_endpoint, &txcq->fid, FI_TRANSMIT);
+                if (ret) throw fabric_error(ret, "bind txcq");
             }
 
             if (rxcq) {
                 LOG_DEBUG_MSG("Binding endpoint to RX CQ");
-                ret = fi_ep_bind(*new_ep, &rxcq->fid, FI_RECV);
-                if (ret) throw fabric_error(ret, "bind new_ep to rxcq");
+                ret = fi_ep_bind(*new_endpoint, &rxcq->fid, FI_RECV);
+                if (ret) throw fabric_error(ret, "rxcq");
             }
 
-            ret = fi_enable(*new_ep);
-            if (ret) throw fabric_error(ret, "new_ep fi_enable");
+            LOG_DEBUG_MSG("Enabling active endpoint");
+            ret = fi_enable(*new_endpoint);
+            if (ret) throw fabric_error(ret, "fi_enable");
 
-            // @TODO check for connection race
-            LOG_DEBUG_MSG("Calling fi_accept with ep data "
-                    << decnumber(sizeof(uint32_t)) << ipaddress(here_.ip_address()));
-            ret = fi_accept(*new_ep, &here_.ip_address(), sizeof(uint32_t));
-            if (ret) throw fabric_error(ret, "new_ep fi_accept failed");
+            // prepost a receive to the new endpoint
+            auto region = memory_pool_->allocate_region(0);
+            void *desc = region->get_desc();
+            LOG_DEBUG_MSG("Preposting recv memory descriptor " << hexpointer(desc));
+
+            ret = fi_recv(*new_endpoint, region->get_address(), region->get_size(), desc, 0, region);
+            if (ret!=0) {
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("We must repost");
+                } else {
+                    throw fabric_error(ret, "pp_post_rx");
+                }
+            }
         }
+
         // --------------------------------------------------------------------
         // This is the main polling function that checks for work completions
         // and connection manager events, if stopped is true, then completions
         // are thrown away, otherwise the completion callback is triggered
-        int poll_endpoints(bool stopped=false) {
+        int poll_endpoints(bool stopped=false)
+        {
+            poll_for_work_completions(stopped);
+            poll_event_queue(stopped);
 
+            return 0;
+        }
+
+        // --------------------------------------------------------------------
+        int poll_for_work_completions(bool stopped=false)
+        {
+            // @TODO, disable polling until queues are initialized to avoid this check
+            // if queues are not setup, don't poll
+            if (HPX_UNLIKELY(!this->rxcq)) return 0;
+
+            LOG_TIMED_INIT(poll);
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
+                {
+                    LOG_DEVEL_MSG("Polling work completion channel");
+                }
+            )
+/*
+struct fi_cq_msg_entry {
+    void     *op_context; // operation context
+    uint64_t flags;       // completion flags
+    size_t   len;         // size of received data
+};
+*/
+            std::array<char, 256> buffer;
+
+            int ret = fi_cq_read(this->txcq, buffer.data(), 1);
+            if (ret>0) {
+                struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
+                LOG_DEBUG_MSG("Completion wr_id "
+                    << fi_tostr(&entry->flags, FI_TYPE_OP_FLAGS) << " "
+                    << hexpointer(entry->op_context));
+                send_completion_function_(entry->op_context, nullptr);
+                return 1;
+            }
+            else if (ret==0 || ret==-EAGAIN) {
+                // do nothing, we will try again on the next check
+                LOG_TIMED_MSG(poll, DEVEL, 5, "txcq EAGAIN");
+            }
+            else if (ret<0) {
+                throw fabric_error(ret, "completion read");
+            }
+
+            ret = fi_cq_read(this->rxcq, buffer.data(), 1);
+            if (ret>0) {
+                struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
+                LOG_DEBUG_MSG("Completion wr_id "
+                    << fi_tostr(&entry->flags, FI_TYPE_OP_FLAGS) << " "
+                    << hexpointer(entry->op_context));
+                void *client = reinterpret_cast<libfabric_memory_region*>
+                    (entry->op_context)->get_user_data();
+                recv_completion_function_(entry->op_context,
+                    reinterpret_cast<struct fid_ep *>(client));
+                return 1;
+            }
+            else if (ret==0 || ret==-EAGAIN) {
+                // do nothing, we will try again on the next check
+                LOG_TIMED_MSG(poll, DEVEL, 5, "rxcq EAGAIN");
+            }
+            else if (ret<0) {
+                throw fabric_error(ret, "completion read");
+            }
+
+            return 0;
+        }
+
+        // --------------------------------------------------------------------
+        int poll_event_queue(bool stopped=false)
+        {
+            LOG_TIMED_INIT(poll);
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
+                {
+                    LOG_DEVEL_MSG("Polling event completion channel");
+                }
+            )
             struct fi_eq_cm_entry *cm_entry;
             struct fi_eq_entry    *entry;
             struct fid_ep         *new_ep;
             uint32_t *addr;
             uint32_t event;
             std::array<char, 256> buffer;
-            LOG_TIMED_INIT(poll)
             ssize_t rd = fi_eq_read(event_queue_, &event, buffer.data(), sizeof(buffer), 0);
             if (rd > 0) {
                 LOG_DEBUG_MSG("fi_eq_cm_entry " << decnumber(sizeof(fi_eq_cm_entry)) << " fi_eq_entry " << decnumber(sizeof(fi_eq_entry)));
@@ -382,6 +447,12 @@ namespace libfabric
                         }
                         // create a new endpoint for this request
                         new_endpoint_active(cm_entry->info, &new_ep);
+
+                        // @TODO check for connection race
+                        LOG_DEBUG_MSG("Calling fi_accept with ep data "
+                                << decnumber(sizeof(uint32_t)) << ipaddress(here_.ip_address()));
+                        int ret = fi_accept(new_ep, &here_.ip_address(), sizeof(uint32_t));
+                        if (ret) throw fabric_error(ret, "new_ep fi_accept failed");
 
                         // @TODO : support reject of connection request
                         hpx::shared_future<struct fid_ep*> result =
@@ -439,41 +510,36 @@ namespace libfabric
                 //                   HPX_ASSERT(cm_entry->fid == event_queue_->fid);
             }
             else {
-                LOG_TIMED_MSG(poll, debug, 5, "We did not get an event")
+                LOG_TIMED_MSG(poll, DEVEL, 5, "We did not get an event completion")
             }
             return 0;
         }
 
-        int poll_for_work_completions(bool stopped=false) { return 0; }
-/*
-        inline libfabric_completion_queue *get_completion_queue() const {
-            return completion_queue_.get();
-        }
-
-        inline libfabric_endpoint *get_client_from_completion(struct fi_cq_msg_entry &completion)
-        {
-            return qp_endpoint_map_.at(completion.qp_num).get();
-        }
-*/
+        // --------------------------------------------------------------------
         inline struct fid_domain * get_domain() {
             return this->fabric_domain_;
         }
 
-//        libfabric_endpoint* get_endpoint(uint32_t remote_ip) {
-//           return (std::get<0>(connections_started_.find(remote_ip)->second)).get();
-//        }
-
+        // --------------------------------------------------------------------
         inline rdma_memory_pool_ptr get_memory_pool() {
             return memory_pool_;
         }
 
-        typedef std::function<int(struct fi_cq_msg_entry completion, libfabric_endpoint *client)>
+        // --------------------------------------------------------------------
+        typedef std::function<void(void* region, struct fid_ep *client)>
             CompletionFunction;
 
-        void setCompletionFunction(CompletionFunction f) {
-            this->completion_function_ = f;
+        void setSendCompletionFunction(CompletionFunction f) {
+            this->send_completion_function_ = f;
+        }
+        void setRecvCompletionFunction(CompletionFunction f) {
+            this->recv_completion_function_ = f;
+        }
+        void setRDMACompletionFunction(CompletionFunction f) {
+            this->rdma_completion_function_ = f;
         }
 
+        // --------------------------------------------------------------------
         void refill_client_receives(bool force=true) {}
 
         // --------------------------------------------------------------------
@@ -488,7 +554,8 @@ namespace libfabric
             int ret;
             // @TODO - why do we check this
             if (cq_attr.format == FI_CQ_FORMAT_UNSPEC) {
-                cq_attr.format = FI_CQ_FORMAT_CONTEXT;
+                LOG_DEBUG_MSG("Setting CQ attribute to FI_CQ_FORMAT_MSG");
+                cq_attr.format = FI_CQ_FORMAT_MSG;
             }
 
             // open a completion queue on our fabric domain and set context ptr to tx queue
@@ -515,6 +582,7 @@ namespace libfabric
 
         }
 
+        // --------------------------------------------------------------------
         hpx::shared_future<struct fid_ep*> insert_new_future(
             uint32_t remote_ip, struct fid_ep *new_endpoint)
         {
@@ -567,7 +635,7 @@ namespace libfabric
             struct fi_info *fabric_info_active_;
 
             int ret = fi_getinfo(FI_VERSION(1,4), addr_str, port_str.c_str(),
-                flags, fabric_hints_, &fabric_info_active_);
+                flags, fabric_info_, &fabric_info_active_);
 
             setup_queues(fabric_info_active_);
 
@@ -578,57 +646,10 @@ namespace libfabric
             }
 
             fid_ep *new_endpoint;
-            // create an 'active' endpoint that can be used for sending/receiving
-            LOG_DEBUG_MSG("Creating active endpoint");
-            ret = fi_endpoint(fabric_domain_, the_info, &new_endpoint, NULL);
-            if (ret) throw fabric_error(ret, "fi_endpoint");
-
-            if (the_info->ep_attr->type == FI_EP_MSG) {
-                if (event_queue_) {
-                    LOG_DEBUG_MSG("Binding endpoint to EQ");
-                    ret = fi_ep_bind(new_endpoint, &event_queue_->fid, 0);
-                    if (ret) throw fabric_error(ret, "bind event_queue_");
-                }
-            }
-
-            if (av) {
-                LOG_DEBUG_MSG("Binding endpoint to AV");
-                ret = fi_ep_bind(new_endpoint, &av->fid, 0);
-                if (ret) throw fabric_error(ret, "bind event_queue_");
-            }
-
-            if (txcq) {
-                LOG_DEBUG_MSG("Binding endpoint to TX CQ");
-                ret = fi_ep_bind(new_endpoint, &txcq->fid, FI_TRANSMIT);
-                if (ret) throw fabric_error(ret, "bind txcq");
-            }
-
-            if (rxcq) {
-                LOG_DEBUG_MSG("Binding endpoint to RX CQ");
-                ret = fi_ep_bind(new_endpoint, &rxcq->fid, FI_RECV);
-                if (ret) throw fabric_error(ret, "rxcq");
-            }
-
-            LOG_DEBUG_MSG("Enabling active endpoint");
-            ret = fi_enable(new_endpoint);
-            if (ret) throw fabric_error(ret, "fi_enable");
+            new_endpoint_active(the_info, &new_endpoint);
 
             LOG_DEBUG_MSG("Deleting new endpoint info structure");
             fi_freeinfo(fabric_info_active_);
-
-            // prepost a receive to the new endpoint
-            auto region = memory_pool_->allocate_region(0);
-            void *desc = region->get_desc();
-            LOG_DEBUG_MSG("Preposting recv memory descriptor " << hexpointer(desc));
-
-            ret = fi_recv(new_endpoint, region->get_address(), region->get_size(), desc, 0, NULL);
-            if (ret!=0) {
-                if (ret == -FI_EAGAIN) {
-                    LOG_ERROR_MSG("We must repost");
-                } else {
-                    throw fabric_error(ret, "pp_post_rx");
-                }
-            }
 
             // create a future for this connection, do this before calling fi_connect
             // to ensure a connection completion does not arrive before we are ready
@@ -643,24 +664,13 @@ namespace libfabric
             return result;
         }
 
-        void disconnect_from_server(libfabric_endpoint_ptr client) {}
+//        void disconnect_from_server(struct fid_ep *client) {}
 
         void disconnect_all() {}
 
         bool active() { return false; }
 
     private:
-        void debug_connections() {}
-
-        int handle_event(struct rdma_cm_event *cm_event, libfabric_endpoint *client) { return 0; }
-
-        int handle_connect_request(
-            struct fi_eq_cm_entry *cm_event) {
-            return 0;
-        }
-
-        int start_server_connection(uint32_t remote_ip) { return 0; }
-
         // store info about local device
         std::string           device_;
         std::string           interface_;
@@ -671,16 +681,16 @@ namespace libfabric
         DisconnectionFunction disconnection_function_;
 
         // callback function for handling a completion event
-        CompletionFunction    completion_function_;
+        CompletionFunction    send_completion_function_;
+        CompletionFunction    recv_completion_function_;
+        CompletionFunction    rdma_completion_function_;
 
         // Pinned memory pool used for allocating buffers
-        rdma_memory_pool_ptr        memory_pool_;
-        // Server/Listener for RDMA connections.
-        libfabric_endpoint_ptr          server_endpoint_;
+        rdma_memory_pool_ptr  memory_pool_;
+
         // Shared completion queue for all endoints
-//        libfabric_completion_queue_ptr  completion_queue_;
         // Count outstanding receives posted to SRQ + Completion queue
-        std::atomic<uint16_t>       preposted_receives_;
+        std::atomic<uint16_t> preposted_receives_;
 
         // only allow one thread to handle connect/disconnect events etc
         mutex_type            initialization_mutex_;

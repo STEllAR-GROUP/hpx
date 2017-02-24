@@ -60,12 +60,12 @@ namespace libfabric
             if (ret) {
                 LOG_ERROR_MSG(
                     "error registering fi_mr_reg "
-                	<< hexpointer(buffer) << hexlength(length));
-            	throw fabric_error(ret, "error in fi_mr_reg");
+                    << hexpointer(buffer) << hexlength(length));
+                throw fabric_error(ret, "error in fi_mr_reg");
             }
             else {
                 LOG_DEBUG_MSG(
-    	            "OK registering fi_mr_reg "
+                    "OK registering fi_mr_reg "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
                     << "length " << hexlength(size_));
@@ -97,15 +97,15 @@ namespace libfabric
             if (ret) {
                 LOG_ERROR_MSG(
                     "error registering fi_mr_reg "
-                	<< hexpointer(buffer) << hexlength(length));
-            	throw fabric_error(ret, "error in fi_mr_reg");
+                    << hexpointer(buffer) << hexlength(length));
+                throw fabric_error(ret, "error in fi_mr_reg");
             }
             else {
-				LOG_DEBUG_MSG(
-	                "OK registering fi_mr_reg "
-                	<< hexpointer(buffer) << hexpointer(address_)
-                	<< "desc " << hexpointer(fi_mr_desc(region_))
-                	<< "length " << hexlength(size_));
+                LOG_DEBUG_MSG(
+                    "OK registering fi_mr_reg "
+                    << hexpointer(buffer) << hexpointer(address_)
+                    << "desc " << hexpointer(fi_mr_desc(region_))
+                    << "length " << hexlength(size_));
             }
 
             LOG_DEBUG_MSG("allocated/registered memory region " << hexpointer(this)
@@ -128,8 +128,8 @@ namespace libfabric
         // returns 0 when successful, -1 otherwise
         int release(void)
         {
-        	LOG_TRACE_MSG("About to release memory region with desc "
-	            << hexpointer(get_desc()));
+            LOG_TRACE_MSG("About to release memory region with desc "
+                << hexpointer(get_desc()));
             if (region_ != nullptr) {
                 // get these before deleting/unregistering (for logging)
                 const void *buffer = get_base_address();
@@ -137,17 +137,17 @@ namespace libfabric
                     uint32_t length = get_size();
                 );
                 //
-				if (fi_close(&region_->fid))
-				{
-					LOG_ERROR_MSG("Error, fi_close mr failed\n");
-					return -1;
-				}
-				else {
-					LOG_DEBUG_MSG("deregistered memory region with desc "
-						<< hexpointer(get_desc())
-						<< "at address " << hexpointer(buffer)
-						<< "with length " << hexlength(length));
-				}
+                if (fi_close(&region_->fid))
+                {
+                    LOG_ERROR_MSG("Error, fi_close mr failed\n");
+                    return -1;
+                }
+                else {
+                    LOG_DEBUG_MSG("deregistered memory region with desc "
+                        << hexpointer(get_desc())
+                        << "at address " << hexpointer(buffer)
+                        << "with length " << hexlength(length));
+                }
                 if (!get_user_region()) {
                     delete [](static_cast<const char*>(buffer));
                 }
@@ -221,6 +221,7 @@ namespace libfabric
         inline void set_user_region() {
             flags_ |= BLOCK_USER;
         }
+
         inline bool get_user_region() const {
             return (flags_ & BLOCK_USER) == BLOCK_USER;
         }
@@ -231,6 +232,7 @@ namespace libfabric
         inline void set_temp_region() {
             flags_ |= BLOCK_TEMP;
         }
+
         inline bool get_temp_region() const {
             return (flags_ & BLOCK_TEMP) == BLOCK_TEMP;
         }
@@ -242,8 +244,19 @@ namespace libfabric
         inline void set_partial_region() {
             flags_ |= BLOCK_PARTIAL;
         }
+
         inline bool get_partial_region() const {
             return (flags_ & BLOCK_PARTIAL) == BLOCK_PARTIAL;
+        }
+
+        // --------------------------------------------------------------------
+        // space for user data to be stored
+        inline void set_user_data(void *ud) {
+            user_data_ = ud;;
+        }
+
+        inline void *get_user_data() const {
+            return user_data_;
         }
 
     private:
@@ -268,6 +281,9 @@ namespace libfabric
 
         // space used by a message in the memory region.
         uint64_t used_space_;
+
+        // user data
+        void *user_data_;
     };
 
     // Smart pointer for libfabric_memory_region object.
