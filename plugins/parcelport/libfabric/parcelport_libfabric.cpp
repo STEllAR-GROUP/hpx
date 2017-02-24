@@ -35,17 +35,11 @@
 // when we have maxed out the number of sends we can handle
 #define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
 
-// --------------------------------------------------------------------
-// When defined, we use a reader/writer lock on maps to squeeze a tiny performance
-// improvement from our code.
-#define HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS true
 
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
-
-#define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
 #include <plugins/parcelport/unordered_map.hpp>
@@ -220,21 +214,12 @@ namespace libfabric
         typedef std::list<parcel_recv_data>      active_recv_list_type;
         typedef active_recv_list_type::iterator  active_recv_iterator;
 
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
         // map send/recv parcel wr_id to all info needed on completion
         typedef hpx::concurrent::unordered_map<void*, active_send_iterator>
             send_wr_map;
         typedef hpx::concurrent::unordered_map<void*, active_recv_iterator>
             recv_wr_map;
-#else
-        mutex_type  ReadCompletionMap_mutex;
-        mutex_type  SendCompletionMap_mutex;
-        mutex_type  TagSendCompletionMap_mutex;
 
-        // map send/recv parcel wr_id to all info needed on completion
-        typedef std::unordered_map<void*, active_send_iterator> send_wr_map;
-        typedef std::unordered_map<void*, active_recv_iterator> recv_wr_map;
-#endif
         // store received objects using a map referenced by libfabric work request ID
         send_wr_map SendCompletionMap;
         send_wr_map TagSendCompletionMap;
@@ -523,7 +508,6 @@ namespace libfabric
                 // zero copy GETs might complete and another thread might receive
                 // a zero copy complete message then delete the current send data
                 // whilst we are still waiting
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                 auto is_present = SendCompletionMap.is_in_map(wr_id);
                 if (is_present.second) {
                     found_wr_id = true;
@@ -533,27 +517,16 @@ namespace libfabric
                         << "from SendCompletionMap : size before erase "
                         << SendCompletionMap.size());
                 }
-#else
-                unique_lock lock(SendCompletionMap_mutex);
-                auto it = SendCompletionMap.find(wr_id);
-                if (it!=SendCompletionMap.end()) {
-                    found_wr_id = true;
-                    current_send = it->second;
-                    SendCompletionMap.erase(it);
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
-                        << "from SendCompletionMap : size before erase "
-                        << SendCompletionMap.size());
-                }
-#endif
                 else {
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                    //handle_tag_send_completion(wr_id);
-                    return;
-#else
-                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
-                        << hexpointer(wr_id));
-                    std::terminate();
-#endif
+                    if (libfabric_controller_->immedate_data_supported()) {
+                        LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
+                            << hexpointer(wr_id));
+                        std::terminate();
+                    }
+                    else {
+                        //handle_tag_send_completion(wr_id);
+                        return;
+                    }
                 }
             }
             if (found_wr_id) {
@@ -672,14 +645,8 @@ namespace libfabric
                             // put region into map before posting read in case it
                             // completes whilst this thread is suspended
                             {
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                                 ReadCompletionMap.insert(
                                     std::make_pair(get_region, current_recv));
-#else
-                                scoped_lock lock(ReadCompletionMap_mutex);
-                                ReadCompletionMap.insert(
-                                    std::make_pair(get_region, current_recv));
-#endif
                             }
                             // overwrite the serialization data to account for the
                             // local pointers instead of remote ones
@@ -728,15 +695,8 @@ namespace libfabric
                 // put region into map before posting read in case it completes
                 // whilst this thread is suspended during map insertion
                 {
-
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                     ReadCompletionMap.insert(
                         std::make_pair(get_region, current_recv));
-#else
-                    scoped_lock lock(ReadCompletionMap_mutex);
-                    ReadCompletionMap.insert(
-                        std::make_pair(get_region, current_recv));
-#endif
                 }
                 const void *remoteAddr = h->get_message_rdma_addr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
@@ -756,7 +716,8 @@ namespace libfabric
             //  data.time_ = timer.elapsed_nanoseconds() - data.time_;
         }
 
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+        // if immediate data is not supported, we need this function
+        // otherwise it is unnecessary
         void handle_tag_send_completion(uint64_t wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
@@ -766,7 +727,6 @@ namespace libfabric
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
                 << hexuint32(tag));
         }
-#endif
 
         void handle_tag_recv_completion(void* wr_id, uint32_t tag,
             const struct fid_ep *client)
@@ -827,7 +787,6 @@ namespace libfabric
             bool                 found_wr_id;
             active_recv_iterator current_recv;
             {
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
                 auto is_present = ReadCompletionMap.is_in_map(wr_id);
                 if (is_present.second) {
                     found_wr_id = true;
@@ -837,18 +796,6 @@ namespace libfabric
                         << ReadCompletionMap.size());
                     ReadCompletionMap.erase(is_present.first);
                 }
-#else
-                scoped_lock lock(ReadCompletionMap_mutex);
-                auto it = ReadCompletionMap.find(wr_id);
-                if (it!=ReadCompletionMap.end()) {
-                    found_wr_id = true;
-                    current_recv = it->second;
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
-                        << "from ReadCompletionMap : size before erase "
-                        << ReadCompletionMap.size());
-                    ReadCompletionMap.erase(it);
-                }
-#endif
                 else {
                     LOG_ERROR_MSG("Fatal error as wr_id is not in completion map");
                     std::terminate();
@@ -863,24 +810,25 @@ namespace libfabric
                     return;
                 }
                 //
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting 4 byte ack to origin");
-                // allocate space for a single uint32_t
-                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
-                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
-                *tag_memory = recv_data.tag;
-                tag_region->set_message_length(4);
-//                client->post_send(tag_region, true, false, 0);
-#else
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting zero byte ack to origin");
-                // convert uint32 to uint64 so we can use it as a fake message region
-                // (wr_id only for 0 byte send)
-                uint64_t fake_region = recv_data.tag;
-//                client->post_send_x0((libfabric_memory_region*)fake_region,
-//                    false, true, recv_data.tag);
-#endif
+                if (libfabric_controller_->immedate_data_supported()) {
+                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                        << " has completed : posting zero byte ack to origin");
+                    // convert uint32 to uint64 so we can use it as a fake message region
+                    // (wr_id only for 0 byte send)
+                    uint64_t fake_region = recv_data.tag;
+    //                client->post_send_x0((libfabric_memory_region*)fake_region,
+    //                    false, true, recv_data.tag);
+                }
+                else {
+                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                        << " has completed : posting 4 byte ack to origin");
+                    // allocate space for a single uint32_t
+                    libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
+                    uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
+                    *tag_memory = recv_data.tag;
+                    tag_region->set_message_length(4);
+    //                client->post_send(tag_region, true, false, 0);
+                }
                 //
                 LOG_DEBUG_MSG("Zero copy regions size is (completion) "
                     << decnumber(recv_data.zero_copy_regions.size()));
@@ -1338,10 +1286,6 @@ namespace libfabric
                 {
                     // add wr_id's to completion map
                     // put everything into map to be retrieved when send completes
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
-#else
-                    scoped_lock lock(SendCompletionMap_mutex);
-#endif
                     SendCompletionMap.insert(std::make_pair(wr_id, current_send));
                     LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
                             << hexpointer(wr_id) << " Entries "
@@ -1354,10 +1298,6 @@ namespace libfabric
                     // we must hold onto the regions until the destination tells us
                     // it has completed all rdma Get operations
                     if (send_data.has_zero_copy) {
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
-#else
-                        scoped_lock lock(TagSendCompletionMap_mutex);
-#endif
                         // put the data into a new map which is indexed by the Tag of
                         // the send - zero copy blocks will be released when we are
                         // told this has completed

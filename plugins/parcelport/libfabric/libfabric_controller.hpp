@@ -77,12 +77,8 @@ namespace libfabric
         // Map of connections started, needed until connection is completed
         hpx::concurrent::unordered_map<uint32_t, promise_tuple_type> endpoint_tmp_;
 
-//        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_map_;
-//        hpx::concurrent::unordered_map<uint32_t, struct fid_ep *> endpoint_tmp_;
-
         locality here_;
 
-        struct fi_info    *fabric_hints_;
         struct fi_info    *fabric_info_;
         struct fid_fabric *fabric_;
         struct fid_domain *fabric_domain_;
@@ -103,6 +99,8 @@ namespace libfabric
         struct fi_eq_attr eq_attr;
         struct fi_cq_attr cq_attr;
 
+        bool immediate_;
+
         // --------------------------------------------------------------------
         // constructor gets info from device and sets up all necessary
         // maps, queues and server endpoint etc
@@ -112,12 +110,11 @@ namespace libfabric
             std::string endpoint, int port)
         {
             FUNC_START_DEBUG_MSG;
-            fabric_hints_ = nullptr;
-            fabric_info_  = nullptr;
-            fabric_       = nullptr;
-            ep_passive_   = nullptr;
-            event_queue_        = nullptr;
-            fabric_domain_      = nullptr;
+            fabric_info_   = nullptr;
+            fabric_        = nullptr;
+            ep_passive_    = nullptr;
+            event_queue_   = nullptr;
+            fabric_domain_ = nullptr;
             //
             txcq = nullptr;
             rxcq = nullptr;
@@ -135,6 +132,8 @@ namespace libfabric
             eq_attr = {};
             cq_attr = {};
             //
+            immediate_ = false;
+            //
             here_ = open_fabric(provider, domain, endpoint);
 
             FUNC_END_DEBUG_MSG;
@@ -149,15 +148,13 @@ namespace libfabric
             fi_close(&fabric_domain_->fid);
             // clean up
             fi_freeinfo(fabric_info_);
-            fi_freeinfo(fabric_hints_);
         }
 
         // --------------------------------------------------------------------
         locality open_fabric(
             std::string provider, std::string domain, std::string endpoint_type)
         {
-            fabric_info_  = nullptr;
-            fabric_hints_ = fi_allocinfo();
+            struct fi_info *fabric_hints_ = fi_allocinfo();
             if (!fabric_hints_) {
                 throw fabric_error(-1, "Failed to allocate fabric hints");
             }
@@ -220,17 +217,24 @@ namespace libfabric
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
 
+            immediate_ = (fabric_info_->rx_attr->mode & FI_RX_CQ_DATA)!=0;
+            LOG_DEBUG_MSG("Fabric supports immediate data " << immediate_);
+
             LOG_DEBUG_MSG("Name length " << decnumber(addrlen));
             LOG_DEBUG_MSG("address info is "
                     << ipaddress(local_addr[0]) << " "
                     << ipaddress(local_addr[1]) << " "
                     << ipaddress(local_addr[2]) << " "
                     << ipaddress(local_addr[3]) << " ");
+
+            fi_freeinfo(fabric_hints_);
             return locality(local_addr);
         }
 
         // --------------------------------------------------------------------
-        const locality & here() { return here_; }
+        const locality & here() const { return here_; }
+
+        const bool & immedate_data_supported() const { return immediate_; }
 
         // --------------------------------------------------------------------
         // initiate a listener for connections
