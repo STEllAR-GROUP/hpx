@@ -41,6 +41,8 @@
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
+#define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
+
 // --------------------------------------------------------------------
 #include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
@@ -319,12 +321,12 @@ namespace libfabric
             LOG_DEBUG_MSG("Setting Completion functions");
             auto send_completion_function = std::bind(
                 &parcelport::handle_send_completion, this,
-                std::placeholders::_1, std::placeholders::_2);
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             libfabric_controller_->setSendCompletionFunction(send_completion_function);
 
             auto recv_completion_function = std::bind(
                 &parcelport::handle_recv_completion, this,
-                std::placeholders::_1, std::placeholders::_2);
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             libfabric_controller_->setRecvCompletionFunction(recv_completion_function);
 
             return true;
@@ -494,7 +496,7 @@ namespace libfabric
         // If there are zero copy chunks to be RDMA GET from the remote end, then
         // we hold onto data until they have completed.
         // --------------------------------------------------------------------
-        void handle_send_completion(void* wr_id, struct fid_ep* client)
+        void handle_send_completion(void* wr_id, struct fid_ep* client, uint32_t)
         {
             bool                 found_wr_id = false;
             active_send_iterator current_send;
@@ -514,15 +516,14 @@ namespace libfabric
                         << SendCompletionMap.size());
                 }
                 else {
-                    if (libfabric_controller_->immedate_data_supported()) {
-                        LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
-                            << hexpointer(wr_id));
-                        std::terminate();
-                    }
-                    else {
-                        //handle_tag_send_completion(wr_id);
-                        return;
-                    }
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+                    handle_tag_send_completion(wr_id);
+                    return;
+#else
+                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
+                        << hexpointer(wr_id));
+                    std::terminate();
+#endif
                 }
             }
             if (found_wr_id) {
@@ -553,9 +554,15 @@ namespace libfabric
         // If there are zero copy chunks to be RDMA GET'ed from the remote end,
         // then we hold onto data until they have completed.
         // --------------------------------------------------------------------
-        void handle_recv_completion(void* wr_id, struct fid_ep* client)
+        void handle_recv_completion(void* wr_id, struct fid_ep* client, uint32_t len)
         {
             util::high_resolution_timer timer;
+
+            if (len<=4) {
+                int imm_data = 0; // @TODO fix this
+                handle_tag_recv_completion(wr_id, imm_data, client);
+                return;
+            }
 
             // store details about this parcel so that all memory buffers can be kept
             // until all recv operations have completed.
@@ -712,9 +719,8 @@ namespace libfabric
             //  data.time_ = timer.elapsed_nanoseconds() - data.time_;
         }
 
-        // if immediate data is not supported, we need this function
-        // otherwise it is unnecessary
-        void handle_tag_send_completion(uint64_t wr_id)
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+        void handle_tag_send_completion(void *wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
@@ -723,11 +729,12 @@ namespace libfabric
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
                 << hexuint32(tag));
         }
+#endif
 
         void handle_tag_recv_completion(void* wr_id, uint32_t tag,
             const struct fid_ep *client)
         {
-/*
+
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
             tag = *((uint32_t*) (region->get_address()));
@@ -742,20 +749,11 @@ namespace libfabric
             // now release any zero copy regions we were holding until parcel complete
             active_send_iterator current_send;
             {
-#if HPX_PARCELPORT_LIBFABRIC_USE_CONCURRENT_MAPS
-                auto is_present = TagSendCompletionMap.is_in_map(tag);
+                auto is_present = TagSendCompletionMap.is_in_map((void*)(tag));
                 if (is_present.second) {
                     current_send = is_present.first->second;
                     TagSendCompletionMap.erase(is_present.first);
                 }
-#else
-                scoped_lock lock(TagSendCompletionMap_mutex);
-                send_wr_map::iterator it = TagSendCompletionMap.find(tag);
-                if (it!=TagSendCompletionMap.end()) {
-                    current_send = it->second;
-                    TagSendCompletionMap.erase(it);
-                }
-#endif
                 else {
                     LOG_ERROR_MSG("Tag not present in Send map, FATAL");
                     std::terminate();
@@ -775,7 +773,6 @@ namespace libfabric
             LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
                     << " total receives " << decnumber(handled_receives)
             );
-*/
         }
 
         void handle_rdma_get_completion(void *wr_id, struct fid_ep *client)
@@ -806,25 +803,27 @@ namespace libfabric
                     return;
                 }
                 //
-                if (libfabric_controller_->immedate_data_supported()) {
-                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                        << " has completed : posting zero byte ack to origin");
-                    // convert uint32 to uint64 so we can use it as a fake message region
-                    // (wr_id only for 0 byte send)
-                    uint64_t fake_region = recv_data.tag;
-    //                client->post_send_x0((libfabric_memory_region*)fake_region,
-    //                    false, true, recv_data.tag);
-                }
-                else {
-                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                        << " has completed : posting 4 byte ack to origin");
-                    // allocate space for a single uint32_t
-                    libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
-                    uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
-                    *tag_memory = recv_data.tag;
-                    tag_region->set_message_length(4);
-    //                client->post_send(tag_region, true, false, 0);
-                }
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting 4 byte ack to origin");
+                // allocate space for a single uint32_t
+                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
+                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
+                *tag_memory = recv_data.tag;
+                tag_region->set_message_length(4);
+
+                int ret = fi_send(client,
+                    tag_region->get_address(), 4,
+                    tag_region->get_desc(), fi_addr_t(), tag_region);
+#else
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting zero byte ack to origin");
+                // convert uint32 to uint64 so we can use it as a fake message region
+                // (wr_id only for 0 byte send)
+                uint64_t fake_region = recv_data.tag;
+//                client->post_send_x0((libfabric_memory_region*)fake_region,
+//                    false, true, recv_data.tag);
+#endif
                 //
                 LOG_DEBUG_MSG("Zero copy regions size is (completion) "
                     << decnumber(recv_data.zero_copy_regions.size()));

@@ -379,15 +379,16 @@ struct fi_cq_msg_entry {
     size_t   len;         // size of received data
 };
 */
-            std::array<char, 256> buffer;
+            //std::array<char, 256> buffer;
+            fi_cq_msg_entry entry;
 
-            int ret = fi_cq_read(this->txcq, buffer.data(), 1);
+            int ret = fi_cq_read(this->txcq, &entry, 1);
             if (ret>0) {
-                struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
+                //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
-                    << fi_tostr(&entry->flags, FI_TYPE_OP_FLAGS) << " "
-                    << hexpointer(entry->op_context));
-                send_completion_function_(entry->op_context, nullptr);
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " "
+                    << hexpointer(entry.op_context) << "length " << hexuint32(entry.len));
+                send_completion_function_(entry.op_context, nullptr, entry.len);
                 return 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
@@ -398,16 +399,16 @@ struct fi_cq_msg_entry {
                 throw fabric_error(ret, "completion read");
             }
 
-            ret = fi_cq_read(this->rxcq, buffer.data(), 1);
+            ret = fi_cq_read(this->rxcq, &entry, 1);
             if (ret>0) {
-                struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
+                //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
-                    << fi_tostr(&entry->flags, FI_TYPE_OP_FLAGS) << " "
-                    << hexpointer(entry->op_context));
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " "
+                    << hexpointer(entry.op_context));
                 void *client = reinterpret_cast<libfabric_memory_region*>
-                    (entry->op_context)->get_user_data();
-                recv_completion_function_(entry->op_context,
-                    reinterpret_cast<struct fid_ep *>(client));
+                    (entry.op_context)->get_user_data();
+                recv_completion_function_(entry.op_context,
+                    reinterpret_cast<struct fid_ep *>(client), entry.len);
                 return 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
@@ -533,7 +534,7 @@ struct fi_cq_msg_entry {
         }
 
         // --------------------------------------------------------------------
-        typedef std::function<void(void* region, struct fid_ep *client)>
+        typedef std::function<void(void* region, struct fid_ep *client, uint32_t len)>
             CompletionFunction;
 
         void setSendCompletionFunction(CompletionFunction f) {
