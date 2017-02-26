@@ -36,6 +36,7 @@
 #include <rdma/fi_endpoint.h>
 #include <rdma/fi_eq.h>
 #include <rdma/fi_errno.h>
+#include <rdma/fi_rma.h>
 #include "fabric_error.hpp"
 
 // @TODO : Remove the client map pair as we have a copy in the libfabric_parcelport class
