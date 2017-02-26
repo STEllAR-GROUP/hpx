@@ -637,11 +637,11 @@ namespace libfabric
                                 chunk_pool_->allocate_region(c.size_);
 
                             LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
-                                    << " rkey " << decnumber(c.rkey_)
-                                    << " size " << hexnumber(c.size_)
-                                    << " tag " << hexuint32(recv_data.tag)
-                                    << " local address " << get_region->get_address()
-                                    << " length " << c.size_);
+                                << " rkey " << hexnumber(c.rkey_)
+                                << " size " << hexnumber(c.size_)
+                                << " tag " << hexuint32(recv_data.tag)
+                                << " local addr " << hexpointer(get_region->get_address())
+                                << " length " << c.size_);
                             recv_data.zero_copy_regions.push_back(get_region);
                             LOG_DEBUG_MSG("Zero copy regions size is (create) "
                                 << decnumber(recv_data.zero_copy_regions.size()));
@@ -659,7 +659,11 @@ namespace libfabric
                                     get_region->get_address(), c.size_, c.rkey_);
                             ++total_reads;
                             // post the rdma read/get
-//                            client->post_read(get_region, c.rkey_, remoteAddr, c.size_);
+                            LOG_DEBUG_MSG("RDMA Get client " << hexpointer(client->rma));
+                            ssize_t ret = fi_read(client, get_region->get_address(),
+                                c.size_, get_region->get_desc(),
+                                FI_ADDR_UNSPEC, (uint64_t)(c.data_.cpos_), c.rkey_, get_region);
+                            if (ret) throw fabric_error(ret, "fi_read error");
                         }
                         index++;
                     }
