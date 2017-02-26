@@ -1248,20 +1248,15 @@ namespace hpx { namespace util { namespace detail
         return dummy_data;
     }
 
-    inline int get_int_entry(std::string const& key, std::string const& dflt)
-    {
-        return util::safe_lexical_cast<int>(ini.get_entry(key, dflt), dflt);
-    }
-
     void init_logging(runtime_configuration& ini, bool)
     {
         // warn if logging is requested
 
-        if (get_int_entry("hpx.logging.level", "-1") > 0 ||
-            get_int_entry("hpx.logging.timing.level", "-1") > 0 ||
-            get_int_entry("hpx.logging.agas.level", "-1") > 0 ||
-            get_int_entry("hpx.logging.debuglog.level", "-1") > 0 ||
-            get_int_entry("hpx.logging.application.level", "-1") > 0)
+        if (util::get_entry_as<int>(ini, "hpx.logging.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.timing.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.agas.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.debuglog.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.application.level", -1) > 0)
         {
             std::cerr << "hpx::init_logging: warning: logging is requested even "
                          "while it was disabled at compile time. If you "
