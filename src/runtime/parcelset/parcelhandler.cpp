@@ -699,7 +699,10 @@ namespace hpx { namespace parcelset
             std::shared_ptr<policies::message_handler> p;
 
             {
-                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                // Just ignore the handlers_mtx_ while checking. We need to hold
+                // the lock here to avoid multiple registrations that happens
+                // right now in the parcel coalescing plugin
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }
