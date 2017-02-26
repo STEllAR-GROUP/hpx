@@ -373,7 +373,7 @@ namespace hpx
         void deinit_tss();
 
     public:
-        void set_state(state s) { state_.store(s); }
+        void set_state(state s);
 
     protected:
         util::reinit_helper reinit_;

@@ -21,7 +21,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
@@ -386,7 +385,6 @@ namespace hpx
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
-        util::detail::init_logging init_logging_;
         applier::applier applier_;
         boost::signals2::scoped_connection default_error_sink_;
 

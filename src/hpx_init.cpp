@@ -25,6 +25,8 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/init_logging.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
@@ -692,6 +694,8 @@ namespace hpx
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
+            LPROGRESS_;
+
             add_startup_functions(rt, vm, mode, std::move(startup),
                 std::move(shutdown));
 
@@ -709,6 +713,8 @@ namespace hpx
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
+            LPROGRESS_;
+
             add_startup_functions(rt, vm, mode, std::move(startup),
                 std::move(shutdown));
 
@@ -764,6 +770,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_local: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -805,6 +813,8 @@ namespace hpx
                 "core-throttle_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            LPROGRESS_ << "run_throttle: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<throttle_queue_policy> runtime_type;
@@ -852,6 +862,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_static_priority: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -895,6 +907,8 @@ namespace hpx
                 "core-static_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            LPROGRESS_ << "run_static: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -942,6 +956,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_priority_local: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -974,6 +990,8 @@ namespace hpx
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
                 cfg.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
+
+            LPROGRESS_ << "run_priority_abp: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -1011,6 +1029,8 @@ namespace hpx
             queue_policy::init_parameter_type init(cfg.num_threads_, arity,
                 1000, 0, "core-hierarchy_scheduler");
 
+            LPROGRESS_ << "run_hierarchy: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -1046,6 +1066,8 @@ namespace hpx
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
                 num_high_priority_queues, 1000, cfg.numa_sensitive_,
                 "core-periodic_priority_queue_scheduler");
+
+            LPROGRESS_ << "run_periodic: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -1092,7 +1114,6 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
-
             try {
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
@@ -1113,6 +1134,10 @@ namespace hpx
                         result = 0;     // --hpx:help
                     return result;
                 }
+
+                // initialize logging
+                util::detail::init_logging(cfg.rtcfg_,
+                    cfg.mode_ == runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -34,6 +34,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -109,6 +110,8 @@ namespace hpx { namespace parcelset
         count_routed_(0),
         write_handler_(&default_write_handler)
     {
+        LPROGRESS_;
+
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
             std::shared_ptr<parcelport> pp;
