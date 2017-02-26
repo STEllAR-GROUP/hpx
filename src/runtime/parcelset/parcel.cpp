@@ -421,7 +421,7 @@ namespace hpx { namespace parcelset
     }
 
     bool parcel::load_schedule(serialization::input_archive & ar,
-        std::size_t num_thread)
+        std::size_t num_thread, bool& deferred_schedule)
     {
         load_data(ar);
 
@@ -440,7 +440,8 @@ namespace hpx { namespace parcelset
         }
 
         // continuation support, this is handled in the transfer action
-        action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread);
+        action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread,
+            deferred_schedule);
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         static util::itt::event parcel_recv("recv_parcel");
@@ -457,7 +458,7 @@ namespace hpx { namespace parcelset
         return false;
     }
 
-    void parcel::schedule_action()
+    void parcel::schedule_action(std::size_t num_thread)
     {
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
@@ -479,7 +480,7 @@ namespace hpx { namespace parcelset
 
         // dispatch action, register work item either with or without
         // continuation support, this is handled in the transfer action
-        action_->schedule_thread(std::move(data_.dest_), lva, std::size_t(-1));
+        action_->schedule_thread(std::move(data_.dest_), lva, num_thread);
     }
 
     void parcel::load_data(serialization::input_archive & ar)

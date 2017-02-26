@@ -115,6 +115,22 @@ namespace hpx { namespace lcos {
         }
     }
 
+    void barrier::detach()
+    {
+        if (node_)
+        {
+            if (hpx::get_runtime_ptr() != nullptr &&
+                hpx::threads::threadmanager_is(state_running) &&
+                !hpx::is_stopped_or_shutting_down())
+            {
+                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                    hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_);
+            }
+            node_.reset();
+        }
+    }
+
     barrier barrier::create_global_barrier()
     {
         runtime& rt = get_runtime();

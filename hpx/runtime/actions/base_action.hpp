@@ -125,7 +125,7 @@ namespace hpx { namespace actions
 
         virtual void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread) = 0;
+            std::size_t num_thread, bool& deferred_schedule) = 0;
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         /// The function \a get_action_name_itt returns the name of this action

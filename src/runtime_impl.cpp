@@ -537,7 +537,7 @@ namespace hpx {
                 std::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
-            lcos::barrier::get_global_barrier().release();
+            lcos::barrier::get_global_barrier().detach();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();

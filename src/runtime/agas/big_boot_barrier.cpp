@@ -992,12 +992,18 @@ void big_boot_barrier::notify()
     runtime& rt = get_runtime();
     naming::resolver_client& agas_client = rt.get_agas_client();
 
+    bool notify = false;
     {
         std::lock_guard<boost::mutex> lk(mtx, std::adopt_lock);
         if (agas_client.get_status() == state_starting)
+        {
             --connected;
+            if (connected == 0)
+                notify = true;
+        }
     }
-    cond.notify_all();
+    if (notify)
+        cond.notify_all();
 }
 
 // This is triggered in runtime_impl::start, after the early action handler

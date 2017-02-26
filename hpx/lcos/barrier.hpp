@@ -96,6 +96,7 @@ namespace hpx { namespace lcos {
         // Resets this barrier instance.
         void release();
 
+        void detach();
 
         // Get the instance of the global barrier
         static barrier& get_global_barrier();

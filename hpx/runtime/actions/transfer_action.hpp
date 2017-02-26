@@ -101,7 +101,7 @@ namespace hpx { namespace actions
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread);
+            std::size_t num_thread, bool& deferred_schedule);
     };
     /// \endcond
 
@@ -209,10 +209,23 @@ namespace hpx { namespace actions
     template <typename Action>
     void transfer_action<Action>::load_schedule(serialization::input_archive& ar,
         naming::gid_type&& target, naming::address_type lva,
-        std::size_t num_thread)
+        std::size_t num_thread, bool& deferred_schedule)
     {
         // First, serialize, then schedule
         load(ar);
+
+        if (deferred_schedule)
+        {
+            // If this is a direct action and deferred schedule was requested, that
+            // is we are not the last parcel, return immediately
+            if (base_type::direct_execution::value)
+                return;
+
+            // If this is not a direct action, we can safely set deferred_schedule
+            // to false
+            deferred_schedule = false;
+        }
+
         schedule_thread(std::move(target), lva, num_thread);
     }
 }}
