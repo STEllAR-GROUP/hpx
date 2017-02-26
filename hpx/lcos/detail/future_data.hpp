@@ -205,8 +205,28 @@ namespace detail
           , f2_(std::move(other.f2_))
         {}
 
-        void operator()() const
+        void operator()()
         {
+            bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            recurse_asynchronously =
+                !this_thread::has_sufficient_stack_space();
+#else
+            handle_continuation_recursion_count cnt;
+            recurse_asynchronously = recurse_asynchronously ||
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+            if (recurse_asynchronously)
+            {
+                error_code ec;
+                threads::thread_id_type id = threads::register_thread_nullary(
+                    compose_cb_impl(std::move(f1_), std::move(f2_)),
+                    "compose_cb",
+                    threads::pending, true, threads::thread_priority_boost,
+                    std::size_t(-1), threads::thread_stacksize_current, ec);
+                return;
+            }
+
             f1_();
             f2_();
         }
