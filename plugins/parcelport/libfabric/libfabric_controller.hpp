@@ -61,7 +61,6 @@ namespace libfabric
         // endpoint when the connection completes and is ready
         // Note - only used during connection, then deleted
         typedef std::tuple<
-            fid_ep *,
             hpx::promise<fid_ep *>,
             hpx::shared_future<fid_ep *>
         > promise_tuple_type;
@@ -284,13 +283,13 @@ namespace libfabric
         // RDMA_CM_EVENT_ESTABLISHED has been received.
         // This should be used to initialize all structures for handling a new connection
         void setConnectionFunction(ConnectionFunction f) {
-            this->connection_function_ = f;
+            connection_function_ = f;
         }
 
         // --------------------------------------------------------------------
         // currently not used.
         void setDisconnectionFunction(DisconnectionFunction f) {
-            this->disconnection_function_ = f;
+            disconnection_function_ = f;
         }
 
         // --------------------------------------------------------------------
@@ -365,7 +364,7 @@ namespace libfabric
         {
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
-            if (HPX_UNLIKELY(!this->rxcq)) return 0;
+            if (HPX_UNLIKELY(!rxcq)) return 0;
 
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
@@ -383,7 +382,7 @@ struct fi_cq_msg_entry {
             //std::array<char, 256> buffer;
             fi_cq_msg_entry entry;
 
-            int ret = fi_cq_read(this->txcq, &entry, 1);
+            int ret = fi_cq_read(txcq, &entry, 1);
             if (ret>0) {
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
@@ -400,7 +399,7 @@ struct fi_cq_msg_entry {
                 throw fabric_error(ret, "completion read");
             }
 
-            ret = fi_cq_read(this->rxcq, &entry, 1);
+            ret = fi_cq_read(rxcq, &entry, 1);
             if (ret>0) {
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
@@ -464,8 +463,7 @@ struct fi_cq_msg_entry {
                         if (ret) throw fabric_error(ret, "new_ep fi_accept failed");
 
                         // @TODO : support reject of connection request
-                        hpx::shared_future<struct fid_ep*> result =
-                            insert_new_future(addr[1], new_ep);
+                        auto result = insert_new_future(addr[1]);
                     }
                     fi_freeinfo(cm_entry->info);
                     break;
@@ -492,11 +490,11 @@ struct fi_cq_msg_entry {
                     // then set the future ready with the verbs endpoint
                     LOG_DEBUG_MSG("FI_CONNECTED setting future "
                         << ipaddress(address[1]));
-                    std::get<1>(endpoint_tmp_.find(address[1])->second).
+                    std::get<0>(endpoint_tmp_.find(address[1])->second).
                         set_value(new_ep);
 
                     // once the future is set, the entry can be removed
-                    endpoint_tmp_.erase(present1.first);
+//                    endpoint_tmp_.erase(present1.first);
                 }
                 break;
                 case FI_NOTIFY:
@@ -526,7 +524,7 @@ struct fi_cq_msg_entry {
 
         // --------------------------------------------------------------------
         inline struct fid_domain * get_domain() {
-            return this->fabric_domain_;
+            return fabric_domain_;
         }
 
         // --------------------------------------------------------------------
@@ -539,13 +537,13 @@ struct fi_cq_msg_entry {
             CompletionFunction;
 
         void setSendCompletionFunction(CompletionFunction f) {
-            this->send_completion_function_ = f;
+            send_completion_function_ = f;
         }
         void setRecvCompletionFunction(CompletionFunction f) {
-            this->recv_completion_function_ = f;
+            recv_completion_function_ = f;
         }
         void setRDMACompletionFunction(CompletionFunction f) {
-            this->rdma_completion_function_ = f;
+            rdma_completion_function_ = f;
         }
 
         // --------------------------------------------------------------------
@@ -592,28 +590,32 @@ struct fi_cq_msg_entry {
         }
 
         // --------------------------------------------------------------------
-        hpx::shared_future<struct fid_ep*> insert_new_future(
-            uint32_t remote_ip, struct fid_ep *new_endpoint)
+        std::pair<bool, hpx::shared_future<struct fid_ep*>> insert_new_future(
+            uint32_t remote_ip)
         {
             hpx::promise<struct fid_ep*> new_endpoint_promise;
             hpx::future<struct fid_ep*>  new_endpoint_future =
                 new_endpoint_promise.get_future();
 
-            LOG_DEBUG_MSG("Inserting endpoint future/promise into map "
-                    << ipaddress(remote_ip) << hexpointer(new_endpoint));
+            LOG_DEVEL_MSG("Inserting endpoint future/promise into map "
+                    << ipaddress(remote_ip));
             auto it = endpoint_tmp_.insert(
                 std::make_pair(
                     remote_ip,
                     std::make_tuple(
-                        new_endpoint,
                         std::move(new_endpoint_promise),
                         std::move(new_endpoint_future))));
 
+            // get the future that was inserted or already present
             // the future will become ready when the remote end accepts/rejects our connection
             // or we accept a connection from a remote
-            // auto it = endpoint_tmp_.find(remote_ip);
-            hpx::shared_future<struct fid_ep*> result = std::get<2>(it.first->second);
-            return result;
+            hpx::shared_future<struct fid_ep*> result = std::get<1>(it.first->second);
+
+            // if the insert fails due to a duplicate value, return the duplicate
+            if (!it.second) {
+                return std::make_pair(false, result);
+            }
+            return std::make_pair(true, result);
         }
 
         // --------------------------------------------------------------------
@@ -621,17 +623,17 @@ struct fi_cq_msg_entry {
         {
             const uint32_t &remote_ip = remote.ip_address();
 
-            // has a connection been started from here already?
-            auto connection = endpoint_tmp_.is_in_map(remote_ip);
+            // Has a connection been started from here already?
+            // Note: The future must be created before we call fi_connect
+            // otherwise a connection may complete before the future is setup
+            auto connection = insert_new_future(remote_ip);
 
             // if a connection is already underway, just return the future
-            if (connection.second) {
+            if (!connection.first) {
                 LOG_DEVEL_MSG("connect to server : returning existing future");
                 // the future will become ready when the remote end accepts/rejects
                 // our connection - or we accept a connection from a remote
-                auto it = connection.first;
-                // auto it = endpoint_tmp_.find(remote_ip);
-                return std::get<2>(it->second);
+                return connection.second;
             }
 
             // convert remote ip address to a string to pass to getinfo
@@ -646,6 +648,7 @@ struct fi_cq_msg_entry {
             int ret = fi_getinfo(FI_VERSION(1,4), addr_str, port_str.c_str(),
                 flags, fabric_info_, &fabric_info_active_);
 
+            LOG_DEBUG_MSG("Fabric info " << fi_tostr(fabric_info_active_, FI_TYPE_INFO));
             setup_queues(fabric_info_active_);
 
             struct fi_info *the_info = fabric_info_active_;
@@ -658,19 +661,14 @@ struct fi_cq_msg_entry {
             new_endpoint_active(the_info, &new_endpoint);
 
             LOG_DEBUG_MSG("Deleting new endpoint info structure");
-            fi_freeinfo(fabric_info_active_);
-
-            // create a future for this connection, do this before calling fi_connect
-            // to ensure a connection completion does not arrive before we are ready
-            hpx::shared_future<struct fid_ep*> result =
-                insert_new_future(remote_ip, new_endpoint);
+            //fi_freeinfo(fabric_info_active_);
 
             // now it is safe to call connect
             LOG_DEBUG_MSG("Calling fi_connect ");
             ret = fi_connect(new_endpoint, remote.fabric_data(), nullptr, 0);
             if (ret) throw fabric_error(ret, "fi_connect");
-
-            return result;
+            //
+            return connection.second;
         }
 
 //        void disconnect_from_server(struct fid_ep *client) {}
