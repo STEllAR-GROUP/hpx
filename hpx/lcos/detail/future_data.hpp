@@ -269,7 +269,7 @@ namespace detail
 
         typedef lcos::local::spinlock mutex_type;
         typedef util::unused_type result_type;
-        typedef typename future_data_refcnt_base::init_no_addref init_no_addref;
+        typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
         virtual ~future_data() HPX_NOEXCEPT {}
         virtual void execute_deferred(error_code& = throws) = 0;
@@ -748,8 +748,10 @@ namespace detail
             }
             else {
                 // store a combined callback wrapping the old and the new one
+                // make sure continuations are evaluated in the order they are
+                // attached
                 this->on_completed_ = compose_cb(
-                    std::move(data_sink), std::move(on_completed_));
+                    std::move(on_completed_), std::move(data_sink));
             }
         }
 
