@@ -128,9 +128,9 @@ namespace libfabric
         // returns 0 when successful, -1 otherwise
         int release(void)
         {
-            LOG_TRACE_MSG("About to release memory region with desc "
-                << hexpointer(get_desc()));
             if (region_ != nullptr) {
+                LOG_TRACE_MSG("About to release memory region with desc "
+                    << hexpointer(get_desc()));
                 // get these before deleting/unregistering (for logging)
                 const void *buffer = get_base_address();
                 LOG_EXCLUSIVE(
