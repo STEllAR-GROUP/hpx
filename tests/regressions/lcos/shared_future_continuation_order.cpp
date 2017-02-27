@@ -38,8 +38,9 @@ int main()
 
     p.set_value(42);
 
-    HPX_TEST_EQ(f1.get(), 1);
-    HPX_TEST_EQ(f2.get(), 2);
+    HPX_TEST_EQ(f1.get(), 42);
+    HPX_TEST_EQ(f2.get(), 1);
+    HPX_TEST_EQ(f3.get(), 2);
 
     return hpx::util::report_errors();
 }
