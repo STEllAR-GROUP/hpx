@@ -84,6 +84,8 @@ namespace libfabric
         struct fid_domain *fabric_domain_;
         // Server/Listener for RDMA connections.
         struct fid_pep    *ep_passive_;
+        struct fid_ep     *ep_first_;
+
 
         // we will use just one event queue for all connections
         struct fid_eq     *event_queue_;
@@ -137,6 +139,7 @@ namespace libfabric
             here_ = open_fabric(provider, domain, endpoint);
 
             FUNC_END_DEBUG_MSG;
+            ep_first_ = nullptr;
         }
 
         // clean up all resources
@@ -261,6 +264,8 @@ namespace libfabric
             ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
             if (ret) throw fabric_error(ret, "fi_domain");
 
+            preposted_receives_ = 0;
+
             // Create a memory pool for pinned buffers
             memory_pool_ = std::make_shared<rdma_memory_pool> (fabric_domain_);
             return 0;
@@ -332,19 +337,10 @@ namespace libfabric
             ret = fi_enable(*new_endpoint);
             if (ret) throw fabric_error(ret, "fi_enable");
 
-            // prepost a receive to the new endpoint
-            auto region = memory_pool_->allocate_region(0);
-            void *desc = region->get_desc();
-            LOG_DEBUG_MSG("Preposting recv memory descriptor " << hexpointer(desc));
-
-            ret = fi_recv(*new_endpoint, region->get_address(), region->get_size(), desc, 0, region);
-            if (ret!=0) {
-                if (ret == -FI_EAGAIN) {
-                    LOG_ERROR_MSG("We must repost");
-                } else {
-                    throw fabric_error(ret, "pp_post_rx");
-                }
+            if (ep_first_ == nullptr) {
+                ep_first_ = *new_endpoint;
             }
+            refill_client_receives(ep_first_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
         }
 
         // --------------------------------------------------------------------
@@ -401,6 +397,9 @@ struct fi_cq_msg_entry {
 
             ret = fi_cq_read(rxcq, &entry, 1);
             if (ret>0) {
+                if (--preposted_receives_<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS/4) {
+                    refill_client_receives(ep_first_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
+                }
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " "
@@ -546,8 +545,39 @@ struct fi_cq_msg_entry {
             rdma_completion_function_ = f;
         }
 
-        // --------------------------------------------------------------------
-        void refill_client_receives(bool force=true) {}
+        // ---------------------------------------------------------------------------
+        // The number of outstanding work requests
+        inline uint32_t get_receive_count() const { return preposted_receives_; }
+
+        // ---------------------------------------------------------------------------
+        void refill_client_receives(struct fid_ep *client, unsigned int preposts, bool force=true) {
+            //            LOG_DEBUG_MSG("Entering refill size of waiting receives is "
+            //                << decnumber(get_receive_count()));
+            while (get_receive_count() < preposts) {
+                // if the pool has spare small blocks (just use 0 size) then
+                // refill the queues, but don't wait, just abort if none are available
+                if (force || memory_pool_->can_allocate_unsafe(
+                    memory_pool_->small_.chunk_size()))
+                {
+                    LOG_TRACE_MSG("Pre-Posting a receive to client size "
+                        << hexnumber(memory_pool_->small_.chunk_size()));
+
+                    auto region = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
+                    void *desc = region->get_desc();
+                    LOG_DEBUG_MSG("Preposting recv memory descriptor " << hexpointer(desc));
+
+                    int ret = fi_recv(client, region->get_address(), region->get_size(), desc, 0, region);
+                    if (ret!=0 && ret != -FI_EAGAIN) {
+                        throw fabric_error(ret, "pp_post_rx");
+                    }
+                    ++preposted_receives_;
+                }
+                else {
+                    LOG_DEVEL_MSG("aborting refill can_allocate_unsafe false");
+                    break; // don't block, if there are no free memory blocks
+                }
+            }
+        }
 
         // --------------------------------------------------------------------
         void setup_queues(struct fi_info *info)
