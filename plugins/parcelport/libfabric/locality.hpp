@@ -120,9 +120,9 @@ private:
     }
 
     friend bool operator<(locality const & lhs, locality const & rhs) {
-        const uint32_t &ipaddr_1 = lhs.data_[1];
-        const uint32_t &ipaddr_2 = rhs.data_[1];
-        return ipaddr_1 < ipaddr_2;
+        uint32_t a1 = lhs.ip_address();
+        uint32_t a2 = rhs.ip_address();
+        return a1 < a2;
     }
 
     friend std::ostream & operator<<(std::ostream & os, locality const & loc) {

@@ -134,10 +134,9 @@ namespace libfabric
         // These are called from a static function, so use static
         // --------------------------------------------------------------------
         static libfabric_controller_ptr libfabric_controller_;
-        static std::string         _iblibfabric_device;
-        static std::string         _iblibfabric_interface;
-        static std::uint32_t       _port;
-        static std::uint32_t       _ibv_ip;
+
+        // our local ip address (estimated based on fabric PP adress info)
+        uint32_t ip_addr_;
 
         // Not currently working, we support bootstrapping, but when not enabled
         // we should be able to skip it
@@ -276,7 +275,7 @@ namespace libfabric
 
             LOG_DEBUG_MSG("libfabric parcelport function using attributes "
                 << provider << " " << domain << " " << endpoint);
-
+/*
             _port = hpx::util::get_entry_as<std::uint16_t>(ini,
                 "hpx.agas.port", HPX_INITIAL_IP_PORT);
             std::uint16_t port_p = hpx::util::get_entry_as<std::uint16_t>(ini,
@@ -284,20 +283,17 @@ namespace libfabric
 
             LOG_DEBUG_MSG("libfabric hpx.agas port number " << decnumber(_port));
             LOG_DEBUG_MSG("libfabric hpx.parcel port number " << decnumber(port_p));
-
+*/
             // create our main fabric control structure
             libfabric_controller_ = std::make_shared<libfabric_controller>(
-                provider, domain, endpoint, _port);
+                provider, domain, endpoint);
 
             // get 'this' locality from the controller
             LOG_DEBUG_MSG("Getting local locality object");
             const locality & local = libfabric_controller_->here();
-            LOG_DEBUG_MSG("Setting parcelset locality object");
-            here_   = parcelset::locality(local);
+            here_ = parcelset::locality(local);
             // and make a note of our ip address for convenience
-            LOG_DEBUG_MSG("Getting ip address");
-            _ibv_ip = local.ip_address();
-            LOG_DEBUG_MSG("Done");
+            ip_addr_ = local.ip_address();
 
             FUNC_END_DEBUG_MSG;
         }
@@ -344,8 +340,8 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             const locality &dest_fabric = dest.get<locality>();
             std::uint32_t dest_ip = dest_fabric.ip_address();
-            LOG_DEVEL_MSG("get_remote_connection        from "
-                << ipaddress(_ibv_ip)
+            LOG_DEBUG_MSG("get_remote_connection        from "
+                << ipaddress(ip_addr_)
                 << "to " << ipaddress(dest_ip)
                 << "chunk pool " << hexpointer(chunk_pool_.get()));
 
@@ -354,15 +350,15 @@ namespace libfabric
             auto it = connection_cache.find(dest_ip);
             if (it!=connection_cache.end()) {
                 std::shared_ptr<sender_connection> connection = it->second;
-                LOG_DEVEL_MSG("Found sender_connection      from "
-                    << ipaddress(_ibv_ip)
+                LOG_DEBUG_MSG("Found sender_connection      from "
+                    << ipaddress(ip_addr_)
                     << "to " << ipaddress(dest_ip)
                     << "chunk pool " << hexpointer(chunk_pool_.get()));
                 return connection;
             }
             else {
-                LOG_DEVEL_MSG("Create sender_connection     from "
-                    << ipaddress(_ibv_ip)
+                LOG_DEBUG_MSG("Create sender_connection     from "
+                    << ipaddress(ip_addr_)
                     << "to " << ipaddress(dest_ip)
                     << "chunk pool " << hexpointer(chunk_pool_.get()));
 
@@ -468,13 +464,13 @@ namespace libfabric
         {
             if (1) {
             LOG_DEVEL_MSG("Connection established       from "
-                << ipaddress(_ibv_ip) << "to "
-                << ipaddress(dest_ip) << "( " << ipaddress(_ibv_ip) << ")");
+                << ipaddress(ip_addr_) << "to "
+                << ipaddress(dest_ip) << "( " << ipaddress(ip_addr_) << ")");
             }
             else {
                 LOG_DEVEL_MSG("Connection established       from "
                     << ipaddress(dest_ip) << "to "
-                    << ipaddress(_ibv_ip) << "( " << ipaddress(_ibv_ip) << ")");
+                    << ipaddress(ip_addr_) << "( " << ipaddress(ip_addr_) << ")");
             }
             //
             auto present = ip_endpoint_map.is_in_map(dest_ip);
@@ -659,7 +655,7 @@ namespace libfabric
                                     get_region->get_address(), c.size_, c.rkey_);
                             ++total_reads;
                             // post the rdma read/get
-                            LOG_DEBUG_MSG("RDMA Get client " << hexpointer(client->rma));
+                            LOG_DEVEL_MSG("RDMA Get client " << hexpointer(client) << hexpointer(client->rma));
                             ssize_t ret = fi_read(client, get_region->get_address(),
                                 c.size_, get_region->get_desc(),
                                 FI_ADDR_UNSPEC, (uint64_t)(c.data_.cpos_), c.rkey_, get_region);
@@ -996,7 +992,7 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             // return hostname:iblibfabric ip address
             std::stringstream temp;
-            temp << boost::asio::ip::host_name() << ":" << ipaddress(_ibv_ip);
+            temp << boost::asio::ip::host_name() << ":" << ipaddress(ip_addr_);
             std::string tstr = temp.str();
             FUNC_END_DEBUG_MSG;
             return tstr.substr(0, tstr.size()-1);
@@ -1077,30 +1073,29 @@ namespace libfabric
             auto present = ip_endpoint_map.is_in_map(dest_ip);
             if (present.second) {
                 LOG_DEVEL_MSG("Client found connection made from "
-                    << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip));
-//                    << "with QP " << present.first->second->get_qp_num());
+                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
                 return present.first->second;
             }
 
             // Didn't find a connection. We must create a new one
-            LOG_DEVEL_MSG("Starting new connect request from "
-                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                << "( " << ipaddress(_ibv_ip) << ")");
+            LOG_DEBUG_MSG("Starting new connect request from "
+                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+                << "( " << ipaddress(ip_addr_) << ")");
 
             hpx::shared_future<struct fid_ep*> client_future =
                 libfabric_controller_->connect_to_server(dest_fabric);
 
             LOG_DEVEL_MSG("About to wait client future  from "
-                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                << "( " << ipaddress(_ibv_ip) << ")");
+                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+                << "( " << ipaddress(ip_addr_) << ")");
 
             // block until a connection is available
             struct fid_ep* client = client_future.get();
 
             LOG_DEVEL_MSG("Client future ("
                 << hexpointer(client) << ") from "
-                << ipaddress(_ibv_ip) << "to " << ipaddress(dest_ip)
-                << "( " << ipaddress(_ibv_ip) << ")");
+                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+                << "( " << ipaddress(ip_addr_) << ")");
 
             return client;
         }
@@ -1539,10 +1534,6 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
 };
 }}
 
-std::string    hpx::parcelset::policies::libfabric::parcelport::_iblibfabric_device;
-std::string    hpx::parcelset::policies::libfabric::parcelport::_iblibfabric_interface;
-std::uint32_t  hpx::parcelset::policies::libfabric::parcelport::_ibv_ip;
-std::uint32_t  hpx::parcelset::policies::libfabric::parcelport::_port;
 hpx::parcelset::policies::libfabric::libfabric_controller_ptr
     hpx::parcelset::policies::libfabric::parcelport::libfabric_controller_;
 hpx::parcelset::policies::libfabric::parcelport *
