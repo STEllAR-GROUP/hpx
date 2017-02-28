@@ -910,27 +910,29 @@ if(NOT MSVC)
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     set(CXX_FLAG -std=c++11)
   else()
-    # Try -std=c++14 first
 
-    # The Intel compiler has the C++14 flag, but doesn't have sufficient C++14
-    # support to compile Boost. If the user has explicitly asked for it, use it,
-    # otherwise don't run the check.
-    # FIXME: This should be replaced with a version-based check in the future
-    # when the Intel compiler is able to build Boost with -std=c++14.
-    if(HPX_WITH_CXX14 OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+    # Try -std=c++14 first
+    if(HPX_WITH_CXX14 OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+                              AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
       check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
     endif()
-    if(HPX_WITH_CXX14)
 
+    if(HPX_WITH_CXX14)
       set(CXX_FLAG -std=c++14)
+      # The Intel compiler doesn't appear to have a fully functional
+      # implementation of C++14 constexpr. It's fine with our C++14 constexpr
+      # usage in HPX but chokes on Boost.
+      # FIXME: This should be replaced with a version-based check in the future
+      # when the Intel compiler is able to build Boost with -std=c++14.
+      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+        add_definitions(-DBOOST_NO_CXX14_CONSTEXPR)
+      endif()
     else()
       # ... otherwise try -std=c++1y
 
-      # See comment above.
-      # FIXME: This should be replaced with a version-based check in the future
-      # when the Intel compiler is able to build Boost with -std=c++14.
-      if(HPX_WITH_CXX1Y OR NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
-        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1Y)
+      if(HPX_WITH_CXX1Y OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+                                AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
+        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1y)
       endif()
 
       if(HPX_WITH_CXX1Y)
