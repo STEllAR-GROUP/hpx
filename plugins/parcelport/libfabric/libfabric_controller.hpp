@@ -84,7 +84,7 @@ namespace libfabric
         struct fid_domain *fabric_domain_;
         // Server/Listener for RDMA connections.
         struct fid_pep    *ep_passive_;
-        struct fid_ep     *ep_first_;
+        struct fid_ep     *ep_shared_rx_cxt_;
 
 
         // we will use just one event queue for all connections
@@ -112,11 +112,12 @@ namespace libfabric
             std::string endpoint, int port=7910)
         {
             FUNC_START_DEBUG_MSG;
-            fabric_info_   = nullptr;
-            fabric_        = nullptr;
-            ep_passive_    = nullptr;
-            event_queue_   = nullptr;
-            fabric_domain_ = nullptr;
+            fabric_info_      = nullptr;
+            fabric_           = nullptr;
+            ep_passive_       = nullptr;
+            event_queue_      = nullptr;
+            fabric_domain_    = nullptr;
+            ep_shared_rx_cxt_ = nullptr;
             //
             txcq = nullptr;
             rxcq = nullptr;
@@ -139,7 +140,6 @@ namespace libfabric
             here_ = open_fabric(provider, domain, endpoint);
 
             FUNC_END_DEBUG_MSG;
-            ep_first_ = nullptr;
         }
 
         // clean up all resources
@@ -149,6 +149,7 @@ namespace libfabric
             fi_close(&ep_passive_->fid);
             fi_close(&event_queue_->fid);
             fi_close(&fabric_domain_->fid);
+            fi_close(&ep_shared_rx_cxt_->fid);
             // clean up
             fi_freeinfo(fabric_info_);
         }
@@ -173,6 +174,9 @@ namespace libfabric
 
             // use infiniband type basic registration for now
             fabric_hints_->domain_attr->mr_mode = FI_MR_BASIC;
+
+            // we will use a shared receive context for active endpoints
+            fabric_hints_->ep_attr->rx_ctx_cnt = FI_SHARED_CONTEXT;
 
             if (endpoint_type=="msg") {
                 fabric_hints_->ep_attr->type = FI_EP_MSG;
@@ -256,7 +260,7 @@ namespace libfabric
             ret = fi_pep_bind(ep_passive_, &event_queue_->fid, 0);
             if (ret) throw fabric_error(ret, "fi_pep_bind");
 
-            LOG_DEBUG_MSG("Ppassive endpoint : listen");
+            LOG_DEBUG_MSG("Passive endpoint : listen");
             ret = fi_listen(ep_passive_);
             if (ret) throw fabric_error(ret, "fi_listen");
 
@@ -264,6 +268,11 @@ namespace libfabric
             LOG_DEBUG_MSG("Allocating domain ");
             ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
             if (ret) throw fabric_error(ret, "fi_domain");
+
+            LOG_DEBUG_MSG("Allocating shared receive context");
+            ret = fi_srx_context(fabric_domain_, fabric_info_->rx_attr,
+                &ep_shared_rx_cxt_, NULL);
+            if (ret) throw fabric_error(ret, "fi_srx_context");
 
             preposted_receives_ = 0;
 
@@ -334,14 +343,18 @@ namespace libfabric
                 if (ret) throw fabric_error(ret, "rxcq");
             }
 
+            if (ep_shared_rx_cxt_) {
+                LOG_DEBUG_MSG("Binding endpoint to shared receive context");
+                ret = fi_ep_bind(*new_endpoint, &ep_shared_rx_cxt_->fid, 0);
+                if (ret) throw fabric_error(ret, "rxcq");
+            }
+
             LOG_DEVEL_MSG("Enabling new active endpoint " << hexpointer(*new_endpoint));
             ret = fi_enable(*new_endpoint);
             if (ret) throw fabric_error(ret, "fi_enable");
 
-            if (ep_first_ == nullptr) {
-                ep_first_ = *new_endpoint;
-            }
-            refill_client_receives(ep_first_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
+            refill_client_receives(ep_shared_rx_cxt_,
+                HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
         }
 
         // --------------------------------------------------------------------
@@ -399,7 +412,7 @@ struct fi_cq_msg_entry {
             ret = fi_cq_read(rxcq, &entry, 1);
             if (ret>0) {
                 if (--preposted_receives_<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS/4) {
-                    refill_client_receives(ep_first_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
+                    refill_client_receives(ep_shared_rx_cxt_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
                 }
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
