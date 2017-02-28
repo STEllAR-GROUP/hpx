@@ -27,6 +27,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
@@ -221,7 +222,7 @@ namespace hpx
             "state_starting",     // 4
             "state_running",      // 5
             "state_suspended",    // 6
-            "state_pre_shutdown"  // 7
+            "state_pre_shutdown", // 7
             "state_shutdown",     // 8
             "state_stopping",     // 9
             "state_terminating",  // 10
@@ -513,6 +514,8 @@ namespace hpx
       , security_data_(new detail::manage_security_data)
 #endif
     {
+        LPROGRESS_;
+
         // initialize our TSS
         runtime::init_tss();
         util::reinit_construct();       // call only after TLS was initialized
@@ -525,6 +528,12 @@ namespace hpx
         // allow to reuse instance number if this was the only instance
         if (0 == instance_number_counter_)
             --instance_number_counter_;
+    }
+
+    void runtime::set_state(state s)
+    {
+        LPROGRESS_ << get_runtime_state_name(s);
+        state_.store(s);
     }
 
     ///////////////////////////////////////////////////////////////////////////

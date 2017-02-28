@@ -122,6 +122,9 @@ described in the table below:
                                        log channel and send all parcel transport
                                        logs to the target destination (default:
                                        cout)]]
+    [[`--hpx:debug-timing-log [arg]`] [enable all messages on the timing log
+                                       channel and send all timing logs to the
+                                       target destination (default: cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
                                     `startup` or `exception` (default: startup)]]

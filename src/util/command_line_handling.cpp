@@ -788,6 +788,7 @@ namespace hpx { namespace util
         if (vm.count("hpx:run-agas-server-only"))
             ini_config += "hpx.agas.dedicated_server=1";
 
+#if defined(HPX_HAVE_LOGGING)
         if (vm.count("hpx:debug-hpx-log")) {
             ini_config += "hpx.logging.console.destination=" +
                 detail::convert_to_log_file(
@@ -820,6 +821,29 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.parcel.level=5";
             ini_config += "hpx.logging.parcel.level=5";
         }
+
+        if (vm.count("hpx:debug-timing-log")) {
+            ini_config += "hpx.logging.console.timing.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-timing-log"].as<std::string>());
+            ini_config += "hpx.logging.timing.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-timing-log"].as<std::string>());
+            ini_config += "hpx.logging.console.timing.level=1";
+            ini_config += "hpx.logging.timing.level=1";
+        }
+#else
+        if (vm.count("hpx:debug-hpx-log") ||
+            vm.count("hpx:debug-agas-log") ||
+            vm.count("hpx:debug-parcel-log") ||
+            vm.count("hpx:debug-timing-log"))
+        {
+            throw hpx::detail::command_line_error(
+                "Command line option error: can't enable logging while it "
+                "was disabled at configuration time. Please re-configure "
+                "HPX using the option -DHPX_WITH_LOGGING=On.");
+        }
+#endif
 
         // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +

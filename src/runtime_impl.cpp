@@ -160,9 +160,10 @@ namespace hpx {
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
-        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_)
     {
+        LPROGRESS_;
+
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
 
@@ -234,6 +235,8 @@ namespace hpx {
         runtime_support_->tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
+
+        LPROGRESS_;
     }
 
     int pre_main(hpx::runtime_mode);
@@ -243,7 +246,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
-        LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
+        lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
@@ -251,12 +254,12 @@ namespace hpx {
         // Finish the bootstrap
         result = hpx::pre_main(mode_);
         if (result) {
-            LBT_(info) << "runtime_impl::run_helper: bootstrap "
-                          "aborted, bailing out";
+            lbt_ << "runtime_impl::run_helper: bootstrap "
+                    "aborted, bailing out";
             return threads::thread_result_type(threads::terminated, nullptr);
         }
 
-        LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
+        lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         set_state(state_running);
 
         parcel_handler_.enable_alternative_parcelports();
@@ -310,23 +313,23 @@ namespace hpx {
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
-        LBT_(info) << "(1st stage) runtime_impl::start: booting locality " //-V128
+        lbt_ << "(1st stage) runtime_impl::start: booting locality " //-V128
                    << here() << " on " << num_threads_ << " OS-thread"
                    << ((num_threads_ == 1) ? "" : "s");
 
         // start runtime_support services
         runtime_support_->run();
-        LBT_(info) << "(1st stage) runtime_impl::start: started "
+        lbt_ << "(1st stage) runtime_impl::start: started "
                       "runtime_support component";
 
         // start the io pool
         io_pool_.run(false);
-        LBT_(info) << "(1st stage) runtime_impl::start: started the application "
+        lbt_ << "(1st stage) runtime_impl::start: started the application "
                       "I/O service pool";
 
         // start the thread manager
         thread_manager_->run(num_threads_);
-        LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
+        lbt_ << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
         // invoke the AGAS v2 notifications
@@ -334,7 +337,7 @@ namespace hpx {
 
         // {{{ launch main
         // register the given main function with the thread manager
-        LBT_(info) << "(1st stage) runtime_impl::start: launching run_helper "
+        lbt_ << "(1st stage) runtime_impl::start: launching run_helper "
                       "HPX thread";
 
         threads::thread_init_data data(

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -146,6 +146,8 @@ addressing_service::addressing_service(
   , state_(state_starting)
   , locality_()
 { // {{{
+    LPROGRESS_;
+
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
 
