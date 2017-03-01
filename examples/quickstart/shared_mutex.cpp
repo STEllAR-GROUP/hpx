@@ -10,6 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/random.hpp>
@@ -65,6 +66,7 @@ int main()
         threads.emplace_back(
             [&ready, &stm, k, i]
             {
+                HPX_UNUSED(k);
                 boost::random::mt19937 urng(
                     static_cast<std::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
