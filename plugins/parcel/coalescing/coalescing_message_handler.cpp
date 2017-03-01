@@ -292,7 +292,7 @@ namespace hpx { namespace plugins { namespace parcel
     std::int64_t
     coalescing_message_handler::get_average_time_between_parcels(bool reset)
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         std::int64_t now = util::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
@@ -377,6 +377,7 @@ namespace hpx { namespace plugins { namespace parcel
         std::unique_lock<mutex_type> l(mtx_);
         if (!time_between_parcels_)
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_message_handler::"
                     "get_time_between_parcels_histogram",
@@ -405,7 +406,7 @@ namespace hpx { namespace plugins { namespace parcel
         std::int64_t num_buckets,
         util::function_nonser<std::vector<std::int64_t>(bool)>& result)
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         if (time_between_parcels_)
         {
             result = util::bind(&coalescing_message_handler::
