@@ -328,39 +328,86 @@ namespace libfabric
             return true;
        }
 
-        std::unordered_map<std::uint32_t, std::shared_ptr<sender_connection>>
+        hpx::concurrent::unordered_map<std::uint32_t, std::shared_ptr<sender_connection>>
             connection_cache;
 
         // --------------------------------------------------------------------
         //  return a sender_connection object back to the parcelport_impl
+        // this is used by the send_immediate version of parcelport_impl
+        // --------------------------------------------------------------------
+        sender_connection* get_connection(
+            parcelset::locality const& dest, error_code& ec)
+        {
+            FUNC_START_DEBUG_MSG;
+            const locality &dest_fabric = dest.get<locality>();
+            const std::uint32_t &dest_ip = dest_fabric.ip_address();
+            LOG_DEBUG_MSG("get_remote_connection        from "
+                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
+
+            sender_connection *connection;
+
+            auto it = connection_cache.is_in_map(dest_ip);
+            if (it.second) {
+                LOG_DEBUG_MSG("Found sender_connection      from "
+                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
+                return it.first->second.get();
+            }
+            else {
+                LOG_DEBUG_MSG("Create sender_connection     from "
+                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
+
+                struct fid_ep *client = get_remote_connection(dest_fabric);
+
+                auto connection_ptr = std::make_shared<sender_connection>(
+                      this
+                    , dest_ip
+                    , dest.get<locality>()
+                    , client
+                    , chunk_pool_.get()
+                    , parcels_sent_
+                );
+                // @TODO : check for duplicate insert fail if two threads try concurrently
+                auto ok = connection_cache.insert(std::make_pair(dest_ip, connection_ptr));
+                if (!ok.second) {
+                    LOG_DEVEL_MSG("Duplicate connection_cache insert");
+                    sender_connection *temp = connection_cache[dest_ip].get();
+                    if (temp->client_ == connection_ptr->client_) {
+                        LOG_DEVEL_MSG("All ok, returning client");
+                        return temp;
+                    }
+                    LOG_ERROR_MSG("Duplicate connection_cache insert failure");
+                    std::terminate();
+                }
+                connection = connection_ptr.get();
+            }
+            FUNC_END_DEBUG_MSG;
+            return connection;
+        }
+
+        // --------------------------------------------------------------------
+        //  return a sender_connection object back to the parcelport_impl
+        // this is for compatibility with non send_immediate operation
         // --------------------------------------------------------------------
         std::shared_ptr<sender_connection> create_connection(
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
             const locality &dest_fabric = dest.get<locality>();
-            std::uint32_t dest_ip = dest_fabric.ip_address();
+            const std::uint32_t &dest_ip = dest_fabric.ip_address();
             LOG_DEBUG_MSG("get_remote_connection        from "
-                << ipaddress(ip_addr_)
-                << "to " << ipaddress(dest_ip)
-                << "chunk pool " << hexpointer(chunk_pool_.get()));
+                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
 
             std::shared_ptr<sender_connection> connection;
 
-            auto it = connection_cache.find(dest_ip);
-            if (it!=connection_cache.end()) {
-                std::shared_ptr<sender_connection> connection = it->second;
+            auto it = connection_cache.is_in_map(dest_ip);
+            if (it.second) {
                 LOG_DEBUG_MSG("Found sender_connection      from "
-                    << ipaddress(ip_addr_)
-                    << "to " << ipaddress(dest_ip)
-                    << "chunk pool " << hexpointer(chunk_pool_.get()));
-                return connection;
+                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
+                return it.first->second;
             }
             else {
                 LOG_DEBUG_MSG("Create sender_connection     from "
-                    << ipaddress(ip_addr_)
-                    << "to " << ipaddress(dest_ip)
-                    << "chunk pool " << hexpointer(chunk_pool_.get()));
+                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
 
                 struct fid_ep *client = get_remote_connection(dest_fabric);
 
@@ -372,9 +419,13 @@ namespace libfabric
                     , chunk_pool_.get()
                     , parcels_sent_
                 );
-
-                connection_cache.insert(std::make_pair(dest_ip, connection));
+                // @TODO : check for duplicate insert fail if two threads try concurrently
+                auto ok = connection_cache.insert(std::make_pair(dest_ip, connection));
+                if (!ok.second) {
+                    LOG_ERROR_MSG("Duplicate connection_cache insert");
+                }
             }
+
             FUNC_END_DEBUG_MSG;
             return connection;
         }
