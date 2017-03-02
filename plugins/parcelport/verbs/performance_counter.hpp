@@ -6,7 +6,7 @@
 #ifndef HPT_PARCELSET_POLICIES_VERBS_PERFORMANCE_COUNTER_HPP
 #define HPT_PARCELSET_POLICIES_VERBS_PERFORMANCE_COUNTER_HPP
 
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <atomic>
