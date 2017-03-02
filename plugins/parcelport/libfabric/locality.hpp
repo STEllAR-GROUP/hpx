@@ -81,7 +81,18 @@ struct locality {
 #elif defined(HPX_PARCELPORT_LIBFABRIC_GNI)
         return data_[0];
 #else
-        throw fabric_error(0, "unsupported provider, please fix ASAP");
+        throw fabric_error(0, "unsupported fabric provider, please fix ASAP");
+#endif
+    }
+
+    static const uint32_t & ip_address(const locality_data &data) {
+#if defined (HPX_PARCELPORT_LIBFABRIC_VERBS)
+        return reinterpret_cast<const struct sockaddr_in*>
+            (&data)->sin_addr.s_addr;
+#elif defined(HPX_PARCELPORT_LIBFABRIC_GNI)
+        return data[0];
+#else
+        throw fabric_error(0, "unsupported fabric provider, please fix ASAP");
 #endif
     }
 

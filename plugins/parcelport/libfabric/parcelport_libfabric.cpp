@@ -514,21 +514,22 @@ namespace libfabric
         void handle_libfabric_connection(struct fid_ep *client, uint32_t dest_ip)
         {
             if (1) {
-            LOG_DEVEL_MSG("Connection established       from "
-                << ipaddress(ip_addr_) << "to "
+            LOG_DEVEL_MSG("Connection established     from "
+                << ipaddress(ip_addr_) << "-> "
                 << ipaddress(dest_ip) << "( " << ipaddress(ip_addr_) << ")");
             }
             else {
-                LOG_DEVEL_MSG("Connection established       from "
-                    << ipaddress(dest_ip) << "to "
+                LOG_DEVEL_MSG("Connection established     from "
+                    << ipaddress(dest_ip) << "-> "
                     << ipaddress(ip_addr_) << "( " << ipaddress(ip_addr_) << ")");
             }
             //
             auto present = ip_endpoint_map.is_in_map(dest_ip);
             if (!present.second) {
                 ip_endpoint_map.insert(std::make_pair(dest_ip, client));
-                LOG_DEVEL_MSG("handle_libfabric_connection OK adding to ip_qp_map "
-                    << ipaddress(dest_ip));
+                LOG_DEVEL_MSG("handle_libfabric_connection OK  ip_endpoint_map "
+                    << ipaddress(dest_ip)
+                    << "( " << ipaddress(ip_addr_) << ")");
             }
             else {
                 throw std::runtime_error("libfabric parcelport "
@@ -1123,29 +1124,33 @@ namespace libfabric
             // if a connection exists to this destination, get it
             auto present = ip_endpoint_map.is_in_map(dest_ip);
             if (present.second) {
-                LOG_DEVEL_MSG("Client found connection made from "
-                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
+                LOG_DEVEL_MSG("Client found connection    from "
+                    << ipaddress(ip_addr_) << "-> "
+                    << ipaddress(dest_ip)
+                    << "( " << ipaddress(ip_addr_) << ")");
                 return present.first->second;
             }
 
             // Didn't find a connection. We must create a new one
-            LOG_DEBUG_MSG("Starting new connect request from "
-                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+            LOG_DEVEL_MSG("Starting new connect request    "
+                << ipaddress(ip_addr_) << "-> "
+                << ipaddress(dest_ip)
                 << "( " << ipaddress(ip_addr_) << ")");
 
             hpx::shared_future<struct fid_ep*> client_future =
                 libfabric_controller_->connect_to_server(dest_fabric);
 
-            LOG_DEVEL_MSG("About to wait client future  from "
-                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+            LOG_DEVEL_MSG("About to wait future       from "
+                << ipaddress(ip_addr_) << "-> "
+                << ipaddress(dest_ip)
                 << "( " << ipaddress(ip_addr_) << ")");
 
             // block until a connection is available
             struct fid_ep* client = client_future.get();
 
-            LOG_DEVEL_MSG("Client future ("
-                << hexpointer(client) << ") from "
-                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip)
+            LOG_DEVEL_MSG("OK future    " << hexpointer(client)
+                << ipaddress(ip_addr_) << "-> "
+                << ipaddress(dest_ip)
                 << "( " << ipaddress(ip_addr_) << ")");
 
             return client;
