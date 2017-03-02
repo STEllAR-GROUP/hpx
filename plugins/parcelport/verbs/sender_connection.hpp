@@ -30,7 +30,7 @@ namespace verbs
     //
     typedef rdma_memory_pool                                 memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>                memory_pool_ptr_type;
-    typedef pinned_memory_vector<char, header_size>          snd_data_type;
+    typedef pinned_memory_vector<char>                       snd_data_type;
     typedef parcel_buffer<snd_data_type>                     snd_buffer_type;
 
     struct sender_connection : std::enable_shared_from_this<sender_connection>

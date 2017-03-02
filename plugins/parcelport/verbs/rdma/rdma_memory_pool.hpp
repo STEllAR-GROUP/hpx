@@ -18,7 +18,7 @@
 //
 #include <boost/lockfree/stack.hpp>
 //
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
@@ -133,7 +133,7 @@ namespace verbs
                 verbs_memory_region region = chunk_allocator.malloc();
                 if (region.get_address()!=nullptr) {
                     block_list_[region.get_address()] = region;
-                    // we use the pointer to the region
+                    // we use the pointer to the region for access
                     verbs_memory_region *r = &block_list_[region.get_address()];
                     push(r);
                 }
@@ -172,6 +172,20 @@ namespace verbs
             LOG_TRACE_MSG(PoolType::desc() << "Push block "
                 << hexpointer(region->get_address()) << hexlength(region->get_size())
                 << decnumber(used_-1));
+#ifdef RDMA_POOL_MEMORY_CHECK
+            uintptr_t val = uintptr_t(region->get_address());
+            LOG_TRACE_MSG(PoolType::desc()
+                << "Writing 0xdeadbeef to region address "
+                << hexpointer(region->get_address()));
+            if (region->get_address()!=nullptr) {
+                // get use the pointer to the region
+                uintptr_t *ptr = reinterpret_cast<uintptr_t*>(region->get_address());
+                for (unsigned int c=0; c<chunk_size_/8; ++c) {
+                    ptr[c] = 0xdeadbeef;
+                    ptr[c] = val;
+                }
+            }
+#endif
 
 #ifdef RDMA_POOL_USE_LOCKFREE_STACK
             if (!free_list_.push(region)) {
