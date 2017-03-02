@@ -9,7 +9,7 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/future.hpp>
 //
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>

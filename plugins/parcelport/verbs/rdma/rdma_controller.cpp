@@ -5,8 +5,10 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_VERBS)
+
 #include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 //
