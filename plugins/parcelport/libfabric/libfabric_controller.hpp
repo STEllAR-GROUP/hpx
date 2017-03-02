@@ -461,25 +461,32 @@ struct fi_cq_msg_entry {
                     locality::locality_data addressinfo;
                     std::memcpy(addressinfo.data(), cm_entry->info->dest_addr, locality::array_size);
                     locality loc(addressinfo);
-                    LOG_DEVEL_MSG("FI_CONNREQ from " << ipaddress(loc.ip_address()));
+                    LOG_DEVEL_MSG("FI_CONNREQ                 from "
+                        << ipaddress(loc.ip_address()) << "-> "
+                        << ipaddress(here_.ip_address())
+                        << "( " << ipaddress(here_.ip_address()) << " )");
                     {
-                        scoped_lock lock(endpoint_map_mutex_);
-                        auto present1 = endpoint_tmp_.is_in_map(loc.ip_address());
-                        // auto present2 = endpoint_map_.is_in_map(addr[1]);
-                        if (present1.second /*&& !present2.second*/) {
-                            throw fabric_error(0, "FI_CONNREQ Duplicate request");
+                        auto result = insert_new_future(loc.ip_address());
+                        // if the insert fails, it means we have a connection
+                        // already in progress, reject if we are a lower ip address
+                        if (!result.first && loc.ip_address()>here_.ip_address()) {
+                            LOG_DEVEL_MSG("FI_CONNREQ priority fi_reject   "
+                                << ipaddress(loc.ip_address()) << "-> "
+                                << ipaddress(here_.ip_address())
+                                << "( " << ipaddress(here_.ip_address()) << " )");
+//                            int ret = fi_reject(ep_passive_, cm_entry->info->handle,  nullptr, 0);
+//                            if (ret) throw fabric_error(ret, "new_ep fi_reject failed");
+                            fi_freeinfo(cm_entry->info);
+                            return 0;
                         }
-                        // create a new endpoint for this request
+                        // create a new endpoint for this request and accept it
                         new_endpoint_active(cm_entry->info, &new_ep);
-
-                        // @TODO check for connection race
-                        LOG_DEBUG_MSG("Calling fi_accept with ep data "
-                                << decnumber(sizeof(uint32_t)) << ipaddress(here_.ip_address()));
+                        LOG_DEVEL_MSG("Calling fi_accept               "
+                            << ipaddress(loc.ip_address()) << "-> "
+                            << ipaddress(here_.ip_address())
+                            << "( " << ipaddress(here_.ip_address()) << " )");
                         int ret = fi_accept(new_ep, &here_.ip_address(), sizeof(uint32_t));
                         if (ret) throw fabric_error(ret, "new_ep fi_accept failed");
-
-                        // @TODO : support reject of connection request
-                        auto result = insert_new_future(loc.ip_address());
                     }
                     fi_freeinfo(cm_entry->info);
                     break;
@@ -496,21 +503,25 @@ struct fi_cq_msg_entry {
                     if (!present1.second) {
                         throw fabric_error(0, "FI_CONNECTED, endpoint map error");
                     }
-                    LOG_DEVEL_MSG("FI_CONNECTED to endpoint "
-                        << hexpointer(new_ep) << ipaddress(address[1]));
-                    //
-                    // endpoint_map_.insert(std::make_pair(address[1], new_ep));
+                    LOG_DEVEL_MSG("FI_CONNECTED " << hexpointer(new_ep)
+                        << ipaddress(locality::ip_address(address)) << "<> "
+                        << ipaddress(here_.ip_address())
+                        << "( " << ipaddress(here_.ip_address()) << " )");
+
                     // call parcelport connection function before setting future
                     connection_function_(new_ep, address[1]);
 
                     // if there is an entry for a locally started connection on this IP
                     // then set the future ready with the verbs endpoint
-                    LOG_DEVEL_MSG("FI_CONNECTED setting future "
-                        << ipaddress(address[1]));
+                    LOG_DEVEL_MSG("FI_CONNECTED setting future   "
+                            << ipaddress(locality::ip_address(address)) << "<> "
+                            << ipaddress(here_.ip_address())
+                        << "( " << ipaddress(here_.ip_address()) << " )");
+
                     std::get<0>(endpoint_tmp_.find(address[1])->second).
                         set_value(new_ep);
 
-                    // once the future is set, the entry can be removed
+                    // once the future is set, the entry can be removed?
 //                    endpoint_tmp_.erase(present1.first);
                 }
                 break;
@@ -590,7 +601,7 @@ struct fi_cq_msg_entry {
                     ++preposted_receives_;
                 }
                 else {
-                    LOG_DEVEL_MSG("aborting refill can_allocate_unsafe false");
+                    LOG_DEBUG_MSG("aborting refill can_allocate_unsafe false");
                     break; // don't block, if there are no free memory blocks
                 }
             }
@@ -640,8 +651,11 @@ struct fi_cq_msg_entry {
         std::pair<bool, hpx::shared_future<struct fid_ep*>> insert_new_future(
             uint32_t remote_ip)
         {
-            LOG_DEVEL_MSG("Inserting endpoint future/promise into map "
-                    << ipaddress(remote_ip));
+            LOG_DEVEL_MSG("Inserting future in map         "
+                << ipaddress(here_.ip_address()) << "-> "
+                << ipaddress(remote_ip)
+                << "( " << ipaddress(here_.ip_address()) << " )");
+
             //
             hpx::promise<struct fid_ep*> new_endpoint_promise;
             hpx::future<struct fid_ep*>  new_endpoint_future =
@@ -702,7 +716,7 @@ struct fi_cq_msg_entry {
                 flags, new_info, &fabric_info_active_);
             if (ret) throw fabric_error(ret, "fi_getinfo");
 
-            LOG_DEVEL_MSG("New connection for IP address " << ipaddress(remote.ip_address())
+            LOG_DEBUG_MSG("New connection for IP address " << ipaddress(remote.ip_address())
                 << "Fabric info " << fi_tostr(fabric_info_active_, FI_TYPE_INFO));
             setup_queues(fabric_info_active_);
 
@@ -714,7 +728,11 @@ struct fi_cq_msg_entry {
             new_endpoint_active(fabric_info_active_, &new_endpoint);
 
             // now it is safe to call connect
-            LOG_DEBUG_MSG("Calling fi_connect ");
+            LOG_DEVEL_MSG("Calling fi_connect         from "
+                << ipaddress(here_.ip_address()) << "-> "
+                << ipaddress(remote.ip_address())
+                << "( " << ipaddress(here_.ip_address()) << " )");
+
             ret = fi_connect(new_endpoint, remote.fabric_data(), nullptr, 0);
             if (ret) throw fabric_error(ret, "fi_connect");
 
