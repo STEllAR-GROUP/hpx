@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 bool called_test_action = false;
+bool called_t_action = false;
 
 namespace mynamespace
 {
@@ -20,6 +21,12 @@ namespace mynamespace
     }
 
     HPX_DEFINE_PLAIN_ACTION(test);
+
+    static auto t = hpx::actions::lambda_to_action(
+        []()
+        {
+            called_t_action = true;
+        });
 }
 
 typedef mynamespace::test_action mynamespace_test_action;
@@ -29,11 +36,21 @@ HPX_REGISTER_ACTION(mynamespace_test_action);
 int hpx_main(int argc, char* argv[])
 {
     {
-        typedef mynamespace_test_action func;
-        hpx::async<func>(hpx::find_here()).get();
+        {
+            typedef mynamespace_test_action func;
+            hpx::async<func>(hpx::find_here()).get();
+        }
+
+        HPX_TEST(called_test_action);
     }
 
-    HPX_TEST(called_test_action);
+    {
+        {
+            hpx::async(std::move(mynamespace::t),hpx::find_here()).get();
+        }
+
+        HPX_TEST(called_t_action);
+    }
 
     return hpx::finalize();
 }
