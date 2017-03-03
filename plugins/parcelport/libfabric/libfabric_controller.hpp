@@ -174,10 +174,10 @@ namespace libfabric
 
             // use infiniband type basic registration for now
             fabric_hints_->domain_attr->mr_mode = FI_MR_BASIC;
-
+#ifndef HPX_PARCELPORT_LIBFABRIC_GNI
             // we will use a shared receive context for active endpoints
             fabric_hints_->ep_attr->rx_ctx_cnt = FI_SHARED_CONTEXT;
-
+#endif
             if (endpoint_type=="msg") {
                 fabric_hints_->ep_attr->type = FI_EP_MSG;
             } else if (endpoint_type=="rdm") {
@@ -269,11 +269,12 @@ namespace libfabric
             ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
             if (ret) throw fabric_error(ret, "fi_domain");
 
+#ifndef HPX_PARCELPORT_LIBFABRIC_GNI
             LOG_DEBUG_MSG("Allocating shared receive context");
             ret = fi_srx_context(fabric_domain_, fabric_info_->rx_attr,
                 &ep_shared_rx_cxt_, NULL);
             if (ret) throw fabric_error(ret, "fi_srx_context");
-
+#endif
             preposted_receives_ = 0;
 
             // Create a memory pool for pinned buffers
@@ -353,8 +354,12 @@ namespace libfabric
             ret = fi_enable(*new_endpoint);
             if (ret) throw fabric_error(ret, "fi_enable");
 
+#ifndef HPX_PARCELPORT_LIBFABRIC_GNI
             refill_client_receives(ep_shared_rx_cxt_,
                 HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
+#else
+            refill_client_receives(*new_endpoint, 256, false);
+#endif
         }
 
         // --------------------------------------------------------------------
@@ -411,9 +416,15 @@ struct fi_cq_msg_entry {
 
             ret = fi_cq_read(rxcq, &entry, 1);
             if (ret>0) {
+#ifndef HPX_PARCELPORT_LIBFABRIC_GNI
                 if (--preposted_receives_<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS/4) {
-                    refill_client_receives(ep_shared_rx_cxt_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true);
+                    refill_client_receives(ep_shared_rx_cxt_, HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
                 }
+#else
+                if (--preposted_receives_<64) {
+                    refill_client_receives(ep_shared_rx_cxt_, 256, false);
+                }
+#endif
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEBUG_MSG("Completion wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " "
