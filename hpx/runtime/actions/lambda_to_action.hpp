@@ -102,9 +102,10 @@ namespace hpx { namespace actions
             constexpr typename hpx::actions::detail::action_from_lambda<F>::type
             operator += (F* f)
             {
-                static_assert( !std::is_assignable<F,F>::value &&
+                static_assert( 
+                    //!std::is_assignable<F,F>::value &&
                     std::is_empty<F>::value,
-                    "make_action() needs and only needs a lambda without " \
+                    "lambda_to_action() needs and only needs a lambda without " \
                     "capture list");
 
                 return typename
