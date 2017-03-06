@@ -8,6 +8,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/future.hpp>
+#include <utility>
 
 namespace mynamespace
 {

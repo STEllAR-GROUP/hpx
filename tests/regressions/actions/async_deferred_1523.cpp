@@ -10,9 +10,12 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <utility>
 
 bool null_action_executed = false;
 bool int_action_executed = false;
+bool nt_executed = false;
+bool it_executed = false;
 
 void null_thread()
 {
@@ -57,13 +60,13 @@ int main()
         auto nt = hpx::actions::lambda_to_action(
             []()
             {
-                null_action_executed = true;
+                nt_executed = true;
             });
 
         auto it = hpx::actions::lambda_to_action(
             []() -> int
             {
-                int_action_executed = true;
+                it_executed = true;
                 return 42;
             });
 
@@ -75,11 +78,11 @@ int main()
 
         hpx::async(
             hpx::launch::deferred, std::move(nt), hpx::find_here()).get();
-        HPX_TEST(null_action_executed);
+        HPX_TEST(nt_executed);
 
         int result = hpx::async(
             hpx::launch::deferred, std::move(it), hpx::find_here()).get();
-        HPX_TEST(int_action_executed);
+        HPX_TEST(it_executed);
         HPX_TEST_EQ(result, 42);
 
         for (hpx::id_type const& loc : hpx::find_all_localities())
