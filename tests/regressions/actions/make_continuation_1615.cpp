@@ -39,13 +39,13 @@ int hpx_main(int argc, char* argv[])
 
     // Same test with lambdas
     {
-        auto t2 = hpx::actions::lambda_to_action(
+        constexpr auto t2 = hpx::actions::lambda_to_action(
             [](std::int32_t i) -> std::int32_t
             {
                 return i * 2;
             });
 
-        auto ts = hpx::actions::lambda_to_action(
+        constexpr auto ts = hpx::actions::lambda_to_action(
             [](std::int32_t i) -> std::string
             {
                 return std::to_string(i);

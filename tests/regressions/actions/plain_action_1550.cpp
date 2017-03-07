@@ -23,7 +23,7 @@ namespace mynamespace
 
     HPX_DEFINE_PLAIN_ACTION(test);
 
-    static auto t = hpx::actions::lambda_to_action(
+    static constexpr auto t = hpx::actions::lambda_to_action(
         []()
         {
             called_t = true;

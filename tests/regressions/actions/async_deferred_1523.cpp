@@ -57,20 +57,20 @@ int main()
 
     // Same test with lambdas
     {
-        auto nt = hpx::actions::lambda_to_action(
+        constexpr auto nt = hpx::actions::lambda_to_action(
             []()
             {
                 nt_executed = true;
             });
 
-        auto it = hpx::actions::lambda_to_action(
+        constexpr auto it = hpx::actions::lambda_to_action(
             []() -> int
             {
                 it_executed = true;
                 return 42;
             });
 
-        auto gl = hpx::actions::lambda_to_action(
+        constexpr auto gl = hpx::actions::lambda_to_action(
             []() -> hpx::id_type
             {
                 return hpx::find_here();
