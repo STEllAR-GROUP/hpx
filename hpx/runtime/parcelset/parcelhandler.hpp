@@ -195,7 +195,7 @@ namespace hpx { namespace parcelset
         void put_parcel(parcel p, write_handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no
-        /// callback functor is provided by the user.
+        /// callback is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
@@ -233,7 +233,7 @@ namespace hpx { namespace parcelset
         void put_parcels(std::vector<parcel> p, std::vector<write_handler_type> f);
 
         /// This put_parcel() function overload is asynchronous, but no
-        /// callback functor is provided by the user.
+        /// callback is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
