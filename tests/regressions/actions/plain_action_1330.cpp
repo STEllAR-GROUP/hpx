@@ -19,11 +19,12 @@ namespace mynamespace
 
     HPX_DEFINE_PLAIN_ACTION(test, test_action);
 
-    static constexpr auto t = hpx::actions::lambda_to_action(
+    static constexpr auto t =
+        HPX_LAMBDA_ACTION
         []()
         {
             hpx::cout << "test" << hpx::endl;
-        });
+        };
 }
 
 HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);

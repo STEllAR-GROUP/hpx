@@ -95,17 +95,16 @@ namespace hpx { namespace actions
                     F,return_type,sequence_type>::type;
         };
 
-
-        template<typename F>
         struct action_maker
         {
+            template<typename F>
             constexpr typename hpx::actions::detail::action_from_lambda<F>::type
             operator += (F* f)
             {
                 static_assert(
                     //!std::is_assignable<F,F>::value &&
                     std::is_empty<F>::value,
-                    "lambda_to_action() needs and only needs a lambda with empty " \
+                    "HPX_LAMBDA_ACTION needs and only needs a lambda with empty " \
                     "capture list");
 
                 return typename
@@ -113,17 +112,9 @@ namespace hpx { namespace actions
             }
         };
     }
-
-    template<typename F>
-    constexpr auto lambda_to_action(F && f)
-    -> decltype(hpx::actions::detail::action_maker<F>() += true
-        ? nullptr
-        : hpx::actions::detail::addr_add() + f)
-    {
-        return hpx::actions::detail::action_maker<F>() += true
-            ? nullptr
-            : hpx::actions::detail::addr_add() + f;
-    }
 }}
+
+#define HPX_LAMBDA_ACTION hpx::actions::detail::action_maker() \
+    += true ? nullptr : hpx::actions::detail::addr_add() +
 
 #endif /*HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP*/

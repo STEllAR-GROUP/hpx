@@ -39,17 +39,19 @@ int hpx_main(int argc, char* argv[])
 
     // Same test with lambdas
     {
-        constexpr auto t2 = hpx::actions::lambda_to_action(
+        constexpr auto t2 =
+            HPX_LAMBDA_ACTION
             [](std::int32_t i) -> std::int32_t
             {
                 return i * 2;
-            });
+            };
 
-        constexpr auto ts = hpx::actions::lambda_to_action(
+        constexpr auto ts =
+            HPX_LAMBDA_ACTION
             [](std::int32_t i) -> std::string
             {
                 return std::to_string(i);
-            });
+            };
 
         std::string result = hpx::async_continue(
             std::move(t2), hpx::make_continuation(std::move(ts)),
