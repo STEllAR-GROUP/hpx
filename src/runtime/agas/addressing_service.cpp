@@ -337,6 +337,21 @@ bool addressing_service::has_resolved_locality(
     return resolved_localities_.find(gid) != resolved_localities_.end();
 } // }}}
 
+void addressing_service::pre_cache_endpoints(
+    std::vector<parcelset::endpoints_type> const& endpoints)
+{ // {{{
+    std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+    std::uint32_t locality_id = 0;
+    for (parcelset::endpoints_type const& endpoint : endpoints)
+    {
+        resolved_localities_.insert(
+            resolved_localities_type::value_type(
+                naming::get_gid_from_locality_id(locality_id),
+                endpoint));
+        ++locality_id;
+    }
+} // }}}
+
 parcelset::endpoints_type const & addressing_service::resolve_locality(
     naming::gid_type const & gid
   , error_code& ec
