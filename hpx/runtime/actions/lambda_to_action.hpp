@@ -36,10 +36,10 @@ namespace hpx { namespace actions
 
         template<typename F, typename ReturnType, typename ... Args>
         struct caller{
-          static inline ReturnType call(Args... args)
+          static inline ReturnType call(Args && ... args)
           {
              int * dummy = nullptr;
-             return reinterpret_cast<const F&>(*dummy)( args... );
+             return reinterpret_cast<const F&>(*dummy)( std::forward<Args>(args)... );
           }
         };
 
@@ -68,7 +68,7 @@ namespace hpx { namespace actions
             template<typename T>
             using remove_reference_t = typename std::remove_reference<T>::type;
             using type
-                = hpx::actions::detail::sequence< remove_reference_t<Args>... >;
+                = hpx::actions::detail::sequence< Args... >;
         };
 
         template <typename T>
