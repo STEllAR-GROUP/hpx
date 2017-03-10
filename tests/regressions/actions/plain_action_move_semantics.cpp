@@ -45,11 +45,11 @@ std::size_t pass_movable_object(movable_object const& obj)
     return obj.get_count();
 }
 
-constexpr auto movable_object_void_passer =
+HPX_CONSTEXPR auto movable_object_void_passer =
     HPX_LAMBDA_ACTION
     [](movable_object const&) -> void {};
 
-constexpr auto movable_object_passer =
+HPX_CONSTEXPR auto movable_object_passer =
     HPX_LAMBDA_ACTION
     [](movable_object const& obj) -> std::size_t
     {
@@ -75,11 +75,11 @@ std::size_t pass_movable_object_value(movable_object obj)
     return obj.get_count();
 }
 
-constexpr auto movable_object_value_void_passer =
+HPX_CONSTEXPR auto movable_object_value_void_passer =
     HPX_LAMBDA_ACTION
     [](movable_object) -> void {};
 
-constexpr auto movable_object_value_passer =
+HPX_CONSTEXPR auto movable_object_value_passer =
     HPX_LAMBDA_ACTION
     [](movable_object obj) -> std::size_t
     {
@@ -105,11 +105,11 @@ std::size_t pass_non_movable_object(non_movable_object const& obj)
     return obj.get_count();
 }
 
-constexpr auto non_movable_object_void_passer =
+HPX_CONSTEXPR auto non_movable_object_void_passer =
     HPX_LAMBDA_ACTION
     [](non_movable_object const&) -> void {};
 
-constexpr auto non_movable_object_passer =
+HPX_CONSTEXPR auto non_movable_object_passer =
     HPX_LAMBDA_ACTION
     [](non_movable_object const& obj) -> std::size_t
     {
@@ -134,11 +134,11 @@ std::size_t pass_non_movable_object_value(non_movable_object obj)
     return obj.get_count();
 }
 
-constexpr auto non_movable_object_value_void_passer =
+HPX_CONSTEXPR auto non_movable_object_value_void_passer =
     HPX_LAMBDA_ACTION
     [](non_movable_object) -> void {};
 
-constexpr auto non_movable_object_value_passer =
+HPX_CONSTEXPR auto non_movable_object_value_passer =
     HPX_LAMBDA_ACTION
     [](non_movable_object obj) -> std::size_t
     {
@@ -166,14 +166,14 @@ movable_object return_movable_object()
     return movable_object();
 }
 
-constexpr auto non_movable_object_returner =
+HPX_CONSTEXPR auto non_movable_object_returner =
     HPX_LAMBDA_ACTION
     []() -> non_movable_object
     {
         return non_movable_object();
     };
 
-constexpr auto movable_object_returner =
+HPX_CONSTEXPR auto movable_object_returner =
     HPX_LAMBDA_ACTION
     []() -> movable_object
     {
@@ -513,20 +513,22 @@ void test_object_actions()
             if (is_local)
             {
                 HPX_TEST_EQ((
-                    pass_object<pass_non_movable_object_value_action, non_movable_object>(id)
-                ), 3u); // bind + function + call
+                    pass_object<pass_non_movable_object_value_action,
+                    non_movable_object>(id)), 3u); // bind + function + call
 
                 HPX_TEST_EQ((
-                    move_object<pass_non_movable_object_value_action, non_movable_object>(id)
-                ), 3u); // bind + function + call
+                    move_object<pass_non_movable_object_value_action,
+                    non_movable_object>(id)), 3u); // bind + function + call
             } else {
                 HPX_TEST_EQ((
-                    pass_object<pass_non_movable_object_value_action, non_movable_object>(id)
-                ), 4u); // transfer_action + bind + function + call
+                    pass_object<pass_non_movable_object_value_action,
+                    non_movable_object>(id)),
+                    4u); // transfer_action + bind + function + call
 
                 HPX_TEST_EQ((
-                    move_object<pass_non_movable_object_value_action, non_movable_object>(id)
-                ), 4u); // transfer_action + bind + function + call
+                    move_object<pass_non_movable_object_value_action,
+                    non_movable_object>(id)),
+                    4u); // transfer_action + bind + function + call
             }
 
             // test movable_object()
@@ -596,59 +598,61 @@ void test_object_actions()
             if (is_local)
             {
                 HPX_TEST_EQ((
-                    pass_object<decltype(non_movable_object_passer), non_movable_object>(id)
-                ), 2u); // bind + function
+                    pass_object<decltype(non_movable_object_passer),
+                    non_movable_object>(id)), 2u); // bind + function
 
                 HPX_TEST_EQ((
-                    move_object<decltype(non_movable_object_passer), non_movable_object>(id)
-                ), 2u); // bind + function
+                    move_object<decltype(non_movable_object_passer),
+                    non_movable_object>(id)), 2u); // bind + function
             } else {
                 HPX_TEST_EQ((
-                    pass_object<decltype(non_movable_object_passer), non_movable_object>(id)
-                ), 3u); // transfer_action + bind + function
+                    pass_object<decltype(non_movable_object_passer),
+                    non_movable_object>(id)), 3u); // transfer_action + bind + function
 
                 HPX_TEST_EQ((
-                    move_object<decltype(non_movable_object_passer), non_movable_object>(id)
-                ), 3u); // transfer_action + bind + function
+                    move_object<decltype(non_movable_object_passer),
+                    non_movable_object>(id)), 3u); // transfer_action + bind + function
             }
 
             // test size_t(movable_object)
             if (is_local)
             {
                 HPX_TEST_EQ((
-                    pass_object<decltype(movable_object_value_passer), movable_object>(id)
-                ), 1u); // call
+                    pass_object<decltype(movable_object_value_passer),
+                    movable_object>(id)), 1u); // call
 
                 HPX_TEST_EQ((
-                    move_object<decltype(movable_object_value_passer), movable_object>(id)
-                ), 0u);
+                    move_object<decltype(movable_object_value_passer),
+                    movable_object>(id)), 0u);
             } else {
                 HPX_TEST_EQ((
-                    pass_object<decltype(movable_object_value_passer), movable_object>(id)
-                ), 1u); // transfer_action
+                    pass_object<decltype(movable_object_value_passer),
+                    movable_object>(id)), 1u); // transfer_action
 
                 HPX_TEST_EQ((
-                    move_object<decltype(movable_object_value_passer), movable_object>(id)
-                ), 0u);
+                    move_object<decltype(movable_object_value_passer),
+                    movable_object>(id)), 0u);
             }
 
             // test size_t(non_movable_object)
             if (is_local)
             {
                 HPX_TEST_EQ((
-                    pass_object<decltype(non_movable_object_value_passer), non_movable_object>(id)
-                ), 3u); // bind + function + call
+                    pass_object<decltype(non_movable_object_value_passer),
+                    non_movable_object>(id)), 3u); // bind + function + call
 
                 HPX_TEST_EQ((
-                    move_object<decltype(non_movable_object_value_passer), non_movable_object>(id)
-                ), 3u); // bind + function + call
+                    move_object<decltype(non_movable_object_value_passer),
+                    non_movable_object>(id)), 3u); // bind + function + call
             } else {
                 HPX_TEST_EQ((
-                    pass_object<decltype(non_movable_object_value_passer), non_movable_object>(id)
+                    pass_object<decltype(non_movable_object_value_passer),
+                    non_movable_object>(id)
                 ), 4u); // transfer_action + bind + function + call
 
                 HPX_TEST_EQ((
-                    move_object<decltype(non_movable_object_value_passer), non_movable_object>(id)
+                    move_object<decltype(non_movable_object_value_passer),
+                    non_movable_object>(id)
                 ), 4u); // transfer_action + bind + function + call
             }
 

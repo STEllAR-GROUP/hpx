@@ -19,7 +19,7 @@ namespace mynamespace
 
     HPX_DEFINE_PLAIN_ACTION(test, test_action);
 
-    static constexpr auto t =
+    static HPX_CONSTEXPR auto t =
         HPX_LAMBDA_ACTION
         []()
         {

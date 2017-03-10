@@ -57,14 +57,14 @@ int main()
 
     // Same test with lambdas
     {
-        constexpr auto nt =
+        HPX_CONSTEXPR auto nt =
             HPX_LAMBDA_ACTION
             []()
             {
                 nt_executed = true;
             };
 
-        constexpr auto it =
+        HPX_CONSTEXPR auto it =
             HPX_LAMBDA_ACTION
             []() -> int
             {
@@ -72,7 +72,7 @@ int main()
                 return 42;
             };
 
-        constexpr auto gl =
+        HPX_CONSTEXPR auto gl =
             HPX_LAMBDA_ACTION
             []() -> hpx::id_type
             {

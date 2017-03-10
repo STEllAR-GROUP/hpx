@@ -10,6 +10,7 @@
 
 #include <hpx/include/plain_actions.hpp>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace actions
 {
@@ -65,10 +66,7 @@ namespace hpx { namespace actions
         template <typename ClassType, typename ReturnType, typename... Args>
         struct extract_parameters<ReturnType(ClassType::*)(Args...) const>
         {
-            template<typename T>
-            using remove_reference_t = typename std::remove_reference<T>::type;
-            using type
-                = hpx::actions::detail::sequence< Args... >;
+            using type = hpx::actions::detail::sequence< Args... >;
         };
 
         template <typename T>
@@ -98,7 +96,7 @@ namespace hpx { namespace actions
         struct action_maker
         {
             template<typename F>
-            constexpr typename hpx::actions::detail::action_from_lambda<F>::type
+            HPX_CONSTEXPR typename hpx::actions::detail::action_from_lambda<F>::type
             operator += (F* f)
             {
                 static_assert(
