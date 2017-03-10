@@ -35,7 +35,7 @@ namespace hpx { namespace performance_counters { namespace memory
             "referenced locality", "bytes"
         );
         pc::install_counter_type(
-            "/runtime/memory/total", &read_total_mem_avail, 
+            "/runtime/memory/total", &read_total_mem_avail,
             "returns the total available memory on the node", "kB"
         );
     }

@@ -1211,6 +1211,18 @@ system and application performance.
          referenced locality (in bytes).]
         [None]
     ]
+    [   [`/runtime/memory/total`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the total available
+          memory should be queried. The locality id is a (zero based) number
+          identifying the locality. 
+          Note: only supported in Linux
+        ]
+        [Returns the total available memory for use by the referenced locality 
+         (in bytes).]
+        [None]
+    ]
     [   [`/runtime/io/read_bytes_issued`]
         [`locality#*/total`
 
