@@ -11,6 +11,7 @@
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -107,6 +108,7 @@ namespace hpx { namespace lcos {
                     hpx::launch::sync,
                     [node](hpx::future<void> f)
                     {
+                        HPX_UNUSED(node);
                         f.get();
                     }
                 ).get();

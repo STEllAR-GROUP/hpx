@@ -12,6 +12,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/gather.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -487,6 +488,8 @@ partition stepper_server::heat_part(partition const& left,
         hpx::util::unwrapped(
             [middle](partition_data const& m) -> partition_data
             {
+                HPX_UNUSED(middle);
+
                 // All local operations are performed once the middle data of
                 // the previous time step becomes available.
                 std::size_t size = m.size();
@@ -504,6 +507,9 @@ partition stepper_server::heat_part(partition const& left,
             [left, middle, right](partition_data next, partition_data const& l,
                 partition_data const& m, partition_data const& r) -> partition
             {
+                HPX_UNUSED(left);
+                HPX_UNUSED(right);
+
                 // Calculate the missing boundary elements once the
                 // corresponding data has become available.
                 std::size_t size = m.size();

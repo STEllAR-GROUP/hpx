@@ -11,6 +11,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -282,6 +283,9 @@ struct stepper
                 [left, middle, right](partition_data const& l, partition_data const& m,
                     partition_data const& r)
                 {
+                    HPX_UNUSED(left);
+                    HPX_UNUSED(right);
+
                     // The new partition_data will be allocated on the same locality
                     // as 'middle'.
                     return partition(middle.get_id(), heat_part_data(l, m, r));

@@ -163,12 +163,12 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, Functor, Name)            \
-    HPX_DECLARE_GET_FUNCTION_NAME(function_vtable<Sig>, Functor, Name)        \
+#define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, F, Name)                  \
+    HPX_DECLARE_GET_FUNCTION_NAME(function_vtable<Sig>, F, Name)              \
 /**/
 
-#define HPX_UTIL_REGISTER_FUNCTION(Sig, Functor, Name)                        \
-    HPX_DEFINE_GET_FUNCTION_NAME(function_vtable<Sig>, Functor, Name)         \
+#define HPX_UTIL_REGISTER_FUNCTION(Sig, F, Name)                              \
+    HPX_DEFINE_GET_FUNCTION_NAME(function_vtable<Sig>, F, Name)               \
 /**/
 
 #endif

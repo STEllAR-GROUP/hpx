@@ -13,6 +13,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -171,6 +172,7 @@ namespace hpx { namespace parallel { namespace util
                             std::vector<hpx::future<Result> > && r2) mutable
                     ->  FwdIter
                     {
+                        HPX_UNUSED(scoped_param);
                         handle_local_exceptions<ExPolicy>::call(r1, errors);
                         handle_local_exceptions<ExPolicy>::call(r2, errors);
 
