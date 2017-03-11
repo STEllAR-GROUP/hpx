@@ -151,12 +151,12 @@ namespace hpx { namespace parcelset
 
         for (pports_type::value_type& pp : pports_)
         {
+            pp.second->set_applier(applier);
             if(pp.second != get_bootstrap_parcelport())
             {
                 if(pp.first > 0)
                     pp.second->run(false);
             }
-            pp.second->set_applier(applier);
         }
     }
 
