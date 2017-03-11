@@ -17,6 +17,9 @@ namespace hpx { namespace performance_counters { namespace memory
 
     // returns resident memory value
     std::uint64_t read_psm_resident(bool);
+
+    // returns total available memory
+    std::uint64_t read_total_mem_avail(bool);
 }}}
 
 #endif
