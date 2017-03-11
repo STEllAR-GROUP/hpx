@@ -102,7 +102,7 @@ namespace hpx { namespace actions
                 static_assert(
                     //!std::is_assignable<F,F>::value &&
                     std::is_empty<F>::value,
-                    "HPX_LAMBDA_ACTION needs and only needs a lambda with empty " \
+                    "lambda_to_action() needs and only needs a lambda with empty " \
                     "capture list");
 
                 return typename
@@ -110,9 +110,20 @@ namespace hpx { namespace actions
             }
         };
     }
-}}
 
-#define HPX_LAMBDA_ACTION hpx::actions::detail::action_maker() \
-    += true ? nullptr : hpx::actions::detail::addr_add() +
+    template<typename F>
+    auto lambda_to_action(F&& f)
+    -> decltype( hpx::actions::detail::action_maker() += true
+        ? nullptr
+        : hpx::actions::detail::addr_add() +  f)
+    {
+        HPX_CONSTEXPR auto act =
+            hpx::actions::detail::action_maker() += true
+            ? nullptr
+            : hpx::actions::detail::addr_add() +  f;
+
+        return act;
+    }
+}}
 
 #endif /*HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP*/

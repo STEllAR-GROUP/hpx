@@ -23,12 +23,12 @@ namespace mynamespace
 
     HPX_DEFINE_PLAIN_ACTION(test);
 
-    static HPX_CONSTEXPR auto t =
-        HPX_LAMBDA_ACTION
+    static auto t =
+        hpx::actions::lambda_to_action(
         []()
         {
             called_t = true;
-        };
+        });
 }
 
 typedef mynamespace::test_action mynamespace_test_action;

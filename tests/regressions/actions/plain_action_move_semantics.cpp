@@ -45,16 +45,16 @@ std::size_t pass_movable_object(movable_object const& obj)
     return obj.get_count();
 }
 
-HPX_CONSTEXPR auto movable_object_void_passer =
-    HPX_LAMBDA_ACTION
-    [](movable_object const&) -> void {};
+auto movable_object_void_passer =
+    hpx::actions::lambda_to_action(
+    [](movable_object const&) -> void {});
 
-HPX_CONSTEXPR auto movable_object_passer =
-    HPX_LAMBDA_ACTION
+auto movable_object_passer =
+    hpx::actions::lambda_to_action(
     [](movable_object const& obj) -> std::size_t
     {
         return obj.get_count();
-    };
+    });
 
 // 'normal' actions (execution is scheduled on a new thread)
 HPX_PLAIN_ACTION(pass_movable_object,
@@ -75,16 +75,16 @@ std::size_t pass_movable_object_value(movable_object obj)
     return obj.get_count();
 }
 
-HPX_CONSTEXPR auto movable_object_value_void_passer =
-    HPX_LAMBDA_ACTION
-    [](movable_object) -> void {};
+auto movable_object_value_void_passer =
+    hpx::actions::lambda_to_action(
+    [](movable_object) -> void {});
 
-HPX_CONSTEXPR auto movable_object_value_passer =
-    HPX_LAMBDA_ACTION
+auto movable_object_value_passer =
+    hpx::actions::lambda_to_action(
     [](movable_object obj) -> std::size_t
     {
        return obj.get_count();
-    };
+    });
 
 // 'normal' actions (execution is scheduled on a new thread)
 HPX_PLAIN_ACTION(pass_movable_object_value,
@@ -105,16 +105,16 @@ std::size_t pass_non_movable_object(non_movable_object const& obj)
     return obj.get_count();
 }
 
-HPX_CONSTEXPR auto non_movable_object_void_passer =
-    HPX_LAMBDA_ACTION
-    [](non_movable_object const&) -> void {};
+auto non_movable_object_void_passer =
+    hpx::actions::lambda_to_action(
+    [](non_movable_object const&) -> void {});
 
-HPX_CONSTEXPR auto non_movable_object_passer =
-    HPX_LAMBDA_ACTION
+auto non_movable_object_passer =
+    hpx::actions::lambda_to_action(
     [](non_movable_object const& obj) -> std::size_t
     {
         return obj.get_count();
-    };
+    });
 
 // 'normal' actions (execution is scheduled on a new thread)
 HPX_PLAIN_ACTION(pass_non_movable_object_void,
@@ -134,16 +134,16 @@ std::size_t pass_non_movable_object_value(non_movable_object obj)
     return obj.get_count();
 }
 
-HPX_CONSTEXPR auto non_movable_object_value_void_passer =
-    HPX_LAMBDA_ACTION
-    [](non_movable_object) -> void {};
+auto non_movable_object_value_void_passer =
+    hpx::actions::lambda_to_action(
+    [](non_movable_object) -> void {});
 
-HPX_CONSTEXPR auto non_movable_object_value_passer =
-    HPX_LAMBDA_ACTION
+auto non_movable_object_value_passer =
+    hpx::actions::lambda_to_action(
     [](non_movable_object obj) -> std::size_t
     {
        return obj.get_count();
-    };
+    });
 
 // 'normal' actions (execution is scheduled on a new thread)
 HPX_PLAIN_ACTION(pass_non_movable_object_value_void,
@@ -166,19 +166,19 @@ movable_object return_movable_object()
     return movable_object();
 }
 
-HPX_CONSTEXPR auto non_movable_object_returner =
-    HPX_LAMBDA_ACTION
+auto non_movable_object_returner =
+    hpx::actions::lambda_to_action(
     []() -> non_movable_object
     {
         return non_movable_object();
-    };
+    });
 
-HPX_CONSTEXPR auto movable_object_returner =
-    HPX_LAMBDA_ACTION
+auto movable_object_returner =
+    hpx::actions::lambda_to_action(
     []() -> movable_object
     {
         return movable_object();
-    };
+    });
 
 // 'normal' actions (execution is scheduled on a new thread)
 HPX_PLAIN_ACTION(return_movable_object,

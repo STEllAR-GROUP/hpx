@@ -57,27 +57,27 @@ int main()
 
     // Same test with lambdas
     {
-        HPX_CONSTEXPR auto nt =
-            HPX_LAMBDA_ACTION
+        auto nt =
+            hpx::actions::lambda_to_action(
             []()
             {
                 nt_executed = true;
-            };
+            });
 
-        HPX_CONSTEXPR auto it =
-            HPX_LAMBDA_ACTION
+        auto it =
+            hpx::actions::lambda_to_action(
             []() -> int
             {
                 it_executed = true;
                 return 42;
-            };
+            });
 
-        HPX_CONSTEXPR auto gl =
-            HPX_LAMBDA_ACTION
+        auto gl =
+            hpx::actions::lambda_to_action(
             []() -> hpx::id_type
             {
                 return hpx::find_here();
-            };
+            });
 
         hpx::async(
             hpx::launch::deferred, std::move(nt), hpx::find_here()).get();
