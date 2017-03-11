@@ -38,7 +38,7 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::map<naming::gid_type, naming::gid_type> split_gids_type;
+        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,

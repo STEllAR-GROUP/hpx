@@ -75,7 +75,7 @@ namespace hpx { namespace parcelset
     private:
 
         typedef
-            std::map<naming::gid_type, naming::gid_type>
+            std::map<const naming::gid_type*, naming::gid_type>
             split_gids_type;
 
 #if defined(HPX_DEBUG)
