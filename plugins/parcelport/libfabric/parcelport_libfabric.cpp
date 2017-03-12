@@ -101,10 +101,10 @@ namespace libfabric
     struct tag_provider {
         tag_provider() : next_tag_(1) {}
 
-        uint32_t next(uint32_t ip_addr)
+        uint32_t next(uint32_t fi_addr)
         {
             // @TODO track wrap around and collisions (how?)
-            return (next_tag_++ & 0x0000FFFF) + (ip_addr & 0xFFFF0000);
+            return (next_tag_++ & 0x0000FFFF) + ((fi_addr << 16) & 0xFFFF0000);
         }
 
         // using 16 bits currently.
@@ -143,10 +143,14 @@ namespace libfabric
         bool bootstrap_enabled_;
         bool parcelport_enabled_;
 
-        // to quickly lookup a queue-pair (QP) from a destination ip address
+        // to quickly lookup an endpoint from a destination ip address
         typedef hpx::concurrent::unordered_map<std::uint32_t, struct fid_ep *> ip_map;
         typedef ip_map::iterator ip_map_iterator;
         ip_map ip_endpoint_map;
+
+        typedef hpx::concurrent::unordered_map<std::uint32_t, fi_addr_t> addr_map;
+        typedef addr_map::iterator addr_map_iterator;
+        addr_map addr_endpoint_map;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
         // more consistent reuse of classes/types.
@@ -160,6 +164,7 @@ namespace libfabric
 
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
+        mutex_type  address_mutex;
 
         // These are counters that are used for flow control so that we can throttle
         // send tasks when too many messages have been posted.
@@ -198,10 +203,11 @@ namespace libfabric
         // --------------------------------------------------------------------
         typedef serialization::serialization_chunk chunk_struct;
         typedef struct {
-            std::atomic<unsigned int>   rdma_count;
+            std::atomic<uint32_t>       rdma_count;
             uint32_t                    tag;
-            std::vector<chunk_struct>   chunks;
+            fi_addr_t                    src_addr;
             libfabric_memory_region    *header_region, *message_region;
+            std::vector<chunk_struct>   chunks;
             zero_copy_vector            zero_copy_regions;
         } parcel_recv_data;
 
@@ -214,12 +220,14 @@ namespace libfabric
         // map send/recv parcel wr_id to all info needed on completion
         typedef hpx::concurrent::unordered_map<void*, active_send_iterator>
             send_wr_map;
+        typedef hpx::concurrent::unordered_map<uint32_t, active_send_iterator>
+            tag_map;
         typedef hpx::concurrent::unordered_map<void*, active_recv_iterator>
             recv_wr_map;
 
         // store received objects using a map referenced by libfabric work request ID
         send_wr_map SendCompletionMap;
-        send_wr_map TagSendCompletionMap;
+        tag_map     TagSendCompletionMap;
         recv_wr_map ReadCompletionMap;
 
         // keep track of all outgoing sends in a list, protected by a mutex
@@ -265,6 +273,8 @@ namespace libfabric
             // we need this for background OS threads to get 'this' pointer
             parcelport::parcelport_instance_ = this;
 
+            if (!parcelport_enabled_) return;
+
             // Get parameters that determine our fabric selection
             std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
                 HPX_PARCELPORT_LIBFABRIC_PROVIDER);
@@ -275,15 +285,7 @@ namespace libfabric
 
             LOG_DEBUG_MSG("libfabric parcelport function using attributes "
                 << provider << " " << domain << " " << endpoint);
-/*
-            _port = hpx::util::get_entry_as<std::uint16_t>(ini,
-                "hpx.agas.port", HPX_INITIAL_IP_PORT);
-            std::uint16_t port_p = hpx::util::get_entry_as<std::uint16_t>(ini,
-                "hpx.parcel.port", HPX_INITIAL_IP_PORT);
 
-            LOG_DEBUG_MSG("libfabric hpx.agas port number " << decnumber(_port));
-            LOG_DEBUG_MSG("libfabric hpx.parcel port number " << decnumber(port_p));
-*/
             // create our main fabric control structure
             libfabric_controller_ = std::make_shared<libfabric_controller>(
                 provider, domain, endpoint);
@@ -301,8 +303,14 @@ namespace libfabric
         // Start the handling of connections.
         bool do_run()
         {
+            if (!parcelport_enabled_) return false;
+
+            auto &as = this->applier_->get_agas_client();
+            libfabric_controller_->initialize_localities(as);
+
             FUNC_START_DEBUG_MSG;
             libfabric_controller_->startup();
+
 
             LOG_DEBUG_MSG("Fetching memory pool");
             chunk_pool_ = libfabric_controller_->get_memory_pool();
@@ -322,112 +330,58 @@ namespace libfabric
 
             auto recv_completion_function = std::bind(
                 &parcelport::handle_recv_completion, this,
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3, std::placeholders::_4);
             libfabric_controller_->setRecvCompletionFunction(recv_completion_function);
+
+            auto rdma_completion_function = std::bind(
+                &parcelport::handle_rdma_completion, this,
+                std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3);
+            libfabric_controller_->setRDMACompletionFunction(rdma_completion_function);
+
+            singleton_connection = std::make_shared<sender_connection>(
+                  this
+                , 0
+                , libfabric_controller_->ep_active_
+                , chunk_pool_.get()
+                , parcels_sent_
+            );
 
             return true;
        }
 
-        hpx::concurrent::unordered_map<std::uint32_t, std::shared_ptr<sender_connection>>
-            connection_cache;
+        std::shared_ptr<sender_connection> singleton_connection;
 
         // --------------------------------------------------------------------
-        //  return a sender_connection object back to the parcelport_impl
+        // return a sender_connection object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
         sender_connection* get_connection(
-            parcelset::locality const& dest, error_code& ec)
+            parcelset::locality const& dest, fi_addr_t &fi_addr)
         {
             FUNC_START_DEBUG_MSG;
-            const locality &dest_fabric = dest.get<locality>();
-            const std::uint32_t &dest_ip = dest_fabric.ip_address();
-            LOG_DEBUG_MSG("get_remote_connection        from "
-                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-
-            sender_connection *connection;
-
-            auto it = connection_cache.is_in_map(dest_ip);
-            if (it.second) {
-                LOG_DEBUG_MSG("Found sender_connection      from "
-                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-                return it.first->second.get();
-            }
-            else {
-                LOG_DEBUG_MSG("Create sender_connection     from "
-                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-
-                struct fid_ep *client = get_remote_connection(dest_fabric);
-
-                auto connection_ptr = std::make_shared<sender_connection>(
-                      this
-                    , dest_ip
-                    , dest.get<locality>()
-                    , client
-                    , chunk_pool_.get()
-                    , parcels_sent_
-                );
-                // @TODO : check for duplicate insert fail if two threads try concurrently
-                auto ok = connection_cache.insert(std::make_pair(dest_ip, connection_ptr));
-                if (!ok.second) {
-                    LOG_DEVEL_MSG("Duplicate connection_cache insert");
-                    sender_connection *temp = connection_cache[dest_ip].get();
-                    if (temp->client_ == connection_ptr->client_) {
-                        LOG_DEVEL_MSG("All ok, returning client");
-                        return temp;
-                    }
-                    LOG_ERROR_MSG("Duplicate connection_cache insert failure");
-                    std::terminate();
-                }
-                connection = connection_ptr.get();
-            }
+            const locality &fabric_locality = dest.get<locality>();
+            LOG_DEBUG_MSG("get_fabric_address           from "
+                << ipaddress(here_.get<locality>().ip_address()) << "to "
+                << ipaddress(fabric_locality.ip_address()));
+            fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
             FUNC_END_DEBUG_MSG;
-            return connection;
+            return singleton_connection.get();
         }
 
         // --------------------------------------------------------------------
-        //  return a sender_connection object back to the parcelport_impl
+        // return a sender_connection object back to the parcelport_impl
         // this is for compatibility with non send_immediate operation
         // --------------------------------------------------------------------
         std::shared_ptr<sender_connection> create_connection(
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
-            const locality &dest_fabric = dest.get<locality>();
-            const std::uint32_t &dest_ip = dest_fabric.ip_address();
-            LOG_DEBUG_MSG("get_remote_connection        from "
-                << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-
-            std::shared_ptr<sender_connection> connection;
-
-            auto it = connection_cache.is_in_map(dest_ip);
-            if (it.second) {
-                LOG_DEBUG_MSG("Found sender_connection      from "
-                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-                return it.first->second;
-            }
-            else {
-                LOG_DEBUG_MSG("Create sender_connection     from "
-                    << ipaddress(ip_addr_) << "to " << ipaddress(dest_ip));
-
-                struct fid_ep *client = get_remote_connection(dest_fabric);
-
-                connection = std::make_shared<sender_connection>(
-                      this
-                    , dest_ip
-                    , dest.get<locality>()
-                    , client
-                    , chunk_pool_.get()
-                    , parcels_sent_
-                );
-                // @TODO : check for duplicate insert fail if two threads try concurrently
-                auto ok = connection_cache.insert(std::make_pair(dest_ip, connection));
-                if (!ok.second) {
-                    LOG_ERROR_MSG("Duplicate connection_cache insert");
-                }
-            }
-
+            LOG_ERROR_MSG("connection cache not supported");
+            std::terminate();
             FUNC_END_DEBUG_MSG;
-            return connection;
+            return singleton_connection;
         }
 
         // --------------------------------------------------------------------
@@ -558,10 +512,10 @@ namespace libfabric
                 if (is_present.second) {
                     found_wr_id = true;
                     current_send = is_present.first->second;
-                    SendCompletionMap.erase(is_present.first);
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
                         << "from SendCompletionMap : size before erase "
                         << SendCompletionMap.size());
+                    SendCompletionMap.erase(is_present.first);
                 }
                 else {
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
@@ -602,11 +556,12 @@ namespace libfabric
         // If there are zero copy chunks to be RDMA GET'ed from the remote end,
         // then we hold onto data until they have completed.
         // --------------------------------------------------------------------
-        void handle_recv_completion(void* wr_id, struct fid_ep* client, uint32_t len)
+        void handle_recv_completion(void* wr_id, struct fid_ep* client, uint32_t len, fi_addr_t src)
         {
             util::high_resolution_timer timer;
 
             if (len<=4) {
+                LOG_DEVEL_MSG("Tag receive");
                 int imm_data = 0; // @TODO fix this
                 handle_tag_recv_completion(wr_id, imm_data, client);
                 return;
@@ -629,16 +584,17 @@ namespace libfabric
             recv_data.message_region = nullptr;
             // zero copy chunks we have to GET from the source locality
             if (h->piggy_back()) {
-              recv_data.rdma_count        = h->num_chunks().first;
+              recv_data.rdma_count = h->num_chunks().first;
             }
             else {
-                recv_data.rdma_count      = 1 + h->num_chunks().first;
+                recv_data.rdma_count = 1 + h->num_chunks().first;
             }
             // each parcel has a unique tag which we use to organize
             // zero-copy data if we need any
-            recv_data.tag            = h->tag();
+            recv_data.tag      = h->tag();
+            recv_data.src_addr = src;
             //
-            LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
+            LOG_DEVEL_MSG( "received IBV_WC_RECV " <<
                     "buffsize " << decnumber(h->size())
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                     << ", chunk_flag " << decnumber(h->header_length())
@@ -674,7 +630,7 @@ namespace libfabric
                     {
                         LOG_DEBUG_MSG("recv : chunk : size " << hexnumber(c.size_)
                                 << " type " << decnumber((uint64_t)c.type_)
-                                << " rkey " << decnumber(c.rkey_)
+                                << " rkey " << hexpointer(c.rkey_)
                                 << " cpos " << hexpointer(c.data_.cpos_)
                                 << " pos " << hexpointer(c.data_.pos_)
                                 << " index " << decnumber(c.data_.index_));
@@ -684,12 +640,12 @@ namespace libfabric
                             libfabric_memory_region *get_region =
                                 chunk_pool_->allocate_region(c.size_);
 
-                            LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
-                                << " rkey " << hexnumber(c.rkey_)
-                                << " size " << hexnumber(c.size_)
-                                << " tag " << hexuint32(recv_data.tag)
-                                << " local addr " << hexpointer(get_region->get_address())
-                                << " length " << c.size_);
+                            LOG_DEVEL_MSG("RDMA Get addr " << hexpointer(c.data_.cpos_)
+                                << "rkey " << hexpointer(c.rkey_)
+                                << "size " << hexnumber(c.size_)
+                                << "tag " << hexuint32(recv_data.tag)
+                                << "local addr " << hexpointer(get_region->get_address())
+                                << "length " << hexlength(c.size_));
                             recv_data.zero_copy_regions.push_back(get_region);
                             LOG_DEBUG_MSG("Zero copy regions size is (create) "
                                 << decnumber(recv_data.zero_copy_regions.size()));
@@ -707,11 +663,24 @@ namespace libfabric
                                     get_region->get_address(), c.size_, c.rkey_);
                             ++total_reads;
                             // post the rdma read/get
-                            LOG_DEVEL_MSG("RDMA Get client " << hexpointer(client) << hexpointer(client->rma));
-                            ssize_t ret = fi_read(client, get_region->get_address(),
-                                c.size_, get_region->get_desc(),
-                                FI_ADDR_UNSPEC, (uint64_t)(c.data_.cpos_), c.rkey_, get_region);
+                            LOG_DEVEL_MSG("RDMA Get fi_read :"
+                                << " chunk " << decnumber(index)
+                                << " client " << hexpointer(client)
+                                << " fi_addr " << hexpointer(src)
+                                << " local addr " << hexpointer(get_region->get_address())
+                                << " local desc " << hexpointer(get_region->get_desc())
+                                << " size " << hexnumber(c.size_)
+                                << " rkey " << hexpointer(c.rkey_)
+                                << " remote cpos " << hexpointer(remoteAddr)
+                                << " remote pos " << hexpointer(remoteAddr)
+                                << " index " << decnumber(c.data_.index_));
+                            ssize_t ret = fi_read(client,
+                                get_region->get_address(), c.size_, get_region->get_desc(),
+                                src,
+                                (uint64_t)(remoteAddr), c.rkey_, get_region);
+
                             if (ret) throw fabric_error(ret, "fi_read error");
+                            else { LOG_DEVEL_MSG("fi_read completed ok"); }
                         }
                         index++;
                     }
@@ -757,7 +726,7 @@ namespace libfabric
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
                 recv_data.chunks.push_back(
                     hpx::serialization::create_pointer_chunk(get_region->get_address(),
-                        size, reinterpret_cast<uint64_t>(h->get_message_rdma_key())));
+                        size, h->get_message_rdma_key()));
                 ++total_reads;
 //                client->post_read(get_region, h->get_message_rdma_key(), remoteAddr,
 //                    h->get_message_rdma_size());
@@ -774,7 +743,7 @@ namespace libfabric
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
         void handle_tag_send_completion(void *wr_id)
         {
-            LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
+            LOG_DEBUG_MSG("Handle 4 byte completion " << hexpointer(wr_id));
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
             uint32_t tag = *(uint32_t*) (region->get_address());
             chunk_pool_->deallocate(region);
@@ -783,16 +752,15 @@ namespace libfabric
         }
 #endif
 
+        // --------------------------------------------------------------------
         void handle_tag_recv_completion(void* wr_id, uint32_t tag,
             const struct fid_ep *client)
         {
-
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
             tag = *((uint32_t*) (region->get_address()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
 #else
-            libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
             LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
 #endif
             // let go of this region (waste really as this was a zero byte message)
@@ -801,7 +769,7 @@ namespace libfabric
             // now release any zero copy regions we were holding until parcel complete
             active_send_iterator current_send;
             {
-                auto is_present = TagSendCompletionMap.is_in_map((void*)(tag));
+                auto is_present = TagSendCompletionMap.is_in_map(tag);
                 if (is_present.second) {
                     current_send = is_present.first->second;
                     TagSendCompletionMap.erase(is_present.first);
@@ -827,7 +795,8 @@ namespace libfabric
             );
         }
 
-        void handle_rdma_get_completion(void *wr_id, struct fid_ep *client)
+        // --------------------------------------------------------------------
+        void handle_rdma_completion(void* wr_id, struct fid_ep* client, fi_addr_t src)
         {
             bool                 found_wr_id;
             active_recv_iterator current_recv;
@@ -856,17 +825,21 @@ namespace libfabric
                 }
                 //
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
                     << " has completed : posting 4 byte ack to origin");
                 // allocate space for a single uint32_t
                 libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
+                tag_region->set_user_data(client);
 
                 int ret = fi_send(client,
                     tag_region->get_address(), 4,
-                    tag_region->get_desc(), fi_addr_t(), tag_region);
+                    tag_region->get_desc(), recv_data.src_addr, tag_region);
+                if (ret) throw fabric_error(ret, "fi_send tag notification error");
+                else LOG_DEVEL_MSG("All ok after tag_Send");
+
 #else
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
                     << " has completed : posting zero byte ack to origin");
@@ -921,7 +894,7 @@ namespace libfabric
                 for (chunk_struct &c : recv_data.chunks) {
                     LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
-                            << " rkey " << decnumber(c.rkey_)
+                            << " rkey " << hexpointer(c.rkey_)
                             << " cpos " << hexpointer(c.data_.cpos_)
                             << " pos " << hexpointer(c.data_.pos_)
                             << " index " << decnumber(c.data_.index_));
@@ -1148,14 +1121,14 @@ namespace libfabric
             // block until a connection is available
             struct fid_ep* client = client_future.get();
 
-            LOG_DEVEL_MSG("OK future    " << hexpointer(client)
+            LOG_TRACE_MSG("Got future   " << hexpointer(client)
                 << ipaddress(ip_addr_) << "-> "
                 << ipaddress(dest_ip)
                 << "( " << ipaddress(ip_addr_) << ")");
-
             return client;
         }
 
+        // --------------------------------------------------------------------
         bool can_send_immediate() {
             while (!immediate_send_allowed_) {
                 background_work(0);
@@ -1163,18 +1136,19 @@ namespace libfabric
             return true;
         }
 
+        // --------------------------------------------------------------------
         template <typename Handler>
         bool async_write(Handler && handler,
-            sender_connection *sender,
+            sender_connection *sender, fi_addr_t addr,
             snd_buffer_type &buffer)
         {
             FUNC_START_DEBUG_MSG;
             // if the serialization overflows the block, panic and rewrite this.
             {
                 // create a tag, needs to be unique per client
-                uint32_t tag = tag_provider_.next(sender->dest_ip_);
-                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from "
-                    << hexuint32(sender->dest_ip_));
+                uint32_t tag = tag_provider_.next(static_cast<uint32_t>(addr));
+                LOG_DEVEL_MSG("Generated tag " << hexuint32(tag) << " from "
+                    << hexpointer(addr));
 
                 // we must store details about this parcel so that all memory buffers
                 // can be kept until all send operations have completed.
@@ -1188,12 +1162,14 @@ namespace libfabric
                     current_send = std::prev(active_sends.end());
                     //
                     if (++active_send_count_ >= HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS) {
+/*
                         if (immediate_send_allowed_) {
                             LOG_DEBUG_MSG("Disabling immediate send : active "
                                 << decnumber(active_send_count_) << " "
                                 << active_sends.size());
                         }
                         immediate_send_allowed_ = false;
+*/
                     }
                     LOG_DEBUG_MSG("Active send after insert size "
                         << decnumber(active_send_count_));
@@ -1211,7 +1187,7 @@ namespace libfabric
                     for (chunk_struct &c : buffer.chunks_) {
                     LOG_DEBUG_MSG("write : chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
-                            << " rkey " << decnumber(c.rkey_)
+                            << " rkey " << hexpointer(c.rkey_)
                             << " cpos " << hexpointer(c.data_.cpos_)
                             << " pos " << hexpointer(c.data_.pos_)
                             << " index " << decnumber(c.data_.index_));
@@ -1223,7 +1199,7 @@ namespace libfabric
                     if (c.type_ == serialization::chunk_type_pointer) {
                         send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
-//                        util::high_resolution_timer regtimer;
+                        LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
                         libfabric_memory_region *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD) {
                             zero_copy_region = chunk_pool_->allocate_region((std::max)
@@ -1234,8 +1210,8 @@ namespace libfabric
                             // the pointer in the chunk info must be changed
                             buffer.chunks_[index] = serialization::create_pointer_chunk(
                                 zero_copy_memory, c.size_);
-//                            LOG_DEBUG_MSG("Time to copy memory (ns) "
-//                                << decnumber(regtimer.elapsed_nanoseconds()));
+                            LOG_DEBUG_MSG("Time to copy memory (ns) "
+                                << decnumber(regtimer.elapsed_nanoseconds()));
                         }
                         else {
                             // create a memory region from the pointer
@@ -1243,14 +1219,14 @@ namespace libfabric
                                     libfabric_controller_->get_domain(),
                                     c.data_.cpos_, (std::max)(c.size_,
                                         (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
-//                            LOG_DEBUG_MSG("Time to register memory (ns) "
-//                                << decnumber(regtimer.elapsed_nanoseconds()));
+                            LOG_DEBUG_MSG("Time to register memory (ns) "
+                                << decnumber(regtimer.elapsed_nanoseconds()));
                         }
                         c.rkey_  = zero_copy_region->get_remote_key();
-                        LOG_DEBUG_MSG("Zero-copy rdma Get region "
+                        LOG_DEVEL_MSG("Zero-copy rdma Get region "
                             << decnumber(index) << " created for address "
                             << hexpointer(zero_copy_region->get_address())
-                            << " and rkey " << decnumber(c.rkey_));
+                            << " and rkey " << hexpointer(c.rkey_));
                         send_data.zero_copy_regions.push_back(zero_copy_region);
                     }
                     index++;
@@ -1266,7 +1242,7 @@ namespace libfabric
                 header_type *h = new(header_memory) header_type(buffer, send_data.tag);
                 send_data.header_region->set_message_length(h->header_length());
 
-                LOG_DEBUG_MSG("sending, buffsize "
+                LOG_DEVEL_MSG("sending, buffsize "
                     << decnumber(h->size())
                     << "header_length " << decnumber(h->header_length())
                     << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
@@ -1318,13 +1294,13 @@ namespace libfabric
                 else {
                     LOG_DEBUG_MSG("Main message NOT piggybacked ");
                     h->set_message_rdma_size(h->size());
-                    h->set_message_rdma_key(send_data.message_region->get_desc());
+                    h->set_message_rdma_key(send_data.message_region->get_remote_key());
                     h->set_message_rdma_addr(send_data.message_region->get_address());
                     send_data.zero_copy_regions.push_back(send_data.message_region);
                     send_data.has_zero_copy  = true;
 
                     LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer.data_.size())
-                        << "desc " << hexpointer(send_data.message_region->get_desc())
+                        << "desc " << hexnumber(send_data.message_region->get_desc())
                         << "pos " << hexpointer(send_data.message_region->get_address()));
 
                     // do not delete twice, clear the message block pointer as it
@@ -1351,8 +1327,8 @@ namespace libfabric
                         // put the data into a new map which is indexed by the Tag of
                         // the send - zero copy blocks will be released when we are
                         // told this has completed
-//                        TagSendCompletionMap.insert(
-//                            std::make_pair(send_data.tag, current_send));
+                        TagSendCompletionMap.insert(
+                            std::make_pair(send_data.tag, current_send));
                     }
                 }
 
@@ -1361,23 +1337,25 @@ namespace libfabric
 
                 // send the header/main_chunk to the destination,
                 // wr_id is header_region (entry 0 in region_list)
-                LOG_DEBUG_MSG("num regions to send " << decnumber(num_regions)
-                    << "Block header_region"
+                LOG_DEVEL_MSG("fi_send num regions " << decnumber(num_regions)
+                    << " client " << hexpointer(sender->client_)
+                    << " fi_addr " << hexpointer(addr)
+                    << " header_region"
                     << " buffer " << hexpointer(send_data.header_region->get_address())
                     << " region " << hexpointer(send_data.header_region));
                 if (num_regions>1) {
                     LOG_TRACE_MSG(
-                    "Block message_region "
+                    "message_region"
                     << " buffer " << hexpointer(send_data.message_region->get_address())
                     << " region " << hexpointer(send_data.message_region));
                     int ret = fi_sendv(sender->client_, region_list,
-                        desc, num_regions, fi_addr_t(), send_data.header_region);
+                        desc, num_regions, addr, send_data.header_region);
                     if (ret) throw fabric_error(ret, "fi_sendv");
                 }
                 else {
                     int ret = fi_send(sender->client_,
                         region_list[0].iov_base, region_list[0].iov_len,
-                        desc[0], fi_addr_t(), send_data.header_region);
+                        desc[0], addr, send_data.header_region);
                     if (ret) throw fabric_error(ret, "fi_sendv");
                 }
 
@@ -1510,9 +1488,11 @@ namespace libfabric
         Handler && handler,
         ParcelPostprocess && parcel_postprocess)
     {
-        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {}
-        error_code ec;
-        parcel_postprocess(ec, there_, shared_from_this());
+//        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {}
+        LOG_DEBUG_MSG("Removed async write until there_ member fixed");
+        std::terminate();
+//        error_code ec;
+//        parcel_postprocess(ec, there_, shared_from_this());
     }
 
     bool sender_connection::can_send_immediate() const
