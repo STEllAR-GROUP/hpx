@@ -62,7 +62,7 @@ if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MO
 endif()
 
 #------------------------------------------------------------------------------
-# IB device selection
+# Hardware device selection
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_LIBFABRIC_PROVIDER STRING
   "The provider (verbs/gni/psm2)"
@@ -94,7 +94,7 @@ hpx_add_config_define_namespace(
 
 hpx_option(HPX_PARCELPORT_LIBFABRIC_ENDPOINT STRING
   "The libfabric endpoint type (leave blank for default"
-  "msg" CATEGORY "Parcelport" ADVANCED)
+  "rdm" CATEGORY "Parcelport" ADVANCED)
 
 hpx_add_config_define_namespace(
     DEFINE HPX_PARCELPORT_LIBFABRIC_ENDPOINT

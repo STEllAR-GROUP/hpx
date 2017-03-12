@@ -47,7 +47,7 @@
 #define hexuint64(p)  nhex(16) << (uintptr_t)(p) << " "
 #define hexuint32(p)  nhex(8)  << (uint32_t)(p) << " "
 #define hexlength(p)  nhex(6)  << (uintptr_t)(p) << " "
-#define hexnumber(p)  nhex(4)  << p << " "
+#define hexnumber(p)  nhex(4)  << (uintptr_t)(p) << " "
 #define hexbyte(p)    nhex(2)  << static_cast<int>(p) << " "
 #define decimal(n)    std::setfill('0') << std::setw(n) << std::noshowbase << std::dec
 #define decnumber(p)  std::dec << p << " "
