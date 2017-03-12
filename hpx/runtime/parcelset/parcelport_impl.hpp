@@ -532,9 +532,10 @@ namespace hpx { namespace parcelset
         send_immediate_impl(
             parcelport_impl &this_, locality &dest_, write_handler_type &&f_, parcel&& p)
         {
+            uint64_t addr;
             error_code ec;
             connection *sender =
-                this_.connection_handler().get_connection(dest_, ec);
+                this_.connection_handler().get_connection(dest_, addr);
 
             auto encoded_buffer = sender->get_new_buffer();
             // encode the parcels
@@ -547,7 +548,7 @@ namespace hpx { namespace parcelset
 
             if (sender->parcelport_->async_write(
                 std::move(util::bind(util::one_shot(f_), _1,  std::move(p))),
-                sender,
+                sender, addr,
                 encoded_buffer))
             {
                 // we don't propagate errors for now
@@ -840,7 +841,7 @@ namespace hpx { namespace parcelset
             {
                 std::lock_guard<lcos::local::spinlock> l(mtx_);
 
-                HPX_ASSERT(locality_id == sender_connection->destination());
+//                HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                 if (it == pending_parcels_.end() ||
@@ -868,7 +869,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_DEBUG)
             // verify the connection points to the right destination
-            HPX_ASSERT(parcel_locality_id == sender_connection->destination());
+//            HPX_ASSERT(parcel_locality_id == sender_connection->destination());
             sender_connection->verify(parcel_locality_id);
 #endif
             // encode the parcels

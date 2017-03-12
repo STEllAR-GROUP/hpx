@@ -11,6 +11,7 @@
 //
 #include <cstdint>
 #include <array>
+#include <rdma/fabric.h>
 
 // Different providers use different address formats that we must accomodate
 // in our locality object.
@@ -21,6 +22,8 @@
 #ifdef HPX_PARCELPORT_LIBFABRIC_VERBS
 # define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 16
 #endif
+
+//typedef struct fid* fi_addr_t;
 
 namespace hpx {
 namespace parcelset {
@@ -52,25 +55,36 @@ struct locality {
     explicit locality(const locality_data &in_data)
     {
         std::memcpy(&data_[0], &in_data[0], array_size);
-        LOG_DEBUG_MSG("explicit constructing locality from " << ipaddress(ip_address()) << ":" << decnumber(port()));
+        fi_address_ = 0;
+        LOG_DEBUG_MSG("explicit constructing locality from "
+            << ipaddress(ip_address()) << ":" << decnumber(port()));
     }
 
     locality() {
         std::memset(&data_[0], 0x00, array_size);
-        LOG_DEBUG_MSG("default constructing locality from " << ipaddress(ip_address()) << ":" << decnumber(port()));
+        fi_address_ = 0;
+        LOG_DEBUG_MSG("default constructing locality from "
+            << ipaddress(ip_address()) << ":" << decnumber(port()));
     }
 
     locality(const locality &other) : data_(other.data_) {
-        LOG_DEBUG_MSG("copy constructing locality with " << ipaddress(ip_address()) << ":" << decnumber(port()));
+        fi_address_ = other.fi_address_;
+        LOG_DEBUG_MSG("copy constructing locality with "
+            << ipaddress(ip_address()) << ":" << decnumber(port()));
     }
 
-    locality(locality &&other) : data_(std::move(other.data_)) {
-        LOG_DEBUG_MSG("move constructing locality with " << ipaddress(ip_address()) << ":" << decnumber(port()));
+    locality(locality &&other) : data_(std::move(other.data_)),
+        fi_address_(other.fi_address_)
+    {
+        LOG_DEBUG_MSG("move constructing locality with "
+            << ipaddress(ip_address()) << ":" << decnumber(port()));
     }
 
     locality & operator = (const locality &other) {
-        data_            = other.data_;
-        LOG_DEBUG_MSG("copy operator locality with " << ipaddress(ip_address()) << ":" << decnumber(port()));
+        data_       = other.data_;
+        fi_address_ = other.fi_address_;
+        LOG_DEBUG_MSG("copy operator locality with "
+            << ipaddress(ip_address()) << ":" << decnumber(port()));
         return *this;
     }
 
@@ -94,6 +108,14 @@ struct locality {
 #else
         throw fabric_error(0, "unsupported fabric provider, please fix ASAP");
 #endif
+    }
+
+    const fi_addr_t fi_address() const {
+        return fi_address_;
+    }
+
+    void set_fi_address(fi_addr_t fi_addr) {
+        fi_address_ = fi_addr;
     }
 
     uint16_t port() const {
@@ -146,6 +168,7 @@ private:
 
 private:
     locality_data data_;
+    fi_addr_t     fi_address_;
 };
 
 }}}}

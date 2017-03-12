@@ -46,16 +46,14 @@ namespace libfabric
         sender_connection(
               parcelport * pp
             , std::uint32_t dest
-            , locality there
-            , struct fid_ep *client
+            , struct fid_ep *ep
             , memory_pool_type * chunk_pool
             , performance_counters::parcels::gatherer & parcels_sent
         )
         : buffer_(snd_buffer_type(snd_data_type(chunk_pool_), chunk_pool_))
         , parcelport_(pp)
         , dest_ip_(dest)
-        , there_(there)
-        , client_(client)
+        , client_(ep)
         , chunk_pool_(chunk_pool)
         , parcels_sent_(parcels_sent)
         {}
@@ -66,22 +64,16 @@ namespace libfabric
 
         void verify(parcelset::locality const & parcel_locality_id) const {}
 
-        parcelset::locality const& destination() const
-        {
-            return there_;
-        }
-
         bool can_send_immediate() const;
 
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler && handler, ParcelPostprocess && parcel_postprocess);
 
-        // @TODO: this buffer is never used, it is here just to shut the compiler to
+        // @TODO: this buffer is never used, it is here just to shut the compiler up
         snd_buffer_type      buffer_;
         //
         parcelport          *parcelport_;
         std::uint32_t        dest_ip_;
-        parcelset::locality  there_;
         struct fid_ep       *client_;
         memory_pool_type    *chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;

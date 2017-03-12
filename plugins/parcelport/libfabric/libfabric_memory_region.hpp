@@ -30,14 +30,14 @@ namespace libfabric
         // --------------------------------------------------------------------
         libfabric_memory_region() :
             region_(nullptr), address_(nullptr), base_addr_(nullptr),
-                flags_(0), size_(0), used_space_(0) {}
+                flags_(0), size_(0), used_space_(0), user_data_(nullptr) {}
 
         // --------------------------------------------------------------------
         libfabric_memory_region(struct fid_mr *region, char * address,
             char *base_address,
             uint32_t flags, uint64_t size) :
                 region_(region), address_(address), base_addr_(base_address),
-                flags_(flags), size_(size), used_space_(0) {}
+                flags_(flags), size_(size), used_space_(0), user_data_(nullptr)  {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
@@ -49,6 +49,7 @@ namespace libfabric
             size_       = length;
             used_space_ = length;
             flags_      = BLOCK_USER;
+            user_data_  = nullptr;
 
             int ret = fi_mr_reg(pd,
                     const_cast<void*>(buffer), length,
@@ -64,10 +65,11 @@ namespace libfabric
                 throw fabric_error(ret, "error in fi_mr_reg");
             }
             else {
-                LOG_DEBUG_MSG(
+                LOG_DEVEL_MSG(
                     "OK registering fi_mr_reg "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
+                    << "rkey " << hexpointer(fi_mr_key(region_))
                     << "length " << hexlength(size_));
             }
         }
@@ -105,11 +107,12 @@ namespace libfabric
                     "OK registering fi_mr_reg "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
+                    << "rkey " << hexpointer(fi_mr_key(region_))
                     << "length " << hexlength(size_));
             }
 
             LOG_DEBUG_MSG("allocated/registered memory region " << hexpointer(this)
-                << "with desc " << hexpointer(get_desc())
+                << "with desc " << hexnumber(get_desc())
                 << "at address " << hexpointer(get_address())
                 << "with length " << hexlength(get_size()));
             return 0;
