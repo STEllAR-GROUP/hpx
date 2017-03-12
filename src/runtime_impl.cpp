@@ -171,10 +171,6 @@ namespace hpx {
         // and get_runtime_ptr) is already initialized at this point.
         applier_.init_tss();
 
-#if defined(HPX_HAVE_SECURITY)
-        // once all has been initialized, finalize security data for bootstrap
-        this->init_security();
-#endif
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, std::uint64_t(runtime_support_.get()),
@@ -183,11 +179,6 @@ namespace hpx {
 
         applier_.initialize(std::uint64_t(runtime_support_.get()),
         std::uint64_t(memory_.get()));
-
-#if defined(HPX_HAVE_SECURITY)
-        // enable parcel capability checking
-        applier_.enable_verify_capabilities();
-#endif
 
         // copy over all startup functions registered so far
         for (startup_function_type& f : global_pre_startup_functions)

@@ -873,28 +873,6 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_receiving_serialization_time(reset) : 0;
     }
 
-#if defined(HPX_HAVE_SECURITY)
-    // the total time it took for all sender-side security operations
-    // (nanoseconds)
-    std::int64_t parcelhandler::get_sending_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_sending_security_time(reset) : 0;
-    }
-
-    // the total time it took for all receiver-side security
-    // operations (nanoseconds)
-    std::int64_t parcelhandler::get_receiving_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_receiving_security_time(reset) : 0;
-    }
-#endif
-
     // total data sent (bytes)
     std::int64_t parcelhandler::get_data_sent(std::string const& pp_type,
         bool reset) const
@@ -1140,15 +1118,6 @@ namespace hpx { namespace parcelset
             ));
 #endif
 
-#if defined(HPX_HAVE_SECURITY)
-        util::function_nonser<std::int64_t(bool)> sending_security_time(
-            util::bind(&parcelhandler::get_sending_security_time, this,
-                pp_type, _1));
-        util::function_nonser<std::int64_t(bool)> receiving_security_time(
-            util::bind(&parcelhandler::get_receiving_security_time, this,
-                pp_type, _1));
-#endif
-
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         util::function_nonser<std::int64_t(std::string const&, bool)>
             data_sent(util::bind(
@@ -1315,34 +1284,6 @@ namespace hpx { namespace parcelset
               "ns"
             },
 
-#if defined(HPX_HAVE_SECURITY)
-            { boost::str(boost::format("/security/time/%s/sent") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format(
-                  "returns the total time required to perform tasks related to "
-                  "security in the parcel layer for all sent parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, std::move(sending_security_time), _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-            { boost::str(boost::format("/security/time/%s/received") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format(
-                  "returns the total time required to perform tasks related to "
-                  "security in the parcel layer for all received parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, std::move(receiving_security_time), _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-#endif
             { boost::str(boost::format("/data/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format(

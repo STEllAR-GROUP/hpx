@@ -298,36 +298,6 @@ system and application performance.
          as its parameter. In this case the counter will report the serialization
          time for the given action only.]
     ]
-    [   [`/security/time/<connection_type>/<operation>`
-
-          where:[br] `<operation>` is one of the following:
-          `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `mpi`
-        ]
-        [`locality#*/total`
-
-          where:[br] `*` is the locality id of the locality the time spent for
-          security related operation should be queried for. The locality id is
-          a (zero based) number identifying the locality.
-        ]
-        [Returns the overall time spent performing outgoing security operations
-         for the specified `<connection_type>`on the given locality (see
-         `<operation>`, e.g. `sent` or `received`).
-
-         The performance counters for the connection type `mpi` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
-         defined while compiling the __hpx__ core library (which is not defined
-         by default, the corresponding cmake configuration constant is
-         `HPX_WITH_PARCELPORT_MPI`).
-
-         These performance counters are available only if the compile time constant
-         `HPX_HAVE_SECURITY` was defined while compiling the __hpx__ core library
-         (which is not defined by default, the corresponding cmake configuration
-         constant is `HPX_WITH_SECURITY`).
-
-         Please see __cmake_options__ for more details.]
-        [None]
-    ]
     [   [`/parcels/count/routed`
         ]
         [`locality#*/total`
@@ -1216,10 +1186,10 @@ system and application performance.
 
           where:[br] `*` is the locality id of the locality the total available
           memory should be queried. The locality id is a (zero based) number
-          identifying the locality. 
+          identifying the locality.
           Note: only supported in Linux
         ]
-        [Returns the total available memory for use by the referenced locality 
+        [Returns the total available memory for use by the referenced locality
          (in bytes).]
         [None]
     ]
