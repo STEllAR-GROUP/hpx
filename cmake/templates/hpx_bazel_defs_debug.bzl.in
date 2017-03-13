@@ -19,18 +19,18 @@ def hpx_copts():
 
 def hpx_link_opts():
     """Shorthand for needed HPX link options
-        Returns the needed HPX link options
+        Returns the needed HPX link options.
     """
     return "@CXX_FLAG@ -L@HPX_CONF_PREFIX@ @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_DEBUG_LIBRARIES_BAZEL@".replace("  ", " ").replace(hpx_path(), "hpx").replace(boost_path(), "boost").split(" ")
 
 def hpx_path():
-    """Shorthand for the Boost path
-        Returns the Boost path
+    """Shorthand for the HPX path
+        Returns the HPX path.
     """
     return "@HPX_CONF_PREFIX@"
 
 def boost_path():
     """Shorthand for the Boost path
-        Returns the Boost path
+        Returns the Boost path.
     """
     return "@BOOST_ROOT@"
