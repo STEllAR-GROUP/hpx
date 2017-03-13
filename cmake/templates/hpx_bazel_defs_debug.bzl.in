@@ -27,7 +27,7 @@ def hpx_path():
     """Shorthand for the Boost path
         Returns the Boost path
     """
-    return "@HPX_CONF_PREFIX@
+    return "@HPX_CONF_PREFIX@"
 
 def boost_path():
     """Shorthand for the Boost path
