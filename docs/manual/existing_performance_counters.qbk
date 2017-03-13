@@ -1216,11 +1216,11 @@ system and application performance.
 
           where:[br] `*` is the locality id of the locality the total available
           memory should be queried. The locality id is a (zero based) number
-          identifying the locality. 
+          identifying the locality.
           Note: only supported in Linux
         ]
-        [Returns the total available memory for use by the referenced locality 
-         (in bytes).]
+        [Returns the total available memory for use by the referenced locality
+         (in bytes). This counter is available on Linux systems only.]
         [None]
     ]
     [   [`/runtime/io/read_bytes_issued`]
