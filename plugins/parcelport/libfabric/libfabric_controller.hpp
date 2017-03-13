@@ -460,10 +460,14 @@ namespace libfabric
         // are thrown away, otherwise the completion callback is triggered
         int poll_endpoints(bool stopped=false)
         {
-            poll_for_work_completions(stopped);
-            poll_event_queue(stopped);
-
-            return 0;
+            unique_lock lock(polling_mutex_, std::try_to_lock);
+            if (!lock.owns_lock()) return 0;
+            //
+            int work = poll_for_work_completions(stopped);
+#ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
+            work += poll_event_queue(stopped);
+#endif
+            return work;
         }
 
         // --------------------------------------------------------------------
@@ -952,6 +956,7 @@ struct fi_cq_msg_entry {
         // only allow one thread to handle connect/disconnect events etc
         mutex_type            initialization_mutex_;
         mutex_type            endpoint_map_mutex_;
+        mutex_type            polling_mutex_;
 
         // used to skip polling event channel too frequently
         typedef std::chrono::time_point<std::chrono::system_clock> time_type;
