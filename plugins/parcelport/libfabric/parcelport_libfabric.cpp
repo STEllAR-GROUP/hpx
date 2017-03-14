@@ -378,7 +378,7 @@ namespace libfabric
             parcelset::locality const& dest, error_code& ec)
         {
             FUNC_START_DEBUG_MSG;
-            LOG_ERROR_MSG("connection cache not supported");
+            LOG_DEVEL_MSG("connection cache not supported");
             std::terminate();
             FUNC_END_DEBUG_MSG;
             return singleton_connection;
@@ -522,7 +522,7 @@ namespace libfabric
                     handle_tag_send_completion(wr_id);
                     return;
 #else
-                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find "
+                    LOG_DEVEL_MSG("FATAL : SendCompletionMap did not find "
                         << hexpointer(wr_id));
                     std::terminate();
 #endif
@@ -675,8 +675,6 @@ namespace libfabric
                                 << " remote pos " << hexpointer(remoteAddr)
                                 << " index " << decnumber(c.data_.index_));
 
-                            get_region->set_user_data(
-                                reinterpret_cast<void*>(FI_READ | FI_RMA));
                             ssize_t ret = fi_read(client,
                                 get_region->get_address(), c.size_, get_region->get_desc(),
                                 src,
@@ -692,7 +690,7 @@ namespace libfabric
             else {
                 // no chunk information was sent in this message, so we must GET it
                 parcel_complete = false;
-                LOG_ERROR_MSG("@TODO implement RDMA GET of mass chunk information "
+                LOG_DEVEL_MSG("@TODO implement RDMA GET of mass chunk information "
                     "when header too small");
                 std::terminate();
                 throw std::runtime_error("@TODO implement RDMA GET of mass chunk "
@@ -725,7 +723,7 @@ namespace libfabric
                     ReadCompletionMap.insert(
                         std::make_pair(get_region, current_recv));
                 }
-                const void *remoteAddr = h->get_message_rdma_addr();
+//                 const void *remoteAddr = h->get_message_rdma_addr();
                 LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
                 recv_data.chunks.push_back(
                     hpx::serialization::create_pointer_chunk(get_region->get_address(),
@@ -748,10 +746,9 @@ namespace libfabric
         {
             LOG_DEBUG_MSG("Handle 4 byte completion " << hexpointer(wr_id));
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
-            uint32_t tag = *(uint32_t*) (region->get_address());
             chunk_pool_->deallocate(region);
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
-                << hexuint32(tag));
+                << hexuint32(/*tag*/*(uint32_t*) (region->get_address())));
         }
 #endif
 
@@ -778,7 +775,7 @@ namespace libfabric
                     TagSendCompletionMap.erase(is_present.first);
                 }
                 else {
-                    LOG_ERROR_MSG("Tag not present in Send map, FATAL");
+                    LOG_DEVEL_MSG("Tag not present in Send map, FATAL");
                     std::terminate();
                 }
             }
@@ -814,7 +811,7 @@ namespace libfabric
                     ReadCompletionMap.erase(is_present.first);
                 }
                 else {
-                    LOG_ERROR_MSG("Fatal error as wr_id is not in completion map");
+                    LOG_DEVEL_MSG("Fatal error as wr_id is not in completion map");
                     std::terminate();
                 }
             }
@@ -835,14 +832,15 @@ namespace libfabric
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
-                tag_region->set_user_data(
-                        reinterpret_cast<void*>(FI_SEND | FI_MSG));
 
                 int ret = fi_send(client,
                     tag_region->get_address(), 4,
                     tag_region->get_desc(), recv_data.src_addr, tag_region);
                 if (ret) throw fabric_error(ret, "fi_send tag notification error");
-                else LOG_DEVEL_MSG("All ok after tag_Send");
+                else
+                {
+                    LOG_DEVEL_MSG("All ok after tag_Send");
+                }
 
 #else
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
@@ -1002,6 +1000,7 @@ namespace libfabric
 
         ~parcelport() {
             FUNC_START_DEBUG_MSG;
+            scoped_lock lk(stop_mutex);
             libfabric_controller_ = nullptr;
             FUNC_END_DEBUG_MSG;
         }
@@ -1032,8 +1031,8 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             // load all components as described in the configuration information
             std::string addr = ini.get_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
-            LOG_DEBUG_MSG("Got AGAS addr " << addr);
-            LOG_DEBUG_MSG("What should we return for agas locality for fabric PP" << addr);
+            LOG_DEVEL_MSG("Got AGAS addr " << addr);
+            LOG_DEVEL_MSG("What should we return for agas locality for fabric PP" << addr);
             std::terminate();
 
 //            inet_pton(AF_INET, &addr[0], &buf);
@@ -1065,7 +1064,7 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             if (!stopped_) {
                 if (!active_sends.empty() || !active_recvs.empty()) {
-                    LOG_ERROR_MSG("Entering STOP with outstanding parcels");
+                    LOG_DEVEL_MSG("Entering STOP with outstanding parcels");
                     std::terminate();
                 };
 
@@ -1337,8 +1336,6 @@ namespace libfabric
                 }
 
                 ++sends_posted;
-                send_data.header_region->set_user_data(
-                        reinterpret_cast<void*>(FI_SEND | FI_MSG));
 
                 // send the header/main_chunk to the destination,
                 // wr_id is header_region (entry 0 in region_list)
@@ -1432,7 +1429,7 @@ namespace libfabric
                     //using namespace std::chrono_literals;
                     //std::this_thread::sleep_for(5us);
                 }
-
+#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
                 LOG_TIMED_INIT(background_sends);
                 LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
                 {
@@ -1468,6 +1465,7 @@ namespace libfabric
                     << "Total completions " << decnumber(completions_handled)
                     << "("<< decnumber(sends_posted+handled_receives+total_reads)<<")");
                 )
+#endif
 
             }
             return result;
@@ -1494,7 +1492,7 @@ namespace libfabric
         ParcelPostprocess && parcel_postprocess)
     {
 //        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {}
-        LOG_DEBUG_MSG("Removed async write until there_ member fixed");
+        LOG_DEVEL_MSG("Removed async write until there_ member fixed");
         std::terminate();
 //        error_code ec;
 //        parcel_postprocess(ec, there_, shared_from_this());
@@ -1546,7 +1544,7 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
             log_init = true;
         }
         FUNC_END_DEBUG_MSG;
-        return "100";
+        return "10000";
     }
 
     // This is used to initialize your parcelport,

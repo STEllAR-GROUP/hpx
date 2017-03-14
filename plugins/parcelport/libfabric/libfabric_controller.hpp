@@ -42,7 +42,9 @@
 #include <rdma/fi_rma.h>
 #include "fabric_error.hpp"
 
-#define HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS 16
+#ifndef HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS
+# define HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS 16
+#endif
 
 #ifdef HPX_PARCELPORT_LIBFABRIC_GNI
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
@@ -170,13 +172,29 @@ namespace libfabric
         // clean up all resources
         ~libfabric_controller()
         {
-            fi_close(&fabric_->fid);
-            fi_close(&ep_passive_->fid);
-            fi_close(&ep_active_->fid);
-            fi_close(&event_queue_->fid);
-            fi_close(&fabric_domain_->fid);
-            fi_close(&ep_shared_rx_cxt_->fid);
+            LOG_DEVEL_MSG("closing fabric_->fid");
+            if (fabric_)
+                fi_close(&fabric_->fid);
+#ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
+            LOG_DEVEL_MSG("closing ep_active_->fid");
+            if (ep_active_)
+                fi_close(&ep_active_->fid);
+#else
+            LOG_DEVEL_MSG("closing ep_passive_->fid");
+            if (ep_passive_)
+                fi_close(&ep_passive_->fid);
+#endif
+            LOG_DEVEL_MSG("closing event_queue_->fid");
+            if (event_queue_)
+                fi_close(&event_queue_->fid);
+            LOG_DEVEL_MSG("closing fabric_domain_->fid");
+            if (fabric_domain_)
+                fi_close(&fabric_domain_->fid);
+            LOG_DEVEL_MSG("closing ep_shared_rx_cxt_->fid");
+            if (ep_shared_rx_cxt_)
+                fi_close(&ep_shared_rx_cxt_->fid);
             // clean up
+            LOG_DEVEL_MSG("freeing fabric_info");
             fi_freeinfo(fabric_info_);
         }
 
@@ -193,7 +211,7 @@ namespace libfabric
             // we require message and RMA support, so ask for them
             // we also want receives to carry source address info
             fabric_hints_->caps                   = FI_MSG | FI_RMA | FI_SOURCE | FI_WRITE | FI_READ | FI_REMOTE_READ | FI_REMOTE_WRITE | FI_RMA_EVENT;
-            fabric_hints_->mode                   = ~0; // FI_CONTEXT | FI_LOCAL_MR;
+            fabric_hints_->mode                   = FI_CONTEXT | FI_LOCAL_MR | FI_RX_CQ_DATA;
             fabric_hints_->fabric_attr->prov_name = strdup(provider.c_str());
             LOG_DEBUG_MSG("fabric provider " << fabric_hints_->fabric_attr->prov_name);
             if (domain.size()>0) {
@@ -343,6 +361,7 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             // create an 'active' endpoint that can be used for sending/receiving
             LOG_DEBUG_MSG("Creating active endpoint");
+            LOG_DEVEL_MSG("Got info mode " << (info->mode & FI_NOTIFY_FLAGS_ONLY));
             int ret = fi_endpoint(fabric_domain_, info, new_endpoint, NULL);
             if (ret) throw fabric_error(ret, "fi_endpoint");
 
@@ -412,7 +431,7 @@ namespace libfabric
                 const locality &loc = fabric_locality.get<locality>();
                 // put the provide specific data into the address vector
                 // so that we can look it  up later
-                fi_addr_t dummy = insert_address(loc);
+                /*fi_addr_t dummy =*/ insert_address(loc);
             }
             LOG_DEVEL_MSG("Done getting localities ");
             FUNC_END_DEBUG_MSG;
@@ -465,7 +484,7 @@ namespace libfabric
             unique_lock lock(polling_mutex_, std::try_to_lock);
             if (!lock.owns_lock()) return 0;
             //
-            int work = poll_for_work_completions(stopped);
+            int work = poll_for_work_completions(lock, stopped);
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
             work += poll_event_queue(stopped);
 #endif
@@ -473,7 +492,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_for_work_completions(bool stopped=false)
+        int poll_for_work_completions(unique_lock& lock, bool stopped=false)
         {
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
@@ -493,24 +512,27 @@ struct fi_cq_msg_entry {
 };
 */
             //std::array<char, 256> buffer;
+            fi_addr_t src_addr;
             fi_cq_msg_entry entry;
             int ret = fi_cq_read(txcq, &entry, 1);
             if (ret>0) {
+                hpx::util::unlock_guard_try<unique_lock> ul(lock);
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
-                LOG_DEBUG_MSG("Completion txcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " "
+                LOG_DEVEL_MSG("Completion txcq wr_id "
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
                     << hexpointer(entry.op_context) << "length " << hexuint32(entry.len));
                 if (entry.flags & FI_RMA) {
                     LOG_DEVEL_MSG("@@@@@ Received a txcq RMA completion %%%%% ");
                     rdma_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else if (entry.flags == (FI_MSG | FI_SEND)) {
+                    LOG_DEVEL_MSG("@@@@@ Received a txcq RMA send completion %%%%% ");
                     send_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else {
                     LOG_DEVEL_MSG("$$$$$ Received an unknown txcq completion ***** "
                         << decnumber(entry.flags));
-                    std::terminate();
+//                     std::terminate();
                 }
                 return 1;
             }
@@ -526,37 +548,44 @@ struct fi_cq_msg_entry {
                 throw fabric_error(ret, "completion txcq read");
             }
 
+            if (!lock) return 0;
+
             // receives will use fi_cq_readfrom as we want the source address
-            fi_addr_t src_addr;
             ret = fi_cq_readfrom(rxcq, &entry, 1, &src_addr);
             if (ret>0) {
                 if (--preposted_receives_<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS/4) {
                     refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
                 }
-                LOG_DEBUG_MSG("Completion rxcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
-                    << " source " << hexpointer(src_addr)
-                    << "context " << hexpointer(entry.op_context));
-//                void *client = reinterpret_cast<libfabric_memory_region*>
-//                    (entry.op_context)->get_user_data();
-#ifdef CRAY_FLAGS_BUG
-                entry.flags = reinterpret_cast<uint64_t>(
-                    (reinterpret_cast<libfabric_memory_region*>
-                        (entry.op_context)->get_user_data()));
-#endif
-                if ((entry.flags & FI_RMA) == FI_RMA) {
-                    LOG_DEVEL_MSG("Received an rxcq RMA completion");
-                    rdma_completion_function_(entry.op_context,
-                        ep_active_, src_addr);
-                }
-                else if (entry.flags == (FI_MSG | FI_RECV)) {
-//                    LOG_DEVEL_MSG("FI_ADDR_T FI_RECV " << hexpointer(src_addr));
-                    recv_completion_function_(entry.op_context,
-                        ep_active_, entry.len, src_addr);
-                }
-                else {
-                    LOG_DEVEL_MSG("Received an unknown rxcq completion "
-                        << decnumber(entry.flags));
+                {
+                    lock.unlock();
+                    LOG_DEVEL_MSG("Completion rxcq wr_id "
+                        << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
+                        << " source " << hexpointer(src_addr)
+                        << "context " << hexpointer(entry.op_context)
+                        << "length " << hexuint32(entry.len));
+    //                void *client = reinterpret_cast<libfabric_memory_region*>
+    //                    (entry.op_context)->get_user_data();
+                    if (src_addr == FI_ADDR_NOTAVAIL)
+                    {
+                        LOG_DEVEL_MSG("Source address not available...\n");
+                        std::terminate();
+                    }
+//                     if ((entry.flags & FI_RMA) == FI_RMA) {
+//                         LOG_DEVEL_MSG("Received an rxcq RMA completion");
+//                         rdma_completion_function_(entry.op_context,
+//                             ep_active_, src_addr);
+//                     }
+                    else if (entry.flags == (FI_MSG | FI_RECV)) {
+                        LOG_DEVEL_MSG("Received an rxcq recv completion");
+    //                    LOG_DEVEL_MSG("FI_ADDR_T FI_RECV " << hexpointer(src_addr));
+                        recv_completion_function_(entry.op_context,
+                            ep_active_, entry.len, src_addr);
+                    }
+                    else {
+                        LOG_DEVEL_MSG("Received an unknown rxcq completion "
+                            << decnumber(entry.flags));
+                        std::terminate();
+                    }
                 }
                 return 1;
             }
@@ -584,9 +613,9 @@ struct fi_cq_msg_entry {
                 }
             )
             struct fi_eq_cm_entry *cm_entry;
-            struct fi_eq_entry    *entry;
+//             struct fi_eq_entry    *entry;
             struct fid_ep         *new_ep;
-            uint32_t *addr;
+//             uint32_t *addr;
             uint32_t event;
             std::array<char, 256> buffer;
             ssize_t rd = fi_eq_read(event_queue_, &event, buffer.data(), sizeof(buffer), 0);
@@ -734,12 +763,15 @@ struct fi_cq_msg_entry {
 #else
             struct fid_ep *endpoint = ep_shared_rx_cxt_;
 #endif
-            while (get_receive_count() < preposts) {
+            while (preposts) {
+                --preposts;
                 // if the pool has spare small blocks (just use 0 size) then
                 // refill the queues, but don't wait, just abort if none are available
                 if (force || memory_pool_->can_allocate_unsafe(
                     memory_pool_->small_.chunk_size()))
                 {
+                    if (++preposted_receives_ >= HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS)
+                        break;
                     auto region = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
                     void *desc = region->get_desc();
                     LOG_TRACE_MSG("Pre-Posting a receive to client size "
@@ -750,7 +782,6 @@ struct fi_cq_msg_entry {
                     if (ret!=0 && ret != -FI_EAGAIN) {
                         throw fabric_error(ret, "pp_post_rx");
                     }
-                    ++preposted_receives_;
                 }
                 else {
                     LOG_DEBUG_MSG("aborting refill can_allocate_unsafe false");
@@ -774,16 +805,16 @@ struct fi_cq_msg_entry {
 
             int ret;
             // @TODO - why do we check this
-            if (cq_attr.format == FI_CQ_FORMAT_UNSPEC) {
-                LOG_DEBUG_MSG("Setting CQ attribute to FI_CQ_FORMAT_MSG");
+//             if (cq_attr.format == FI_CQ_FORMAT_UNSPEC) {
+                LOG_DEVEL_MSG("Setting CQ attribute to FI_CQ_FORMAT_MSG");
                 cq_attr.format = FI_CQ_FORMAT_MSG;
-            }
+//             }
 
             // open a completion queue on our fabric domain and set context ptr to tx queue
             cq_attr.wait_obj = FI_WAIT_NONE;
             cq_attr.size = info->tx_attr->size;
             info->tx_attr->op_flags |= FI_COMPLETION;
-            cq_attr.flags |= FI_COMPLETION;
+            cq_attr.flags = 0;//|= FI_COMPLETION;
             LOG_DEBUG_MSG("Creating CQ with tx size " << decnumber(info->tx_attr->size));
             ret = fi_cq_open(fabric_domain_, &cq_attr, &txcq, &txcq);
             if (ret) throw fabric_error(ret, "fi_cq_open");
@@ -815,7 +846,7 @@ struct fi_cq_msg_entry {
             uint32_t remote_ip)
         {
 
-            LOG_ERROR_MSG("insert_new_future : Obsolete in RDM mode");
+            LOG_DEVEL_MSG("insert_new_future : Obsolete in RDM mode");
             std::terminate();
 
             LOG_DEVEL_MSG("Inserting future in map         "
@@ -877,7 +908,7 @@ struct fi_cq_msg_entry {
         hpx::shared_future<struct fid_ep*> connect_to_server(const locality &remote)
         {
 
-            LOG_ERROR_MSG("connect_to_server : Obsolete in RDM mode");
+            LOG_DEVEL_MSG("connect_to_server : Obsolete in RDM mode");
             std::terminate();
 
             const uint32_t &remote_ip = remote.ip_address();
