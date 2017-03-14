@@ -37,6 +37,29 @@ namespace hpx { namespace util
     private:
         Mutex& m_;
     };
+
+    template <typename Mutex>
+    class unlock_guard_try
+    {
+        HPX_NON_COPYABLE(unlock_guard_try);
+
+    public:
+        typedef Mutex mutex_type;
+
+        explicit unlock_guard_try(Mutex& m)
+          : m_(m)
+        {
+            m_.unlock();
+        }
+
+        ~unlock_guard_try()
+        {
+            m_.try_lock();
+        }
+
+    private:
+        Mutex& m_;
+    };
 }}
 
 #endif /*HPX_UTIL_UNLOCK_GUARD_HPP*/
