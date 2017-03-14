@@ -110,7 +110,7 @@ struct locality {
 #endif
     }
 
-    const fi_addr_t fi_address() const {
+    fi_addr_t fi_address() const {
         return fi_address_;
     }
 
@@ -143,12 +143,14 @@ struct locality {
 
 private:
     friend bool operator==(locality const & lhs, locality const & rhs) {
+#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
         uint32_t a1 = lhs.ip_address();
         uint32_t a2 = rhs.ip_address();
         LOG_DEBUG_MSG("Testing array equality "
             << ipaddress(a1)
             << ipaddress(a2)
         );
+#endif
         return (lhs.data_ == rhs.data_);
     }
 

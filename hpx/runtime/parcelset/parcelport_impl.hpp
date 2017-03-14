@@ -547,6 +547,7 @@ namespace hpx { namespace parcelset
                 encoded_buffer,
                 this_.archive_flags_,
                 this_.get_max_outbound_message_size());
+            HPX_ASSERT(num_parcels == 1);
 
             using hpx::util::placeholders::_1;
 
