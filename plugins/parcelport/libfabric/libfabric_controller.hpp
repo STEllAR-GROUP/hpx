@@ -50,6 +50,8 @@
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
 #endif
 
+#define CRAY_FLAGS_BUG
+
 // @TODO : Remove the client map pair as we have a copy in the libfabric_parcelport class
 // that does almost the same job.
 // @TODO : Most of this code could be moved into the main parcelport, or the endpoint
@@ -537,6 +539,11 @@ struct fi_cq_msg_entry {
                     << "context " << hexpointer(entry.op_context));
 //                void *client = reinterpret_cast<libfabric_memory_region*>
 //                    (entry.op_context)->get_user_data();
+#ifdef CRAY_FLAGS_BUG
+                entry.flags = reinterpret_cast<uint64_t>(
+                    (reinterpret_cast<libfabric_memory_region*>
+                        (entry.op_context)->get_user_data()));
+#endif
                 if ((entry.flags & FI_RMA) == FI_RMA) {
                     LOG_DEVEL_MSG("Received an rxcq RMA completion");
                     rdma_completion_function_(entry.op_context,
