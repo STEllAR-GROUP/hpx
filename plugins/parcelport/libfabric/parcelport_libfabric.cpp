@@ -674,6 +674,9 @@ namespace libfabric
                                 << " remote cpos " << hexpointer(remoteAddr)
                                 << " remote pos " << hexpointer(remoteAddr)
                                 << " index " << decnumber(c.data_.index_));
+
+                            get_region->set_user_data(
+                                reinterpret_cast<void*>(FI_READ | FI_RMA));
                             ssize_t ret = fi_read(client,
                                 get_region->get_address(), c.size_, get_region->get_desc(),
                                 src,
@@ -832,7 +835,8 @@ namespace libfabric
                 uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
                 *tag_memory = recv_data.tag;
                 tag_region->set_message_length(4);
-                tag_region->set_user_data(client);
+                tag_region->set_user_data(
+                        reinterpret_cast<void*>(FI_SEND | FI_MSG));
 
                 int ret = fi_send(client,
                     tag_region->get_address(), 4,
@@ -1333,7 +1337,8 @@ namespace libfabric
                 }
 
                 ++sends_posted;
-                send_data.header_region->set_user_data(sender->client_);
+                send_data.header_region->set_user_data(
+                        reinterpret_cast<void*>(FI_SEND | FI_MSG));
 
                 // send the header/main_chunk to the destination,
                 // wr_id is header_region (entry 0 in region_list)
