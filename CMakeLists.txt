@@ -233,8 +233,8 @@ if(APPLE OR WIN32)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
-  "Build and link HPX libraries and executables with full RPATHs (default: ON)"
-  OFF ADVANCED)
+  "Build and link HPX libraries and executables with full RPATHs (default: ${HPX_FULL_RPATH_DEFAULT})"
+  ${HPX_FULL_RPATH_DEFAULT} ADVANCED)
 
 ################################################################################
 # HPX Compute configuration
