@@ -163,7 +163,9 @@ namespace libfabric
 
             // setup a passive listener, or an active RDM endpoint
             here_ = create_local_endpoint();
+#ifndef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             create_event_queue();
+#endif
 
             FUNC_END_DEBUG_MSG;
         }
@@ -303,7 +305,7 @@ namespace libfabric
         void create_event_queue()
         {
             LOG_DEVEL_MSG("Creating event queue");
-            eq_attr.wait_obj = FI_WAIT_UNSPEC;
+            eq_attr.wait_obj = FI_WAIT_NONE;
             int ret = fi_eq_open(fabric_, &eq_attr, &event_queue_, NULL);
             if (ret) throw fabric_error(ret, "fi_eq_open");
 
