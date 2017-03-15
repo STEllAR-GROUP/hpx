@@ -235,15 +235,12 @@ else()
 endif()
 
 if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-  target_link_libraries(hpx
-    PUBLIC ${HPX_LIBRARIES})
+  target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
   if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx
-      PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+    target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
   endif()
   if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx
-      PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+    target_link_libraries(hpx PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
   endif()
 else()
   target_link_libraries(hpx ${HPX_LIBRARIES})
@@ -261,8 +258,11 @@ endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
-    target_link_libraries(hpx
-      PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
+    if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
+      target_link_libraries(hpx ${_parcelport_${_plugin}_LIBRARIES})
+    else()
+      target_link_libraries(hpx PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
+    endif()
     hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
   endif()
 endforeach()

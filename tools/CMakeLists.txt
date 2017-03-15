@@ -17,7 +17,11 @@ foreach(tool ${tools})
     SOURCES ${tool}.cpp ${${tool}}
     FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool}_exe)
-  target_link_libraries(${tool}_exe ${Boost_LIBRARIES})
+  if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
+    target_link_libraries(${tool}_exe ${Boost_LIBRARIES})
+  else()
+    target_link_libraries(${tool}_exe PUBLIC ${Boost_LIBRARIES})
+  endif()
 endforeach()
 
 foreach(subdir ${subdirs})
