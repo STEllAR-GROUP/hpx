@@ -133,8 +133,6 @@ hpx_option(HPX_WITH_HWLOC
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
 
-hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
-
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
@@ -1416,27 +1414,6 @@ if(HPX_WITH_VALGRIND)
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
-
-################################################################################
-# Security, libsodium: P(ortable|ackageable) NaCl
-################################################################################
-if(HPX_WITH_SECURITY)
-  find_package(Sodium)
-  if(NOT SODIUM_FOUND)
-    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
-  endif()
-  hpx_add_config_define(HPX_HAVE_SODIUM)
-
-  include_directories(${SODIUM_INCLUDE_DIR})
-
-  if(MSVC)
-    hpx_add_config_define(SODIUM_STATIC)
-  endif()
-  hpx_libraries(${SODIUM_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_SECURITY)
-endif()
-################################################################################
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors

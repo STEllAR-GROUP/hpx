@@ -247,21 +247,6 @@ namespace hpx { namespace components
             return refcnt_;
         }
 
-#if defined(HPX_HAVE_SECURITY)
-        /// \brief Return the required capabilities necessary to create an
-        ///        instance of a component using this factory instance.
-        ///
-        /// \return Returns required capabilities necessary to create a new
-        ///         instance of a component using this factory instance.
-        virtual components::security::capability
-            get_required_capabilities() const
-        {
-            using namespace components::security;
-            return Component::get_required_capabilities(
-                traits::capability<>::capability_create_component);
-        }
-#endif
-
     protected:
         util::section global_settings_;
         util::section local_settings_;

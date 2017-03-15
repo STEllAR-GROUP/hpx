@@ -561,14 +561,6 @@ namespace hpx { namespace components
             heap_type::free(p, count);
         }
 
-#if defined(HPX_HAVE_SECURITY)
-        static components::security::capability get_required_capabilities(
-            components::security::traits::capability<>::capabilities caps)
-        {
-            return components::default_component_creation_capabilities(caps);
-        }
-#endif
-
     public:
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object

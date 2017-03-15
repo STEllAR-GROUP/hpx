@@ -233,14 +233,6 @@ namespace hpx { namespace actions
                 call(ph, loc, p);
         }
 
-#if defined(HPX_HAVE_SECURITY)
-        /// Return the set of capabilities required to invoke this action
-        components::security::capability get_required_capabilities(
-            naming::address::address_type lva) const
-        {
-            return traits::action_capability_provider<derived_type>::call(lva);
-        }
-#endif
     public:
         /// retrieve the N's argument
         template <std::size_t N>

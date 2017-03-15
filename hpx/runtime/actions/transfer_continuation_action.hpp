@@ -11,9 +11,6 @@
 #define HPX_RUNTIME_ACTIONS_TRANSFER_CONTINUATION_ACTION_HPP
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/traits/action_capability_provider.hpp>
-#endif
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>

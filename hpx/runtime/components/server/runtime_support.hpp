@@ -10,9 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/traits/action_capability_provider.hpp>
-#endif
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -344,11 +341,6 @@ namespace hpx { namespace components { namespace server
 
         // notify of message being sent
         void dijkstra_make_black();
-
-#if defined(HPX_HAVE_SECURITY)
-        components::security::capability get_factory_capabilities(
-            components::component_type type);
-#endif
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -1010,45 +1002,6 @@ namespace hpx { namespace traits
             return true;
         }
     };
-
-#if defined(HPX_HAVE_SECURITY)
-    ///////////////////////////////////////////////////////////////////////////
-    // Actions used to create components with constructors of various arities.
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_action<Component, Ts...> >
-    {
-        // return the required capabilities to invoke the given action
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_direct_action<Component, Ts...> >
-    {
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-#endif
 
     // runtime_support is a (hand-rolled) component
     template <>
