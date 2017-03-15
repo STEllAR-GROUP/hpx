@@ -34,10 +34,13 @@ namespace hpx { namespace performance_counters { namespace memory
             "returns the amount of resident memory currently allocated by the "
             "referenced locality", "bytes"
         );
+#if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__)
+        // this counter is currently supported on Linux only
         pc::install_counter_type(
             "/runtime/memory/total", &read_total_mem_avail,
             "returns the total available memory on the node", "kB"
         );
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
