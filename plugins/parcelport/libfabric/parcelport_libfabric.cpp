@@ -133,7 +133,7 @@ namespace libfabric
         // main vars used to manage the RDMA controller and interface
         // These are called from a static function, so use static
         // --------------------------------------------------------------------
-        static libfabric_controller_ptr libfabric_controller_;
+        libfabric_controller_ptr libfabric_controller_;
 
         // our local ip address (estimated based on fabric PP adress info)
         uint32_t ip_addr_;
@@ -270,9 +270,6 @@ namespace libfabric
                 hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
             LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
 
-            // we need this for background OS threads to get 'this' pointer
-            parcelport::parcelport_instance_ = this;
-
             if (!parcelport_enabled_) return;
 
             // Get parameters that determine our fabric selection
@@ -348,6 +345,7 @@ namespace libfabric
                 , parcels_sent_
             );
 
+
             return true;
        }
 
@@ -422,7 +420,7 @@ namespace libfabric
                 if (--active_send_count_ <= HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE)
                 {
                     if (!immediate_send_allowed_) {
-                        LOG_DEBUG_MSG("Enabling immediate send : active "
+                        LOG_DEVEL_MSG("Enabling immediate send : active "
                             << decnumber(active_send_count_) << " "
                             << active_sends.size());
                     }
@@ -729,8 +727,14 @@ namespace libfabric
                     hpx::serialization::create_pointer_chunk(get_region->get_address(),
                         size, h->get_message_rdma_key()));
                 ++total_reads;
-//                client->post_read(get_region, h->get_message_rdma_key(), remoteAddr,
-//                    h->get_message_rdma_size());
+//
+                ssize_t ret = fi_read(client,
+                    get_region->get_address(), size, get_region->get_desc(),
+                    src,
+                    (uint64_t)h->get_message_rdma_addr(), h->get_message_rdma_key(), get_region);
+
+                if (ret) throw fabric_error(ret, "fi_read error");
+                else { LOG_DEVEL_MSG("fi_read completed ok"); }
             }
 
             // @TODO replace performance counter data
@@ -824,33 +828,6 @@ namespace libfabric
                     return;
                 }
                 //
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting 4 byte ack to origin");
-                // allocate space for a single uint32_t
-                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
-                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
-                *tag_memory = recv_data.tag;
-                tag_region->set_message_length(4);
-
-                int ret = fi_send(client,
-                    tag_region->get_address(), 4,
-                    tag_region->get_desc(), recv_data.src_addr, tag_region);
-                if (ret) throw fabric_error(ret, "fi_send tag notification error");
-                else
-                {
-                    LOG_DEVEL_MSG("All ok after tag_Send");
-                }
-
-#else
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting zero byte ack to origin");
-                // convert uint32 to uint64 so we can use it as a fake message region
-                // (wr_id only for 0 byte send)
-                uint64_t fake_region = recv_data.tag;
-//                client->post_send_x0((libfabric_memory_region*)fake_region,
-//                    false, true, recv_data.tag);
-#endif
                 //
                 LOG_DEBUG_MSG("Zero copy regions size is (completion) "
                     << decnumber(recv_data.zero_copy_regions.size()));
@@ -886,6 +863,7 @@ namespace libfabric
 
                 LOG_DEBUG_MSG("Creating a release buffer callback for tag "
                     << hexuint32(recv_data.tag));
+                auto ack_addr = recv_data.src_addr;
                 rcv_data_type wrapped_pointer(message, message_length,
                         util::bind(&parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
@@ -908,6 +886,35 @@ namespace libfabric
                 buffer.chunks_.resize(recv_data.chunks.size());
                 decode_message_with_chunks(*this, std::move(buffer), 0, recv_data.chunks);
                 LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
+
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting 4 byte ack to origin");
+                // allocate space for a single uint32_t
+                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
+                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
+                *tag_memory = recv_data.tag;
+                tag_region->set_message_length(4);
+
+                int ret = 0;
+                ret = fi_send(client,
+                    tag_region->get_address(), 4,
+                    tag_region->get_desc(), ack_addr, tag_region);
+                if (ret) throw fabric_error(ret, "fi_send tag notification error");
+                else
+                {
+                    LOG_DEVEL_MSG("All ok after tag_Send");
+                }
+
+#else
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting zero byte ack to origin");
+                // convert uint32 to uint64 so we can use it as a fake message region
+                // (wr_id only for 0 byte send)
+                uint64_t fake_region = recv_data.tag;
+//                client->post_send_x0((libfabric_memory_region*)fake_region,
+//                    false, true, recv_data.tag);
+#endif
             }
             else {
                 throw std::runtime_error("RDMA Get completed with unmatched Id");
@@ -946,7 +953,7 @@ namespace libfabric
                     }
                 }
                 temp << std::endl;
-                std::cout << temp.str().c_str();
+                std::cerr << temp.str().c_str();
             }
             )
 
@@ -1133,8 +1140,10 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         bool can_send_immediate() {
-            while (!immediate_send_allowed_) {
-                background_work(0);
+            for (std::size_t k = 0; !immediate_send_allowed_; ++k)
+            {
+                LOG_DEVEL_MSG("Waiting until we can send");
+                hpx::util::detail::yield_k(k, "libfabric::parcelport::can_send_immediate");
             }
             return true;
         }
@@ -1165,14 +1174,12 @@ namespace libfabric
                     current_send = std::prev(active_sends.end());
                     //
                     if (++active_send_count_ >= HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS) {
-/*
                         if (immediate_send_allowed_) {
-                            LOG_DEBUG_MSG("Disabling immediate send : active "
+                            LOG_DEVEL_MSG("Disabling immediate send : active "
                                 << decnumber(active_send_count_) << " "
                                 << active_sends.size());
                         }
                         immediate_send_allowed_ = false;
-*/
                     }
                     LOG_DEBUG_MSG("Active send after insert size "
                         << decnumber(active_send_count_));
@@ -1383,15 +1390,16 @@ namespace libfabric
         // hpx threads when necessary.
         // --------------------------------------------------------------------
         inline bool background_work_OS_thread() {
-            bool done = false;
-            do {
-                // if an event comes in, we may spend time processing/handling it
-                // and another may arrive during this handling,
-                // so keep checking until none are received
-                //libfabric_controller_->refill_client_receives(false);
-                done = (libfabric_controller_->poll_endpoints() == 0);
-            } while (!done);
-            return true;
+//             bool done = false;
+//             do {
+//                 // if an event comes in, we may spend time processing/handling it
+//                 // and another may arrive during this handling,
+//                 // so keep checking until none are received
+//                 //libfabric_controller_->refill_client_receives(false);
+//                 done = (libfabric_controller_->poll_endpoints() == 0);
+//             } while (!done);
+//             std::cerr << "active sends: " << active_send_count_ << '\n';
+            return libfabric_controller_->poll_endpoints();
         }
 
         // There is no difference between our background polling work on OS or HPX
@@ -1413,22 +1421,12 @@ namespace libfabric
             if (stopped_ || hpx::is_stopped()) {
                 return false;
             }
-            int result;
-            if (hpx::threads::get_self_ptr() == nullptr) {
-                result = background_work_OS_thread();
-            }
-            else {
-                result = background_work_hpx_thread();
-            }
+            bool result = background_work_hpx_thread();
+
             // if we are still blocked after making progress on the network
             // we must block the thread that is sending to allow returning futures
             // to be handled
             if (!immediate_send_allowed_) {
-                if (hpx::threads::get_self_ptr() != nullptr) {
-                    hpx::this_thread::suspend();
-                    //using namespace std::chrono_literals;
-                    //std::this_thread::sleep_for(5us);
-                }
 #if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
                 LOG_TIMED_INIT(background_sends);
                 LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
@@ -1470,14 +1468,6 @@ namespace libfabric
             }
             return result;
         }
-
-        static parcelport *get_singleton()
-        {
-            return parcelport_instance_;
-        }
-
-        static parcelport *parcelport_instance_;
-
     };
 
     // --------------------------------------------------------------------
@@ -1524,7 +1514,6 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
         if (!log_init) {
 #if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING) || \
     defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
-            std::cout << "Initializing libfabric parcelport logging " << std::endl;
             boost::log::add_console_log(
             std::clog,
             // This makes the sink to write log records that look like this:
@@ -1572,11 +1561,6 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
     }
 };
 }}
-
-hpx::parcelset::policies::libfabric::libfabric_controller_ptr
-    hpx::parcelset::policies::libfabric::parcelport::libfabric_controller_;
-hpx::parcelset::policies::libfabric::parcelport *
-    hpx::parcelset::policies::libfabric::parcelport::parcelport_instance_;
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric);
 

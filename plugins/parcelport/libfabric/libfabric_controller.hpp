@@ -222,6 +222,16 @@ namespace libfabric
             // use infiniband type basic registration for now
             fabric_hints_->domain_attr->mr_mode = FI_MR_BASIC;
 
+            // Disable the use of progress threads
+            fabric_hints_->domain_attr->control_progress = FI_PROGRESS_MANUAL;
+            fabric_hints_->domain_attr->data_progress = FI_PROGRESS_MANUAL;
+
+            // Enable thread safe mode
+            fabric_hints_->domain_attr->threading = FI_THREAD_SAFE;
+
+            // Enable resource management
+            fabric_hints_->domain_attr->resource_mgmt = FI_RM_ENABLED;
+
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             LOG_DEVEL_MSG("Selecting endpoint type RDM");
             fabric_hints_->ep_attr->type = FI_EP_RDM;
@@ -481,10 +491,11 @@ namespace libfabric
         // are thrown away, otherwise the completion callback is triggered
         int poll_endpoints(bool stopped=false)
         {
-            unique_lock lock(polling_mutex_, std::try_to_lock);
-            if (!lock.owns_lock()) return 0;
+//             unique_lock lock(polling_mutex_, std::try_to_lock);
+//             if (!lock.owns_lock()) return 0;
             //
-            int work = poll_for_work_completions(lock, stopped);
+//             int work = poll_for_work_completions(lock, stopped);
+            int work = poll_for_work_completions(stopped);
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
             work += poll_event_queue(stopped);
 #endif
@@ -492,11 +503,15 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        int poll_for_work_completions(unique_lock& lock, bool stopped=false)
+//         int poll_for_work_completions(unique_lock& lock, bool stopped=false)
+        int poll_for_work_completions(bool stopped=false)
         {
+//             std::cerr << "preposted receives: " << preposted_receives_ << '\n';
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
             if (HPX_UNLIKELY(!rxcq)) return 0;
+
+            int result = 0;
 
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
@@ -516,7 +531,7 @@ struct fi_cq_msg_entry {
             fi_cq_msg_entry entry;
             int ret = fi_cq_read(txcq, &entry, 1);
             if (ret>0) {
-                hpx::util::unlock_guard_try<unique_lock> ul(lock);
+//                 hpx::util::unlock_guard_try<unique_lock> ul(lock);
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEVEL_MSG("Completion txcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
@@ -534,7 +549,7 @@ struct fi_cq_msg_entry {
                         << decnumber(entry.flags));
 //                     std::terminate();
                 }
-                return 1;
+                result = 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
@@ -548,46 +563,43 @@ struct fi_cq_msg_entry {
                 throw fabric_error(ret, "completion txcq read");
             }
 
-            if (!lock) return 0;
+//             if (!lock) return 0;
 
+//             LOG_DEVEL_MSG("Preposted receives: " << preposted_receives_);
+            refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
             // receives will use fi_cq_readfrom as we want the source address
             ret = fi_cq_readfrom(rxcq, &entry, 1, &src_addr);
             if (ret>0) {
-                if (--preposted_receives_<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS/4) {
-                    refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
-                }
+                --preposted_receives_;
+                LOG_DEVEL_MSG("Completion rxcq wr_id "
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
+                    << " source " << hexpointer(src_addr)
+                    << "context " << hexpointer(entry.op_context)
+                    << "length " << hexuint32(entry.len));
+//                void *client = reinterpret_cast<libfabric_memory_region*>
+//                    (entry.op_context)->get_user_data();
+                if (src_addr == FI_ADDR_NOTAVAIL)
                 {
-                    lock.unlock();
-                    LOG_DEVEL_MSG("Completion rxcq wr_id "
-                        << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
-                        << " source " << hexpointer(src_addr)
-                        << "context " << hexpointer(entry.op_context)
-                        << "length " << hexuint32(entry.len));
-    //                void *client = reinterpret_cast<libfabric_memory_region*>
-    //                    (entry.op_context)->get_user_data();
-                    if (src_addr == FI_ADDR_NOTAVAIL)
-                    {
-                        LOG_DEVEL_MSG("Source address not available...\n");
-                        std::terminate();
-                    }
+                    LOG_DEVEL_MSG("Source address not available...\n");
+                    std::terminate();
+                }
 //                     if ((entry.flags & FI_RMA) == FI_RMA) {
 //                         LOG_DEVEL_MSG("Received an rxcq RMA completion");
 //                         rdma_completion_function_(entry.op_context,
 //                             ep_active_, src_addr);
 //                     }
-                    else if (entry.flags == (FI_MSG | FI_RECV)) {
-                        LOG_DEVEL_MSG("Received an rxcq recv completion");
-    //                    LOG_DEVEL_MSG("FI_ADDR_T FI_RECV " << hexpointer(src_addr));
-                        recv_completion_function_(entry.op_context,
-                            ep_active_, entry.len, src_addr);
-                    }
-                    else {
-                        LOG_DEVEL_MSG("Received an unknown rxcq completion "
-                            << decnumber(entry.flags));
-                        std::terminate();
-                    }
+                else if (entry.flags == (FI_MSG | FI_RECV)) {
+                    LOG_DEVEL_MSG("Received an rxcq recv completion");
+//                    LOG_DEVEL_MSG("FI_ADDR_T FI_RECV " << hexpointer(src_addr));
+                    recv_completion_function_(entry.op_context,
+                        ep_active_, entry.len, src_addr);
                 }
-                return 1;
+                else {
+                    LOG_DEVEL_MSG("Received an unknown rxcq completion "
+                        << decnumber(entry.flags));
+                    std::terminate();
+                }
+                result = 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
@@ -600,7 +612,8 @@ struct fi_cq_msg_entry {
                 LOG_ERROR_MSG("rxcq Error with flags " << e.flags << " len " << e.len);
                 throw fabric_error(ret, "completion rxcq read");
             }
-            return 0;
+
+            return result;
         }
 
         // --------------------------------------------------------------------

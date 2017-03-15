@@ -31,7 +31,7 @@ namespace libfabric
         typedef policies::libfabric::sender_connection      connection_type;
         typedef HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING send_early_parcel;
         typedef std::true_type                              do_background_work;
-        typedef std::true_type                              send_immediate_parcels;
+        typedef std::true_type                             send_immediate_parcels;
 
         static const char * type()
         {
