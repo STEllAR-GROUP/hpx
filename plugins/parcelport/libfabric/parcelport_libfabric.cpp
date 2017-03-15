@@ -498,7 +498,6 @@ namespace libfabric
         // --------------------------------------------------------------------
         void handle_send_completion(void* wr_id, struct fid_ep* client, uint32_t)
         {
-            bool                 found_wr_id = false;
             active_send_iterator current_send;
             {
                 // we must be very careful here.
@@ -508,7 +507,6 @@ namespace libfabric
                 // whilst we are still waiting
                 auto is_present = SendCompletionMap.is_in_map(wr_id);
                 if (is_present.second) {
-                    found_wr_id = true;
                     current_send = is_present.first->second;
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
                         << "from SendCompletionMap : size before erase "
@@ -526,24 +524,19 @@ namespace libfabric
 #endif
                 }
             }
-            if (found_wr_id) {
-                // if the send had no zero_copy regions, then it has completed
-                if (!current_send->has_zero_copy) {
-                    LOG_DEBUG_MSG("Deleting send data "
-                        << hexpointer(&(*current_send)) << "normal");
-                    delete_send_data(current_send);
-                }
-                // if another thread signals to say zero-copy complete, delete the data
-                else if (current_send->delete_flag.test_and_set(
-                    std::memory_order_acquire))
-                {
-                    LOG_DEBUG_MSG("Deleting send data "
-                        << hexpointer(&(*current_send)) << "after race detection");
-                    delete_send_data(current_send);
-                }
+            // if the send had no zero_copy regions, then it has completed
+            if (!current_send->has_zero_copy) {
+                LOG_DEBUG_MSG("Deleting send data "
+                    << hexpointer(&(*current_send)) << "normal");
+                delete_send_data(current_send);
             }
-            else {
-                throw std::runtime_error("RDMA Send completed with unmatched Id");
+            // if another thread signals to say zero-copy complete, delete the data
+            else if (current_send->delete_flag.test_and_set(
+                std::memory_order_acquire))
+            {
+                LOG_DEBUG_MSG("Deleting send data "
+                    << hexpointer(&(*current_send)) << "after race detection");
+                delete_send_data(current_send);
             }
         }
 
@@ -779,7 +772,7 @@ namespace libfabric
                     TagSendCompletionMap.erase(is_present.first);
                 }
                 else {
-                    LOG_DEVEL_MSG("Tag not present in Send map, FATAL");
+                    LOG_DEVEL_MSG("Tag " << tag << " not present in Send map, FATAL");
                     std::terminate();
                 }
             }
@@ -863,7 +856,16 @@ namespace libfabric
 
                 LOG_DEBUG_MSG("Creating a release buffer callback for tag "
                     << hexuint32(recv_data.tag));
+#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
+                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
+                    << " has completed : posting 4 byte ack to origin");
+                // allocate space for a single uint32_t
+                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
+                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
+                *tag_memory = recv_data.tag;
+                tag_region->set_message_length(4);
                 auto ack_addr = recv_data.src_addr;
+#endif
                 rcv_data_type wrapped_pointer(message, message_length,
                         util::bind(&parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
@@ -888,16 +890,7 @@ namespace libfabric
                 LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
 
 #if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting 4 byte ack to origin");
-                // allocate space for a single uint32_t
-                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
-                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
-                *tag_memory = recv_data.tag;
-                tag_region->set_message_length(4);
-
-                int ret = 0;
-                ret = fi_send(client,
+                int ret = fi_send(client,
                     tag_region->get_address(), 4,
                     tag_region->get_desc(), ack_addr, tag_region);
                 if (ret) throw fabric_error(ret, "fi_send tag notification error");
@@ -930,78 +923,6 @@ namespace libfabric
         int handle_libfabric_completion(const struct fi_cq_msg_entry completion,
                 struct fid_ep *client)
         {
-/*
-            uint64_t wr_id = completion.wr_id;
-            LOG_DEVEL_MSG("Handle libfabric completion " << hexpointer(wr_id)
-                << decnumber(completion.qp_num)
-                << sockaddress(client->get_remote_address())
-                << libfabric_completion_queue::wc_opcode_str(completion.opcode));
-
-            // get the header of the new message/parcel
-
-            LOG_EXCLUSIVE(
-            if (0 && completion.opcode==IBV_WC_RECV) {
-                auto region = (libfabric_memory_region *)wr_id;
-                std::stringstream temp;
-                temp << "Completion Buffer "
-                    << libfabric_completion_queue::wc_opcode_str(completion.opcode) << ":\n";
-                if (completion.byte_len<1024) {
-                    int P = completion.byte_len;
-                    uintptr_t *ptr = reinterpret_cast<uintptr_t*>(region->get_address());
-                    for(int j=0; j<P/8; ++j) {
-                        temp << dec4(j) << " " << hexuint64(ptr[j]) << "\n";
-                    }
-                }
-                temp << std::endl;
-                std::cerr << temp.str().c_str();
-            }
-            )
-
-            ++completions_handled;
-
-            if (completion.opcode==IBV_WC_SEND) {
-                LOG_DEBUG_MSG("Handle general completion " << hexpointer(wr_id)
-                    << libfabric_completion_queue::wc_opcode_str(completion.opcode));
-                handle_send_completion(wr_id);
-                return 0;
-            }
-
-            //
-            // When an Rdma Get operation completes, either add it to an ongoing parcel
-            // receive, or if it is the last one, trigger decode message
-            //
-            else if (completion.opcode==IBV_WC_RDMA_READ) {
-                handle_rdma_get_completion(wr_id, client);
-                return 0;
-            }
-
-            //
-            // A zero byte receive indicates we are being informed that remote
-            // GET operations are complete we can release any data we were holding onto
-            // and signal a send as finished.
-            // On hardware not supporting immediate data, a 4 byte tag message is used.
-            //
-            else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
-                handle_tag_recv_completion(wr_id, completion.imm_data, client);
-                return 0;
-            }
-
-            //
-            // When an unmatched receive completes, it is a new parcel, if everything
-            // fits into the header, call decode message, otherwise, queue all the
-            // Rdma Get operations necessary to complete the message
-            //
-            else if (completion.opcode==IBV_WC_RECV) {
-                LOG_DEBUG_MSG("Entering receive (completion handler) section with "
-                    "received size " << decnumber(completion.byte_len));
-                handle_recv_completion(wr_id, client);
-                return 0;
-            }
-
-            throw std::runtime_error("Unexpected opcode in handle_libfabric_completion "
-                + libfabric_sender_receiver::
-                fi_cq_msg_entry_opcode_string((ibv_wr_opcode)(completion.opcode)));
-*/
             return 0;
         }
 
