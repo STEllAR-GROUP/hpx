@@ -1190,7 +1190,7 @@ system and application performance.
           Note: only supported in Linux
         ]
         [Returns the total available memory for use by the referenced locality
-         (in bytes). This counter is available on Linux systems only.]
+         (in bytes). This counter is available on Linux and Windows systems only.]
         [None]
     ]
     [   [`/runtime/io/read_bytes_issued`]
