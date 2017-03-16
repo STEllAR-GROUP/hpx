@@ -42,22 +42,12 @@
 #include <rdma/fi_rma.h>
 #include "fabric_error.hpp"
 
-#ifndef HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS
-# define HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS 16
-#endif
-
 #ifdef HPX_PARCELPORT_LIBFABRIC_GNI
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
 #else
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
 #endif
 
-#define CRAY_FLAGS_BUG
-
-// @TODO : Remove the client map pair as we have a copy in the libfabric_parcelport class
-// that does almost the same job.
-// @TODO : Most of this code could be moved into the main parcelport, or the endpoint
-// classes
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -71,6 +61,7 @@ namespace libfabric
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
 
+        // NOTE: Connection maps are not used for endpoint type RDM
         // when a new connection is requested, it will be completed asynchronously
         // we need a promise/future for each endpoint so that we can set the new
         // endpoint when the connection completes and is ready
@@ -79,9 +70,6 @@ namespace libfabric
             hpx::promise<fid_ep *>,
             hpx::shared_future<fid_ep *>
         > promise_tuple_type;
-
-        // used in map of ipaddress->promise_tuple_type
-        typedef std::pair<const uint32_t, promise_tuple_type> ClientMapPair;
 
         // lock types for maps
         typedef hpx::concurrent::unordered_map<uint32_t, promise_tuple_type>
@@ -102,7 +90,6 @@ namespace libfabric
         struct fid_pep    *ep_passive_;
         struct fid_ep     *ep_active_;
         struct fid_ep     *ep_shared_rx_cxt_;
-
 
         // we will use just one event queue for all connections
         struct fid_eq     *event_queue_;
@@ -539,11 +526,11 @@ struct fi_cq_msg_entry {
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
                     << hexpointer(entry.op_context) << "length " << hexuint32(entry.len));
                 if (entry.flags & FI_RMA) {
-                    LOG_DEVEL_MSG("@@@@@ Received a txcq RMA completion %%%%% ");
+                    LOG_DEBUG_MSG("Received a txcq RMA completion");
                     rdma_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else if (entry.flags == (FI_MSG | FI_SEND)) {
-                    LOG_DEVEL_MSG("@@@@@ Received a txcq RMA send completion %%%%% ");
+                    LOG_DEBUG_MSG("Received a txcq RMA send completion");
                     send_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else {
