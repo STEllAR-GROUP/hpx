@@ -15,6 +15,17 @@
 //
 #include <boost/thread/locks.hpp>
 
+#ifdef RW_LOCK_ENABLE_LOGGING
+# define LOG_DEBUG_MSG(x) std::cout << "00: <debug> " << \
+    << x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
+#else
+# define LOG_DEBUG_MSG(x)
+#endif
+
+// Note that this implementaion uses 16bit counters so can handle 65536
+// contentions on the lock without wraparound. It has not proven to be a
+// problem so far. (c.f. original description below)
+
 /*
  * Based on "Spinlocks and Read-Write Locks" by Dr. Steven Fuerst:
  *      http://locklessinc.com/articles/locks/
@@ -134,23 +145,30 @@ namespace local {
         } readwrite_ticket;
 
         readwrite_ticket ticket;
+        bool readlock_;
 
     public:
-        readers_writer_mutex() : ticket{0} {}
+        readers_writer_mutex() : ticket{0}, readlock_(false) {}
 
         //
         // acquire lock for a unique writer
         //
         void lock()
         {
+            LOG_DEBUG_MSG("lock wr " << std::hex << this
+                << " r " << ticket.s.readers
+                << " w " << ticket.s.writers
+                << " n " << ticket.s.next
+                << " v " << ticket.s.next);
+
             // memory ordering barrier
             rwl_barrier_();
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.writers) {
-// std::cout << "rw lock sleep write " << val << " " << ticket.s.next << " \n";
                 hpx::util::detail::yield_k(4, nullptr);
             }
+            readlock_ = false;
 
             // memory ordering rwl_barrier_
             rwl_barrier_();
@@ -161,12 +179,25 @@ namespace local {
         //
         void unlock()
         {
-            // only one writer can enter unlock at a time, so we do not need atomic ops
-            readwrite_ticket new_ticket = ticket;
-            //
-            ++new_ticket.s.writers;
-            ++new_ticket.s.readers;
-            ticket.i.wr = new_ticket.i.wr;
+            // readlock incremented readers when it took the lock
+            if (readlock_) {
+                atomic_inc(&ticket.s.writers);
+                LOG_DEBUG_MSG("unlock rd " << std::hex << this
+                    << " r " << ticket.s.readers
+                    << " w " << ticket.s.writers
+                    << " n " << ticket.s.next);
+            }
+            else {
+                // only one writer can enter unlock at a time, do not need atomics
+                readwrite_ticket new_ticket = ticket;
+                ++new_ticket.s.writers;
+                ++new_ticket.s.readers;
+                LOG_DEBUG_MSG("unlock wr " << std::hex << this
+                    << " r " << new_ticket.s.readers
+                    << " w " << new_ticket.s.writers
+                    << " n " << new_ticket.s.next);
+                ticket.i.wr = new_ticket.i.wr;
+            }
         }
 
         //
@@ -190,7 +221,12 @@ namespace local {
             // The replacement lock value is a result of allocating a new ticket.
             ++new_ticket.s.next;
 
-            return (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
+            bool granted =
+                (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
+            if (granted) {
+                readlock_ = false;
+            }
+            return granted;
         }
 
         //
@@ -198,17 +234,23 @@ namespace local {
         //
         void lock_shared()
         {
+            LOG_DEBUG_MSG("lock rd " << std::hex << this
+                << " r " << ticket.s.readers
+                << " w " << ticket.s.writers
+                << " n " << ticket.s.next
+                << " v " << ticket.s.next);
+
             // memory ordering rwl_barrier_
             rwl_barrier_();
 
             uint16_t val = atomic_xadd(&ticket.s.next, 1);
             while (val != ticket.s.readers) {
-// std::cout << "rw lock sleep read " << val << " " << ticket.s.readers << "\n";
                 hpx::util::detail::yield_k(0, nullptr);
             }
+            readlock_ = true;
 
             // only one writer can lock, so no need for atomic increment
-            ++ticket.s.readers;
+            atomic_inc(&ticket.s.readers);
 
             // memory ordering rwl_barrier_
             rwl_barrier_();
@@ -245,7 +287,12 @@ namespace local {
              * incrementing the reader value to match it.
              */
             new_ticket.s.readers = new_ticket.s.next = old_ticket.s.next + 1;
-            return (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
+            bool granted =
+                (cmpxchg(&ticket.u, old_ticket.u, new_ticket.u) ? true : false);
+            if (granted) {
+                readlock_ = true;
+            }
+            return granted;
         }
 
         // return true if a reader or writer has the lock
