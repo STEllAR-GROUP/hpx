@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -234,22 +234,12 @@ else()
     FOLDER "Core")
 endif()
 
-if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-  target_link_libraries(hpx PUBLIC ${HPX_LIBRARIES})
-  if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx PUBLIC ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
-  endif()
-  if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx PRIVATE ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
-  endif()
-else()
-  target_link_libraries(hpx ${HPX_LIBRARIES})
-  if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
-  endif()
-  if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
-    target_link_libraries(hpx ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
-  endif()
+target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
+if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
+  target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+endif()
+if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
+  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
 endif()
 
 if(HPX_WITH_APEX)
@@ -258,11 +248,7 @@ endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
-    if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-      target_link_libraries(hpx ${_parcelport_${_plugin}_LIBRARIES})
-    else()
-      target_link_libraries(hpx PUBLIC ${_parcelport_${_plugin}_LIBRARIES})
-    endif()
+    target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${_parcelport_${_plugin}_LIBRARIES})
     hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
   endif()
 endforeach()

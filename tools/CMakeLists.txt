@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,11 +17,7 @@ foreach(tool ${tools})
     SOURCES ${tool}.cpp ${${tool}}
     FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool}_exe)
-  if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-    target_link_libraries(${tool}_exe ${Boost_LIBRARIES})
-  else()
-    target_link_libraries(${tool}_exe PUBLIC ${Boost_LIBRARIES})
-  endif()
+  target_link_libraries(${tool}_exe ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
 endforeach()
 
 foreach(subdir ${subdirs})

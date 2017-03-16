@@ -11,11 +11,7 @@ add_hpx_executable(inspect
   FOLDER "Tools/Inspect")
 
 if(NOT MSVC)
-  if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-    target_link_libraries(inspect_exe ${Boost_LIBRARIES})
-  else()
-    target_link_libraries(inspect_exe PUBLIC ${Boost_LIBRARIES})
-  endif()
+  target_link_libraries(inspect_exe ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
 endif()
 
 # add dependencies to pseudo-target

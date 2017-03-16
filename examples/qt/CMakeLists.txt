@@ -23,11 +23,7 @@ if(HPX_WITH_EXAMPLES_QT4)
         ${qt_FLAGS}
         FOLDER "Examples/Qt")
 
-    if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-        target_link_libraries(qt_exe ${QT_LIBRARIES})
-    else()
-        target_link_libraries(qt_exe PUBLIC ${QT_LIBRARIES})
-    endif()
+    target_link_libraries(qt_exe ${HPX_TLL_PUBLIC} ${QT_LIBRARIES})
 
     # add a custom target for this example
     add_hpx_pseudo_target(examples.qt.qt)
