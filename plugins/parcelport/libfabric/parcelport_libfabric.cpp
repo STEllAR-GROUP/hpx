@@ -672,7 +672,6 @@ namespace libfabric
                                 (uint64_t)(remoteAddr), c.rkey_, get_region);
 
                             if (ret) throw fabric_error(ret, "fi_read error");
-                            else { LOG_DEVEL_MSG("fi_read completed ok"); }
                         }
                         index++;
                     }
@@ -727,7 +726,6 @@ namespace libfabric
                     (uint64_t)h->get_message_rdma_addr(), h->get_message_rdma_key(), get_region);
 
                 if (ret) throw fabric_error(ret, "fi_read error");
-                else { LOG_DEVEL_MSG("fi_read completed ok"); }
             }
 
             // @TODO replace performance counter data
@@ -745,7 +743,7 @@ namespace libfabric
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
             chunk_pool_->deallocate(region);
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
-                << hexuint32(/*tag*/*(uint32_t*) (region->get_address())));
+                << hexuint32(*(uint32_t*) (region->get_address())));
         }
 #endif
 
@@ -894,10 +892,6 @@ namespace libfabric
                     tag_region->get_address(), 4,
                     tag_region->get_desc(), ack_addr, tag_region);
                 if (ret) throw fabric_error(ret, "fi_send tag notification error");
-                else
-                {
-                    LOG_DEVEL_MSG("All ok after tag_Send");
-                }
 
 #else
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
@@ -1063,7 +1057,7 @@ namespace libfabric
         bool can_send_immediate() {
             for (std::size_t k = 0; !immediate_send_allowed_; ++k)
             {
-                LOG_DEVEL_MSG("Waiting until we can send");
+//                LOG_DEVEL_MSG("Waiting until we can send");
                 hpx::util::detail::yield_k(k, "libfabric::parcelport::can_send_immediate");
             }
             return true;
