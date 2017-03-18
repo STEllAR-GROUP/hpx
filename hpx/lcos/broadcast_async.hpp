@@ -43,7 +43,7 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<T> broadcast_here(char const* basename,
+    hpx::future<T> broadcast_recv(char const* basename,
         std::size_t this_site = std::size_t(-1),
         std::size_t generation = std::size_t(-1))
     {
@@ -54,17 +54,19 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
+        typedef typename std::decay<T>::type result_type;
+
         // this is the receiving endpoint for this site
-        hpx::lcos::promise<T> p;
-        hpx::future<T> f = p.get_future();
+        hpx::lcos::promise<result_type> p;
+        hpx::future<result_type> f = p.get_future();
 
         // register promise using symbolic name
         hpx::future<bool> was_registered =
             hpx::register_with_basename(name, p.get_id(), this_site);
 
         return hpx::dataflow(
-            [](hpx::future<T> f, hpx::future<bool> was_registered,
-                std::string && name, std::size_t this_site)
+            [](hpx::future<result_type> f, hpx::future<bool> was_registered,
+                std::string && name, std::size_t this_site) -> result_type
             {
                 // rethrow exceptions
                 was_registered.get();
@@ -110,10 +112,11 @@ namespace hpx { namespace lcos
             );
 
             // find_from_basename is always a local operation (see assert above)
+            typedef typename std::decay<T>::type result_type;
             return hpx::dataflow(
-                [](hpx::future<hpx::id_type> f, T && t)
+                [](hpx::future<hpx::id_type> f, result_type && t) -> void
                 {
-                    return set_lco_value(f.get(), std::move(t));
+                    set_lco_value(f.get(), std::move(t));
                 },
                 hpx::find_from_basename(name, site), std::forward<T>(t));
         }
@@ -151,7 +154,7 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<void> broadcast_there(char const* basename, T && t,
+    hpx::future<void> broadcast_send(char const* basename, T && t,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1))
     {

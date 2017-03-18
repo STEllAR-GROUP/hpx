@@ -25,7 +25,7 @@ int hpx_main()
     for (int i = 0; i != num_generations; ++i)
     {
         hpx::future<void> there =
-            hpx::lcos::broadcast_there(broadcast_basename, data, num_sites, i);
+            hpx::lcos::broadcast_send(broadcast_basename, data, num_sites, i);
 
         std::vector<hpx::future<void> > futures;
         futures.reserve(num_sites);
@@ -35,7 +35,7 @@ int hpx_main()
                 [&, j]() -> void
                 {
                     std::vector<int> result =
-                        hpx::lcos::broadcast_here<std::vector<int> >(
+                        hpx::lcos::broadcast_recv<std::vector<int> >(
                             broadcast_basename, j, i
                         ).get();
 
