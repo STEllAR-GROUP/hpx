@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <vector>
 
-HPX_CONSTEXPR char const* const basename = "/broadcast_async_test";
+HPX_CONSTEXPR char const* const broadcast_basename = "/broadcast_async_test";
 HPX_CONSTEXPR int const num_sites = 10;
 HPX_CONSTEXPR int const num_generations = 100;
 
@@ -25,7 +25,7 @@ int hpx_main()
     for (int i = 0; i != num_generations; ++i)
     {
         hpx::future<void> there =
-            hpx::lcos::broadcast_there(basename, data, num_sites, i);
+            hpx::lcos::broadcast_there(broadcast_basename, data, num_sites, i);
 
         std::vector<hpx::future<void> > futures;
         futures.reserve(num_sites);
@@ -36,7 +36,7 @@ int hpx_main()
                 {
                     std::vector<int> result =
                         hpx::lcos::broadcast_here<std::vector<int> >(
-                            basename, j, i
+                            broadcast_basename, j, i
                         ).get();
 
                     HPX_TEST(
