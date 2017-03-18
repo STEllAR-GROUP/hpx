@@ -20,7 +20,11 @@ hpx_add_config_define(HPX_HAVE_PARCELPORT_LIBFABRIC)
 #------------------------------------------------------------------------------
 # OFIWG libfabric stack
 #------------------------------------------------------------------------------
-find_package(Libfabric REQUIRED)
+if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/libfabric/CMakeLists.txt)
+else()
+  find_package(Libfabric REQUIRED)
+endif()
 
 #------------------------------------------------------------------------------
 # Logging
@@ -242,14 +246,54 @@ endif()
 #------------------------------------------------------------------------------
 include(HPX_AddLibrary)
 
-# make these variables cache ones so that the macro definitions picks them up correctly
-set(_libfabric_libraries
-    "${LIBFABRIC_LIBRARIES}"
-    CACHE STRING "" FORCE)
+# make these variables cache ones so that the macro definition picks them up correctly
+# it is executed from a different source dir, so vars lose their scope
 
-set(_libfabric_include_dirs
+set(_parcelport_CXX_srcs
+  "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/parcelport_libfabric.cpp"
+  CACHE INTERNAL "" FORCE)
+
+set(_hpxc_CXX_srcs          "" CACHE INTERNAL "" FORCE)
+set(_libfabric_C_srcs       "" CACHE INTERNAL "" FORCE)
+set(_libfabric_libraries    "" CACHE INTERNAL "" FORCE)
+set(_libfabric_include_dirs "" CACHE INTERNAL "" FORCE)
+
+if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
+  set(_libfabric_libraries
+    "${LIBFABRIC_LIBRARIES}"
+    CACHE INTERNAL "" FORCE)
+
+  set(_libfabric_include_dirs
     "${LIBFABRIC_INCLUDE_DIRS}"
-    CACHE STRING "" FORCE)
+    CACHE INTERNAL "" FORCE)
+else()
+  set(_libfabric_libraries
+    "${GNI_LIB}"
+    CACHE INTERNAL "" FORCE)
+
+  set(_libfabric_C_srcs
+    ${libfabric_SRCS}
+    ${libfabric_util_SRCS}
+    ${libfabric_gni_SRCS}
+    CACHE INTERNAL "" FORCE)
+
+  set(_hpxc_CXX_srcs ${_parcelport_CXX_srcs}
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/hpxc/src/threads/thread.cpp"
+    CACHE INTERNAL "" FORCE)
+
+  set(_parcelport_CXX_srcs ${_parcelport_CXX_srcs} ${_hpxc_CXX_srcs}
+    CACHE INTERNAL "" FORCE)
+
+  set(_libfabric_include_dirs
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/hpxc
+    ${CMAKE_CURRENT_SOURCE_DIR}/libfabric
+    ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni
+    ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/prov/gni/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libfabric/include
+    ${GNI_INCLUDE}
+    CACHE INTERNAL "" FORCE)
+endif()
 
 macro(add_parcelport_libfabric_module)
   hpx_debug("add_parcelport_libfabric_module")
@@ -259,23 +303,36 @@ macro(add_parcelport_libfabric_module)
   add_parcelport(libfabric
     STATIC
     SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/libfabric/parcelport_libfabric.cpp"
-    # do we need to declare any of these headers?
-    HEADERS
+        ${_parcelport_CXX_srcs}
+        ${_libfabric_C_srcs}
+    # do we need to declare any headers?
+    #HEADERS
     DEPENDENCIES
         ${_libfabric_libraries}
     FOLDER
       "Core/Plugins/Parcelport/libfabric")
+
+  if(HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
+    set_source_files_properties(
+      ${_libfabric_C_srcs}
+      PROPERTIES
+        COMPILE_FLAGS
+            "-include \"hpxc/hpxc/pthread_compatibility.h\" \
+            -include \"libfabric/config.h\"                 \
+            -Wsign-compare -Wunused-parameter"
+        LANGUAGE C)
+
+    set_source_files_properties(
+      ${_parcelport_CXX_srcs}
+      PROPERTIES
+        COMPILE_FLAGS "-include \"libfabric/config.h\" -Wno-missing-field-initializers"
+        LANGUAGE CXX)
+  else()
+    set_source_files_properties(
+      ${_parcelport_CXX_srcs}
+      PROPERTIES
+        COMPILE_FLAGS "-Wno-missing-field-initializers"
+        LANGUAGE CXX)
+  endif()
 endmacro()
-
-include_directories(${LIBFABRIC_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-#add_executable(fabric_pingpong
-#  fabric_pingpong.c
-#)
-
-#target_link_libraries(fabric_pingpong
-#  ${LIBFABRIC_LIBRARIES}
-#)
 
