@@ -22,6 +22,7 @@ set(tests
     async_remote_client
     broadcast
     broadcast_apply
+    broadcast_async
     channel
     channel_local
     client_then
