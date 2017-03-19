@@ -1,12 +1,16 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(binary_filter_plugins
+set(binary_filter_plugins)
+
+if(HPX_WITH_NETWORKING)
+  set(binary_filter_plugins ${binary_filter_plugins}
     bzip2
     snappy
     zlib)
+endif()
 
 foreach(type ${binary_filter_plugins})
   add_hpx_pseudo_target(plugins.binary_filter.${type})
@@ -15,7 +19,9 @@ foreach(type ${binary_filter_plugins})
 endforeach()
 
 macro(add_binary_filter_modules)
-  add_bzip2_module()
-  add_snappy_module()
-  add_zlib_module()
+  if(HPX_WITH_NETWORKING)
+    add_bzip2_module()
+    add_snappy_module()
+    add_zlib_module()
+  endif()
 endmacro()

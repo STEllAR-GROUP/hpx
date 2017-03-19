@@ -203,6 +203,12 @@ namespace hpx { namespace util
             "[hpx.on_startup]",
             "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
 
+#if defined(HPX_HAVE_NETWORKING)
+            // by default, enable networking
+            "[hpx.parcel]",
+            "enable = 1",
+#endif
+
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",

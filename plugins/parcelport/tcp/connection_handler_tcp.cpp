@@ -11,6 +11,8 @@
 // hpxinspect:nodeprecatedname:boost::chrono
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -337,3 +339,5 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
     }
 }}}}
+
+#endif
