@@ -68,6 +68,12 @@ namespace hpx { namespace compute { namespace cuda
             return access_target::read(*target_, p_);
         }
 #endif
+
+        T* operator &() const
+        {
+            return p_;
+        }
+
         T* device_ptr() const HPX_NOEXCEPT
         {
             return p_;

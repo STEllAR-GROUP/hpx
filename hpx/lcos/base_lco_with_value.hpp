@@ -85,7 +85,7 @@ namespace hpx { namespace lcos
         ///
         /// \param result [in] The result value to be transferred from the
         ///               remote operation back to this LCO instance.
-#if defined(__NVCC__) || defined(__CUDACC__)
+#if defined(__NVCC__)
         HPX_DEVICE void set_value_nonvirt (RemoteResult&&) {}
 #else
         void set_value_nonvirt (RemoteResult&& result)
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos
         /// \a get_result_action is applied on this LCO instance. This
         /// function just forwards to the virtual function \a get_result, which
         /// is overloaded by the derived concrete LCO.
-#if defined(__NVCC__) || defined(__CUDACC__)
+#if defined(__NVCC__)
         HPX_DEVICE Result get_value_nonvirt() { return Result(); }
 #else
         Result get_value_nonvirt()
@@ -169,7 +169,7 @@ namespace hpx { namespace traits
     };
 }}
 
-#if defined(__NVCC__) || defined(__CUDACC__)
+#if defined(__NVCC__)
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(...)
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(...)
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE(...)
