@@ -6,6 +6,8 @@
 #if !defined(HPX_COMPILER_SPECIFIC_201204261048)
 #define HPX_COMPILER_SPECIFIC_201204261048
 
+#include <hpx/config/defines.hpp>
+
 #if defined(__GNUC__)
 
 // macros to facilitate handling of compiler-specific issues
