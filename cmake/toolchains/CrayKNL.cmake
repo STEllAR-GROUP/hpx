@@ -68,5 +68,5 @@ set(HPX_WITH_MAX_CPU_COUNT "512" CACHE STRING "")
 # We do a cross compilation here ...
 set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
 
-# RDTSC is available on Xeon/Phis
-set(HPX_WITH_RDTSC ON CACHE BOOL "")
+# RDTSCP is available on Xeon/Phis
+set(HPX_WITH_RDTSCP ON CACHE BOOL "")
