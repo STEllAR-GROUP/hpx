@@ -266,6 +266,8 @@ hpx_option(HPX_WITH_DATAPAR_LIBFLATARRAY BOOL
   "Enable data parallel algorithm support using the external LibFlatArray (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
+  "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
   "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
 if((HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD) OR
