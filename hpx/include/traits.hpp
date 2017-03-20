@@ -8,7 +8,6 @@
 
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/action_capability_provider.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>

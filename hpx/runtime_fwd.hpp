@@ -238,48 +238,6 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
-
-#if defined(HPX_HAVE_SODIUM)
-    namespace components { namespace security
-    {
-        class certificate;
-        class certificate_signing_request;
-        class parcel_suffix;
-        class hash;
-
-        template <typename T> class signed_type;
-        typedef signed_type<certificate> signed_certificate;
-        typedef signed_type<certificate_signing_request>
-            signed_certificate_signing_request;
-        typedef signed_type<parcel_suffix> signed_parcel_suffix;
-    }}
-
-#if defined(HPX_HAVE_SECURITY)
-    /// \brief Return the certificate for this locality
-    ///
-    /// \returns This function returns the signed certificate for this locality.
-    HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(error_code& ec = throws);
-
-    /// \brief Return the certificate for the given locality
-    ///
-    /// \param id The id representing the locality for which to retrieve
-    ///           the signed certificate.
-    ///
-    /// \returns This function returns the signed certificate for the locality
-    ///          identified by the parameter \a id.
-    HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(std::uint32_t locality_id, error_code& ec = throws);
-
-    /// \brief Add the given certificate to the certificate store of this locality.
-    ///
-    /// \param cert The certificate to add to the certificate store of this
-    ///             locality
-    HPX_API_EXPORT void add_locality_certificate(
-        components::security::signed_certificate const& cert,
-        error_code& ec = throws);
-#endif
-#endif
 }
 
 #endif

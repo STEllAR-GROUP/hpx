@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2013 Jeroen Habraken
 #
@@ -11,7 +11,6 @@ set(subdirs
     iostreams
     performance_counters
     process
-    security
    )
 
 add_hpx_pseudo_target(components)

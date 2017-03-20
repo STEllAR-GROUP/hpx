@@ -40,11 +40,6 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/certificate.hpp>
-#include <hpx/components/security/signed_type.hpp>
-#endif
-
 #include <boost/chrono/chrono.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
@@ -262,16 +257,15 @@ struct registration_header
 
     // TODO: pass head address as a GVA
     registration_header(
-        parcelset::endpoints_type const& endpoints_
-      , std::uint64_t primary_ns_ptr_
-      , std::uint64_t symbol_ns_ptr_
-      , std::uint32_t cores_needed_
-      , std::uint32_t num_threads_
-      , std::string const& hostname_
-      , detail::unassigned_typename_sequence const& typenames_
-      , naming::gid_type prefix_ = naming::gid_type()
-    ) :
-        endpoints(endpoints_)
+          parcelset::endpoints_type const& endpoints_
+        , std::uint64_t primary_ns_ptr_
+        , std::uint64_t symbol_ns_ptr_
+        , std::uint32_t cores_needed_
+        , std::uint32_t num_threads_
+        , std::string const& hostname_
+        , detail::unassigned_typename_sequence const& typenames_
+        , naming::gid_type prefix_ = naming::gid_type())
+      : endpoints(endpoints_)
       , primary_ns_ptr(primary_ns_ptr_)
       , symbol_ns_ptr(symbol_ns_ptr_)
       , cores_needed(cores_needed_)
@@ -314,18 +308,17 @@ struct notification_header
     {}
 
     notification_header(
-        naming::gid_type const& prefix_
-      , parcelset::locality const & agas_locality_
-      , naming::address const& locality_ns_address_
-      , naming::address const& primary_ns_address_
-      , naming::address const& component_ns_address_
-      , naming::address const& symbol_ns_address_
-      , std::uint32_t num_localities_
-      , std::uint32_t used_cores_
-      , parcelset::endpoints_type const & agas_endpoints_
-      , detail::assigned_id_sequence const & ids_
-    ) :
-        prefix(prefix_)
+          naming::gid_type const& prefix_
+        , parcelset::locality const & agas_locality_
+        , naming::address const& locality_ns_address_
+        , naming::address const& primary_ns_address_
+        , naming::address const& component_ns_address_
+        , naming::address const& symbol_ns_address_
+        , std::uint32_t num_localities_
+        , std::uint32_t used_cores_
+        , parcelset::endpoints_type const & agas_endpoints_
+        , detail::assigned_id_sequence const & ids_)
+      : prefix(prefix_)
       , agas_locality(agas_locality_)
       , locality_ns_address(locality_ns_address_)
       , primary_ns_address(primary_ns_address_)
@@ -347,10 +340,7 @@ struct notification_header
     std::uint32_t used_cores;
     parcelset::endpoints_type agas_endpoints;
     detail::assigned_id_sequence ids;
-
-#if defined(HPX_HAVE_SECURITY)
-    components::security::signed_certificate root_certificate;
-#endif
+    std::vector<parcelset::endpoints_type> endpoints;
 
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
@@ -365,9 +355,7 @@ struct notification_header
         ar & used_cores;
         ar & agas_endpoints;
         ar & ids;
-#if defined(HPX_HAVE_SECURITY)
-        ar & root_certificate;
-#endif
+        ar & endpoints;
     }
 };
 
@@ -388,76 +376,6 @@ typedef actions::direct_action<
 > notify_worker_action;
 // }}}
 
-#if defined(HPX_HAVE_SECURITY)
-// This structure is used when a locality registers with node zero
-// (second roundtrip)
-struct registration_header_security
-{
-    registration_header_security() {}
-
-    registration_header_security(
-            naming::gid_type const& prefix_
-          , parcelset::endpoints_type const& endpoints_
-          , components::security::signed_type<
-                components::security::certificate_signing_request> const& csr_)
-      : prefix(prefix_)
-      , endpoints(endpoints_)
-      , csr(csr_)
-    {}
-
-    naming::gid_type prefix;
-    parcelset::endpoints_type endpoints;
-
-    // CSR for sub-CA of the locality which tries to register
-    components::security::signed_type<
-        components::security::certificate_signing_request> csr;
-
-    template <typename Archive>
-    void serialize(Archive & ar, const unsigned int)
-    {
-        ar & prefix;
-        ar & endpoints;
-        ar & csr;
-    }
-};
-
-// This structure is used in the response from node zero to the locality which
-// is trying to register.
-struct notification_header_security
-{
-    notification_header_security() {}
-
-    notification_header_security(
-            components::security::signed_certificate const& root_subca_certificate_,
-            components::security::signed_certificate const& subca_certificate_)
-      : root_subca_certificate(root_subca_certificate_)
-      , subca_certificate(subca_certificate_)
-    {}
-
-    components::security::signed_certificate root_subca_certificate;
-    components::security::signed_certificate subca_certificate;
-
-    template <typename Archive>
-    void serialize(Archive & ar, const unsigned int)
-    {
-        ar & root_subca_certificate;
-        ar & subca_certificate;
-    }
-};
-
-void register_worker_security(registration_header_security const& header);
-void notify_worker_security(notification_header_security const& header);
-
-typedef actions::action<
-    void (*)(registration_header_security const&)
-  , register_worker_security
-> register_worker_security_action;
-
-typedef actions::action<
-    void (*)(notification_header_security const&)
-  , notify_worker_security
-> notify_worker_security_action;
-#endif
 }}
 
 using hpx::agas::register_worker_action;
@@ -472,21 +390,6 @@ HPX_REGISTER_ACTION_ID(register_worker_action,
 HPX_REGISTER_ACTION_ID(notify_worker_action,
     notify_worker_action,
     hpx::actions::notify_worker_action_id)
-
-#if defined(HPX_HAVE_SECURITY)
-using hpx::agas::register_worker_security_action;
-using hpx::agas::notify_worker_security_action;
-
-HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_security_action);
-HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_security_action);
-
-HPX_REGISTER_ACTION_ID(register_worker_security_action,
-    register_worker_security_action,
-    hpx::actions::register_worker_security_action_id)
-HPX_REGISTER_ACTION_ID(notify_worker_security_action,
-    notify_worker_security_action,
-    hpx::actions::notify_worker_security_action_id)
-#endif
 
 namespace hpx { namespace agas
 {
@@ -539,20 +442,18 @@ void register_worker(registration_header const& header)
         return;
     }
 
-    naming::gid_type primary_ns_gid(
-        primary_namespace::get_service_instance(prefix));
-    naming::address primary_ns_address(prefix
-      , components::get_component_type<agas::server::primary_namespace>()
-      , header.primary_ns_ptr);
+//     naming::gid_type primary_ns_gid(
+//         primary_namespace::get_service_instance(prefix));
+//     naming::address primary_ns_address(prefix
+//       , components::get_component_type<agas::server::primary_namespace>()
+//       , header.primary_ns_ptr);
 //     agas_client.bind_local(primary_ns_gid, primary_ns_address);
 
-    naming::gid_type symbol_ns_gid(
-        symbol_namespace::get_service_instance(prefix));
-
-    naming::address symbol_ns_address(prefix
-      , components::get_component_type<agas::server::symbol_namespace>()
-      , header.symbol_ns_ptr);
-
+//     naming::gid_type symbol_ns_gid(
+//         symbol_namespace::get_service_instance(prefix));
+//     naming::address symbol_ns_address(prefix
+//       , components::get_component_type<agas::server::symbol_namespace>()
+//       , header.symbol_ns_ptr);
 //     agas_client.bind_local(symbol_ns_gid, symbol_ns_address);
 
     naming::address locality_addr(hpx::get_locality(),
@@ -581,31 +482,6 @@ void register_worker(registration_header const& header)
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
       , first_core, bbb.get_endpoints(), assigned_ids);
 
-#if defined(HPX_HAVE_SECURITY)
-    // wait for the root certificate to be available
-    bool got_root_certificate = false;
-    for (std::size_t i = 0; i != HPX_MAX_NETWORK_RETRIES; ++i)
-    {
-        error_code ec(lightweight);
-        hdr.root_certificate = rt.get_root_certificate(ec);
-        if (!ec)
-        {
-            got_root_certificate = true;
-            break;
-        }
-        boost::this_thread::sleep_for(
-            boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-    }
-
-    if (!got_root_certificate)
-    {
-        HPX_THROW_EXCEPTION(internal_server_error
-          , "agas::register_console"
-          , "could not obtain root certificate");
-        return;
-    }
-#endif
-
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
     for (parcelset::endpoints_type::value_type const & loc : header.endpoints)
@@ -616,6 +492,10 @@ void register_worker(registration_header const& header)
             break;
         }
     }
+
+    // collect endpoints from all registering localities
+    bbb.add_locality_endpoints(naming::get_locality_id_from_gid(prefix),
+        header.endpoints);
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
@@ -635,35 +515,18 @@ void register_worker(registration_header const& header)
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-#if defined(HPX_HAVE_SECURITY)
-        // send response directly to initiate second round trip
-        get_big_boot_barrier().apply(
-            0
-          , naming::get_locality_id_from_gid(prefix)
-          , dest
-          , notify_worker_action()
-          , std::move(hdr));
-#else
+
         // delay the final response until the runtime system is up and running
-        void (big_boot_barrier::*f)(
-            std::uint32_t,
-            std::uint32_t,
-            parcelset::locality,
-            notify_worker_action,
-            notification_header&&)
-            = &big_boot_barrier::apply<notify_worker_action, notification_header&&>;
-        util::unique_function_nonser<void()>* thunk
-            = new util::unique_function_nonser<void()>(
-            util::bind(
-                util::one_shot(f)
-              , std::ref(get_big_boot_barrier())
-              , 0
-              , naming::get_locality_id_from_gid(prefix)
-              , dest
-              , notify_worker_action()
-              , std::move(hdr)));
+        util::unique_function_nonser<void()>* thunk =
+            new util::unique_function_nonser<void()>(
+                util::bind(
+                    util::one_shot(&big_boot_barrier::apply_notification)
+                  , std::ref(get_big_boot_barrier())
+                  , 0
+                  , naming::get_locality_id_from_gid(prefix)
+                  , dest
+                  , std::move(hdr)));
         get_big_boot_barrier().add_thunk(thunk);
-#endif
     }
 }
 
@@ -737,23 +600,8 @@ void notify_worker(notification_header const& header)
     cfg.set_first_used_core(header.used_cores);
     rt.assign_cores();
 
-#if defined(HPX_HAVE_SECURITY)
-    // initialize certificate store
-    rt.store_root_certificate(header.root_certificate);
-
-    // initiate second round trip to root
-    registration_header_security hdr(
-        header.prefix
-      , rt.here()
-      , rt.get_certificate_signing_request());
-
-    get_big_boot_barrier().apply(
-        naming::get_locality_id_from_gid(header.prefix)
-      , 0
-      , header.agas_locality
-      , register_worker_security_action()
-      , std::move(hdr));
-#endif
+    // pre-cache all known locality endpoints in local AGAS
+    agas_client.pre_cache_endpoints(header.endpoints);
 }
 // }}}
 
@@ -857,6 +705,24 @@ void notify_worker_security(notification_header_security const& header)
 // }}}
 #endif
 
+void big_boot_barrier::apply_notification(
+    std::uint32_t source_locality_id
+    , std::uint32_t target_locality_id
+    , parcelset::locality const& dest
+    , notification_header && hdr)
+{
+    hdr.endpoints = localities;
+    apply(source_locality_id, target_locality_id, dest,
+        notify_worker_action(), std::move(hdr));
+}
+
+void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
+    parcelset::endpoints_type const& endpoints)
+{
+    localities.resize(locality_id + 1);
+    localities[locality_id] = endpoints;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
@@ -877,10 +743,6 @@ inline std::size_t get_number_of_bootstrap_connections(
             static_cast<std::size_t>(ini.get_num_localities());
         result = num_localities ? num_localities-1 : 0;
     }
-
-#if defined(HPX_HAVE_SECURITY)
-    result *= 2;        // we have to do 2 round trips
-#endif
 
     return result;
 }
@@ -907,6 +769,9 @@ big_boot_barrier::big_boot_barrier(
 void big_boot_barrier::wait_bootstrap()
 { // {{{
     HPX_ASSERT(service_mode_bootstrap == service_type);
+
+    // store endpoints of root locality for later
+    add_locality_endpoints(0, get_runtime().endpoints());
 
     // the root just waits until all localities have connected
     spin();

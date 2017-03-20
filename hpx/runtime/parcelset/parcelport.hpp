@@ -230,16 +230,6 @@ namespace hpx { namespace parcelset
         /// operations (nanoseconds)
         std::int64_t get_receiving_serialization_time(bool reset);
 
-#if defined(HPX_HAVE_SECURITY)
-        /// the total time it took for all sender-side security operations
-        /// (nanoseconds)
-        std::int64_t get_sending_security_time(bool reset);
-
-        /// the total time it took for all receiver-side security
-        /// operations (nanoseconds)
-        std::int64_t get_receiving_security_time(bool reset);
-#endif
-
         /// total data sent (bytes)
         std::int64_t get_data_sent(bool reset);
 

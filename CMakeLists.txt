@@ -126,14 +126,13 @@ endif()
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
-  ${DEFAULT_MALLOC} ADVANCED)
+  ${DEFAULT_MALLOC}
+  STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
 
 hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
-
-hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -233,8 +232,8 @@ if(APPLE OR WIN32)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
-  "Build and link HPX libraries and executables with full RPATHs (default: ON)"
-  OFF ADVANCED)
+  "Build and link HPX libraries and executables with full RPATHs (default: ${HPX_FULL_RPATH_DEFAULT})"
+  ${HPX_FULL_RPATH_DEFAULT} ADVANCED)
 
 ################################################################################
 # HPX Compute configuration
@@ -248,6 +247,9 @@ if(HPX_WITH_CUDA)
   set(HPX_WITH_COMPUTE On)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
+else()
+  set(HPX_TLL_PUBLIC "PUBLIC")      # keywords for target_link_libraries
+  set(HPX_TLL_PRIVATE "PRIVATE")
 endif()
 if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
@@ -264,6 +266,8 @@ hpx_option(HPX_WITH_DATAPAR_LIBFLATARRAY BOOL
   "Enable data parallel algorithm support using the external LibFlatArray (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
+  "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
   "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
 if((HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD) OR
@@ -603,9 +607,7 @@ hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
-  if(OPENMP_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_OPENMP)
-  else()
+  if(NOT OPENMP_FOUND)
     set(HPX_WITH_EXAMPLES_OPENMP OFF)
   endif()
 endif()
@@ -614,9 +616,7 @@ hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
-  if(TBB_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_TBB)
-  else()
+  if(NOT TBB_FOUND)
     set(HPX_WITH_EXAMPLES_TBB OFF)
   endif()
 endif()
@@ -625,9 +625,7 @@ hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
-  if(QTHREADS_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_QTHREADS)
-  else()
+  if(NOT QTHREADS_FOUND)
     set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
@@ -636,9 +634,7 @@ hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
-  if(HDF5_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_HDF5)
-  else()
+  if(NOT HDF5_FOUND)
     set(HPX_WITH_EXAMPLES_HDF5 OFF)
   endif()
 endif()
@@ -650,9 +646,7 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     CATEGORY "Tools" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
-    if(QT4_FOUND)
-      hpx_add_config_define(HPX_HAVE_EXAMPLES_QT4)
-    else()
+    if(NOT QT4_FOUND)
       set(HPX_WITH_EXAMPLES_QT4 OFF)
     endif()
   endif()
@@ -986,7 +980,6 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
   endif()
   set(CUDA_SEPARABLE_COMPILATION ON)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=sm_30)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=sm_35)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=compute_30)
@@ -1416,27 +1409,6 @@ if(HPX_WITH_VALGRIND)
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
-
-################################################################################
-# Security, libsodium: P(ortable|ackageable) NaCl
-################################################################################
-if(HPX_WITH_SECURITY)
-  find_package(Sodium)
-  if(NOT SODIUM_FOUND)
-    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
-  endif()
-  hpx_add_config_define(HPX_HAVE_SODIUM)
-
-  include_directories(${SODIUM_INCLUDE_DIR})
-
-  if(MSVC)
-    hpx_add_config_define(SODIUM_STATIC)
-  endif()
-  hpx_libraries(${SODIUM_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_SECURITY)
-endif()
-################################################################################
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors

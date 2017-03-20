@@ -148,6 +148,7 @@ namespace hpx { namespace lcos { namespace detail
                         value_type const & value =
                             *hpx::traits::future_access<Future>::
                                 get_shared_state(f)->get_result();
+                        state = future_state::has_value;
                         ar << state << value; //-V128
                     } else if (f.has_exception()) {
                         state = future_state::has_exception;

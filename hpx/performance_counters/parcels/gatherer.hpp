@@ -32,9 +32,6 @@ namespace hpx { namespace performance_counters { namespace parcels
               : overall_bytes_(0),
                 overall_time_(0),
                 serialization_time_(0),
-#if defined(HPX_HAVE_SECURITY)
-                security_time_(0),
-#endif
                 num_parcels_(0),
                 num_messages_(0),
                 overall_raw_bytes_(0),
@@ -50,18 +47,12 @@ namespace hpx { namespace performance_counters { namespace parcels
             std::int64_t total_raw_bytes(bool reset);
             std::int64_t total_time(bool reset);
             std::int64_t total_serialization_time(bool reset);
-#if defined(HPX_HAVE_SECURITY)
-            std::int64_t total_security_time(bool reset);
-#endif
             std::int64_t total_buffer_allocate_time(bool reset);
 
         private:
             std::int64_t overall_bytes_;
             std::int64_t overall_time_;
             std::int64_t serialization_time_;
-#if defined(HPX_HAVE_SECURITY)
-            std::int64_t security_time_;
-#endif
             std::int64_t num_parcels_;
             std::int64_t num_messages_;
             std::int64_t overall_raw_bytes_;
@@ -80,9 +71,6 @@ namespace hpx { namespace performance_counters { namespace parcels
             overall_bytes_ += x.bytes_;
             overall_time_ += x.time_;
             serialization_time_ += x.serialization_time_;
-#if defined(HPX_HAVE_SECURITY)
-            security_time_ += x.security_time_;
-#endif
             num_parcels_ += x.num_parcels_;
             overall_raw_bytes_ += x.raw_bytes_;
             ++num_messages_;
@@ -117,15 +105,6 @@ namespace hpx { namespace performance_counters { namespace parcels
             std::lock_guard<mutex_type> l(acc_mtx);
             return util::get_and_reset_value(serialization_time_, reset);
         }
-
-#if defined(HPX_HAVE_SECURITY)
-        template <typename Mutex>
-        inline std::int64_t gatherer<Mutex>::total_security_time(bool reset)
-        {
-            std::lock_guard<mutex_type> l(acc_mtx);
-            return util::get_and_reset_value(security_time_, reset);
-        }
-#endif
 
         template <typename Mutex>
         inline std::int64_t gatherer<Mutex>::total_bytes(bool reset)

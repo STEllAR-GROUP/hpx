@@ -43,10 +43,7 @@ namespace hpx { namespace parcelset { namespace detail
             total_serialization_time,
             total_bytes,
             total_raw_bytes,
-            total_buffer_allocate_time,
-#if defined(HPX_HAVE_SECURITY)
-            total_security_time
-#endif
+            total_buffer_allocate_time
         };
 
         typedef std::unordered_set<std::string, hpx::util::jenkins_hash> map_type;
