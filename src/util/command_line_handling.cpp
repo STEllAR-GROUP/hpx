@@ -551,7 +551,7 @@ namespace hpx { namespace util
         std::uint16_t hpx_port =
             cfgmap.get_value<std::uint16_t>("hpx.parcel.port", initial_hpx_port);
 
-        bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
+        bool run_agas_server = false;
         if (node == std::size_t(-1))
             node = env.retrieve_node_number();
 
@@ -758,21 +758,6 @@ namespace hpx { namespace util
 
         if (run_agas_server) {
             ini_config += "hpx.agas.service_mode=bootstrap";
-            if (vm.count("hpx:run-agas-server-only"))
-                ini_config += "hpx.components.load_external=0";
-        }
-        else if (vm.count("hpx:run-agas-server-only") &&
-              !(env.found_batch_environment()))
-        {
-            throw hpx::detail::command_line_error(
-                "Command line option --hpx:run-agas-server-only "
-                "can be specified only for the node running the AGAS server.");
-        }
-
-        if (1 == num_localities_ && vm.count("hpx:run-agas-server-only")) {
-            std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
-                "used for single locality execution, application might "
-                "not run properly." << std::endl;
         }
 
         // we can't run the AGAS server while connecting
@@ -781,12 +766,6 @@ namespace hpx { namespace util
                 "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
         }
-
-        // Set whether the AGAS server is running as a dedicated runtime.
-        // This decides whether the AGAS actions are executed with normal
-        // priority (if dedicated) or with high priority (non-dedicated)
-        if (vm.count("hpx:run-agas-server-only"))
-            ini_config += "hpx.agas.dedicated_server=1";
 
 #if defined(HPX_HAVE_LOGGING)
         if (vm.count("hpx:debug-hpx-log")) {
