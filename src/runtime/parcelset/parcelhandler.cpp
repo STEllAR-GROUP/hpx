@@ -359,10 +359,17 @@ namespace hpx { namespace parcelset
             }
         }
 
+        std::ostringstream strm;
+        strm << "target locality: " << dest_gid << "\n";
+        strm << "available destination endpoints:\n" << dest_endpoints << "\n";
+        strm << "available partcelports:\n";
+        list_parcelports(strm);
+
         HPX_THROW_EXCEPTION(network_error,
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
-            "No valid parcelport configured.");
+            "No valid parcelport configured. Detailed information\n" +
+            strm.str());
         return std::pair<std::shared_ptr<parcelport>, locality>();
     }
 
