@@ -262,30 +262,26 @@ hpx_option(HPX_WITH_SYCL BOOL
 ################################################################################
 # HPX datapar configuration
 ################################################################################
-hpx_option(HPX_WITH_DATAPAR_LIBFLATARRAY BOOL
-  "Enable data parallel algorithm support using the external LibFlatArray (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
-hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
-  "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_DATAPAR_VC)
+  hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
+    "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
+endif()
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
   "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
-if((HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD) OR
-   (HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY) OR
-   (HPX_WITH_DATAPAR_BOOST_SIMD AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY))
-  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC, HPX_WITH_DATAPAR_BOOST_SIMD, OR HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY)")
+
+if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
+  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
 endif()
 
-if(HPX_WITH_DATAPAR_LIBFLATARRAY)
-  include(HPX_SetupLibFlatArray)
-endif()
 if(HPX_WITH_DATAPAR_VC)
   include(HPX_SetupVc)
 endif()
 if(HPX_WITH_DATAPAR_BOOST_SIMD)
   include(HPX_SetupBoostSIMD)
 endif()
-if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD) AND (NOT HPX_WITH_DATAPAR_LIBFLATARRAY))
+if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD))
   hpx_info("No vectorization library configured")
 else()
   set(HPX_WITH_DATAPAR ON)
