@@ -12,7 +12,7 @@
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/fabric_error.hpp>
-#include <plugins/parcelport/libfabric/sender_connection.hpp>
+#include <plugins/parcelport/libfabric/sender.hpp>
 //
 #include <sstream>
 #include <type_traits>
@@ -28,7 +28,7 @@ namespace libfabric
     template <>
     struct connection_handler_traits<policies::libfabric::parcelport>
     {
-        typedef policies::libfabric::sender_connection      connection_type;
+        typedef policies::libfabric::sender                 connection_type;
         typedef HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING send_early_parcel;
         typedef std::true_type                              do_background_work;
         typedef std::true_type                             send_immediate_parcels;
