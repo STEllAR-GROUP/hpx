@@ -181,9 +181,10 @@ namespace libfabric
                     << "Deallocating free_list : Not all blocks were returned "
                     << " refcounts " << decnumber(used_));
             }
-            while (!free_list_.empty()) {
+            libfabric_memory_region* region = nullptr;
+            while (!free_list_.pop(region)) {
                 // clear our stack
-                pop();
+                delete region;
             }
             // wipe our copies of sub-regions (no clear function for std::array)
             std::fill(region_list_.begin(), region_list_.end(), libfabric_memory_region());
@@ -223,17 +224,10 @@ namespace libfabric
         inline libfabric_memory_region *pop()
         {
             // if we have not exceeded our max size, allocate a new block
-            if (free_list_.empty()) {
-                //  LOG_TRACE_MSG("Creating new small Block as free list is empty "
-                // "but max chunks " << max_small_chunks_ << " not reached");
-                //  AllocateRegisteredBlock(length);
-                //std::terminate();
-                return nullptr;
-            }
             // get a block
             libfabric_memory_region *region = nullptr;
             if (!free_list_.pop(region)) {
-                LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
+                return nullptr;
             }
             // Keep reference counts to self so that we can check
             // this pool is not deleted whilst blocks still exist
@@ -243,10 +237,6 @@ namespace libfabric
                 << decnumber(used_));
             //
             return region;
-        }
-
-        void decrement_used_count(uint32_t N) {
-            used_ -= N;
         }
 
         constexpr std::size_t chunk_size() const { return ChunkSize; }

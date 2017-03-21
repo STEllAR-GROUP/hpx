@@ -45,7 +45,7 @@ namespace libfabric
         typedef std::pair<uint16_t, uint16_t> num_chunks_type;
 
         struct header_block {
-            uint32_t        tag;
+            uint64_t        tag;
             uint32_t        size;
             num_chunks_type num_chunks;
             uint32_t        flags;
@@ -69,10 +69,10 @@ namespace libfabric
     public:
         //
         template <typename Buffer>
-        header(Buffer const & buffer, uint32_t tag)
+        header(Buffer const & buffer, void* tag)
         {
             message_header.flags      = 0;
-            message_header.tag        = tag;
+            message_header.tag        = reinterpret_cast<std::uint64_t>(tag);
             message_header.size       = static_cast<uint32_t>(buffer.size_);
             message_header.num_chunks =
                 std::make_pair(buffer.num_chunks_.first, buffer.num_chunks_.second);
@@ -114,7 +114,7 @@ namespace libfabric
             return &data_[0];
         }
 
-        inline uint32_t tag() const
+        inline uint64_t tag() const
         {
             return message_header.tag;
         }
@@ -134,7 +134,7 @@ namespace libfabric
             if ((message_header.flags & chunk_flag) !=0) {
                 return &data_[0];
             }
-            return 0;
+            return nullptr;
         }
 
         inline char * piggy_back()
@@ -142,7 +142,7 @@ namespace libfabric
             if ((message_header.flags & message_flag) !=0) {
                 return &data_[message_header.message_info.piggyback.offset];
             }
-            return 0;
+            return nullptr;
         }
 
         inline std::size_t header_length() const
