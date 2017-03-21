@@ -327,6 +327,7 @@ namespace hpx { namespace components { namespace server
         bool keep_factory_alive(component_type t);
 
         void remove_here_from_connection_cache();
+        void remove_here_from_console_connection_cache();
 
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,

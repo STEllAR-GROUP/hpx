@@ -1138,7 +1138,6 @@ namespace hpx { namespace components { namespace server
 
             // Drop the locality from the partition table.
             naming::gid_type here = agas_client.get_local_locality();
-            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1146,6 +1145,11 @@ namespace hpx { namespace components { namespace server
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
+
+            agas_client.unregister_locality(here, ec);
+
+            if (remove_from_remote_caches)
+                remove_here_from_console_connection_cache();
 
             if (respond_to) {
                 // respond synchronously
@@ -1416,12 +1420,36 @@ namespace hpx { namespace components { namespace server
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
+            // console is handled separately
+            if (naming::get_locality_id_from_id(id) == 0)
+                continue;
+
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+    }
+
+    void runtime_support::remove_here_from_console_connection_cache()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+            return;
+
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
+        action_type act;
+        indirect_packaged_task ipt;
+        future<void> callback = ipt.get_future();
+
+        // handle console separately
+        id_type id = naming::get_id_from_locality_id(0);
+        apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+
+        callback.wait();
     }
 
     ///////////////////////////////////////////////////////////////////////////
