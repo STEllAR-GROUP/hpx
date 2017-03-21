@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/policies/hwloc_topology.hpp>
+#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 
 #if defined(HPX_HAVE_HWLOC)
 
@@ -38,12 +38,13 @@ namespace hpx { namespace threads
     {
         void write_to_log(char const* valuename, std::size_t value)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << ": " << value; //-V128
+            LTM_(debug) << "hwloc_topology_info: "
+                        << valuename << ": " << value; //-V128
         }
 
         void write_to_log_mask(char const* valuename, mask_cref_type value)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename
+            LTM_(debug) << "hwloc_topology_info: " << valuename
                         << ": " HPX_CPU_MASK_PREFIX
                         << std::hex << value;
         }
@@ -51,13 +52,14 @@ namespace hpx { namespace threads
         void write_to_log(char const* valuename,
             std::vector<std::size_t> const& values)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: " //-V128
+            LTM_(debug) << "hwloc_topology_info: "
+                        << valuename << "s, size: " //-V128
                         << values.size();
 
             std::size_t i = 0;
             for (std::size_t value : values)
             {
-                LTM_(debug) << "hwloc_topology: " << valuename //-V128
+                LTM_(debug) << "hwloc_topology_info: " << valuename //-V128
                             << "(" << i++ << "): " << value;
             }
         }
@@ -65,13 +67,14 @@ namespace hpx { namespace threads
         void write_to_log_mask(char const* valuename,
             std::vector<mask_type> const& values)
         {
-            LTM_(debug) << "hwloc_topology: " << valuename << "s, size: " //-V128
+            LTM_(debug) << "hwloc_topology_info: "
+                        << valuename << "s, size: " //-V128
                         << values.size();
 
             std::size_t i = 0;
             for (mask_cref_type value : values)
             {
-                LTM_(debug) << "hwloc_topology: " << valuename //-V128
+                LTM_(debug) << "hwloc_topology_info: " << valuename //-V128
                             << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
                             << std::hex << value;
             }
@@ -88,22 +91,24 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type hwloc_topology::empty_mask = mask_type();
+    mask_type hwloc_topology_info::empty_mask = mask_type();
 
-    hwloc_topology::hwloc_topology()
+    hwloc_topology_info::hwloc_topology_info()
       : topo(nullptr), machine_affinity_mask_(0)
     { // {{{
         int err = hwloc_topology_init(&topo);
         if (err != 0)
         {
-            HPX_THROW_EXCEPTION(no_success, "hwloc_topology::hwloc_topology",
+            HPX_THROW_EXCEPTION(no_success,
+                "hwloc_topology_info::hwloc_topology_info",
                 "Failed to init hwloc topology");
         }
 
         err = hwloc_topology_load(topo);
         if (err != 0)
         {
-            HPX_THROW_EXCEPTION(no_success, "hwloc_topology::hwloc_topology",
+            HPX_THROW_EXCEPTION(no_success,
+                "hwloc_topology_info::hwloc_topology_info",
                 "Failed to load hwloc topology");
         }
 
@@ -174,7 +179,7 @@ namespace hpx { namespace threads
         }
     } // }}}
 
-    void hwloc_topology::write_to_log() const
+    void hwloc_topology_info::write_to_log() const
     {
         std::size_t num_of_sockets = get_number_of_sockets();
         if (num_of_sockets == 0) num_of_sockets = 1;
@@ -203,13 +208,13 @@ namespace hpx { namespace threads
         detail::write_to_log_mask("thread_affinity_mask", thread_affinity_masks_);
     }
 
-    hwloc_topology::~hwloc_topology()
+    hwloc_topology_info::~hwloc_topology_info()
     {
         if (topo)
             hwloc_topology_destroy(topo);
     }
 
-    std::size_t hwloc_topology::get_pu_number(
+    std::size_t hwloc_topology_info::get_pu_number(
         std::size_t num_core
       , std::size_t num_pu
       , error_code& ec
@@ -224,7 +229,8 @@ namespace hpx { namespace threads
         // core
         if(num_cores <= 0)
         {
-            HPX_THROWS_IF(ec, no_success, "hwloc_topology::hwloc_get_nobjs_by_type",
+            HPX_THROWS_IF(ec, no_success,
+                "hwloc_topology_info::hwloc_get_nobjs_by_type",
                 "Failed to get number of cores");
             return std::size_t(-1);
         }
@@ -241,7 +247,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_cref_type hwloc_topology::get_machine_affinity_mask(
+    mask_cref_type hwloc_topology_info::get_machine_affinity_mask(
         error_code& ec
         ) const
     {
@@ -251,7 +257,7 @@ namespace hpx { namespace threads
         return machine_affinity_mask_;
     }
 
-    mask_cref_type hwloc_topology::get_socket_affinity_mask(
+    mask_cref_type hwloc_topology_info::get_socket_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -268,14 +274,14 @@ namespace hpx { namespace threads
         }
 
         HPX_THROWS_IF(ec, bad_parameter
-          , "hpx::threads::hwloc_topology::get_socket_affinity_mask"
+          , "hpx::threads::hwloc_topology_info::get_socket_affinity_mask"
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
         return empty_mask;
     } // }}}
 
-    mask_cref_type hwloc_topology::get_numa_node_affinity_mask(
+    mask_cref_type hwloc_topology_info::get_numa_node_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -292,14 +298,14 @@ namespace hpx { namespace threads
         }
 
         HPX_THROWS_IF(ec, bad_parameter
-          , "hpx::threads::hwloc_topology::get_numa_node_affinity_mask"
+          , "hpx::threads::hwloc_topology_info::get_numa_node_affinity_mask"
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
         return empty_mask;
     } // }}}
 
-    mask_cref_type hwloc_topology::get_core_affinity_mask(
+    mask_cref_type hwloc_topology_info::get_core_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -316,14 +322,14 @@ namespace hpx { namespace threads
         }
 
         HPX_THROWS_IF(ec, bad_parameter
-          , "hpx::threads::hwloc_topology::get_core_affinity_mask"
+          , "hpx::threads::hwloc_topology_info::get_core_affinity_mask"
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
         return empty_mask;
     }
 
-    mask_cref_type hwloc_topology::get_thread_affinity_mask(
+    mask_cref_type hwloc_topology_info::get_thread_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -340,7 +346,7 @@ namespace hpx { namespace threads
         }
 
         HPX_THROWS_IF(ec, bad_parameter
-          , "hpx::threads::hwloc_topology::get_thread_affinity_mask"
+          , "hpx::threads::hwloc_topology_info::get_thread_affinity_mask"
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
@@ -348,7 +354,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    void hwloc_topology::set_thread_affinity_mask(
+    void hwloc_topology_info::set_thread_affinity_mask(
         boost::thread&
       , mask_cref_type //mask
       , error_code& ec
@@ -358,7 +364,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
     }
 
-    void hwloc_topology::set_thread_affinity_mask(
+    void hwloc_topology_info::set_thread_affinity_mask(
         mask_cref_type mask
       , error_code& ec
         ) const
@@ -396,7 +402,7 @@ namespace hpx { namespace threads
                     hwloc_bitmap_free(cpuset);
 
                     HPX_THROWS_IF(ec, kernel_error
-                      , "hpx::threads::hwloc_topology::set_thread_affinity_mask"
+                      , "hpx::threads::hwloc_topology_info::set_thread_affinity_mask"
                       , boost::str(boost::format(
                             "failed to set thread affinity mask ("
                             HPX_CPU_MASK_PREFIX "%x) for cpuset %s")
@@ -418,7 +424,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type hwloc_topology::get_thread_affinity_mask_from_lva(
+    mask_type hwloc_topology_info::get_thread_affinity_mask_from_lva(
         naming::address_type lva
       , error_code& ec
         ) const
@@ -465,7 +471,7 @@ namespace hpx { namespace threads
         return empty_mask;
     } // }}}
 
-    std::size_t hwloc_topology::init_node_number(
+    std::size_t hwloc_topology_info::init_node_number(
         std::size_t num_thread, hwloc_obj_type_t type
         )
     { // {{{
@@ -497,7 +503,7 @@ namespace hpx { namespace threads
         return 0;
     } // }}}
 
-    void hwloc_topology::extract_node_mask(
+    void hwloc_topology_info::extract_node_mask(
         hwloc_obj_t parent
       , mask_type& mask
         ) const
@@ -531,7 +537,7 @@ namespace hpx { namespace threads
         }
     } // }}}
 
-    std::size_t hwloc_topology::extract_node_count(
+    std::size_t hwloc_topology_info::extract_node_count(
         hwloc_obj_t parent
       , hwloc_obj_type_t type
       , std::size_t count
@@ -572,33 +578,33 @@ namespace hpx { namespace threads
         return count;
     } // }}}
 
-    std::size_t hwloc_topology::get_number_of_sockets() const
+    std::size_t hwloc_topology_info::get_number_of_sockets() const
     {
         int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
         if(0 > nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::hwloc_topology::get_number_of_sockets"
+              , "hpx::threads::hwloc_topology_info::get_number_of_sockets"
               , "hwloc_get_nbobjs_by_type failed");
             return std::size_t(nobjs);
         }
         return std::size_t(nobjs);
     }
 
-    std::size_t hwloc_topology::get_number_of_numa_nodes() const
+    std::size_t hwloc_topology_info::get_number_of_numa_nodes() const
     {
         int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
         if(0 > nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::hwloc_topology::get_number_of_numa_nodes"
+              , "hpx::threads::hwloc_topology_info::get_number_of_numa_nodes"
               , "hwloc_get_nbobjs_by_type failed");
             return std::size_t(nobjs);
         }
         return std::size_t(nobjs);
     }
 
-    std::size_t hwloc_topology::get_number_of_cores() const
+    std::size_t hwloc_topology_info::get_number_of_cores() const
     {
         int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
         // If num_cores is smaller 0, we have an error, it should never be zero
@@ -607,14 +613,14 @@ namespace hpx { namespace threads
         if(0 >= nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::hwloc_topology::get_number_of_cores"
+              , "hpx::threads::hwloc_topology_info::get_number_of_cores"
               , "hwloc_get_nbobjs_by_type failed");
             return std::size_t(nobjs);
         }
         return std::size_t(nobjs);
     }
 
-    std::size_t hwloc_topology::get_number_of_socket_pus(
+    std::size_t hwloc_topology_info::get_number_of_socket_pus(
         std::size_t num_socket
         ) const
     {
@@ -636,7 +642,7 @@ namespace hpx { namespace threads
         return num_of_pus_;
     }
 
-    std::size_t hwloc_topology::get_number_of_numa_node_pus(
+    std::size_t hwloc_topology_info::get_number_of_numa_node_pus(
         std::size_t numa_node
         ) const
     {
@@ -658,7 +664,7 @@ namespace hpx { namespace threads
         return num_of_pus_;
     }
 
-    std::size_t hwloc_topology::get_number_of_core_pus(
+    std::size_t hwloc_topology_info::get_number_of_core_pus(
         std::size_t core
         ) const
     {
@@ -680,7 +686,7 @@ namespace hpx { namespace threads
         return num_of_pus_;
     }
 
-    std::size_t hwloc_topology::get_number_of_socket_cores(
+    std::size_t hwloc_topology_info::get_number_of_socket_cores(
         std::size_t num_socket
         ) const
     {
@@ -702,7 +708,7 @@ namespace hpx { namespace threads
         return get_number_of_cores();
     }
 
-    std::size_t hwloc_topology::get_number_of_numa_node_cores(
+    std::size_t hwloc_topology_info::get_number_of_numa_node_cores(
         std::size_t numa_node
         ) const
     {
@@ -763,7 +769,7 @@ namespace hpx { namespace threads
         }
     }
 
-    void hwloc_topology::print_affinity_mask(std::ostream& os,
+    void hwloc_topology_info::print_affinity_mask(std::ostream& os,
         std::size_t num_thread, mask_type const& m) const
     {
         boost::io::ios_flags_saver ifs(os);
@@ -776,7 +782,7 @@ namespace hpx { namespace threads
             if (!obj)
             {
                 HPX_THROW_EXCEPTION(kernel_error
-                  , "hpx::threads::hwloc_topology::print_affinity_mask"
+                  , "hpx::threads::hwloc_topology_info::print_affinity_mask"
                   , "object not found");
                 return;
             }
@@ -804,7 +810,7 @@ namespace hpx { namespace threads
         }
     }
 
-    mask_type hwloc_topology::init_machine_affinity_mask() const
+    mask_type hwloc_topology_info::init_machine_affinity_mask() const
     { // {{{
         mask_type machine_affinity_mask = mask_type();
         resize(machine_affinity_mask, get_number_of_pus());
@@ -821,12 +827,12 @@ namespace hpx { namespace threads
         }
 
         HPX_THROW_EXCEPTION(kernel_error
-          , "hpx::threads::hwloc_topology::init_machine_affinity_mask"
+          , "hpx::threads::hwloc_topology_info::init_machine_affinity_mask"
           , "failed to initialize machine affinity mask");
         return empty_mask;
     } // }}}
 
-    mask_type hwloc_topology::init_socket_affinity_mask_from_socket(
+    mask_type hwloc_topology_info::init_socket_affinity_mask_from_socket(
         std::size_t num_socket
         ) const
     { // {{{
@@ -856,7 +862,7 @@ namespace hpx { namespace threads
         return machine_affinity_mask_;
     } // }}}
 
-    mask_type hwloc_topology::init_numa_node_affinity_mask_from_numa_node(
+    mask_type hwloc_topology_info::init_numa_node_affinity_mask_from_numa_node(
         std::size_t numa_node
         ) const
     { // {{{
@@ -887,7 +893,7 @@ namespace hpx { namespace threads
         return machine_affinity_mask_;
     } // }}}
 
-    mask_type hwloc_topology::init_core_affinity_mask_from_core(
+    mask_type hwloc_topology_info::init_core_affinity_mask_from_core(
         std::size_t core, mask_cref_type default_mask
         ) const
     { // {{{
@@ -917,7 +923,7 @@ namespace hpx { namespace threads
         return default_mask;
     } // }}}
 
-    mask_type hwloc_topology::init_thread_affinity_mask(
+    mask_type hwloc_topology_info::init_thread_affinity_mask(
         std::size_t num_thread
         ) const
     { // {{{
@@ -951,7 +957,7 @@ namespace hpx { namespace threads
         return mask;
     } // }}}
 
-    mask_type hwloc_topology::init_thread_affinity_mask(
+    mask_type hwloc_topology_info::init_thread_affinity_mask(
         std::size_t num_core,
         std::size_t num_pu
         ) const
@@ -966,7 +972,7 @@ namespace hpx { namespace threads
             // core
             if (num_cores <= 0) {
                 HPX_THROW_EXCEPTION(kernel_error
-                  , "hpx::threads::hwloc_topology::init_thread_affinity_mask"
+                  , "hpx::threads::hwloc_topology_info::init_thread_affinity_mask"
                   , "hwloc_get_nbobjs_by_type failed");
                 return empty_mask;
             }
@@ -992,7 +998,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    void hwloc_topology::init_num_of_pus()
+    void hwloc_topology_info::init_num_of_pus()
     {
         num_of_pus_ = 1;
         {
@@ -1006,13 +1012,13 @@ namespace hpx { namespace threads
         }
     }
 
-    std::size_t hwloc_topology::get_number_of_pus() const
+    std::size_t hwloc_topology_info::get_number_of_pus() const
     {
         return num_of_pus_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type hwloc_topology::get_cpubind_mask(error_code& ec) const
+    mask_type hwloc_topology_info::get_cpubind_mask(error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
@@ -1025,7 +1031,7 @@ namespace hpx { namespace threads
             {
                 hwloc_bitmap_free(cpuset);
                 HPX_THROWS_IF(ec, kernel_error
-                  , "hpx::threads::hwloc_topology::get_cpubind_mask"
+                  , "hpx::threads::hwloc_topology_info::get_cpubind_mask"
                   , "hwloc_get_cpubind failed");
                 return empty_mask;
             }
@@ -1048,7 +1054,7 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type hwloc_topology::get_cpubind_mask(boost::thread& handle,
+    mask_type hwloc_topology_info::get_cpubind_mask(boost::thread& handle,
         error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
@@ -1063,7 +1069,7 @@ namespace hpx { namespace threads
             {
                 hwloc_bitmap_free(cpuset);
                 HPX_THROWS_IF(ec, kernel_error
-                  , "hpx::threads::hwloc_topology::get_cpubind_mask"
+                  , "hpx::threads::hwloc_topology_info::get_cpubind_mask"
                   , "hwloc_get_cpubind failed");
                 return empty_mask;
             }
@@ -1089,13 +1095,13 @@ namespace hpx { namespace threads
 
     /// This is equivalent to malloc(), except that it tries to allocate
     /// page-aligned memory from the OS.
-    void* hwloc_topology::allocate(std::size_t len) const
+    void* hwloc_topology_info::allocate(std::size_t len) const
     {
         return hwloc_alloc(topo, len);
     }
 
     /// Free memory that was previously allocated by allocate
-    void hwloc_topology::deallocate(void* addr, std::size_t len) const
+    void hwloc_topology_info::deallocate(void* addr, std::size_t len) const
     {
         hwloc_free(topo, addr, len);
     }

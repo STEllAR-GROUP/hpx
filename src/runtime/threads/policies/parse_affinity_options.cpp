@@ -9,7 +9,7 @@
 
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/runtime/threads/policies/hwloc_topology.hpp>
+#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>
@@ -303,7 +303,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<mask_info>
-    extract_socket_masks(hwloc_topology const& t, bounds_type const& b)
+    extract_socket_masks(hwloc_topology_info const& t, bounds_type const& b)
     {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
@@ -316,7 +316,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     std::vector<mask_info>
-    extract_numanode_masks(hwloc_topology const& t, bounds_type const& b)
+    extract_numanode_masks(hwloc_topology_info const& t, bounds_type const& b)
     {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
@@ -328,13 +328,13 @@ namespace hpx { namespace threads { namespace detail
         return masks;
     }
 
-    mask_cref_type extract_machine_mask(hwloc_topology const& t, error_code& ec)
+    mask_cref_type extract_machine_mask(hwloc_topology_info const& t, error_code& ec)
     {
         return t.get_machine_affinity_mask(ec);
     }
 
     std::vector<mask_info>
-    extract_socket_or_numanode_masks(hwloc_topology const& t,
+    extract_socket_or_numanode_masks(hwloc_topology_info const& t,
         spec_type const& s, error_code& ec)
     {
         switch (s.type_)
@@ -376,7 +376,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     std::vector<mask_info>
-    extract_core_masks(hwloc_topology const& t, spec_type const& s,
+    extract_core_masks(hwloc_topology_info const& t, spec_type const& s,
         std::size_t socket, mask_cref_type socket_mask, error_code& ec)
     {
         std::vector<mask_info> masks;
@@ -446,7 +446,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     std::vector<mask_info>
-    extract_pu_masks(hwloc_topology const& t, spec_type const& s,
+    extract_pu_masks(hwloc_topology_info const& t, spec_type const& s,
         std::size_t socket, std::size_t core, mask_cref_type core_mask,
         error_code& ec)
     {
@@ -556,7 +556,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     // for each given core-mask extract all required pu-masks
-    void extract_pu_affinities(hwloc_topology const& t,
+    void extract_pu_affinities(hwloc_topology_info const& t,
         std::vector<spec_type> const& specs, std::size_t socket,
         std::vector<mask_info> const& core_masks,
         std::vector<mask_type>& affinities, error_code& ec)
@@ -603,7 +603,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     // for each given socket-mask extract all required pu-masks
-    void extract_core_affinities(hwloc_topology const& t,
+    void extract_core_affinities(hwloc_topology_info const& t,
         std::vector<spec_type> const& specs,
         std::vector<mask_info> const& socket_masks,
         std::vector<mask_type>& affinities, error_code& ec)
@@ -682,7 +682,7 @@ namespace hpx { namespace threads { namespace detail
         }
     }
 
-    void decode_mappings(hwloc_topology const& t, full_mapping_type& m,
+    void decode_mappings(hwloc_topology_info const& t, full_mapping_type& m,
         std::vector<mask_type>& affinities, std::size_t num_threads,
         error_code& ec)
     {
@@ -707,7 +707,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_compact_distribution(hwloc_topology& t,
+    void decode_compact_distribution(hwloc_topology_info& t,
         std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores,
         std::vector<std::size_t>& num_pus, error_code& ec)
@@ -745,7 +745,7 @@ namespace hpx { namespace threads { namespace detail
         }
     }
 
-    void decode_scatter_distribution(hwloc_topology& t,
+    void decode_scatter_distribution(hwloc_topology_info& t,
         std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores,
         std::vector<std::size_t>& num_pus, error_code& ec)
@@ -783,7 +783,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_balanced_distribution(hwloc_topology& t,
+    void decode_balanced_distribution(hwloc_topology_info& t,
         std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores,
         std::vector<std::size_t>& num_pus, error_code& ec)
@@ -833,7 +833,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_distribution(distribution_type d, hwloc_topology& t,
+    void decode_distribution(distribution_type d, hwloc_topology_info& t,
         std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, error_code& ec)
@@ -875,7 +875,7 @@ namespace hpx { namespace threads
 
         // We need to instantiate a new topology object as the runtime has not
         // been initialized yet
-        threads::hwloc_topology& t = threads::create_topology();
+        threads::hwloc_topology_info& t = threads::create_topology();
 
         switch (mappings.which())
         {
