@@ -14,7 +14,7 @@ function(hpx_setup_target target)
   # retrieve arguments
   set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN)
   set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX)
-  set(multi_value_args SOURCES DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
+  set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   hpx_is_target(is_target ${target})
@@ -44,6 +44,8 @@ function(hpx_setup_target target)
   if(target_FOLDER)
     set_target_properties(${target} PROPERTIES FOLDER "${target_FOLDER}")
   endif()
+
+  get_target_property(target_SOURCES ${target} SOURCES)
 
   # Manage files with .cu extension in case When Cuda Clang is used
   if(target_SOURCES AND HPX_WITH_CUDA_CLANG)

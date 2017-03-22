@@ -178,7 +178,6 @@ macro(add_hpx_component name)
     TYPE COMPONENT
     NAME ${name}
     EXPORT
-    SOURCES ${${name}_SOURCES}
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}

@@ -166,7 +166,6 @@ macro(add_hpx_executable name)
   hpx_setup_target(
     ${name}_exe
     TYPE EXECUTABLE
-    SOURCES ${${name}_SOURCES}
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}
