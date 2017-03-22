@@ -148,16 +148,21 @@ addressing_service::addressing_service(
 { // {{{
     LPROGRESS_;
 
-    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
-
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
+#if defined(HPX_HAVE_NETWORKING)
+    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
     if (service_type == service_mode_bootstrap)
     {
         launch_bootstrap(pp, ph.endpoints(), ini_);
     }
+#else
+    create_big_boot_barrier(nullptr, ph.endpoints(), ini_);
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    launch_bootstrap(nullptr, ph.endpoints(), ini_);
+#endif
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
@@ -166,6 +171,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
 
+#if defined(HPX_HAVE_NETWORKING)
     // now, boot the parcel port
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     if(pp)
@@ -182,6 +188,10 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
             pp->get_locality_name(),
             primary_ns_.ptr(), symbol_ns_.ptr());
     }
+#else
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    get_big_boot_barrier().wait_bootstrap();
+#endif
 
     set_status(state_running);
 } // }}}
@@ -210,7 +220,7 @@ void addressing_service::launch_bootstrap(
     // store number of cores used by other processes
     std::uint32_t cores_needed = rt.assign_cores();
     std::uint32_t first_used_core = rt.assign_cores(
-        pp ? pp->get_locality_name() : "", cores_needed);
+        pp ? pp->get_locality_name() : "<console>", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);

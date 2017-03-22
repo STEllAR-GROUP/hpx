@@ -112,18 +112,23 @@ namespace hpx { namespace parcelset
     {
         LPROGRESS_;
 
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+#if defined(HPX_HAVE_NETWORKING)
+        if (cfg.get_entry("hpx.parcel.enabled", "1") != "0")
         {
-            std::shared_ptr<parcelport> pp;
-            pp.reset(
-                factory->create(
-                    cfg
-                  , on_start_thread
-                  , on_stop_thread
-                )
-            );
-            attach_parcelport(pp);
+            for (plugins::parcelport_factory_base* factory :
+                    get_parcelport_factories())
+            {
+                std::shared_ptr<parcelport> pp(
+                    factory->create(
+                        cfg
+                      , on_start_thread
+                      , on_stop_thread
+                    )
+                );
+                attach_parcelport(pp);
+            }
         }
+#endif
     }
 
     std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
@@ -197,6 +202,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
         using util::placeholders::_1;
+#if defined(HPX_HAVE_NETWORKING)
 
         if(!pp) return;
 
@@ -214,6 +220,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(pp->type() == pp->here().type());
         if(priority > 0)
             endpoints_[pp->type()] = pp->here();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -243,6 +250,7 @@ namespace hpx { namespace parcelset
     {
         bool did_some_work = false;
 
+#if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
         if(0 == num_thread)
         {
@@ -278,7 +286,7 @@ namespace hpx { namespace parcelset
                     did_some_work;
             }
         }
-
+#endif
         return did_some_work;
     }
 
@@ -415,6 +423,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
         naming::gid_type const& gid = p.destination();
@@ -497,11 +506,18 @@ namespace hpx { namespace parcelset
         ++count_routed_;
 
         resolver_->route(std::move(p), std::move(wrapped_f));
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcel");
+#endif
     }
 
     void parcelhandler::put_parcels(std::vector<parcel> parcels,
         std::vector<write_handler_type> handlers)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
         if (parcels.size() != handlers.size())
@@ -647,6 +663,12 @@ namespace hpx { namespace parcelset
             resolver_->route(std::move(nonresolved_parcels[i]),
                 std::move(nonresolved_handlers[i]));
         }
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcels");
+#endif
     }
 
     std::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
@@ -664,6 +686,7 @@ namespace hpx { namespace parcelset
     void default_write_handler(boost::system::error_code const& ec,
         parcel const& p)
     {
+#if defined(HPX_HAVE_NETWORKING)
         if (ec) {
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
@@ -686,6 +709,7 @@ namespace hpx { namespace parcelset
 
             hpx::report_error(exception);
         }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -694,6 +718,7 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
@@ -771,6 +796,13 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
 
         return (*it).second.get();
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::get_message_handler");
+        return nullptr;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1053,6 +1085,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
         using util::placeholders::_1;
         using util::placeholders::_2;
 
@@ -1377,6 +1410,7 @@ namespace hpx { namespace parcelset
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+#endif
     }
 
     // register connection specific performance counters related to connection
@@ -1384,6 +1418,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_connection_cache_counter_types(
         std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
         util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions, _1));
@@ -1471,6 +1506,7 @@ namespace hpx { namespace parcelset
         };
         performance_counters::install_counter_types(connection_cache_types,
             sizeof(connection_cache_types)/sizeof(connection_cache_types[0]));
+#endif
     }
 
     std::vector<plugins::parcelport_factory_base *> &
@@ -1481,7 +1517,6 @@ namespace hpx { namespace parcelset
         {
             init_static_parcelport_factories(factories);
         }
-
         return factories;
     }
 
@@ -1508,9 +1543,10 @@ namespace hpx { namespace parcelset
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
     {
-        /// TODO: properly hide this in plugins ...
+        // TODO: properly hide this in plugins ...
         std::vector<std::string> ini_defs;
 
+#if defined(HPX_HAVE_NETWORKING)
         using namespace boost::assign;
         ini_defs +=
             "[hpx.parcel]",
@@ -1548,6 +1584,7 @@ namespace hpx { namespace parcelset
         {
             f->get_plugin_info(ini_defs);
         }
+#endif
 
         return ini_defs;
     }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -390,13 +390,51 @@ namespace hpx { namespace util
 
             return num_cores;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+#if !defined(HPX_HAVE_NETWORKING)
+        void check_networking_option(boost::program_options::variables_map& vm,
+            char const* option)
+        {
+            if (vm.count(option) != 0)
+            {
+                throw hpx::detail::command_line_error(
+                    std::string("Invalid command line option: '--") + option +
+                    "', networking was disabled at configuration time. "
+                    "Reconfigure HPX using -DHPX_WITH_NETWORKING=On.");
+            }
+        }
+#endif
+
+        void check_networking_options(boost::program_options::variables_map& vm)
+        {
+#if !defined(HPX_HAVE_NETWORKING)
+            check_networking_option(vm, "hpx:agas");
+            check_networking_option(vm, "hpx:run-agas-server-only");
+            check_networking_option(vm, "hpx:hpx");
+            check_networking_option(vm, "hpx:nodefile");
+            check_networking_option(vm, "hpx:nodes");
+            check_networking_option(vm, "hpx:endnodes");
+            check_networking_option(vm, "hpx:ifsuffix");
+            check_networking_option(vm, "hpx:ifprefix");
+            check_networking_option(vm, "hpx:iftransform");
+            check_networking_option(vm, "hpx:localities");
+            check_networking_option(vm, "hpx:node");
+            check_networking_option(vm, "hpx:ignore-batch-env");
+            check_networking_option(vm, "hpx:expect-connecting-localities");
+#endif
+        }
     }
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     bool command_line_handling::handle_arguments(util::manage_config& cfgmap,
         boost::program_options::variables_map& vm,
         std::vector<std::string>& ini_config, std::size_t& node, bool initial)
     {
+        // verify that no networking options were used if networking was
+        // disabled
+        detail::check_networking_options(vm);
+
         using namespace boost::assign;
 
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
@@ -456,9 +494,11 @@ namespace hpx { namespace util
         }
 
         bool using_nodelist = false;
+        bool enable_batch_env = false;
 
         std::vector<std::string> nodelist;
 
+#if defined(HPX_HAVE_NETWORKING)
         if(vm.count("hpx:nodefile"))
         {
             if (vm.count("hpx:nodes")) {
@@ -494,9 +534,12 @@ namespace hpx { namespace util
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        bool enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+        enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+#endif
+
         util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
 
+#if defined(HPX_HAVE_NETWORKING)
         if(!nodelist.empty())
         {
             using_nodelist = true;
@@ -507,12 +550,20 @@ namespace hpx { namespace util
         // let the batch environment decide about the AGAS host
         agas_host = env.agas_host_name(
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
+#endif
 
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(
             cfgmap, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
+        bool expect_connections = false;
+        bool run_agas_server = false;
+        std::string hpx_host;
+        std::uint16_t initial_hpx_port = 0;
+        std::uint16_t hpx_port = 0;
+
+#if defined(HPX_HAVE_NETWORKING)
         // handling number of localities, those might have already been initialized
         // from MPI environment
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
@@ -520,8 +571,7 @@ namespace hpx { namespace util
 
         // Determine our network port, use arbitrary port if running on one
         // locality.
-        std::string hpx_host =
-            cfgmap.get_value<std::string>("hpx.parcel.address",
+        hpx_host = cfgmap.get_value<std::string>("hpx.parcel.address",
                 env.host_name(
                     rtcfg_.get_entry("hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)
                 ));
@@ -530,7 +580,7 @@ namespace hpx { namespace util
         //  - --hpx:expect-connecting-localities or
         //  - hpx.expect_connecting_localities=1 is given, or
         //  - num_localities > 1
-        bool expect_connections =
+        expect_connections =
             cfgmap.get_value<int>("hpx.expect_connecting_localities",
                 num_localities_ > 1 ? 0 : 1) ? true : false;
 
@@ -540,7 +590,6 @@ namespace hpx { namespace util
         ini_config += std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0");
 
-        std::uint16_t initial_hpx_port = 0;
         if (num_localities_ != 1 || expect_connections)
         {
             initial_hpx_port =
@@ -548,16 +597,21 @@ namespace hpx { namespace util
                     rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
         }
 
-        std::uint16_t hpx_port =
-            cfgmap.get_value<std::uint16_t>("hpx.parcel.port", initial_hpx_port);
+        hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
+            initial_hpx_port);
 
-        bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
+        run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
             node = env.retrieve_node_number();
+#else
+        num_localities_ = 1;
+        node = 0;
+#endif
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
         if (hpx::runtime_mode_default == mode_) {
+#if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
             mode_ = hpx::runtime_mode_console;
@@ -588,8 +642,12 @@ namespace hpx { namespace util
             else if (vm.count("hpx:connect")) {
                 mode_ = hpx::runtime_mode_connect;
             }
+#else
+            mode_ = hpx::runtime_mode_console;
+#endif
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
         if (mode_ == hpx::runtime_mode_connect) {
@@ -672,6 +730,7 @@ namespace hpx { namespace util
         {
             hpx_host = hpx::util::resolve_public_ip_address();
         }
+#endif
 
         // handle setting related to schedulers
         queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority-fifo");
@@ -720,6 +779,7 @@ namespace hpx { namespace util
             run_agas_server = mode_ != runtime_mode_connect;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         if (hpx_host == agas_host && hpx_port == agas_port) {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
@@ -787,6 +847,9 @@ namespace hpx { namespace util
         // priority (if dedicated) or with high priority (non-dedicated)
         if (vm.count("hpx:run-agas-server-only"))
             ini_config += "hpx.agas.dedicated_server=1";
+#else
+        ini_config += "hpx.agas.service_mode=bootstrap";
+#endif
 
 #if defined(HPX_HAVE_LOGGING)
         if (vm.count("hpx:debug-hpx-log")) {
@@ -853,8 +916,7 @@ namespace hpx { namespace util
 
         // Set number of localities in configuration (do it everywhere,
         // even if this information is only used by the AGAS server).
-        ini_config += "hpx.localities=" +
-            std::to_string(num_localities_);
+        ini_config += "hpx.localities!=" + std::to_string(num_localities_);
 
         // FIXME: AGAS V2: if a locality is supposed to run the AGAS
         //        service only and requests to use 'priority_local' as the
