@@ -359,18 +359,29 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
 { // {{{
     std::unique_lock<mutex_type> l(resolved_localities_mtx_);
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
-    if (it == resolved_localities_.end())
+    if (it == resolved_localities_.end() || it->second.empty())
     {
         // The locality hasn't been requested to be resolved yet. Do it now.
         parcelset::endpoints_type endpoints;
         {
             hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             endpoints = locality_ns_->resolve_locality(gid);
+            if (endpoints.empty())
+            {
+                std::stringstream strm;
+                strm << "couldn't resolve the given target locality ("
+                     << gid << ")";
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "addressing_service::resolve_locality",
+                    strm.str());
+
+                static parcelset::endpoints_type empty_endpoints;
+                return empty_endpoints;
+            }
         }
 
         // Search again ... might have been added by a different thread already
         it = resolved_localities_.find(gid);
-
         if (it == resolved_localities_.end())
         {
             if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
@@ -388,6 +399,10 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                     "due to a locking error or memory corruption");
                 return resolved_localities_[naming::invalid_gid];
             }
+        }
+        else if (it->second.empty() && !endpoints.empty())
+        {
+            resolved_localities_[gid] = endpoints;
         }
     }
     return it->second;
