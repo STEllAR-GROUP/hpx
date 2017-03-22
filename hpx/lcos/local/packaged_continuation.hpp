@@ -123,7 +123,7 @@ namespace hpx { namespace lcos { namespace detail
         char const* name = traits::get_function_annotation<Func>::call(func);
         if (name != nullptr)
         {
-            util::apex_wrapper apex_profiler(name);
+            util::apex_wrapper apex_profiler(name, (uint64_t)&future);
             invoke_continuation(func, future, cont, is_void());
         }
         else
