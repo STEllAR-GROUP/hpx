@@ -66,7 +66,7 @@ namespace hpx { namespace lcos
         hpx::future<bool> was_registered =
             hpx::register_with_basename(name, p.get_id(), this_site);
 
-        return hpx::dataflow(
+        return hpx::dataflow(hpx::launch::sync,
             [](hpx::future<result_type> f, hpx::future<bool> was_registered,
                 std::string && name, std::size_t this_site) -> result_type
             {
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos
 
             // find_from_basename is always a local operation (see assert above)
             typedef typename std::decay<T>::type result_type;
-            return hpx::dataflow(
+            return hpx::dataflow(hpx::launch::sync,
                 [](hpx::future<hpx::id_type> f, result_type && t) -> void
                 {
                     set_lco_value(f.get(), std::move(t));
