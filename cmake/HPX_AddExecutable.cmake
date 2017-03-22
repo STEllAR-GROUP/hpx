@@ -116,14 +116,14 @@ macro(add_hpx_executable name)
     set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
   endif()
 
+  # Manage files with .cu extension in case When Cuda Clang is used
   if(HPX_WITH_CUDA_CLANG)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
         message(${extension})
         SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
-          LANGUAGE CXX
-          COMPILE_FLAGS ${HPX_CUDA_CLANG_FLAGS})
+          LANGUAGE CXX)
       endif()
     endforeach()
   endif()
@@ -166,6 +166,7 @@ macro(add_hpx_executable name)
   hpx_setup_target(
     ${name}_exe
     TYPE EXECUTABLE
+    SOURCES ${${name}_SOURCES}
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}
