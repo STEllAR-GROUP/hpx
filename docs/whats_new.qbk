@@ -51,13 +51,26 @@ particular order):
   `-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On` to __cmake__.
 * Added versions of `hpx::get_ptr` taking client side representations for
   component instances as their parameter (instead of a global id).
-* Added the helper utility `hpx::performance_countyers::performance_counter_set`
+* Added the helper utility `hpx::performance_counters::performance_counter_set`
   helping to encapsulate a set of performance counters to be managed concurrently.
 * All execution policies and related classes have been renamed to be consistent
   with the naming changes applied for C++17. All policies now live in the
   namespace `hpx::parallel::execution`. The ols names can be still enabled
   at configure time by specifying `-DHPX_WITH_EXECUTION_POLICY_COMPATIBILITY=On`
   to __cmake__.
+* The thread scheduling subsystem has undergone a major refactoring which results
+  in significant performance improvements. We have also imroved the performance
+  of creating `hpx::future` and of various facilities handling those.
+* We have consolidated all of the code in HPX.Compute related to the integration
+  of CUDA. `hpx::partitioned_vector` has been enabled to be usable with
+  `hpx::compute::vector` which allows to place the partitions on one or more
+  GPU devices.
+* Added new performance counters exposing various internals of the thread
+  scheduling subsystem, such as the current idle- and busy-loop counters and
+  instantaneous scheduler utilization.
+* Extended and improved the use of the ITTNotify hooks allowing to collect
+  performance counter data and function annotation information from within the
+  Intel Amplifier tool.
 
 [heading Breaking Changes]
 
@@ -81,10 +94,192 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2549] - Pre-include defines.hpp to get the macro HPX_HAVE_CUDA value
+* [pr    2548] - Fixing issue with disconnect
+* [pr    2546] - Some fixes around cuda clang partitioned_vector example
+* [pr    2545] - Fix uses of the Vc2 datapar flags; the value, not the type,
+                 should be passed to functions
+* [pr    2542] - Make HPX_WITH_MALLOC easier to use
+* [pr    2541] - avoid recompiles when enabling/disabling examples
+* [pr    2540] - Fixing usage of target_link_libraries()
+* [pr    2539] - fix RPATH behaviour
+* [pr    2537] - Add output of a Bazel Skylark extension for paths and compile
+                 options
+* [pr    2536] - Add counter exposing total available memory to Windows as well
+* [pr    2535] - Remove obsolete support for security
+* [pr    2533] - Pre-cache locality endpoints during bootstrap
+* [pr    2532] - Fixing handling of GIDs during serialization preprocessing
+* [pr    2531] - Amend uses of the term "functor"
+* [pr    2529] - added counter for reading available memory
+* [pr    2527] - Facilities to create actions from lambdas
+* [pr    2526] - Updated docs: HPX_WITH_EXAMPLES
+* [pr    2525] - Remove warnings related to unused captured variables
+* [issue 2524] - CMAKE failed because it is missing:
+                 TCMALLOC_LIBRARY TCMALLOC_INCLUDE_DIR
+* [pr    2523] - Fixing compose_cb stack overflow
+* [pr    2522] - Instead of unlocking, ignore the lock while creating the
+                 message handler
+* [pr    2521] - Create LPROGRESS_ logging macro to simplify progress tracking
+                 and timings
+* [pr    2520] - Intel 17 support
+* [pr    2519] - Fix components example
+* [pr    2518] - Fixing parcel scheduling
+* [issue 2517] - Race condition during Parcel Coalescing Handler creation
+* [issue 2516] - HPX locks up when using at least 256 localities
+* [issue 2515] - error: Install cannot find "/lib/hpx/libparcel_coalescing.so.0.9.99"
+                 but I can see that file
+* [pr    2514] - Making sure that all continuations of a shared_future are
+                 invoked in order
+* [pr    2513] - Fixing locks held during suspension
+* [pr    2512] - MPI Parcelport improvements and fixes related to the background
+                 work changes
+* [pr    2511] - Fixing bit-wise (zero-copy) serialization
+* [pr    2508] - Added documentation for debugging with core files
+* [pr    2506] - Fixing background work invocations
+* [pr    2505] - Fix tuple serialization
+* [issue 2504] - Ensure continuations are called in the order they have been
+                 attached
+* [pr    2503] - Adding serialization support for Vc v2 (datapar)
+* [pr    2502] - Resolve various, minor compiler warnings
+* [pr    2501] - Some other fixes around cuda examples
+* [issue 2500] - nvcc / cuda clang issue due to a missing -DHPX_WITH_CUDA flag
+* [pr    2499] - Adding support for std::array to wait_all and friends
+* [pr    2498] - Execute background work as HPX thread
+* [pr    2497] - Fixing configuration options for spinlock-deadlock detection
+* [pr    2496] - Accounting for different compilers in CrayKNL toolchain file
+* [pr    2494] - Adding component base class which ties a component instance to
+                 a given executor
+* [pr    2493] - Enable controlling amount of pending threads which must be
+                 available to allow thread stealing
+* [pr    2492] - Adding new command line option --hpx:print-counter-reset
+* [pr    2491] - Resolve ambiguities when compiling with APEX
+* [pr    2490] - Resuming threads waiting on future with higher priority
+* [pr    2488] - Adding performance counters exposing the internal idle and
+                 busy-loop counters
+* [pr    2487] - Allowing for plain suspend to reschedule thread right away
+* [pr    2486] - Only flag HPX code for CUDA if HPX_WITH_CUDA is set
+* [pr    2485] - Making thread-queue parameters runtime-configurable
+* [pr    2484] - Added atomic counter for parcel-destinations
+* [pr    2483] - Added priority-queue lifo scheduler
+* [pr    2482] - Changing scheduler to steal only if more than a minimal number
+                 of tasks are available
+* [pr    2481] - Extending command line option --hpx:print-counter-destination
+                 to support value 'none'
+* [pr    2479] - Added option to disable signal handler
+* [pr    2478] - Making sure the sine performance counter module gets loaded
+                 only for the corresponding example
+* [issue 2477] - Breaking at a throw statement
+* [pr    2476] - Annotated function
+* [pr    2475] - Ensure that using %osthread% during logging will not throw for
+                 non-hpx threads
+* [pr    2474] - Remove now superficial non_direct actions from base_lco and
+                 friends
+* [pr    2473] - Refining support for ITTNotify
+* [pr    2472] - Some fixes around hpx compute
+* [issue 2470] - redefinition of boost::detail::spinlock
+* [issue 2469] - Dataflow performance issue
+* [pr    2468] - Perf docs update
+* [pr    2466] - Guarantee to execute remote direct actions on HPX-thread
+* [pr    2465] - Improve demo : Async copy and fixed device handling
+* [pr    2464] - Adding performance counter exposing instantaneous scheduler
+                 utilization
+* [pr    2463] - Downcast to future<void>
+* [pr    2462] - Fixed usage of ITT-Notify API with Intel Amplifier
+* [pr    2461] - Cublas demo
+* [pr    2460] - Fixing thread bindings
+* [pr    2459] - Make -std=c++11 nvcc flag consistent for in-build and
+                 installed versions
+* [issue 2457] - Segmentation fault when registering a partitioned vector
+* [pr    2452] - Properly releasing global barrier for unhandled exceptions
+* [pr    2451] - Fixing long shutdown times
+* [pr    2450] - Attempting to fix initialization errors on newer platforms
+                 (Boost V1.63)
+* [pr    2449] - Replace BOOST_COMPILER_FENCE with an HPX version
+* [pr    2448] - This fixes a possible race in the migration code
+* [pr    2445] - Fixing dataflow et.al. for futures or future-ranges wrapped
+                 into ref()
+* [pr    2444] - Fix segfaults
+* [pr    2443] - Issue 2442
+* [issue 2442] - Mismatch between #if/#endif and namespace scope brackets in
+                 this_thread_executers.hpp
+* [issue 2441] - undeclared identifier BOOST_COMPILER_FENCE
+* [pr    2440] - Knl build
+* [pr    2438] - Datapar backend
+* [pr    2437] - Adapt algorithm parameter sequence changes from C++17
+* [pr    2436] - Adapt execution policy name changes from C++17
+* [issue 2435] - Trunk broken, undefined reference to
+                 hpx::thread::interrupt(hpx::thread::id, bool)
+* [pr    2434] - More fixes to resource manager
+* [pr    2433] - Added versions of `hpx::get_ptr` taking client side representations
+* [pr    2432] - Warning fixes
+* [pr    2431] - Adding facility representing set of performance counters
+* [pr    2430] - Fix parallel_executor thread spawning
+* [pr    2429] - Fix attribute warning for gcc
+* [issue 2427] - Seg fault running octo-tiger with latest HPX commit
+* [issue 2426] - Bug in 9592f5c0bc29806fce0dbe73f35b6ca7e027edcb causes
+                 immediate crash in Octo-tiger
+* [pr    2425] - Fix nvcc errors due to constexpr specifier
+* [issue 2424] - Async action on component present on hpx::find_here is executing
+                 synchronously
+* [pr    2423] - Fix nvcc errors due to constexpr specifier
+* [pr    2422] - Implementing hpx::this_thread thread data functions
+* [pr    2421] - Adding benchmark for wait_all
+* [issue 2420] - Returning object of a component client from another component
+                 action fails
+* [pr    2419] - Infiniband parcelport
+* [issue 2418] - gcc + nvcc fails to compile code that uses partitioned_vector
+* [pr    2417] - Fixing context switching
+* [pr    2416] - Adding fixes and workarounds to allow compilation with nvcc/msvc
+                 (VS2015up3)
+* [pr    2415] - Fix errors coming from hpx compute examples
+* [pr    2414] - Fixing msvc12
+* [pr    2413] - Enable cuda/nvcc or cuda/clang when using add_hpx_executable()
+* [pr    2412] - Fix issue in HPX_SetupTarget.cmake when cuda is used
+* [pr    2411] - This fixes the core compilation issues with MSVC12
+* [issue 2410] - undefined reference to opal_hwloc191_hwloc_.....
+* [pr    2409] - Fixing locking for channel and receive_buffer
+* [pr    2407] - Solving #2402 and #2403
+* [pr    2406] - Improve guards
+* [pr    2405] - Enable parallel::for_each for iterators returning proxy types
+* [pr    2404] - Forward the explicitly given result_type in the hpx invoke
+* [issue 2403] - datapar_execution + zip iterator: lambda arguments aren't
+                 references
+* [issue 2402] - datapar algorithm instantiated with wrong type #2402
+* [pr    2401] - Added support for imported libraries to HPX_Libraries.cmake
+* [pr    2400] - Use CMake policy CMP0060
+* [issue 2399] - Error trying to push back vector of futures to vector
+* [pr    2398] - Allow config #defines to be written out to custom config/defines.hpp
+* [issue 2397] - CMake generated config defines can cause tedious rebuilds
+                 category
+* [issue 2396] - BOOST_ROOT paths are not used at link time
+* [pr    2395] - Fix target_link_libraries() issue when HPX Cuda is enabled
+* [pr    2393] - Fixing lock registration for recursive mutex
+* [pr    2392] - Add keywords in target_link_libraries in hpx_setup_target
+* [pr    2391] - Clang goroutines
+* [issue 2390] - Adapt execution policy name changes from C++17
+* [pr    2389] - Chunk allocator and pool are not used and are obsolete
+* [pr    2388] - Adding functionalities to datapar needed by octotiger
+* [pr    2387] - Fixing race condition for early parcels
+* [issue 2386] - Lock registration broken for recursive_mutex
+* [pr    2385] - Datapar zip iterator
+* [pr    2384] - Fixing race condition in for_loop_reduction
+* [pr    2383] - Continuations
+* [pr    2382] - add LibFlatArray-based backend for datapar
+* [pr    2381] - remove unused typedef to get rid of compiler warnings
+* [pr    2380] - Tau cleanup
+* [pr    2379] - Can send immediate
+* [pr    2378] - Renaming copy_helper/copy_n_helper/move_helper/move_n_helper
+* [issue 2376] - Boost trunk's spinlock initializer fails to compile
+* [pr    2375] - Add support for minimal thread local data
+* [pr    2374] - Adding API functions set_config_entry_callback
+* [pr    2373] - Add a simple utility for debugging that gives supended task
+                 backtraces
 * [pr    2372] - Barrier Fixes
 * [issue 2370] - Can't wait on a wrapped future
 * [pr    2369] - Fixing stable_partition
 * [pr    2367] - Fixing find_prefixes for Windows platforms
+* [pr    2366] - Testing for experimental/optional only in C++14 mode
+* [pr    2364] - Adding set_config_entry
 * [pr    2363] - Fix papi
 * [pr    2362] - Adding missing macros for new non-direct actions
 * [pr    2361] - Improve cmake output to help debug compiler incompatibility check
@@ -94,6 +289,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2356] - Fixing return type of get_iterator_tuple
 * [pr    2355] - Fixing compilation against Boost 1 62
 * [pr    2354] - Adding serialization for mask_type if CPU_COUNT > 64
+* [pr    2353] - Adding hooks to tie in APEX into the parcel layer
 * [issue 2352] - Compile errors when using intel 17 beta (for KNL) on edison
 * [pr    2351] - Fix function vtable get_function_address implementation
 * [issue 2350] - Build failure - master branch (4de09f5) with Intel Compiler v17
@@ -119,6 +315,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2332] - Fixing hpx::lcos::local::barrier
 * [pr    2331] - Updating APEX support to include OTF2
 * [pr    2330] - Support for data-parallelism for parallel algorithms
+* [issue 2329] - Coordinate settings in cmake
 * [pr    2328] - fix LibGeoDecomp builds with HPX + GCC 5.3.0 + CUDA 8RC
 * [pr    2326] - Making scan_partitioner work (for now)
 * [issue 2323] - Constructing a vector of components only correctly initializes
@@ -207,11 +404,22 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2232] - Implement local-only primary namespace service
 * [issue 2147] - would like to know how much data is being routed by particular
                  actions
+* [issue 2109] - Warning while compiling hpx
+* [issue 1973] - Setting INTERFACE_COMPILE_OPTIONS for hpx_init in CMake taints
+                 Fortran_FLAGS
+* [issue 1864] - run_guarded using bound function ignores reference
 * [issue 1754] - Running with TCP parcelport causes immediate crash or freeze
 * [issue 1655] - Enable zip_iterator to be used with Boost traversal iterator
                  categories
 * [issue 1591] - Optimize AGAS for shared memory only operation
+* [issue 1401] - Need an efficient infiniband parcelport
+* [issue 1125] - Fix the IPC parcelport
+* [issue  839] - Refactor ibverbs and shmem parcelport
+* [issue  702] - Add instrumentation of parcel layer
 * [issue  668] - Implement ispc task interface
+* [issue  533] - Thread queue/deque internal parameters should be runtime
+                 configurable
+* [issue  475] - Create a means of combining performance counters into querysets
 
 [endsect]
 
