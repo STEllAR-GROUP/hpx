@@ -7,6 +7,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/compute.hpp>
 
+#include <cstddef>
+#include <iostream>
+
 __global__ void dummy()
 {}
 
