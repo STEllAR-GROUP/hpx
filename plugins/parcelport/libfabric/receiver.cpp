@@ -100,12 +100,11 @@ namespace libfabric
 
         HPX_ASSERT(recv);
 
-        HPX_ASSERT(recv->rma_count_ == 0);
         // We save the received region and swap it with a newly allocated
         // to be able to post a recv again as soon as possible.
-        libfabric_memory_region* region = memory_pool_->allocate_region(
+        libfabric_memory_region* region = region_;
+        region_ = memory_pool_->allocate_region(
             memory_pool_->small_.chunk_size());
-        std::swap(region, region_);
         post_recv();
 
         // we dispatch our work to our rma_receiver once it completed the

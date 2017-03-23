@@ -27,30 +27,19 @@ namespace libfabric
 {
     namespace detail {
         struct rdma_region {
-            std::size_t  size;
             uint64_t     key;
             const void * addr;
-        };
-
-        struct piggy_back {
-            uint32_t  offset;
-            uint32_t  bytes;
-        };
-
-        union rdma_info {
-            piggy_back  piggyback;
-            rdma_region region;
         };
 
         typedef std::pair<uint16_t, uint16_t> num_chunks_type;
 
         struct header_block {
+            rdma_region     region;
             uint64_t        tag;
-            uint32_t        size;
             num_chunks_type num_chunks;
-            uint32_t        flags;
-            rdma_info       chunk_info;
-            rdma_info       message_info;
+            uint64_t        size;
+            uint16_t        message_offset;
+            uint8_t         flags;
         };
     }
 
@@ -62,7 +51,7 @@ namespace libfabric
         static const     unsigned int chunk_flag        = 0x01;
         static const     unsigned int message_flag      = 0x02;
         //
-    private:
+//     private:
         detail::header_block         message_header;
         std::array<char, data_size_> data_;
 
@@ -85,8 +74,6 @@ namespace libfabric
             // can we send the chunk info inside the header
             if (chunkbytes <= data_size_) {
               message_header.flags |= chunk_flag;
-              message_header.chunk_info.piggyback.offset = 0;
-              message_header.chunk_info.piggyback.bytes  = chunkbytes;
               std::memcpy(&data_[0], chunks.data(), chunkbytes);
               LOG_DEBUG_MSG("Chunkbytes is " << decnumber(chunkbytes) <<
                   "header_block_size "
@@ -98,7 +85,7 @@ namespace libfabric
             }
 
             // the end of header position will be start of piggyback data
-            message_header.message_info.piggyback.offset = chunkbytes;
+            message_header.message_offset = chunkbytes;
 
             // can we send main message chunk as well as other information
             if (buffer.data_.size() <= (data_size_ - chunkbytes)) {
@@ -140,7 +127,7 @@ namespace libfabric
         inline char * piggy_back()
         {
             if ((message_header.flags & message_flag) !=0) {
-                return &data_[message_header.message_info.piggyback.offset];
+                return &data_[message_header.message_offset];
             }
             return nullptr;
         }
@@ -150,34 +137,26 @@ namespace libfabric
             // if chunks are included in header, return header + chunkbytes
             if ((message_header.flags & chunk_flag) !=0)
                 return sizeof(detail::header_block)
-                    + message_header.chunk_info.piggyback.bytes;
+                    + message_header.message_offset;
             // otherwise, just end of normal header
             else
                 return sizeof(detail::header_block);
         }
 
         inline void set_message_rdma_key(uint64_t v) {
-            message_header.chunk_info.region.key = v;
+            message_header.region.key = v;
         }
 
         inline uint64_t get_message_rdma_key() const {
-            return message_header.chunk_info.region.key;
+            return message_header.region.key;
         }
 
         inline void set_message_rdma_addr(const void *v) {
-            message_header.chunk_info.region.addr = v;
+            message_header.region.addr = v;
         }
 
         inline const void * get_message_rdma_addr() const {
-            return message_header.chunk_info.region.addr;
-        }
-
-        inline void set_message_rdma_size(std::size_t v) {
-            message_header.chunk_info.region.size = v;
-        }
-
-        inline std::size_t get_message_rdma_size() const {
-            return message_header.chunk_info.region.size;
+            return message_header.region.addr;
         }
     };
 
