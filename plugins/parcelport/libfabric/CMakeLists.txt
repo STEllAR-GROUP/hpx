@@ -63,7 +63,7 @@ endif()
 # Hardware device selection
 #------------------------------------------------------------------------------
 hpx_option(HPX_PARCELPORT_LIBFABRIC_PROVIDER STRING
-  "The provider (verbs/gni/psm2)"
+  "The provider (verbs/gni/psm2/sockets)"
   "verbs" CATEGORY "Parcelport" ADVANCED)
 
 hpx_add_config_define_namespace(
@@ -78,6 +78,10 @@ if(HPX_PARCELPORT_LIBFABRIC_PROVIDER MATCHES "verbs")
 elseif(HPX_PARCELPORT_LIBFABRIC_PROVIDER MATCHES "gni")
     hpx_add_config_define_namespace(
         DEFINE HPX_PARCELPORT_LIBFABRIC_GNI
+        NAMESPACE parcelport)
+elseif(HPX_PARCELPORT_LIBFABRIC_PROVIDER MATCHES "sockets")
+    hpx_add_config_define_namespace(
+        DEFINE HPX_PARCELPORT_LIBFABRIC_SOCKETS
         NAMESPACE parcelport)
 endif()
 
