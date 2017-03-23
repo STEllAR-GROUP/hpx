@@ -54,6 +54,7 @@ struct symbol_namespace
     }
 
     static naming::id_type symbol_namespace_locality(std::string const& key);
+    static std::uint32_t service_locality_id(std::string const& key);
 
     symbol_namespace();
     ~symbol_namespace();

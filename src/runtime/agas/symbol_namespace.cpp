@@ -92,7 +92,8 @@ namespace hpx { namespace agas {
             == HPX_AGAS_SYMBOL_NS_MSB;
     }
 
-    naming::id_type symbol_namespace::symbol_namespace_locality(std::string const& key)
+    std::uint32_t symbol_namespace::service_locality_id(
+        std::string const& key)
     {
         std::uint32_t hash_value = 0;
         if (key.size() < 2 || key[1] != '0' || key[0] != '/')
@@ -101,7 +102,13 @@ namespace hpx { namespace agas {
             util::jenkins_hash hash;
             hash_value = hash(key) % get_initial_num_localities();
         }
-        return naming::id_type(get_service_instance(hash_value),
+        return hash_value;
+    }
+
+    naming::id_type symbol_namespace::symbol_namespace_locality(
+        std::string const& key)
+    {
+        return naming::id_type(get_service_instance(service_locality_id(key)),
             naming::id_type::unmanaged);
     }
 

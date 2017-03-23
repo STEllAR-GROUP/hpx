@@ -330,7 +330,7 @@ namespace hpx { namespace util { namespace functional
     async_continuation(Bound && bound, Continuation && c)
     {
         return functional::detail::async_continuation_impl<Bound, Continuation>(
-                std::forward<Bound>(bound), std::forward<Continuation>(c));
+            std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
 }}}
 
