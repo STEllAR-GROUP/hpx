@@ -556,7 +556,7 @@ namespace hpx { namespace parcelset
 
             auto encoded_buffer = sender->get_new_buffer();
             // encode the parcels
-            std::size_t num_parcels = encode_parcels(this_, &p, 1,
+            std::size_t num_parcels = encode_parcels(this_, &p, -1,
                 encoded_buffer,
                 this_.archive_flags_,
                 this_.get_max_outbound_message_size());

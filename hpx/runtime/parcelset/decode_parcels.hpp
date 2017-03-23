@@ -123,6 +123,7 @@ namespace hpx { namespace parcelset
                         if (parcel_count > 1)
                             deferred_parcels.reserve(parcel_count);
                     }
+
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
                         bool deferred_schedule = true;

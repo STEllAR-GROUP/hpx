@@ -15,8 +15,6 @@
 #include <hpx/util/detail/yield_k.hpp>
 
 #include <rdma/fi_endpoint.h>
-// include for iovec
-#include <sys/uio.h>
 
 #include <memory>
 
@@ -27,6 +25,7 @@ namespace libfabric
 {
     void sender::async_write_impl()
     {
+        HPX_ASSERT(message_region_ == nullptr);
         HPX_ASSERT(completion_count_ == 0);
         // for each zerocopy chunk, we must create a memory region for the data
         LOG_EXCLUSIVE(
@@ -116,15 +115,13 @@ namespace libfabric
         // header region is always sent, message region is usually piggybacked
         int num_regions = 1;
 
-        struct iovec region_list[2] = {
-            { header_region_->get_address(),
-                header_region_->get_message_length() },
-            { message_region_->get_address(),
-                message_region_->get_message_length() } };
+        region_list_[0] = { header_region_->get_address(),
+                header_region_->get_message_length() };
+        region_list_[1] = { message_region_->get_address(),
+                message_region_->get_message_length() };
 
-        void *desc[2] = {
-            header_region_->get_desc(),
-            message_region_->get_desc() };
+        desc_[0] = header_region_->get_desc();
+        desc_[1] = message_region_->get_desc();
 
         if (header_->chunk_data()) {
             LOG_DEBUG_MSG("Chunk info is piggybacked");
@@ -140,9 +137,11 @@ namespace libfabric
         }
         else {
             LOG_DEBUG_MSG("Main message NOT piggybacked ");
+
             header_->set_message_rdma_size(header_->size());
             header_->set_message_rdma_key(message_region_->get_remote_key());
             header_->set_message_rdma_addr(message_region_->get_address());
+//             std::cout << "sending message to " << header_->get_message_rdma_addr() << " " << header_->get_message_rdma_key() << "\n";
 
             LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer_.data_.size())
                 << "desc " << hexnumber(message_region_->get_desc())
@@ -158,31 +157,70 @@ namespace libfabric
             << " buffer " << hexpointer(header_region_->get_address())
             << " region " << hexpointer(header_region_));
 
-        fi_msg msg;
-        msg.msg_iov = region_list;
-        msg.desc = desc;
-        msg.iov_count = num_regions;
-        msg.addr = dst_addr_;
-        msg.context = this;
-        msg.data = 0;
-
         if (header_->piggy_back() && rma_regions_.empty())
             --completion_count_;
-
         int ret = 0;
-        for (std::size_t k = 0; true; ++k)
+        if (num_regions>1)
         {
-            ret = fi_sendmsg(endpoint_, &msg, 0);
-            if (ret == -FI_EAGAIN)
+            LOG_TRACE_MSG(
+            "message_region"
+            << " buffer " << hexpointer(send_data.message_region->get_address())
+            << " region " << hexpointer(send_data.message_region));
+            for (std::size_t k = 0; true; ++k)
             {
-                LOG_DEVEL_MSG("reposting send...\n");
-                hpx::util::detail::yield_k(k,
-                    "libfabric::sender::async_write");
-                continue;
+                ret = fi_sendv(endpoint_, region_list_,
+                    desc_, num_regions, dst_addr_, this);
+                if (ret == -FI_EAGAIN)
+                {
+                    LOG_DEVEL_MSG("reposting send...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
             }
-            if (ret) throw fabric_error(ret, "fi_sendv");
-            break;
         }
+        else
+        {
+            for (std::size_t k = 0; true; ++k)
+            {
+                ret = fi_send(endpoint_,
+                    region_list_[0].iov_base, region_list_[0].iov_len,
+                desc_[0], dst_addr_, this);
+                if (ret == -FI_EAGAIN)
+                {
+                    LOG_DEVEL_MSG("reposting send...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
+        }
+
+//         fi_msg msg;
+//         msg.msg_iov = region_list;
+//         msg.desc = desc;
+//         msg.iov_count = num_regions;
+//         msg.addr = dst_addr_;
+//         msg.context = this;
+//         msg.data = 0;
+//         int ret = 0;
+//         for (std::size_t k = 0; true; ++k)
+//         {
+//             ret = fi_sendmsg(endpoint_, &msg, FI_COMPLETION | FI_TRANSMIT_COMPLETE);
+//             if (ret == -FI_EAGAIN)
+//             {
+//                 LOG_DEVEL_MSG("reposting send...\n");
+//                 hpx::util::detail::yield_k(k,
+//                     "libfabric::sender::async_write");
+//                 continue;
+//             }
+//             if (ret) throw fabric_error(ret, "fi_sendv");
+//             break;
+//         }
 
         // log the time spent in performance counter
 //                buffer.data_point_.time_ =
@@ -215,6 +253,7 @@ namespace libfabric
         handler_(ec);
 
         memory_pool_->deallocate(message_region_);
+        message_region_ = nullptr;
 
         for (auto& region: rma_regions_)
         {
