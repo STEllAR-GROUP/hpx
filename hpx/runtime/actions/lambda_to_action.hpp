@@ -93,6 +93,13 @@ namespace hpx { namespace actions
                     F,return_type,sequence_type>::type;
         };
 
+#if defined(HPX_MSVC)
+// suppress: 'operator +=': in C++14 'constexpr' will not imply 'const';
+// consider explicitly specifying 'const'
+#pragma warning(push)
+#pragma warning(disable: 4814)
+#endif
+
         struct action_maker
         {
             template<typename F>
@@ -109,6 +116,10 @@ namespace hpx { namespace actions
                     hpx::actions::detail::action_from_lambda<F>::type();
             }
         };
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 
     template<typename F>
