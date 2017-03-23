@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@ set(benchmarks
     wait_all_timings
 )
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLATARRAY)
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(benchmarks
       ${benchmarks}
       transform_reduce_binary
