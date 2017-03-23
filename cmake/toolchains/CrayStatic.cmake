@@ -46,7 +46,7 @@ set(HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE OFF CACHE BOOL
   "Custom libfabric logging flag")
 set(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING  OFF CACHE BOOL
   "Libfabric parcelport logging on/off flag")
-set(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD "4096" CACHE STRING
+set(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD "4096" CACHE STRING
   "The threshhold in bytes to when perform zero copy optimizations (default: 128)")
 
 # We do a cross compilation here ...
