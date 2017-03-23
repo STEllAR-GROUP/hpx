@@ -45,7 +45,7 @@
 #include <rdma/fi_rma.h>
 #include "fabric_error.hpp"
 
-#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+#if defined(HPX_PARCELPORT_LIBFABRIC_GNI) || defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS)
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
 #else
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
