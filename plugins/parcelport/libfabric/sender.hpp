@@ -19,6 +19,9 @@
 
 #include <memory>
 
+// include for iovec
+#include <sys/uio.h>
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -44,6 +47,7 @@ namespace libfabric
             memory_pool_(memory_pool),
             buffer_(snd_data_type(memory_pool_), memory_pool_),
             header_region_(memory_pool_->allocate_region(memory_pool_->small_.chunk_size())),
+            message_region_(nullptr),
             completion_count_(0)
         {
             LOG_DEVEL_MSG("Create sender: " << this);
@@ -94,6 +98,9 @@ namespace libfabric
         > handler_;
         util::function_nonser<void(sender*)> postprocess_handler_;
         hpx::util::atomic_count completion_count_;
+
+        struct iovec region_list_[2];
+        void *desc_[2];
     };
 }}}}
 

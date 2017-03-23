@@ -75,8 +75,7 @@ namespace libfabric
 
         header_ = reinterpret_cast<header_type*>(header_region_->get_address());
         src_addr_ = src_addr;
-        rma_count_ = header_->num_chunks().first;
-        HPX_ASSERT(rma_count_ == header_->num_chunks().first);
+        long rma_count = header_->num_chunks().first;
 
         HPX_ASSERT(header_region_);
         HPX_ASSERT(header_region_->get_address());
@@ -93,18 +92,21 @@ namespace libfabric
 
         if (!header_->piggy_back())
         {
-            ++rma_count_;
+            ++rma_count;
         }
 
         // If we have no zero copy chunks and piggy backed data, we can
         // process the message immediately, otherwise, dispatch to rma_receiver
         // If we have neither piggy back, nor zero copy chunks, rma_count is 0
-        if (rma_count_ == 0)
+        if (rma_count == 0)
         {
+            HPX_ASSERT(rma_count_ == 0);
             handle_non_rma();
             handler_(this);
             return;
         }
+
+        rma_count_ = rma_count;
 
         chunks_.resize(header_->num_chunks().first + header_->num_chunks().second);
 
@@ -129,7 +131,7 @@ namespace libfabric
                 << " index " << decnumber(c.data_.index_));
         });
 
-        rma_regions_.reserve(rma_count_);
+        rma_regions_.reserve(rma_count);
 
         std::size_t index = 0;
         for (const chunk_struct &c : chunks_)
@@ -184,6 +186,7 @@ namespace libfabric
         if (!header_->piggy_back())
         {
             std::size_t size = header_->get_message_rdma_size();
+            HPX_ASSERT(size == header_->size());
             message_region_ = memory_pool_->allocate_region(size);
             message_region_->set_message_length(size);
 
@@ -195,6 +198,8 @@ namespace libfabric
                 << " remote addr " << hexpointer(header_->get_message_rdma_addr())
                 << " size " << hexnumber(size)
             );
+
+//             std::cout << "reading message from " << header_->get_message_rdma_addr() << " " << header_->get_message_rdma_key() << "\n";
 
             ssize_t ret = fi_read(endpoint_,
                 message_region_->get_address(), size, message_region_->get_desc(),
@@ -210,6 +215,7 @@ namespace libfabric
     {
         typedef pinned_memory_vector<char, header_size> rcv_data_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
+//         send_ack();
 
         LOG_DEVEL_MSG("handle piggy backed sends without zero copy regions");
 
@@ -220,9 +226,11 @@ namespace libfabric
                 memory_pool_, nullptr);
 
         rcv_buffer_type buffer(std::move(wrapped_pointer), memory_pool_);
+        buffer.num_chunks_ = header_->num_chunks();
+        buffer.data_size_ = header_->size();
         LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        parcelset::decode_parcels(*pp_, std::move(buffer), num_thread);
+        decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
         LOG_DEVEL_MSG("parcel decode called for complete NORMAL parcel");
 
         memory_pool_->deallocate(header_region_);
@@ -248,6 +256,7 @@ namespace libfabric
         if (message_region_)
         {
             message = static_cast<char *>(message_region_->get_address());
+            HPX_ASSERT(message);
             HPX_ASSERT(message_region_->get_message_length() == header_->size());
             LOG_DEBUG_MSG("No piggy_back message, RDMA GET : "
                 << hexpointer(message_region_)
@@ -255,6 +264,7 @@ namespace libfabric
         }
         else
         {
+            HPX_ASSERT(header_->piggy_back());
             message = header_->piggy_back();
         }
 
@@ -280,7 +290,8 @@ namespace libfabric
         //buffer.data_.resize(static_cast<std::size_t>(header_->size()));
         buffer.data_size_ = header_->size();
 //         buffer.chunks_.resize(chunks_.size());
-        decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_);
+        std::size_t num_thread = hpx::get_worker_thread_num();
+        decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
         LOG_DEVEL_MSG("parcel decode called for ZEROCOPY complete parcel");
 
         for (auto region: rma_regions_)
