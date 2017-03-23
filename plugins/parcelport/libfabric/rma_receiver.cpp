@@ -212,7 +212,6 @@ namespace libfabric
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
 
         LOG_DEVEL_MSG("handle piggy backed sends without zero copy regions");
-//         send_ack();
 
         HPX_ASSERT(header_);
         char *piggy_back = header_->piggy_back();
@@ -244,19 +243,18 @@ namespace libfabric
         HPX_ASSERT(rma_count_ == 0);
 
 
-        std::size_t message_length = 0;
+        std::size_t message_length = header_->size();
         char *message = nullptr;
         if (message_region_)
         {
             message = static_cast<char *>(message_region_->get_address());
-            message_length = message_region_->get_message_length();
+            HPX_ASSERT(message_region_->get_message_length() == header_->size());
             LOG_DEBUG_MSG("No piggy_back message, RDMA GET : "
                 << hexpointer(message_region_)
                 << " length " << decnumber(message_length));
         }
         else
         {
-            message_length = header_->size();
             message = header_->piggy_back();
         }
 
@@ -280,8 +278,8 @@ namespace libfabric
 
         buffer.num_chunks_ = header_->num_chunks();
         //buffer.data_.resize(static_cast<std::size_t>(header_->size()));
-        //buffer.data_size_ = header_->size();
-        buffer.chunks_.resize(chunks_.size());
+        buffer.data_size_ = header_->size();
+//         buffer.chunks_.resize(chunks_.size());
         decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_);
         LOG_DEVEL_MSG("parcel decode called for ZEROCOPY complete parcel");
 

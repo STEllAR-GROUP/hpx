@@ -266,7 +266,6 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
         FUNC_END_DEBUG_MSG;
         // @TODO : check which of these are obsolete after recent changes
         return
-        "zero_copy_optimization = 1\n"
         "provider = ${HPX_PARCELPORT_LIBFABRIC_PROVIDER:"
                 HPX_PARCELPORT_LIBFABRIC_PROVIDER "}\n"
         "domain = ${HPX_PARCELPORT_LIBFABRIC_DOMAIN:"

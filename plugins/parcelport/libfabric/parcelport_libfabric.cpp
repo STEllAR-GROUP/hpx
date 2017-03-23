@@ -167,19 +167,7 @@ namespace libfabric
                     chunk_pool_);
             snd->postprocess_handler_ = [this](sender* s)
                 {
-                    parcelset::locality dest;
-                    parcel p;
-                    write_handler_type f;
-                    if (dequeue_parcel(dest, p, f))
-                    {
-                        const locality &fabric_locality = dest.get<locality>();
-                        std::uint64_t addr = libfabric_controller_->get_fabric_address(fabric_locality);
-                        send_immediate_impl<parcelport>(*this, s, addr, std::move(f), std::move(p));
-                    }
-                    else
-                    {
-                        senders_.push(s);
-                    }
+                    senders_.push(s);
                 };
            senders_.push(snd);
         }

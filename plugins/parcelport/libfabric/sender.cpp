@@ -51,19 +51,21 @@ namespace libfabric
                 // if the data chunk fits into a memory block, copy it
                 LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
                 libfabric_memory_region *zero_copy_region;
-                if (c.size_<=HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD) {
-                    zero_copy_region = memory_pool_->allocate_region((std::max)
-                      (c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
-                    char *zero_copy_memory =
-                        (char*)(zero_copy_region->get_address());
-                    std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
-                    // the pointer in the chunk info must be changed
-                    buffer_.chunks_[index] = serialization::create_pointer_chunk(
-                        zero_copy_memory, c.size_);
-                    LOG_DEBUG_MSG("Time to copy memory (ns) "
-                        << decnumber(regtimer.elapsed_nanoseconds()));
-                }
-                else {
+//                 if (c.size_<=HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD)
+//                 {
+//                     zero_copy_region = memory_pool_->allocate_region((std::max)
+//                       (c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
+//                     char *zero_copy_memory =
+//                         (char*)(zero_copy_region->get_address());
+//                     std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
+//                     // the pointer in the chunk info must be changed
+//                     buffer_.chunks_[index] = serialization::create_pointer_chunk(
+//                         zero_copy_memory, c.size_);
+//                     LOG_DEBUG_MSG("Time to copy memory (ns) "
+//                         << decnumber(regtimer.elapsed_nanoseconds()));
+//                 }
+//                 else
+                {
                     // create a memory region from the pointer
                     zero_copy_region = new libfabric_memory_region(
                             domain_, c.data_.cpos_, (std::max)(c.size_,

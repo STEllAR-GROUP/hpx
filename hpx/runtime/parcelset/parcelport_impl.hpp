@@ -339,22 +339,7 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            if (!connection_handler_traits<ConnectionHandler>::
-                    send_immediate_parcels::value)
-            {
-                trigger_pending_work();
-            }
-            else
-            {
-                parcelset::locality dest;
-                parcel p;
-                write_handler_type f;
-                if (dequeue_parcel(dest, p, f))
-                {
-                    send_immediate_impl<ConnectionHandler>(
-                        *this, dest, std::move(f), std::move(p));
-                }
-            }
+            trigger_pending_work();
             return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
@@ -547,19 +532,23 @@ namespace hpx { namespace parcelset
             void
         >::type
         send_immediate_impl(
-            parcelport_impl &this_, locality &dest_, write_handler_type &&f_, parcel&& p)
+            parcelport_impl &this_, locality const&dest_, write_handler_type &&f_, parcel&& p)
         {
             std::uint64_t addr;
             error_code ec;
-            connection *sender = this_.connection_handler().get_connection(dest_, addr);
+            // First try to get a connection ...
+            connection *sender = nullptr;
 
-            // First try to get a connection, spin for a while...
-            for (std::size_t k = 0; sender == nullptr; ++k)
+            std::size_t k = 0;
+            while (true)
             {
-                hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
                 sender = this_.connection_handler().get_connection(dest_, addr);
+                if (sender != nullptr)
+                    break;
                 if (k == 4096)
                     break;
+                hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
+                ++k;
             }
 
             // If we couldn't get one ... enqueue the parcel and move on
@@ -569,20 +558,6 @@ namespace hpx { namespace parcelset
                 return;
             }
 
-            send_immediate_impl<ConnectionHandler_>(this_, sender, addr, std::move(f_), std::move(p));
-        }
-
-
-        template <typename ConnectionHandler_>
-        typename std::enable_if<
-            connection_handler_traits<
-                ConnectionHandler_
-            >::send_immediate_parcels::value,
-            void
-        >::type
-        send_immediate_impl(
-            parcelport_impl &this_, connection* sender, std::uint64_t addr, write_handler_type &&f_, parcel&& p)
-        {
             auto encoded_buffer = sender->get_new_buffer();
             // encode the parcels
             std::size_t num_parcels = encode_parcels(this_, &p, 1,
@@ -610,20 +585,7 @@ namespace hpx { namespace parcelset
             void
         >::type
         send_immediate_impl(
-            parcelport_impl &this_, locality &dest_, write_handler_type &&f_, parcel&& p)
-        {
-            HPX_ASSERT(false);
-        }
-
-        template <typename ConnectionHandler_>
-        typename std::enable_if<
-            !connection_handler_traits<
-                ConnectionHandler_
-            >::send_immediate_parcels::value,
-            void
-        >::type
-        send_immediate_impl(
-            parcelport_impl &this_, connection* sender, std::uint64_t addr, write_handler_type &&f_, parcel&& p)
+            parcelport_impl &this_, locality const&dest_, write_handler_type &&f_, parcel&& p)
         {
             HPX_ASSERT(false);
         }
@@ -877,6 +839,17 @@ namespace hpx { namespace parcelset
 
             if(!dequeue_parcels(locality_id, parcels, handlers))
             {
+                return;
+            }
+
+            if (connection_handler_traits<ConnectionHandler>::
+                    send_immediate_parcels::value)
+            {
+                for (std::size_t i = 0; i < parcels.size(); ++i)
+                {
+                    this->send_immediate_impl<ConnectionHandler>(
+                        *this, locality_id, std::move(handlers[i]), std::move(parcels[i]));
+                }
                 return;
             }
 
