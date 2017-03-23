@@ -138,7 +138,6 @@ namespace libfabric
         else {
             LOG_DEBUG_MSG("Main message NOT piggybacked ");
 
-            header_->set_message_rdma_size(header_->size());
             header_->set_message_rdma_key(message_region_->get_remote_key());
             header_->set_message_rdma_addr(message_region_->get_address());
 //             std::cout << "sending message to " << header_->get_message_rdma_addr() << " " << header_->get_message_rdma_key() << "\n";

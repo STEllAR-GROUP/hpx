@@ -74,7 +74,6 @@ namespace libfabric
         rdma_memory_pool* memory_pool_;
         fi_addr_t src_addr_;
         completion_handler handler_;
-    public:
         hpx::util::atomic_count rma_count_;
     };
 }}}}

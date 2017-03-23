@@ -545,18 +545,18 @@ namespace hpx { namespace parcelset
                 sender = this_.connection_handler().get_connection(dest_, addr);
                 if (sender != nullptr)
                     break;
-                if (k == 4096)
-                    break;
+//                 if (k == 4096)
+//                     break;
                 hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
                 ++k;
             }
 
             // If we couldn't get one ... enqueue the parcel and move on
-            if (sender == nullptr)
-            {
-                enqueue_parcel(dest_, std::move(p), std::move(f_));
-                return;
-            }
+//             if (sender == nullptr)
+//             {
+//                 enqueue_parcel(dest_, std::move(p), std::move(f_));
+//                 return;
+//             }
 
             auto encoded_buffer = sender->get_new_buffer();
             // encode the parcels

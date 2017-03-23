@@ -102,7 +102,6 @@ namespace libfabric
         {
             HPX_ASSERT(rma_count_ == 0);
             handle_non_rma();
-            handler_(this);
             return;
         }
 
@@ -115,6 +114,7 @@ namespace libfabric
 
         size_t chunkbytes =
             chunks_.size() * sizeof(chunk_struct);
+        HPX_ASSERT(chunkbytes == header_->message_header.message_offset);
 
         std::memcpy(chunks_.data(), chunk_data, chunkbytes);
         LOG_DEBUG_MSG("Copied chunk data from header : size "
@@ -170,12 +170,23 @@ namespace libfabric
                     << " remote pos " << hexpointer(remoteAddr)
                     << " index " << decnumber(c.data_.index_));
 
-                ssize_t ret = fi_read(endpoint_,
-                    get_region->get_address(), c.size_, get_region->get_desc(),
-                    src_addr_,
-                    (uint64_t)(remoteAddr), c.rkey_, this);
-
-                if (ret) throw fabric_error(ret, "fi_read error");
+                ssize_t ret = 0;
+                for (std::size_t k = 0; true; ++k)
+                {
+                    ret = fi_read(endpoint_,
+                        get_region->get_address(), c.size_, get_region->get_desc(),
+                        src_addr_,
+                        (uint64_t)(remoteAddr), c.rkey_, this);
+                    if (ret == -FI_EAGAIN)
+                    {
+                        LOG_DEVEL_MSG("reposting read...\n");
+                        hpx::util::detail::yield_k(k,
+                            "libfabric::rma_receiver::async_read");
+                        continue;
+                    }
+                    if (ret) throw fabric_error(ret, "fi_read");
+                    break;
+                }
             }
             ++index;
         }
@@ -185,8 +196,7 @@ namespace libfabric
         // If the main message was not piggy backed
         if (!header_->piggy_back())
         {
-            std::size_t size = header_->get_message_rdma_size();
-            HPX_ASSERT(size == header_->size());
+            std::size_t size = header_->size();
             message_region_ = memory_pool_->allocate_region(size);
             message_region_->set_message_length(size);
 
@@ -199,15 +209,24 @@ namespace libfabric
                 << " size " << hexnumber(size)
             );
 
-//             std::cout << "reading message from " << header_->get_message_rdma_addr() << " " << header_->get_message_rdma_key() << "\n";
-
-            ssize_t ret = fi_read(endpoint_,
-                message_region_->get_address(), size, message_region_->get_desc(),
-                src_addr_,
-                (uint64_t)header_->get_message_rdma_addr(),
-                header_->get_message_rdma_key(), this);
-
-            if (ret) throw fabric_error(ret, "fi_read error");
+            ssize_t ret = 0;
+            for (std::size_t k = 0; true; ++k)
+            {
+                ret = fi_read(endpoint_,
+                    message_region_->get_address(), size, message_region_->get_desc(),
+                    src_addr_,
+                    (uint64_t)header_->get_message_rdma_addr(),
+                    header_->get_message_rdma_key(), this);
+                if (ret == -FI_EAGAIN)
+                {
+                    LOG_DEVEL_MSG("reposting read...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::rma_receiver::async_read");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_read");
+                break;
+            }
         }
     }
 
@@ -215,38 +234,40 @@ namespace libfabric
     {
         typedef pinned_memory_vector<char, header_size> rcv_data_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
-//         send_ack();
 
         LOG_DEVEL_MSG("handle piggy backed sends without zero copy regions");
 
         HPX_ASSERT(header_);
         char *piggy_back = header_->piggy_back();
         HPX_ASSERT(piggy_back);
-        rcv_data_type wrapped_pointer(piggy_back, header_->size(), [](){},
-                memory_pool_, nullptr);
+        rcv_data_type wrapped_pointer(piggy_back, header_->size(),
+            [this]()
+            {
+                memory_pool_->deallocate(header_region_);
+                header_region_ = nullptr;
+                chunks_.clear();
+                handler_(this);
+            },
+            nullptr, nullptr);
 
-        rcv_buffer_type buffer(std::move(wrapped_pointer), memory_pool_);
+        rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
         buffer.num_chunks_ = header_->num_chunks();
         buffer.data_size_ = header_->size();
         LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
         decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
         LOG_DEVEL_MSG("parcel decode called for complete NORMAL parcel");
-
-        memory_pool_->deallocate(header_region_);
-        header_region_ = nullptr;
-        chunks_.clear();
     }
 
     void rma_receiver::handle_read_completion()
     {
+        HPX_ASSERT(rma_count_ >= 0);
         // If we haven't read all chunks, we can return and wait
         // for the other incoming read completions
         if (--rma_count_ > 0)
         {
             return;
         }
-        send_ack();
 
         HPX_ASSERT(rma_count_ == 0);
 
@@ -272,8 +293,24 @@ namespace libfabric
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
 
         rcv_data_type wrapped_pointer(message, message_length,
-            [](){}, memory_pool_, nullptr);
-        rcv_buffer_type buffer(std::move(wrapped_pointer), memory_pool_);
+            [this]()
+            {
+                send_ack();
+                for (auto region: rma_regions_)
+                    memory_pool_->deallocate(region);
+                rma_regions_.clear();
+                chunks_.clear();
+
+                memory_pool_->deallocate(header_region_);
+                header_region_ = nullptr;
+                if (message_region_)
+                {
+                    memory_pool_->deallocate(message_region_);
+                    message_region_ = nullptr;
+                }
+                handler_(this);
+            }, nullptr, nullptr);
+        rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
         LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
 
         LOG_EXCLUSIVE(
@@ -293,20 +330,6 @@ namespace libfabric
         std::size_t num_thread = hpx::get_worker_thread_num();
         decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
         LOG_DEVEL_MSG("parcel decode called for ZEROCOPY complete parcel");
-
-        for (auto region: rma_regions_)
-            memory_pool_->deallocate(region);
-        rma_regions_.clear();
-        chunks_.clear();
-
-        memory_pool_->deallocate(header_region_);
-        header_region_ = nullptr;
-        if (message_region_)
-        {
-            memory_pool_->deallocate(message_region_);
-            message_region_ = nullptr;
-        }
-        handler_(this);
     }
 
     void rma_receiver::send_ack()
