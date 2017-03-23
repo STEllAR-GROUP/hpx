@@ -16,7 +16,7 @@
 
 #include <Vc/global.h>
 
-#if Vc_IS_VERSION_1
+#if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
 
 #include <Vc/Vc>
 
