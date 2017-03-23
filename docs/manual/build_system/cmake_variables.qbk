@@ -187,6 +187,7 @@ The options are split into these categories:
 ] [/ AGAS Options]
 
 [#build_system.cmake_variables.Parcelport][h3 Parcelport Options]
+* [link build_system.cmake_variables.HPX_WITH_NETWORKING HPX_WITH_NETWORKING]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_ACTION_COUNTERS HPX_WITH_PARCELPORT_ACTION_COUNTERS]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI HPX_WITH_PARCELPORT_MPI]
 * [link build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_ENV HPX_WITH_PARCELPORT_MPI_ENV]
@@ -196,6 +197,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_PARCEL_PROFILING HPX_WITH_PARCEL_PROFILING]
 
 [variablelist
+        [[[#build_system.cmake_variables.HPX_WITH_NETWORKING] `HPX_WITH_NETWORKING:BOOL`][Enable support for networking and multi-node runs (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_ACTION_COUNTERS] `HPX_WITH_PARCELPORT_ACTION_COUNTERS:BOOL`][Enable performance counters reporting parcelport statistics on a per-action basis.]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI] `HPX_WITH_PARCELPORT_MPI:BOOL`][Enable the MPI based parcelport.]]
         [[[#build_system.cmake_variables.HPX_WITH_PARCELPORT_MPI_ENV] `HPX_WITH_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE).]]
