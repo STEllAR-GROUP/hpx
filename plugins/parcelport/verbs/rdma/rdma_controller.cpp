@@ -3,8 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/parcelport_defines.hpp>
-//
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/config/parcelport_verbs_defines.hpp>
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
@@ -770,3 +772,5 @@ bool rdma_controller::active()
     }
     return false;
 }
+
+#endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -156,22 +156,6 @@ namespace hpx { namespace parcelset
     {
         return parcels_received_.total_serialization_time(reset);
     }
-
-#if defined(HPX_HAVE_SECURITY)
-    // the total time it took for all sender-side security operations
-    // (nanoseconds)
-    std::int64_t parcelport::get_sending_security_time(bool reset)
-    {
-        return parcels_sent_.total_security_time(reset);
-    }
-
-    // the total time it took for all receiver-side security
-    // operations (nanoseconds)
-    std::int64_t parcelport::get_receiving_security_time(bool reset)
-    {
-        return parcels_received_.total_security_time(reset);
-    }
-#endif
 
     // total data sent (bytes)
     std::int64_t parcelport::get_data_sent(bool reset)

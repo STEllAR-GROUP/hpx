@@ -114,12 +114,6 @@ namespace hpx { namespace actions
             parcelset::parcelhandler* ph, parcelset::locality const& loc,
             parcelset::parcel const& p) const = 0;
 
-#if defined(HPX_HAVE_SECURITY)
-        /// Return the set of capabilities required to invoke this action
-        virtual components::security::capability get_required_capabilities(
-            naming::address_type lva) const = 0;
-#endif
-
         virtual void load(serialization::input_archive& ar) = 0;
         virtual void save(serialization::output_archive& ar) = 0;
 

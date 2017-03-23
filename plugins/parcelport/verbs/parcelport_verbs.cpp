@@ -5,6 +5,8 @@
 
 // config
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 // util
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -1733,3 +1735,4 @@ HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::verbs::parcelport, verbs);
                 << decnumber(sends_posted+handled_receives+total_reads));
 */
 
+#endif

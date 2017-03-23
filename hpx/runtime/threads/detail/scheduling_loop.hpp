@@ -491,7 +491,7 @@ namespace hpx { namespace threads { namespace detail
 
 #if defined(HPX_HAVE_APEX)
                                 util::apex_wrapper apex_profiler(
-                                    thrd->get_description());
+                                    thrd->get_description(), (uint64_t)thrd);
 
                                 thrd_stat = (*thrd)();
 

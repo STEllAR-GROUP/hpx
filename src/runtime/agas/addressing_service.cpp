@@ -148,16 +148,21 @@ addressing_service::addressing_service(
 { // {{{
     LPROGRESS_;
 
-    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
-
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
+#if defined(HPX_HAVE_NETWORKING)
+    std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    create_big_boot_barrier(pp ? pp.get() : nullptr, ph.endpoints(), ini_);
     if (service_type == service_mode_bootstrap)
     {
         launch_bootstrap(pp, ph.endpoints(), ini_);
     }
+#else
+    create_big_boot_barrier(nullptr, ph.endpoints(), ini_);
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    launch_bootstrap(nullptr, ph.endpoints(), ini_);
+#endif
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
@@ -166,6 +171,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
 
+#if defined(HPX_HAVE_NETWORKING)
     // now, boot the parcel port
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
     if(pp)
@@ -182,6 +188,10 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
             pp->get_locality_name(),
             primary_ns_.ptr(), symbol_ns_.ptr());
     }
+#else
+    HPX_ASSERT(service_type == service_mode_bootstrap);
+    get_big_boot_barrier().wait_bootstrap();
+#endif
 
     set_status(state_running);
 } // }}}
@@ -210,7 +220,7 @@ void addressing_service::launch_bootstrap(
     // store number of cores used by other processes
     std::uint32_t cores_needed = rt.assign_cores();
     std::uint32_t first_used_core = rt.assign_cores(
-        pp ? pp->get_locality_name() : "", cores_needed);
+        pp ? pp->get_locality_name() : "<console>", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
@@ -359,18 +369,29 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
 { // {{{
     std::unique_lock<mutex_type> l(resolved_localities_mtx_);
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
-    if (it == resolved_localities_.end())
+    if (it == resolved_localities_.end() || it->second.empty())
     {
         // The locality hasn't been requested to be resolved yet. Do it now.
         parcelset::endpoints_type endpoints;
         {
             hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             endpoints = locality_ns_->resolve_locality(gid);
+            if (endpoints.empty())
+            {
+                std::stringstream strm;
+                strm << "couldn't resolve the given target locality ("
+                     << gid << ")";
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "addressing_service::resolve_locality",
+                    strm.str());
+
+                static parcelset::endpoints_type empty_endpoints;
+                return empty_endpoints;
+            }
         }
 
         // Search again ... might have been added by a different thread already
         it = resolved_localities_.find(gid);
-
         if (it == resolved_localities_.end())
         {
             if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
@@ -388,6 +409,10 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                     "due to a locking error or memory corruption");
                 return resolved_localities_[naming::invalid_gid];
             }
+        }
+        else if (it->second.empty() && !endpoints.empty())
+        {
+            resolved_localities_[gid] = endpoints;
         }
     }
     return it->second;

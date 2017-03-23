@@ -1138,7 +1138,6 @@ namespace hpx { namespace components { namespace server
 
             // Drop the locality from the partition table.
             naming::gid_type here = agas_client.get_local_locality();
-            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1146,6 +1145,11 @@ namespace hpx { namespace components { namespace server
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
+
+            agas_client.unregister_locality(here, ec);
+
+            if (remove_from_remote_caches)
+                remove_here_from_console_connection_cache();
 
             if (respond_to) {
                 // respond synchronously
@@ -1416,12 +1420,36 @@ namespace hpx { namespace components { namespace server
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
+            // console is handled separately
+            if (naming::get_locality_id_from_id(id) == 0)
+                continue;
+
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+    }
+
+    void runtime_support::remove_here_from_console_connection_cache()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+            return;
+
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
+        action_type act;
+        indirect_packaged_task ipt;
+        future<void> callback = ipt.get_future();
+
+        // handle console separately
+        id_type id = naming::get_id_from_locality_id(0);
+        apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+
+        callback.wait();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -2416,51 +2444,6 @@ namespace hpx { namespace components { namespace server
 
         modules_.insert(std::make_pair(HPX_MANGLE_STRING(plugin), d));
         return true;    // plugin got loaded
-    }
-#endif
-
-#if defined(HPX_HAVE_SECURITY)
-    components::security::capability
-        runtime_support::get_factory_capabilities(components::component_type type)
-    {
-        components::security::capability caps;
-
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (component type not found in map)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        if (!(*it).second.first) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (map entry is nullptr)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        std::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_guard<std::unique_lock<component_map_mutex_type> > ul(l);
-            caps = factory->get_required_capabilities();
-        }
-        return caps;
     }
 #endif
 }}}

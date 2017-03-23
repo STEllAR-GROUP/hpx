@@ -126,14 +126,13 @@ endif()
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
-  ${DEFAULT_MALLOC} ADVANCED)
+  ${DEFAULT_MALLOC}
+  STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
 
 hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
-
-hpx_option(HPX_WITH_SECURITY BOOL "Enable security support via libsodium." OFF)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -233,8 +232,8 @@ if(APPLE OR WIN32)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
-  "Build and link HPX libraries and executables with full RPATHs (default: ON)"
-  OFF ADVANCED)
+  "Build and link HPX libraries and executables with full RPATHs (default: ${HPX_FULL_RPATH_DEFAULT})"
+  ${HPX_FULL_RPATH_DEFAULT} ADVANCED)
 
 ################################################################################
 # HPX Compute configuration
@@ -248,6 +247,9 @@ if(HPX_WITH_CUDA)
   set(HPX_WITH_COMPUTE On)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
+else()
+  set(HPX_TLL_PUBLIC "PUBLIC")      # keywords for target_link_libraries
+  set(HPX_TLL_PRIVATE "PRIVATE")
 endif()
 if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
@@ -260,28 +262,26 @@ hpx_option(HPX_WITH_SYCL BOOL
 ################################################################################
 # HPX datapar configuration
 ################################################################################
-hpx_option(HPX_WITH_DATAPAR_LIBFLATARRAY BOOL
-  "Enable data parallel algorithm support using the external LibFlatArray (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_DATAPAR_VC BOOL
   "Enable data parallel algorithm support using the external Vc library (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_DATAPAR_VC)
+  hpx_option(HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
+    "Don't link with the Vc static library (default: OFF)" OFF ADVANCED)
+endif()
 hpx_option(HPX_WITH_DATAPAR_BOOST_SIMD BOOL
   "Enable data parallel algorithm support using the external Boost.SIMD library (default: OFF)" OFF ADVANCED)
-if((HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD) OR
-   (HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY) OR
-   (HPX_WITH_DATAPAR_BOOST_SIMD AND HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY))
-  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC, HPX_WITH_DATAPAR_BOOST_SIMD, OR HPX_WITH_DATAPAR_BOOST_LIBFLATARRAY)")
+
+if(HPX_WITH_DATAPAR_VC AND HPX_WITH_DATAPAR_BOOST_SIMD)
+  hpx_error("Please select only one of the supported external vectorization libraries (HPX_WITH_DATAPAR_VC or HPX_WITH_DATAPAR_BOOST_SIMD)")
 endif()
 
-if(HPX_WITH_DATAPAR_LIBFLATARRAY)
-  include(HPX_SetupLibFlatArray)
-endif()
 if(HPX_WITH_DATAPAR_VC)
   include(HPX_SetupVc)
 endif()
 if(HPX_WITH_DATAPAR_BOOST_SIMD)
   include(HPX_SetupBoostSIMD)
 endif()
-if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD) AND (NOT HPX_WITH_DATAPAR_LIBFLATARRAY))
+if((NOT HPX_WITH_DATAPAR_VC) AND (NOT HPX_WITH_DATAPAR_BOOST_SIMD))
   hpx_info("No vectorization library configured")
 else()
   set(HPX_WITH_DATAPAR ON)
@@ -564,47 +564,55 @@ if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
-## Parcelport related build options
-set(_parcel_profiling_default OFF)
-if(HPX_WITH_APEX)
-  set(_parcel_profiling_default ON)
-endif()
-
-hpx_option(HPX_WITH_PARCEL_PROFILING BOOL
-  "Enable profiling data for parcels"
-  ${_parcel_profiling_default} CATEGORY "Parcelport" ADVANCED)
-
-if(HPX_WITH_PARCEL_PROFILING)
-  hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
-endif()
-
-## Parcelport related build options
-hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
-  "Enable the libfabric based parcelport. This is currently an experimental feature"
-  OFF CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
-  "Enable the ibverbs based parcelport. This is currently an experimental feature"
-  OFF CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
-  "Enable the MPI based parcelport."
-  OFF CATEGORY "Parcelport")
-hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
-  "Enable the TCP based parcelport."
+# Should networking be supported?
+hpx_option(HPX_WITH_NETWORKING BOOL
+  "Enable support for networking and multi-node runs (default: ON)"
   ON CATEGORY "Parcelport")
-hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
-  "Enable performance counters reporting parcelport statistics on a per-action basis."
-  OFF CATEGORY "Parcelport")
-if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-endif()
+if(HPX_WITH_NETWORKING)
+  hpx_add_config_define(HPX_HAVE_NETWORKING)
 
-## mpi parcelport settings
-hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
-  "Turn on MPI multithreading support (default: ON)."
-  ON CATEGORY "Parcelport" ADVANCED)
+  ## Parcelport related build options
+  set(_parcel_profiling_default OFF)
+  if(HPX_WITH_APEX)
+    set(_parcel_profiling_default ON)
+  endif()
+
+  hpx_option(HPX_WITH_PARCEL_PROFILING BOOL
+    "Enable profiling data for parcels"
+    ${_parcel_profiling_default} CATEGORY "Parcelport" ADVANCED)
+
+  if(HPX_WITH_PARCEL_PROFILING)
+    hpx_add_config_define(HPX_HAVE_PARCEL_PROFILING)
+  endif()
+
+  ## Parcelport related build options
+  hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
+    "Enable the libfabric based parcelport. This is currently an experimental feature"
+    OFF CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
+    "Enable the ibverbs based parcelport. This is currently an experimental feature"
+    OFF CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_WITH_PARCELPORT_MPI BOOL
+    "Enable the MPI based parcelport."
+    OFF CATEGORY "Parcelport")
+  hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
+    "Enable the TCP based parcelport."
+    ON CATEGORY "Parcelport")
+  hpx_option(HPX_WITH_PARCELPORT_ACTION_COUNTERS BOOL
+    "Enable performance counters reporting parcelport statistics on a per-action basis."
+    OFF CATEGORY "Parcelport")
+  if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+  endif()
+
+  ## mpi parcelport settings
+  hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
+    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
+    "Turn on MPI multithreading support (default: ON)."
+    ON CATEGORY "Parcelport" ADVANCED)
+endif()
 
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
@@ -612,9 +620,7 @@ hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
-  if(OPENMP_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_OPENMP)
-  else()
+  if(NOT OPENMP_FOUND)
     set(HPX_WITH_EXAMPLES_OPENMP OFF)
   endif()
 endif()
@@ -623,9 +629,7 @@ hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
-  if(TBB_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_TBB)
-  else()
+  if(NOT TBB_FOUND)
     set(HPX_WITH_EXAMPLES_TBB OFF)
   endif()
 endif()
@@ -634,9 +638,7 @@ hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
-  if(QTHREADS_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_QTHREADS)
-  else()
+  if(NOT QTHREADS_FOUND)
     set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
@@ -645,9 +647,7 @@ hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   CATEGORY "Tools" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
-  if(HDF5_FOUND)
-    hpx_add_config_define(HPX_HAVE_EXAMPLES_HDF5)
-  else()
+  if(NOT HDF5_FOUND)
     set(HPX_WITH_EXAMPLES_HDF5 OFF)
   endif()
 endif()
@@ -659,9 +659,7 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     CATEGORY "Tools" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
-    if(QT4_FOUND)
-      hpx_add_config_define(HPX_HAVE_EXAMPLES_QT4)
-    else()
+    if(NOT QT4_FOUND)
       set(HPX_WITH_EXAMPLES_QT4 OFF)
     endif()
   endif()
@@ -744,19 +742,21 @@ if(HPX_WITH_RUN_MAIN_EVERYWHERE)
   hpx_add_config_define(HPX_HAVE_RUN_MAIN_EVERYWHERE)
 endif()
 
-# Options for our plugins
-hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL
-  "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL
-  "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL
-  "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_WITH_NETWORKING)
+  # Options for our plugins
+  hpx_option(HPX_WITH_COMPRESSION_BZIP2 BOOL
+    "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+  hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL
+    "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
+  hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL
+    "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
 
-# Parcel coalescing is used by the main HPX library, enable it always
-hpx_option(HPX_WITH_PARCEL_COALESCING BOOL
-  "Enable the parcel coalescing plugin (default: ON)." ON ADVANCED)
-if(HPX_WITH_PARCEL_COALESCING)
-  hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+  # Parcel coalescing is used by the main HPX library, enable it always
+  hpx_option(HPX_WITH_PARCEL_COALESCING BOOL
+    "Enable the parcel coalescing plugin (default: ON)." ON ADVANCED)
+  if(HPX_WITH_PARCEL_COALESCING)
+    hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+  endif()
 endif()
 
 ################################################################################
@@ -995,7 +995,6 @@ if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
   endif()
   set(CUDA_SEPARABLE_COMPILATION ON)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=sm_30)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=sm_35)
   set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=compute_30)
@@ -1366,7 +1365,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v1.0
+    v1.1
     ${_hpx_apex_no_update}
     VERBOSE)
 
@@ -1425,27 +1424,6 @@ if(HPX_WITH_VALGRIND)
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
-
-################################################################################
-# Security, libsodium: P(ortable|ackageable) NaCl
-################################################################################
-if(HPX_WITH_SECURITY)
-  find_package(Sodium)
-  if(NOT SODIUM_FOUND)
-    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
-  endif()
-  hpx_add_config_define(HPX_HAVE_SODIUM)
-
-  include_directories(${SODIUM_INCLUDE_DIR})
-
-  if(MSVC)
-    hpx_add_config_define(SODIUM_STATIC)
-  endif()
-  hpx_libraries(${SODIUM_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_SECURITY)
-endif()
-################################################################################
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors

@@ -7,7 +7,7 @@
 #define HPX_THREADS_POLICIES_TOPOLGY_NOV_25_2012_1036AM
 
 #if defined(HPX_HAVE_HWLOC)
-#  include <hpx/runtime/threads/policies/hwloc_topology.hpp>
+#  include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 #else
 #  include <hpx/runtime/threads/policies/noop_topology.hpp>
 #endif

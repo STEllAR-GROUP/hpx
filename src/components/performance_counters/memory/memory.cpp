@@ -1,5 +1,5 @@
 //  Copyright (c) 2012 Vinay C Amatya
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +34,8 @@ namespace hpx { namespace performance_counters { namespace memory
             "returns the amount of resident memory currently allocated by the "
             "referenced locality", "bytes"
         );
-#if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__)
+#if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__) \
+ || defined(HPX_WINDOWS)
         // this counter is currently supported on Linux only
         pc::install_counter_type(
             "/runtime/memory/total", &read_total_mem_avail,
