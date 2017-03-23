@@ -11,8 +11,14 @@ if(HPX_WITH_CUDA)
       cublas_matmul
       data_copy
       hello_compute
-      partitioned_vector
     )
+
+# Append example programs that only compiles with Cuda Clang
+  if(HPX_WITH_CUDA_CLANG)
+    list(APPEND example_programs
+         partitioned_vector
+        )
+  endif()
 
   include_directories(${CUDA_INCLUDE_DIRS})
 
