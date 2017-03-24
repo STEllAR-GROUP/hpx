@@ -63,8 +63,10 @@ function(write_config_defines_file)
       HPX_CONFIG_DEFINITIONS_${OPTION_NAMESPACE})
   endif()
 
-  list(SORT DEFINITIONS_VAR)
-  list(REMOVE_DUPLICATES DEFINITIONS_VAR)
+  if(DEFINED DEFINITIONS_VAR)
+    list(SORT DEFINITIONS_VAR)
+    list(REMOVE_DUPLICATES DEFINITIONS_VAR)
+  endif()
 
   set(hpx_config_defines "\n")
   foreach(def ${DEFINITIONS_VAR})
