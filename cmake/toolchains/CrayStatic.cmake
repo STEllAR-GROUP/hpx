@@ -1,15 +1,8 @@
-# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2014-2017 Thomas Heller
+# Copyright (c) 2017      Bryce Adelstein Lelbach 
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#
-# This is the default toolchain file to be used with Intel Xeon PHIs. It sets
-# the appropriate compile flags and compiler such that HPX will compile.
-# Note that you still need to provide Boost, hwloc and other utility libraries
-# like a custom allocator yourself.
-#
-
-#set(CMAKE_SYSTEM_NAME Cray-CNK-Intel)
 
 set(HPX_WITH_STATIC_LINKING ON CACHE BOOL "")
 set(HPX_WITH_STATIC_EXE_LINKING ON CACHE BOOL "")
@@ -40,8 +33,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
-set(HPX_WITH_PARCELPORT_MPI OFF CACHE BOOL "")
-set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED OFF CACHE BOOL "")
+
+set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
+set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED ON CACHE BOOL "")
 
 set(HPX_WITH_PARCELPORT_LIBFABRIC ON CACHE BOOL "")
 set(HPX_PARCELPORT_LIBFABRIC_PROVIDER "gni" CACHE STRING
