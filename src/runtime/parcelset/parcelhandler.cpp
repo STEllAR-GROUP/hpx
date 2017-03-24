@@ -113,7 +113,7 @@ namespace hpx { namespace parcelset
         LPROGRESS_;
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (cfg.get_entry("hpx.parcel.enabled", "1") != "0")
+        if (cfg.get_entry("hpx.parcel.enable", "1") != "0")
         {
             for (plugins::parcelport_factory_base* factory :
                     get_parcelport_factories())
