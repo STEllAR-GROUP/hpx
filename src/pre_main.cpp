@@ -31,8 +31,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 static void garbage_collect_non_blocking()
 {
     hpx::agas::garbage_collect_non_blocking();
@@ -50,21 +48,21 @@ namespace hpx
 // Install performance counter startup functions for core subsystems.
 static void register_counter_types()
 {
-     naming::get_agas_client().register_counter_types();
-     lbt_ << "(2nd stage) pre_main: registered AGAS client-side "
-             "performance counter types";
+    naming::get_agas_client().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered AGAS client-side "
+            "performance counter types";
 
-     get_runtime().register_counter_types();
-     lbt_ << "(2nd stage) pre_main: registered runtime performance "
-             "counter types";
+    get_runtime().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered runtime performance "
+            "counter types";
 
-     threads::get_thread_manager().register_counter_types();
-     lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
-             "counter types";
+    threads::get_thread_manager().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
+            "counter types";
 
-     applier::get_applier().get_parcel_handler().register_counter_types();
-     lbt_ << "(2nd stage) pre_main: registered parcelset performance "
-             "counter types";
+    applier::get_applier().get_parcel_handler().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered parcelset performance "
+            "counter types";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,6 +77,7 @@ static void register_message_handlers()
         error_code ec(lightweight);
         rt.register_message_handler(util::get<0>(t), util::get<1>(t), ec);
     }
+    lbt_ << "(2nd stage) pre_main: registered message handlers";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -161,7 +160,6 @@ int pre_main(runtime_mode mode)
         // Register all counter types before the startup functions are being
         // executed.
         register_counter_types();
-
 
         // Second stage bootstrap synchronizes component loading across all
         // localities, ensuring that the component namespace tables are fully
