@@ -197,7 +197,7 @@ namespace hpx { namespace util
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
-            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:256}",
+            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:-1}",
 
             // connect back to the given latch if specified
             "[hpx.on_startup]",
