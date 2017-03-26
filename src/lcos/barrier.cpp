@@ -137,7 +137,7 @@ namespace hpx { namespace lcos {
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        return barrier("/hpx/global_barrier", cfg.get_num_localities());
+        return barrier("/0/hpx/global_barrier", cfg.get_num_localities());
     }
 
     barrier& barrier::get_global_barrier()
