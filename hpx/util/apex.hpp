@@ -37,32 +37,35 @@ namespace hpx { namespace util
         static std::mutex params_mutex;
 
         void set_coalescing_params() {
-            std::cout << __func__ << ": Setting params!" << std::endl;
+            std::cerr << __func__ << ": Setting params!" << std::endl;
             std::shared_ptr<apex_param_long> parcel_count_param = 
                 std::static_pointer_cast<apex_param_long>(request->get_param("parcel_count"));
             std::shared_ptr<apex_param_long> buffer_time_param = 
                 std::static_pointer_cast<apex_param_long>(request->get_param("buffer_time"));
             const int parcel_count = parcel_count_param->get_value();
             const int buffer_time = buffer_time_param->get_value();
-            std::cout << "setting parcel count: " << parcel_count << std::endl;
-            std::cout << "setting buffer time: " << buffer_time << std::endl;
+            std::cerr << "setting parcel count: " << parcel_count << std::endl;
             hpx::set_config_entry(
                 "hpx.plugins.coalescing_message_handler.num_messages",
                 parcel_count);
+            std::cerr << "setting buffer time: " << buffer_time << std::endl;
             hpx::set_config_entry(
                 "hpx.plugins.coalescing_message_handler.interval",
                 buffer_time);
-            std::cout << "done." << std::endl;
+            std::cerr << "done." << std::endl;
         }
 
         /* policy function */
         static int policy(const apex_context context) {
-            static std::atomic<bool> working(false);
-            std::unique_lock<std::mutex> l(params_mutex);
+            std::cerr << "policy" << std::endl;
+            //static std::atomic<bool> working(false);
+            //std::unique_lock<std::mutex> l(params_mutex);
             apex_profile * profile = apex::get_profile(instance->counter_name);
-            if(profile != nullptr && profile->calls >= instance->tuning_window && !working) {
-                working = true;
-                l.unlock();
+            std::cerr << "profile: " << profile << " " << std::endl;
+            if(profile != nullptr && profile->calls >= instance->tuning_window /* && !working*/) {
+                std::cerr << "profile calls: " << profile->calls << " " << std::endl;
+                //working = true;
+                //l.unlock();
                 //std::cout << __func__ << ": Got results!" << std::endl;
                 // Evaluate the results
                 apex::custom_event(instance->request->get_trigger(), NULL);
@@ -70,24 +73,24 @@ namespace hpx { namespace util
                 instance->set_coalescing_params();
                 // Reset counter so each measurement is fresh.
                 apex::reset(instance->counter_name);
-            } else if (profile != nullptr && profile->calls < instance->tuning_window && working) {
-                working = false;
-                l.unlock();
-            } else {
-                //std::cout << __func__ << ": No results." << std::endl;
-                l.unlock();
+            //} else if (profile != nullptr && profile->calls < instance->tuning_window && working) {
+            //    working = false;
+            //    l.unlock();
+            //} else {
+            //    //std::cout << __func__ << ": No results." << std::endl;
+            //    l.unlock();
             }
             return APEX_NOERROR;
         }   
 
         /* Constructor */
-        apex_parcel_coalescing_policy() : tuning_window(10),
+        apex_parcel_coalescing_policy() : tuning_window(1),
             name("HPX parcel coalescing")
         {
             std::cout << __func__ << ": Constructor!" << std::endl;
             std::stringstream ss;
             ///threads{locality#0/total}/time/average-overhead
-            ss << "/threads{locality#" << hpx::get_locality_id();
+            ss << "/counters/threads{locality#" << hpx::get_locality_id();
             ss << "/total}/time/average-overhead";
             counter_name = std::string(ss.str());
             /* Create a metric to be queried for this policy */
@@ -111,8 +114,8 @@ namespace hpx { namespace util
 
             /* register the tuning policy */
             //std::function<int(apex_context const&)> policy_fn{policy};
-            //policy_handle = apex::register_periodic_policy(500000, policy);
-            policy_handle = apex::register_policy(APEX_SEND, policy);
+            policy_handle = apex::register_periodic_policy(500000, policy);
+            //policy_handle = apex::register_policy(APEX_SEND, policy);
             if(policy_handle == nullptr) {
                 std::cerr << "Error registering policy!" << std::endl;
             }
@@ -137,7 +140,9 @@ namespace hpx { namespace util
         apex::init(nullptr, hpx::get_locality_id(),
             hpx::get_initial_num_localities());
 #ifdef HPX_HAVE_PARCEL_COALESCING
-        apex_parcel_coalescing_policy::initialize();
+        hpx::register_startup_function([&](){
+            apex_parcel_coalescing_policy::initialize();
+        });
 #endif
     }
 
