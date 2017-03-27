@@ -58,6 +58,13 @@
 #  include <signal.h>
 #endif
 
+#if defined(HPX_HAVE_PARCEL_COALESCING) && defined(HPX_HAVE_APEX)
+// declare some static variables that are needed for parcel coalescing
+hpx::util::apex_parcel_coalescing_policy *hpx::util::apex_parcel_coalescing_policy::instance = nullptr;
+std::mutex hpx::util::apex_parcel_coalescing_policy::params_mutex;
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {

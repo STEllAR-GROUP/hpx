@@ -10,18 +10,135 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/config_entry.hpp>
+#include <mutex>
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
+#include "apex_policies.hpp"
 #endif
 
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+
+#ifdef HPX_HAVE_PARCEL_COALESCING
+/* these are related to parcel coalescing policy
+ */
+    struct apex_parcel_coalescing_policy {
+        /* pointer to the policy (so we can stop it) */
+        apex_policy_handle * policy_handle;
+        /* The tuning request */
+        apex_tuning_request * request;
+        int tuning_window;
+        std::string counter_name;
+        std::string name;
+        static apex_parcel_coalescing_policy * instance;
+        static std::mutex params_mutex;
+
+        void set_coalescing_params() {
+            std::cout << __func__ << ": Setting params!" << std::endl;
+            std::shared_ptr<apex_param_long> parcel_count_param = 
+                std::static_pointer_cast<apex_param_long>(request->get_param("parcel_count"));
+            std::shared_ptr<apex_param_long> buffer_time_param = 
+                std::static_pointer_cast<apex_param_long>(request->get_param("buffer_time"));
+            const int parcel_count = parcel_count_param->get_value();
+            const int buffer_time = buffer_time_param->get_value();
+            std::cout << "setting parcel count: " << parcel_count << std::endl;
+            std::cout << "setting buffer time: " << buffer_time << std::endl;
+            hpx::set_config_entry(
+                "hpx.plugins.coalescing_message_handler.num_messages",
+                parcel_count);
+            hpx::set_config_entry(
+                "hpx.plugins.coalescing_message_handler.interval",
+                buffer_time);
+            std::cout << "done." << std::endl;
+        }
+
+        /* policy function */
+        static int policy(const apex_context context) {
+            static std::atomic<bool> working(false);
+            std::unique_lock<std::mutex> l(params_mutex);
+            apex_profile * profile = apex::get_profile(instance->counter_name);
+            if(profile != nullptr && profile->calls >= instance->tuning_window && !working) {
+                working = true;
+                l.unlock();
+                //std::cout << __func__ << ": Got results!" << std::endl;
+                // Evaluate the results
+                apex::custom_event(instance->request->get_trigger(), NULL);
+                // get new settings from the search
+                instance->set_coalescing_params();
+                // Reset counter so each measurement is fresh.
+                apex::reset(instance->counter_name);
+            } else if (profile != nullptr && profile->calls < instance->tuning_window && working) {
+                working = false;
+                l.unlock();
+            } else {
+                //std::cout << __func__ << ": No results." << std::endl;
+                l.unlock();
+            }
+            return APEX_NOERROR;
+        }   
+
+        /* Constructor */
+        apex_parcel_coalescing_policy() : tuning_window(10),
+            name("HPX parcel coalescing")
+        {
+            std::cout << __func__ << ": Constructor!" << std::endl;
+            std::stringstream ss;
+            ///threads{locality#0/total}/time/average-overhead
+            ss << "/threads{locality#" << hpx::get_locality_id();
+            ss << "/total}/time/average-overhead";
+            counter_name = std::string(ss.str());
+            /* Create a metric to be queried for this policy */
+            std::function<double(void)> metric = [=]()->double{
+                apex_profile * profile = apex::get_profile(counter_name);
+                if (profile == nullptr || profile->calls == 0) {
+                    // no data yet
+                    return 0.0;
+                }
+                double result = profile->accumulated/profile->calls;
+                return result;
+            };
+            request = new apex_tuning_request(name);
+            request->set_metric(metric);
+            request->set_strategy(apex_ah_tuning_strategy::NELDER_MEAD);
+            request->add_param_long("parcel_count", 50, 1, 256, 1);
+            request->add_param_long("buffer_time", 100, 1, 7000, 1);
+            request->set_trigger(apex::register_custom_event(name));
+            /* add the request */
+            apex::setup_custom_tuning(*request);
+
+            /* register the tuning policy */
+            //std::function<int(apex_context const&)> policy_fn{policy};
+            //policy_handle = apex::register_periodic_policy(500000, policy);
+            policy_handle = apex::register_policy(APEX_SEND, policy);
+            if(policy_handle == nullptr) {
+                std::cerr << "Error registering policy!" << std::endl;
+            }
+        }
+        static void initialize() {
+            if (instance == nullptr) {
+                instance = new apex_parcel_coalescing_policy();
+            }
+        }
+        static void finalize() {
+            std::cout << __func__ << ": Destructor!" << std::endl;
+            if (instance != nullptr) {
+                delete instance;
+                instance = nullptr;
+            }
+        }
+    };
+#endif
+
     static void hpx_util_apex_init_startup(void)
     {
         apex::init(nullptr, hpx::get_locality_id(),
             hpx::get_initial_num_localities());
+#ifdef HPX_HAVE_PARCEL_COALESCING
+        apex_parcel_coalescing_policy::initialize();
+#endif
     }
 
     inline void apex_init()
@@ -32,6 +149,9 @@ namespace hpx { namespace util
 
     inline void apex_finalize()
     {
+#ifdef HPX_HAVE_PARCEL_COALESCING
+        apex_parcel_coalescing_policy::finalize();
+#endif
         apex::finalize();
     }
 
@@ -97,9 +217,13 @@ namespace hpx { namespace util
         }
         ~apex_wrapper_init()
         {
+//#ifdef HPX_HAVE_PARCEL_COALESCING
+            apex_parcel_coalescing_policy::finalize();
+//#endif
             apex::finalize();
         }
     };
+
 #else
     inline void apex_init() {}
     inline void apex_finalize() {}
