@@ -79,33 +79,33 @@ namespace hpx { namespace util
         section& clone_from(section const& rhs, section* root = nullptr);
 
     private:
-        void add_section(std::lock_guard<mutex_type>& l,
+        void add_section(std::unique_lock<mutex_type>& l,
             std::string const& sec_name, section& sec, section* root = nullptr);
-        bool has_section(std::lock_guard<mutex_type>& l,
+        bool has_section(std::unique_lock<mutex_type>& l,
             std::string const& sec_name) const;
 
-        section* get_section (std::lock_guard<mutex_type>& l,
+        section* get_section (std::unique_lock<mutex_type>& l,
             std::string const& sec_name);
-        section const* get_section (std::lock_guard<mutex_type>& l,
+        section const* get_section (std::unique_lock<mutex_type>& l,
             std::string const& sec_name) const;
 
         ///////////////////////////////////////////////////////////////////////////
-        section* add_section_if_new(std::lock_guard<lcos::local::spinlock>& l,
+        section* add_section_if_new(std::unique_lock<lcos::local::spinlock>& l,
             std::string const& sec_name);
 
-        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+        void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,
             std::string const& key, std::string val);
-        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+        void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,
             std::string const& key, entry_type const& val);
 
-        bool has_entry(std::lock_guard<mutex_type>& l,
+        bool has_entry(std::unique_lock<mutex_type>& l,
             std::string const& key) const;
-        std::string get_entry(std::lock_guard<mutex_type>& l,
+        std::string get_entry(std::unique_lock<mutex_type>& l,
             std::string const& key) const;
-        std::string get_entry(std::lock_guard<mutex_type>& l,
+        std::string get_entry(std::unique_lock<mutex_type>& l,
             std::string const& key, std::string const& dflt) const;
 
-        void add_notification_callback(std::lock_guard<mutex_type>& l,
+        void add_notification_callback(std::unique_lock<mutex_type>& l,
             std::string const& key, entry_changed_func const& callback);
 
     public:
@@ -137,31 +137,31 @@ namespace hpx { namespace util
         void add_section(std::string const& sec_name, section& sec,
             section* root = nullptr)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             add_section(l, sec_name, sec, root);
         }
 
         section* add_section_if_new(std::string const& sec_name)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return add_section_if_new(l, sec_name);
         }
 
         bool has_section(std::string const& sec_name) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return has_section(l, sec_name);
         }
 
         section* get_section (std::string const& sec_name)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return get_section(l, sec_name);
         }
 
         section const* get_section (std::string const& sec_name) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return get_section(l, sec_name);
         }
 
@@ -169,80 +169,80 @@ namespace hpx { namespace util
 
         void add_entry(std::string const& key, entry_type const& val)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             add_entry(l, key, key, val);
         }
 
         void add_entry(std::string const& key, std::string const& val)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             add_entry(l, key, key, val);
         }
 
         bool has_entry(std::string const& key) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return has_entry(l, key);
         }
 
         std::string get_entry(std::string const& key) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return get_entry(l, key);
         }
 
         std::string get_entry(std::string const& key, std::string const& dflt) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return get_entry(l, key, dflt);
         }
 
         template <typename T>
         std::string get_entry(std::string const& key, T dflt) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return get_entry(l, key, boost::lexical_cast<std::string>(dflt));
         }
 
         void add_notification_callback(std::string const& key,
             entry_changed_func const& callback)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             add_notification_callback(l, key, callback);
         }
 
         entry_map const& get_entries() const { return entries_; }
 
     private:
-        std::string expand(std::lock_guard<mutex_type>& l, std::string in) const;
+        std::string expand(std::unique_lock<mutex_type>& l, std::string in) const;
 
-        void expand(std::lock_guard<mutex_type>& l, std::string&,
+        void expand(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
-        void expand_bracket(std::lock_guard<mutex_type>& l, std::string&,
+        void expand_bracket(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
-        void expand_brace(std::lock_guard<mutex_type>& l, std::string&,
+        void expand_brace(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
 
-        std::string expand_only(std::lock_guard<mutex_type>& l, std::string in,
+        std::string expand_only(std::unique_lock<mutex_type>& l, std::string in,
             std::string const& expand_this) const;
 
-        void expand_only(std::lock_guard<mutex_type>& l, std::string&,
+        void expand_only(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type, std::string const& expand_this) const;
-        void expand_bracket_only(std::lock_guard<mutex_type>& l, std::string&,
+        void expand_bracket_only(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type, std::string const& expand_this) const;
-        void expand_brace_only(std::lock_guard<mutex_type>& l, std::string&,
+        void expand_brace_only(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type, std::string const& expand_this) const;
 
     public:
         std::string expand(std::string const& str) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             return expand(l, str);
         }
 
         void expand(std::string& str, std::string::size_type len) const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             expand(l, str, len);
         }
 
