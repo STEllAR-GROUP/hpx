@@ -53,7 +53,7 @@ function(hpx_setup_target target)
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
         SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
-          COMPILE_FLAGS "${CUDA_CLANG_FLAGS}")
+          COMPILE_FLAGS "${HPX_CUDA_CLANG_FLAGS}")
       endif()
     endforeach()
   endif()
