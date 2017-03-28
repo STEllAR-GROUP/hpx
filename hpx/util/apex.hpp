@@ -57,15 +57,10 @@ namespace hpx { namespace util
 
         /* policy function */
         static int policy(const apex_context context) {
-            std::cerr << "policy" << std::endl;
-            //static std::atomic<bool> working(false);
-            //std::unique_lock<std::mutex> l(params_mutex);
+            //std::cerr << "policy" << std::endl;
             apex_profile * profile = apex::get_profile(instance->counter_name);
-            std::cerr << "profile: " << profile << " " << std::endl;
-            if(profile != nullptr && profile->calls >= instance->tuning_window /* && !working*/) {
+            if(profile != nullptr && profile->calls >= instance->tuning_window) {
                 std::cerr << "profile calls: " << profile->calls << " " << std::endl;
-                //working = true;
-                //l.unlock();
                 //std::cout << __func__ << ": Got results!" << std::endl;
                 // Evaluate the results
                 apex::custom_event(instance->request->get_trigger(), NULL);
@@ -73,24 +68,18 @@ namespace hpx { namespace util
                 instance->set_coalescing_params();
                 // Reset counter so each measurement is fresh.
                 apex::reset(instance->counter_name);
-            //} else if (profile != nullptr && profile->calls < instance->tuning_window && working) {
-            //    working = false;
-            //    l.unlock();
-            //} else {
-            //    //std::cout << __func__ << ": No results." << std::endl;
-            //    l.unlock();
             }
             return APEX_NOERROR;
         }   
 
         /* Constructor */
-        apex_parcel_coalescing_policy() : tuning_window(1),
+        apex_parcel_coalescing_policy() : tuning_window(10),
             name("HPX parcel coalescing")
         {
-            std::cout << __func__ << ": Constructor!" << std::endl;
+            //std::cout << __func__ << ": Constructor!" << std::endl;
             std::stringstream ss;
             ///threads{locality#0/total}/time/average-overhead
-            ss << "/counters/threads{locality#" << hpx::get_locality_id();
+            ss << "/threads{locality#" << hpx::get_locality_id();
             ss << "/total}/time/average-overhead";
             counter_name = std::string(ss.str());
             /* Create a metric to be queried for this policy */
@@ -115,7 +104,6 @@ namespace hpx { namespace util
             /* register the tuning policy */
             //std::function<int(apex_context const&)> policy_fn{policy};
             policy_handle = apex::register_periodic_policy(500000, policy);
-            //policy_handle = apex::register_policy(APEX_SEND, policy);
             if(policy_handle == nullptr) {
                 std::cerr << "Error registering policy!" << std::endl;
             }
@@ -126,7 +114,7 @@ namespace hpx { namespace util
             }
         }
         static void finalize() {
-            std::cout << __func__ << ": Destructor!" << std::endl;
+            //std::cout << __func__ << ": Destructor!" << std::endl;
             if (instance != nullptr) {
                 delete instance;
                 instance = nullptr;
