@@ -79,6 +79,7 @@ namespace hpx { namespace util
             ss << "/threads{locality#" << hpx::get_locality_id();
             ss << "/total}/time/average-overhead";
             counter_name = std::string(ss.str());
+            apex::sample_runtime_counter(500000, counter_name);
             /* Create a metric to be queried for this policy */
             std::function<double(void)> metric = [=]()->double{
                 apex_profile * profile = apex::get_profile(counter_name);
