@@ -37,7 +37,7 @@ namespace hpx { namespace util
             std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest,
             std::string const& form, std::vector<std::string> const& shortnames,
-            bool csv_header);
+            bool csv_header, bool print_counters_locally);
 
         void start();
         void stop_evaluating_counters();
@@ -107,6 +107,7 @@ namespace hpx { namespace util
         std::string format_;
         std::vector<std::string> counter_shortnames_;
         bool csv_header_;
+        bool print_counters_locally_;
 
         interval_timer timer_;
 

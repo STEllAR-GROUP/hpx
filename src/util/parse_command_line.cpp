@@ -565,6 +565,8 @@ namespace hpx { namespace util
                 ("hpx:reset-counters",
                   "reset all performance counter(s) specified with --hpx:print-counter "
                   "after they have been evaluated")
+                ("hpx:print-counters-locally",
+                  "each locality prints only its own local counters")
             ;
 
             hidden_options.add_options()
