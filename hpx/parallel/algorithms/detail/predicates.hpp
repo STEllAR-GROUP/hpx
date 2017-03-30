@@ -22,14 +22,14 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
-    template<class InputIterator, class Distance>
+    template<typename InputIterator, typename Distance>
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
         std::random_access_iterator_tag)
     {
         i += n;
     }
 
-    template<class InputIterator, class Distance>
+    template<typename InputIterator, typename Distance>
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
         std::bidirectional_iterator_tag)
     {
@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
     }
 
-    template<class InputIterator, class Distance>
+    template<typename InputIterator, typename Distance>
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
         std::input_iterator_tag)
     {
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         while (n--) ++i;
     }
 
-    template<class InputIterator, class Distance>
+    template<typename InputIterator, typename Distance>
     HPX_HOST_DEVICE void advance (InputIterator& i, Distance n)
     {
         advance_impl(i, n,

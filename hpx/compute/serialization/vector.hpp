@@ -101,7 +101,7 @@ namespace hpx { namespace serialization
             compute::vector<T, Allocator> const& vs, std::false_type)
         {
             // normal save ...
-            for(auto v : vs)
+            for(auto const & v : vs)
             {
                 ar << v;
             }
