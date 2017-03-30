@@ -20,8 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-
-namespace hpx { namespace detail
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
     template<class InputIterator, class Distance>
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
@@ -34,10 +33,13 @@ namespace hpx { namespace detail
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
         std::bidirectional_iterator_tag)
     {
-        if (n < 0) {
-        while (n++) --i;
-        } else {
-        while (n--) ++i;
+        if (n < 0)
+        {
+            while (n++) --i;
+        }
+        else
+        {
+            while (n--) ++i;
         }
     }
 
@@ -56,11 +58,6 @@ namespace hpx { namespace detail
         typename std::iterator_traits<InputIterator>::iterator_category());
     }
 
-}}
-
-
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
-{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterable, typename Enable = void>
     struct calculate_distance
@@ -156,7 +153,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-            hpx::detail::advance(iter, offset);
+            hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
 #endif
@@ -196,7 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-            hpx::detail::advance(iter, offset);
+            hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
 #endif
@@ -214,7 +211,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 // NVCC seems to have a bug with std::min...
                 offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-                hpx::detail::advance(iter, offset);
+                hpx::parallel::v1::detail::advance(iter, offset);
 #else
                 std::advance(iter, offset);
 #endif
@@ -226,7 +223,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         max_count < negate(offset) ? max_count : negate(offset)
                     ));
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-                hpx::detail::advance(iter, offset);
+                hpx::parallel::v1::detail::advance(iter, offset);
 #else
                 std::advance(iter, offset);
 #endif
@@ -243,7 +240,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             // NVCC seems to have a bug with std::min...
             offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-            hpx::detail::advance(iter, offset);
+            hpx::parallel::v1::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
 #endif

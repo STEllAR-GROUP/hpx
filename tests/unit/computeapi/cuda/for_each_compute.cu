@@ -32,6 +32,11 @@ void test_for_each(executor_type& exec, target_vector& d_A)
         hpx::parallel::execution::par,
         d_A.begin(), d_A.end(), h_C.begin());
 
+    // FIXME : Lambda function given to for_each() is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used inside for_each()) to get the return
+    //         type
+
     hpx::parallel::for_each(
         hpx::parallel::execution::par.on(exec),
         d_A.begin(), d_A.end(),

@@ -27,10 +27,15 @@ typedef hpx::compute::vector<int, target_allocator> target_vector;
 
 struct transform_test
 {
-    template< typename T >
-    HPX_HOST_DEVICE int operator()(T A, T B)
+    // FIXME : call operator of transform_test() is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used inside transform()) to get the return
+    //         type
+
+    template <typename T>
+    HPX_HOST_DEVICE int operator()(T const & a, T const & b)
     {
-        return A + 3.0 * B;
+        return a + 3.0 * b;
     }
 };
 

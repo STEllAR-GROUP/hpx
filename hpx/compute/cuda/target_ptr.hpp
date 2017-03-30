@@ -117,14 +117,14 @@ namespace hpx { namespace compute { namespace cuda
             return this->base();
         }
 #else
-    // Note : need to define implicit cast at host_side because of invoke()
-    //        which is defined host_device. This function should never be
-    //        executed.
-    HPX_HOST operator T*() const
-    {
-        HPX_ASSERT(false);
-        return nullptr;
-    }
+        // Note : need to define implicit cast at host_side because of invoke()
+        //        which is defined host_device. This function should never be
+        //        executed.
+        HPX_HOST operator T*() const
+        {
+            HPX_ASSERT(false);
+            return nullptr;
+        }
 
     private:
         friend class hpx::util::iterator_core_access;
