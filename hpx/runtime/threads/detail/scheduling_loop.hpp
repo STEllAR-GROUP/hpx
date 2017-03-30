@@ -353,8 +353,24 @@ namespace hpx { namespace threads { namespace detail
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
+#if defined(HPX_HAVE_APEX)
+                        util::apex_wrapper apex_profiler(
+                            background_thread->get_description(),
+                            reinterpret_cast<std::uint64_t>(background_thread.get()));
+
                         thrd_stat = (*background_thread)();
 
+                        if (thrd_stat.get_previous() == terminated)
+                        {
+                            apex_profiler.stop();
+                        }
+                        else
+                        {
+                            apex_profiler.yield();
+                        }
+#else
+                        thrd_stat = (*background_thread)();
+#endif
                         thread_data *next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
                         {
@@ -491,7 +507,8 @@ namespace hpx { namespace threads { namespace detail
 
 #if defined(HPX_HAVE_APEX)
                                 util::apex_wrapper apex_profiler(
-                                    thrd->get_description(), (uint64_t)thrd);
+                                    thrd->get_description(),
+                                    reinterpret_cast<std::uint64_t>(thrd));
 
                                 thrd_stat = (*thrd)();
 
