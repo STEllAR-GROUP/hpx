@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace server
             > create_component_action;
 
         // additional functionality
-        HPX_HOST_DEVICE void wait() const
+        void wait() const
         {
             latch_.wait();
         }

@@ -46,7 +46,12 @@ void test_async()
 ///////////////////////////////////////////////////////////////////////////////
 struct bulk_test
 {
-    __device__ void operator()(int) {}
+    // FIXME : call operator of bulk_test is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used in traits::bulk_execute()) to get the return
+    //         type
+
+    HPX_HOST_DEVICE void operator()(int) {}
 };
 
 void test_bulk_sync()
