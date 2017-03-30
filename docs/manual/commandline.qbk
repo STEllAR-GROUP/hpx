@@ -170,6 +170,11 @@ described in the table below:
         `--hpx:print-counter` (or `--hpx:print-counter-reset`) at the given
         point in time, possible argument are values: 'startup',
         'shutdown' (default), 'noshutdown'.]]
+    [[`--hpx:print-counters-locally`]
+     [Each locality prints only its own local counters. If this is used with
+      `--hpx-print-counter-destination=<file>, the code will append a
+      `".<locality_id>"` to the file name in order to avoid clashes between
+      localities.]]
 ]
 
 [heading Command Line Argument Shortcuts]
