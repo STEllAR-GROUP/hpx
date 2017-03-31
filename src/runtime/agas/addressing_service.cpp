@@ -383,9 +383,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 HPX_THROWS_IF(ec, bad_parameter,
                     "addressing_service::resolve_locality",
                     strm.str());
-
-                static parcelset::endpoints_type empty_endpoints;
-                return empty_endpoints;
+                return resolved_localities_[naming::invalid_gid];
             }
         }
 
