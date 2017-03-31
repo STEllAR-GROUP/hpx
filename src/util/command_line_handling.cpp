@@ -534,7 +534,8 @@ namespace hpx { namespace util
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+        enable_batch_env = (cfgmap.get_value<int>("hpx.ignore_batch_env", 0)
+            + vm.count("hpx:ignore-batch-env")) == 0;
 #endif
 
         util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
