@@ -240,9 +240,13 @@ namespace libfabric
 
         // a count of all receives, for debugging/performance measurement
         performance_counter<unsigned int> sends_posted;
-        performance_counter<unsigned int> handled_receives;
+        performance_counter<unsigned int> acks_posted;
+        performance_counter<unsigned int> acks_received;
+        performance_counter<unsigned int> receives_handled;
         performance_counter<unsigned int> completions_handled;
         performance_counter<unsigned int> total_reads;
+        performance_counter<unsigned int> send_deletes;
+        performance_counter<unsigned int> recv_deletes;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -255,9 +259,13 @@ namespace libfabric
             , immediate_send_allowed_(true)
             , stopped_(false)
             , sends_posted(0)
-            , handled_receives(0)
+            , acks_posted(0)
+            , acks_received(0)
+            , receives_handled(0)
             , completions_handled(0)
             , total_reads(0)
+            , send_deletes(0)
+            , recv_deletes(0)
         {
             FUNC_START_DEBUG_MSG;
 
@@ -388,6 +396,11 @@ namespace libfabric
         // or when all zero-copy Get operations are done
         // --------------------------------------------------------------------
         void delete_send_data(active_send_iterator send) {
+
+            // a count of all receives, for debugging/performance measurement
+
+            ++send_deletes;
+
             parcel_send_data &send_data = *send;
             // trigger the send complete handler for hpx internal cleanup
             LOG_DEBUG_MSG("Calling write_handler for completed send");
@@ -437,6 +450,9 @@ namespace libfabric
         // --------------------------------------------------------------------
         void delete_recv_data(active_recv_iterator recv)
         {
+
+            ++recv_deletes;
+
             FUNC_START_DEBUG_MSG;
             parcel_recv_data &recv_data = *recv;
             chunk_pool_->deallocate(recv_data.header_region);
@@ -453,7 +469,6 @@ namespace libfabric
                 LOG_DEBUG_MSG("Active recv after erase size "
                     << hexnumber(active_recvs.size()) );
             }
-            ++handled_receives;
         }
 
         // --------------------------------------------------------------------
@@ -514,14 +529,9 @@ namespace libfabric
                     SendCompletionMap.erase(is_present.first);
                 }
                 else {
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                    handle_tag_send_completion(wr_id);
-                    return;
-#else
-                    LOG_DEVEL_MSG("FATAL : SendCompletionMap did not find "
-                        << hexpointer(wr_id));
                     std::terminate();
-#endif
+                    //handle_tag_send_completion(wr_id);
+                    return;
                 }
             }
             // if the send had no zero_copy regions, then it has completed
@@ -555,9 +565,11 @@ namespace libfabric
                 LOG_DEVEL_MSG("Tag receive");
                 int imm_data = 0; // @TODO fix this
                 handle_tag_recv_completion(wr_id, imm_data, client);
+                ++acks_received;
                 return;
             }
 
+            ++receives_handled;
             // store details about this parcel so that all memory buffers can be kept
             // until all recv operations have completed.
             active_recv_iterator current_recv;
@@ -593,7 +605,7 @@ namespace libfabric
                     << " chunkdata " << decnumber((h->chunk_data()!=nullptr))
                     << " piggyback " << decnumber((h->piggy_back()!=nullptr))
                     << " tag " << hexuint32(h->tag())
-                    << " total receives " << decnumber(handled_receives)
+                    << " total receives " << decnumber(receives_handled)
             );
 
             // setting this flag to false - if more data is needed -
@@ -692,14 +704,15 @@ namespace libfabric
             // if the main serialization chunk is piggybacked in second SGE
             if (piggy_back) {
                 if (parcel_complete) {
-                    rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                    rcv_data_type wrapped_pointer(piggy_back, h->size(), [](){},
+                        //util::bind(&parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
                     rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                     LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
                     parcelset::decode_message_with_chunks<parcelport, rcv_buffer_type>
                         (*this, std::move(buffer), 0, recv_data.chunks);
                     LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
+                    delete_recv_data(current_recv);
                 }
             }
             else {
@@ -736,7 +749,6 @@ namespace libfabric
             //  data.time_ = timer.elapsed_nanoseconds() - data.time_;
         }
 
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
         void handle_tag_send_completion(void *wr_id)
         {
             LOG_DEBUG_MSG("Handle 4 byte completion " << hexpointer(wr_id));
@@ -745,19 +757,14 @@ namespace libfabric
             LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
                 << hexuint32(*(uint32_t*) (region->get_address())));
         }
-#endif
 
         // --------------------------------------------------------------------
         void handle_tag_recv_completion(void* wr_id, uint32_t tag,
             const struct fid_ep *client)
         {
             libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
             tag = *((uint32_t*) (region->get_address()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
-#else
-            LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
-#endif
             // let go of this region (waste really as this was a zero byte message)
             chunk_pool_->deallocate(region);
 
@@ -782,12 +789,6 @@ namespace libfabric
                     << hexpointer(&(*current_send)) << "with no race detection");
                 delete_send_data(current_send);
             }
-            //
-            ++handled_receives;
-
-            LOG_DEBUG_MSG( "received IBV_WC_RECV handle_tag_recv_completion "
-                    << " total receives " << decnumber(handled_receives)
-            );
         }
 
         // --------------------------------------------------------------------
@@ -854,18 +855,16 @@ namespace libfabric
 
                 LOG_DEBUG_MSG("Creating a release buffer callback for tag "
                     << hexuint32(recv_data.tag));
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
                 LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
                     << " has completed : posting 4 byte ack to origin");
-                // allocate space for a single uint32_t
-                libfabric_memory_region *tag_region = chunk_pool_->allocate_region(4);
-                uint32_t *tag_memory = (uint32_t*)(tag_region->get_address());
-                *tag_memory = recv_data.tag;
-                tag_region->set_message_length(4);
+                ++acks_posted;
                 auto ack_addr = recv_data.src_addr;
-#endif
-                rcv_data_type wrapped_pointer(message, message_length,
-                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                uint32_t tag  = recv_data.tag;
+                int ret = fi_inject(client, &tag, 4, ack_addr);
+                if (ret) throw fabric_error(ret, "fi_inject tag notification error");
+
+                rcv_data_type wrapped_pointer(message, message_length, [](){},
+                        //util::bind(&parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
                 rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                 LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
@@ -887,21 +886,7 @@ namespace libfabric
                 decode_message_with_chunks(*this, std::move(buffer), 0, recv_data.chunks);
                 LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
 
-#if HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-                int ret = fi_send(client,
-                    tag_region->get_address(), 4,
-                    tag_region->get_desc(), ack_addr, tag_region);
-                if (ret) throw fabric_error(ret, "fi_send tag notification error");
-
-#else
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting zero byte ack to origin");
-                // convert uint32 to uint64 so we can use it as a fake message region
-                // (wr_id only for 0 byte send)
-                uint64_t fake_region = recv_data.tag;
-//                client->post_send_x0((libfabric_memory_region*)fake_region,
-//                    false, true, recv_data.tag);
-#endif
+                delete_recv_data(current_recv);
             }
             else {
                 throw std::runtime_error("RDMA Get completed with unmatched Id");
@@ -920,10 +905,32 @@ namespace libfabric
             return 0;
         }
 
+        // --------------------------------------------------------------------
         ~parcelport() {
             FUNC_START_DEBUG_MSG;
             scoped_lock lk(stop_mutex);
             libfabric_controller_ = nullptr;
+
+            int total_completions = sends_posted + receives_handled + total_reads + acks_received;
+
+//#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PERFORMANCE_COUNTERS
+            std::cout << "Parcelport counters \n"
+                << "\tsends_posted " << decnumber(sends_posted)
+                << "send_deletes " << decnumber(send_deletes)
+                << "delete send error " << decnumber(sends_posted-send_deletes)
+                << std::endl
+                << "\treceives_handled " << decnumber(receives_handled)
+                << "recv_deletes " << decnumber(recv_deletes)
+                << "delete recv error " << decnumber(receives_handled-recv_deletes)
+                << std::endl
+                << "\tacks_posted " << decnumber(acks_posted)
+                << "acks_received " << decnumber(acks_received)
+                << "total_reads " << decnumber(total_reads)
+                << std::endl
+                << "\tcompletions_handled " << decnumber(completions_handled)
+                << "completion error " << decnumber(total_completions-completions_handled)
+                << std::endl;
+//#endif
             FUNC_END_DEBUG_MSG;
         }
 
@@ -998,7 +1005,7 @@ namespace libfabric
 
                 // wait for all clients initiated elsewhere to be disconnected
                 while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/) {
-                    libfabric_controller_->poll_endpoints(true);
+                    completions_handled += libfabric_controller_->poll_endpoints(true);
                     LOG_TIMED_INIT(disconnect_poll);
                     LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
                         {
@@ -1187,13 +1194,6 @@ namespace libfabric
 
                 // header region is always sent, message region is usually piggybacked
                 int num_regions = 1;
-/*
-                struct iovec {
-                    void  *iov_base;    // Starting address
-                    size_t iov_len;     // Number of bytes to transfer
-                };
-*/
-
                 struct iovec region_list[2] = {
                     { send_data.header_region->get_address(),
                         send_data.header_region->get_message_length() },
@@ -1310,11 +1310,14 @@ namespace libfabric
 //                 // if an event comes in, we may spend time processing/handling it
 //                 // and another may arrive during this handling,
 //                 // so keep checking until none are received
-//                 //libfabric_controller_->refill_client_receives(false);
+//                 libfabric_controller_->refill_client_receives(false);
 //                 done = (libfabric_controller_->poll_endpoints() == 0);
 //             } while (!done);
 //             std::cerr << "active sends: " << active_send_count_ << '\n';
-            return libfabric_controller_->poll_endpoints();
+            int done = libfabric_controller_->poll_endpoints();
+            completions_handled += done;
+
+            return (done!=0);
         }
 
         // There is no difference between our background polling work on OS or HPX
@@ -1373,10 +1376,10 @@ namespace libfabric
                     "active_send_count_ " << decnumber(active_send_count_)
                     << "active_send_size " << decnumber(active_sends.size())
                     << "Total sends " << decnumber(sends_posted)
-                    << "Total recvs " << decnumber(handled_receives)
+                    << "Total recvs " << decnumber(receives_handled)
                     << "Total reads " << decnumber(total_reads)
                     << "Total completions " << decnumber(completions_handled)
-                    << "("<< decnumber(sends_posted+handled_receives+total_reads)<<")");
+                    << "("<< decnumber(sends_posted+receives_handled+total_reads)<<")");
                 )
 #endif
 
@@ -1498,10 +1501,10 @@ HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabr
             LOG_TIMED_MSG(background, DEVEL, 0.1,
                 "PP reported\n"
                 << "actv " << decnumber(active_send_count_) << "\n"
-                << "recv " << decnumber(handled_receives) << "\n"
+                << "recv " << decnumber(receives_handled) << "\n"
                 << "send " << decnumber(sends_posted) << "\n"
                 << "read " << decnumber(total_reads) << "\n"
                 << "Total completions " << decnumber(completions_handled)
-                << decnumber(sends_posted+handled_receives+total_reads));
+                << decnumber(sends_posted+receives_handled+total_reads));
 */
 

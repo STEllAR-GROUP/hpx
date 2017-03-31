@@ -30,14 +30,14 @@ namespace libfabric
         // --------------------------------------------------------------------
         libfabric_memory_region() :
             region_(nullptr), address_(nullptr), base_addr_(nullptr),
-                flags_(0), size_(0), used_space_(0), user_data_(nullptr) {}
+                flags_(0), size_(0), used_space_(0) {}
 
         // --------------------------------------------------------------------
         libfabric_memory_region(struct fid_mr *region, char * address,
             char *base_address,
             uint32_t flags, uint64_t size) :
                 region_(region), address_(address), base_addr_(base_address),
-                flags_(flags), size_(size), used_space_(0), user_data_(nullptr)  {}
+                flags_(flags), size_(size), used_space_(0) {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
@@ -49,7 +49,6 @@ namespace libfabric
             size_       = length;
             used_space_ = length;
             flags_      = BLOCK_USER;
-            user_data_  = nullptr;
 
             int ret = fi_mr_reg(pd,
                     const_cast<void*>(buffer), length,
@@ -252,16 +251,6 @@ namespace libfabric
             return (flags_ & BLOCK_PARTIAL) == BLOCK_PARTIAL;
         }
 
-        // --------------------------------------------------------------------
-        // space for user data to be stored
-        inline void set_user_data(void *ud) {
-            user_data_ = ud;;
-        }
-
-        inline void *get_user_data() const {
-            return user_data_;
-        }
-
     private:
         // The internal Infiniband memory region handle
         struct fid_mr *region_;
@@ -284,9 +273,6 @@ namespace libfabric
 
         // space used by a message in the memory region.
         uint64_t used_space_;
-
-        // user data
-        void *user_data_;
     };
 
     // Smart pointer for libfabric_memory_region object.

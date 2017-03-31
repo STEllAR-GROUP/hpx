@@ -161,6 +161,8 @@ namespace libfabric
         // clean up all resources
         ~libfabric_controller()
         {
+            memory_pool_->small_.decrement_used_count(preposted_receives_);
+
             LOG_DEVEL_MSG("closing fabric_->fid");
             if (fabric_)
                 fi_close(&fabric_->fid);
@@ -480,11 +482,8 @@ namespace libfabric
         // are thrown away, otherwise the completion callback is triggered
         int poll_endpoints(bool stopped=false)
         {
-//             unique_lock lock(polling_mutex_, std::try_to_lock);
-//             if (!lock.owns_lock()) return 0;
-            //
-//             int work = poll_for_work_completions(lock, stopped);
-            int work = poll_for_work_completions(stopped);
+            int work = poll_for_work_completions();
+
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
             work += poll_event_queue(stopped);
 #endif
@@ -492,53 +491,45 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-//         int poll_for_work_completions(unique_lock& lock, bool stopped=false)
-        int poll_for_work_completions(bool stopped=false)
+        int poll_for_work_completions()
         {
-//             std::cerr << "preposted receives: " << preposted_receives_ << '\n';
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
             if (HPX_UNLIKELY(!rxcq)) return 0;
+            //
+            return poll_send_queue() + poll_recv_queue();
+        }
+
+        // --------------------------------------------------------------------
+        int poll_send_queue()
+        {
+            LOG_TIMED_INIT(poll);
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_send_queue"); });
 
             int result = 0;
-
-            LOG_TIMED_INIT(poll);
-            LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
-                {
-                    LOG_DEVEL_MSG("Polling work completion channel");
-                }
-            )
-/*
-struct fi_cq_msg_entry {
-    void     *op_context; // operation context
-    uint64_t flags;       // completion flags
-    size_t   len;         // size of received data
-};
-*/
-            //std::array<char, 256> buffer;
-            fi_addr_t src_addr;
             fi_cq_msg_entry entry;
             int ret = fi_cq_read(txcq, &entry, 1);
             if (ret>0) {
-//                 hpx::util::unlock_guard_try<unique_lock> ul(lock);
-                //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEVEL_MSG("Completion txcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
-                    << hexpointer(entry.op_context) << "length " << hexuint32(entry.len));
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
+                    << " (" << decnumber(entry.flags) << ") "
+                    << "context " << hexpointer(entry.op_context)
+                    << "length " << hexuint32(entry.len));
                 if (entry.flags & FI_RMA) {
-                    LOG_DEBUG_MSG("Received a txcq RMA completion");
+                    LOG_DEBUG_MSG("Received a txcq RMA completion "
+                        << "Context " << hexpointer(entry.op_context));
                     rdma_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else if (entry.flags == (FI_MSG | FI_SEND)) {
-                    LOG_DEBUG_MSG("Received a txcq RMA send completion");
+                    LOG_DEBUG_MSG("Received a txcq MSG send completion");
                     send_completion_function_(entry.op_context, ep_active_, entry.len);
                 }
                 else {
                     LOG_DEVEL_MSG("$$$$$ Received an unknown txcq completion ***** "
                         << decnumber(entry.flags));
-//                     std::terminate();
+                    std::terminate();
                 }
-                result = 1;
+                return 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
@@ -551,35 +542,39 @@ struct fi_cq_msg_entry {
                 LOG_ERROR_MSG("txcq Error with flags " << e.flags << " len " << e.len);
                 throw fabric_error(ret, "completion txcq read");
             }
+            return 0;
+        }
 
-//             if (!lock) return 0;
+        // --------------------------------------------------------------------
+        int poll_recv_queue()
+        {
+            LOG_TIMED_INIT(poll);
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_recv_queue"); });
 
-//             LOG_DEVEL_MSG("Preposted receives: " << preposted_receives_);
-            refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
-            // receives will use fi_cq_readfrom as we want the source address
-            ret = fi_cq_readfrom(rxcq, &entry, 1, &src_addr);
+            int result = 0;
+            fi_addr_t src_addr;
+            fi_cq_msg_entry entry;
+
+            // receives use fi_cq_readfrom as we want the source address
+            int ret = fi_cq_readfrom(rxcq, &entry, 1, &src_addr);
             if (ret>0) {
-                --preposted_receives_;
                 LOG_DEVEL_MSG("Completion rxcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
-                    << " source " << hexpointer(src_addr)
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
+                    << " (" << decnumber(entry.flags) << ") "
+                    << "source " << hexpointer(src_addr)
                     << "context " << hexpointer(entry.op_context)
                     << "length " << hexuint32(entry.len));
-//                void *client = reinterpret_cast<libfabric_memory_region*>
-//                    (entry.op_context)->get_user_data();
                 if (src_addr == FI_ADDR_NOTAVAIL)
                 {
                     LOG_DEVEL_MSG("Source address not available...\n");
                     std::terminate();
                 }
-//                     if ((entry.flags & FI_RMA) == FI_RMA) {
-//                         LOG_DEVEL_MSG("Received an rxcq RMA completion");
-//                         rdma_completion_function_(entry.op_context,
-//                             ep_active_, src_addr);
-//                     }
                 else if (entry.flags == (FI_MSG | FI_RECV)) {
-                    LOG_DEVEL_MSG("Received an rxcq recv completion");
-//                    LOG_DEVEL_MSG("FI_ADDR_T FI_RECV " << hexpointer(src_addr));
+                    // a receive has been consumed
+                    --preposted_receives_;
+                    LOG_DEVEL_MSG("Received an rxcq recv completion "
+                        << hexpointer(entry.op_context));
+                    refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
                     recv_completion_function_(entry.op_context,
                         ep_active_, entry.len, src_addr);
                 }
@@ -601,7 +596,6 @@ struct fi_cq_msg_entry {
                 LOG_ERROR_MSG("rxcq Error with flags " << e.flags << " len " << e.len);
                 throw fabric_error(ret, "completion rxcq read");
             }
-
             return result;
         }
 
@@ -758,36 +752,26 @@ struct fi_cq_msg_entry {
             FUNC_START_DEBUG_MSG;
             LOG_DEBUG_MSG("Entering refill " << hexpointer(memory_pool_.get())
                 << "size of waiting receives is "
-                << decnumber(get_receive_count()));
+                << decnumber(preposted_receives_));
 
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             struct fid_ep *endpoint = ep_active_;
 #else
             struct fid_ep *endpoint = ep_shared_rx_cxt_;
 #endif
-            while (preposts) {
-                --preposts;
-                // if the pool has spare small blocks (just use 0 size) then
-                // refill the queues, but don't wait, just abort if none are available
-                if (force || memory_pool_->can_allocate_unsafe(
-                    memory_pool_->small_.chunk_size()))
-                {
-                    if (++preposted_receives_ >= HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS)
-                        break;
-                    auto region = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
-                    void *desc = region->get_desc();
-                    LOG_TRACE_MSG("Pre-Posting a receive to client size "
-                        << hexnumber(memory_pool_->small_.chunk_size())
-                        << " descriptor " << hexpointer(desc));
-                    region->set_user_data(endpoint);
-                    int ret = fi_recv(endpoint, region->get_address(), region->get_size(), desc, 0, region);
-                    if (ret!=0 && ret != -FI_EAGAIN) {
-                        throw fabric_error(ret, "pp_post_rx");
-                    }
+            while (preposted_receives_<preposts) {
+                if (!memory_pool_->can_allocate_unsafe(memory_pool_->small_.chunk_size()) && !force) {
+                    return;
                 }
-                else {
-                    LOG_DEBUG_MSG("aborting refill can_allocate_unsafe false");
-                    break; // don't block, if there are no free memory blocks
+                ++preposted_receives_;
+                auto region = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
+                void *desc = region->get_desc();
+                LOG_TRACE_MSG("Pre-Posting a receive to client size "
+                    << hexnumber(memory_pool_->small_.chunk_size())
+                    << " descriptor " << hexpointer(desc));
+                int ret = fi_recv(endpoint, region->get_address(), region->get_size(), desc, 0, region);
+                if (ret!=0 && ret != -FI_EAGAIN) {
+                    throw fabric_error(ret, "pp_post_rx");
                 }
             }
             FUNC_END_DEBUG_MSG;
