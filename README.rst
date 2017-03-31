@@ -24,8 +24,8 @@ functionalities and converging onto a stable API which will provide a
 smooth migration path for developers.
 
 The API exposed by HPX is not only modelled after the interfaces defined by the
-C++11/14 ISO standard, it also adheres to the programming guidelines used by the
-Boost collection of C++ libraries. We aim improve the scalability of today's
+C++11/14/17 ISO standard, it also adheres to the programming guidelines used by the
+Boost collection of C++ libraries. We aim to improve the scalability of today's
 applications and to expose new levels of parallelism which are necessary to
 take advantage of the exascale systems of the future.
 
