@@ -619,7 +619,7 @@ void big_boot_barrier::apply_notification(
 void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
     parcelset::endpoints_type const& endpoints)
 {
-    if(localities.size() < locality_id + 1)
+    if (localities.size() < locality_id + 1)
         localities.resize(locality_id + 1);
 
     localities[locality_id] = endpoints;
@@ -633,9 +633,9 @@ void big_boot_barrier::spin()
         cond.wait(lock);
 
     // pre-cache all known locality endpoints in local AGAS on locality 0 as well
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
-    if (agas_client.is_bootstrap())
+    if (service_mode_bootstrap == service_type)
     {
+        naming::resolver_client& agas_client = get_runtime().get_agas_client();
         agas_client.pre_cache_endpoints(localities);
     }
 }
