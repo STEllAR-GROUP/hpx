@@ -629,6 +629,13 @@ void big_boot_barrier::spin()
     boost::unique_lock<boost::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
+
+    // pre-cache all known locality endpoints in local AGAS on locality 0 as well
+    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    if (agas_client.is_bootstrap())
+    {
+        agas_client.pre_cache_endpoints(localities);
+    }
 }
 
 inline std::size_t get_number_of_bootstrap_connections(
