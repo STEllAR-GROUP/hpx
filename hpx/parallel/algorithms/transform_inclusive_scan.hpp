@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -125,6 +126,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::shared_future<T> curr, hpx::shared_future<T> next
                     )
                     {
+                        HPX_UNUSED(policy);
+
                         next.get();     // rethrow exceptions
 
                         T val = curr.get();

@@ -18,6 +18,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -82,6 +83,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator part_begin, std::size_t part_size
                     ) mutable
                     {
+                        HPX_UNUSED(policy);
+
                         // VS2015RC bails out when op is captured by ref
                         using hpx::util::get;
                         util::loop_n<ExPolicy>(
