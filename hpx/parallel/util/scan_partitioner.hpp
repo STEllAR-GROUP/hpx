@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/range/functions.hpp>
@@ -267,6 +268,8 @@ namespace hpx { namespace parallel { namespace util
                         std::vector<hpx::future<Result2> >&& fitems
                     ) mutable -> R
                     {
+                        HPX_UNUSED(scoped_param);
+
                         handle_local_exceptions<ExPolicy>::call(witems, errors);
                         handle_local_exceptions<ExPolicy>::call(fitems, errors);
 
