@@ -1289,6 +1289,7 @@ namespace libfabric
 
                 // parcels_posted_.add_data(buffer.data_point_);
             }
+            background_work_OS_thread();
             FUNC_END_DEBUG_MSG;
             return true;
         }
@@ -1305,18 +1306,16 @@ namespace libfabric
         // hpx threads when necessary.
         // --------------------------------------------------------------------
         inline bool background_work_OS_thread() {
-//             bool done = false;
-//             do {
-//                 // if an event comes in, we may spend time processing/handling it
-//                 // and another may arrive during this handling,
-//                 // so keep checking until none are received
-//                 libfabric_controller_->refill_client_receives(false);
-//                 done = (libfabric_controller_->poll_endpoints() == 0);
-//             } while (!done);
-//             std::cerr << "active sends: " << active_send_count_ << '\n';
-            int done = libfabric_controller_->poll_endpoints();
-            completions_handled += done;
-
+             bool done = false;
+             do {
+                 // if an event comes in, we may spend time processing/handling it
+                 // and another may arrive during this handling,
+                 // so keep checking until none are received
+                 //libfabric_controller_->refill_client_receives(false);
+                 int numc = libfabric_controller_->poll_endpoints();
+                 completions_handled += numc;
+                 done = (numc==0);
+             } while (!done);
             return (done!=0);
         }
 
