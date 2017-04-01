@@ -5,6 +5,7 @@
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
@@ -31,7 +32,6 @@
 #include <boost/system/system_error.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -243,7 +243,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    boost::thread& thread_pool<Scheduler>::get_os_thread_handle(
+    compat::thread& thread_pool<Scheduler>::get_os_thread_handle(
         std::size_t num_thread)
     {
         HPX_ASSERT(num_thread < threads_.size());
@@ -414,7 +414,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
                 // create a new thread
-                threads_.push_back(boost::thread(
+                threads_.push_back(compat::thread(
                         &thread_pool::thread_func, this, thread_num,
                         std::ref(topology_), std::ref(*startup_)
                     ));

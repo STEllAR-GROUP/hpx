@@ -7,6 +7,7 @@
 
 #include "worker_timed.hpp"
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <cstdint>
@@ -16,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -31,6 +31,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 using std::cout;
@@ -132,12 +133,12 @@ int app_main(
         throw std::invalid_argument("error: count of 0 tasks specified\n");
 
     std::vector<double> elapsed(threads - 1);
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
     boost::barrier b(threads - 1);
 
     for (std::uint32_t i = 0; i != threads - 1; ++i)
     {
-        workers.add_thread(new boost::thread(invoke_n_workers,
+        workers.push_back(compat::thread(invoke_n_workers,
             std::ref(b), std::ref(elapsed[i]), tasks));
     }
 
@@ -145,7 +146,11 @@ int app_main(
 
     invoke_n_workers_nowait(total_elapsed, tasks);
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     for (std::uint64_t i = 0; i < elapsed.size(); ++i)
     {

@@ -9,9 +9,9 @@
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/format.hpp>
 #include <boost/lockfree/queue.hpp>
@@ -37,6 +37,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,18 +217,22 @@ int app_main(
         elapsed_control(threads, std::pair<double, double>(0.0, 0.0));
     std::vector<std::pair<double, double> >
         elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
     boost::barrier b(threads);
 
     for (std::uint32_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(
+        workers.push_back(compat::thread(
             perform_iterations,
             std::ref(b),
             std::ref(elapsed_control[i]),
             std::ref(elapsed_lockfree[i])
             ));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     std::pair<double, double> total_elapsed_control(0.0, 0.0);
     std::pair<double, double> total_elapsed_lockfree(0.0, 0.0);

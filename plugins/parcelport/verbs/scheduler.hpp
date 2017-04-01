@@ -17,6 +17,8 @@
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
+#include <boost/thread/mutex.hpp>
+//
 #include <cstddef>
 #include <iostream>
 #include <utility>

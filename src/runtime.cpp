@@ -34,6 +34,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>

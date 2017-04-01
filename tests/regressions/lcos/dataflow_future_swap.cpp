@@ -8,12 +8,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <chrono>
 #include <iostream>

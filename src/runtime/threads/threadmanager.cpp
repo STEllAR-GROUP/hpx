@@ -28,6 +28,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/format.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>

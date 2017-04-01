@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -182,7 +183,7 @@ namespace hpx { namespace threads
             return pool_.get_os_thread_count();
         }
 
-        boost::thread& get_os_thread_handle(std::size_t num_thread)
+        compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);
             return pool_.get_os_thread_handle(num_thread);

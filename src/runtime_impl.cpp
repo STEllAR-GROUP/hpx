@@ -7,6 +7,7 @@
 // hpxinspect:nodeprecatedname:boost::unique_lock
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
@@ -29,8 +30,8 @@
 #include <hpx/util/thread_mapper.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -422,7 +423,7 @@ namespace hpx {
         boost::condition_variable cond;
         bool running = false;
 
-        boost::thread t (util::bind(
+        compat::thread t (util::bind(
                 &runtime_impl<SchedulingPolicy>::wait_helper,
                 this, std::ref(mtx), std::ref(cond), std::ref(running)
             ));
@@ -471,7 +472,7 @@ namespace hpx {
             boost::condition_variable cond;
             boost::unique_lock<boost::mutex> l(mtx);
 
-            boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
+            compat::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 

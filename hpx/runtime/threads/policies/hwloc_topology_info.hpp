@@ -15,14 +15,13 @@
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
-
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -107,7 +106,7 @@ namespace hpx { namespace threads
             ) const;
 
         void set_thread_affinity_mask(
-            boost::thread&
+            compat::thread&
           , mask_cref_type //mask
           , error_code& ec = throws
             ) const;
@@ -139,7 +138,7 @@ namespace hpx { namespace threads
             ) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
-        mask_type get_cpubind_mask(boost::thread & handle,
+        mask_type get_cpubind_mask(compat::thread & handle,
             error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
