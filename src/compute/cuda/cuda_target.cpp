@@ -89,28 +89,20 @@ namespace hpx { namespace compute { namespace cuda
             future_data* this_ = static_cast<future_data*>(user_data);
 
             runtime_registration_wrapper wrap(this_->rt_);
+            release_on_exit on_exit(this_);
 
-            // We need to run this as an HPX thread ...
-            hpx::applier::register_thread_nullary(
-                [this_, error] ()
-                {
-                    release_on_exit on_exit(this_);
+            if (error != cudaSuccess)
+            {
+                this_->set_exception(
+                    HPX_GET_EXCEPTION(kernel_error,
+                        "cuda::detail::future_data::stream_callback()",
+                        std::string("cudaStreamAddCallback failed: ") +
+                            cudaGetErrorString(error))
+                );
+                return;
+            }
 
-                    if (error != cudaSuccess)
-                    {
-                        this_->set_exception(
-                            HPX_GET_EXCEPTION(kernel_error,
-                                "cuda::detail::future_data::stream_callback()",
-                                std::string("cudaStreamAddCallback failed: ") +
-                                    cudaGetErrorString(error))
-                        );
-                        return;
-                    }
-
-                    this_->set_data(hpx::util::unused);
-                },
-                "hpx::compute::cuda::future_data::stream_callback"
-            );
+            this_->set_data(hpx::util::unused);
         }
 
         future_data::future_data()
