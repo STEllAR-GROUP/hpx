@@ -6,6 +6,7 @@
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
 #include <hpx/compat/thread.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
@@ -31,7 +32,6 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -288,7 +288,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    bool thread_pool<Scheduler>::run(std::unique_lock<boost::mutex>& l,
+    bool thread_pool<Scheduler>::run(std::unique_lock<compat::mutex>& l,
         std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
@@ -474,7 +474,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void thread_pool<Scheduler>::stop (
-        std::unique_lock<boost::mutex>& l, bool blocking)
+        std::unique_lock<compat::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -1461,17 +1461,17 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
     > >;
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_lifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
     > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
     > >;
 #endif
 

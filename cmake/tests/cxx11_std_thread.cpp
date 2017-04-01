@@ -6,13 +6,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chrono>
+#include <condition_variable>
 #include <cstddef>
+#include <mutex>
 #include <thread>
 
 void f(int, float, double) {}
 
+bool pred() { return true; }
+
 int main()
 {
+    std::chrono::seconds rel_time;
+    std::chrono::system_clock::time_point abs_time;
+
     // check thread
     {
         std::thread t;
@@ -36,7 +43,40 @@ int main()
 
         std::this_thread::yield();
 
-        std::this_thread::sleep_for(std::chrono::seconds(0));
-        std::this_thread::sleep_until(std::chrono::system_clock::now());
+        std::this_thread::sleep_for(rel_time);
+        std::this_thread::sleep_until(abs_time);
+    }
+
+    // check mutex
+    {
+        std::mutex mut;
+        mut.lock();
+        bool c = mut.try_lock();
+        mut.unlock();
+    }
+
+    // check recursive_mutex
+    {
+        std::recursive_mutex mut;
+        mut.lock();
+        bool c = mut.try_lock();
+        mut.unlock();
+    }
+
+    // check condition_variable
+    {
+        std::condition_variable cv;
+
+        cv.notify_one();
+        cv.notify_all();
+
+        std::mutex mut;
+        std::unique_lock<std::mutex> lock(mut);
+        cv.wait(lock);
+        cv.wait(lock, pred);
+        cv.wait_for(lock, rel_time);
+        cv.wait_for(lock, rel_time, pred);
+        cv.wait_until(lock, abs_time);
+        cv.wait_until(lock, abs_time, pred);
     }
 }

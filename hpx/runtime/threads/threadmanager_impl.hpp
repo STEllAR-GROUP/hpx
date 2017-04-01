@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -24,7 +25,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -47,7 +47,7 @@ namespace hpx { namespace threads
     private:
         // we use a simple mutex to protect the data members of the
         // thread manager for now
-        typedef boost::mutex mutex_type;
+        typedef compat::mutex mutex_type;
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;

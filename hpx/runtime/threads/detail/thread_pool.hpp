@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
@@ -23,7 +24,6 @@
 #include <boost/exception_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -53,8 +53,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t init(std::size_t num_threads,
             policies::init_affinity_data const& data);
 
-        bool run(std::unique_lock<boost::mutex>& l, std::size_t num_threads);
-        void stop(std::unique_lock<boost::mutex>& l, bool blocking = true);
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+        void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
 

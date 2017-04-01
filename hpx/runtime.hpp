@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -27,7 +28,6 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -94,7 +94,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -111,7 +111,7 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             for (value_type const& f : on_exit_functions_)
                 f();
         }
@@ -327,7 +327,7 @@ namespace hpx
         // list of functions to call on exit
         typedef std::vector<util::function_nonser<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
-        mutable boost::mutex mtx_;
+        mutable compat::mutex mtx_;
 
         util::runtime_configuration ini_;
         std::shared_ptr<performance_counters::registry> counters_;

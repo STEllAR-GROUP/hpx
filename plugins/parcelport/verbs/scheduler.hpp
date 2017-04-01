@@ -6,6 +6,8 @@
 #ifndef __PARCELPORT_VERBS_CUSTOM_SCHEDULER_H__
 #define __PARCELPORT_VERBS_CUSTOM_SCHEDULER_H__
 //
+#include <hpx/compat/mutex.hpp>
+//
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -16,8 +18,6 @@
 //
 #include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
-//
-#include <boost/thread/mutex.hpp>
 //
 #include <cstddef>
 #include <iostream>
@@ -40,12 +40,12 @@ namespace verbs
 
     public:
         //    typedef static_queue_scheduler<
-        //                boost::mutex, lockfree_fifo, lockfree_fifo, lockfree_lifo>
+        //                compat::mutex, lockfree_fifo, lockfree_fifo, lockfree_lifo>
         //                scheduling_policy_type;
         typedef static_queue_scheduler<> scheduling_policy_type;
 
         // mutex protecting the members
-        mutable boost::mutex mtx_;
+        mutable compat::mutex mtx_;
 
         // some params we need to initialize the scheduler
         scheduling_policy_type::init_parameter init_param_;
@@ -90,7 +90,7 @@ namespace verbs
 
         //----------------------------------------------------------------------------
         void init() {
-            std::unique_lock<boost::mutex> lk(mtx_);
+            std::unique_lock<compat::mutex> lk(mtx_);
             init_affinity_data affinity_data;
             pool_.init(1, affinity_data);
             pool_.run(lk, 1);
@@ -99,7 +99,7 @@ namespace verbs
         //----------------------------------------------------------------------------
         void stop()
         {
-            std::unique_lock<boost::mutex> lk(mtx_);
+            std::unique_lock<compat::mutex> lk(mtx_);
             pool_.stop(lk, true);
         }
 

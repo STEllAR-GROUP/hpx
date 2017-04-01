@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:boost::unique_lock
-
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/barrier.hpp>
@@ -30,8 +30,6 @@
 #include <hpx/util/thread_mapper.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -382,11 +380,11 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
+        compat::mutex& mtx, compat::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
-            std::lock_guard<boost::mutex> lk(mtx);
+            std::lock_guard<compat::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -419,8 +417,8 @@ namespace hpx {
         LRT_(info) << "runtime_impl: about to enter wait state";
 
         // start the wait_helper in a separate thread
-        boost::mutex mtx;
-        boost::condition_variable cond;
+        compat::mutex mtx;
+        compat::condition_variable cond;
         bool running = false;
 
         compat::thread t (util::bind(
@@ -430,7 +428,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            boost::unique_lock<boost::mutex> lk(mtx);
+            std::unique_lock<compat::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -468,9 +466,9 @@ namespace hpx {
             // this is necessary as this function (stop()) might have been called
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
-            boost::mutex mtx;
-            boost::condition_variable cond;
-            boost::unique_lock<boost::mutex> l(mtx);
+            compat::mutex mtx;
+            compat::condition_variable cond;
+            std::unique_lock<compat::mutex> l(mtx);
 
             compat::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 std::ref(cond), std::ref(mtx)));
@@ -501,7 +499,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
+        bool blocking, compat::condition_variable& cond, compat::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -512,7 +510,7 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        std::lock_guard<boost::mutex> l(mtx);
+        std::lock_guard<compat::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -529,7 +527,7 @@ namespace hpx {
 
             // store the exception to be able to rethrow it later
             {
-                std::lock_guard<boost::mutex> l(mtx_);
+                std::lock_guard<compat::mutex> l(mtx_);
                 exception_ = e;
             }
             lcos::barrier::get_global_barrier().detach();
@@ -574,7 +572,7 @@ namespace hpx {
     {
         if (state_.load() > state_running)
         {
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;
@@ -871,17 +869,17 @@ template class HPX_EXPORT hpx::runtime_impl<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
     > >;
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_lifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
     > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
     > >;
 #endif
 

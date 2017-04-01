@@ -11,11 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/asio/io_service.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -116,7 +116,7 @@ namespace hpx { namespace util
             );
         }
 
-        boost::mutex mtx_;
+        compat::mutex mtx_;
 
         /// The pool of io_services.
         std::vector<io_service_ptr> io_services_;
