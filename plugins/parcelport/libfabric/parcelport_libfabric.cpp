@@ -1133,24 +1133,25 @@ namespace libfabric
                         // if the data chunk fits into a memory block, copy it
                         LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
                         libfabric_memory_region *zero_copy_region;
-                        if (c.size_<=HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD) {
-                            zero_copy_region = chunk_pool_->allocate_region((std::max)
-                              (c.size_, (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
+                        if (c.size_<HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD) {
+                            zero_copy_region = chunk_pool_->allocate_region(c.size_);
                             char *zero_copy_memory =
                                 (char*)(zero_copy_region->get_address());
                             std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
                             // the pointer in the chunk info must be changed
                             buffer.chunks_[index] = serialization::create_pointer_chunk(
                                 zero_copy_memory, c.size_);
+                            LOG_ERROR_MSG("Should not be asking for such a small chunk "
+                                << decnumber(c.size_) << "zero copy threshold is "
+                                << decnumber(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD));
                             LOG_DEBUG_MSG("Time to copy memory (ns) "
                                 << decnumber(regtimer.elapsed_nanoseconds()));
                         }
                         else {
                             // create a memory region from the pointer
                             zero_copy_region = new libfabric_memory_region(
-                                    libfabric_controller_->get_domain(),
-                                    c.data_.cpos_, (std::max)(c.size_,
-                                        (std::size_t)RDMA_POOL_SMALL_CHUNK_SIZE));
+                                libfabric_controller_->get_domain(),
+                                c.data_.cpos_, c.size_);
                             LOG_DEBUG_MSG("Time to register memory (ns) "
                                 << decnumber(regtimer.elapsed_nanoseconds()));
                         }

@@ -575,7 +575,8 @@ namespace libfabric
                     // a receive has been consumed
                     --preposted_receives_;
                     LOG_DEVEL_MSG("Received an rxcq recv completion "
-                        << hexpointer(entry.op_context));
+                        << hexpointer(entry.op_context)
+                        << *(libfabric_memory_region*)(entry.op_context));
                     refill_client_receives(HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, false);
                     recv_completion_function_(entry.op_context,
                         ep_active_, entry.len, src_addr);
