@@ -19,8 +19,11 @@
 # define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 48
 #endif
 
-#if defined(HPX_PARCELPORT_LIBFABRIC_VERBS) || defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS)
+#if defined(HPX_PARCELPORT_LIBFABRIC_VERBS) || \
+    defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS) || \
+    defined(HPX_PARCELPORT_LIBFABRIC_PSM2)
 # define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 16
+# define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SOCKADDR
 #endif
 
 //typedef struct fid* fi_addr_t;
@@ -89,7 +92,7 @@ struct locality {
     }
 
     const uint32_t & ip_address() const {
-#if defined (HPX_PARCELPORT_LIBFABRIC_VERBS) || defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS)
+#if defined (HPX_PARCELPORT_LIBFABRIC_LOCALITY_SOCKADDR)
         return reinterpret_cast<const struct sockaddr_in*>
             (data_.data())->sin_addr.s_addr;
 #elif defined(HPX_PARCELPORT_LIBFABRIC_GNI)
@@ -100,7 +103,7 @@ struct locality {
     }
 
     static const uint32_t & ip_address(const locality_data &data) {
-#if defined (HPX_PARCELPORT_LIBFABRIC_VERBS) || defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS)
+#if defined (HPX_PARCELPORT_LIBFABRIC_LOCALITY_SOCKADDR)
         return reinterpret_cast<const struct sockaddr_in*>
             (&data)->sin_addr.s_addr;
 #elif defined(HPX_PARCELPORT_LIBFABRIC_GNI)

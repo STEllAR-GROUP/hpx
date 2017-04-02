@@ -42,7 +42,9 @@
 #include <rdma/fi_rma.h>
 #include "fabric_error.hpp"
 
-#if defined(HPX_PARCELPORT_LIBFABRIC_GNI) || defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS)
+#if defined(HPX_PARCELPORT_LIBFABRIC_GNI) || \
+    defined(HPX_PARCELPORT_LIBFABRIC_SOCKETS) || \
+    defined(HPX_PARCELPORT_LIBFABRIC_PSM2)
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
 #else
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
@@ -202,7 +204,7 @@ namespace libfabric
             // we require message and RMA support, so ask for them
             // we also want receives to carry source address info
             fabric_hints_->caps                   = FI_MSG | FI_RMA | FI_SOURCE | FI_WRITE | FI_READ | FI_REMOTE_READ | FI_REMOTE_WRITE | FI_RMA_EVENT;
-            fabric_hints_->mode                   = FI_CONTEXT | FI_LOCAL_MR | FI_RX_CQ_DATA;
+            fabric_hints_->mode                   = FI_CONTEXT | FI_LOCAL_MR;
             fabric_hints_->fabric_attr->prov_name = strdup(provider.c_str());
             LOG_DEBUG_MSG("fabric provider " << fabric_hints_->fabric_attr->prov_name);
             if (domain.size()>0) {
@@ -217,8 +219,8 @@ namespace libfabric
             fabric_hints_->domain_attr->control_progress = FI_PROGRESS_MANUAL;
             fabric_hints_->domain_attr->data_progress = FI_PROGRESS_MANUAL;
 
-            // Enable thread safe mode
-            fabric_hints_->domain_attr->threading = FI_THREAD_SAFE;
+            // Enable thread safe mode Does not work with psm2 provider
+            // fabric_hints_->domain_attr->threading = FI_THREAD_SAFE;
 
             // Enable resource management
             fabric_hints_->domain_attr->resource_mgmt = FI_RM_ENABLED;

@@ -89,6 +89,10 @@ elseif(HPX_PARCELPORT_LIBFABRIC_PROVIDER MATCHES "sockets")
     hpx_add_config_define_namespace(
         DEFINE HPX_PARCELPORT_LIBFABRIC_SOCKETS
         NAMESPACE parcelport)
+elseif(HPX_PARCELPORT_LIBFABRIC_PROVIDER MATCHES "psm2")
+    hpx_add_config_define_namespace(
+        DEFINE HPX_PARCELPORT_LIBFABRIC_PSM2
+        NAMESPACE parcelport)
 endif()
 
 hpx_option(HPX_PARCELPORT_LIBFABRIC_DOMAIN STRING

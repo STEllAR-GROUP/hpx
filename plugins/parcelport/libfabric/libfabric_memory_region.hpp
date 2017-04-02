@@ -54,7 +54,7 @@ namespace libfabric
                     const_cast<void*>(buffer), length,
                     FI_READ | FI_WRITE | FI_RECV | FI_SEND |
                     FI_REMOTE_READ | FI_REMOTE_WRITE,
-                    0, 0, 0, &(region_),
+                    0, (uint64_t)address_, 0, &(region_),
                     NULL);
 
             if (ret) {
@@ -93,7 +93,7 @@ namespace libfabric
                     FI_READ | FI_WRITE |
                     FI_RECV | FI_SEND |
                     FI_REMOTE_READ | FI_REMOTE_WRITE,
-                    0, 0, 0, &(region_), NULL);
+                    0, (uint64_t)address_, 0, &(region_), NULL);
 
             if (ret) {
                 LOG_ERROR_MSG(
