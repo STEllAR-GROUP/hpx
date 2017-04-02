@@ -59,7 +59,26 @@
 #define sockaddress(p) ipaddress(((struct sockaddr_in*)(p))->sin_addr.s_addr)
 
 // ------------------------------------------------------------------
-// helper class for printing thread ID
+// include files needed for boost::log
+// ------------------------------------------------------------------
+#ifdef HPX_PARCELPORT_LOGGING_INCLUDE_FILES
+#  include <boost/log/trivial.hpp>
+#  include <boost/log/expressions/formatter.hpp>
+#  include <boost/log/expressions/formatters.hpp>
+#  include <boost/log/expressions/formatters/stream.hpp>
+#  include <boost/log/expressions.hpp>
+#  include <boost/log/sources/severity_logger.hpp>
+#  include <boost/log/sources/record_ostream.hpp>
+#  include <boost/log/utility/formatting_ostream.hpp>
+#  include <boost/log/utility/manipulators/to_log.hpp>
+#  include <boost/log/utility/setup/console.hpp>
+#  include <boost/log/utility/setup/common_attributes.hpp>
+#endif
+
+#include <boost/crc.hpp>
+
+// ------------------------------------------------------------------
+// helper classes/functions used in logging
 // ------------------------------------------------------------------
 namespace hpx {
 namespace parcelset {
@@ -67,6 +86,9 @@ namespace policies {
 namespace libfabric {
 namespace detail {
 
+    // ------------------------------------------------------------------
+    // helper class for printing thread ID
+    // ------------------------------------------------------------------
     struct rdma_thread_print_helper {};
 
     inline std::ostream& operator<<(std::ostream& os, const rdma_thread_print_helper&)
@@ -83,27 +105,44 @@ namespace detail {
         return os;
     }
 
+    // ------------------------------------------------------------------
+    // helper fuction for printing CRC32
+    // ------------------------------------------------------------------
+    static uint32_t crc32(const void *address, size_t length)
+    {
+        boost::crc_32_type result;
+        result.process_bytes(address, length);
+        return result.checksum();
+    }
+
+    // ------------------------------------------------------------------
+    // helper fuction for printing CRC32 and short memory dump
+    // ------------------------------------------------------------------
+    static std::string mem_crc32(const void *address, size_t length, const char *txt)
+    {
+        const uint64_t *uintBuf = static_cast<const uint64_t*>(address);
+        std::stringstream temp;
+        temp << "Memory: ";
+        temp << "address " << hexpointer(address)
+             << "length " << hexuint32(length)
+             << "CRC32: " << hexuint32(crc32(address,length));
+        for (size_t i=0; i < std::min(length/8, size_t(128)); i++) {
+            temp << hexuint64(*uintBuf++);
+        }
+        temp << ": " << txt;
+        return temp.str();
+    }
+
 }}}}}
 
 #define THREAD_ID "" \
     << hpx::parcelset::policies::libfabric::detail::rdma_thread_print_helper()
 
-// ------------------------------------------------------------------
-// include files needed for boost::log
-// ------------------------------------------------------------------
-#ifdef HPX_PARCELPORT_LOGGING_INCLUDE_FILES
-#  include <boost/log/trivial.hpp>
-#  include <boost/log/expressions/formatter.hpp>
-#  include <boost/log/expressions/formatters.hpp>
-#  include <boost/log/expressions/formatters/stream.hpp>
-#  include <boost/log/expressions.hpp>
-#  include <boost/log/sources/severity_logger.hpp>
-#  include <boost/log/sources/record_ostream.hpp>
-#  include <boost/log/utility/formatting_ostream.hpp>
-#  include <boost/log/utility/manipulators/to_log.hpp>
-#  include <boost/log/utility/setup/console.hpp>
-#  include <boost/log/utility/setup/common_attributes.hpp>
-#endif
+#define CRC32(buf,len) "" \
+    << hpx::parcelset::policies::libfabric::detail::crc32(buf,len)
+
+#define CRC32_MEM(buf, len, txt) "" \
+    << hpx::parcelset::policies::libfabric::detail::mem_crc32(buf, len, txt)
 
 // ------------------------------------------------------------------
 // Trace messages are enabled for full debug
