@@ -184,7 +184,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     {
         launch_hosted();
         get_big_boot_barrier().wait_hosted(
-            pp->get_locality_name(),
+            pp ? pp->get_locality_name() : "<console>",
             primary_ns_.ptr(), symbol_ns_.ptr());
     }
 #else
