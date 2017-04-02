@@ -14,11 +14,12 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 
+#include <plugins/parcelport/parcelport_logging.hpp>
+
 #ifdef RW_LOCK_ENABLE_LOGGING
-# define LOG_DEBUG_MSG(x) std::cout << "00: <debug> " << \
-    << x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
+# define RWL_DEBUG_MSG(x) LOG_DEBUG_MSG(x)
 #else
-# define LOG_DEBUG_MSG(x)
+# define RWL_DEBUG_MSG(x)
 #endif
 
 // Note that this implementaion uses 16bit counters so can handle 65536
@@ -154,7 +155,7 @@ namespace local {
         //
         void lock()
         {
-            LOG_DEBUG_MSG("lock wr " << std::hex << this
+            RWL_DEBUG_MSG("lock wr " << std::hex << this
                 << " r " << ticket.s.readers
                 << " w " << ticket.s.writers
                 << " n " << ticket.s.next
@@ -181,7 +182,7 @@ namespace local {
             // readlock incremented readers when it took the lock
             if (readlock_) {
                 atomic_inc(&ticket.s.writers);
-                LOG_DEBUG_MSG("unlock rd " << std::hex << this
+                RWL_DEBUG_MSG("unlock rd " << std::hex << this
                     << " r " << ticket.s.readers
                     << " w " << ticket.s.writers
                     << " n " << ticket.s.next);
@@ -191,7 +192,7 @@ namespace local {
                 readwrite_ticket new_ticket = ticket;
                 ++new_ticket.s.writers;
                 ++new_ticket.s.readers;
-                LOG_DEBUG_MSG("unlock wr " << std::hex << this
+                RWL_DEBUG_MSG("unlock wr " << std::hex << this
                     << " r " << new_ticket.s.readers
                     << " w " << new_ticket.s.writers
                     << " n " << new_ticket.s.next);
@@ -233,7 +234,7 @@ namespace local {
         //
         void lock_shared()
         {
-            LOG_DEBUG_MSG("lock rd " << std::hex << this
+            RWL_DEBUG_MSG("lock rd " << std::hex << this
                 << " r " << ticket.s.readers
                 << " w " << ticket.s.writers
                 << " n " << ticket.s.next
