@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_THREAD_COMPATIBILITY)
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/once.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <cstdint>
@@ -47,6 +48,15 @@ namespace hpx { namespace compat
         using base_type::try_lock;
         using base_type::unlock;
     };
+
+    struct once_flag : boost::once_flag
+    {
+        HPX_CONSTEXPR once_flag() HPX_NOEXCEPT
+          : boost::once_flag(BOOST_ONCE_INIT)
+        {}
+    };
+
+    using boost::call_once;
 }}
 #else
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +66,9 @@ namespace hpx { namespace compat
 {
     using mutex = std::mutex;
     using recursive_mutex = std::recursive_mutex;
+
+    using once_flag = std::once_flag;
+    using std::call_once;
 }}
 #endif
 
