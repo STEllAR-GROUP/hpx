@@ -333,7 +333,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         void handle_list_and_print_options(hpx::runtime& rt,
-            boost::program_options::variables_map& vm)
+            boost::program_options::variables_map& vm,
+            bool print_counters_locally)
         {
             if (vm.count("hpx:list-counters")) {
                 // Print the names of all registered performance counters.
@@ -430,7 +431,8 @@ namespace hpx
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
                         std::ref(counters), std::ref(reset_counters), interval,
-                        destination, counter_format, counter_shortnames, csv_header);
+                        destination, counter_format, counter_shortnames, csv_header,
+                        print_counters_locally);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
@@ -491,8 +493,10 @@ namespace hpx
 
             // Add startup function related to listing counter names or counter
             // infos (on console only).
-            if (mode == runtime_mode_console)
-                handle_list_and_print_options(rt, vm);
+            bool print_counters_locally =
+                vm.count("hpx:print-counters-locally") != 0;
+            if (mode == runtime_mode_console || print_counters_locally)
+                handle_list_and_print_options(rt, vm, print_counters_locally);
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial")) {
