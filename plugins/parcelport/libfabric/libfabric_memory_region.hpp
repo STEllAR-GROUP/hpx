@@ -202,6 +202,7 @@ namespace libfabric
             return used_space_;
         }
 
+
         // --------------------------------------------------------------------
         // return the underlying infiniband region handle
         inline struct fid_mr *get_region() { return region_; }
@@ -238,7 +239,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // a partial region is a subregion of a larger memory region
-        // on destruction, it is not unregister or deleted as the 'parent' region
+        // on destruction, it is not unregistered or deleted as the 'parent' region
         // will delete many partial regions on destruction
         inline void set_partial_region() {
             flags_ |= BLOCK_PARTIAL;

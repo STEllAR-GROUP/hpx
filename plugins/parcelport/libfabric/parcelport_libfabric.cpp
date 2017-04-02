@@ -3,6 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
+
+// TODO: cleanup includes
+
 // config
 #include <hpx/config.hpp>
 // util
@@ -41,6 +45,9 @@
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
+// until we implement immediate data, or counted rdma send completions
+// we will use a small message returned to the sender to signal ok
+// to release buffers.
 #define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
@@ -48,7 +55,6 @@
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
 
-//#include <plugins/parcelport/libfabric/sender_connection.hpp>
 #include <plugins/parcelport/libfabric/connection_handler.hpp>
 //#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
 #include <plugins/parcelport/libfabric/performance_counter.hpp>
@@ -86,831 +92,133 @@ namespace policies {
 namespace libfabric
 {
     // --------------------------------------------------------------------
-    // Simple atomic counter we use for tags
-    // When a parcel is sent to a remote locality, it may need to pull zero copy
-    // chunks from us. We keep the chunks until the remote locality sends a zero byte
-    // message with the tag we gave them and then we know it is safe to release the
-    // memory back to the pool.
-    // The tags can have a short lifetime, but must be unique, so we encode the ip
-    // address with a counter to generate tags per destination.
-    // The tag is sent in immediate data so must be 32bits only : Note that the tag
-    // only has a lifetime of the unprocessed parcel, so it can be reused as soon as
-    // the parcel has been completed and therefore a 16bit count is sufficient as we
-    // only keep a few parcels per locality in flight at a time
-    // --------------------------------------------------------------------
-    struct tag_provider {
-        tag_provider() : next_tag_(1) {}
-
-        uint32_t next(uint32_t fi_addr)
-        {
-            // @TODO track wrap around and collisions (how?)
-            return (next_tag_++ & 0x0000FFFF) + ((fi_addr << 16) & 0xFFFF0000);
-        }
-
-        // using 16 bits currently.
-        std::atomic<uint32_t> next_tag_;
-    };
-
-    // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
-    struct HPX_EXPORT parcelport : public parcelport_impl<parcelport>
-    {
-    private:
-        typedef parcelport_impl<parcelport> base_type;
 
-    public:
-
-        // These are the types used in the parcelport for locking etc
-        // Note that spinlock is the only supported mutex that works on HPX+OS threads
-        // and condition_variable_any can be used across HPX/OS threads
-        typedef hpx::lcos::local::spinlock                               mutex_type;
-        typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
-        typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
-        typedef hpx::lcos::local::condition_variable_any                 condition_type;
-
-        // --------------------------------------------------------------------
-        // main vars used to manage the RDMA controller and interface
-        // These are called from a static function, so use static
-        // --------------------------------------------------------------------
-        libfabric_controller_ptr libfabric_controller_;
-
-        // our local ip address (estimated based on fabric PP adress info)
-        uint32_t ip_addr_;
-
-        // Not currently working, we support bootstrapping, but when not enabled
-        // we should be able to skip it
-        bool bootstrap_enabled_;
-        bool parcelport_enabled_;
-
-        // to quickly lookup an endpoint from a destination ip address
-        typedef hpx::concurrent::unordered_map<std::uint32_t, struct fid_ep *> ip_map;
-        typedef ip_map::iterator ip_map_iterator;
-        ip_map ip_endpoint_map;
-
-        typedef hpx::concurrent::unordered_map<std::uint32_t, fi_addr_t> addr_map;
-        typedef addr_map::iterator addr_map_iterator;
-        addr_map addr_endpoint_map;
-
-        // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a
-        // more consistent reuse of classes/types.
-        // The use of pointer allocators etc is a dreadful hack and needs reworking
-
-        typedef rdma_memory_pool                                   memory_pool_type;
-        typedef std::shared_ptr<memory_pool_type>                  memory_pool_ptr_type;
-        typedef snd_data_type                                      rcv_data_type;
-        typedef parcel_buffer<rcv_data_type>                       snd_buffer_type;
-        typedef parcel_buffer<rcv_data_type, std::vector<char>>    rcv_buffer_type;
-
-        // when terminating the parcelport, this is used to restrict access
-        mutex_type  stop_mutex;
-        mutex_type  address_mutex;
-
-        // These are counters that are used for flow control so that we can throttle
-        // send tasks when too many messages have been posted.
-        std::atomic<unsigned int> active_send_count_;
-        std::atomic<bool>         immediate_send_allowed_;
-        // Used to help with shutdown
-        std::atomic<bool>         stopped_;
-
-        memory_pool_ptr_type      chunk_pool_;
-        libfabric::tag_provider   tag_provider_;
-
-        // performance_counters::parcels::gatherer& parcels_sent_;
-
-#if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
-        typedef boost::container::small_vector<libfabric_memory_region*,4> zero_copy_vector;
-#else
-        typedef std::vector<libfabric_memory_region*>                      zero_copy_vector;
-#endif
-
-        // --------------------------------------------------------------------
-        // struct we use to keep track of all memory regions used during a send,
-        // they must be held onto until all transfers of data are complete.
-        // --------------------------------------------------------------------
-        typedef struct {
-            uint32_t                                                tag;
-            std::atomic_flag                                        delete_flag;
-            bool                                                    has_zero_copy;
-            util::unique_function_nonser< void(error_code const&) > handler;
-            libfabric_memory_region                     *header_region, *message_region;
-            zero_copy_vector                                        zero_copy_regions;
-        } parcel_send_data;
-
-        // --------------------------------------------------------------------
-        // struct we use to keep track of all memory regions used during a recv,
-        // they must be held onto until all transfers of data are complete.
-        // --------------------------------------------------------------------
-        typedef serialization::serialization_chunk chunk_struct;
-        typedef struct {
-            std::atomic<uint32_t>       rdma_count;
-            uint32_t                    tag;
-            fi_addr_t                    src_addr;
-            libfabric_memory_region    *header_region, *message_region;
-            std::vector<chunk_struct>   chunks;
-            zero_copy_vector            zero_copy_regions;
-        } parcel_recv_data;
-
-        typedef std::list<parcel_send_data>      active_send_list_type;
-        typedef active_send_list_type::iterator  active_send_iterator;
-        //
-        typedef std::list<parcel_recv_data>      active_recv_list_type;
-        typedef active_recv_list_type::iterator  active_recv_iterator;
-
-        // map send/recv parcel wr_id to all info needed on completion
-        typedef hpx::concurrent::unordered_map<void*, active_send_iterator>
-            send_wr_map;
-        typedef hpx::concurrent::unordered_map<uint32_t, active_send_iterator>
-            tag_map;
-        typedef hpx::concurrent::unordered_map<void*, active_recv_iterator>
-            recv_wr_map;
-
-        // store received objects using a map referenced by libfabric work request ID
-        send_wr_map SendCompletionMap;
-        tag_map     TagSendCompletionMap;
-        recv_wr_map ReadCompletionMap;
-
-        // keep track of all outgoing sends in a list, protected by a mutex
-        active_send_list_type   active_sends;
-        mutex_type              active_send_mutex;
-
-        // keep track of all active receive operations in a list, protected by a mutex
-        active_recv_list_type   active_recvs;
-        mutex_type              active_recv_mutex;
-
-        // a count of all receives, for debugging/performance measurement
-        performance_counter<unsigned int> sends_posted;
-        performance_counter<unsigned int> acks_posted;
-        performance_counter<unsigned int> acks_received;
-        performance_counter<unsigned int> receives_handled;
-        performance_counter<unsigned int> completions_handled;
-        performance_counter<unsigned int> total_reads;
-        performance_counter<unsigned int> send_deletes;
-        performance_counter<unsigned int> recv_deletes;
-
-        // --------------------------------------------------------------------
-        // Constructor : mostly just initializes the superclass with 'here'
-        // --------------------------------------------------------------------
-        parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread)
-            : base_type(ini, locality(), on_start_thread, on_stop_thread)
-            , active_send_count_(0)
-            , immediate_send_allowed_(true)
+    // --------------------------------------------------------------------
+    // Constructor : mostly just initializes the superclass with 'here'
+    // --------------------------------------------------------------------
+    parcelport::parcelport(util::runtime_configuration const& ini,
+        util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+        util::function_nonser<void()> const& on_stop_thread)
+        : base_type(ini, locality(), on_start_thread, on_stop_thread)
             , stopped_(false)
-            , sends_posted(0)
-            , acks_posted(0)
-            , acks_received(0)
-            , receives_handled(0)
-            , completions_handled(0)
-            , total_reads(0)
-            , send_deletes(0)
-            , recv_deletes(0)
+    {
+        FUNC_START_DEBUG_MSG;
+
+        // if we are not enabled, then skip allocating resources
+        parcelport_enabled_ = hpx::util::get_entry_as<bool>(ini,
+            "hpx.parcel.libfabric.enable", 0);
+        LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
+
+        bootstrap_enabled_ = ("libfabric" ==
+            hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
+        LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
+
+        if (!parcelport_enabled_) return;
+
+        // Get parameters that determine our fabric selection
+        std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
+            HPX_PARCELPORT_LIBFABRIC_PROVIDER);
+        std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
+            HPX_PARCELPORT_LIBFABRIC_DOMAIN);
+        std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
+            HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
+
+        LOG_DEBUG_MSG("libfabric parcelport function using attributes "
+            << provider << " " << domain << " " << endpoint);
+
+        // create our main fabric control structure
+        libfabric_controller_ = std::make_shared<libfabric_controller>(
+            provider, domain, endpoint);
+
+        // get 'this' locality from the controller
+        LOG_DEBUG_MSG("Getting local locality object");
+        const locality & local = libfabric_controller_->here();
+        here_ = parcelset::locality(local);
+        // and make a note of our ip address for convenience
+        ip_addr_ = local.ip_address();
+
+        FUNC_END_DEBUG_MSG;
+    }
+
+    // Start the handling of connections.
+    bool parcelport::do_run()
+    {
+        if (!parcelport_enabled_) return false;
+
+        auto &as = this->applier_->get_agas_client();
+        libfabric_controller_->initialize_localities(as);
+
+        FUNC_START_DEBUG_MSG;
+        libfabric_controller_->startup(this);
+
+        LOG_DEBUG_MSG("Fetching memory pool");
+        chunk_pool_ = &libfabric_controller_->get_memory_pool();
+
+        for (std::size_t i = 0; i < HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS; ++i)
         {
-            FUNC_START_DEBUG_MSG;
-
-            // if we are not enabled, then skip allocating resources
-            parcelport_enabled_ = hpx::util::get_entry_as<bool>(ini,
-                "hpx.parcel.libfabric.enable", 0);
-            LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
-
-            bootstrap_enabled_ = ("libfabric" ==
-                hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
-            LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
-
-            if (!parcelport_enabled_) return;
-
-            // Get parameters that determine our fabric selection
-            std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
-                HPX_PARCELPORT_LIBFABRIC_PROVIDER);
-            std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
-                HPX_PARCELPORT_LIBFABRIC_DOMAIN);
-            std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
-                HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
-
-            LOG_DEBUG_MSG("libfabric parcelport function using attributes "
-                << provider << " " << domain << " " << endpoint);
-
-            // create our main fabric control structure
-            libfabric_controller_ = std::make_shared<libfabric_controller>(
-                provider, domain, endpoint);
-
-            // get 'this' locality from the controller
-            LOG_DEBUG_MSG("Getting local locality object");
-            const locality & local = libfabric_controller_->here();
-            here_ = parcelset::locality(local);
-            // and make a note of our ip address for convenience
-            ip_addr_ = local.ip_address();
-
-            FUNC_END_DEBUG_MSG;
+            sender *snd =
+               new sender(this,
+                    libfabric_controller_->ep_active_,
+                    libfabric_controller_->get_domain(),
+                    chunk_pool_);
+            // the postprocess handler will be triggered when the send operation completes
+            // this function simply pushes it back onto the senders queue/stack
+            snd->postprocess_handler_ = [this](sender* s)
+                {
+                    LOG_DEBUG_MSG("Pushed a sender (postprocess_handler)" << hexpointer(s));
+                    senders_.push(s);
+                };
+            LOG_DEBUG_MSG("Pushed a sender (startup)" << hexpointer(snd));
+            senders_.push(snd);
         }
+        return true;
+    }
 
-        // Start the handling of connections.
-        bool do_run()
+    // --------------------------------------------------------------------
+    // return a sender object back to the parcelport_impl
+    // this is used by the send_immediate version of parcelport_impl
+    // --------------------------------------------------------------------
+    sender* parcelport::get_connection(
+        parcelset::locality const& dest, fi_addr_t &fi_addr)
+    {
+        FUNC_START_DEBUG_MSG;
+        sender* snd = nullptr;
+        if (senders_.pop(snd))
         {
-            if (!parcelport_enabled_) return false;
-
-            auto &as = this->applier_->get_agas_client();
-            libfabric_controller_->initialize_localities(as);
-
-            FUNC_START_DEBUG_MSG;
-            libfabric_controller_->startup();
-
-
-            LOG_DEBUG_MSG("Fetching memory pool");
-            chunk_pool_ = libfabric_controller_->get_memory_pool();
-
-            LOG_DEBUG_MSG("Setting Connection function");
-            auto connection_function = std::bind(
-                &parcelport::handle_libfabric_connection, this,
-                std::placeholders::_1, std::placeholders::_2
-            );
-            libfabric_controller_->setConnectionFunction(connection_function);
-
-            LOG_DEBUG_MSG("Setting Completion functions");
-            auto send_completion_function = std::bind(
-                &parcelport::handle_send_completion, this,
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            libfabric_controller_->setSendCompletionFunction(send_completion_function);
-
-            auto recv_completion_function = std::bind(
-                &parcelport::handle_recv_completion, this,
-                std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3, std::placeholders::_4);
-            libfabric_controller_->setRecvCompletionFunction(recv_completion_function);
-
-            auto rdma_completion_function = std::bind(
-                &parcelport::handle_rdma_completion, this,
-                std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3);
-            libfabric_controller_->setRDMACompletionFunction(rdma_completion_function);
-
-            singleton_connection = std::make_shared<sender_connection>(
-                  this
-                , 0
-                , libfabric_controller_->ep_active_
-                , chunk_pool_.get()
-                , parcels_sent_
-            );
-
-
-            return true;
-       }
-
-        std::shared_ptr<sender_connection> singleton_connection;
-
-        // --------------------------------------------------------------------
-        // return a sender_connection object back to the parcelport_impl
-        // this is used by the send_immediate version of parcelport_impl
-        // --------------------------------------------------------------------
-        sender_connection* get_connection(
-            parcelset::locality const& dest, fi_addr_t &fi_addr)
-        {
-            FUNC_START_DEBUG_MSG;
+            LOG_DEBUG_MSG("Popped a sender " << hexpointer(snd));
             const locality &fabric_locality = dest.get<locality>();
             LOG_DEBUG_MSG("get_fabric_address           from "
                 << ipaddress(here_.get<locality>().ip_address()) << "to "
                 << ipaddress(fabric_locality.ip_address()));
             fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
             FUNC_END_DEBUG_MSG;
-            return singleton_connection.get();
+
+            return snd;
         }
+        // if no senders are available shutdown
+        LOG_ERROR_MSG("No senders left, stop sending stuff please");
+        std::terminate();
+        FUNC_END_DEBUG_MSG;
+        return nullptr;
+    }
 
-        // --------------------------------------------------------------------
-        // return a sender_connection object back to the parcelport_impl
-        // this is for compatibility with non send_immediate operation
-        // --------------------------------------------------------------------
-        std::shared_ptr<sender_connection> create_connection(
-            parcelset::locality const& dest, error_code& ec)
-        {
-            FUNC_START_DEBUG_MSG;
-            LOG_DEVEL_MSG("connection cache not supported");
-            std::terminate();
-            FUNC_END_DEBUG_MSG;
-            return singleton_connection;
-        }
+    // --------------------------------------------------------------------
+    // return a sender object back to the parcelport_impl
+    // this is for compatibility with non send_immediate operation
+    // --------------------------------------------------------------------
+    std::shared_ptr<sender> parcelport::create_connection(
+        parcelset::locality const& dest, error_code& ec)
+    {
+        LOG_DEVEL_MSG("Creating new sender");
+        // if no senders are available shutdown
+        LOG_ERROR_MSG("Do not support the connection cache stuff");
+        std::terminate();
+        return std::shared_ptr<sender>();
+    }
 
-        // --------------------------------------------------------------------
-        // Clean up a completed send and all its regions etc
-        // Called when we finish sending a simple message,
-        // or when all zero-copy Get operations are done
-        // --------------------------------------------------------------------
-        void delete_send_data(active_send_iterator send) {
-
-            // a count of all receives, for debugging/performance measurement
-
-            ++send_deletes;
-
-            parcel_send_data &send_data = *send;
-            // trigger the send complete handler for hpx internal cleanup
-            LOG_DEBUG_MSG("Calling write_handler for completed send");
-            send_data.handler.operator()(error_code());
-            //
-            LOG_DEBUG_MSG("deallocating region 1 for completed send "
-                << hexpointer(send_data.header_region)
-                << " tag " << hexuint32(send_data.tag));
-            chunk_pool_->deallocate(send_data.header_region);
-            send_data.header_region  = nullptr;
-            // if this message had multiple (2) SGEs then release other regions
-            if (send_data.message_region) {
-                LOG_DEBUG_MSG("deallocating region 2 for completed send "
-                    << hexpointer(send_data.message_region));
-                chunk_pool_->deallocate(send_data.message_region);
-                send_data.message_region = nullptr;
-            }
-            for (auto r : send_data.zero_copy_regions) {
-                LOG_DEBUG_MSG("Deallocating zero_copy_regions " << hexpointer(r));
-                chunk_pool_->deallocate(r);
-            }
-
-            {
-                LOG_DEBUG_MSG("Taking lock on active_send_mutex in delete_send_data "
-                    << decnumber(active_send_count_) );
-                //
-                scoped_lock lock(active_send_mutex);
-                active_sends.erase(send);
-                //
-                if (--active_send_count_ <= HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE)
-                {
-                    if (!immediate_send_allowed_) {
-                        LOG_DEVEL_MSG("Enabling immediate send : active "
-                            << decnumber(active_send_count_) << " "
-                            << active_sends.size());
-                    }
-                    immediate_send_allowed_ = true;
-                }
-                LOG_DEBUG_MSG("Active send after erase size "
-                    << decnumber(active_send_count_) );
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // Clean up a completed recv and all its regions etc
-        // Called when a parcel_buffer finishes decoding a message
-        // --------------------------------------------------------------------
-        void delete_recv_data(active_recv_iterator recv)
-        {
-
-            ++recv_deletes;
-
-            FUNC_START_DEBUG_MSG;
-            parcel_recv_data &recv_data = *recv;
-            chunk_pool_->deallocate(recv_data.header_region);
-            LOG_DEBUG_MSG("Zero copy regions size is (delete) "
-                << decnumber(recv_data.zero_copy_regions.size())
-                << hexuint32(recv_data.tag));
-            for (auto r : recv_data.zero_copy_regions) {
-                LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
-                chunk_pool_->deallocate(r);
-            }
-            {
-                scoped_lock lock(active_recv_mutex);
-                active_recvs.erase(recv);
-                LOG_DEBUG_MSG("Active recv after erase size "
-                    << hexnumber(active_recvs.size()) );
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // handler for connections, this is triggered as a callback from the
-        // controller when a connection has been established.
-        // When we connect to another locality, all internal structures are
-        // updated accordingly, but when another locality connects to us,
-        // we must do it manually via this callback
-        // --------------------------------------------------------------------
-        void handle_libfabric_connection(struct fid_ep *client, uint32_t dest_ip)
-        {
-            if (1) {
-            LOG_DEVEL_MSG("Connection established     from "
-                << ipaddress(ip_addr_) << "-> "
-                << ipaddress(dest_ip) << "( " << ipaddress(ip_addr_) << ")");
-            }
-            else {
-                LOG_DEVEL_MSG("Connection established     from "
-                    << ipaddress(dest_ip) << "-> "
-                    << ipaddress(ip_addr_) << "( " << ipaddress(ip_addr_) << ")");
-            }
-            //
-            auto present = ip_endpoint_map.is_in_map(dest_ip);
-            if (!present.second) {
-                ip_endpoint_map.insert(std::make_pair(dest_ip, client));
-                LOG_DEVEL_MSG("handle_libfabric_connection OK  ip_endpoint_map "
-                    << ipaddress(dest_ip)
-                    << "( " << ipaddress(ip_addr_) << ")");
-            }
-            else {
-                throw std::runtime_error("libfabric parcelport "
-                    ": should not be receiving a connection more than once");
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // When a send completes take one of two actions ...
-        // if there are no zero copy chunks, we consider the parcel sending complete
-        // so release memory and trigger write_handler.
-        // If there are zero copy chunks to be RDMA GET from the remote end, then
-        // we hold onto data until they have completed.
-        // --------------------------------------------------------------------
-        void handle_send_completion(void* wr_id, struct fid_ep* client, uint32_t)
-        {
-            active_send_iterator current_send;
-            {
-                // we must be very careful here.
-                // if the lock is not obtained and this thread is waiting, then
-                // zero copy GETs might complete and another thread might receive
-                // a zero copy complete message then delete the current send data
-                // whilst we are still waiting
-                auto is_present = SendCompletionMap.is_in_map(wr_id);
-                if (is_present.second) {
-                    current_send = is_present.first->second;
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
-                        << "from SendCompletionMap : size before erase "
-                        << SendCompletionMap.size());
-                    SendCompletionMap.erase(is_present.first);
-                }
-                else {
-                    std::terminate();
-                    //handle_tag_send_completion(wr_id);
-                    return;
-                }
-            }
-            // if the send had no zero_copy regions, then it has completed
-            if (!current_send->has_zero_copy) {
-                LOG_DEBUG_MSG("Deleting send data "
-                    << hexpointer(&(*current_send)) << "normal");
-                delete_send_data(current_send);
-            }
-            // if another thread signals to say zero-copy complete, delete the data
-            else if (current_send->delete_flag.test_and_set(
-                std::memory_order_acquire))
-            {
-                LOG_DEBUG_MSG("Deleting send data "
-                    << hexpointer(&(*current_send)) << "after race detection");
-                delete_send_data(current_send);
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // When a recv completes, take one of two actions ...
-        // if there are no zero copy chunks, we consider the parcel receive complete
-        // so release memory and trigger write_handler.
-        // If there are zero copy chunks to be RDMA GET'ed from the remote end,
-        // then we hold onto data until they have completed.
-        // --------------------------------------------------------------------
-        void handle_recv_completion(void* wr_id, struct fid_ep* client, uint32_t len, fi_addr_t src)
-        {
-            util::high_resolution_timer timer;
-
-            if (len<=4) {
-                LOG_DEVEL_MSG("Tag receive");
-                int imm_data = 0; // @TODO fix this
-                handle_tag_recv_completion(wr_id, imm_data, client);
-                ++acks_received;
-                return;
-            }
-
-            ++receives_handled;
-            // store details about this parcel so that all memory buffers can be kept
-            // until all recv operations have completed.
-            active_recv_iterator current_recv;
-            {
-                scoped_lock lock(active_recv_mutex);
-                active_recvs.emplace_back();
-                current_recv = std::prev(active_recvs.end());
-                LOG_DEBUG_MSG("Active recv after insert size "
-                    << hexnumber(active_recvs.size()));
-            }
-            parcel_recv_data &recv_data = *current_recv;
-            // get the header of the new message/parcel
-            recv_data.header_region  = (libfabric_memory_region *)wr_id;
-            header_type *h = (header_type*)recv_data.header_region->get_address();
-            recv_data.message_region = nullptr;
-            // zero copy chunks we have to GET from the source locality
-            if (h->piggy_back()) {
-              recv_data.rdma_count = h->num_chunks().first;
-            }
-            else {
-                recv_data.rdma_count = 1 + h->num_chunks().first;
-            }
-            // each parcel has a unique tag which we use to organize
-            // zero-copy data if we need any
-            recv_data.tag      = h->tag();
-            recv_data.src_addr = src;
-            //
-            LOG_DEVEL_MSG( "received IBV_WC_RECV " <<
-                    "buffsize " << decnumber(h->size())
-                    << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
-                    << ", chunk_flag " << decnumber(h->header_length())
-                    << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                    << " chunkdata " << decnumber((h->chunk_data()!=nullptr))
-                    << " piggyback " << decnumber((h->piggy_back()!=nullptr))
-                    << " tag " << hexuint32(h->tag())
-                    << " total receives " << decnumber(receives_handled)
-            );
-
-            // setting this flag to false - if more data is needed -
-            // disables final parcel receive call
-            bool parcel_complete = true;
-
-            // if message was not piggybacked
-            char *piggy_back = h->piggy_back();
-            char *chunk_data = h->chunk_data();
-            if (chunk_data) {
-                // all the info about chunks we need is stored inside the header
-                recv_data.chunks.resize(h->num_chunks().first + h->num_chunks().second);
-                size_t chunkbytes =
-                    recv_data.chunks.size() * sizeof(chunk_struct);
-                std::memcpy(recv_data.chunks.data(), chunk_data, chunkbytes);
-                LOG_DEBUG_MSG("Copied chunk data from header : size "
-                    << decnumber(chunkbytes));
-
-                // setup info for zero-copy rdma get chunks (if there are any)
-                if (recv_data.rdma_count>0) {
-                    parcel_complete = false;
-                    int index = 0;
-                    LOG_EXCLUSIVE(
-                    for (const chunk_struct &c : recv_data.chunks)
-                    {
-                        LOG_DEBUG_MSG("recv : chunk : size " << hexnumber(c.size_)
-                                << " type " << decnumber((uint64_t)c.type_)
-                                << " rkey " << hexpointer(c.rkey_)
-                                << " cpos " << hexpointer(c.data_.cpos_)
-                                << " pos " << hexpointer(c.data_.pos_)
-                                << " index " << decnumber(c.data_.index_));
-                    })
-                    for (chunk_struct &c : recv_data.chunks) {
-                        if (c.type_ == serialization::chunk_type_pointer) {
-                            libfabric_memory_region *get_region =
-                                chunk_pool_->allocate_region(c.size_);
-
-                            LOG_DEVEL_MSG("RDMA Get addr " << hexpointer(c.data_.cpos_)
-                                << "rkey " << hexpointer(c.rkey_)
-                                << "size " << hexnumber(c.size_)
-                                << "tag " << hexuint32(recv_data.tag)
-                                << "local addr " << hexpointer(get_region->get_address())
-                                << "length " << hexlength(c.size_));
-                            recv_data.zero_copy_regions.push_back(get_region);
-                            LOG_DEBUG_MSG("Zero copy regions size is (create) "
-                                << decnumber(recv_data.zero_copy_regions.size()));
-                            // put region into map before posting read in case it
-                            // completes whilst this thread is suspended
-                            {
-                                ReadCompletionMap.insert(
-                                    std::make_pair(get_region, current_recv));
-                            }
-                            // overwrite the serialization data to account for the
-                            // local pointers instead of remote ones
-                            const void *remoteAddr = c.data_.cpos_;
-                            recv_data.chunks[index] =
-                                hpx::serialization::create_pointer_chunk(
-                                    get_region->get_address(), c.size_, c.rkey_);
-                            ++total_reads;
-                            // post the rdma read/get
-                            LOG_DEVEL_MSG("RDMA Get fi_read :"
-                                << " chunk " << decnumber(index)
-                                << " client " << hexpointer(client)
-                                << " fi_addr " << hexpointer(src)
-                                << " local addr " << hexpointer(get_region->get_address())
-                                << " local desc " << hexpointer(get_region->get_desc())
-                                << " size " << hexnumber(c.size_)
-                                << " rkey " << hexpointer(c.rkey_)
-                                << " remote cpos " << hexpointer(remoteAddr)
-                                << " remote pos " << hexpointer(remoteAddr)
-                                << " index " << decnumber(c.data_.index_));
-
-                            ssize_t ret = fi_read(client,
-                                get_region->get_address(), c.size_, get_region->get_desc(),
-                                src,
-                                (uint64_t)(remoteAddr), c.rkey_, get_region);
-
-                            if (ret) throw fabric_error(ret, "fi_read error");
-                        }
-                        index++;
-                    }
-                }
-            }
-            else {
-                // no chunk information was sent in this message, so we must GET it
-                parcel_complete = false;
-                LOG_DEVEL_MSG("@TODO implement RDMA GET of mass chunk information "
-                    "when header too small");
-                std::terminate();
-                throw std::runtime_error("@TODO implement RDMA GET of mass chunk "
-                    "information when header too small");
-            }
-
-            LOG_DEBUG_MSG("piggy_back is " << hexpointer(piggy_back)
-                << " chunk data is " << hexpointer(h->chunk_data()));
-            // if the main serialization chunk is piggybacked in second SGE
-            if (piggy_back) {
-                if (parcel_complete) {
-                    rcv_data_type wrapped_pointer(piggy_back, h->size(), [](){},
-                        //util::bind(&parcelport::delete_recv_data, this, current_recv),
-                        chunk_pool_.get(), nullptr);
-                    rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
-                    LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
-                    parcelset::decode_message_with_chunks<parcelport, rcv_buffer_type>
-                        (*this, std::move(buffer), 0, recv_data.chunks);
-                    LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
-                    delete_recv_data(current_recv);
-                }
-            }
-            else {
-                std::size_t size = h->get_message_rdma_size();
-                libfabric_memory_region *get_region = chunk_pool_->allocate_region(size);
-                get_region->set_message_length(size);
-                recv_data.zero_copy_regions.push_back(get_region);
-                // put region into map before posting read in case it completes
-                // whilst this thread is suspended during map insertion
-                {
-                    ReadCompletionMap.insert(
-                        std::make_pair(get_region, current_recv));
-                }
-//                 const void *remoteAddr = h->get_message_rdma_addr();
-                LOG_DEBUG_MSG("@TODO Pushing back an extra chunk description");
-                recv_data.chunks.push_back(
-                    hpx::serialization::create_pointer_chunk(get_region->get_address(),
-                        size, h->get_message_rdma_key()));
-                ++total_reads;
-//
-                ssize_t ret = fi_read(client,
-                    get_region->get_address(), size, get_region->get_desc(),
-                    src,
-                    (uint64_t)h->get_message_rdma_addr(), h->get_message_rdma_key(), get_region);
-
-                if (ret) throw fabric_error(ret, "fi_read error");
-            }
-
-            // @TODO replace performance counter data
-            //  performance_counters::parcels::data_point& data = buffer.data_point_;
-            //  data.time_ = timer.elapsed_nanoseconds();
-            //  data.bytes_ = static_cast<std::size_t>(buffer.size_);
-            //  ...
-            //  data.time_ = timer.elapsed_nanoseconds() - data.time_;
-        }
-
-        void handle_tag_send_completion(void *wr_id)
-        {
-            LOG_DEBUG_MSG("Handle 4 byte completion " << hexpointer(wr_id));
-            libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
-            chunk_pool_->deallocate(region);
-            LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag "
-                << hexuint32(*(uint32_t*) (region->get_address())));
-        }
-
-        // --------------------------------------------------------------------
-        void handle_tag_recv_completion(void* wr_id, uint32_t tag,
-            const struct fid_ep *client)
-        {
-            libfabric_memory_region *region = (libfabric_memory_region *)wr_id;
-            tag = *((uint32_t*) (region->get_address()));
-            LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
-            // let go of this region (waste really as this was a zero byte message)
-            chunk_pool_->deallocate(region);
-
-            // now release any zero copy regions we were holding until parcel complete
-            active_send_iterator current_send;
-            {
-                auto is_present = TagSendCompletionMap.is_in_map(tag);
-                if (is_present.second) {
-                    current_send = is_present.first->second;
-                    TagSendCompletionMap.erase(is_present.first);
-                }
-                else {
-                    LOG_DEVEL_MSG("Tag " << tag << " not present in Send map, FATAL");
-                    std::terminate();
-                }
-            }
-
-            // we cannot delete the send data until we are absolutely sure that
-            // the initial send has been cleaned up
-            if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
-                LOG_DEBUG_MSG("Deleting send data "
-                    << hexpointer(&(*current_send)) << "with no race detection");
-                delete_send_data(current_send);
-            }
-        }
-
-        // --------------------------------------------------------------------
-        void handle_rdma_completion(void* wr_id, struct fid_ep* client, fi_addr_t src)
-        {
-            bool                 found_wr_id;
-            active_recv_iterator current_recv;
-            {
-                auto is_present = ReadCompletionMap.is_in_map(wr_id);
-                if (is_present.second) {
-                    found_wr_id = true;
-                    current_recv = is_present.first->second;
-                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id)
-                        << "from ReadCompletionMap : size before erase "
-                        << ReadCompletionMap.size());
-                    ReadCompletionMap.erase(is_present.first);
-                }
-                else {
-                    LOG_DEVEL_MSG("Fatal error as wr_id is not in completion map");
-                    std::terminate();
-                }
-            }
-            if (found_wr_id) {
-                parcel_recv_data &recv_data = *current_recv;
-                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has count of " << decnumber(recv_data.rdma_count));
-                if (--recv_data.rdma_count > 0) {
-                    // we can't do anything until all zero copy chunks are here
-                    return;
-                }
-                //
-                //
-                LOG_DEBUG_MSG("Zero copy regions size is (completion) "
-                    << decnumber(recv_data.zero_copy_regions.size()));
-
-                header_type *h = (header_type*)recv_data.header_region->get_address();
-                LOG_DEBUG_MSG( "rdma get completion "
-                    << "buffsize " << decnumber(h->size())
-                    << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
-                    << ", chunk_flag " << decnumber(h->header_length())
-                    << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                    << " chunkdata " << decnumber((h->chunk_data()!=nullptr))
-                    << " piggyback " << decnumber((h->piggy_back()!=nullptr))
-                    << " tag " << hexuint32(h->tag())
-                );
-
-                std::size_t message_length;
-                char *message = h->piggy_back();
-                if (message) {
-                    message_length = h->size();
-                }
-                else {
-                    libfabric_memory_region *message_region =
-                        recv_data.zero_copy_regions.back();
-                    recv_data.zero_copy_regions.resize(
-                        recv_data.zero_copy_regions.size()-1);
-                    message = static_cast<char *>(message_region->get_address());
-                    message_length = message_region->get_message_length();
-                    LOG_DEBUG_MSG("No piggy_back message, RDMA GET : "
-                        << hexpointer(message_region)
-                        << hexpointer(recv_data.message_region)
-                        << " length " << decnumber(message_length));
-                }
-
-                LOG_DEBUG_MSG("Creating a release buffer callback for tag "
-                    << hexuint32(recv_data.tag));
-                LOG_DEVEL_MSG("RDMA Get tag " << hexuint32(recv_data.tag)
-                    << " has completed : posting 4 byte ack to origin");
-                ++acks_posted;
-                auto ack_addr = recv_data.src_addr;
-                uint32_t tag  = recv_data.tag;
-                int ret = fi_inject(client, &tag, 4, ack_addr);
-                if (ret) throw fabric_error(ret, "fi_inject tag notification error");
-
-                rcv_data_type wrapped_pointer(message, message_length, [](){},
-                        //util::bind(&parcelport::delete_recv_data, this, current_recv),
-                        chunk_pool_.get(), nullptr);
-                rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
-                LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
-
-                LOG_EXCLUSIVE(
-                for (chunk_struct &c : recv_data.chunks) {
-                    LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
-                            << " type " << decnumber((uint64_t)c.type_)
-                            << " rkey " << hexpointer(c.rkey_)
-                            << " cpos " << hexpointer(c.data_.cpos_)
-                            << " pos " << hexpointer(c.data_.pos_)
-                            << " index " << decnumber(c.data_.index_));
-                })
-
-                buffer.num_chunks_ = h->num_chunks();
-                //buffer.data_.resize(static_cast<std::size_t>(h->size()));
-                //buffer.data_size_ = h->size();
-                buffer.chunks_.resize(recv_data.chunks.size());
-                decode_message_with_chunks(*this, std::move(buffer), 0, recv_data.chunks);
-                LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
-
-                delete_recv_data(current_recv);
-            }
-            else {
-                throw std::runtime_error("RDMA Get completed with unmatched Id");
-            }
-        }
-
-        // --------------------------------------------------------------------
-        // Every (signalled) rdma operation triggers a completion event when
-        // it completes, the controller calls this callback function and we
-        // must clean up all temporary memory etc and signal hpx when sends
-        // or receives finish.
-        // --------------------------------------------------------------------
-        int handle_libfabric_completion(const struct fi_cq_msg_entry completion,
-                struct fid_ep *client)
-        {
-            return 0;
-        }
-
-        // --------------------------------------------------------------------
-        ~parcelport() {
-            FUNC_START_DEBUG_MSG;
-            scoped_lock lk(stop_mutex);
-            libfabric_controller_ = nullptr;
-
+/*
             int total_completions = sends_posted + receives_handled + total_reads + acks_received;
 
 //#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PERFORMANCE_COUNTERS
@@ -927,584 +235,210 @@ namespace libfabric
                 << "acks_received " << decnumber(acks_received)
                 << "total_reads " << decnumber(total_reads)
                 << std::endl
-                << "\tcompletions_handled " << decnumber(completions_handled)
-                << "completion error " << decnumber(total_completions-completions_handled)
+                << "\tcompletions_handled_ " << decnumber(completions_handled_)
+                << "completion error " << decnumber(total_completions-completions_handled_)
                 << std::endl;
 //#endif
-            FUNC_END_DEBUG_MSG;
+*/
+    parcelport::~parcelport() {
+        FUNC_START_DEBUG_MSG;
+        scoped_lock lk(stop_mutex);
+        sender *snd = nullptr;
+        while (senders_.pop(snd)) {
+            LOG_DEBUG_MSG("Popped a sender for delete " << hexpointer(snd));
+            delete snd;
         }
+        libfabric_controller_ = nullptr;
+        FUNC_END_DEBUG_MSG;
+    }
 
-        /// Should not be used any more as parcelport_impl handles this?
-        bool can_bootstrap() const {
-            FUNC_START_DEBUG_MSG;
-            bool can_boot = HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING();
-            LOG_TRACE_MSG("Returning " << can_boot << " from can_bootstrap")
-            FUNC_END_DEBUG_MSG;
-            return can_boot;
-        }
+    /// Should not be used any more as parcelport_impl handles this?
+    bool parcelport::can_bootstrap() const {
+        FUNC_START_DEBUG_MSG;
+        bool can_boot = HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING();
+        LOG_TRACE_MSG("Returning " << can_boot << " from can_bootstrap")
+        FUNC_END_DEBUG_MSG;
+        return can_boot;
+    }
 
-        /// Return the name of this locality
-        std::string get_locality_name() const
-        {
-            FUNC_START_DEBUG_MSG;
-            // return hostname:iblibfabric ip address
-            std::stringstream temp;
-            temp << boost::asio::ip::host_name() << ":" << ipaddress(ip_addr_);
-            std::string tstr = temp.str();
-            FUNC_END_DEBUG_MSG;
-            return tstr.substr(0, tstr.size()-1);
-        }
-
-        parcelset::locality agas_locality(util::runtime_configuration const & ini) const
-        {
-            FUNC_START_DEBUG_MSG;
-            // load all components as described in the configuration information
-            std::string addr = ini.get_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
-            LOG_DEVEL_MSG("Got AGAS addr " << addr);
-            LOG_DEVEL_MSG("What should we return for agas locality for fabric PP" << addr);
-            std::terminate();
-
-//            inet_pton(AF_INET, &addr[0], &buf);
-//            return
-//                parcelset::locality(locality(buf.s_addr));
-
-            FUNC_END_DEBUG_MSG;
-            return parcelset::locality(locality());
-        }
-
-        parcelset::locality create_locality() const {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            return parcelset::locality(locality());
-        }
-
-        static void suspended_task_debug(const std::string &match)
-        {
-            std::string temp = hpx::util::debug::suspended_task_backtraces();
-            if (match.size()==0 ||
-                temp.find(match)!=std::string::npos)
-            {
-                LOG_DEVEL_MSG("Suspended threads " << temp);
-            }
-        }
-
-        void do_stop() {
-            LOG_DEBUG_MSG("Entering libfabric stop ");
-            FUNC_START_DEBUG_MSG;
-            if (!stopped_) {
-                if (!active_sends.empty() || !active_recvs.empty()) {
-                    LOG_DEVEL_MSG("Entering STOP with outstanding parcels");
-                    std::terminate();
-                };
-
-                // we don't want multiple threads trying to stop the clients
-                scoped_lock lock(stop_mutex);
-
-                LOG_DEBUG_MSG("Removing all initiated connections");
-                libfabric_controller_->disconnect_all();
-
-                // wait for all clients initiated elsewhere to be disconnected
-                while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/) {
-                    completions_handled += libfabric_controller_->poll_endpoints(true);
-                    LOG_TIMED_INIT(disconnect_poll);
-                    LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
-                        {
-                            LOG_DEVEL_MSG("Polling before shutdown");
-                        }
-                    )
-                }
-                LOG_DEBUG_MSG("stopped removing clients and terminating");
-            }
-            stopped_ = true;
-            // Stop receiving and sending of parcels
-        }
-
-        // --------------------------------------------------------------------
-        // find the client object that is at the destination ip address
-        // if no connection has been made yet, make one.
-        // --------------------------------------------------------------------
-        struct fid_ep *get_remote_connection(const locality &dest_fabric)
-        {
-            uint32_t dest_ip = dest_fabric.ip_address();
-            // if a connection exists to this destination, get it
-            auto present = ip_endpoint_map.is_in_map(dest_ip);
-            if (present.second) {
-                LOG_DEVEL_MSG("Client found connection    from "
-                    << ipaddress(ip_addr_) << "-> "
-                    << ipaddress(dest_ip)
-                    << "( " << ipaddress(ip_addr_) << ")");
-                return present.first->second;
-            }
-
-            // Didn't find a connection. We must create a new one
-            LOG_DEVEL_MSG("Starting new connect request    "
-                << ipaddress(ip_addr_) << "-> "
-                << ipaddress(dest_ip)
-                << "( " << ipaddress(ip_addr_) << ")");
-
-            hpx::shared_future<struct fid_ep*> client_future =
-                libfabric_controller_->connect_to_server(dest_fabric);
-
-            LOG_DEVEL_MSG("About to wait future       from "
-                << ipaddress(ip_addr_) << "-> "
-                << ipaddress(dest_ip)
-                << "( " << ipaddress(ip_addr_) << ")");
-
-            // block until a connection is available
-            struct fid_ep* client = client_future.get();
-
-            LOG_TRACE_MSG("Got future   " << hexpointer(client)
-                << ipaddress(ip_addr_) << "-> "
-                << ipaddress(dest_ip)
-                << "( " << ipaddress(ip_addr_) << ")");
-            return client;
-        }
-
-        // --------------------------------------------------------------------
-        bool can_send_immediate() {
-            for (std::size_t k = 0; !immediate_send_allowed_; ++k)
-            {
-//                LOG_DEVEL_MSG("Waiting until we can send");
-                hpx::util::detail::yield_k(k, "libfabric::parcelport::can_send_immediate");
-            }
-            return true;
-        }
-
-        // --------------------------------------------------------------------
-        template <typename Handler>
-        bool async_write(Handler && handler,
-            sender_connection *sender, fi_addr_t addr,
-            snd_buffer_type &buffer)
-        {
-            FUNC_START_DEBUG_MSG;
-            // if the serialization overflows the block, panic and rewrite this.
-            {
-                // create a tag, needs to be unique per client
-                uint32_t tag = tag_provider_.next(static_cast<uint32_t>(addr));
-                LOG_DEVEL_MSG("Generated tag " << hexuint32(tag) << " from "
-                    << hexpointer(addr));
-
-                // we must store details about this parcel so that all memory buffers
-                // can be kept until all send operations have completed.
-                active_send_iterator current_send;
-                {
-                    LOG_DEBUG_MSG("Taking lock on active_send_mutex in async_write "
-                        << decnumber(active_send_count_) );
-                    //
-                    scoped_lock lock(active_send_mutex);
-                    active_sends.emplace_back();
-                    current_send = std::prev(active_sends.end());
-                    //
-                    if (++active_send_count_ >= HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS) {
-                        if (immediate_send_allowed_) {
-                            LOG_DEVEL_MSG("Disabling immediate send : active "
-                                << decnumber(active_send_count_) << " "
-                                << active_sends.size());
-                        }
-                        immediate_send_allowed_ = false;
-                    }
-                    LOG_DEBUG_MSG("Active send after insert size "
-                        << decnumber(active_send_count_));
-                }
-                parcel_send_data &send_data = *current_send;
-                send_data.tag            = tag;
-                send_data.handler        = std::move(handler);
-                send_data.header_region  = nullptr;
-                send_data.message_region = nullptr;
-                send_data.has_zero_copy  = false;
-                send_data.delete_flag.clear();
-
-                // for each zerocopy chunk, we must create a memory region for the data
-                LOG_EXCLUSIVE(
-                    for (chunk_struct &c : buffer.chunks_) {
-                    LOG_DEBUG_MSG("write : chunk : size " << hexnumber(c.size_)
-                            << " type " << decnumber((uint64_t)c.type_)
-                            << " rkey " << hexpointer(c.rkey_)
-                            << " cpos " << hexpointer(c.data_.cpos_)
-                            << " pos " << hexpointer(c.data_.pos_)
-                            << " index " << decnumber(c.data_.index_));
-                })
-
-                // for each zerocopy chunk, we must create a memory region for the data
-                int index = 0;
-                for (chunk_struct &c : buffer.chunks_) {
-                    if (c.type_ == serialization::chunk_type_pointer) {
-                        send_data.has_zero_copy  = true;
-                        // if the data chunk fits into a memory block, copy it
-                        LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
-                        libfabric_memory_region *zero_copy_region;
-                        if (c.size_<HPX_PARCELPORT_LIBFABRIC_MEMORY_COPY_THRESHOLD) {
-                            zero_copy_region = chunk_pool_->allocate_region(c.size_);
-                            char *zero_copy_memory =
-                                (char*)(zero_copy_region->get_address());
-                            std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
-                            // the pointer in the chunk info must be changed
-                            buffer.chunks_[index] = serialization::create_pointer_chunk(
-                                zero_copy_memory, c.size_);
-                            LOG_ERROR_MSG("Should not be asking for such a small chunk "
-                                << decnumber(c.size_) << "zero copy threshold is "
-                                << decnumber(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD));
-                            LOG_DEBUG_MSG("Time to copy memory (ns) "
-                                << decnumber(regtimer.elapsed_nanoseconds()));
-                        }
-                        else {
-                            // create a memory region from the pointer
-                            zero_copy_region = new libfabric_memory_region(
-                                libfabric_controller_->get_domain(),
-                                c.data_.cpos_, c.size_);
-                            LOG_DEBUG_MSG("Time to register memory (ns) "
-                                << decnumber(regtimer.elapsed_nanoseconds()));
-                        }
-                        c.rkey_  = zero_copy_region->get_remote_key();
-                        LOG_DEVEL_MSG("Zero-copy rdma Get region "
-                            << decnumber(index) << " created for address "
-                            << hexpointer(zero_copy_region->get_address())
-                            << " and rkey " << hexpointer(c.rkey_));
-                        send_data.zero_copy_regions.push_back(zero_copy_region);
-                    }
-                    index++;
-                }
-
-                // grab a memory block from the pinned pool to use for the header
-                send_data.header_region =
-                    chunk_pool_->allocate_region(chunk_pool_->small_.chunk_size());
-                char *header_memory = (char*)(send_data.header_region->get_address());
-
-                // create the header in the pinned memory block
-                LOG_DEBUG_MSG("Placement new for header with piggyback copy disabled");
-                header_type *h = new(header_memory) header_type(buffer, send_data.tag);
-                send_data.header_region->set_message_length(h->header_length());
-
-                LOG_DEVEL_MSG("sending, buffsize "
-                    << decnumber(h->size())
-                    << "header_length " << decnumber(h->header_length())
-                    << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
-                    << ", chunk_flag " << decnumber(h->header_length())
-                    << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                    << ", chunk_flag " << decnumber(h->header_length())
-                    << "tag " << hexuint32(h->tag())
-                );
-
-                // Get the block of pinned memory where the message was encoded
-                // during serialization
-                send_data.message_region = buffer.data_.m_region_;
-                send_data.message_region->set_message_length(h->size());
-                LOG_DEBUG_MSG("Found region allocated during encode_parcel : address "
-                    << hexpointer(buffer.data_.m_array_)
-                    << " region "<< hexpointer(send_data.message_region));
-
-                // header region is always sent, message region is usually piggybacked
-                int num_regions = 1;
-                struct iovec region_list[2] = {
-                    { send_data.header_region->get_address(),
-                        send_data.header_region->get_message_length() },
-                    { send_data.message_region->get_address(),
-                        send_data.message_region->get_message_length() } };
-
-                void *desc[2] = {
-                    send_data.header_region->get_desc(),
-                    send_data.message_region->get_desc() };
-
-                if (h->chunk_data()) {
-                    LOG_DEBUG_MSG("Chunk info is piggybacked");
-                }
-                else {
-                    throw std::runtime_error("@TODO : implement chunk info rdma get "
-                        "when zero-copy chunks exceed header space");
-                }
-
-                if (h->piggy_back()) {
-                    LOG_DEBUG_MSG("Main message is piggybacked");
-                    num_regions += 1;
-                }
-                else {
-                    LOG_DEBUG_MSG("Main message NOT piggybacked ");
-                    h->set_message_rdma_size(h->size());
-                    h->set_message_rdma_key(send_data.message_region->get_remote_key());
-                    h->set_message_rdma_addr(send_data.message_region->get_address());
-                    send_data.zero_copy_regions.push_back(send_data.message_region);
-                    send_data.has_zero_copy  = true;
-
-                    LOG_DEBUG_MSG("RDMA message " << hexnumber(buffer.data_.size())
-                        << "desc " << hexnumber(send_data.message_region->get_desc())
-                        << "pos " << hexpointer(send_data.message_region->get_address()));
-
-                    // do not delete twice, clear the message block pointer as it
-                    // is also used in the zero_copy_regions list
-                    send_data.message_region = nullptr;
-                }
-
-                void *wr_id = send_data.header_region;
-                {
-                    // add wr_id's to completion map
-                    // put everything into map to be retrieved when send completes
-                    SendCompletionMap.insert(std::make_pair(wr_id, current_send));
-                    LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
-                            << hexpointer(wr_id) << " Entries "
-                            << decnumber(SendCompletionMap.size())
-                            << "tag " << hexuint32(h->tag())
-                    );
-                }
-                {
-                    // if there are zero copy regions (or message/chunks not piggybacked),
-                    // we must hold onto the regions until the destination tells us
-                    // it has completed all rdma Get operations
-                    if (send_data.has_zero_copy) {
-                        // put the data into a new map which is indexed by the Tag of
-                        // the send - zero copy blocks will be released when we are
-                        // told this has completed
-                        TagSendCompletionMap.insert(
-                            std::make_pair(send_data.tag, current_send));
-                    }
-                }
-
-                ++sends_posted;
-
-                // send the header/main_chunk to the destination,
-                // wr_id is header_region (entry 0 in region_list)
-                LOG_DEVEL_MSG("fi_send num regions " << decnumber(num_regions)
-                    << " client " << hexpointer(sender->client_)
-                    << " fi_addr " << hexpointer(addr)
-                    << " header_region"
-                    << " buffer " << hexpointer(send_data.header_region->get_address())
-                    << " region " << hexpointer(send_data.header_region));
-                if (num_regions>1) {
-                    LOG_TRACE_MSG(
-                    "message_region"
-                    << " buffer " << hexpointer(send_data.message_region->get_address())
-                    << " region " << hexpointer(send_data.message_region));
-                    int ret = fi_sendv(sender->client_, region_list,
-                        desc, num_regions, addr, send_data.header_region);
-                    if (ret) throw fabric_error(ret, "fi_sendv");
-                }
-                else {
-                    int ret = fi_send(sender->client_,
-                        region_list[0].iov_base, region_list[0].iov_len,
-                        desc[0], addr, send_data.header_region);
-                    if (ret) throw fabric_error(ret, "fi_sendv");
-                }
-
-                // log the time spent in performance counter
-//                buffer.data_point_.time_ =
-//                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-
-                // parcels_posted_.add_data(buffer.data_point_);
-            }
-            background_work_OS_thread();
-            FUNC_END_DEBUG_MSG;
-            return true;
-        }
-
-        // --------------------------------------------------------------------
-        // This is called to poll for completions and handle all incoming messages
-        // as well as complete outgoing messages.
-        //
-        // @TODO : It is assumed that hpx_bakground_work is only going to be called from
-        // an hpx thread.
-        // Since the parcelport can be serviced by hpx threads or by OS threads,
-        // we must use extra care when dealing with mutexes and condition_variables
-        // since we do not want to suspend an OS thread, but we do want to suspend
-        // hpx threads when necessary.
-        // --------------------------------------------------------------------
-        inline bool background_work_OS_thread() {
-             bool done = false;
-             do {
-                 // if an event comes in, we may spend time processing/handling it
-                 // and another may arrive during this handling,
-                 // so keep checking until none are received
-                 //libfabric_controller_->refill_client_receives(false);
-                 int numc = libfabric_controller_->poll_endpoints();
-                 completions_handled += numc;
-                 done = (numc==0);
-             } while (!done);
-            return (done!=0);
-        }
-
-        // There is no difference between our background polling work on OS or HPX
-        // threads any more, but we will keep the two entry points for future use
-        inline bool background_work_hpx_thread() {
-            // this must be called on an HPX thread
-            HPX_ASSERT(threads::get_self_ptr() != nullptr);
-            //
-            return background_work_OS_thread();
-        }
-
-        // --------------------------------------------------------------------
-        // Background work
-        //
-        // This is called whenever the main thread scheduler is idling,
-        // is used to poll for events, messages on the libfabric connection
-        // --------------------------------------------------------------------
-        bool background_work(std::size_t num_thread) {
-            if (stopped_ || hpx::is_stopped()) {
-                return false;
-            }
-            bool result = background_work_hpx_thread();
-
-            // if we are still blocked after making progress on the network
-            // we must block the thread that is sending to allow returning futures
-            // to be handled
-            if (!immediate_send_allowed_) {
-#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
-                LOG_TIMED_INIT(background_sends);
-                LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
-                {
-                    scoped_lock lock(active_send_mutex);
-                    int count = 0;
-                    for (const auto & as : active_sends) {
-                        LOG_DEBUG_MSG("active_sends " << decnumber(count)
-                            << ", tag "     << hexnumber(as.tag)
-                            << ", ZC "      << as.has_zero_copy
-                            << ", ZC size " << as.zero_copy_regions.size());
-                        count++;
-                    }
-                }
-                {
-                    scoped_lock lock(active_recv_mutex);
-                    int count = 0;
-                    for (const auto & as : active_recvs) {
-                        LOG_DEBUG_MSG("active_recvs " << decnumber(count)
-                            << ", tag "         << hexnumber(as.tag)
-                            << ", rdma_count "  << as.rdma_count
-                            << ", chunks "      << as.chunks.size()
-                            << ", ZC size "     << as.zero_copy_regions.size());
-                        count++;
-                    }
-                }
-                // suspended_task_debug("");
-                LOG_DEBUG_MSG(
-                    "active_send_count_ " << decnumber(active_send_count_)
-                    << "active_send_size " << decnumber(active_sends.size())
-                    << "Total sends " << decnumber(sends_posted)
-                    << "Total recvs " << decnumber(receives_handled)
-                    << "Total reads " << decnumber(total_reads)
-                    << "Total completions " << decnumber(completions_handled)
-                    << "("<< decnumber(sends_posted+receives_handled+total_reads)<<")");
-                )
-#endif
-
-            }
-            return result;
-        }
-    };
-
-    // --------------------------------------------------------------------
-    // sender_connection functions
-    //
-    // could not be included in sender_connection.hpp because they
-    // need the full definition of the libfabric PP to come first
-    // --------------------------------------------------------------------
-    template <typename Handler, typename ParcelPostprocess>
-    inline void sender_connection::async_write(
-        Handler && handler,
-        ParcelPostprocess && parcel_postprocess)
+    /// Return the name of this locality
+    std::string parcelport::get_locality_name() const
     {
-//        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {}
-        LOG_DEVEL_MSG("Removed async write until there_ member fixed");
+        FUNC_START_DEBUG_MSG;
+        // return hostname:iblibfabric ip address
+        std::stringstream temp;
+        temp << boost::asio::ip::host_name() << ":" << ipaddress(ip_addr_);
+        std::string tstr = temp.str();
+        FUNC_END_DEBUG_MSG;
+        return tstr.substr(0, tstr.size()-1);
+    }
+
+    parcelset::locality parcelport::agas_locality(util::runtime_configuration const & ini) const
+    {
+        FUNC_START_DEBUG_MSG;
+        // load all components as described in the configuration information
+        std::string addr = ini.get_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
+        LOG_DEVEL_MSG("Got AGAS addr " << addr);
+        LOG_DEVEL_MSG("What should we return for agas locality for fabric PP" << addr);
         std::terminate();
-//        error_code ec;
-//        parcel_postprocess(ec, there_, shared_from_this());
+        FUNC_END_DEBUG_MSG;
+        return parcelset::locality(locality());
     }
 
-    bool sender_connection::can_send_immediate() const
+    parcelset::locality parcelport::create_locality() const {
+        FUNC_START_DEBUG_MSG;
+        FUNC_END_DEBUG_MSG;
+        return parcelset::locality(locality());
+    }
+
+    void parcelport::suspended_task_debug(const std::string &match)
     {
-        return parcelport_->can_send_immediate();
+        std::string temp = hpx::util::debug::suspended_task_backtraces();
+        if (match.size()==0 ||
+            temp.find(match)!=std::string::npos)
+        {
+
+            LOG_DEVEL_MSG("Suspended threads " << temp);
+        }
     }
 
+    void parcelport::do_stop() {
+        LOG_DEBUG_MSG("Entering libfabric stop ");
+        FUNC_START_DEBUG_MSG;
+        if (!stopped_) {
+            // we don't want multiple threads trying to stop the clients
+            scoped_lock lock(stop_mutex);
+
+            LOG_DEBUG_MSG("Removing all initiated connections");
+            libfabric_controller_->disconnect_all();
+
+            // wait for all clients initiated elsewhere to be disconnected
+            while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/) {
+                completions_handled_ += libfabric_controller_->poll_endpoints(true);
+                LOG_TIMED_INIT(disconnect_poll);
+                LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
+                    {
+                        LOG_DEVEL_MSG("Polling before shutdown");
+                    }
+                )
+            }
+            LOG_DEBUG_MSG("stopped removing clients and terminating");
+        }
+        stopped_ = true;
+        // Stop receiving and sending of parcels
+    }
+
+    // --------------------------------------------------------------------
+    bool parcelport::can_send_immediate()
+    {
+        while (senders_.empty()) {
+            background_work(0);
+        }
+        return true;
+    }
+
+    // --------------------------------------------------------------------
+    template <typename Handler>
+    bool parcelport::async_write(Handler && handler,
+        sender *snd, fi_addr_t addr,
+        snd_buffer_type &buffer)
+    {
+        LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
+        snd->dst_addr_ = addr;
+        snd->buffer_   = std::move(buffer);
+        snd->handler_  = std::forward<Handler>(handler);
+        snd->async_write_impl();
+        // after a send poll to make progress on the network and
+        // reduce latencies for receives coming in
+        // background_work_OS_thread();
+        return true;
+    }
+
+    // --------------------------------------------------------------------
+    // This is called to poll for completions and handle all incoming messages
+    // as well as complete outgoing messages.
+    //
+    // Since the parcelport can be serviced by hpx threads or by OS threads,
+    // we must use extra care when dealing with mutexes and condition_variables
+    // since we do not want to suspend an OS thread, but we do want to suspend
+    // hpx threads when necessary.
+    //
+    // NB: There is no difference any more between background polling work
+    // on OS or HPX as all has been test thoroughly
+    // --------------------------------------------------------------------
+    inline bool parcelport::background_work_OS_thread() {
+         bool done = false;
+         do {
+             // if an event comes in, we may spend time processing/handling it
+             // and another may arrive during this handling,
+             // so keep checking until none are received
+             //libfabric_controller_->refill_client_receives(false);
+             int numc = libfabric_controller_->poll_endpoints();
+             completions_handled_ += numc;
+             done = (numc==0);
+         } while (!done);
+        return (done!=0);
+    }
+
+    // --------------------------------------------------------------------
+    // Background work
+    //
+    // This is called whenever the main thread scheduler is idling,
+    // is used to poll for events, messages on the libfabric connection
+    // --------------------------------------------------------------------
+    bool parcelport::background_work(std::size_t num_thread) {
+        if (stopped_ || hpx::is_stopped()) {
+            return false;
+        }
+        bool result = background_work_OS_thread();
+/*
+        // if we are still blocked after making progress on the network
+        // we must block the thread that is sending to allow returning futures
+        // to be handled
+        if (!immediate_send_allowed_) {
+#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING)
+            LOG_TIMED_INIT(background_sends);
+            LOG_TIMED_BLOCK(background_sends, DEVEL, 5.0,
+            {
+                scoped_lock lock(active_send_mutex);
+                int count = 0;
+                for (const auto & as : active_sends) {
+                    LOG_DEBUG_MSG("active_sends " << decnumber(count)
+                        << ", tag "     << hexnumber(as.tag)
+                        << ", ZC "      << as.has_zero_copy
+                        << ", ZC size " << as.zero_copy_regions.size());
+                    count++;
+                }
+            }
+            {
+                scoped_lock lock(active_recv_mutex);
+                int count = 0;
+                for (const auto & as : active_recvs) {
+                    LOG_DEBUG_MSG("active_recvs " << decnumber(count)
+                        << ", tag "         << hexnumber(as.tag)
+                        << ", rdma_count "  << as.rdma_count
+                        << ", chunks "      << as.chunks.size()
+                        << ", ZC size "     << as.zero_copy_regions.size());
+                    count++;
+                }
+            }
+            // suspended_task_debug("");
+            LOG_DEBUG_MSG(
+                "active_send_count_ " << decnumber(active_send_count_)
+                << "active_send_size " << decnumber(active_sends.size())
+                << "Total sends " << decnumber(sends_posted)
+                << "Total recvs " << decnumber(receives_handled)
+                << "Total reads " << decnumber(total_reads)
+                << "Total completions " << decnumber(completions_handled_)
+                << "("<< decnumber(sends_posted+receives_handled+total_reads)<<")");
+            )
+#endif
+        }
+*/
+        return result;
+    }
 
 }}}}
 
-namespace hpx {
-namespace traits {
-// Inject additional configuration data into the factory registry for this
-// type. This information ends up in the system wide configuration database
-// under the plugin specific section:
-//
-//      [hpx.parcel.libfabric]
-//      ...
-//      priority = 100
-//
-template<>
-struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
-    static char const* priority() {
-        FUNC_START_DEBUG_MSG;
-        static int log_init = false;
-        if (!log_init) {
-#if defined(HPX_PARCELPORT_LIBFABRIC_HAVE_LOGGING) || \
-    defined(HPX_PARCELPORT_LIBFABRIC_HAVE_DEV_MODE)
-            boost::log::add_console_log(
-            std::clog,
-            // This makes the sink to write log records that look like this:
-            // 1: <normal> A normal severity message
-            // 2: <error> An error severity message
-            boost::log::keywords::format =
-                (
-                    boost::log::expressions::stream
-                    // << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
-                    << boost::log::expressions::attr< unsigned int >("LineID")
-                    << ": <" << boost::log::trivial::severity
-                    << "> " << boost::log::expressions::smessage
-                )
-            );
-            boost::log::add_common_attributes();
-#endif
-            log_init = true;
-        }
-        FUNC_END_DEBUG_MSG;
-        return "10000";
-    }
-
-    // This is used to initialize your parcelport,
-    // for example check for availability of devices etc.
-    static void init(int *argc, char ***argv, util::command_line_handling &cfg) {
-        FUNC_START_DEBUG_MSG;
-
-        FUNC_END_DEBUG_MSG;
-    }
-
-    static char const* call()
-    {
-        FUNC_START_DEBUG_MSG;
-        FUNC_END_DEBUG_MSG;
-        // @TODO : check which of these are obsolete after recent changes
-        return
-        "zero_copy_optimization = 1\n"
-        "provider = ${HPX_PARCELPORT_LIBFABRIC_PROVIDER:"
-                HPX_PARCELPORT_LIBFABRIC_PROVIDER "}\n"
-        "domain = ${HPX_PARCELPORT_LIBFABRIC_DOMAIN:"
-                HPX_PARCELPORT_LIBFABRIC_DOMAIN "}\n"
-        "endpoint = ${HPX_PARCELPORT_LIBFABRIC_ENDPOINT:"
-                HPX_PARCELPORT_LIBFABRIC_ENDPOINT "}\n"
-        ;
-    }
-};
-}}
-
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric);
-
-/*
-            libfabric_controller_->for_each_client(
-                [](std::pair<uint32_t, libfabric_endpoint_ptr> clientpair)
-                {
-                libfabric_endpoint* client = clientpair.second.get();
-                LOG_TIMED_INIT(clientlog);
-                LOG_TIMED_MSG(clientlog, DEVEL, 0.1,
-                    "internal reported, \n"
-                    << "recv " << decnumber(client->get_total_posted_recv_count()) << "\n"
-                    << "send " << decnumber(client->get_total_posted_send_count()) << "\n"
-                    << "read " << decnumber(client->get_total_posted_read_count()) << "\n"
-                );
-                }
-            );
-
-            LOG_TIMED_INIT(background);
-            LOG_TIMED_MSG(background, DEVEL, 0.1,
-                "PP reported\n"
-                << "actv " << decnumber(active_send_count_) << "\n"
-                << "recv " << decnumber(receives_handled) << "\n"
-                << "send " << decnumber(sends_posted) << "\n"
-                << "read " << decnumber(total_reads) << "\n"
-                << "Total completions " << decnumber(completions_handled)
-                << decnumber(sends_posted+receives_handled+total_reads));
-*/
 

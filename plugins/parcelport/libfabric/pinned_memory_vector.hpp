@@ -47,7 +47,7 @@ namespace libfabric
         allocator_type      *m_alloc_;
         libfabric_memory_region *m_region_;
 
-        // construct with a memory pool pointer
+        // construct with a memory pool allocator
         pinned_memory_vector(allocator_type* alloc) :
         m_array_(0), m_size_(0), m_cb_(0), m_alloc_(alloc), m_region_(0)
         {
@@ -58,7 +58,7 @@ namespace libfabric
                 << "alloc " << hexpointer(m_alloc_));
         }
 
-        // construct from existing memory chunk
+        // construct from existing memory chunk, provide allocator, deleter etc
         pinned_memory_vector(T* p, std::size_t s, deleter_callback cb,
             allocator_type* alloc, libfabric_memory_region *r) :
                 m_array_(p), m_size_(s), m_cb_(cb), m_alloc_(alloc), m_region_(r)
@@ -107,7 +107,7 @@ namespace libfabric
             m_cb_     = other.m_cb_;
             m_alloc_  = other.m_alloc_;
             m_region_ = other.m_region_;
-            LOG_DEBUG_MSG("pinned_memory_vector copied "
+            LOG_DEBUG_MSG("pinned_memory_vector assigned/moved "
                 << "size " << hexuint32(m_size_)
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
