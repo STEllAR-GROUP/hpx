@@ -541,7 +541,6 @@ namespace hpx { namespace parcelset
                 sender = this_.connection_handler().get_connection(dest_, addr);
                 if (sender != nullptr)
                     break;
-                std::cout << "Did not get a sender, doing a mini sleep k=" << k << std::endl;
                 hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
                 ++k;
             }

@@ -194,12 +194,9 @@ namespace libfabric
                 << ipaddress(fabric_locality.ip_address()));
             fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
             FUNC_END_DEBUG_MSG;
-
             return snd;
         }
         // if no senders are available shutdown
-        LOG_ERROR_MSG("No senders left, stop sending stuff please");
-        std::terminate();
         FUNC_END_DEBUG_MSG;
         return nullptr;
     }
