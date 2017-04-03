@@ -39,6 +39,7 @@ namespace libfabric
         // for each zerocopy chunk, we must create a memory region for the data
         // do this before creating the header as the chunk details will be copied
         // into the header space
+        rma_regions_.reserve(buffer_.num_chunks_.first);
         int index = 0;
         for (auto &c : buffer_.chunks_)
         {
@@ -91,9 +92,6 @@ namespace libfabric
             << ", chunk_flag " << decnumber(header_->header_length())
             << ", tag " << hexuint64(header_->tag())
         );
-
-        // reserve some space or zero copy information
-        rma_regions_.reserve(buffer_.num_chunks_.first);
 
         // Get the block of pinned memory where the message was encoded
         // during serialization

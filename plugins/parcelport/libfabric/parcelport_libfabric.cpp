@@ -196,6 +196,9 @@ namespace libfabric
             FUNC_END_DEBUG_MSG;
             return snd;
         }
+        else {
+            background_work_OS_thread();
+        }
         // if no senders are available shutdown
         FUNC_END_DEBUG_MSG;
         return nullptr;
@@ -338,7 +341,7 @@ namespace libfabric
     template <typename Handler>
     bool parcelport::async_write(Handler && handler,
         sender *snd, fi_addr_t addr,
-        snd_buffer_type &buffer)
+        snd_buffer_type &&buffer)
     {
         LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
         snd->dst_addr_ = addr;

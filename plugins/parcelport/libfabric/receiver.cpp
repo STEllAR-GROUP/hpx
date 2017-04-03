@@ -203,6 +203,7 @@ namespace libfabric
                     << "length " << hexlength(c.size_));
 
                 rma_regions_.push_back(get_region);
+                get_region->set_message_length(c.size_);
 
                 // overwrite the serialization chunk data to account for the
                 // local pointers instead of remote ones
@@ -219,7 +220,7 @@ namespace libfabric
                     << "fi_addr " << hexpointer(src_addr_)
                     << "local addr " << hexpointer(get_region->get_address())
                     << "local desc " << hexpointer(get_region->get_desc())
-                    << "size " << hexnumber(c.size_)
+                    << "size " << hexlength(c.size_)
                     << "rkey " << hexpointer(c.rkey_)
                     << "remote cpos " << hexpointer(remoteAddr)
                     << "index " << decnumber(c.data_.index_));
@@ -230,12 +231,13 @@ namespace libfabric
                 ssize_t ret = 0;
                 for (std::size_t k = 0; true; ++k)
                 {
-
-                    uint32_t *dead_buffer = reinterpret_cast<uint32_t*>(get_region->get_address());
-                    std::fill(dead_buffer, dead_buffer + get_region->get_size()/4, 0x01010101);
-                    LOG_TRACE_MSG(
-                        CRC32_MEM(get_region->get_address(), c.size_,
-                            "(RDMA GET region (pre-fi_read))"));
+                    LOG_EXCLUSIVE(
+                        uint32_t *buffer = reinterpret_cast<uint32_t*>(get_region->get_address());
+                        std::fill(buffer, buffer + get_region->get_size()/4, 0x01010101);
+                        LOG_TRACE_MSG(
+                            CRC32_MEM(get_region->get_address(), c.size_,
+                                "(RDMA GET region (pre-fi_read))"));
+                    );
 
                     ret = fi_read(endpoint_,
                         get_region->get_address(), c.size_, get_region->get_desc(),
@@ -245,8 +247,7 @@ namespace libfabric
                     {
                         LOG_ERROR_MSG("receiver " << hexpointer(this)
                             << "reposting fi_read...\n");
-                        hpx::util::detail::yield_k(k,
-                            "libfabric::receiver::async_read");
+                        hpx::util::detail::yield_k(k, "libfabric::receiver::async_read");
                         continue;
                     }
                     if (ret) throw fabric_error(ret, "fi_read");
@@ -276,7 +277,7 @@ namespace libfabric
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "all RMA regions now read ");
 
-        // If the main message was not piggy backed, then the final zero copy chunk
+        // If the main message was not piggy backed, then the final chunk
         // is our main message block
         if (!header_->message_piggy_back())
         {
@@ -290,7 +291,6 @@ namespace libfabric
         {
             message = static_cast<char *>(message_region_->get_address());
             HPX_ASSERT(message);
-            HPX_ASSERT(message_region_->get_message_length() == header_->message_size());
             LOG_DEBUG_MSG("receiver " << hexpointer(this)
                 << "No piggy_back RDMA message "
                 << "region " << hexpointer(message_region_)
@@ -299,13 +299,15 @@ namespace libfabric
 
             LOG_TRACE_MSG(
                 CRC32_MEM(message, message_length, "Message region (recv rdma)"));
+
+            HPX_ASSERT(message_region_->get_message_length() == header_->message_size());
         }
         else
         {
-            HPX_ASSERT(header_->message_data());
-            message = header_->message_data();
             LOG_TRACE_MSG(CRC32_MEM(message, message_length,
                 "Message region (recv piggyback with rdma)"));
+            HPX_ASSERT(header_->message_data());
+            message = header_->message_data();
         }
 
         for (auto &r : rma_regions_)

@@ -558,7 +558,7 @@ namespace hpx { namespace parcelset
             if (sender->parcelport_->async_write(
                 std::move(util::bind(util::one_shot(f_), _1,  std::move(p))),
                 sender, addr,
-                encoded_buffer))
+                std::move(encoded_buffer)))
             {
                 // we don't propagate errors for now
             }

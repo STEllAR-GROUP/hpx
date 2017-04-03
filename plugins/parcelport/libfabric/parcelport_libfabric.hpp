@@ -189,7 +189,7 @@ namespace libfabric
         template <typename Handler>
         bool async_write(Handler && handler,
             sender *sender, fi_addr_t addr,
-            snd_buffer_type &buffer);
+            snd_buffer_type &&buffer);
 
         // --------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages
