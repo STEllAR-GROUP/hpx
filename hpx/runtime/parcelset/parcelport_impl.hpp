@@ -543,6 +543,12 @@ namespace hpx { namespace parcelset
                     break;
                 hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
                 ++k;
+
+                if (k >= 4096)
+                {
+                    enqueue_parcel(dest_, std::move(p), std::move(f_));
+                    return;
+                }
             }
 
             auto encoded_buffer = sender->get_new_buffer();

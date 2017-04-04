@@ -196,9 +196,11 @@ namespace libfabric
             FUNC_END_DEBUG_MSG;
             return snd;
         }
-        else {
+        else
+        {
             background_work_OS_thread();
         }
+
         // if no senders are available shutdown
         FUNC_END_DEBUG_MSG;
         return nullptr;
@@ -331,9 +333,9 @@ namespace libfabric
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-        while (senders_.empty()) {
-            background_work(0);
-        }
+//         while (senders_.empty()) {
+//             background_work(0);
+//         }
         return true;
     }
 
