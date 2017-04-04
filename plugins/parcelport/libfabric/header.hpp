@@ -292,15 +292,6 @@ namespace libfabric
             return message_header.num_chunks;
         }
 
-        std::uint32_t num_chunks_excluding_message()
-        {
-            if ((message_header.flags & message_flag) == 0) {
-                // add one chunk for the message region
-                return message_header.num_chunks - 1;
-            }
-            return message_header.num_chunks;
-        }
-
         std::uint32_t num_zero_copy_chunks()
         {
             chunktype *chunks = reinterpret_cast<chunktype *>(chunk_ptr());
@@ -314,6 +305,15 @@ namespace libfabric
                 }
             }
             return num;
+        }
+
+        std::uint32_t num_original_zero_copy_chunks()
+        {
+            if ((message_header.flags & message_flag) == 0) {
+                // subtract one chunk for the message region
+                return num_zero_copy_chunks() - 1;
+            }
+            return num_zero_copy_chunks();
         }
 
         std::uint32_t num_index_chunks()

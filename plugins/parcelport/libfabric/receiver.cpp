@@ -232,6 +232,7 @@ namespace libfabric
                 for (std::size_t k = 0; true; ++k)
                 {
                     LOG_EXCLUSIVE(
+                        // write a pattern and dump out data for debugging purposes
                         uint32_t *buffer = reinterpret_cast<uint32_t*>(get_region->get_address());
                         std::fill(buffer, buffer + get_region->get_size()/4, 0x01010101);
                         LOG_TRACE_MSG(
@@ -278,11 +279,13 @@ namespace libfabric
             << "all RMA regions now read ");
 
         // If the main message was not piggy backed, then the final chunk
-        // is our main message block
+        // is our main message block, remove it from the rma list
         if (!header_->message_piggy_back())
         {
             message_region_ = rma_regions_.back();
+            //
             rma_regions_.resize(rma_regions_.size()-1);
+            chunks_.resize(chunks_.size()-1);
         }
 
         std::size_t message_length = header_->message_size();
@@ -296,10 +299,10 @@ namespace libfabric
                 << "region " << hexpointer(message_region_)
                 << "address " << hexpointer(message_region_->get_address())
                 << "length " << hexuint32(message_length));
-
             LOG_TRACE_MSG(
                 CRC32_MEM(message, message_length, "Message region (recv rdma)"));
 
+            // do this after dumping out data as otherwise we lose some debug info
             HPX_ASSERT(message_region_->get_message_length() == header_->message_size());
         }
         else
@@ -333,20 +336,18 @@ namespace libfabric
             }, nullptr, nullptr);
         //
         rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
-        LOG_DEBUG_MSG("receiver " << hexpointer(this)
-            << "calling parcel decode for complete ZEROCOPY parcel");
 
         LOG_EXCLUSIVE(
-        for (chunk_struct &c : chunks_) {
-            LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
+            for (chunk_struct &c : chunks_) {
+                LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
                     << " type " << decnumber((uint64_t)c.type_)
                     << " rkey " << hexpointer(c.rkey_)
                     << " cpos " << hexpointer(c.data_.cpos_)
                     << " index " << decnumber(c.data_.index_));
-        })
+        });
 
         buffer.num_chunks_ = std::make_pair(
-            header_->num_zero_copy_chunks(), header_->num_index_chunks());
+            header_->num_original_zero_copy_chunks(), header_->num_index_chunks());
         buffer.data_size_  = header_->message_size();
 
         LOG_DEVEL_MSG("receiver " << hexpointer(this)
