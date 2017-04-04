@@ -514,7 +514,12 @@ namespace libfabric
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_send_queue"); });
 
             fi_cq_msg_entry entry;
-            int ret = fi_cq_read(txcq_, &entry, 1);
+            int ret = 0;
+            {
+                std::unique_lock<mutex_type> lk(polling_mutex_, std::try_to_lock);
+                if (!lk) return 0;
+                ret = fi_cq_read(txcq_, &entry, 1);
+            }
             if (ret>0) {
                 LOG_DEVEL_MSG("Completion txcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
@@ -565,7 +570,12 @@ namespace libfabric
             fi_cq_msg_entry entry;
 
             // receives will use fi_cq_readfrom as we want the source address
-            int ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
+            int ret = 0;
+            {
+                std::unique_lock<mutex_type> lk(polling_mutex_, std::try_to_lock);
+                if (!lk) return 0;
+                ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
+            }
             if (ret>0) {
                 LOG_DEVEL_MSG("Completion rxcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
