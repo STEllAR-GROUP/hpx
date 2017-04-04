@@ -52,6 +52,10 @@
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
 #endif
 
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+# include "rdma/fi_ext_gni.h"
+#endif
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -269,8 +273,46 @@ namespace libfabric
             ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
             if (ret) throw fabric_error(ret, "fi_domain");
 
+            // Cray special. Disable memory registration cache
+            _set_disable_registration();
+
             fi_freeinfo(fabric_hints_);
             FUNC_END_DEBUG_MSG;
+        }
+
+        // -------------------------------------------------------------------
+        // Special GNI extensions to disable memory registration cache
+
+        // this helper function only works for string ops
+        void _set_check_domain_op_value(int op, char *value)
+        {
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+            int ret;
+            struct fi_gni_ops_domain *gni_domain_ops;
+            char *get_val, *val;
+
+            ret = fi_open_ops(&fabric_domain_->fid, FI_GNI_DOMAIN_OPS_1,
+                      0, (void **) &gni_domain_ops, NULL);
+            if (ret) throw fabric_error(ret, "fi_open_ops");
+            LOG_DEBUG_MSG("domain ops returned " << hexpointer(gni_domain_ops));
+
+            val = value;
+            ret = gni_domain_ops->set_val(&fabric_domain_->fid,
+                    (dom_ops_val_t)(op), &val);
+            if (ret) throw fabric_error(ret, "set val (ops)");
+
+            ret = gni_domain_ops->get_val(&fabric_domain_->fid,
+                    (dom_ops_val_t)(op), &get_val);
+            LOG_DEBUG_MSG("Cache mode set to " << get_val);
+            if (std::string(val) != std::string(get_val)) throw fabric_error(ret, "get val");
+#endif
+        }
+
+        void _set_disable_registration()
+        {
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+            _set_check_domain_op_value(GNI_MR_CACHE, "none");
+#endif
         }
 
         // -------------------------------------------------------------------
@@ -348,7 +390,7 @@ namespace libfabric
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
 
-            //LOG_EXCLUSIVE(
+            // LOG_EXCLUSIVE(
                 std::stringstream temp1, temp2;
                 for (std::size_t i=0; i<locality::array_length; ++i) {
                     temp1 << ipaddress(local_addr[i]);
