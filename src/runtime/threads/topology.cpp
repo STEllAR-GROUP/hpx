@@ -71,6 +71,7 @@ namespace hpx { namespace threads
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
+#ifdef HPX_HAVE_NICE_THREADLEVEL
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
         tid = syscall(SYS_gettid);
@@ -89,6 +90,7 @@ namespace hpx { namespace threads
         }
 #elif defined(__bgq__)
         ThreadPriority_Low();
+#endif
 #endif
         return true;
     }
