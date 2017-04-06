@@ -317,6 +317,19 @@ else()
 endif()
 
 ################################################################################
+# Threadlevel Nice option
+################################################################################
+hpx_option(HPX_WITH_NICE_THREADLEVEL BOOL
+  "Set HPX worker threads to have high NICE level (may impact performance) (default: OFF)"
+  OFF ADVANCED)
+if(HPX_WITH_NICE_THREADLEVEL)
+  hpx_info("Nice threadlevel is enabled.")
+  hpx_add_config_define(HPX_HAVE_NICE_THREADLEVEL)
+else()
+  hpx_info("Nice threadlevel is disabled.")
+endif()
+
+################################################################################
 # Utility configuration
 ################################################################################
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
