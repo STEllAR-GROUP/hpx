@@ -27,6 +27,19 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
+#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -110,7 +123,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename B>
             HPX_HOST_DEVICE
-            void operator()(B part_begin, std::size_t part_steps,
+            void execute(B part_begin, std::size_t part_steps,
                 std::size_t part_index)
             {
                 auto pack = typename hpx::util::detail::make_index_pack<
@@ -132,6 +145,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                         part_begin, part_steps, chunk);
                     part_steps -= chunk;
                 }
+            }
+
+            template <typename B>
+            HPX_HOST_DEVICE
+            void operator()(B part_begin, std::size_t part_steps,
+                std::size_t part_index)
+            {
+#if HPX_HAVE_ITTNOTIFY != 0
+                util::itt::string_handle const& sh =
+                    hpx::traits::get_function_annotation_itt<fun_type>::call(f_);
+                util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
+                char const* name =
+                    hpx::traits::get_function_annotation<fun_type>::call(f_);
+                if (name != nullptr)
+                {
+                    util::apex_wrapper apex_profiler(name,
+                        reinterpret_cast<std::uint64_t>(this));
+                    execute(part_begin, part_steps, part_index)
+                }
+                else
+#endif
+                execute(part_begin, part_steps, part_index);
             }
         };
 
@@ -1098,6 +1134,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             std::forward<Args>(args)...);
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename F, typename S, typename Tuple>
+    struct get_function_address<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static std::size_t call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename F, typename S, typename Tuple>
+    struct get_function_annotation<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static char const* call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif
 
