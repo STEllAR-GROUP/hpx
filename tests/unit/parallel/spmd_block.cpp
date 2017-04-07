@@ -9,20 +9,23 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
+#include <iostream>
 
-std::size_t num_images = 1000;
+std::size_t num_images = 10;
 
 int main()
 {
-    using hpx::parallel::execution::par;
-
     auto bulk_test = [](hpx::parallel::v2::spmd_block block)
                      {
+                        std::cout<< "Welcome in image "
+                            << block.this_image() << std::endl;
+
                         HPX_TEST_EQ( block.get_num_images(), num_images );
                         HPX_TEST_EQ( block.this_image() < num_images, true );
+                        block.sync_all();
                      };
 
-    hpx::parallel::v2::define_spmd_block(par, "block1", num_images, bulk_test);
+    hpx::parallel::v2::define_spmd_block("block1", num_images, bulk_test);
 
     return 0;
 }
