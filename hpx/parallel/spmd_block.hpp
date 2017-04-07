@@ -1,24 +1,24 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017 Antoine Tran Tan
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-///////////////////////////////////////////////////////////////////////////////
+
 #if !defined(HPX_PARALLEL_SPMD_BLOCK_HPP)
 #define HPX_PARALLEL_SPMD_BLOCK_HPP
 
 #include <hpx/include/parallel_for_each.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/barrier.hpp>
+/*#include <hpx/runtime/actions/lambda_to_action.hpp>*/
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 /*#include <hpx/runtime/serialization/serialize.hpp>*/
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/barrier.hpp>
-
-/*#include <hpx/runtime/actions/lambda_to_action.hpp>*/
 
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
 #include <memory>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -71,6 +71,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             return image_id_;
         }
 
+    // FIXME : If 2 images are scheduled in the same thread (not OS-thread)
+    // -> deadlock
         void sync_all() const
         {
            if (!barrier_)
