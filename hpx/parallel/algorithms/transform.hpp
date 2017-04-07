@@ -27,6 +27,19 @@
 #include <hpx/parallel/util/transform_loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#else
+#include <hpx/util/itt_notify.hpp>
+#endif
+#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -103,14 +116,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     1, typename Iter::iterator_tuple_type
                 >::type
             >
-            operator()(Iter part_begin, std::size_t part_size,
-                std::size_t /*part_index*/)
+            execute(Iter part_begin, std::size_t part_size)
             {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters),
                     transform_projected<F, Proj>{f_, proj_});
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            std::pair<
+                typename hpx::util::tuple_element<
+                    0, typename Iter::iterator_tuple_type
+                >::type,
+                typename hpx::util::tuple_element<
+                    1, typename Iter::iterator_tuple_type
+                >::type
+            >
+            operator()(Iter part_begin, std::size_t part_size,
+                std::size_t /*part_index*/)
+            {
+#if HPX_HAVE_ITTNOTIFY != 0
+                util::itt::string_handle const& sh =
+                    hpx::traits::get_function_annotation_itt<fun_type>::call(f_);
+                util::itt::task task(hpx::get_thread_itt_domain(), sh);
+#elif defined(HPX_HAVE_APEX)
+                char const* name =
+                    hpx::traits::get_function_annotation<fun_type>::call(f_);
+                if (name != nullptr)
+                {
+                    util::apex_wrapper apex_profiler(name,
+                        reinterpret_cast<std::uint64_t>(this));
+                    return execute(part_begin, part_size);
+                }
+                else
+#endif
+                return execute(part_begin, part_size);
             }
         };
 
@@ -787,5 +830,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_address<
+        parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
+    {
+        static std::size_t call(
+            parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_annotation<
+        parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
+    {
+        static char const* call(
+            parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif
