@@ -18,6 +18,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -115,13 +116,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }*/
     };
 
-    template <typename ExPolicy, typename F, typename ... Args>
+    template <typename F, typename ... Args>
     void define_spmd_block(
-        ExPolicy && policy,
         std::string && name,
         std::size_t num_images,
         F && f, Args && ... args)
     {
+        using hpx::parallel::execution::par;
         using ftype = typename std::remove_reference<F>::type;
 
         using first_type
@@ -134,12 +135,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "has at least a spmd_block as 1st argument");
 
         auto range = boost::irange(0ul, num_images);
+        hpx::parallel::static_chunk_size cs(1);
 
 // FIXME : How to invoke images remotely?
+
 /*        auto a = hpx::actions::lambda_to_action(std::move(f));*/
 
+    // Note : par.with() ensures that each invoked image is running in a
+    // separate thread
         hpx::parallel::for_each(
-            policy, range.begin(), range.end(),
+            par.with(cs), range.begin(), range.end(),
             [=,&f](std::size_t image_id)
             {
                 spmd_block block(name,num_images,image_id);
