@@ -83,78 +83,64 @@ namespace hpx { namespace threads { namespace policies
             std::size_t queue_size = this->queues_.size();
 
             {
-                std::size_t high_priority_queue_size =
-                    this->high_priority_queues_.size();
-
                 // Calculate the average ...
                 std::int64_t average_task_count = 0;
                 std::int64_t average_work_count = 0;
-                for(std::size_t i = 0; i != high_priority_queue_size; ++i)
-                {
-                    thread_queue_type* q = this->high_priority_queues_[i];
-                    average_task_count += q->get_staged_queue_length();
-                    average_work_count += q->get_pending_queue_length();
-                }
+                thread_queue_type* q = &this->high_priority_queue_;
+                average_task_count += q->get_staged_queue_length();
+                average_work_count += q->get_pending_queue_length();
 
-                average_task_count = average_task_count / high_priority_queue_size;
-                average_work_count = average_work_count / high_priority_queue_size;
+                average_task_count = average_task_count;
+                average_work_count = average_work_count;
 
                 // Remove items from queues that have more than the average
                 // FIXME: We should be able to avoid using a thread_queue as
                 // a temporary.
                 thread_queue_type tmp_queue;
-                for(std::size_t i = 0; i != high_priority_queue_size; ++i)
+                std::int64_t task_items = q->get_staged_queue_length();
+                std::int64_t work_items = q->get_pending_queue_length();
+
+                if(task_items > average_task_count)
                 {
-                    thread_queue_type* q = this->high_priority_queues_[i];
-                    std::int64_t task_items = q->get_staged_queue_length();
-                    std::int64_t work_items = q->get_pending_queue_length();
+                    std::int64_t count = task_items - average_task_count;
+                    tmp_queue.move_task_items_from(q, count);
+                }
 
-                    if(task_items > average_task_count)
-                    {
-                        std::int64_t count = task_items - average_task_count;
-                        tmp_queue.move_task_items_from(q, count);
-                    }
-
-                    if(work_items > average_work_count)
-                    {
-                        std::int64_t count = work_items - average_work_count;
-                        tmp_queue.move_work_items_from(q, count);
-                    }
+                if(work_items > average_work_count)
+                {
+                    std::int64_t count = work_items - average_work_count;
+                    tmp_queue.move_work_items_from(q, count);
                 }
 
                 // And re-add them to the queues which didn't have enough work ...
-                for (std::size_t i = 0; i != high_priority_queue_size; ++i)
+                task_items = q->get_staged_queue_length();
+                work_items = q->get_pending_queue_length();
+
+                if(task_items < average_task_count)
                 {
-                    thread_queue_type* q = this->high_priority_queues_[i];
-                    std::int64_t task_items = q->get_staged_queue_length();
-                    std::int64_t work_items = q->get_pending_queue_length();
+                    std::int64_t count = average_task_count - task_items;
+                    q->move_task_items_from(&tmp_queue, count);
+                }
 
-                    if(task_items < average_task_count)
-                    {
-                        std::int64_t count = average_task_count - task_items;
-                        q->move_task_items_from(&tmp_queue, count);
-                    }
-
-                    if(work_items < average_work_count)
-                    {
-                        std::int64_t count = average_work_count - work_items;
-                        q->move_work_items_from(&tmp_queue, count);
-                    }
+                if(work_items < average_work_count)
+                {
+                    std::int64_t count = average_work_count - work_items;
+                    q->move_work_items_from(&tmp_queue, count);
                 }
 
                 // Some items might remain in the tmp_queue ... re-add them
                 // round robin
                 for (std::size_t i = 0; tmp_queue.get_staged_queue_length();
-                        i = (i + 1) % high_priority_queue_size)
+                        i = (i + 1))
                 {
-                    this->high_priority_queues_[i]->
+                    this->high_priority_queue_.
                         move_task_items_from(&tmp_queue, 1);
                 }
 
                 for (std::size_t i = 0; tmp_queue.get_pending_queue_length();
-                     i = (i + 1) % high_priority_queue_size)
+                     i = (i + 1))
                 {
-                    this->high_priority_queues_[i]->
+                    this->high_priority_queue_.
                         move_work_items_from(&tmp_queue, 1);
                 }
             }
