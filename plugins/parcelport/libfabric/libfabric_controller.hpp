@@ -51,6 +51,10 @@
 # define HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
 #endif
 
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+# include "rdma/fi_ext_gni.h"
+#endif
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -253,6 +257,9 @@ namespace libfabric
             ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
             if (ret) throw fabric_error(ret, "fi_domain");
 
+            // Cray specific. Disable memory registration cache
+            _set_disable_registration();
+
             fi_freeinfo(fabric_hints_);
             FUNC_END_DEBUG_MSG;
         }
@@ -268,6 +275,7 @@ namespace libfabric
 #else
             bind_endpoint_to_queues(ep_passive_);
 #endif
+
             // filling our vector of receivers...
             std::size_t num_receivers = HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
             receivers_.reserve(num_receivers);
@@ -278,6 +286,41 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
+        // Special GNI extensions to disable memory registration cache
+
+        // this helper function only works for string ops
+        void _set_check_domain_op_value(int op, char *value)
+        {
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+            int ret;
+            struct fi_gni_ops_domain *gni_domain_ops;
+            char *get_val, *val;
+
+            ret = fi_open_ops(&fabric_domain_->fid, FI_GNI_DOMAIN_OPS_1,
+                      0, (void **) &gni_domain_ops, NULL);
+            if (ret) throw fabric_error(ret, "fi_open_ops");
+            LOG_DEBUG_MSG("domain ops returned " << hexpointer(gni_domain_ops));
+
+            val = value;
+            ret = gni_domain_ops->set_val(&fabric_domain_->fid,
+                    (dom_ops_val_t)(op), &val);
+            if (ret) throw fabric_error(ret, "set val (ops)");
+
+            ret = gni_domain_ops->get_val(&fabric_domain_->fid,
+                    (dom_ops_val_t)(op), &get_val);
+            LOG_DEBUG_MSG("Cache mode set to " << get_val);
+            if (std::string(val) != std::string(get_val)) throw fabric_error(ret, "get val");
+#endif
+        }
+
+        void _set_disable_registration()
+        {
+#ifdef HPX_PARCELPORT_LIBFABRIC_GNI
+            _set_check_domain_op_value(GNI_MR_CACHE, "none");
+#endif
+        }
+
+        // -------------------------------------------------------------------
         void create_event_queue()
         {
             LOG_DEVEL_MSG("Creating event queue");
@@ -507,7 +550,12 @@ struct fi_cq_msg_entry {
             //std::array<char, 256> buffer;
             fi_addr_t src_addr;
             fi_cq_msg_entry entry;
-            int ret = fi_cq_read(txcq_, &entry, 1);
+            int ret = 0;
+            {
+                std::unique_lock<mutex_type> l(polling_mutex_, std::try_to_lock);
+                if (l)
+                    ret = fi_cq_read(txcq_, &entry, 1);
+            }
             if (ret>0) {
 //                 hpx::util::unlock_guard_try<unique_lock> ul(lock);
                 //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
@@ -546,7 +594,12 @@ struct fi_cq_msg_entry {
 //             if (!lock) return 0;
 
             // receives will use fi_cq_readfrom as we want the source address
-            ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
+            ret = 0;
+            {
+                std::unique_lock<mutex_type> l(polling_mutex_, std::try_to_lock);
+                if (l)
+                    ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
+            }
             if (ret>0) {
                 LOG_DEVEL_MSG("Completion rxcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
