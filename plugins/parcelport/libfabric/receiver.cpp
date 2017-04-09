@@ -10,7 +10,7 @@
 #include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
-#include <plugins/parcelport/libfabric/parcelport.hpp>
+#include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>

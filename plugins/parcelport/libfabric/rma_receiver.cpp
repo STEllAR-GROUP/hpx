@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
-#include <plugins/parcelport/libfabric/parcelport.hpp>
+#include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
