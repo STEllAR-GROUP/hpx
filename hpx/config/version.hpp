@@ -32,13 +32,13 @@
 #define HPX_VERSION_MINOR        0
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20161031
+#define HPX_VERSION_DATE         20170424
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          "-rc1"
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"
