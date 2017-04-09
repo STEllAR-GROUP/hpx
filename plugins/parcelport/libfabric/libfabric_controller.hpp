@@ -513,11 +513,8 @@ namespace libfabric
         // are thrown away, otherwise the completion callback is triggered
         int poll_endpoints(bool stopped=false)
         {
-//             unique_lock lock(polling_mutex_, std::try_to_lock);
-//             if (!lock.owns_lock()) return 0;
-            //
-//             int work = poll_for_work_completions(lock, stopped);
-            int work = poll_for_work_completions(stopped);
+            int work = poll_for_work_completions();
+
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_MSG
             work += poll_event_queue(stopped);
 #endif
@@ -525,30 +522,21 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-//         int poll_for_work_completions(unique_lock& lock, bool stopped=false)
-        int poll_for_work_completions(bool stopped=false)
+        int poll_for_work_completions()
         {
             // @TODO, disable polling until queues are initialized to avoid this check
             // if queues are not setup, don't poll
             if (HPX_UNLIKELY(!rxcq_)) return 0;
+            //
+            return poll_send_queue() + poll_recv_queue();
+        }
 
-            int result = 0;
-
+        // --------------------------------------------------------------------
+        int poll_send_queue()
+        {
             LOG_TIMED_INIT(poll);
-            LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
-                {
-                    LOG_DEVEL_MSG("Polling work completion channel");
-                }
-            )
-/*
-struct fi_cq_msg_entry {
-    void     *op_context; // operation context
-    uint64_t flags;       // completion flags
-    size_t   len;         // size of received data
-};
-*/
-            //std::array<char, 256> buffer;
-            fi_addr_t src_addr;
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_send_queue"); });
+
             fi_cq_msg_entry entry;
             int ret = 0;
             {
@@ -557,13 +545,14 @@ struct fi_cq_msg_entry {
                     ret = fi_cq_read(txcq_, &entry, 1);
             }
             if (ret>0) {
-//                 hpx::util::unlock_guard_try<unique_lock> ul(lock);
-                //struct fi_cq_msg_entry *entry = (struct fi_cq_msg_entry *)(buffer.data());
                 LOG_DEVEL_MSG("Completion txcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
-                    << hexpointer(entry.op_context) << "length " << hexuint32(entry.len));
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
+                    << " (" << decnumber(entry.flags) << ") "
+                    << "context " << hexpointer(entry.op_context)
+                    << "length " << hexuint32(entry.len));
                 if (entry.flags & FI_RMA) {
-                    LOG_DEBUG_MSG("Received a txcq RMA completion");
+                    LOG_DEBUG_MSG("Received a txcq RMA completion "
+                        << "Context " << hexpointer(entry.op_context));
                     rma_receiver* rcv = reinterpret_cast<rma_receiver*>(entry.op_context);
                     rcv->handle_read_completion();
                 }
@@ -575,9 +564,9 @@ struct fi_cq_msg_entry {
                 else {
                     LOG_DEVEL_MSG("$$$$$ Received an unknown txcq completion ***** "
                         << decnumber(entry.flags));
-//                     std::terminate();
+                    std::terminate();
                 }
-                result = 1;
+                return 1;
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
@@ -590,11 +579,21 @@ struct fi_cq_msg_entry {
                 LOG_ERROR_MSG("txcq Error with flags " << e.flags << " len " << e.len);
                 throw fabric_error(ret, "completion txcq read");
             }
+            return 0;
+        }
 
-//             if (!lock) return 0;
+        // --------------------------------------------------------------------
+        int poll_recv_queue()
+        {
+            LOG_TIMED_INIT(poll);
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_recv_queue"); });
+
+            int result = 0;
+            fi_addr_t src_addr;
+            fi_cq_msg_entry entry;
 
             // receives will use fi_cq_readfrom as we want the source address
-            ret = 0;
+            int ret = 0;
             {
                 std::unique_lock<mutex_type> l(polling_mutex_, std::try_to_lock);
                 if (l)
@@ -602,12 +601,11 @@ struct fi_cq_msg_entry {
             }
             if (ret>0) {
                 LOG_DEVEL_MSG("Completion rxcq wr_id "
-                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS) << " (" << decnumber(entry.flags) << ") "
-                    << " source " << hexpointer(src_addr)
+                    << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
+                    << " (" << decnumber(entry.flags) << ") "
+                    << "source " << hexpointer(src_addr)
                     << "context " << hexpointer(entry.op_context)
                     << "length " << hexuint32(entry.len));
-//                void *client = reinterpret_cast<libfabric_memory_region*>
-//                    (entry.op_context)->get_user_data();
                 if (src_addr == FI_ADDR_NOTAVAIL)
                 {
                     LOG_DEVEL_MSG("Source address not available...\n");
@@ -617,7 +615,8 @@ struct fi_cq_msg_entry {
 //                         LOG_DEVEL_MSG("Received an rxcq RMA completion");
 //                     }
                 else if (entry.flags == (FI_MSG | FI_RECV)) {
-                    LOG_DEVEL_MSG("Received an rxcq recv completion" << entry.op_context);
+                    LOG_DEVEL_MSG("Received an rxcq recv completion "
+                        << hexpointer(entry.op_context));
                     reinterpret_cast<receiver *>(entry.op_context)->handle_recv(src_addr, entry.len);
                 }
                 else {
@@ -638,7 +637,6 @@ struct fi_cq_msg_entry {
                 LOG_ERROR_MSG("rxcq Error with flags " << e.flags << " len " << e.len);
                 throw fabric_error(ret, "completion rxcq read");
             }
-
             return result;
         }
 

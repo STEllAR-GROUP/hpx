@@ -45,6 +45,9 @@
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
+// until we implement immediate data, or counted rdma send completions
+// we will use a small message returned to the sender to signal ok
+// to release buffers.
 #define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
@@ -101,10 +104,7 @@ namespace libfabric
         : base_type(ini, locality(), on_start_thread, on_stop_thread)
         , active_send_count_(0)
         , stopped_(false)
-        , sends_posted(0)
-        , handled_receives(0)
-        , completions_handled(0)
-        , total_reads(0)
+        , completions_handled_(0)
     {
         FUNC_START_DEBUG_MSG;
 
@@ -194,6 +194,13 @@ namespace libfabric
             FUNC_END_DEBUG_MSG;
             return snd;
         }
+        else
+        {
+            background_work_OS_thread();
+        }
+
+        // if no senders are available shutdown
+        FUNC_END_DEBUG_MSG;
         return nullptr;
     }
 
@@ -205,22 +212,17 @@ namespace libfabric
         parcelset::locality const& dest, error_code& ec)
     {
         LOG_DEVEL_MSG("Creating new sender");
-//         const locality &fabric_locality = dest.get<locality>();
-//         fi_addr_t fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
         return std::shared_ptr<sender>();
-//         return std::make_shared<sender>(
-//             this,
-//             libfabric_controller_->ep_active_, libfabric_controller_->get_domain(),
-//             &libfabric_controller_->get_memory_pool(),
-//             fi_addr, dest);
     }
 
     parcelport::~parcelport() {
         FUNC_START_DEBUG_MSG;
         scoped_lock lk(stop_mutex);
         sender *snd = nullptr;
-        while (senders_.pop(snd))
+        while (senders_.pop(snd)) {
+            LOG_DEBUG_MSG("Popped a sender for delete " << hexpointer(snd));
             delete snd;
+        }
         libfabric_controller_ = nullptr;
         FUNC_END_DEBUG_MSG;
     }
@@ -254,11 +256,6 @@ namespace libfabric
         LOG_DEVEL_MSG("Got AGAS addr " << addr);
         LOG_DEVEL_MSG("What should we return for agas locality for fabric PP" << addr);
         std::terminate();
-
-//            inet_pton(AF_INET, &addr[0], &buf);
-//            return
-//                parcelset::locality(locality(buf.s_addr));
-
         FUNC_END_DEBUG_MSG;
         return parcelset::locality(locality());
     }
@@ -291,7 +288,7 @@ namespace libfabric
 
             // wait for all clients initiated elsewhere to be disconnected
             while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/) {
-                libfabric_controller_->poll_endpoints(true);
+                completions_handled_ += libfabric_controller_->poll_endpoints(true);
                 LOG_TIMED_INIT(disconnect_poll);
                 LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
                     {
@@ -306,7 +303,11 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    bool parcelport::can_send_immediate() {
+    bool parcelport::can_send_immediate()
+    {
+//         while (senders_.empty()) {
+//             background_work(0);
+//         }
         return true;
     }
 
@@ -316,11 +317,41 @@ namespace libfabric
         sender *snd, fi_addr_t addr,
         snd_buffer_type &buffer)
     {
+        LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
         snd->dst_addr_ = addr;
         snd->buffer_ = std::move(buffer);
         snd->handler_ = std::forward<Handler>(handler);
         snd->async_write_impl();
+        // after a send poll to make progress on the network and
+        // reduce latencies for receives coming in
+        background_work_OS_thread();
         return true;
+    }
+
+    // --------------------------------------------------------------------
+    // This is called to poll for completions and handle all incoming messages
+    // as well as complete outgoing messages.
+    //
+    // Since the parcelport can be serviced by hpx threads or by OS threads,
+    // we must use extra care when dealing with mutexes and condition_variables
+    // since we do not want to suspend an OS thread, but we do want to suspend
+    // hpx threads when necessary.
+    //
+    // NB: There is no difference any more between background polling work
+    // on OS or HPX as all has been test thoroughly
+    // --------------------------------------------------------------------
+    inline bool parcelport::background_work_OS_thread() {
+         bool done = false;
+         do {
+             // if an event comes in, we may spend time processing/handling it
+             // and another may arrive during this handling,
+             // so keep checking until none are received
+             //libfabric_controller_->refill_client_receives(false);
+             int numc = libfabric_controller_->poll_endpoints();
+             completions_handled_ += numc;
+             done = (numc==0);
+         } while (!done);
+        return (done!=0);
     }
 
     // --------------------------------------------------------------------
@@ -333,8 +364,7 @@ namespace libfabric
         if (stopped_ || hpx::is_stopped()) {
             return false;
         }
-
-        return libfabric_controller_->poll_endpoints();
+        return background_work_OS_thread();
     }
 }}}}
 

@@ -96,9 +96,10 @@ namespace libfabric
         // These are the types used in the parcelport for locking etc
         // Note that spinlock is the only supported mutex that works on HPX+OS threads
         // and condition_variable_any can be used across HPX/OS threads
-        typedef hpx::lcos::local::spinlock                               mutex_type;
+        typedef hpx::lcos::local::spinlock                                   mutex_type;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
+
 
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
@@ -106,7 +107,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         libfabric_controller_ptr libfabric_controller_;
 
-        // our local ip address (estimated based on fabric PP adress info)
+        // our local ip address (estimated based on fabric PP address info)
         uint32_t ip_addr_;
 
         // Not currently working, we support bootstrapping, but when not enabled
@@ -123,7 +124,6 @@ namespace libfabric
         typedef rdma_memory_pool                                   memory_pool_type;
         typedef pinned_memory_vector<char, header_size>            snd_data_type;
         typedef parcel_buffer<snd_data_type>                       snd_buffer_type;
-
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
 
@@ -132,8 +132,6 @@ namespace libfabric
             boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
             boost::lockfree::fixed_sized<true>
         > senders_;
-
-
         // These are counters that are used for flow control so that we can throttle
         // send tasks when too many messages have been posted.
         std::atomic<unsigned int> active_send_count_;
@@ -144,11 +142,8 @@ namespace libfabric
 
         // performance_counters::parcels::gatherer& parcels_sent_;
 
-        // a count of all receives, for debugging/performance measurement
-        performance_counter<unsigned int> sends_posted;
-        performance_counter<unsigned int> handled_receives;
-        performance_counter<unsigned int> completions_handled;
-        performance_counter<unsigned int> total_reads;
+        // for debugging/performance measurement
+        performance_counter<unsigned int> completions_handled_;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'
@@ -209,6 +204,8 @@ namespace libfabric
         // is used to poll for events, messages on the libfabric connection
         // --------------------------------------------------------------------
         bool background_work(std::size_t num_thread);
+        bool background_work_OS_thread();
+
     };
 }}}}
 
@@ -276,31 +273,5 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
     }
 };
 }}
-
-/*
-            libfabric_controller_->for_each_client(
-                [](std::pair<uint32_t, libfabric_endpoint_ptr> clientpair)
-                {
-                libfabric_endpoint* client = clientpair.second.get();
-                LOG_TIMED_INIT(clientlog);
-                LOG_TIMED_MSG(clientlog, DEVEL, 0.1,
-                    "internal reported, \n"
-                    << "recv " << decnumber(client->get_total_posted_recv_count()) << "\n"
-                    << "send " << decnumber(client->get_total_posted_send_count()) << "\n"
-                    << "read " << decnumber(client->get_total_posted_read_count()) << "\n"
-                );
-                }
-            );
-
-            LOG_TIMED_INIT(background);
-            LOG_TIMED_MSG(background, DEVEL, 0.1,
-                "PP reported\n"
-                << "actv " << decnumber(active_send_count_) << "\n"
-                << "recv " << decnumber(handled_receives) << "\n"
-                << "send " << decnumber(sends_posted) << "\n"
-                << "read " << decnumber(total_reads) << "\n"
-                << "Total completions " << decnumber(completions_handled)
-                << decnumber(sends_posted+handled_receives+total_reads));
-*/
 
 #endif
