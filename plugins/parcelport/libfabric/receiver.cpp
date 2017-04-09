@@ -29,7 +29,7 @@ namespace libfabric
       , endpoint_(endpoint)
       , memory_pool_(&memory_pool)
     {
-        LOG_DEVEL_MSG("created receiver: " << this);
+        LOG_DEBUG_MSG("created receiver: " << this);
         // Once constructed, we need to post the receive...
         post_recv();
     }
@@ -81,12 +81,12 @@ namespace libfabric
             /// @TODO: fixme immediate tag retreival
             sender* snd = *reinterpret_cast<sender **>(region_->get_address());
             post_recv();
-            LOG_DEVEL_MSG("Handling sender completion: " << hexpointer(snd));
+            LOG_DEBUG_MSG("Handling sender completion: " << hexpointer(snd));
             snd->handle_message_completion();
             return;
         }
 
-        LOG_DEVEL_MSG("Handling message");
+        LOG_DEBUG_MSG("Handling message");
         rma_receiver* recv = nullptr;
         if(!rma_receivers_.pop(recv))
         {
@@ -118,7 +118,7 @@ namespace libfabric
     {
         FUNC_START_DEBUG_MSG;
         void* desc = region_->get_desc();
-        LOG_DEVEL_MSG("Pre-Posting a receive to client size "
+        LOG_DEBUG_MSG("Pre-Posting a receive to client size "
             << hexnumber(memory_pool_->small_.chunk_size())
             << " descriptor " << hexpointer(desc) << " context " << hexpointer(this));
 
@@ -133,7 +133,7 @@ namespace libfabric
 
             if (ret == -FI_EAGAIN)
             {
-                LOG_DEVEL_MSG("reposting recv\n");
+                LOG_DEBUG_MSG("reposting recv\n");
                 hpx::util::detail::yield_k(k,
                     "libfabric::receiver::post_recv");
                 continue;

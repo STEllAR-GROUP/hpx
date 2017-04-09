@@ -150,29 +150,29 @@ namespace libfabric
             // Cleaning up receivers to avoid memory leak errors.
             receivers_.clear();
 
-            LOG_DEVEL_MSG("closing fabric_->fid");
+            LOG_DEBUG_MSG("closing fabric_->fid");
             if (fabric_)
                 fi_close(&fabric_->fid);
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
-            LOG_DEVEL_MSG("closing ep_active_->fid");
+            LOG_DEBUG_MSG("closing ep_active_->fid");
             if (ep_active_)
                 fi_close(&ep_active_->fid);
 #else
-            LOG_DEVEL_MSG("closing ep_passive_->fid");
+            LOG_DEBUG_MSG("closing ep_passive_->fid");
             if (ep_passive_)
                 fi_close(&ep_passive_->fid);
 #endif
-            LOG_DEVEL_MSG("closing event_queue_->fid");
+            LOG_DEBUG_MSG("closing event_queue_->fid");
             if (event_queue_)
                 fi_close(&event_queue_->fid);
-            LOG_DEVEL_MSG("closing fabric_domain_->fid");
+            LOG_DEBUG_MSG("closing fabric_domain_->fid");
             if (fabric_domain_)
                 fi_close(&fabric_domain_->fid);
-            LOG_DEVEL_MSG("closing ep_shared_rx_cxt_->fid");
+            LOG_DEBUG_MSG("closing ep_shared_rx_cxt_->fid");
             if (ep_shared_rx_cxt_)
                 fi_close(&ep_shared_rx_cxt_->fid);
             // clean up
-            LOG_DEVEL_MSG("freeing fabric_info");
+            LOG_DEBUG_MSG("freeing fabric_info");
             fi_freeinfo(fabric_info_);
         }
 
@@ -211,7 +211,7 @@ namespace libfabric
             fabric_hints_->domain_attr->resource_mgmt = FI_RM_ENABLED;
 
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
-            LOG_DEVEL_MSG("Selecting endpoint type RDM");
+            LOG_DEBUG_MSG("Selecting endpoint type RDM");
             fabric_hints_->ep_attr->type = FI_EP_RDM;
 #else
             // we will use a shared receive context for active endpoints
@@ -241,12 +241,12 @@ namespace libfabric
             if (ret) {
                 throw fabric_error(ret, "Failed to get fabric info");
             }
-            LOG_DEVEL_MSG("Fabric info " << fi_tostr(fabric_info_, FI_TYPE_INFO));
+            LOG_DEBUG_MSG("Fabric info " << fi_tostr(fabric_info_, FI_TYPE_INFO));
 
             immediate_ = (fabric_info_->rx_attr->mode & FI_RX_CQ_DATA)!=0;
-            LOG_DEVEL_MSG("Fabric supports immediate data " << immediate_);
+            LOG_DEBUG_MSG("Fabric supports immediate data " << immediate_);
             bool context = (fabric_hints_->mode & FI_CONTEXT)!=0;
-            LOG_DEVEL_MSG("Fabric requires FI_CONTEXT " << context);
+            LOG_DEBUG_MSG("Fabric requires FI_CONTEXT " << context);
 
             LOG_DEBUG_MSG("Creating fabric object");
             ret = fi_fabric(fabric_info_->fabric_attr, &fabric_, NULL);
@@ -325,7 +325,7 @@ namespace libfabric
         // -------------------------------------------------------------------
         void create_event_queue()
         {
-            LOG_DEVEL_MSG("Creating event queue");
+            LOG_DEBUG_MSG("Creating event queue");
             fi_eq_attr eq_attr = {};
             eq_attr.wait_obj = FI_WAIT_NONE;
             int ret = fi_eq_open(fabric_, &eq_attr, &event_queue_, NULL);
@@ -355,7 +355,7 @@ namespace libfabric
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             LOG_DEBUG_MSG("Creating active endpoint");
             new_endpoint_active(fabric_info_, &ep_active_);
-            LOG_DEVEL_MSG("active endpoint " << hexpointer(ep_active_));
+            LOG_DEBUG_MSG("active endpoint " << hexpointer(ep_active_));
             id = &ep_active_->fid;
 #else
             LOG_DEBUG_MSG("Creating passive endpoint");
@@ -363,12 +363,12 @@ namespace libfabric
             if (ret) {
                 throw fabric_error(ret, "Failed to create fi_passive_ep");
             }
-            LOG_DEVEL_MSG("passive endpoint " << hexpointer(ep_passive_));
+            LOG_DEBUG_MSG("passive endpoint " << hexpointer(ep_passive_));
             id = &ep_passive_->fid;
 #endif
             locality::locality_data local_addr;
             std::size_t addrlen = locality::array_size;
-            LOG_DEVEL_MSG("Fetching local address using size " << decnumber(addrlen));
+            LOG_DEBUG_MSG("Fetching local address using size " << decnumber(addrlen));
             int ret = fi_getname(id, local_addr.data(), &addrlen);
             if (ret || (addrlen>locality::array_size)) {
                 fabric_error(ret, "fi_getname - size error or other problem");
@@ -379,11 +379,11 @@ namespace libfabric
                 for (std::size_t i=0; i<locality::array_length; ++i) {
                     temp1 << ipaddress(local_addr[i]);
                 }
-                LOG_DEVEL_MSG("address info is " << temp1.str().c_str());
+                LOG_DEBUG_MSG("address info is " << temp1.str().c_str());
                 for (std::size_t i=0; i<locality::array_length; ++i) {
                     temp2 << hexuint32(local_addr[i]);
                 }
-                LOG_DEVEL_MSG("address info is " << temp2.str().c_str());
+                LOG_DEBUG_MSG("address info is " << temp2.str().c_str());
             //);
             FUNC_END_DEBUG_MSG;
             return locality(local_addr);
@@ -395,7 +395,7 @@ namespace libfabric
             FUNC_START_DEBUG_MSG;
             // create an 'active' endpoint that can be used for sending/receiving
             LOG_DEBUG_MSG("Creating active endpoint");
-            LOG_DEVEL_MSG("Got info mode " << (info->mode & FI_NOTIFY_FLAGS_ONLY));
+            LOG_DEBUG_MSG("Got info mode " << (info->mode & FI_NOTIFY_FLAGS_ONLY));
             int ret = fi_endpoint(fabric_domain_, info, new_endpoint, NULL);
             if (ret) throw fabric_error(ret, "fi_endpoint");
 
@@ -436,7 +436,7 @@ namespace libfabric
                 if (ret) throw fabric_error(ret, "ep_shared_rx_cxt_");
             }
 
-            LOG_DEVEL_MSG("Enabling endpoint " << hexpointer(endpoint));
+            LOG_DEBUG_MSG("Enabling endpoint " << hexpointer(endpoint));
             ret = fi_enable(endpoint);
             if (ret) throw fabric_error(ret, "fi_enable");
 
@@ -448,26 +448,26 @@ namespace libfabric
         {
             FUNC_START_DEBUG_MSG;
             std::uint32_t N = hpx::get_config().get_num_localities();
-            LOG_DEVEL_MSG("Parcelport initialize_localities with " << N << " localities");
+            LOG_DEBUG_MSG("Parcelport initialize_localities with " << N << " localities");
 
             // make sure address vector is created
             create_completion_queues(fabric_info_, N);
 
             for (std::uint32_t i=0; i<N; ++i) {
                 hpx::naming::gid_type l = hpx::naming::get_gid_from_locality_id(i);
-                LOG_DEVEL_MSG("Resolving locality" << l);
+                LOG_DEBUG_MSG("Resolving locality" << l);
                 // each locality may be reachable by mutiplte parcelports
                 const parcelset::endpoints_type &res = as.resolve_locality(l);
                 // get the fabric related data
                 auto it = res.find("libfabric");
-                LOG_DEVEL_MSG("locality resolution " << it->first << " => " << it->second);
+                LOG_DEBUG_MSG("locality resolution " << it->first << " => " << it->second);
                 const hpx::parcelset::locality &fabric_locality = it->second;
                 const locality &loc = fabric_locality.get<locality>();
                 // put the provide specific data into the address vector
                 // so that we can look it  up later
                 /*fi_addr_t dummy =*/ insert_address(loc);
             }
-            LOG_DEVEL_MSG("Done getting localities ");
+            LOG_DEBUG_MSG("Done getting localities ");
             FUNC_END_DEBUG_MSG;
         }
 
@@ -537,7 +537,7 @@ namespace libfabric
         int poll_send_queue()
         {
             LOG_TIMED_INIT(poll);
-            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_send_queue"); });
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEBUG_MSG("poll_send_queue"); });
 
             fi_cq_msg_entry entry;
             int ret = 0;
@@ -547,7 +547,7 @@ namespace libfabric
                     ret = fi_cq_read(txcq_, &entry, 1);
             }
             if (ret>0) {
-                LOG_DEVEL_MSG("Completion txcq wr_id "
+                LOG_DEBUG_MSG("Completion txcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
                     << " (" << decnumber(entry.flags) << ") "
                     << "context " << hexpointer(entry.op_context)
@@ -564,7 +564,7 @@ namespace libfabric
                     handler->handle_send_completion();
                 }
                 else {
-                    LOG_DEVEL_MSG("$$$$$ Received an unknown txcq completion ***** "
+                    LOG_DEBUG_MSG("$$$$$ Received an unknown txcq completion ***** "
                         << decnumber(entry.flags));
                     std::terminate();
                 }
@@ -572,7 +572,7 @@ namespace libfabric
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
-                LOG_TIMED_MSG(poll, DEVEL, 5, "txcq EAGAIN");
+                LOG_TIMED_MSG(poll, DEVEL, 10, "txcq EAGAIN");
             }
             else if (ret<0) {
                 struct fi_cq_err_entry e = {};
@@ -588,7 +588,7 @@ namespace libfabric
         int poll_recv_queue()
         {
             LOG_TIMED_INIT(poll);
-            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEVEL_MSG("poll_recv_queue"); });
+            LOG_TIMED_BLOCK(poll, DEVEL, 5.0, { LOG_DEBUG_MSG("poll_recv_queue"); });
 
             int result = 0;
             fi_addr_t src_addr;
@@ -602,7 +602,7 @@ namespace libfabric
                     ret = fi_cq_readfrom(rxcq_, &entry, 1, &src_addr);
             }
             if (ret>0) {
-                LOG_DEVEL_MSG("Completion rxcq wr_id "
+                LOG_DEBUG_MSG("Completion rxcq wr_id "
                     << fi_tostr(&entry.flags, FI_TYPE_OP_FLAGS)
                     << " (" << decnumber(entry.flags) << ") "
                     << "source " << hexpointer(src_addr)
@@ -610,19 +610,19 @@ namespace libfabric
                     << "length " << hexuint32(entry.len));
                 if (src_addr == FI_ADDR_NOTAVAIL)
                 {
-                    LOG_DEVEL_MSG("Source address not available...\n");
+                    LOG_DEBUG_MSG("Source address not available...\n");
                     std::terminate();
                 }
 //                     if ((entry.flags & FI_RMA) == FI_RMA) {
-//                         LOG_DEVEL_MSG("Received an rxcq RMA completion");
+//                         LOG_DEBUG_MSG("Received an rxcq RMA completion");
 //                     }
                 else if (entry.flags == (FI_MSG | FI_RECV)) {
-                    LOG_DEVEL_MSG("Received an rxcq recv completion "
+                    LOG_DEBUG_MSG("Received an rxcq recv completion "
                         << hexpointer(entry.op_context));
                     reinterpret_cast<receiver *>(entry.op_context)->handle_recv(src_addr, entry.len);
                 }
                 else {
-                    LOG_DEVEL_MSG("Received an unknown rxcq completion "
+                    LOG_DEBUG_MSG("Received an unknown rxcq completion "
                         << decnumber(entry.flags));
                     std::terminate();
                 }
@@ -630,7 +630,7 @@ namespace libfabric
             }
             else if (ret==0 || ret==-EAGAIN) {
                 // do nothing, we will try again on the next check
-                LOG_TIMED_MSG(poll, DEVEL, 5, "rxcq EAGAIN");
+                LOG_TIMED_MSG(poll, DEVEL, 10, "rxcq EAGAIN");
             }
             else if (ret<0) {
                 struct fi_cq_err_entry e = {};
@@ -648,7 +648,7 @@ namespace libfabric
             LOG_TIMED_INIT(poll);
             LOG_TIMED_BLOCK(poll, DEVEL, 5.0,
                 {
-                    LOG_DEVEL_MSG("Polling event completion channel");
+                    LOG_DEBUG_MSG("Polling event completion channel");
                 }
             )
             struct fi_eq_cm_entry *cm_entry;
@@ -668,7 +668,7 @@ namespace libfabric
                     locality::locality_data addressinfo;
                     std::memcpy(addressinfo.data(), cm_entry->info->dest_addr, locality::array_size);
                     locality loc(addressinfo);
-                    LOG_DEVEL_MSG("FI_CONNREQ                 from "
+                    LOG_DEBUG_MSG("FI_CONNREQ                 from "
                         << ipaddress(loc.ip_address()) << "-> "
                         << ipaddress(here_.ip_address())
                         << "( " << ipaddress(here_.ip_address()) << " )");
@@ -677,7 +677,7 @@ namespace libfabric
                         // if the insert fails, it means we have a connection
                         // already in progress, reject if we are a lower ip address
                         if (!result.first && loc.ip_address()>here_.ip_address()) {
-                            LOG_DEVEL_MSG("FI_CONNREQ priority fi_reject   "
+                            LOG_DEBUG_MSG("FI_CONNREQ priority fi_reject   "
                                 << ipaddress(loc.ip_address()) << "-> "
                                 << ipaddress(here_.ip_address())
                                 << "( " << ipaddress(here_.ip_address()) << " )");
@@ -688,7 +688,7 @@ namespace libfabric
                         }
                         // create a new endpoint for this request and accept it
                         new_endpoint_active(cm_entry->info, &new_ep);
-                        LOG_DEVEL_MSG("Calling fi_accept               "
+                        LOG_DEBUG_MSG("Calling fi_accept               "
                             << ipaddress(loc.ip_address()) << "-> "
                             << ipaddress(here_.ip_address())
                             << "( " << ipaddress(here_.ip_address()) << " )");
@@ -710,7 +710,7 @@ namespace libfabric
                     if (!present1.second) {
                         throw fabric_error(0, "FI_CONNECTED, endpoint map error");
                     }
-                    LOG_DEVEL_MSG("FI_CONNECTED " << hexpointer(new_ep)
+                    LOG_DEBUG_MSG("FI_CONNECTED " << hexpointer(new_ep)
                         << ipaddress(locality::ip_address(address)) << "<> "
                         << ipaddress(here_.ip_address())
                         << "( " << ipaddress(here_.ip_address()) << " )");
@@ -720,7 +720,7 @@ namespace libfabric
 
                     // if there is an entry for a locally started connection on this IP
                     // then set the future ready with the verbs endpoint
-                    LOG_DEVEL_MSG("FI_CONNECTED setting future     "
+                    LOG_DEBUG_MSG("FI_CONNECTED setting future     "
                             << ipaddress(locality::ip_address(address)) << "<> "
                             << ipaddress(here_.ip_address())
                         << "( " << ipaddress(here_.ip_address()) << " )");
@@ -784,7 +784,7 @@ namespace libfabric
             fi_cq_attr cq_attr = {};
             // @TODO - why do we check this
 //             if (cq_attr.format == FI_CQ_FORMAT_UNSPEC) {
-                LOG_DEVEL_MSG("Setting CQ attribute to FI_CQ_FORMAT_MSG");
+                LOG_DEBUG_MSG("Setting CQ attribute to FI_CQ_FORMAT_MSG");
                 cq_attr.format = FI_CQ_FORMAT_MSG;
 //             }
 
@@ -809,12 +809,12 @@ namespace libfabric
                 if (info->domain_attr->av_type != FI_AV_UNSPEC)
                     av_attr.type = info->domain_attr->av_type;
                 else {
-                    LOG_DEVEL_MSG("Setting map type to FI_AV_MAP");
+                    LOG_DEBUG_MSG("Setting map type to FI_AV_MAP");
                     av_attr.type  = FI_AV_MAP;
                     av_attr.count = N;
                 }
 
-                LOG_DEVEL_MSG("Creating address vector ");
+                LOG_DEBUG_MSG("Creating address vector ");
                 ret = fi_av_open(fabric_domain_, &av_attr, &av_, NULL);
                 if (ret) throw fabric_error(ret, "fi_av_open");
             }
@@ -826,10 +826,10 @@ namespace libfabric
             uint32_t remote_ip)
         {
 
-            LOG_DEVEL_MSG("insert_new_future : Obsolete in RDM mode");
+            LOG_DEBUG_MSG("insert_new_future : Obsolete in RDM mode");
             std::terminate();
 
-            LOG_DEVEL_MSG("Inserting future in map         "
+            LOG_DEBUG_MSG("Inserting future in map         "
                 << ipaddress(here_.ip_address()) << "-> "
                 << ipaddress(remote_ip)
                 << "( " << ipaddress(here_.ip_address()) << " )");
@@ -848,7 +848,7 @@ namespace libfabric
             auto it = endpoint_tmp_.insert(std::move(fp_pair));
             // if the insert failed, we must safely delete the future/promise
             if (!it.second) {
-                LOG_DEVEL_MSG("Must safely delete promise");
+                LOG_DEBUG_MSG("Must safely delete promise");
             }
 
             // get the future that was inserted or already present
@@ -867,7 +867,7 @@ namespace libfabric
         fi_addr_t insert_address(const locality &remote)
         {
             FUNC_START_DEBUG_MSG;
-            LOG_DEVEL_MSG("inserting address in vector "
+            LOG_DEBUG_MSG("inserting address in vector "
                 << ipaddress(remote.ip_address()));
             fi_addr_t result = 0xffffffff;
             int ret = fi_av_insert(av_, remote.fabric_data(), 1, &result, 0, nullptr);
@@ -878,7 +878,7 @@ namespace libfabric
                 fabric_error(ret, "fi_av_insert did not return 1");
             }
             endpoint_av_.insert(std::make_pair(remote.ip_address(), result));
-            LOG_DEVEL_MSG("Address inserted in vector "
+            LOG_DEBUG_MSG("Address inserted in vector "
                 << ipaddress(remote.ip_address()) << hexuint64(result));
             FUNC_END_DEBUG_MSG;
             return result;
@@ -888,7 +888,7 @@ namespace libfabric
         hpx::shared_future<struct fid_ep*> connect_to_server(const locality &remote)
         {
 
-            LOG_DEVEL_MSG("connect_to_server : Obsolete in RDM mode");
+            LOG_DEBUG_MSG("connect_to_server : Obsolete in RDM mode");
             std::terminate();
 
             const uint32_t &remote_ip = remote.ip_address();
@@ -900,7 +900,7 @@ namespace libfabric
 
             // if a connection is already underway, just return the future
             if (!connection.first) {
-                LOG_DEVEL_MSG("connect to server : returning existing future");
+                LOG_DEBUG_MSG("connect to server : returning existing future");
                 // the future will become ready when the remote end accepts/rejects
                 // our connection - or we accept a connection from a remote
                 return connection.second;
@@ -928,7 +928,7 @@ namespace libfabric
             new_endpoint_active(fabric_info_active_, &new_endpoint);
 
             // now it is safe to call connect
-            LOG_DEVEL_MSG("Calling fi_connect         from "
+            LOG_DEBUG_MSG("Calling fi_connect         from "
                 << ipaddress(here_.ip_address()) << "-> "
                 << ipaddress(remote.ip_address())
                 << "( " << ipaddress(here_.ip_address()) << " )");

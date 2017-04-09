@@ -73,7 +73,7 @@ namespace libfabric
                         << decnumber(regtimer.elapsed_nanoseconds()));
                 }
                 c.rkey_  = zero_copy_region->get_remote_key();
-                LOG_DEVEL_MSG("Zero-copy rdma Get region "
+                LOG_DEBUG_MSG("Zero-copy rdma Get region "
                     << decnumber(index) << " created for address "
                     << hexpointer(zero_copy_region->get_address())
                     << " and rkey " << hexpointer(c.rkey_));
@@ -93,7 +93,7 @@ namespace libfabric
         header_ = new(header_memory) header_type(buffer_, this);
         header_region_->set_message_length(header_->header_length());
 
-        LOG_DEVEL_MSG("sending, buffsize "
+        LOG_DEBUG_MSG("sending, buffsize "
             << decnumber(header_->size())
             << "header_length " << decnumber(header_->header_length())
             << "chunks zerocopy( " << decnumber(header_->num_chunks().first) << ") "
@@ -149,7 +149,7 @@ namespace libfabric
 
         // send the header/main_chunk to the destination,
         // wr_id is header_region (entry 0 in region_list)
-        LOG_DEVEL_MSG("fi_send num regions " << decnumber(num_regions)
+        LOG_DEBUG_MSG("fi_send num regions " << decnumber(num_regions)
             << " client " << hexpointer(endpoint_)
             << " fi_addr " << hexpointer(dst_addr_)
             << " header_region"
@@ -171,7 +171,7 @@ namespace libfabric
                     desc_, num_regions, dst_addr_, this);
                 if (ret == -FI_EAGAIN)
                 {
-                    LOG_DEVEL_MSG("reposting send...\n");
+                    LOG_DEBUG_MSG("reposting send...\n");
                     hpx::util::detail::yield_k(k,
                         "libfabric::sender::async_write");
                     continue;
@@ -189,7 +189,7 @@ namespace libfabric
                 desc_[0], dst_addr_, this);
                 if (ret == -FI_EAGAIN)
                 {
-                    LOG_DEVEL_MSG("reposting send...\n");
+                    LOG_DEBUG_MSG("reposting send...\n");
                     hpx::util::detail::yield_k(k,
                         "libfabric::sender::async_write");
                     continue;
@@ -212,7 +212,7 @@ namespace libfabric
 //             ret = fi_sendmsg(endpoint_, &msg, FI_COMPLETION | FI_TRANSMIT_COMPLETE);
 //             if (ret == -FI_EAGAIN)
 //             {
-//                 LOG_DEVEL_MSG("reposting send...\n");
+//                 LOG_DEBUG_MSG("reposting send...\n");
 //                 hpx::util::detail::yield_k(k,
 //                     "libfabric::sender::async_write");
 //                 continue;
@@ -231,14 +231,14 @@ namespace libfabric
 
     void sender::handle_send_completion()
     {
-        LOG_DEVEL_MSG("sender handle send_completion message("
+        LOG_DEBUG_MSG("sender handle send_completion message("
             << hexpointer(header_->piggy_back()) << ") RMA regions:" << rma_regions_.size());
         cleanup();
     }
 
     void sender::handle_message_completion()
     {
-        LOG_DEVEL_MSG("sender handle message_completion message("
+        LOG_DEBUG_MSG("sender handle message_completion message("
             << hexpointer(header_->piggy_back()) << ") RMA regions:" << rma_regions_.size());
         cleanup();
     }

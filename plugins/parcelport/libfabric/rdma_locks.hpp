@@ -22,12 +22,12 @@ namespace libfabric
     {
         scoped_lock(Mutex &m) : std::lock_guard<Mutex>(m)
         {
-            LOG_DEVEL_MSG("Creating scoped_lock RAII");
+            LOG_DEBUG_MSG("Creating scoped_lock RAII");
         }
 
         ~scoped_lock()
         {
-            LOG_DEVEL_MSG("Destroying scoped_lock RAII");
+            LOG_DEBUG_MSG("Destroying scoped_lock RAII");
         }
     };
 
@@ -36,17 +36,17 @@ namespace libfabric
     {
         unique_lock(Mutex &m) : std::unique_lock<Mutex>(m)
         {
-            LOG_DEVEL_MSG("Creating unique_lock RAII");
+            LOG_DEBUG_MSG("Creating unique_lock RAII");
         }
 
         unique_lock(Mutex& m, std::try_to_lock_t t) : std::unique_lock<Mutex>(m, t)
         {
-            LOG_DEVEL_MSG("Creating unique_lock try_to_lock_t RAII");
+            LOG_DEBUG_MSG("Creating unique_lock try_to_lock_t RAII");
         }
 
         ~unique_lock()
         {
-            LOG_DEVEL_MSG("Destroying unique_lock RAII");
+            LOG_DEBUG_MSG("Destroying unique_lock RAII");
         }
     };
 #else

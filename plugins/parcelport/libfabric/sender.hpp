@@ -50,7 +50,7 @@ namespace libfabric
             message_region_(nullptr),
             completion_count_(0)
         {
-            LOG_DEVEL_MSG("Create sender: " << this);
+            LOG_DEBUG_MSG("Create sender: " << this);
         }
 
         ~sender()

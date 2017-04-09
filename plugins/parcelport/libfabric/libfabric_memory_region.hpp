@@ -64,7 +64,7 @@ namespace libfabric
                 throw fabric_error(ret, "error in fi_mr_reg");
             }
             else {
-                LOG_DEVEL_MSG(
+                LOG_DEBUG_MSG(
                     "OK registering fi_mr_reg "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
