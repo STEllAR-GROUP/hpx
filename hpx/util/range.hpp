@@ -67,7 +67,13 @@ namespace hpx { namespace util
         R size_impl(C const& c, long)
             noexcept(noexcept(c.size()))
         {
+#if BOOST_VERSION < 105600
+            // Before 1.56.0 boost::size() does not respect the iterator
+            // category of its argument.
+            return std::distance(begin_impl(c, 0L), end_impl(c, 0L));
+#else
             return c.size();
+#endif
         }
 
         template <typename C, typename R = decltype(std::declval<C const&>().empty())>
