@@ -158,12 +158,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 util::itt::task task(hpx::get_thread_itt_domain(), sh);
 #elif defined(HPX_HAVE_APEX)
                 char const* name =
-                    hpx::traits::get_function_annotation<fun_type>::call(f_);
+                    hpx::traits::get_function_annotation<F>::call(f_);
                 if (name != nullptr)
                 {
-                    util::apex_wrapper apex_profiler(name,
+                    hpx::util::apex_wrapper apex_profiler(name,
                         reinterpret_cast<std::uint64_t>(this));
-                    execute(part_begin, part_steps, part_index)
+                    execute(part_begin, part_steps, part_index);
                 }
                 else
 #endif
