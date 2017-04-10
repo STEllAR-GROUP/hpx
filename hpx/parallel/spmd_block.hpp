@@ -8,11 +8,10 @@
 
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/barrier.hpp>
-/*#include <hpx/runtime/actions/lambda_to_action.hpp>*/
+#include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
-/*#include <hpx/runtime/serialization/serialize.hpp>*/
+
 
 #include <boost/range/irange.hpp>
 
@@ -42,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         struct extract_first_parameter<
             ReturnType(ClassType::*)(Arg0, Args...) const>
         {
-            using type = Arg0;
+            using type = typename std::decay<Arg0>::type;
         };
     }
 
@@ -55,12 +54,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// define_spmd_block function is to accept a spmd_block as first parameter.
     struct spmd_block
     {
-        spmd_block(){}
-
-        spmd_block(
-            std::string name, std::size_t num_images, std::size_t image_id)
-        : name_(name), num_images_(num_images), image_id_(image_id)
+        explicit spmd_block(std::size_t num_images, std::size_t image_id)
+        : num_images_(num_images), image_id_(image_id), barrier_(num_images_+1)
         {}
+
+        spmd_block(spmd_block &&) = default;
+        spmd_block(spmd_block const &) = delete;
+
+        spmd_block & operator=(spmd_block &&) = default;
+        spmd_block & operator=(spmd_block const &) = delete;
 
         std::size_t get_num_images() const
         {
@@ -76,80 +78,64 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     // -> deadlock
         void sync_all() const
         {
-           if (!barrier_)
-           {
-               barrier_ = std::make_shared<hpx::lcos::barrier>(
-                 name_ + "_barrier"
-               , num_images_
-               );
-           }
-
-           barrier_->wait();
-        }
-
-        hpx::future<void> sync_all(hpx::launch::async_policy const &) const
-        {
-           if (!barrier_)
-           {
-               barrier_ = std::make_shared<hpx::lcos::barrier>(
-                 name_+ "_barrier"
-               , num_images_
-               );
-           }
-
-           return barrier_->wait(hpx::launch::async);
+           barrier_.wait();
         }
 
     private:
-        std::string name_;
         std::size_t num_images_;
         std::size_t image_id_;
-        mutable std::shared_ptr<hpx::lcos::barrier> barrier_;
-
-/*    private:
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned int const)
-        {
-            ar & name_ & num_images_ && image_id_;
-        }*/
+        mutable hpx::lcos::local::barrier barrier_;
     };
 
-    template <typename F, typename ... Args>
-    void define_spmd_block(
-        std::string && name,
-        std::size_t num_images,
+    namespace detail
+    {
+        template <typename F>
+        struct spmd_block_helper
+        {
+            typename std::decay<F>::type f_;
+            std::size_t num_images_;
+
+            template <typename ... Ts>
+            void operator()(std::size_t image_id, Ts && ... ts) const
+            {
+
+                spmd_block block(num_images_, image_id);
+                hpx::util::invoke_r<void>(
+                    f_, block, std::forward<Ts>(ts)...);
+            }
+        };
+    }
+
+    template <typename Executor, typename F, typename ... Args>
+    void define_spmd_block(Executor && exec, std::size_t num_images,
         F && f, Args && ... args)
     {
-        using hpx::parallel::execution::par;
-        using ftype = typename std::remove_reference<F>::type;
+        using ftype = typename std::decay<F>::type;
 
-        using first_type
-            = typename
-                hpx::parallel::v2::detail::extract_first_parameter<
-                    decltype(&ftype::operator())>::type;
+        using first_type =
+                typename hpx::parallel::v2::detail::extract_first_parameter<
+                            decltype(&ftype::operator())>::type;
 
-        static_assert( std::is_same<spmd_block,first_type>::value,
+        static_assert(std::is_same<spmd_block, first_type>::value,
             "define_spmd_block() needs a lambda that " \
             "has at least a spmd_block as 1st argument");
 
-        auto range = boost::irange(0ul, num_images);
-        hpx::parallel::static_chunk_size cs(1);
+        hpx::parallel::executor_traits<
+                typename std::decay<Executor>::type
+            >::bulk_execute(
+                std::forward<Executor>(exec),
+                detail::spmd_block_helper<F>{
+                    std::forward<F>(f), num_images
+                },
+                boost::irange(0ul, num_images), std::forward<Args>(args)...);
+    }
 
-// FIXME : How to invoke images remotely?
-
-/*        auto a = hpx::actions::lambda_to_action(std::move(f));*/
-
-    // Note : par.with() ensures that each invoked image is running in a
-    // separate thread
-        hpx::parallel::for_each(
-            par.with(cs), range.begin(), range.end(),
-            [=,&f](std::size_t image_id)
-            {
-                spmd_block block(name,num_images,image_id);
-                f(block,args...);
-            });
+    template <typename F, typename ... Args>
+    void define_spmd_block(std::size_t num_images, F && f, Args && ... args)
+    {
+        define_spmd_block(hpx::parallel::parallel_executor(),
+            num_images, std::forward<F>(f),
+            std::forward<Args>(args)...);
     }
 }}}
 

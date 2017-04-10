@@ -15,17 +15,18 @@ std::size_t num_images = 10;
 
 int main()
 {
-    auto bulk_test = [](hpx::parallel::v2::spmd_block block)
+    auto bulk_test = [](hpx::parallel::v2::spmd_block & block)
                      {
                         std::cout<< "Welcome in image "
                             << block.this_image() << std::endl;
 
                         HPX_TEST_EQ( block.get_num_images(), num_images );
                         HPX_TEST_EQ( block.this_image() < num_images, true );
+
                         block.sync_all();
                      };
 
-    hpx::parallel::v2::define_spmd_block("block1", num_images, bulk_test);
+    hpx::parallel::v2::define_spmd_block(num_images, std::move(bulk_test));
 
     return 0;
 }
