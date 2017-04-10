@@ -43,6 +43,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
