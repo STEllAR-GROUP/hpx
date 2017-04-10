@@ -12,10 +12,10 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -107,27 +107,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         };
     }
 
-    template <typename Executor, typename F, typename ... Args>
-    void define_spmd_block(Executor && exec, std::size_t num_images,
-        F && f, Args && ... args)
+    template <typename ExPolicy, typename F, typename ... Args>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    define_spmd_block(ExPolicy && policy,
+        std::size_t num_images, F && f, Args && ... args)
     {
+        static_assert(
+            parallel::execution::is_execution_policy<ExPolicy>::value,
+            "parallel::execution::is_execution_policy<ExPolicy>::value");
+
         using ftype = typename std::decay<F>::type;
 
         using first_type =
                 typename hpx::parallel::v2::detail::extract_first_parameter<
                             decltype(&ftype::operator())>::type;
 
+        using executor_type =
+            typename hpx::util::decay<ExPolicy>::type::executor_type;
+
         static_assert(std::is_same<spmd_block, first_type>::value,
             "define_spmd_block() needs a lambda that " \
             "has at least a spmd_block as 1st argument");
 
-
         hpx::lcos::local::barrier barrier(num_images);
 
-        hpx::parallel::executor_traits<
-                typename std::decay<Executor>::type
+        return hpx::parallel::executor_traits<
+                typename std::decay<executor_type>::type
             >::bulk_execute(
-                std::forward<Executor>(exec),
+                policy.executor(),
                 detail::spmd_block_helper<F>{
                     barrier, std::forward<F>(f), num_images
                 },
@@ -137,9 +144,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     template <typename F, typename ... Args>
     void define_spmd_block(std::size_t num_images, F && f, Args && ... args)
     {
-        define_spmd_block(hpx::parallel::parallel_executor(),
-            num_images, std::forward<F>(f),
-            std::forward<Args>(args)...);
+        define_spmd_block(parallel::execution::par,
+            num_images, std::forward<F>(f), std::forward<Args>(args)...);
     }
 }}}
 
