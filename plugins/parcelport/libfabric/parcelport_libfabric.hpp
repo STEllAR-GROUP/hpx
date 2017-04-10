@@ -132,9 +132,7 @@ namespace libfabric
             boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
             boost::lockfree::fixed_sized<true>
         > senders_;
-        // These are counters that are used for flow control so that we can throttle
-        // send tasks when too many messages have been posted.
-        std::atomic<unsigned int> active_send_count_;
+
         // Used to help with shutdown
         std::atomic<bool>         stopped_;
 
@@ -144,6 +142,7 @@ namespace libfabric
 
         // for debugging/performance measurement
         performance_counter<unsigned int> completions_handled_;
+        performance_counter<unsigned int> senders_in_use_;
 
         // --------------------------------------------------------------------
         // Constructor : mostly just initializes the superclass with 'here'

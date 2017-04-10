@@ -102,9 +102,9 @@ namespace libfabric
         util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
         util::function_nonser<void()> const& on_stop_thread)
         : base_type(ini, locality(), on_start_thread, on_stop_thread)
-        , active_send_count_(0)
         , stopped_(false)
         , completions_handled_(0)
+        , senders_in_use_(0)
     {
         FUNC_START_DEBUG_MSG;
 
@@ -167,6 +167,7 @@ namespace libfabric
                     chunk_pool_);
             snd->postprocess_handler_ = [this](sender* s)
                 {
+                    --senders_in_use_;
                     senders_.push(s);
                 };
            senders_.push(snd);
@@ -190,6 +191,7 @@ namespace libfabric
             LOG_DEBUG_MSG("get_fabric_address           from "
                 << ipaddress(here_.get<locality>().ip_address()) << "to "
                 << ipaddress(fabric_locality.ip_address()));
+            ++senders_in_use_;
             fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
             FUNC_END_DEBUG_MSG;
             return snd;
@@ -305,9 +307,13 @@ namespace libfabric
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-//         while (senders_.empty()) {
-//             background_work(0);
-//         }
+         std::size_t k = 0;
+         while (senders_.empty())
+         {
+             background_work(0);
+             hpx::util::detail::yield_k(k, "libfabric::can_send_immediate");
+             ++k;
+         }
         return true;
     }
 
@@ -338,19 +344,24 @@ namespace libfabric
     // hpx threads when necessary.
     //
     // NB: There is no difference any more between background polling work
-    // on OS or HPX as all has been test thoroughly
+    // on OS or HPX as all has been tested thoroughly
     // --------------------------------------------------------------------
     inline bool parcelport::background_work_OS_thread() {
-         bool done = false;
-         do {
-             // if an event comes in, we may spend time processing/handling it
-             // and another may arrive during this handling,
-             // so keep checking until none are received
-             //libfabric_controller_->refill_client_receives(false);
-             int numc = libfabric_controller_->poll_endpoints();
-             completions_handled_ += numc;
-             done = (numc==0);
-         } while (!done);
+        LOG_TIMED_INIT(background);
+        bool done = false;
+        do {
+            LOG_TIMED_BLOCK(background, DEVEL, 5.0, {
+                LOG_DEVEL_MSG("number of senders in use "
+                    << decnumber(senders_in_use_));
+            });
+            // if an event comes in, we may spend time processing/handling it
+            // and another may arrive during this handling,
+            // so keep checking until none are received
+            // libfabric_controller_->refill_client_receives(false);
+            int numc = libfabric_controller_->poll_endpoints();
+            completions_handled_ += numc;
+            done = (numc==0);
+        } while (!done);
         return (done!=0);
     }
 
