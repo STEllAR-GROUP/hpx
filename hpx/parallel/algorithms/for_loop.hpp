@@ -153,9 +153,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 std::size_t part_index)
             {
 #if HPX_HAVE_ITTNOTIFY != 0
-                util::itt::string_handle const& sh =
+                hpx::util::itt::string_handle const& sh =
                     hpx::traits::get_function_annotation_itt<fun_type>::call(f_);
-                util::itt::task task(hpx::get_thread_itt_domain(), sh);
+                hpx::util::itt::task task(hpx::get_thread_itt_domain(), sh);
 #elif defined(HPX_HAVE_APEX)
                 char const* name =
                     hpx::traits::get_function_annotation<F>::call(f_);
