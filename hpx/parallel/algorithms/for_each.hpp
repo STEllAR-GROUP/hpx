@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     hpx::traits::get_function_annotation<fun_type>::call(f_);
                 if (name != nullptr)
                 {
-                    util::apex_wrapper apex_profiler(name,
+                    hpx::util::apex_wrapper apex_profiler(name,
                         reinterpret_cast<std::uint64_t>(this));
                     execute(part_begin, part_size);
                 }
