@@ -54,8 +54,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// define_spmd_block function is to accept a spmd_block as first parameter.
     struct spmd_block
     {
-        explicit spmd_block(std::size_t num_images, std::size_t image_id)
-        : num_images_(num_images), image_id_(image_id), barrier_(num_images_+1)
+        explicit spmd_block(std::size_t num_images, std::size_t image_id,
+            hpx::lcos::local::barrier & barrier)
+        : num_images_(num_images), image_id_(image_id), barrier_(barrier)
         {}
 
         spmd_block(spmd_block &&) = default;
@@ -78,13 +79,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     // -> deadlock
         void sync_all() const
         {
-           barrier_.wait();
+           barrier_.get().wait();
         }
 
     private:
         std::size_t num_images_;
         std::size_t image_id_;
-        mutable hpx::lcos::local::barrier barrier_;
+        mutable std::reference_wrapper<hpx::lcos::local::barrier> barrier_;
     };
 
     namespace detail
@@ -92,14 +93,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F>
         struct spmd_block_helper
         {
+            mutable std::reference_wrapper<hpx::lcos::local::barrier> barrier_;
             typename std::decay<F>::type f_;
             std::size_t num_images_;
 
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
-
-                spmd_block block(num_images_, image_id);
+                spmd_block block(num_images_, image_id, barrier_);
                 hpx::util::invoke_r<void>(
                     f_, block, std::forward<Ts>(ts)...);
             }
@@ -120,12 +121,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "define_spmd_block() needs a lambda that " \
             "has at least a spmd_block as 1st argument");
 
+
+        hpx::lcos::local::barrier barrier(num_images);
+
         hpx::parallel::executor_traits<
                 typename std::decay<Executor>::type
             >::bulk_execute(
                 std::forward<Executor>(exec),
                 detail::spmd_block_helper<F>{
-                    std::forward<F>(f), num_images
+                    barrier, std::forward<F>(f), num_images
                 },
                 boost::irange(0ul, num_images), std::forward<Args>(args)...);
     }
