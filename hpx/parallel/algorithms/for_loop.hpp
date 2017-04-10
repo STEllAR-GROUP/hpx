@@ -110,7 +110,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F, typename S, typename ...Ts>
         struct part_iterations<F, S, hpx::util::tuple<Ts...> >
         {
-            typename hpx::util::decay<F>::type f_;
+            typedef typename hpx::util::decay<F>::type fun_type;
+
+            fun_type f_;
             S stride_;
             hpx::util::tuple<Ts...> args_;
 
@@ -158,7 +160,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 hpx::util::itt::task task(hpx::get_thread_itt_domain(), sh);
 #elif defined(HPX_HAVE_APEX)
                 char const* name =
-                    hpx::traits::get_function_annotation<F>::call(f_);
+                    hpx::traits::get_function_annotation<fun_type>::call(f_);
                 if (name != nullptr)
                 {
                     hpx::util::apex_wrapper apex_profiler(name,
