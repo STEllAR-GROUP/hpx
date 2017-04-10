@@ -149,6 +149,7 @@ namespace libfabric
                     << "length " << hexlength(c.size_));
 
                 rma_regions_.push_back(get_region);
+                get_region->set_message_length(c.size_);
 
                 // overwrite the serialization data to account for the
                 // local pointers instead of remote ones
@@ -164,7 +165,7 @@ namespace libfabric
                     << " fi_addr " << hexpointer(src_addr_)
                     << " local addr " << hexpointer(get_region->get_address())
                     << " local desc " << hexpointer(get_region->get_desc())
-                    << " size " << hexnumber(c.size_)
+                    << " size " << hexlength(c.size_)
                     << " rkey " << hexpointer(c.rkey_)
                     << " remote cpos " << hexpointer(remoteAddr)
                     << " remote pos " << hexpointer(remoteAddr)
