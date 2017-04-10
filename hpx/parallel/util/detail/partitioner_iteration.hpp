@@ -59,7 +59,7 @@ namespace hpx { namespace traits
         parallel::util::detail::partitioner_iteration<Result, F> >
     {
         static std::size_t call(
-            parallel::util::detail::partitioner_iteration<Result, F> const& f) 
+            parallel::util::detail::partitioner_iteration<Result, F> const& f)
                 HPX_NOEXCEPT
         {
             return get_function_address<
@@ -73,7 +73,7 @@ namespace hpx { namespace traits
         parallel::util::detail::partitioner_iteration<Result, F> >
     {
         static char const* call(
-            parallel::util::detail::partitioner_iteration<Result, F> const& f) 
+            parallel::util::detail::partitioner_iteration<Result, F> const& f)
                 HPX_NOEXCEPT
         {
             return get_function_annotation<
