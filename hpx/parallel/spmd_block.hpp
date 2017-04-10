@@ -93,14 +93,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F>
         struct spmd_block_helper
         {
-            mutable std::reference_wrapper<hpx::lcos::local::barrier> barrier_;
+            mutable std::shared_ptr<hpx::lcos::local::barrier> barrier_;
             typename std::decay<F>::type f_;
             std::size_t num_images_;
 
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
-                spmd_block block(num_images_, image_id, barrier_);
+                spmd_block block(num_images_, image_id, *barrier_);
                 hpx::util::invoke_r<void>(
                     f_, block, std::forward<Ts>(ts)...);
             }
@@ -129,7 +129,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "define_spmd_block() needs a lambda that " \
             "has at least a spmd_block as 1st argument");
 
-        hpx::lcos::local::barrier barrier(num_images);
+        std::shared_ptr<hpx::lcos::local::barrier> barrier
+            = std::make_shared<hpx::lcos::local::barrier>(num_images);
 
         return hpx::parallel::executor_traits<
                 typename std::decay<executor_type>::type
