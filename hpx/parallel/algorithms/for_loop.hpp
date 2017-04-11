@@ -11,7 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -27,19 +32,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#endif
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -155,21 +147,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             void operator()(B part_begin, std::size_t part_steps,
                 std::size_t part_index)
             {
-#if HPX_HAVE_ITTNOTIFY != 0
-                hpx::util::itt::string_handle const& sh =
-                    hpx::traits::get_function_annotation_itt<fun_type>::call(f_);
-                hpx::util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-                char const* name =
-                    hpx::traits::get_function_annotation<fun_type>::call(f_);
-                if (name != nullptr)
-                {
-                    hpx::util::apex_wrapper apex_profiler(name,
-                        reinterpret_cast<std::uint64_t>(this));
-                    execute(part_begin, part_steps, part_index);
-                }
-                else
-#endif
+                hpx::util::annotate_function annotate(f_);
                 execute(part_begin, part_steps, part_index);
             }
         };
