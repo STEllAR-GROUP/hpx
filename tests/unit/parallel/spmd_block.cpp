@@ -10,12 +10,13 @@
 
 #include <cstddef>
 #include <iostream>
+#include <utility>
 
 std::size_t num_images = 10;
 
 int main()
 {
-    auto bulk_test = [](hpx::parallel::v2::spmd_block & block)
+    auto bulk_test = [](hpx::parallel::v2::spmd_block block)
                      {
                         std::cout<< "Welcome in image "
                             << block.this_image() << std::endl;
