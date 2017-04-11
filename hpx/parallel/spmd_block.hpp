@@ -120,8 +120,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         using ftype = typename std::decay<F>::type;
 
         using first_type =
-                typename hpx::parallel::v2::detail::extract_first_parameter<
-                            decltype(&ftype::operator())>::type;
+            typename hpx::parallel::v2::detail::extract_first_parameter<
+                        decltype(&ftype::operator())>::type;
 
         using executor_type =
             typename hpx::util::decay<ExPolicy>::type::executor_type;

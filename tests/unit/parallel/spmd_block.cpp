@@ -8,26 +8,38 @@
 #include <hpx/parallel/spmd_block.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
-#include <iostream>
+#include <functional>
 #include <utility>
 
 std::size_t num_images = 10;
+std::size_t iterations = 20;
 
 int main()
 {
-    auto bulk_test = [](hpx::parallel::v2::spmd_block block)
-                     {
-                        std::cout<< "Welcome in image "
-                            << block.this_image() << std::endl;
+    auto bulk_test =
+        [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> & c)
+        {
+            HPX_TEST_EQ(block.get_num_images(), num_images);
+            HPX_TEST_EQ(block.this_image() < num_images, true);
 
-                        HPX_TEST_EQ( block.get_num_images(), num_images );
-                        HPX_TEST_EQ( block.this_image() < num_images, true );
+            for(std::size_t i=0, test_count = num_images;
+                i<iterations;
+                i++, test_count+=num_images)
+            {
+                ++c;
+                block.sync_all();
+                HPX_TEST_EQ(c, test_count);
+                block.sync_all();
+            }
+        };
 
-                        block.sync_all();
-                     };
+    boost::atomic<std::size_t> c(0);
 
-    hpx::parallel::v2::define_spmd_block(num_images, std::move(bulk_test));
+    hpx::parallel::v2::define_spmd_block(
+        num_images, std::move(bulk_test), std::ref(c));
 
     return 0;
 }
