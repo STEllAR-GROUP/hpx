@@ -26,6 +26,15 @@ else()
   find_package(Libfabric REQUIRED)
 endif()
 
+find_package(PMI)
+
+if (PMI_FOUND)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+    NAMESPACE parcelport)
+else()
+    set(PMI_LIBRARY "" CACHE INTERNAL "" FORCE)
+endif()
 #------------------------------------------------------------------------------
 # Logging
 #------------------------------------------------------------------------------
@@ -114,9 +123,9 @@ hpx_add_config_define_namespace(
 #------------------------------------------------------------------------------
 # Bootstrap options
 #------------------------------------------------------------------------------
-#hpx_option(HPX_PARCELPORT_LIBFABRIC_WITH_BOOTSTRAPPING BOOL
-#  "Configure the parcelport to enable bootstrap capabilities (default: ON)"
-#  OFF CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_LIBFABRIC_WITH_BOOTSTRAPPING BOOL
+  "Configure the parcelport to enable bootstrap capabilities (default: OFF, enabled if PMI was found)"
+  ${PMI_FOUND} CATEGORY "Parcelport" ADVANCED)
 
 if (HPX_PARCELPORT_LIBFABRIC_WITH_BOOTSTRAPPING)
   hpx_add_config_define_namespace(
@@ -264,6 +273,7 @@ set(_libfabric_include_dirs "" CACHE INTERNAL "" FORCE)
 if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
   set(_libfabric_libraries
     "${LIBFABRIC_LIBRARIES}"
+    "${PMI_LIBRARY}"
     CACHE INTERNAL "" FORCE)
 
   set(_libfabric_include_dirs
@@ -271,6 +281,7 @@ if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
     CACHE INTERNAL "" FORCE)
 else()
   set(_libfabric_libraries
+    "${PMI_LIBRARY}"
     "${GNI_LIB}"
     CACHE INTERNAL "" FORCE)
 

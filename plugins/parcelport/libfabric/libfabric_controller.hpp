@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 John Biddiscombe
+//  Copyright (c) 2017 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -57,6 +58,11 @@
 # include "rdma/fi_ext_gni.h"
 #endif
 
+#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+#include <pmi2.h>
+#include <plugins/parcelport/libfabric/base64.hpp>
+#endif
+
 namespace hpx {
 namespace parcelset {
 namespace policies {
@@ -91,6 +97,7 @@ namespace libfabric
         std::unordered_map<uint32_t, fi_addr_t> endpoint_av_;
 
         locality here_;
+        locality agas_;
 
         struct fi_info    *fabric_info_;
         struct fid_fabric *fabric_;
@@ -140,7 +147,81 @@ namespace libfabric
             create_event_queue();
 #endif
 
+            LOG_DEVEL_MSG("Calling boot PMI");
+            boot_PMI();
             FUNC_END_DEBUG_MSG;
+        }
+
+        void boot_PMI()
+        {
+#ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+            int spawned;
+            int size;
+            int rank;
+            int appnum;
+
+            LOG_DEVEL_MSG("Calling PMI init");
+            PMI2_Init(&spawned, &size, &rank, &appnum);
+            LOG_DEVEL_MSG("Called PMI init on rank" << decnumber(rank));
+
+            // create address vector and queues we need if bootstrapping
+            create_completion_queues(fabric_info_, size);
+
+            // we must pass out libfabric data to other nodes
+            // encode it as a string to put into the PMI KV store
+            constexpr int encoded_length = Base64::EncodedLength(locality::array_size);
+            char encoded_locality[encoded_length + 1] = {0};
+            Base64::Encode(static_cast<const char*>(here_.fabric_data()),
+                locality::array_size, encoded_locality, encoded_length);
+            LOG_DEVEL_MSG("Encoded locality as " << encoded_locality
+                << " with length " << decnumber(encoded_length));
+
+            // Key name for PMI
+            std::string pmi_key = "hpx_libfabric_" + std::to_string(rank);
+
+            // insert out data in the KV store
+            LOG_DEVEL_MSG("Calling PMI2_KVS_Put on rank " << decnumber(rank));
+            PMI2_KVS_Put(pmi_key.data(), encoded_locality);
+
+            // Wait for all to do the same
+            LOG_DEVEL_MSG("Calling PMI2_KVS_Fence on rank " << decnumber(rank));
+            PMI2_KVS_Fence();
+
+            // read libfabric data for all nodes and insert into our Address vector
+            for (int i = 0; i < size; ++i)
+            {
+                // read one locality key
+                std::string pmi_key = "hpx_libfabric_" + std::to_string(i);
+                char encoded_data[encoded_length + 1] = {0};
+                int length = 0;
+                PMI2_KVS_Get(0, i, pmi_key.data(), encoded_data, encoded_length + 1, &length);
+                if (length != encoded_length)
+                {
+                    LOG_ERROR_MSG("PMI value length mismatch, expected "
+                        << decnumber(encoded_length) << "got " << decnumber(length));
+                }
+
+                // decode the string back to raw locality data
+                LOG_DEVEL_MSG("Calling decode for " << decnumber(i)
+                    << " locality data on rank " << decnumber(rank));
+                locality new_locality;
+                Base64::Decode(encoded_data, encoded_length,
+                    ((char *)new_locality.fabric_data()), locality::array_size);
+
+                // insert locality into address vector
+                LOG_DEVEL_MSG("Calling insert_address for " << decnumber(i)
+                    << "on rank " << decnumber(rank));
+                insert_address(new_locality);
+                LOG_DEVEL_MSG("rank " << decnumber(i)
+                    << "added to address vector");
+                if (i == 0)
+                {
+                    agas_ = new_locality;
+                }
+            }
+
+            PMI2_Finalize();
+#endif
         }
 
         // --------------------------------------------------------------------
@@ -291,27 +372,26 @@ namespace libfabric
         // Special GNI extensions to disable memory registration cache
 
         // this helper function only works for string ops
-        void _set_check_domain_op_value(int op, char *value)
+        void _set_check_domain_op_value(int op, const char *value)
         {
 #ifdef HPX_PARCELPORT_LIBFABRIC_GNI
             int ret;
             struct fi_gni_ops_domain *gni_domain_ops;
-            char *get_val, *val;
+            char *get_val;
 
             ret = fi_open_ops(&fabric_domain_->fid, FI_GNI_DOMAIN_OPS_1,
                       0, (void **) &gni_domain_ops, NULL);
             if (ret) throw fabric_error(ret, "fi_open_ops");
             LOG_DEBUG_MSG("domain ops returned " << hexpointer(gni_domain_ops));
 
-            val = value;
             ret = gni_domain_ops->set_val(&fabric_domain_->fid,
-                    (dom_ops_val_t)(op), &val);
+                    (dom_ops_val_t)(op), &value);
             if (ret) throw fabric_error(ret, "set val (ops)");
 
             ret = gni_domain_ops->get_val(&fabric_domain_->fid,
                     (dom_ops_val_t)(op), &get_val);
             LOG_DEBUG_MSG("Cache mode set to " << get_val);
-            if (std::string(val) != std::string(get_val)) throw fabric_error(ret, "get val");
+            if (std::string(value) != std::string(get_val)) throw fabric_error(ret, "get val");
 #endif
         }
 
@@ -447,6 +527,7 @@ namespace libfabric
         void initialize_localities(hpx::agas::addressing_service &as)
         {
             FUNC_START_DEBUG_MSG;
+#ifndef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
             std::uint32_t N = hpx::get_config().get_num_localities();
             LOG_DEBUG_MSG("Parcelport initialize_localities with " << N << " localities");
 
@@ -467,6 +548,7 @@ namespace libfabric
                 // so that we can look it  up later
                 /*fi_addr_t dummy =*/ insert_address(loc);
             }
+#endif
             LOG_DEBUG_MSG("Done getting localities ");
             FUNC_END_DEBUG_MSG;
         }
@@ -951,9 +1033,9 @@ namespace libfabric
 
     private:
         // store info about local device
-        std::string           device_;
-        std::string           interface_;
-        sockaddr_in           local_addr_;
+        std::string  device_;
+        std::string  interface_;
+        sockaddr_in  local_addr_;
 
         // callback functions used for connection event handling
         ConnectionFunction    connection_function_;

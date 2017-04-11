@@ -144,13 +144,23 @@ namespace libfabric
         FUNC_END_DEBUG_MSG;
     }
 
+    void parcelport::io_service_work()
+    {
+        while (hpx::is_starting())
+        {
+            background_work(0);
+        }
+        LOG_DEBUG_MSG("io service task completed");
+    }
     // Start the handling of connections.
     bool parcelport::do_run()
     {
         if (!parcelport_enabled_) return false;
 
+#ifndef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
         auto &as = this->applier_->get_agas_client();
         libfabric_controller_->initialize_localities(as);
+#endif
 
         FUNC_START_DEBUG_MSG;
         libfabric_controller_->startup(this);
@@ -173,6 +183,15 @@ namespace libfabric
            senders_.push(snd);
         }
 
+        if (bootstrap_enabled_)
+        {
+            for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
+            {
+                io_service_pool_.get_io_service(int(i)).post(
+                    hpx::util::bind(
+                        &parcelport::io_service_work, this));
+            }
+        }
         return true;
    }
 
@@ -254,12 +273,12 @@ namespace libfabric
     {
         FUNC_START_DEBUG_MSG;
         // load all components as described in the configuration information
-        std::string addr = ini.get_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
-        LOG_DEBUG_MSG("Got AGAS addr " << addr);
-        LOG_DEBUG_MSG("What should we return for agas locality for fabric PP" << addr);
-        std::terminate();
+        if (!bootstrap_enabled_)
+        {
+            LOG_ERROR_MSG("Should only return agas locality when bootstrapping");
+        }
         FUNC_END_DEBUG_MSG;
-        return parcelset::locality(locality());
+        return libfabric_controller_->agas_;
     }
 
     parcelset::locality parcelport::create_locality() const {
