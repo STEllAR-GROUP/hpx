@@ -18,6 +18,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
@@ -26,17 +27,6 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
-
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -513,23 +503,7 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
-#if HPX_HAVE_ITTNOTIFY != 0
-                util::itt::string_handle const& sh =
-                    traits::get_function_annotation_itt<
-                            completed_callback_type
-                        >::call(on_completed);
-                util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-                char const* name = traits::get_function_annotation<
-                        completed_callback_type
-                    >::call(on_completed);
-                if (name != nullptr)
-                {
-                    util::apex_wrapper apex_profiler(name, (uint64_t)this);
-                    on_completed();
-                }
-                else
-#endif
+                hpx::util::annotate_function annotate(on_completed);
                 on_completed();
             }
             catch (...) {
