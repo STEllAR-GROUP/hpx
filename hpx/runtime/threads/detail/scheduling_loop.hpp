@@ -513,7 +513,7 @@ namespace hpx { namespace threads { namespace detail
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description(),
                                     &(tmp_data));
-                                background_thread->set_apex_data(tmp_data);
+                                thrd->set_apex_data(tmp_data);
 
                                 thrd_stat = (*thrd)();
 
