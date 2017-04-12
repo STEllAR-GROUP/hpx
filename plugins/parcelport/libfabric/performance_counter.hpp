@@ -51,7 +51,7 @@ namespace libfabric
 
         performance_counter(const T& init) : value_{init} {}
 
-        inline operator T() { return value_; }
+        inline operator T() const { return value_; }
 
         inline T operator=(const T& x) { return value_ = x; }
 
@@ -87,7 +87,7 @@ namespace libfabric
 
         performance_counter(const T&) {}
 
-        inline operator T() { return 0; }
+        inline operator T() const { return 0; }
 
         inline T operator=(const T&) { return 0; }
 

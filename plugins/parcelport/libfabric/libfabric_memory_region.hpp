@@ -25,19 +25,17 @@ namespace libfabric
 {
     struct libfabric_memory_region
     {
-//        libfabric_memory_region ( libfabric_memory_region && ) = default;
 
         // --------------------------------------------------------------------
         libfabric_memory_region() :
             region_(nullptr), address_(nullptr), base_addr_(nullptr),
-                flags_(0), size_(0), used_space_(0) {}
+                size_(0), used_space_(0), flags_(0) {}
 
         // --------------------------------------------------------------------
         libfabric_memory_region(struct fid_mr *region, char * address,
-            char *base_address,
-            uint32_t flags, uint64_t size) :
+            char *base_address, uint64_t size, uint32_t flags) :
                 region_(region), address_(address), base_addr_(base_address),
-                flags_(flags), size_(size), used_space_(0) {}
+                size_(size), used_space_(0), flags_(flags) {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
@@ -241,7 +239,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // a partial region is a subregion of a larger memory region
-        // on destruction, it is not unregister or deleted as the 'parent' region
+        // on destruction, it is not unregistered or deleted as the 'parent' region
         // will delete many partial regions on destruction
         inline void set_partial_region() {
             flags_ |= BLOCK_PARTIAL;
@@ -249,6 +247,20 @@ namespace libfabric
 
         inline bool get_partial_region() const {
             return (flags_ & BLOCK_PARTIAL) == BLOCK_PARTIAL;
+        }
+
+        // --------------------------------------------------------------------
+        friend std::ostream & operator<<(std::ostream & os,
+                                         libfabric_memory_region const & region)
+        {
+            boost::io::ios_flags_saver ifs(os);
+            os  << "region " << hexpointer(&region)
+                << "base address " << hexpointer(region.base_addr_)
+                << "address " << hexpointer(region.address_)
+                << "flags " << hexbyte(region.flags_)
+                << "size " << hexlength(region.size_)
+                << "used_space_ " << hexlength(region.used_space_);
+            return os;
         }
 
     private:
@@ -264,15 +276,14 @@ namespace libfabric
         // that larger region
         char *base_addr_;
 
-        // flags to control lifetime of blocks
-        uint32_t flags_;
-
         // The size of the memory buffer, if this is a partial region
         // it will be smaller than the value returned by region_->length
         uint64_t size_;
 
         // space used by a message in the memory region.
         uint64_t used_space_;
+        // flags to control lifetime of blocks
+        uint32_t flags_;
     };
 
     // Smart pointer for libfabric_memory_region object.

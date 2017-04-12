@@ -147,7 +147,7 @@ namespace libfabric
             create_event_queue();
 #endif
 
-            LOG_DEVEL_MSG("Calling boot PMI");
+            LOG_DEBUG_MSG("Calling boot PMI");
             boot_PMI();
             FUNC_END_DEBUG_MSG;
         }
@@ -160,9 +160,9 @@ namespace libfabric
             int rank;
             int appnum;
 
-            LOG_DEVEL_MSG("Calling PMI init");
+            LOG_DEBUG_MSG("Calling PMI init");
             PMI2_Init(&spawned, &size, &rank, &appnum);
-            LOG_DEVEL_MSG("Called PMI init on rank" << decnumber(rank));
+            LOG_DEBUG_MSG("Called PMI init on rank" << decnumber(rank));
 
             // create address vector and queues we need if bootstrapping
             create_completion_queues(fabric_info_, size);
@@ -173,18 +173,18 @@ namespace libfabric
             char encoded_locality[encoded_length + 1] = {0};
             Base64::Encode(static_cast<const char*>(here_.fabric_data()),
                 locality::array_size, encoded_locality, encoded_length);
-            LOG_DEVEL_MSG("Encoded locality as " << encoded_locality
+            LOG_DEBUG_MSG("Encoded locality as " << encoded_locality
                 << " with length " << decnumber(encoded_length));
 
             // Key name for PMI
             std::string pmi_key = "hpx_libfabric_" + std::to_string(rank);
 
             // insert out data in the KV store
-            LOG_DEVEL_MSG("Calling PMI2_KVS_Put on rank " << decnumber(rank));
+            LOG_DEBUG_MSG("Calling PMI2_KVS_Put on rank " << decnumber(rank));
             PMI2_KVS_Put(pmi_key.data(), encoded_locality);
 
             // Wait for all to do the same
-            LOG_DEVEL_MSG("Calling PMI2_KVS_Fence on rank " << decnumber(rank));
+            LOG_DEBUG_MSG("Calling PMI2_KVS_Fence on rank " << decnumber(rank));
             PMI2_KVS_Fence();
 
             // read libfabric data for all nodes and insert into our Address vector
@@ -202,17 +202,18 @@ namespace libfabric
                 }
 
                 // decode the string back to raw locality data
-                LOG_DEVEL_MSG("Calling decode for " << decnumber(i)
+                LOG_DEBUG_MSG("Calling decode for " << decnumber(i)
                     << " locality data on rank " << decnumber(rank));
                 locality new_locality;
                 Base64::Decode(encoded_data, encoded_length,
-                    ((char *)new_locality.fabric_data()), locality::array_size);
+                   reinterpret_cast<char*>(const_cast<void*>(new_locality.fabric_data())),
+                   locality::array_size);
 
                 // insert locality into address vector
-                LOG_DEVEL_MSG("Calling insert_address for " << decnumber(i)
+                LOG_DEBUG_MSG("Calling insert_address for " << decnumber(i)
                     << "on rank " << decnumber(rank));
                 insert_address(new_locality);
-                LOG_DEVEL_MSG("rank " << decnumber(i)
+                LOG_DEBUG_MSG("rank " << decnumber(i)
                     << "added to address vector");
                 if (i == 0)
                 {
@@ -228,6 +229,36 @@ namespace libfabric
         // clean up all resources
         ~libfabric_controller()
         {
+            unsigned int messages_handled = 0;
+            unsigned int acks_received    = 0;
+            unsigned int msg_plain        = 0;
+            unsigned int msg_rma          = 0;
+            unsigned int sent_ack         = 0;
+            unsigned int rma_reads        = 0;
+            unsigned int recv_deletes     = 0;
+            //
+            for (auto &r : receivers_) {
+                r.cleanup();
+                // from receiver
+                messages_handled += r.messages_handled_;
+                acks_received    += r.acks_received_;
+                // from rma_receivers
+                msg_plain        += r.msg_plain_;
+                msg_rma          += r.msg_rma_;
+                sent_ack         += r.sent_ack_;
+                rma_reads        += r.rma_reads_;
+                recv_deletes     += r.recv_deletes_;
+            }
+
+            std::cout
+                << "Received messages " << decnumber(messages_handled)
+                << "Received acks "     << decnumber(acks_received)
+                << "Sent acks "     << decnumber(sent_ack)
+                << "Total reads "       << decnumber(rma_reads)
+                << "Total deletes "     << decnumber(recv_deletes)
+                << "deletes error " << decnumber(messages_handled - recv_deletes)
+                << std::endl;
+
             // Cleaning up receivers to avoid memory leak errors.
             receivers_.clear();
 
@@ -326,7 +357,7 @@ namespace libfabric
 
             immediate_ = (fabric_info_->rx_attr->mode & FI_RX_CQ_DATA)!=0;
             LOG_DEBUG_MSG("Fabric supports immediate data " << immediate_);
-            bool context = (fabric_hints_->mode & FI_CONTEXT)!=0;
+            LOG_EXCLUSIVE(bool context = (fabric_hints_->mode & FI_CONTEXT)!=0);
             LOG_DEBUG_MSG("Fabric requires FI_CONTEXT " << context);
 
             LOG_DEBUG_MSG("Creating fabric object");
@@ -454,17 +485,19 @@ namespace libfabric
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
 
-            //LOG_EXCLUSIVE(
-                std::stringstream temp1, temp2;
+            LOG_EXCLUSIVE(
+            {
+                std::stringstream temp1;
                 for (std::size_t i=0; i<locality::array_length; ++i) {
                     temp1 << ipaddress(local_addr[i]);
                 }
                 LOG_DEBUG_MSG("address info is " << temp1.str().c_str());
+                std::stringstream temp2;
                 for (std::size_t i=0; i<locality::array_length; ++i) {
                     temp2 << hexuint32(local_addr[i]);
                 }
                 LOG_DEBUG_MSG("address info is " << temp2.str().c_str());
-            //);
+            });
             FUNC_END_DEBUG_MSG;
             return locality(local_addr);
         }
@@ -638,7 +671,7 @@ namespace libfabric
                     LOG_DEBUG_MSG("Received a txcq RMA completion "
                         << "Context " << hexpointer(entry.op_context));
                     rma_receiver* rcv = reinterpret_cast<rma_receiver*>(entry.op_context);
-                    rcv->handle_read_completion();
+                    rcv->handle_rma_read_completion();
                 }
                 else if (entry.flags == (FI_MSG | FI_SEND)) {
                     LOG_DEBUG_MSG("Received a txcq RMA send completion");
@@ -652,9 +685,9 @@ namespace libfabric
                 }
                 return 1;
             }
-            else if (ret==0 || ret==-EAGAIN) {
+            else if (ret==0 || ret==-FI_EAGAIN) {
                 // do nothing, we will try again on the next check
-                LOG_TIMED_MSG(poll, DEVEL, 10, "txcq EAGAIN");
+                LOG_TIMED_MSG(poll, DEVEL, 10, "txcq FI_EAGAIN");
             }
             else if (ret<0) {
                 struct fi_cq_err_entry e = {};
@@ -710,9 +743,9 @@ namespace libfabric
                 }
                 result = 1;
             }
-            else if (ret==0 || ret==-EAGAIN) {
+            else if (ret==0 || ret==-FI_EAGAIN) {
                 // do nothing, we will try again on the next check
-                LOG_TIMED_MSG(poll, DEVEL, 10, "rxcq EAGAIN");
+                LOG_TIMED_MSG(poll, DEVEL, 10, "rxcq FI_EAGAIN");
             }
             else if (ret<0) {
                 struct fi_cq_err_entry e = {};
@@ -1024,8 +1057,6 @@ namespace libfabric
 
             return connection.second;
         }
-
-//        void disconnect_from_server(struct fid_ep *client) {}
 
         void disconnect_all() {}
 

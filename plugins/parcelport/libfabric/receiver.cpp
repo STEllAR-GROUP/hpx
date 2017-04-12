@@ -23,77 +23,90 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
+    // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint, rdma_memory_pool& memory_pool)
-      : region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
-      , pp_(pp)
-      , endpoint_(endpoint)
-      , memory_pool_(&memory_pool)
+        : pp_(pp)
+        , endpoint_(endpoint)
+        , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
+        , memory_pool_(&memory_pool)
+        , messages_handled_(0)
+        , acks_received_(0)
     {
-        LOG_DEBUG_MSG("created receiver: " << this);
+        LOG_DEBUG_MSG("created receiver: " << hexpointer(this));
         // Once constructed, we need to post the receive...
-        post_recv();
+        pre_post_receive();
     }
 
+    // these constructors are provided because boost::lockfree::stack requires them
+    // they should not be used
+    receiver::receiver(receiver&& other) {
+        std::terminate();
+    }
+    receiver& receiver::operator=(receiver&& other)
+    {
+        std::terminate();
+    }
+
+    // --------------------------------------------------------------------
     receiver::~receiver()
     {
-        if (region_ && memory_pool_)
-            memory_pool_->deallocate(region_);
+        if (header_region_ && memory_pool_) {
+            memory_pool_->deallocate(header_region_);
+        }
+        // this is safe to call twice - it might have been called already
+        // to collect counter information by the fabric controller
+        cleanup();
+    }
 
+    // --------------------------------------------------------------------
+    void receiver::cleanup()
+    {
         rma_receiver *rcv = nullptr;
-        while(rma_receivers_.pop(rcv))
+        while( rma_receivers_.pop(rcv))
         {
+            msg_plain_    += rcv->msg_plain_;
+            msg_rma_      += rcv->msg_rma_;
+            sent_ack_     += rcv->sent_ack_;
+            rma_reads_    += rcv->rma_reads_;
+            recv_deletes_ += rcv->recv_deletes_;
             delete rcv;
         }
     }
 
-    receiver::receiver(receiver&& other)
-      : region_(other.region_)
-      , pp_(other.pp_)
-      , endpoint_(other.endpoint_)
-      , memory_pool_(other.memory_pool_)
-    {
-        other.region_ = nullptr;
-        other.memory_pool_ = nullptr;
-    }
-
-    receiver& receiver::operator=(receiver&& other)
-    {
-        region_ = other.region_;
-        pp_ = other.pp_;
-        endpoint_ = other.endpoint_;
-        memory_pool_ = other.memory_pool_;
-        other.region_ = nullptr;
-        other.memory_pool_ = nullptr;
-
-        return *this;
-    }
-
+    // --------------------------------------------------------------------
+    // when a receive completes, this callback handler is called
     void receiver::handle_recv(fi_addr_t const& src_addr, std::uint64_t len)
     {
         FUNC_START_DEBUG_MSG;
         static_assert(sizeof(std::uint64_t) == sizeof(std::size_t),
             "sizeof(std::uint64_t) != sizeof(std::size_t)");
 
-        // If we recieve a message smaller than 8 byte, we got a tag and need to handle
+        // If we recieve a message of 8 bytes, we got a tag and need to handle
         // the tag completion...
         if (len <= sizeof(std::uint64_t))
         {
-            /// @TODO: fixme immediate tag retreival
-            sender* snd = *reinterpret_cast<sender **>(region_->get_address());
-            post_recv();
-            LOG_DEBUG_MSG("Handling sender completion: " << hexpointer(snd));
-            snd->handle_message_completion();
+            // @TODO: fixme immediate tag retreival
+            // Get the sender that has completed rma operations and signal to it
+            // that it can now cleanup - all remote get operations are done.
+            sender* snd = *reinterpret_cast<sender **>(header_region_->get_address());
+            pre_post_receive();
+            LOG_DEBUG_MSG("Handling sender tag (RMA ack) completion: " << hexpointer(snd));
+            ++acks_received_;
+            snd->handle_message_completion_ack();
             return;
         }
 
         LOG_DEBUG_MSG("Handling message");
         rma_receiver* recv = nullptr;
-        if(!rma_receivers_.pop(recv))
+        if (!rma_receivers_.pop(recv))
         {
             auto f = [this](rma_receiver* recv)
             {
-                if(!rma_receivers_.push(recv))
+                if (!rma_receivers_.push(recv)) {
+                    LOG_ERROR_MSG("rma receiver failed to return to stack "
+                        << hexpointer(recv));
                     delete recv;
+                }
             };
             recv = new rma_receiver(pp_, endpoint_, memory_pool_, std::move(f));
         }
@@ -102,38 +115,41 @@ namespace libfabric
 
         // We save the received region and swap it with a newly allocated
         // to be able to post a recv again as soon as possible.
-        libfabric_memory_region* region = region_;
-        region_ = memory_pool_->allocate_region(
-            memory_pool_->small_.chunk_size());
-        post_recv();
+        libfabric_memory_region* region = header_region_;
+        header_region_ = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
+        pre_post_receive();
 
         // we dispatch our work to our rma_receiver once it completed the
-        // prior message
-        recv->async_read(region, src_addr);
+        // prior message. The saved region is passed to the rma handler
+        ++messages_handled_;
+        recv->read_message(region, src_addr);
 
         FUNC_END_DEBUG_MSG;
     }
 
-    void receiver::post_recv()
+    // --------------------------------------------------------------------
+    void receiver::pre_post_receive()
     {
         FUNC_START_DEBUG_MSG;
-        void* desc = region_->get_desc();
-        LOG_DEBUG_MSG("Pre-Posting a receive to client size "
-            << hexnumber(memory_pool_->small_.chunk_size())
-            << " descriptor " << hexpointer(desc) << " context " << hexpointer(this));
+        void* desc = header_region_->get_desc();
+        LOG_DEBUG_MSG("Pre-Posting receive "
+            << *header_region_
+            << "context " << hexpointer(this));
 
         int ret = 0;
         for (std::size_t k = 0; true; ++k)
         {
+            // post a receive using 'this' as the context, so that this receiver object
+            // can be used to handle the incoming receive/request
             ret = fi_recv(
                 endpoint_,
-                region_->get_address(),
-                region_->get_size(),
+                header_region_->get_address(),
+                header_region_->get_size(),
                 desc, 0, this);
 
             if (ret == -FI_EAGAIN)
             {
-                LOG_DEBUG_MSG("reposting recv\n");
+                LOG_ERROR_MSG("reposting fi_recv\n");
                 hpx::util::detail::yield_k(k,
                     "libfabric::receiver::post_recv");
                 continue;

@@ -8,6 +8,7 @@
 
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/atomic_count.hpp>
 //
 #include <atomic>
 #include <stack>
@@ -23,6 +24,7 @@
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 #include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
+#include <plugins/parcelport/libfabric/performance_counter.hpp>
 
 // the default memory chunk size in bytes
 #define RDMA_POOL_1K_CHUNK_SIZE     0x001*0x0400 //  1KB
@@ -132,7 +134,7 @@ namespace libfabric
     {
         // ------------------------------------------------------------------------
         pool_container(struct fid_domain * pd) :
-            used_(0), pd_(pd)
+            accesses_(0), in_use_(0), pd_(pd)
         {
         }
 
@@ -153,33 +155,33 @@ namespace libfabric
             // break the large region into N small regions
             uint64_t offset = 0;
             for (std::size_t i=0; i<MaxChunks; ++i) {
-                LOG_TRACE_MSG(PoolType::desc() << "Allocate Block "
-                    << i << " of size " << hexlength(ChunkSize));
-
                 // we must keep a copy of the sub-region since we only pass
                 // pointers to regions around the code.
                 region_list_[i] = libfabric_memory_region(
                     block->get_region(),
                     static_cast<char*>(block->get_base_address()) + offset,
                     static_cast<char*>(block->get_base_address()),
-                    libfabric_memory_region::BLOCK_PARTIAL,
-                    ChunkSize
+                    ChunkSize,
+                    libfabric_memory_region::BLOCK_PARTIAL
                 );
+                LOG_TRACE_MSG(PoolType::desc() << "Allocate Block "
+                    << decnumber(i)
+                    << region_list_[i]);
                 // push the pointer onto our stack
                 push(&region_list_[i]);
                 offset += ChunkSize;
             }
-            used_ = 0;
+            in_use_ = 0;
             return true;
         }
 
         // ------------------------------------------------------------------------
         void DeallocatePool()
         {
-            if (used_!=0) {
+            if (in_use_!=0) {
                 LOG_ERROR_MSG(PoolType::desc()
                     << "Deallocating free_list : Not all blocks were returned "
-                    << " refcounts " << decnumber(used_));
+                    << " refcounts " << decnumber(in_use_));
             }
             libfabric_memory_region* region = nullptr;
             while (!free_list_.pop(region)) {
@@ -195,68 +197,74 @@ namespace libfabric
         // ------------------------------------------------------------------------
         inline void push(libfabric_memory_region *region)
         {
-            LOG_TRACE_MSG(PoolType::desc() << "Push block "
-                << hexpointer(region->get_address()) << hexlength(region->get_size())
-                << decnumber(used_-1));
-
-            uintptr_t val = uintptr_t(region->get_address());
-            LOG_TRACE_MSG(PoolType::desc()
-                << "Writing 0xdeadbeef to region address "
-                << hexpointer(region->get_address()));
+            LOG_TRACE_MSG(PoolType::desc() << "Push block " << *region
+                << "Used " << decnumber(in_use_-1)
+                << "Accesses " << decnumber(accesses_));
 
             LOG_EXCLUSIVE(
+                uintptr_t val = uintptr_t(region->get_address());
+                LOG_TRACE_MSG(PoolType::desc()
+                    << "Writing 0xdeadbeef to region address "
+                    << hexpointer(val));
                 if (region->get_address()!=nullptr) {
                     // get use the pointer to the region
-                    uintptr_t *ptr = reinterpret_cast<uintptr_t*>(region->get_address());
+                    uintptr_t *ptr = reinterpret_cast<uintptr_t*>(val);
                     for (unsigned int c=0; c<ChunkSize/8; ++c) {
                         ptr[c] = 0xdeadbeef;
                     }
                 }
-            )
+            );
 
             if (!free_list_.push(region)) {
                 LOG_ERROR_MSG(PoolType::desc() << "Error in memory pool push");
             }
             // decrement one reference
-            --used_;
+            --in_use_;
         }
 
         // ------------------------------------------------------------------------
         inline libfabric_memory_region *pop()
         {
-            // if we have not exceeded our max size, allocate a new block
             // get a block
             libfabric_memory_region *region = nullptr;
             if (!free_list_.pop(region)) {
+                LOG_DEBUG_MSG(PoolType::desc() << "Error in memory pool pop");
                 return nullptr;
             }
-            // Keep reference counts to self so that we can check
-            // this pool is not deleted whilst blocks still exist
-            ++used_;
+            ++in_use_;
+            ++accesses_;
             LOG_TRACE_MSG(PoolType::desc() << "Pop block "
-                << hexpointer(region->get_address()) << hexlength(region->get_size())
-                << decnumber(used_));
-            //
+                << *region
+                << "Used " << decnumber(in_use_)
+                << "Accesses " << decnumber(accesses_));
             return region;
         }
 
+        // ------------------------------------------------------------------------
+        // at shutdown we can disregrad any bocks still prepoted as we can't
+        // unpost them
         void decrement_used_count(uint32_t N) {
-            used_ -= N;
+            in_use_ -= N;
         }
 
+        // ------------------------------------------------------------------------
         // for debug log messages
         std::string status() {
             std::stringstream temp;
             temp << "| " << PoolType::desc()
                  << "ChunkSize " << hexlength(ChunkSize)
-                 << "Free " << decnumber(MaxChunks-used_)
-                 << "Used " << decnumber(used_);
+                 << "Free " << decnumber(MaxChunks-in_use_)
+                 << "Used " << decnumber(in_use_)
+                 << "Accesses " << decnumber(accesses_);
             return temp.str();
         }
 
+        // ------------------------------------------------------------------------
         constexpr std::size_t chunk_size() const { return ChunkSize; }
         //
-        std::atomic<int>                                              used_;
+        performance_counter<unsigned int>                             accesses_;
+        performance_counter<unsigned int>                             in_use_;
+        //
         struct fid_domain *                                           pd_;
         std::unordered_map<const char *, libfabric_memory_region_ptr> block_list_;
         std::array<libfabric_memory_region, MaxChunks>                region_list_;
@@ -315,7 +323,7 @@ namespace libfabric
         //----------------------------------------------------------------------------
         // query the pool for a chunk of a given size to see if one is available
         // this function is 'unsafe' because it is not thread safe and another
-        // thread may push/pop a block after this is called and invalidate the result.
+        // thread may push/pop a block after/during this call and invalidate the result.
         inline bool can_allocate_unsafe(size_t length) const
         {
             if (length<=tiny_.chunk_size()) {
@@ -357,13 +365,13 @@ namespace libfabric
             }
 
             LOG_TRACE_MSG("Popping Block "
-                << "buffer "    << hexpointer(region->get_address())
-                << "region "    << hexpointer(region)
-                << "size "      << hexlength(region->get_size())
+                << *region
                 << tiny_.status()
                 << small_.status()
                 << medium_.status()
-                << large_.status());
+                << large_.status()
+                << large_.status()
+                << "temp regions " << decnumber(temp_regions));
             //
             return region;
         }
@@ -375,14 +383,16 @@ namespace libfabric
             // if this region was registered on the fly, then don't return it to the pool
             if (region->get_temp_region() || region->get_user_region()) {
                 if (region->get_temp_region()) {
-                    temp_regions--;
-                    LOG_TRACE_MSG("Deallocating temp registered block "
-                        << hexpointer(region->get_address()) << decnumber(temp_regions));
+                    --temp_regions;
+                    LOG_TRACE_MSG("Deallocating temp region "
+                        << *region
+                        << "temp regions " << decnumber(temp_regions));
                 }
                 else if (region->get_user_region()) {
-                    user_regions--;
+                    --user_regions;
                     LOG_TRACE_MSG("Deleting (user region) "
-                        << hexpointer(region->get_address()) << decnumber(user_regions));
+                        << *region
+                        << "user regions " << decnumber(user_regions));
                 }
                 delete region;
                 return;
@@ -403,12 +413,12 @@ namespace libfabric
             }
 
             LOG_TRACE_MSG("Pushing Block "
-                << "buffer " << hexpointer(region->get_address())
-                << "region " << hexpointer(region)
+                << *region
                 << tiny_.status()
                 << small_.status()
                 << medium_.status()
-                << large_.status());
+                << large_.status()
+                << "temp regions " << decnumber(temp_regions));
         }
 
         //----------------------------------------------------------------------------
@@ -419,10 +429,9 @@ namespace libfabric
             libfabric_memory_region *region = new libfabric_memory_region();
             region->set_temp_region();
             region->allocate(protection_domain_, length);
-            temp_regions++;
-            LOG_TRACE_MSG("Allocating temp registered block "
-                << hexpointer(region->get_address())
-                << hexlength(length)
+            ++temp_regions;
+            LOG_TRACE_MSG("Allocating temp region "
+                << *region
                 << "temp regions " << decnumber(temp_regions));
             return region;
         }
@@ -442,8 +451,8 @@ namespace libfabric
             RDMA_POOL_LARGE_CHUNK_SIZE,   RDMA_POOL_MAX_LARGE_CHUNKS> large_;
 
         // counters
-        std::atomic<int> temp_regions;
-        std::atomic<int> user_regions;
+        hpx::util::atomic_count temp_regions;
+        hpx::util::atomic_count user_regions;
     };
 
     typedef std::shared_ptr<rdma_memory_pool> rdma_memory_pool_ptr;

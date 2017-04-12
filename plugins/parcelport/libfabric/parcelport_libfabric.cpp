@@ -144,6 +144,8 @@ namespace libfabric
         FUNC_END_DEBUG_MSG;
     }
 
+    // --------------------------------------------------------------------
+    // during bootup, this is used by the service threads
     void parcelport::io_service_work()
     {
         while (hpx::is_starting())
@@ -152,7 +154,9 @@ namespace libfabric
         }
         LOG_DEBUG_MSG("io service task completed");
     }
-    // Start the handling of connections.
+
+    // --------------------------------------------------------------------
+    // Start the handling of communication.
     bool parcelport::do_run()
     {
         if (!parcelport_enabled_) return false;
@@ -164,7 +168,6 @@ namespace libfabric
 
         FUNC_START_DEBUG_MSG;
         libfabric_controller_->startup(this);
-
 
         LOG_DEBUG_MSG("Fetching memory pool");
         chunk_pool_ = &libfabric_controller_->get_memory_pool();
@@ -236,18 +239,36 @@ namespace libfabric
         return std::shared_ptr<sender>();
     }
 
+    // --------------------------------------------------------------------
+    // cleanup
     parcelport::~parcelport() {
         FUNC_START_DEBUG_MSG;
         scoped_lock lk(stop_mutex);
         sender *snd = nullptr;
+
+        unsigned int sends_posted  = 0;
+        unsigned int sends_deleted = 0;
+        unsigned int acks_received = 0;
+        //
         while (senders_.pop(snd)) {
             LOG_DEBUG_MSG("Popped a sender for delete " << hexpointer(snd));
+            sends_posted  += snd->sends_posted_;
+            sends_deleted += snd->sends_deleted_;
+            acks_received += snd->acks_received_;
             delete snd;
         }
+        std::cout
+            << "sends_posted "  << decnumber(sends_posted)
+            << "sends_deleted " << decnumber(sends_posted)
+            << "acks_received " << decnumber(acks_received)
+            << "non_rma-send "  << decnumber(sends_posted-acks_received)
+            << std::endl;
+        //
         libfabric_controller_ = nullptr;
         FUNC_END_DEBUG_MSG;
     }
 
+    // --------------------------------------------------------------------
     /// Should not be used any more as parcelport_impl handles this?
     bool parcelport::can_bootstrap() const {
         FUNC_START_DEBUG_MSG;
@@ -257,7 +278,8 @@ namespace libfabric
         return can_boot;
     }
 
-    /// Return the name of this locality
+    // --------------------------------------------------------------------
+    /// return a string form of the locality name
     std::string parcelport::get_locality_name() const
     {
         FUNC_START_DEBUG_MSG;
@@ -269,6 +291,8 @@ namespace libfabric
         return tstr.substr(0, tstr.size()-1);
     }
 
+    // --------------------------------------------------------------------
+    // the root node has spacial handlig, this returns its Id
     parcelset::locality parcelport::agas_locality(util::runtime_configuration const & ini) const
     {
         FUNC_START_DEBUG_MSG;
@@ -281,12 +305,15 @@ namespace libfabric
         return libfabric_controller_->agas_;
     }
 
+    // --------------------------------------------------------------------
     parcelset::locality parcelport::create_locality() const {
         FUNC_START_DEBUG_MSG;
         FUNC_END_DEBUG_MSG;
         return parcelset::locality(locality());
     }
 
+    // --------------------------------------------------------------------
+    /// for debugging
     void parcelport::suspended_task_debug(const std::string &match)
     {
         std::string temp = hpx::util::debug::suspended_task_backtraces();
@@ -297,6 +324,8 @@ namespace libfabric
         }
     }
 
+    // --------------------------------------------------------------------
+    /// stop the parcelport, prior to shutdown
     void parcelport::do_stop() {
         LOG_DEBUG_MSG("Entering libfabric stop ");
         FUNC_START_DEBUG_MSG;
@@ -370,7 +399,7 @@ namespace libfabric
         bool done = false;
         do {
             LOG_TIMED_BLOCK(background, DEVEL, 5.0, {
-                LOG_DEVEL_MSG("number of senders in use "
+                LOG_DEBUG_MSG("number of senders in use "
                     << decnumber(senders_in_use_));
             });
             // if an event comes in, we may spend time processing/handling it

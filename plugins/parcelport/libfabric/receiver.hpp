@@ -9,7 +9,11 @@
 
 #include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
 #include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
+#include <plugins/parcelport/libfabric/header.hpp>
+#include <plugins/parcelport/libfabric/performance_counter.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
+
+#include <boost/container/small_vector.hpp>
 
 namespace hpx {
 namespace parcelset {
@@ -27,28 +31,58 @@ namespace libfabric
     //         complete the transfer of the message
     struct receiver
     {
-        receiver()
-          : region_(nullptr)
-          , memory_pool_(nullptr)
-        {}
+        typedef boost::container::small_vector<libfabric_memory_region*, 8>
+            zero_copy_vector;
 
+        // --------------------------------------------------------------------
+        // construct receive object
         receiver(parcelport* pp, fid_ep* endpoint, rdma_memory_pool& memory_pool);
 
-        ~receiver();
-
+        // --------------------------------------------------------------------
+        // these constructors are provided because boost::lockfree::stack requires them
+        // they should not be used
         receiver(receiver&& other);
-
         receiver& operator=(receiver&& other);
 
+        // --------------------------------------------------------------------
+        // destruct receive object
+        ~receiver();
+
+        // --------------------------------------------------------------------
+        // A received message is routed by the controller into this function.
+        // it might be an incoming message or just an ack sent to inform that
+        // all rdma reads are complete from a previous send operation.
         void handle_recv(fi_addr_t const& src_addr, std::uint64_t len);
 
-        void post_recv();
+        // --------------------------------------------------------------------
+        // the receiver posts a single receive buffer to the queue, attaching
+        // itself as the context, so that when a message is received
+        // the owning reciever is called to handle processing of the buffer
+        void pre_post_receive();
 
-        libfabric_memory_region* region_;
-        parcelport* pp_;
-        fid_ep* endpoint_;
-        rdma_memory_pool* memory_pool_;
+        // --------------------------------------------------------------------
+        // The cleanup call deletes resources and sums counters from internals
+        // once cleanup is done, the recevier should not be used, other than
+        // dumping counters
+        void cleanup();
 
+    private:
+        parcelport                  *pp_;
+        fid_ep                      *endpoint_;
+        libfabric_memory_region     *header_region_ ;
+        rdma_memory_pool            *memory_pool_;
+        //
+        friend class libfabric_controller;
+        //
+        performance_counter<unsigned int> messages_handled_;
+        performance_counter<unsigned int> acks_received_;
+        // from the internal rma_receivers
+        performance_counter<unsigned int> msg_plain_;
+        performance_counter<unsigned int> msg_rma_;
+        performance_counter<unsigned int> sent_ack_;
+        performance_counter<unsigned int> rma_reads_;
+        performance_counter<unsigned int> recv_deletes_;
+        //
         boost::lockfree::stack<
             rma_receiver*,
             boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
