@@ -545,6 +545,20 @@ namespace hpx { namespace threads
             return coroutine_.set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_APEX)
+        std::size_t get_apex_data() const
+        {
+            return apex_data_;
+        }
+
+        std::size_t set_apex_data(std::size_t data)
+        {
+            std::size_t apex_data = apex_data_;
+            apex_data_ = 0ull;
+            return apex_data;
+        }
+#endif
+
         void rebind(thread_init_data& init_data,
             thread_state_enum newstate)
         {
@@ -598,6 +612,9 @@ namespace hpx { namespace threads
             coroutine_(std::move(init_data.func),
                 this_(), init_data.stacksize),
             pool_(pool)
+#if defined(HPX_WITH_APEX)
+          , apex_data_(0ull)
+#endif
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -671,6 +688,9 @@ namespace hpx { namespace threads
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
 #endif
+#if defined(HPX_HAVE_APEX)
+            apex_data_ = 0ull;
+#endif
         }
 
         mutable boost::atomic<thread_state> current_state_;
@@ -718,13 +738,17 @@ namespace hpx { namespace threads
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
-        //reference count
+        // reference count
         util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;
 
         coroutine_type coroutine_;
         pool_type* pool_;
+
+#if defined(HPX_HAVE_APEX)
+        std::size_t apex_data_;
+#endif
     };
 
     typedef thread_data::pool_type thread_pool;

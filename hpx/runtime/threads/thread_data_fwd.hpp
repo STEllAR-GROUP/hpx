@@ -165,6 +165,11 @@ namespace hpx { namespace threads
     HPX_API_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state = unknown);
+
+#if defined(HPX_HAVE_APEX)
+    HPX_API_EXPORT std::size_t get_self_apex_data();
+    HPX_API_EXPORT std::size_t set_self_apex_data(std::size_t);
+#endif
 }}
 
 #endif
