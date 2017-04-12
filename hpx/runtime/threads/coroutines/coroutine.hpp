@@ -119,6 +119,18 @@ namespace hpx { namespace threads { namespace coroutines
             return m_pimpl.get() ? m_pimpl->set_thread_data(data) : 0;
         }
 
+#if defined(HPX_HAVE_APEX)
+        std::size_t get_apex_data() const
+        {
+            return m_pimpl.get() ? m_pimpl->get_apex_data() : 0ull;
+        }
+
+        std::size_t set_apex_data(std::size_t data)
+        {
+            return m_pimpl.get() ? m_pimpl->set_apex_data(data) : 0ull;
+        }
+#endif
+
         void rebind(functor_type&& f, thread_id_repr_type id = nullptr)
         {
             HPX_ASSERT(exited());

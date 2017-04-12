@@ -548,14 +548,12 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_APEX)
         std::size_t get_apex_data() const
         {
-            return apex_data_;
+            return coroutine_.get_apex_data();
         }
 
         std::size_t set_apex_data(std::size_t data)
         {
-            std::size_t apex_data = apex_data_;
-            apex_data_ = 0ull;
-            return apex_data;
+            return coroutine_.set_apex_data(data);
         }
 #endif
 
@@ -612,9 +610,6 @@ namespace hpx { namespace threads
             coroutine_(std::move(init_data.func),
                 this_(), init_data.stacksize),
             pool_(pool)
-#if defined(HPX_WITH_APEX)
-          , apex_data_(0ull)
-#endif
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -688,9 +683,6 @@ namespace hpx { namespace threads
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
 #endif
-#if defined(HPX_HAVE_APEX)
-            apex_data_ = 0ull;
-#endif
         }
 
         mutable boost::atomic<thread_state> current_state_;
@@ -745,10 +737,6 @@ namespace hpx { namespace threads
 
         coroutine_type coroutine_;
         pool_type* pool_;
-
-#if defined(HPX_HAVE_APEX)
-        std::size_t apex_data_;
-#endif
     };
 
     typedef thread_data::pool_type thread_pool;
