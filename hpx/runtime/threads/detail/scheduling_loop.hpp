@@ -354,9 +354,17 @@ namespace hpx { namespace threads { namespace detail
                             thrd_stat.get_previous() == pending))
                     {
 #if defined(HPX_HAVE_APEX)
+#if 1
+                        std::size_t tmp_data = background_thread->get_apex_data();
                         util::apex_wrapper apex_profiler(
                             background_thread->get_description(),
-                            reinterpret_cast<std::uint64_t>(background_thread.get()));
+                            &(tmp_data));
+                        background_thread->set_apex_data(tmp_data);
+#else
+                        util::apex_wrapper apex_profiler(
+                            background_thread->get_description(),
+                            &(background_thread->apex_data_));
+#endif
 
                         thrd_stat = (*background_thread)();
 
@@ -506,9 +514,18 @@ namespace hpx { namespace threads { namespace detail
                                 exec_time_wrapper exec_time_collector(idle_rate);
 
 #if defined(HPX_HAVE_APEX)
+#if 1
+                                std::size_t tmp_data = thrd->get_apex_data();
+                                // tmp_data is getting updated during this call
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description(),
-                                    reinterpret_cast<std::uint64_t>(thrd));
+                                    &(tmp_data));
+                                background_thread->set_apex_data(tmp_data);
+#else
+                                util::apex_wrapper apex_profiler(
+                                    thrd->get_description(),
+                                    &(thrd->apex_data_));
+#endif
 
                                 thrd_stat = (*thrd)();
 

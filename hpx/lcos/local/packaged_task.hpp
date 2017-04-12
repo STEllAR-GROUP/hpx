@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local
                 >::call(function_);
             if (name != nullptr)
             {
-                util::apex_wrapper apex_profiler(name, (uint64_t)this);
+                util::apex_wrapper apex_profiler(name);
                 invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
             }
             else

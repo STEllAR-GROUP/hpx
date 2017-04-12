@@ -236,7 +236,7 @@ namespace hpx { namespace threads
 #endif
     }
 
-#if defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_APEX_DISABLED)
     std::size_t get_self_apex_data()
     {
         thread_self* self = get_self_ptr();

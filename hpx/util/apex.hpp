@@ -50,17 +50,21 @@ namespace hpx { namespace util
                     apex_function_address(name_.get_address()));
             }
         }
-        apex_wrapper(thread_description const& name, uint64_t id)
+        apex_wrapper(thread_description const& name, std::size_t* data_ptr)
           : name_(name), stopped(false)
         {
             if (name_.kind() == thread_description::data_type_description)
             {
-                profiler_ = apex::start(name_.get_description(), id);
+                // not a mistake... we need to pass in the address of this
+                // pointer, so that we can assign it in apex...
+                profiler_ = apex::start(name_.get_description(), (void**)(data_ptr));
             }
             else
             {
+                // not a mistake... we need to pass in the address of this
+                // pointer, so that we can assign it in apex...
                 profiler_ = apex::start(
-                    apex_function_address(name_.get_address()), id);
+                    apex_function_address(name_.get_address()), (void**)(data_ptr));
             }
         }
         ~apex_wrapper()

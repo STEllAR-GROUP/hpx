@@ -205,7 +205,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT void init_self();
         static HPX_EXPORT void reset_self();
 
-#if defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_APEX_DISABLED)
         std::size_t get_apex_data() const
         {
             HPX_ASSERT(m_pimpl);

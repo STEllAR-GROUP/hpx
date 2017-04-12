@@ -525,7 +525,7 @@ namespace detail
                     >::call(on_completed);
                 if (name != nullptr)
                 {
-                    util::apex_wrapper apex_profiler(name, (uint64_t)this);
+                    util::apex_wrapper apex_profiler(name);
                     on_completed();
                 }
                 else
