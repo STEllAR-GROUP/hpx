@@ -1081,7 +1081,11 @@ endif()
 if(WIN32)
   if(MSVC)
     enable_language(ASM_MASM)
+
     hpx_add_target_compile_option(-Ox CONFIGURATIONS Release)
+
+    # even VS2017 has an ICE when compiling with -Ob2
+    hpx_add_target_compile_option(-Ob1 CONFIGURATIONS Release)
 
     if(NOT HPX_WITH_AWAIT)
       # /RTC1 is incompatible with /await
