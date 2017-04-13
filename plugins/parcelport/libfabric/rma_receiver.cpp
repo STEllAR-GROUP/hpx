@@ -149,7 +149,7 @@ namespace libfabric
 
         // for each zerocopy chunk, schedule a read operation
         std::size_t index = 0;
-        for (const chunk_struct &c : chunks_)
+        for (chunk_struct &c : chunks_)
         {
             if (c.type_ == serialization::chunk_type_pointer)
             {
@@ -173,9 +173,7 @@ namespace libfabric
                 // overwrite the serialization chunk data to account for the
                 // local pointers instead of remote ones
                 const void *remoteAddr = c.data_.cpos_;
-                chunks_[index] =
-                    hpx::serialization::create_pointer_chunk(
-                        get_region->get_address(), c.size_, c.rkey_);
+                c.data_.cpos_ = get_region->get_address();
 
                 // post the rdma read/get
                 LOG_DEBUG_MSG("receiver " << hexpointer(this)
@@ -187,8 +185,7 @@ namespace libfabric
                     << "local desc " << hexpointer(get_region->get_desc())
                     << "size " << hexlength(c.size_)
                     << "rkey " << hexpointer(c.rkey_)
-                    << "remote cpos " << hexpointer(remoteAddr)
-                    << "index " << decnumber(c.data_.index_));
+                    << "remote cpos " << hexpointer(remoteAddr));
 
                 // count reads
                 ++rma_reads_;
