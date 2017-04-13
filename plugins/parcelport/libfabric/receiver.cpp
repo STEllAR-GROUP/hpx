@@ -111,6 +111,7 @@ namespace libfabric
                     delete recv;
                 }
                 // Notify one possibly waiting reciever that one receive just finished
+                if (threads::threadmanager_is_at_least(state_running) && hpx::threads::get_self_ptr())
                 {
                     std::unique_lock<mutex_type> l(active_receivers_mtx_);
                     active_receivers_cv_.notify_one(std::move(l));
@@ -120,11 +121,15 @@ namespace libfabric
             // count drops below the maximum. This can not be a busy wait since it could
             // potentially block all background threads.
             const long max_receivers =
-                HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS;
-            while (active_receivers_ > max_receivers)
+                HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
+            std::size_t k = 0;
+            if (threads::threadmanager_is_at_least(state_running) && hpx::threads::get_self_ptr())
             {
-                std::unique_lock<mutex_type> l(active_receivers_mtx_);
-                active_receivers_cv_.wait(l);
+                while (active_receivers_ > max_receivers)
+                {
+                    std::unique_lock<mutex_type> l(active_receivers_mtx_);
+                    active_receivers_cv_.wait(l);
+                }
             }
 
             recv = new rma_receiver(pp_, endpoint_, memory_pool_, std::move(f));

@@ -87,7 +87,7 @@ namespace libfabric
         //
         boost::lockfree::stack<
             rma_receiver*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
+            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS>,
             boost::lockfree::fixed_sized<true>
         > rma_receivers_;
 
