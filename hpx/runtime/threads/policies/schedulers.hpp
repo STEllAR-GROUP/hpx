@@ -27,5 +27,7 @@
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 #endif
-
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
+#endif
 #endif

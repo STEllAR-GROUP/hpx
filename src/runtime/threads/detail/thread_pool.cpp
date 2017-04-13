@@ -1487,3 +1487,9 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::throttling_scheduler<> >;
+#endif
+
