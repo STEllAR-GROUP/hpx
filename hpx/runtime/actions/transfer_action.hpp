@@ -170,7 +170,7 @@ namespace hpx { namespace actions
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
             std::move(data), target, lva, this->priority_,
-            util::get<Is>(std::move(this->arguments_))...);
+            std::move(util::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>
