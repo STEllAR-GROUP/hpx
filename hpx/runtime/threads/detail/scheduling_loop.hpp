@@ -375,6 +375,7 @@ namespace hpx { namespace threads { namespace detail
                             apex_profiler.yield();
                         }
 			// APEX may have saved some data
+                        std::atomic_thread_fence(std::memory_order_acq_rel);
                         background_thread->set_apex_data(tmp_data);
 #else
                         thrd_stat = (*background_thread)();
@@ -535,6 +536,7 @@ namespace hpx { namespace threads { namespace detail
                                     apex_profiler.yield();
                                 }
 				// APEX may have saved some data
+                                std::atomic_thread_fence(std::memory_order_acq_rel);
                                 thrd->set_apex_data(tmp_data);
 #else
                                 thrd_stat = (*thrd)();
