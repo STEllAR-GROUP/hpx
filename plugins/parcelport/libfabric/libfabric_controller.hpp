@@ -250,14 +250,13 @@ namespace libfabric
                 recv_deletes     += r.recv_deletes_;
             }
 
-            std::cout
-                << "Received messages " << decnumber(messages_handled)
+            LOG_DEBUG_MSG(
+                   "Received messages " << decnumber(messages_handled)
                 << "Received acks "     << decnumber(acks_received)
                 << "Sent acks "     << decnumber(sent_ack)
                 << "Total reads "       << decnumber(rma_reads)
                 << "Total deletes "     << decnumber(recv_deletes)
-                << "deletes error " << decnumber(messages_handled - recv_deletes)
-                << std::endl;
+                << "deletes error " << decnumber(messages_handled - recv_deletes));
 
             // Cleaning up receivers to avoid memory leak errors.
             receivers_.clear();
@@ -689,12 +688,23 @@ namespace libfabric
                 // do nothing, we will try again on the next check
                 LOG_TIMED_MSG(poll, DEVEL, 10, "txcq FI_EAGAIN");
             }
-            else if (ret<0) {
+            else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                int err_sz = 0;
-                err_sz = fi_cq_readerr(txcq_, &e ,0);
-                LOG_ERROR_MSG("txcq Error with flags " << e.flags << " len " << e.len);
-                throw fabric_error(ret, "completion txcq read");
+                int err_sz = fi_cq_readerr(txcq_, &e ,0);
+                // flags might not be set correctly
+                if (e.flags == (FI_MSG | FI_SEND)) {
+                    LOG_ERROR_MSG("txcq Error for FI_SEND with len " << e.len
+                        << "context " << hexpointer(e.op_context));
+                }
+                if (e.flags & FI_RMA) {
+                    LOG_ERROR_MSG("txcq Error for FI_RMA with len " << e.len
+                        << "context " << hexpointer(e.op_context));
+                }
+                rma_base *base = reinterpret_cast<rma_base*>(e.op_context);
+                base->handle_error(e);
+            }
+            else {
+                LOG_ERROR_MSG("unknown error in completion txcq read");
             }
             return 0;
         }
@@ -747,12 +757,13 @@ namespace libfabric
                 // do nothing, we will try again on the next check
                 LOG_TIMED_MSG(poll, DEVEL, 10, "rxcq FI_EAGAIN");
             }
-            else if (ret<0) {
+            else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                int err_sz = 0;
-                err_sz = fi_cq_readerr(rxcq_, &e ,0);
+                int err_sz = fi_cq_readerr(rxcq_, &e ,0);
                 LOG_ERROR_MSG("rxcq Error with flags " << e.flags << " len " << e.len);
-                throw fabric_error(ret, "completion rxcq read");
+            }
+            else {
+                LOG_ERROR_MSG("unknown error in completion rxcq read");
             }
             return result;
         }

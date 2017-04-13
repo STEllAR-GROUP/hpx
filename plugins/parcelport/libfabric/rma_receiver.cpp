@@ -388,4 +388,11 @@ namespace libfabric
             << "Cleaned up, posting self back to rma stack");
         handler_(this);
     }
+
+    // --------------------------------------------------------------------
+    void rma_receiver::handle_error(struct fi_cq_err_entry err)
+    {
+        LOG_ERROR_MSG("rma_receiver handling an error " << hexpointer(this));
+    }
+
 }}}}

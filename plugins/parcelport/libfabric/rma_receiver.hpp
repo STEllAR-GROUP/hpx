@@ -11,6 +11,7 @@
 #include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/performance_counter.hpp>
+#include <plugins/parcelport/libfabric/rma_base.hpp>
 //
 #include <hpx/util/atomic_count.hpp>
 //
@@ -27,7 +28,7 @@ namespace libfabric
     // mising chunks of the message:
     //      1) Non-piggy backed non-zero copy chunks (if existing)
     //      2) The zero copy chunks from serialization
-    struct rma_receiver
+    struct rma_receiver : public rma_base
     {
         typedef boost::container::small_vector<libfabric_memory_region*,4> zero_copy_vector;
 
@@ -73,6 +74,9 @@ namespace libfabric
         // --------------------------------------------------------------------
         // After message processing is complete, this routine cleans up and resets
         void cleanup_receive();
+
+        // --------------------------------------------------------------------
+        void handle_error(struct fi_cq_err_entry err) override;
 
     private:
         parcelport               *pp_;

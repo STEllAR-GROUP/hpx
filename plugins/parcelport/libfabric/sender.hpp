@@ -12,6 +12,7 @@
 #include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/performance_counter.hpp>
+#include <plugins/parcelport/libfabric/rma_base.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 
@@ -31,7 +32,7 @@ namespace libfabric
 {
     struct parcelport;
 
-    struct sender
+    struct sender : public rma_base
     {
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;
@@ -109,6 +110,10 @@ namespace libfabric
         void cleanup();
 
         // --------------------------------------------------------------------
+        // if a send completion reports failure, we can retry the send
+        void handle_error(struct fi_cq_err_entry err) override;
+
+        // --------------------------------------------------------------------
         parcelport               *parcelport_;
         fid_ep                   *endpoint_;
         fid_domain               *domain_;
@@ -127,7 +132,7 @@ namespace libfabric
         performance_counter<unsigned int> acks_received_;
         //
         util::unique_function_nonser<void(error_code const&)> handler_;
-        util::function_nonser<void(sender*)> postprocess_handler_;
+        util::function_nonser<void(sender*)>                  postprocess_handler_;
         //
         struct iovec region_list_[2];
         void        *desc_[2];

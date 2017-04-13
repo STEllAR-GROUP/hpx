@@ -257,12 +257,11 @@ namespace libfabric
             acks_received += snd->acks_received_;
             delete snd;
         }
-        std::cout
+        LOG_DEBUG_MSG(
             << "sends_posted "  << decnumber(sends_posted)
             << "sends_deleted " << decnumber(sends_posted)
             << "acks_received " << decnumber(acks_received)
-            << "non_rma-send "  << decnumber(sends_posted-acks_received)
-            << std::endl;
+            << "non_rma-send "  << decnumber(sends_posted-acks_received));
         //
         libfabric_controller_ = nullptr;
         FUNC_END_DEBUG_MSG;

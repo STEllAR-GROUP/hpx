@@ -72,7 +72,6 @@ namespace libfabric
         }
 
         // create the header using placement new in the pinned memory block
-
         char *header_memory = (char*)(header_region_->get_address());
 
         LOG_DEBUG_MSG("Placement new for header");
@@ -185,28 +184,6 @@ namespace libfabric
             }
         }
 
-//         fi_msg msg;
-//         msg.msg_iov = region_list;
-//         msg.desc = desc;
-//         msg.iov_count = num_regions;
-//         msg.addr = dst_addr_;
-//         msg.context = this;
-//         msg.data = 0;
-//         int ret = 0;
-//         for (std::size_t k = 0; true; ++k)
-//         {
-//             ret = fi_sendmsg(endpoint_, &msg, FI_COMPLETION | FI_TRANSMIT_COMPLETE);
-//             if (ret == -FI_EAGAIN)
-//             {
-//                 LOG_DEBUG_MSG("reposting send...\n");
-//                 hpx::util::detail::yield_k(k,
-//                     "libfabric::sender::async_write");
-//                 continue;
-//             }
-//             if (ret) throw fabric_error(ret, "fi_sendv");
-//             break;
-//         }
-
         // log the time spent in performance counter
 //                buffer.data_point_.time_ =
 //                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
@@ -261,6 +238,49 @@ namespace libfabric
         }
         rma_regions_.clear();
         postprocess_handler_(this);
+    }
+
+    // --------------------------------------------------------------------
+    void sender::handle_error(struct fi_cq_err_entry err)
+    {
+        LOG_ERROR_MSG("resending message after error " << hexpointer(this));
+
+        int ret = 0;
+        if (header_->message_piggy_back())
+        {
+            // send 2 regions as one message, goes into one receive
+            for (std::size_t k = 0; true; ++k)
+            {
+                ret = fi_sendv(endpoint_, region_list_, desc_, 2, dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_sendv...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
+        }
+        else
+        {
+            header_->set_message_rdma_info(
+                message_region_->get_remote_key(), message_region_->get_address());
+
+            // send just the header region - a single message
+            for (std::size_t k = 0; true; ++k) {
+                ret = fi_send(endpoint_, region_list_[0].iov_base,
+                    region_list_[0].iov_len, desc_[0], dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
+        }
     }
 
 }}}}
