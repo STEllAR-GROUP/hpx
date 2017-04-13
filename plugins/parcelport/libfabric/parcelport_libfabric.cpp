@@ -218,7 +218,7 @@ namespace libfabric
             FUNC_END_DEBUG_MSG;
             return snd;
         }
-        else
+        else if(this_thread::has_sufficient_stack_space())
         {
             background_work_OS_thread();
         }
