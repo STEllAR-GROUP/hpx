@@ -42,6 +42,7 @@ namespace libfabric
     void rma_receiver::read_message(libfabric_memory_region* rrregion,
         fi_addr_t const& src_addr)
     {
+        start_time_ = util::high_resolution_clock::now();
         HPX_ASSERT(rma_count_ == 0);
         HPX_ASSERT(header_ == nullptr);
         HPX_ASSERT(header_region_ == nullptr);
@@ -109,6 +110,9 @@ namespace libfabric
         buffer.num_chunks_ = std::make_pair(
             header_->num_zero_copy_chunks(), header_->num_index_chunks());
         buffer.data_size_  = header_->message_size();
+        performance_counters::parcels::data_point& data = buffer.data_point_;
+        data.bytes_ = static_cast<std::size_t>(header_->message_size());
+        data.time_ = util::high_resolution_clock::now() - start_time_;
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
@@ -311,6 +315,9 @@ namespace libfabric
         buffer.num_chunks_ = std::make_pair(
             header_->num_original_zero_copy_chunks(), header_->num_index_chunks());
         buffer.data_size_  = header_->message_size();
+        performance_counters::parcels::data_point& data = buffer.data_point_;
+        data.bytes_ = static_cast<std::size_t>(header_->message_size());
+        data.time_ = util::high_resolution_clock::now() - start_time_;
 
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for ZEROCOPY complete parcel");

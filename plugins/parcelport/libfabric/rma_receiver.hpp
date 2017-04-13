@@ -90,6 +90,9 @@ namespace libfabric
         fi_addr_t                 src_addr_;
         completion_handler        handler_;
         hpx::util::atomic_count   rma_count_;
+
+        double start_time_;
+
         //
         friend class receiver;
         performance_counter<unsigned int> msg_plain_;
