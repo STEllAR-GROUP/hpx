@@ -23,6 +23,13 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
+    // instantiate a stack of rma_receivers
+    boost::lockfree::stack<
+        rma_receiver*,
+        boost::lockfree::capacity<512>,
+        boost::lockfree::fixed_sized<true>
+    > receiver::rma_receivers_;
+
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint, rdma_memory_pool& memory_pool)
         : pp_(pp)
@@ -62,7 +69,7 @@ namespace libfabric
     void receiver::cleanup()
     {
         rma_receiver *rcv = nullptr;
-        while( rma_receivers_.pop(rcv))
+        while(receiver::rma_receivers_.pop(rcv))
         {
             msg_plain_    += rcv->msg_plain_;
             msg_rma_      += rcv->msg_rma_;
@@ -98,13 +105,12 @@ namespace libfabric
 
         LOG_DEBUG_MSG("Handling message");
         rma_receiver* recv = nullptr;
-        if (!rma_receivers_.pop(recv))
+        if (!receiver::rma_receivers_.pop(recv))
         {
             auto f = [this](rma_receiver* recv)
             {
-                if (!rma_receivers_.push(recv)) {
-                    LOG_ERROR_MSG("rma receiver failed to return to stack "
-                        << hexpointer(recv));
+                if (!receiver::rma_receivers_.push(recv)) {
+                    // if the capacity overflowed, just delete this one
                     delete recv;
                 }
             };

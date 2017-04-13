@@ -83,9 +83,9 @@ namespace libfabric
         performance_counter<unsigned int> rma_reads_;
         performance_counter<unsigned int> recv_deletes_;
         //
-        boost::lockfree::stack<
+        static boost::lockfree::stack<
             rma_receiver*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
+            boost::lockfree::capacity<512>,
             boost::lockfree::fixed_sized<true>
         > rma_receivers_;
     };
