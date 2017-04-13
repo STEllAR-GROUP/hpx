@@ -23,13 +23,6 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
-    // instantiate a stack of rma_receivers
-    boost::lockfree::stack<
-        rma_receiver*,
-        boost::lockfree::capacity<512>,
-        boost::lockfree::fixed_sized<true>
-    > receiver::rma_receivers_;
-
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint, rdma_memory_pool& memory_pool)
         : pp_(pp)
@@ -38,6 +31,7 @@ namespace libfabric
         , memory_pool_(&memory_pool)
         , messages_handled_(0)
         , acks_received_(0)
+        , active_receivers_(0)
     {
         LOG_DEBUG_MSG("created receiver: " << hexpointer(this));
         // Once constructed, we need to post the receive...
@@ -46,7 +40,9 @@ namespace libfabric
 
     // these constructors are provided because boost::lockfree::stack requires them
     // they should not be used
-    receiver::receiver(receiver&& other) {
+    receiver::receiver(receiver&& other)
+        : active_receivers_(0)
+    {
         std::terminate();
     }
     receiver& receiver::operator=(receiver&& other)
@@ -109,13 +105,31 @@ namespace libfabric
         {
             auto f = [this](rma_receiver* recv)
             {
+                --active_receivers_;
                 if (!receiver::rma_receivers_.push(recv)) {
                     // if the capacity overflowed, just delete this one
                     delete recv;
                 }
+                // Notify one possibly waiting reciever that one receive just finished
+                {
+                    std::unique_lock<mutex_type> l(active_receivers_mtx_);
+                    active_receivers_cv_.notify_one(std::move(l));
+                }
             };
+            // throttle the creation of new receivers. Wait until the active_receivers_
+            // count drops below the maximum. This can not be a busy wait since it could
+            // potentially block all background threads.
+            const long max_receivers =
+                HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS;
+            while (active_receivers_ > max_receivers)
+            {
+                std::unique_lock<mutex_type> l(active_receivers_mtx_);
+                active_receivers_cv_.wait(l);
+            }
+
             recv = new rma_receiver(pp_, endpoint_, memory_pool_, std::move(f));
         }
+        ++active_receivers_;
 
         HPX_ASSERT(recv);
 

@@ -13,6 +13,8 @@
 #include <plugins/parcelport/libfabric/performance_counter.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
 
+#include <hpx/util/atomic_count.hpp>
+
 #include <boost/container/small_vector.hpp>
 
 namespace hpx {
@@ -83,11 +85,16 @@ namespace libfabric
         performance_counter<unsigned int> rma_reads_;
         performance_counter<unsigned int> recv_deletes_;
         //
-        static boost::lockfree::stack<
+        boost::lockfree::stack<
             rma_receiver*,
-            boost::lockfree::capacity<512>,
+            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
             boost::lockfree::fixed_sized<true>
         > rma_receivers_;
+
+        typedef hpx::lcos::local::spinlock mutex_type;
+        mutex_type active_receivers_mtx_;
+        hpx::lcos::local::detail::condition_variable active_receivers_cv_;
+        hpx::util::atomic_count active_receivers_;
     };
 }}}}
 
