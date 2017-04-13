@@ -16,6 +16,9 @@
 #if defined(HPX_HAVE_THROTTLE_SCHEDULER)
 #include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
 #endif
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
+#endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
@@ -508,4 +511,27 @@ namespace hpx { namespace threads { namespace executors
                 max_punits, min_punits, "static_priority_queue_executor"))
     {}
 #endif
+
+
+
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+    ///////////////////////////////////////////////////////////////////////////
+    throttling_executor::throttling_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::throttling_scheduler<> >(
+                get_os_thread_count(), 1))
+    {}
+
+    throttling_executor::throttling_executor(
+            std::size_t max_punits, std::size_t min_punits)
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::throttling_scheduler<> >(
+                max_punits, min_punits))
+    {}
+#endif
+
+
+
+
 }}}

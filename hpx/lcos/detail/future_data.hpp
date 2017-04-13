@@ -69,6 +69,26 @@ namespace detail
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
 
+
+    ///MENIM
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct handle_continuation_recursion_count
+    {
+        handle_continuation_recursion_count()
+          : count_(threads::get_continuation_recursion_count())
+        {
+            ++count_;
+        }
+        ~handle_continuation_recursion_count()
+        {
+            --count_;
+        }
+
+        std::size_t& count_;
+    };
+
+
     void intrusive_ptr_add_ref(future_data_refcnt_base* p);
     void intrusive_ptr_release(future_data_refcnt_base* p);
 
@@ -253,7 +273,7 @@ namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct handle_continuation_recursion_count
+/*    struct handle_continuation_recursion_count
     {
         handle_continuation_recursion_count()
           : count_(threads::get_continuation_recursion_count())
@@ -267,6 +287,7 @@ namespace detail
 
         std::size_t& count_;
     };
+*/
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool run_on_completed_on_new_thread(
@@ -525,7 +546,7 @@ namespace detail
                     >::call(on_completed);
                 if (name != nullptr)
                 {
-                    util::apex_wrapper apex_profiler(name, (uint64_t)this);
+                    util::apex_wrapper apex_profiler(name);
                     on_completed();
                 }
                 else
