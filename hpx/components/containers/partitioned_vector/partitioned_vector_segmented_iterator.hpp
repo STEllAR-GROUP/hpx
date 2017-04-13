@@ -862,8 +862,8 @@ namespace hpx { namespace traits
                 iter.get_global_index());
         }
 
-       //  Conceptually this function is supposed to retrieve the closest
-       //  local segment of the segment i in locality id.
+        //  Conceptually this function is supposed to retrieve the closest
+        //  local segment of the segment i in locality id.
         static local_segment_iterator local_segment(
             segment_iterator i, segment_iterator end, std::uint32_t locality_id)
         {
@@ -960,8 +960,8 @@ namespace hpx { namespace traits
                 iter.get_global_index());
         }
 
-       //  Conceptually this function is supposed to retrieve the closest
-       //  local segment of the segment i in locality id.
+        //  Conceptually this function is supposed to retrieve the closest
+        //  local segment of the segment i in locality id.
         static local_segment_iterator local_segment(
             segment_iterator i, segment_iterator end, std::uint32_t locality_id)
         {
