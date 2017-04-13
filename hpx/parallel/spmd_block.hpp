@@ -6,17 +6,20 @@
 #if !defined(HPX_PARALLEL_SPMD_BLOCK_HPP)
 #define HPX_PARALLEL_SPMD_BLOCK_HPP
 
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/broadcast.hpp>
+#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/runtime/actions/lambda_to_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/traits/is_execution_policy.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <functional>
-#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -56,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     struct spmd_block
     {
         explicit spmd_block(std::size_t num_images, std::size_t image_id,
-            std::reference_wrapper<hpx::lcos::local::barrier> & barrier)
+            hpx::lcos::barrier & barrier)
         : num_images_(num_images), image_id_(image_id), barrier_(barrier)
         {}
 
@@ -84,10 +87,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
            barrier_.get().wait();
         }
 
+        hpx::future<void> sync_all(hpx::launch::async_policy const &) const
+        {
+           return barrier_.get().wait(hpx::launch::async);
+        }
+
     private:
         std::size_t num_images_;
         std::size_t image_id_;
-        mutable std::reference_wrapper<hpx::lcos::local::barrier> barrier_;
+        mutable std::reference_wrapper<hpx::lcos::barrier> barrier_;
     };
 
     namespace detail
@@ -95,23 +103,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F>
         struct spmd_block_helper
         {
-            mutable std::reference_wrapper<hpx::lcos::local::barrier> barrier_;
-            typename std::decay<F>::type f_;
+            std::string name_;
             std::size_t num_images_;
 
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
-                spmd_block block(num_images_, image_id, barrier_);
+                hpx::lcos::barrier
+                    barrier(name_ + "_barrier" , num_images_, image_id);
+                spmd_block block(num_images_, image_id, barrier);
+
+                int * dummy = nullptr;
                 hpx::util::invoke(
-                    f_, std::move(block), std::forward<Ts>(ts)...);
+                    reinterpret_cast<const F&>(*dummy),
+                    std::move(block),
+                    std::forward<Ts>(ts)...);
+
+                // Ensure that other images reaches that point
+                barrier.wait();
             }
         };
     }
 
     template <typename ExPolicy, typename F, typename ... Args>
-    void define_spmd_block(ExPolicy && policy,
-        std::size_t num_images, F && f, Args && ... args)
+    void define_spmd_block(std::string && name, ExPolicy &&,
+        std::size_t images_per_locality, F && f, Args && ... args)
     {
         static_assert(
             parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -130,23 +146,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             "define_spmd_block() needs a lambda that " \
             "has at least a spmd_block as 1st argument");
 
-        hpx::lcos::local::barrier barrier(num_images);
+        std::size_t num_images
+            = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
 
-        hpx::parallel::executor_traits<
-            typename std::decay<executor_type>::type
-            >::bulk_execute(
-                policy.executor(),
-                detail::spmd_block_helper<F>{
-                    barrier, std::forward<F>(f), num_images
-                },
-                boost::irange(0ul, num_images), std::forward<Args>(args)...);
+        // Force f to be initialized at compile-time
+        auto dummy = hpx::actions::lambda_to_action(f);
+        HPX_UNUSED(dummy);
+
+        auto act = hpx::actions::lambda_to_action(
+            []( std::string name,
+                std::size_t images_per_locality,
+                std::size_t num_images,
+                Args... args)
+            {
+                executor_type exec;
+                std::size_t offset = hpx::get_locality_id();
+                offset *= images_per_locality;
+
+                hpx::parallel::executor_traits<
+                    executor_type
+                    >::bulk_execute(
+                        exec,
+                        detail::spmd_block_helper<ftype>{name,num_images},
+                        boost::irange(
+                            offset, offset + images_per_locality),
+                        args...);
+            });
+
+        hpx::lcos::broadcast(
+            act, hpx::find_all_localities(),
+                std::forward<std::string>(name), images_per_locality, num_images,
+                    std::forward<Args>(args)...);
     }
 
     template <typename F, typename ... Args>
-    void define_spmd_block(std::size_t num_images, F && f, Args && ... args)
+    void define_spmd_block(std::string && name, std::size_t images_per_locality,
+        F && f, Args && ... args)
     {
-        define_spmd_block(parallel::execution::par,
-            num_images, std::forward<F>(f), std::forward<Args>(args)...);
+        define_spmd_block(std::forward<std::string>(name), parallel::execution::par,
+            images_per_locality, std::forward<F>(f), std::forward<Args>(args)...);
     }
 }}}
 

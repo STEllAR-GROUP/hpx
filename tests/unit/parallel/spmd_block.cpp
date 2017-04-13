@@ -14,20 +14,24 @@
 #include <functional>
 #include <utility>
 
-std::size_t num_images = 10;
+std::size_t images_per_locality = 10;
 std::size_t iterations = 20;
+boost::atomic<std::size_t> c(0);
 
 int main()
 {
     auto bulk_test =
-        [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> & c)
+        [](hpx::parallel::v2::spmd_block block)
         {
+            std::size_t num_images
+                = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
+
             HPX_TEST_EQ(block.get_num_images(), num_images);
             HPX_TEST_EQ(block.this_image() < num_images, true);
 
-            for(std::size_t i=0, test_count = num_images;
+            for(std::size_t i=0, test_count = images_per_locality;
                 i<iterations;
-                i++, test_count+=num_images)
+                i++, test_count+=images_per_locality)
             {
                 ++c;
                 block.sync_all();
@@ -36,10 +40,8 @@ int main()
             }
         };
 
-    boost::atomic<std::size_t> c(0);
-
     hpx::parallel::v2::define_spmd_block(
-        num_images, std::move(bulk_test), std::ref(c));
+        "block", images_per_locality, std::move(bulk_test));
 
     return 0;
 }
