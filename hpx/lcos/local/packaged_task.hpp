@@ -12,18 +12,9 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
 
 #include <boost/exception_ptr.hpp>
 
@@ -92,23 +83,7 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-#if HPX_HAVE_ITTNOTIFY != 0
-            util::itt::string_handle const& sh =
-                traits::get_function_annotation_itt<
-                    function_type
-                >::call(function_);
-            util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-            char const* name = traits::get_function_annotation<
-                    function_type
-                >::call(function_);
-            if (name != nullptr)
-            {
-                util::apex_wrapper apex_profiler(name, (uint64_t)this);
-                invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
-            }
-            else
-#endif
+            hpx::util::annotate_function annotate(function_);
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 

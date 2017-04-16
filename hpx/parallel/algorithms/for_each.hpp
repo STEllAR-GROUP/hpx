@@ -10,10 +10,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/identity.hpp>
 #include <hpx/util/invoke.hpp>
 
@@ -29,6 +34,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -86,6 +92,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             fun_type f_;
             proj_type proj_;
 
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void execute(Iter part_begin, std::size_t part_size)
+            {
+                util::loop_n<execution_policy_type>(part_begin, part_size,
+                    invoke_projected<fun_type, proj_type>{f_, proj_});
+            }
+
             template <typename F_, typename Proj_>
             HPX_HOST_DEVICE for_each_iteration(F_ && f, Proj_ && proj)
               : f_(std::forward<F_>(f))
@@ -116,8 +130,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             void operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {
-                util::loop_n<execution_policy_type>(part_begin, part_size,
-                    invoke_projected<fun_type, proj_type>{f_, proj_});
+                hpx::util::annotate_function annotate(f_);
+                execute(part_begin, part_size);
             }
         };
 
@@ -462,5 +476,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_address<
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> >
+    {
+        static std::size_t call(
+            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_annotation<
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> >
+    {
+        static char const* call(
+            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif

@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    for_each_annotated_function
     for_loop_2281
     minimal_findend
     scan_different_inits
