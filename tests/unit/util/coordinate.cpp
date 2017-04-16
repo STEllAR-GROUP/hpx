@@ -48,7 +48,11 @@ void test_bounds1()
 
 void test_bounds2()
 {
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !defined(HPX_INTEL_VERSION)
     hpx::util::bounds<2> bnds({ N1, N2 });
+#else
+    hpx::util::bounds<2> bnds((std::ptrdiff_t[]){ N1, N2 });
+#endif
 
     {
         hpx::util::bounds_iterator<2> it = boost::begin(bnds);
@@ -77,7 +81,11 @@ void test_bounds2()
 
 void test_bounds3()
 {
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !defined(HPX_INTEL_VERSION)
     hpx::util::bounds<3> bnds({ N1, N2, N3 });
+#else
+    hpx::util::bounds<3> bnds((std::ptrdiff_t[]){ N1, N2, N3 });
+#endif
 
     {
         hpx::util::bounds_iterator<3> it = boost::begin(bnds);
