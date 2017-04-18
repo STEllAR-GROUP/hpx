@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/include/async.hpp>
 
-#include <examples/nqueen/server/nqueen.hpp>
+#include "../server/nqueen.hpp"
 
 #include <cstddef>
 
