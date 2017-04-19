@@ -163,14 +163,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 std::size_t offset = hpx::get_locality_id();
                 offset *= images_per_locality;
 
-                hpx::parallel::executor_traits<
-                    executor_type
-                    >::bulk_execute(
-                        exec,
-                        detail::spmd_block_helper<ftype>{name,num_images},
-                        boost::irange(
-                            offset, offset + images_per_locality),
-                        args...);
+                return
+                    hpx::parallel::executor_traits<
+                        executor_type
+                        >::bulk_execute(
+                            exec,
+                            detail::spmd_block_helper<ftype>{name,num_images},
+                            boost::irange(
+                                offset, offset + images_per_locality),
+                            args...);
             });
 
         hpx::lcos::broadcast(
