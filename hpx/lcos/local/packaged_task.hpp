@@ -84,6 +84,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             hpx::util::annotate_function annotate(function_);
+            (void)annotate;     // suppress warning about unused variable
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
