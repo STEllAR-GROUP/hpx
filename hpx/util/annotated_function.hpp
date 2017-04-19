@@ -169,6 +169,7 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name) {}
+        template <typename F> explicit annotate_function(F && f) {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
