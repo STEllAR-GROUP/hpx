@@ -19,7 +19,9 @@
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
+#include <cstdio>
 #include <functional>
+#include <iostream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -109,6 +111,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
+                printf("image_id is equal to %lu and num_images is %lu\n",
+                    image_id, num_images_);
+
+                std::cout << "The barrier name is "
+                    << name_ + "_barrier" << std::endl;
+
                 hpx::lcos::barrier
                     barrier(name_ + "_barrier" , num_images_, image_id);
                 spmd_block block(num_images_, image_id, barrier);

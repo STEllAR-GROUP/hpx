@@ -12,14 +12,18 @@
 
 #include <cstddef>
 #include <functional>
+#include <iostream>
 #include <utility>
 
-std::size_t images_per_locality = 10;
+std::size_t images_per_locality = 4;
 std::size_t iterations = 20;
 boost::atomic<std::size_t> c(0);
 
 int main()
 {
+    std::cout <<"Number of localities is : "
+        << hpx::get_num_localities(hpx::launch::sync) << std::endl;
+
     auto bulk_test =
         [](hpx::parallel::v2::spmd_block block)
         {
