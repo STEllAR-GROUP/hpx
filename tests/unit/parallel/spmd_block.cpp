@@ -19,6 +19,9 @@ std::size_t iterations = 20;
 
 int main()
 {
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
+
     auto bulk_test =
         [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> & c)
         {
@@ -36,10 +39,17 @@ int main()
             }
         };
 
-    boost::atomic<std::size_t> c(0);
+    boost::atomic<std::size_t> c1(0), c2(0);
 
     hpx::parallel::v2::define_spmd_block(
-        num_images, std::move(bulk_test), std::ref(c));
+        num_images, std::move(bulk_test), std::ref(c1));
+
+    auto join =
+        hpx::parallel::v2::define_spmd_block(
+            par(task),
+                num_images, std::move(bulk_test), std::ref(c2));
+
+    hpx::wait_all(join);
 
     return 0;
 }
