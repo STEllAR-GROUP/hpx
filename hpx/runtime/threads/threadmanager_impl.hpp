@@ -296,6 +296,12 @@ namespace hpx { namespace threads
             pool_.reset_thread_distribution();
         }
 
+	// Returns the underlying scheduling policy
+        scheduling_policy_type& get_pool_sched() const
+	{
+	    return pool_.get_sched();
+	}
+
     private:
         // counter creator functions
         naming::gid_type queue_length_counter_creator(

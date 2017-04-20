@@ -99,13 +99,10 @@ namespace hpx { namespace threads { namespace policies
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
-	    //wait_or_add_new(num_thread, running, idle_loop_count);
-
 	    /*
 		Drain the queue of the suspended OS thread
 	    */
             while (disabled(num_thread)) {
-                std::cout << "STEP1.5" << std::endl;
                 thread_queue_type* q = queues_[num_thread];
 	        while (q->get_next_thread(thrd)) {
 		      this->wait_or_add_new(num_thread, running, idle_loop_count) ;
@@ -144,14 +141,13 @@ namespace hpx { namespace threads { namespace policies
 	    HPX_ASSERT(num_thread < queues_.size());
 
 	    queues_[num_thread]->schedule_thread(thrd);
-	    //base_policy::schedule_thread(num_thread);
-
         }
 
-
-        
-        void disable(std::size_t shepherd) {
-		if (!disabled(shepherd))
+        void disable(std::size_t shepherd) 
+	{
+	        std::cout << "Starting disable. shepherd: " << shepherd << std::endl;
+		
+		if (disabled(shepherd))
 		    return;
 
 	        if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
@@ -172,7 +168,8 @@ namespace hpx { namespace threads { namespace policies
  
 	}
 
- 	void enable(std::size_t shepherd) {
+ 	void enable(std::size_t shepherd) 
+	{
 	        std::lock_guard<mutex_type> l(throttle_mtx_);
 
 		if (shepherd == -1)
@@ -187,6 +184,40 @@ namespace hpx { namespace threads { namespace policies
 		cond_.notify_one();
 	}
 
+
+        void enable_one()
+   	{
+		std::lock_guard<mutex_type> l(throttle_mtx_);
+		if (disabled_os_threads_.any()) { 
+		   for (int i=0; i<disabled_os_threads_.size(); i++)
+		       if (disabled_os_threads_[i]) {
+			  disabled_os_threads_[i] = false;
+			  cond_.notify_one();
+			  std::cout << "Resumed worker_id: " << i << std::endl;
+			  break;
+		       }
+		}
+        }
+
+
+        void enable_all()
+        {
+                std::lock_guard<mutex_type> l(throttle_mtx_);
+                if (disabled_os_threads_.any()) {
+                   for (int i=0; i<disabled_os_threads_.size(); i++)
+                       if (disabled_os_threads_[i]) {
+                          disabled_os_threads_[i] = false;
+                          cond_.notify_one();
+                          std::cout << "Resumed worker_id: " << i << std::endl;
+                       }
+                }
+        }
+
+	
+	boost::dynamic_bitset<> const & get_disabled_os_threads()
+	{
+		return disabled_os_threads_;
+	}
 
     protected:
 	typedef hpx::lcos::local::spinlock mutex_type;
