@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -26,7 +26,7 @@
 //  HPX_VERSION_DATE   YYYYMMDD is the date of the release
 //                               (estimated release date for master branch)
 //
-#define HPX_VERSION_FULL         0x001000
+#define HPX_VERSION_FULL         0x010000
 
 #define HPX_VERSION_MAJOR        1
 #define HPX_VERSION_MINOR        0
