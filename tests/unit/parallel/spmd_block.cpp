@@ -24,6 +24,10 @@ int main()
     using hpx::parallel::execution::par;
     using hpx::parallel::execution::task;
 
+    // FIXME : the atomic variable is passed by pointer in place of by
+    // reference because of some issue related to std::ref when using certain
+    // stdlib versions
+/*
     auto bulk_test =
         [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> & c)
         {
@@ -52,6 +56,42 @@ int main()
                 num_images, std::move(bulk_test), std::ref(c2));
 
     hpx::wait_all(join);
+*/
+
+    auto bulk_test =
+        [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> * cptr)
+        {
+            boost::atomic<std::size_t> & c = *cptr;
+
+            HPX_TEST_EQ(block.get_num_images(), num_images);
+            HPX_TEST_EQ(block.this_image() < num_images, true);
+
+            for(std::size_t i=0, test_count = num_images;
+                i<iterations;
+                i++, test_count+=num_images)
+            {
+                ++c;
+                block.sync_all();
+                HPX_TEST_EQ(c, test_count);
+                block.sync_all();
+            }
+        };
+
+    boost::atomic<std::size_t> * c1 = new boost::atomic<std::size_t>(0);
+    boost::atomic<std::size_t> * c2 = new boost::atomic<std::size_t>(0);
+
+    hpx::parallel::v2::define_spmd_block(
+        num_images, std::move(bulk_test), c1);
+
+    std::vector<hpx::future<void>> join =
+        hpx::parallel::v2::define_spmd_block(
+            par(task),
+                num_images, std::move(bulk_test), c2);
+
+    hpx::wait_all(join);
+
+    delete(c1);
+    delete(c2);
 
     return 0;
 }
