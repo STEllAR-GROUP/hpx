@@ -9,7 +9,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.8.10
+# We require at least CMake V2.8.12
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 # explicitly set certain policies
@@ -50,7 +50,7 @@ endif()
 project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
+set(HPX_MINOR_VERSION 1)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")

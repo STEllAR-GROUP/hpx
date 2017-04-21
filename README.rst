@@ -54,12 +54,12 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.99) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.99/html/index.html>`_.
+The documentation for the latest release of HPX (currently V1.0) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.58027.svg
-     :target: http://dx.doi.org/10.5281/zenodo.58027
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.496187.svg
+     :target: https://doi.org/10.5281/zenodo.496187
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
@@ -68,7 +68,7 @@ single-page version of the documentation
 `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.99) which can be
+(currently HPX V1.0) which can be
 `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
