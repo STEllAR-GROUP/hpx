@@ -6,6 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/parallel/spmd_block.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>

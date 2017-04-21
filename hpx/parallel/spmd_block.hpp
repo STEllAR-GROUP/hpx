@@ -6,11 +6,9 @@
 #if !defined(HPX_PARALLEL_SPMD_BLOCK_HPP)
 #define HPX_PARALLEL_SPMD_BLOCK_HPP
 
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/barrier.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 
 #include <boost/range/irange.hpp>
@@ -18,7 +16,6 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
