@@ -354,11 +354,11 @@ namespace hpx { namespace threads { namespace detail
                             thrd_stat.get_previous() == pending))
                     {
 #if defined(HPX_HAVE_APEX)
-			// get the APEX data pointer, in case we are resuming the
-			// thread and have to restore any leaf timers from
-			// direct actions, etc.
+                        // get the APEX data pointer, in case we are resuming the
+                        // thread and have to restore any leaf timers from
+                        // direct actions, etc.
 
-                        // the address of tmp_data is getting stored 
+                        // the address of tmp_data is getting stored
                         // by APEX during this call
                         util::apex_wrapper apex_profiler(
                             background_thread->get_description(),
@@ -515,8 +515,8 @@ namespace hpx { namespace threads { namespace detail
                                 // get the APEX data pointer, in case we are resuming the
                                 // thread and have to restore any leaf timers from
                                 // direct actions, etc.
-                                
-                                // the address of tmp_data is getting stored 
+
+                                // the address of tmp_data is getting stored
                                 // by APEX during this call
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description(),

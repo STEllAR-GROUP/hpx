@@ -654,8 +654,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         mutable std::size_t m_thread_data;
 #endif
 #if defined(HPX_HAVE_APEX)
-	// This is a pointer that APEX will use to maintain state
-	// when an HPX thread is pre-empted.
+        // This is a pointer that APEX will use to maintain state
+        // when an HPX thread is pre-empted.
         void* m_apex_data;
 #endif
 
