@@ -12,6 +12,7 @@
 
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
 #include <boost/thread/mutex.hpp>
@@ -32,8 +33,6 @@ static boost::shared_mutex init_mutex;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-    static std::size_t allscale_current_desired_active_threads = UINT_MAX;
-
     ///////////////////////////////////////////////////////////////////////////
     /// The throttling_scheduler extends local_queue_scheduler.
     /// The local_queue_scheduler maintains exactly one queue of work
@@ -72,16 +71,14 @@ namespace hpx { namespace threads { namespace policies
 
         throttling_scheduler(init_parameter_type const& init,
                 bool deferred_initialization = true)
-          : base_type(init, deferred_initialization),
-            allscale_current_threads_(init.num_queues_)
+          : base_type(init, deferred_initialization)
         {
-            allscale_current_desired_active_threads = init.num_queues_;
             disabled_os_threads_.resize(hpx::get_os_thread_count());
         }
 
         virtual ~throttling_scheduler()
         {
-            //apex::shutdown_throttling();
+//            enable_more(disabled_os_threads_.size());	   //Does it make sense here?
         }
 
         static std::string get_scheduler_name()
@@ -89,7 +86,7 @@ namespace hpx { namespace threads { namespace policies
             return "throttling_scheduler";
         }
 
-
+	/// Check if the OS thread disabled
         bool disabled(std::size_t shepherd) {
              return disabled_os_threads_[shepherd];
         }
@@ -99,14 +96,12 @@ namespace hpx { namespace threads { namespace policies
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
-	    /*
-		Drain the queue of the suspended OS thread
-	    */
+	    //Drain the queue of the disableed OS thread
             while (disabled(num_thread)) {
                 thread_queue_type* q = queues_[num_thread];
 	        while (q->get_next_thread(thrd)) {
 		      this->wait_or_add_new(num_thread, running, idle_loop_count) ;
-        	      this->schedule_thread(thrd, num_thread, thread_priority_unknown); //TODO: what thread_priority should we use
+        	      this->schedule_thread(thrd, num_thread, thread_priority_unknown); 
 		}
 
 		boost::chrono::milliseconds period(1);
@@ -124,7 +119,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-	    // Loop somehow and find a thread that is not disabled
+	    // Loop and find a thread that is not disabled
             if (std::size_t(-1) == num_thread)
                num_thread = curr_queue_++ % queues_.size();
 	    else 
@@ -143,31 +138,61 @@ namespace hpx { namespace threads { namespace policies
 	    queues_[num_thread]->schedule_thread(thrd);
         }
 
+	/// Disables specific OS thread requested by the user/application
         void disable(std::size_t shepherd) 
 	{
-	        std::cout << "Starting disable. shepherd: " << shepherd << std::endl;
+		std::lock_guard<mutex_type> l(throttle_mtx_);
 		
 		if (disabled(shepherd))
 		    return;
 
 	        if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
-		    std::cout << "Not enough running threads to suspend. size: " << disabled_os_threads_.size() << ", count: " << disabled_os_threads_.count() << std::endl;
 		    return;
 		}
 
-		std::lock_guard<mutex_type> l(throttle_mtx_);
+		const std::size_t wtid = hpx::get_worker_thread_num();
+
+		if (shepherd == wtid)
+		   return;
 
 		if (shepherd >= disabled_os_threads_.size()) {
-		    HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::suspend",
+		    HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::disable",
 			"invalid thread number");
 		}
 
 		if (!disabled(shepherd)) {
 		    disabled_os_threads_[shepherd] = true;
 		}
- 
 	}
 
+	/// Decides itself which OS threads to disable.
+	/// Currently it picks up thread ids sequentially
+        void disable_more(std::size_t num_threads = 1)
+        {
+                std::lock_guard<mutex_type> l(throttle_mtx_);
+
+                if (num_threads >= disabled_os_threads_.size()) {
+                   HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::disable_more",
+                        "invalid number of threads");
+                }
+
+	        if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
+                    return;
+                }
+
+		const std::size_t wtid = hpx::get_worker_thread_num();
+
+                std::size_t cnt = 0;
+                for (std::size_t i=0; i<disabled_os_threads_.size(); i++)
+                    if (!disabled_os_threads_[i] && i != wtid) {
+                       disabled_os_threads_[i] = true;
+                       cnt++;
+                       std::cout << "Disable worker_id: " << i << std::endl;
+                       if (cnt == num_threads) break;
+                    }
+        }
+
+	/// Enable specific OS thread requested by the user/application
  	void enable(std::size_t shepherd) 
 	{
 	        std::lock_guard<mutex_type> l(throttle_mtx_);
@@ -176,7 +201,7 @@ namespace hpx { namespace threads { namespace policies
 		   return;
 
 		if (shepherd >= disabled_os_threads_.size()) {
-		    HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::resume",
+		    HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::enable",
 			"invalid thread number");
 		}
 
@@ -185,35 +210,26 @@ namespace hpx { namespace threads { namespace policies
 	}
 
 
-        void enable_one()
-   	{
-		std::lock_guard<mutex_type> l(throttle_mtx_);
-		if (disabled_os_threads_.any()) { 
-		   for (int i=0; i<disabled_os_threads_.size(); i++)
-		       if (disabled_os_threads_[i]) {
-			  disabled_os_threads_[i] = false;
-			  cond_.notify_one();
-			  std::cout << "Resumed worker_id: " << i << std::endl;
-			  break;
-		       }
-		}
-        }
-
-
-        void enable_all()
+	/// Decides itself which OS threads to enable.
+	/// Currently it picks up thread ids sequentially
+        void enable_more(std::size_t num_threads = 1)
         {
                 std::lock_guard<mutex_type> l(throttle_mtx_);
+
+		std::size_t cnt = 0;
                 if (disabled_os_threads_.any()) {
-                   for (int i=0; i<disabled_os_threads_.size(); i++)
+                   for (std::size_t i=0; i<disabled_os_threads_.size(); i++)
                        if (disabled_os_threads_[i]) {
                           disabled_os_threads_[i] = false;
                           cond_.notify_one();
-                          std::cout << "Resumed worker_id: " << i << std::endl;
+			  cnt++;
+                          std::cout << "Enabled worker_id: " << i << std::endl;
+			  if (cnt == num_threads) break;
                        }
                 }
         }
 
-	
+	/// Return the thread bitset 
 	boost::dynamic_bitset<> const & get_disabled_os_threads()
 	{
 		return disabled_os_threads_;
@@ -222,9 +238,8 @@ namespace hpx { namespace threads { namespace policies
     protected:
 	typedef hpx::lcos::local::spinlock mutex_type;
 	mutex_type throttle_mtx_;
-        std::size_t allscale_current_threads_;
-	boost::dynamic_bitset<> disabled_os_threads_;
-	boost::mutex mtx_;
+	mutable boost::mutex mtx_;
+        mutable boost::dynamic_bitset<> disabled_os_threads_;
     };
 }}}
 
