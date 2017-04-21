@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <functional>
 #include <utility>
+#include <vector>
 
 std::size_t num_images = 10;
 std::size_t iterations = 20;
@@ -44,7 +45,7 @@ int main()
     hpx::parallel::v2::define_spmd_block(
         num_images, std::move(bulk_test), std::ref(c1));
 
-    auto join =
+    std::vector<hpx::future<void>> join =
         hpx::parallel::v2::define_spmd_block(
             par(task),
                 num_images, std::move(bulk_test), std::ref(c2));

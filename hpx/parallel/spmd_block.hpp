@@ -21,6 +21,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -61,8 +62,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         : num_images_(num_images), image_id_(image_id), barrier_(barrier)
         {}
 
-    // Note: spmd_block class is movable/move-assignable
-    // but not copyable/copy-assignable
+        // Note: spmd_block class is movable/move-assignable
+        // but not copyable/copy-assignable
 
         spmd_block(spmd_block &&) = default;
         spmd_block(spmd_block const &) = delete;
@@ -115,7 +116,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         typename = std::enable_if_t<
             hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>
         >
-    std::vector<hpx::future<void> >
+    std::vector<hpx::future<void>>
     define_spmd_block(ExPolicy && policy,
         std::size_t num_images, F && f, Args && ... args)
     {
