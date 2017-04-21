@@ -120,14 +120,9 @@ namespace hpx { namespace threads { namespace coroutines
         }
 
 #if defined(HPX_HAVE_APEX)
-        std::size_t get_apex_data() const
+        void** get_apex_data() const
         {
             return m_pimpl.get() ? m_pimpl->get_apex_data() : 0ull;
-        }
-
-        std::size_t set_apex_data(std::size_t data)
-        {
-            return m_pimpl.get() ? m_pimpl->set_apex_data(data) : 0ull;
         }
 #endif
 

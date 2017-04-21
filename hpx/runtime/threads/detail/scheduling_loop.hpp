@@ -357,12 +357,12 @@ namespace hpx { namespace threads { namespace detail
 			// get the APEX data pointer, in case we are resuming the
 			// thread and have to restore any leaf timers from
 			// direct actions, etc.
-                        std::size_t tmp_data = background_thread->get_apex_data();
+
                         // the address of tmp_data is getting stored 
                         // by APEX during this call
                         util::apex_wrapper apex_profiler(
                             background_thread->get_description(),
-                            &(tmp_data));
+                            background_thread->get_apex_data());
 
                         thrd_stat = (*background_thread)();
 
@@ -374,8 +374,6 @@ namespace hpx { namespace threads { namespace detail
                         {
                             apex_profiler.yield();
                         }
-			// APEX may have saved some data
-                        background_thread->set_apex_data(tmp_data);
 #else
                         thrd_stat = (*background_thread)();
 #endif
@@ -517,12 +515,12 @@ namespace hpx { namespace threads { namespace detail
                                 // get the APEX data pointer, in case we are resuming the
                                 // thread and have to restore any leaf timers from
                                 // direct actions, etc.
-                                std::size_t tmp_data = thrd->get_apex_data();
+                                
                                 // the address of tmp_data is getting stored 
                                 // by APEX during this call
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description(),
-                                    &(tmp_data));
+                                    thrd->get_apex_data());
 
                                 thrd_stat = (*thrd)();
 
@@ -534,8 +532,6 @@ namespace hpx { namespace threads { namespace detail
                                 {
                                     apex_profiler.yield();
                                 }
-				// APEX may have saved some data
-                                thrd->set_apex_data(tmp_data);
 #else
                                 thrd_stat = (*thrd)();
 #endif

@@ -484,16 +484,15 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_APEX)
-        std::size_t get_apex_data() const
+        void** get_apex_data() const
         {
-            return m_apex_data;
-        }
-
-        std::size_t set_apex_data(std::size_t data)
-        {
-            std::size_t olddata = m_apex_data;
-            m_apex_data = data;
-            return olddata;
+            // APEX wants the ADDRESS of a location to store
+            // data.  This storage could be updated asynchronously,
+            // so APEX stores this address, and uses it as a way
+            // to remember state for the HPX thread in-betweeen
+            // calls to apex::start/stop/yield/resume().
+            // APEX will change the value pointed to by the address.
+            return const_cast<void**>(&m_apex_data);
         }
 #endif
 
@@ -655,7 +654,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         mutable std::size_t m_thread_data;
 #endif
 #if defined(HPX_HAVE_APEX)
-        std::size_t m_apex_data;
+	// This is a pointer that APEX will use to maintain state
+	// when an HPX thread is pre-empted.
+        void* m_apex_data;
 #endif
 
         // This is used to generate a meaningful exception trace.

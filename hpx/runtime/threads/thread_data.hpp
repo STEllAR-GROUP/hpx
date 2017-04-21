@@ -546,14 +546,9 @@ namespace hpx { namespace threads
         }
 
 #if defined(HPX_HAVE_APEX)
-        std::size_t get_apex_data() const
+        void** get_apex_data() const
         {
             return coroutine_.get_apex_data();
-        }
-
-        std::size_t set_apex_data(std::size_t data)
-        {
-            return coroutine_.set_apex_data(data);
         }
 #endif
 

@@ -237,20 +237,12 @@ namespace hpx { namespace threads
     }
 
 #if defined(HPX_HAVE_APEX)
-    std::size_t get_self_apex_data()
+    void** get_self_apex_data()
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return 0ull;
         return self->get_apex_data();
-    }
-
-    std::size_t set_self_apex_data(std::size_t data)
-    {
-        thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return 0ull;
-        return self->set_apex_data(data);
     }
 #endif
 }}

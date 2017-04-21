@@ -206,15 +206,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT void reset_self();
 
 #if defined(HPX_HAVE_APEX)
-        std::size_t get_apex_data() const
+        void** get_apex_data() const
         {
             HPX_ASSERT(m_pimpl);
             return m_pimpl->get_apex_data();
-        }
-        std::size_t set_apex_data(std::size_t data)
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->set_apex_data(data);
         }
 #endif
 
