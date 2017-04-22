@@ -61,16 +61,14 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : apex_profiler_(name,
-                reinterpret_cast<std::uint64_t>(hpx::threads::get_self_ptr()))
+          : apex_profiler_(name)
         {}
         template <typename F>
         explicit annotate_function(F && f)
           : apex_profiler_(
                 hpx::traits::get_function_annotation<
                     typename std::decay<F>::type
-                >::call(f),
-                reinterpret_cast<std::uint64_t>(hpx::threads::get_self_ptr()))
+                >::call(f))
         {}
 
     private:
