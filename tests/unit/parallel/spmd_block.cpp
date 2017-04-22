@@ -77,21 +77,17 @@ int main()
             }
         };
 
-    boost::atomic<std::size_t> * c1 = new boost::atomic<std::size_t>(0);
-    boost::atomic<std::size_t> * c2 = new boost::atomic<std::size_t>(0);
+    boost::atomic<std::size_t> c1(0), c2(0);
 
     hpx::parallel::v2::define_spmd_block(
-        num_images, std::move(bulk_test), c1);
+        num_images, std::move(bulk_test), &c1);
 
     std::vector<hpx::future<void>> join =
         hpx::parallel::v2::define_spmd_block(
             par(task),
-                num_images, std::move(bulk_test), c2);
+                num_images, std::move(bulk_test), &c2);
 
     hpx::wait_all(join);
-
-    delete(c1);
-    delete(c2);
 
     return 0;
 }
