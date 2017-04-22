@@ -1384,7 +1384,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v1.1
+    v1.2
     ${_hpx_apex_no_update}
     VERBOSE)
 

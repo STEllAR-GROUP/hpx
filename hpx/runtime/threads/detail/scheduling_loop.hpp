@@ -354,9 +354,15 @@ namespace hpx { namespace threads { namespace detail
                             thrd_stat.get_previous() == pending))
                     {
 #if defined(HPX_HAVE_APEX)
+                        // get the APEX data pointer, in case we are resuming the
+                        // thread and have to restore any leaf timers from
+                        // direct actions, etc.
+
+                        // the address of tmp_data is getting stored
+                        // by APEX during this call
                         util::apex_wrapper apex_profiler(
                             background_thread->get_description(),
-                            reinterpret_cast<std::uint64_t>(background_thread.get()));
+                            background_thread->get_apex_data());
 
                         thrd_stat = (*background_thread)();
 
@@ -506,9 +512,15 @@ namespace hpx { namespace threads { namespace detail
                                 exec_time_wrapper exec_time_collector(idle_rate);
 
 #if defined(HPX_HAVE_APEX)
+                                // get the APEX data pointer, in case we are resuming the
+                                // thread and have to restore any leaf timers from
+                                // direct actions, etc.
+
+                                // the address of tmp_data is getting stored
+                                // by APEX during this call
                                 util::apex_wrapper apex_profiler(
                                     thrd->get_description(),
-                                    reinterpret_cast<std::uint64_t>(thrd));
+                                    thrd->get_apex_data());
 
                                 thrd_stat = (*thrd)();
 
