@@ -241,7 +241,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)
-            return 0ull;
+            return nullptr;
         return self->get_apex_data();
     }
 #endif
