@@ -92,7 +92,7 @@
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
-#define MAX_RANKS 1024
+#define MAX_RANKS 16384
 
 //----------------------------------------------------------------------------
 // Define this to make memory access asynchronous and return a future
