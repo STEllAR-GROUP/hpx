@@ -65,10 +65,8 @@ namespace hpx { namespace util
         {}
         template <typename F>
         explicit annotate_function(F && f)
-          : apex_profiler_(
-                hpx::traits::get_function_annotation<
-                    typename std::decay<F>::type
-                >::call(f), threads::get_self_apex_data())
+          : apex_profiler_(hpx::util::thread_description(f),
+                threads::get_self_apex_data())
         {}
 
     private:
