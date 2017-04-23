@@ -61,7 +61,7 @@ namespace hpx { namespace util
         thread_description(char const* desc) HPX_NOEXCEPT
           : type_(data_type_description)
         {
-            data_.desc_ = desc;
+            data_.desc_ = desc ? desc : "<unknown>";
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -69,7 +69,7 @@ namespace hpx { namespace util
                 util::itt::string_handle const& sh) HPX_NOEXCEPT
           : type_(data_type_description)
         {
-            data_.desc_ = desc;
+            data_.desc_ = desc ? desc : "<unknown>";
             desc_itt_ = sh;
         }
 #endif

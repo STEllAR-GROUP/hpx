@@ -144,10 +144,10 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return value; }                                                 \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(                         \
+        void component_type_database< component>::set(                        \
             components::component_type t) { value = t; }                      \
     }}                                                                        \
 /**/
@@ -177,11 +177,11 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return type; }                                                  \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(components::component_type) \
-            { HPX_ASSERT(false); }                                          \
+        void component_type_database< component>::set(components::component_type)\
+            { HPX_ASSERT(false); }                                            \
     }}                                                                        \
 /**/
 

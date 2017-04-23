@@ -242,10 +242,6 @@ if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
 endif()
 
-if(HPX_WITH_APEX)
-  add_definitions(-DAPEX_HAVE_HPX)   # tell APEX that it runs withing HPX
-endif()
-
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   if (_parcelport_${_plugin}_LIBRARIES)
     target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${_parcelport_${_plugin}_LIBRARIES})

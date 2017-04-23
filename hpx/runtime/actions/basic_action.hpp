@@ -838,7 +838,7 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
-        util::itt::string_handle const& get_action_name_itt<action>()         \
+        util::itt::string_handle const& get_action_name_itt< action>()        \
         {                                                                     \
             static util::itt::string_handle sh(BOOST_PP_STRINGIZE(actionname)); \
             return sh;                                                        \
@@ -853,7 +853,7 @@ namespace hpx { namespace serialization
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                        \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_action_name<action>()                                 \
+        char const* get_action_name< action>()                                \
         {                                                                     \
             return BOOST_PP_STRINGIZE(actionname);                            \
         }                                                                     \
@@ -873,8 +873,8 @@ namespace hpx { namespace serialization
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
-        template struct transfer_action<action>;                              \
-        template struct transfer_continuation_action<action>;                 \
+        template struct transfer_action< action>;                             \
+        template struct transfer_continuation_action< action>;                \
     }}                                                                        \
 /**/
 
@@ -884,8 +884,8 @@ namespace hpx { namespace serialization
 #else
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
     namespace hpx { namespace actions {                                       \
-        extern template struct HPX_EXPORT transfer_action<action>;            \
-        extern template struct HPX_EXPORT transfer_continuation_action<action>;\
+        extern template struct HPX_EXPORT transfer_action< action>;           \
+        extern template struct HPX_EXPORT transfer_continuation_action< action>;\
     }}                                                                        \
 /**/
 #endif
@@ -895,7 +895,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
-        util::itt::string_handle const& get_action_name_itt<action>();        \
+        util::itt::string_handle const& get_action_name_itt< action>();       \
     }}}                                                                       \
 /**/
 #else
@@ -906,17 +906,17 @@ namespace hpx { namespace serialization
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_action_name<action>();                                \
+        char const* get_action_name< action>();                               \
     }}}                                                                       \
     HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                            \
                                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
-        struct is_action<action>                                              \
+        struct is_action< action>                                             \
           : std::true_type                                                    \
         {};                                                                   \
         template <>                                                           \
-        struct needs_automatic_registration<action>                           \
+        struct needs_automatic_registration< action>                          \
           : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
@@ -939,7 +939,7 @@ namespace hpx { namespace serialization
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_stacksize<action>                                       \
+        struct action_stacksize< action>                                      \
         {                                                                     \
             enum { value = size };                                            \
         };                                                                    \
@@ -975,7 +975,7 @@ namespace hpx { namespace serialization
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_priority<action>                                        \
+        struct action_priority< action>                                       \
         {                                                                     \
             enum { value = priority };                                        \
         };                                                                    \

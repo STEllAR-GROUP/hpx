@@ -235,4 +235,14 @@ namespace hpx { namespace threads
         return get_self_id()->get_component_id();
 #endif
     }
+
+#if defined(HPX_HAVE_APEX)
+    void** get_self_apex_data()
+    {
+        thread_self* self = get_self_ptr();
+        if (nullptr == self)
+            return nullptr;
+        return self->get_apex_data();
+    }
+#endif
 }}

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -38,7 +38,7 @@
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"

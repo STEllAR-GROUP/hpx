@@ -114,6 +114,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_phase(0),
 #endif
             m_thread_data(0),
+#if defined(HPX_HAVE_APEX)
+            m_apex_data(0ull),
+#endif
             m_type_info(),
             m_thread_id(id),
             continuation_recursion_count_(0)
@@ -177,6 +180,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             delete_tss_storage(m_thread_data);
 #else
             m_thread_data = 0;
+#endif
+#if defined(HPX_HAVE_APEX)
+            m_apex_data = 0ull;
 #endif
             m_thread_id = nullptr;
         }
@@ -450,6 +456,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
             m_thread_data = 0;
 #endif
+#if defined(HPX_HAVE_APEX)
+            m_apex_data = 0ull;
+#endif
         }
 
         std::size_t get_thread_data() const
@@ -473,6 +482,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return olddata;
 #endif
         }
+
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            // APEX wants the ADDRESS of a location to store
+            // data.  This storage could be updated asynchronously,
+            // so APEX stores this address, and uses it as a way
+            // to remember state for the HPX thread in-betweeen
+            // calls to apex::start/stop/yield/resume().
+            // APEX will change the value pointed to by the address.
+            return const_cast<void**>(&m_apex_data);
+        }
+#endif
 
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data(bool create_if_needed) const
@@ -555,6 +577,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(m_phase == 0);
 #endif
             HPX_ASSERT(m_thread_data == 0);
+#if defined(HPX_HAVE_APEX)
+            HPX_ASSERT(m_apex_data == 0ull);
+#endif
             m_type_info = boost::exception_ptr();
         }
 
@@ -627,6 +652,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         mutable detail::tss_storage* m_thread_data;
 #else
         mutable std::size_t m_thread_data;
+#endif
+#if defined(HPX_HAVE_APEX)
+        // This is a pointer that APEX will use to maintain state
+        // when an HPX thread is pre-empted.
+        void* m_apex_data;
 #endif
 
         // This is used to generate a meaningful exception trace.

@@ -511,6 +511,7 @@ hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)   # tell HPX that we use APEX
+  hpx_add_config_define(APEX_HAVE_HPX)   # tell APEX that we use HPX
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
 endif()
@@ -1081,7 +1082,11 @@ endif()
 if(WIN32)
   if(MSVC)
     enable_language(ASM_MASM)
+
     hpx_add_target_compile_option(-Ox CONFIGURATIONS Release)
+
+    # even VS2017 has an ICE when compiling with -Ob2
+    hpx_add_target_compile_option(-Ob1 CONFIGURATIONS Release)
 
     if(NOT HPX_WITH_AWAIT)
       # /RTC1 is incompatible with /await
@@ -1380,7 +1385,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v1.1
+    v1.2
     ${_hpx_apex_no_update}
     VERBOSE)
 

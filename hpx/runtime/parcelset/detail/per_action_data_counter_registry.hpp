@@ -98,8 +98,8 @@ namespace hpx { namespace parcelset { namespace detail
 #define HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(Action)                    \
     namespace hpx { namespace parcelset { namespace detail                    \
     {                                                                         \
-        template register_per_action_data_counters<Action>                    \
-            register_per_action_data_counters<Action>::instance;              \
+        template register_per_action_data_counters< Action>                   \
+            register_per_action_data_counters< Action>::instance;             \
     }}}                                                                       \
 /**/
 

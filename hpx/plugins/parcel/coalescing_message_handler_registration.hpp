@@ -54,12 +54,12 @@ namespace hpx { namespace parcelset
     namespace hpx { namespace parcelset                                       \
     {                                                                         \
         template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_action_coalescing_name<Action>()                      \
+        char const* get_action_coalescing_name< Action>()                     \
         {                                                                     \
             return coalescing_name;                                           \
         }                                                                     \
-        template register_coalescing_for_action<Action>                       \
-            register_coalescing_for_action<Action>::instance_;                \
+        template register_coalescing_for_action< Action>                      \
+            register_coalescing_for_action< Action>::instance_;               \
     }}                                                                        \
 /**/
 
@@ -96,7 +96,7 @@ namespace hpx { namespace parcelset
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_message_handler<action_type>                            \
+        struct action_message_handler< action_type>                           \
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
                 parcelset::parcelhandler* ph, parcelset::locality const& loc, \
@@ -154,7 +154,7 @@ namespace hpx { namespace parcelset
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_message_handler<action_type>                            \
+        struct action_message_handler< action_type>                           \
         {                                                                     \
             static parcelset::policies::message_handler* call(                \
                 parcelset::parcelhandler* ph, parcelset::locality const& loc, \
