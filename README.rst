@@ -58,8 +58,8 @@ The documentation for the latest release of HPX (currently V1.0) can be
 `found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.496187.svg
-     :target: https://doi.org/10.5281/zenodo.496187
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
+     :target: https://doi.org/10.5281/zenodo.556772
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
