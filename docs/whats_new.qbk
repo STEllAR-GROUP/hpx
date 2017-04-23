@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2016 Hartmut Kaiser
+    Copyright (C) 2007-2017 Hartmut Kaiser
     Copyright (c) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 [section:whats_new What's New]
 
 [//////////////////////////////////////////////////////////////////////////////]
-[section:hpx_1_0_0 __hpx__ V1.0]
+[section:hpx_1_0_0 __hpx__ V1.0  (Apr 24, 2017)]
 
 [heading General Changes]
 
@@ -71,6 +71,10 @@ particular order):
 * Extended and improved the use of the ITTNotify hooks allowing to collect
   performance counter data and function annotation information from within the
   Intel Amplifier tool.
+* For APEX< this release includes OTF2 support, updated TAU integration, enhanced
+  support for HPX threads calling direct actions, updated policy support, updated
+  HPX counter integration, HPX send/recv measurement, new scatterplot output, and
+  performance optimizations and bug fixes.
 
 [heading Breaking Changes]
 
@@ -94,6 +98,48 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2596] - Adding apex data
+* [pr    2595] - Remove obsolete file
+* [issue 2594] - FindOpenCL.cmake mismatch with the official cmake module
+* [pr    2592] - First attempt to introduce spmd_block in hpx
+* [issue 2591] - Feature request: continuation (then) which does not require
+                 the callable object to take a future<R> as parameter
+* [pr    2588] - Daint fixes
+* [pr    2587] - Fixing transfer_(continuation)_action::schedule
+* [pr    2585] - Work around MSVC having an ICE when compiling with -Ob2
+* [pr    2583] - chaning 7zip command to 7za in roll_release.sh
+* [pr    2582] - First attempt to introduce spmd_block in hpx
+* [pr    2581] - Enable annotated function for parallel algorithms
+* [pr    2580] - First attempt to introduce spmd_block in hpx
+* [pr    2579] - Make thread NICE level setting an option
+* [pr    2578] - Implementing enqueue instead of busy wait when no sender is
+                 available
+* [pr    2577] - Retrieve -std=c++11 consistent nvcc flag
+* [pr    2576] - Add missing dependencies of cuda based tests
+* [pr    2575] - Remove warnings due to some captured variables
+* [pr    2573] - Attempt to resolve resolve_locality
+* [pr    2572] - Adding APEX hooks to background thread
+* [pr    2571] - Pick up hpx.ignore_batch_env from config map
+* [pr    2570] - Add commandline options --hpx:print-counters-locally
+* [pr    2569] - Fix computeapi unit tests
+* [pr    2567] - This adds another barrier::synchronize before registering
+                 performance counters
+* [pr    2564] - Cray static toolchain support
+* [pr    2563] - Fixed unhandled exception during startup
+* [pr    2562] - Remove partitioned_vector.cu from build tree when nvcc is used
+* [issue 2561] - octo-tiger crash with commit 6e921495ff6c26f125d62629cbaad0525f14f7ab
+* [pr    2560] - Prevent -Wundef warnings on Vc version checks
+* [pr    2559] - Allowing CUDA callback to set the future directly from an OS
+                 thread
+* [pr    2558] - Remove warnings due to float precisions
+* [pr    2557] - Removing bogus handling of compile flags for CUDA
+* [pr    2556] - Fixing scan partitioner
+* [pr    2554] - Add more diagnostics to error thrown from find_appropriate_destination
+* [issue 2555] - No valid parcelport configured
+* [pr    2553] - Add cmake cuda_arch option
+* [pr    2552] - Remove incomplete datapar bindings to libflatarray
+* [pr    2551] - Rename hwloc_topology to hwloc_topology_info
+* [pr    2550] - Apex api updates
 * [pr    2549] - Pre-include defines.hpp to get the macro HPX_HAVE_CUDA value
 * [pr    2548] - Fixing issue with disconnect
 * [pr    2546] - Some fixes around cuda clang partitioned_vector example
@@ -103,10 +149,12 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2541] - avoid recompiles when enabling/disabling examples
 * [pr    2540] - Fixing usage of target_link_libraries()
 * [pr    2539] - fix RPATH behaviour
+* [issue 2538] - HPX_WITH_CUDA corrupts compilation flags
 * [pr    2537] - Add output of a Bazel Skylark extension for paths and compile
                  options
 * [pr    2536] - Add counter exposing total available memory to Windows as well
 * [pr    2535] - Remove obsolete support for security
+* [issue 2534] - Remove command line option `--hpx:run-agas-server`
 * [pr    2533] - Pre-cache locality endpoints during bootstrap
 * [pr    2532] - Fixing handling of GIDs during serialization preprocessing
 * [pr    2531] - Amend uses of the term "functor"
@@ -134,6 +182,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2512] - MPI Parcelport improvements and fixes related to the background
                  work changes
 * [pr    2511] - Fixing bit-wise (zero-copy) serialization
+* [issue 2509] - Linking errors in hwloc_topology
 * [pr    2508] - Added documentation for debugging with core files
 * [pr    2506] - Fixing background work invocations
 * [pr    2505] - Fix tuple serialization
@@ -154,6 +203,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2492] - Adding new command line option --hpx:print-counter-reset
 * [pr    2491] - Resolve ambiguities when compiling with APEX
 * [pr    2490] - Resuming threads waiting on future with higher priority
+* [issue 2489] - nvcc issue because -std=c++11 appears twice
 * [pr    2488] - Adding performance counters exposing the internal idle and
                  busy-loop counters
 * [pr    2487] - Allowing for plain suspend to reschedule thread right away
@@ -253,6 +303,7 @@ Here is a list of the important tickets we closed for this release.
                  category
 * [issue 2396] - BOOST_ROOT paths are not used at link time
 * [pr    2395] - Fix target_link_libraries() issue when HPX Cuda is enabled
+* [issue 2394] - Template compilation error using HPX_WITH_DATAPAR_LIBFLATARRAY
 * [pr    2393] - Fixing lock registration for recursive mutex
 * [pr    2392] - Add keywords in target_link_libraries in hpx_setup_target
 * [pr    2391] - Clang goroutines

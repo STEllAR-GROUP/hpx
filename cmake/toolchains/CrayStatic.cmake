@@ -41,13 +41,6 @@ set(HPX_WITH_PARCELPORT_TCP OFF CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED ON CACHE BOOL "")
 
-# Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
-# right hints
-set(TBBMALLOC_PLATFORM "mic-knl" CACHE STRING "")
-
-# We have a bunch of cores on the MIC ... increase the default
-set(HPX_WITH_MAX_CPU_COUNT "512" CACHE STRING "")
-
 # We do a cross compilation here ...
 set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
 

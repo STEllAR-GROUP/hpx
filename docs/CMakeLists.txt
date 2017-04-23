@@ -234,7 +234,7 @@ if(BOOSTAUTOINDEX_FOUND)
 endif()
 
 set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
@@ -330,8 +330,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=562
-                boost.image.h=104
+                boost.image.w=564
+                boost.image.h=102
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

@@ -132,6 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t /*part_index*/)
             {
                 hpx::util::annotate_function annotate(f_);
+                (void)annotate;     // suppress warning about unused variable
                 return execute(part_begin, part_size);
             }
         };

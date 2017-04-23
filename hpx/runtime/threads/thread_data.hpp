@@ -545,6 +545,13 @@ namespace hpx { namespace threads
             return coroutine_.set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            return coroutine_.get_apex_data();
+        }
+#endif
+
         void rebind(thread_init_data& init_data,
             thread_state_enum newstate)
         {
@@ -718,7 +725,7 @@ namespace hpx { namespace threads
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
-        //reference count
+        // reference count
         util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;

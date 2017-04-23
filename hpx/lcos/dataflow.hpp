@@ -229,6 +229,7 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE void done()
         {
             hpx::util::annotate_function annotate(func_);
+            (void)annotate;     // suppress warning about unused variable
             execute(indices_type(), is_void());
         }
 
