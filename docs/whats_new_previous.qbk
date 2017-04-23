@@ -93,6 +93,10 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2596] - Adding apex data
+* [pr    2595] - Remove obsolete file
+* [issue 2594] - FindOpenCL.cmake mismatch with the official cmake module
+* [pr    2592] - First attempt to introduce spmd_block in hpx
 * [issue 2591] - Feature request: continuation (then) which does not require
                  the callable object to take a future<R> as parameter
 * [pr    2588] - Daint fixes
