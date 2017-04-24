@@ -440,7 +440,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
             lazy_values_.begin(),
-            detail::wait_get_shared_state<Future>());
+            traits::detail::wait_get_shared_state<Future>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
