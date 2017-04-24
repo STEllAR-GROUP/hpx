@@ -33,7 +33,7 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::parallel::transform_exclusive_scan(policy,
@@ -59,7 +59,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::future<void> f =

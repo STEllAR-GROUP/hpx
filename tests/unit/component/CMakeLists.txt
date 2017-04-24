@@ -42,6 +42,14 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
      )
 endif()
 
+# add dependencies to partitioned_vector_target when Cuda is enabled
+if(HPX_WITH_CUDA)
+  include_directories(${CUDA_INCLUDE_DIRS})
+
+  set(partitioned_vector_target_FLAGS
+      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+endif()
+
 # add executable needed for launch_process_test
 add_hpx_executable(launched_process_test
   SOURCES launched_process.cpp

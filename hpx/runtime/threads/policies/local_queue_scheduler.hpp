@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,10 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -20,6 +23,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -47,12 +51,11 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class local_queue_scheduler : public scheduler_base
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT local_queue_scheduler : public scheduler_base
     {
     protected:
         // The maximum number of active threads this thread manager should
@@ -316,7 +319,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -365,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -394,7 +397,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -415,7 +418,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     thread_queue_type* q = queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();
@@ -812,5 +815,6 @@ namespace hpx { namespace threads { namespace policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif
 

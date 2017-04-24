@@ -47,7 +47,8 @@ namespace hpx { namespace detail
         {
             if (id.get_management_type() == naming::id_type::managed)
             {
-                unmanaged_id_ = naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+                unmanaged_id_ = naming::id_type(
+                    id.get_gid(), naming::id_type::unmanaged);
                 target_is_managed_ = true;
             }
         }

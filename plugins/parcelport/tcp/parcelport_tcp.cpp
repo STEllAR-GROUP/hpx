@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/traits/plugin_config_data.hpp>
 
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
@@ -41,3 +43,5 @@ namespace hpx { namespace traits
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::tcp::connection_handler,
     tcp);
+
+#endif

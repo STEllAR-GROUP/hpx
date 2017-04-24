@@ -116,6 +116,7 @@ dispatched_work(hpx::lcos::channel<int> jobs, hpx::lcos::channel<> done)
     {
         hpx::error_code ec(hpx::lightweight);
         int job = jobs.get(hpx::launch::sync, ec);
+        (void)job;
 
         if (!ec)
         {
@@ -168,6 +169,7 @@ void channel_range(hpx::id_type const& loc)
 
     for (auto const& elem : queue)
     {
+        (void)elem;
         ++received_elements;
     }
 
@@ -186,6 +188,7 @@ void channel_range_void(hpx::id_type const& loc)
 
     for (auto const& elem : queue)
     {
+        (void)elem;
         ++received_elements;
     }
 
@@ -215,6 +218,7 @@ void closed_channel_get(hpx::id_type const& loc)
         c.close();
 
         int value = c.get(hpx::launch::sync);
+        (void)value;
         HPX_TEST(false);
     }
     catch(hpx::exception const&) {
@@ -235,6 +239,7 @@ void closed_channel_get_generation(hpx::id_type const& loc)
 
         int value = c.get(hpx::launch::sync, 123); // asking for generation 123
         HPX_TEST(false);
+        (void)value;
     }
     catch(hpx::exception const&) {
         caught_exception = true;

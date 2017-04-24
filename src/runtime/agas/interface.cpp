@@ -366,6 +366,10 @@ naming::id_type get_console_locality(
     error_code& ec
     )
 {
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
+        return naming::invalid_id;
+
     naming::gid_type console;
     naming::get_agas_client().get_console_locality(console, ec);
     if (ec) return naming::invalid_id;
@@ -375,7 +379,8 @@ naming::id_type get_console_locality(
 
 std::uint32_t get_locality_id(error_code& ec)
 {
-    if (get_runtime_ptr() == nullptr)
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
         return naming::invalid_locality_id;
 
     naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
@@ -388,7 +393,8 @@ naming::gid_type get_next_id(
   , error_code& ec
     )
 {
-    if (get_runtime_ptr() == nullptr)
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");

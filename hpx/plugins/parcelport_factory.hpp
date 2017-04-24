@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,7 +79,7 @@ namespace hpx { namespace plugins
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
                 util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
-            fillini += "enable = 1";
+            fillini += "enable = $[hpx.parcel.enable]";
 
             std::string name_uc = boost::to_upper_copy(name);
             // basic parcelport configuration ...

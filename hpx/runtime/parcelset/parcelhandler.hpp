@@ -195,7 +195,7 @@ namespace hpx { namespace parcelset
         void put_parcel(parcel p, write_handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no
-        /// callback functor is provided by the user.
+        /// callback is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
@@ -233,7 +233,7 @@ namespace hpx { namespace parcelset
         void put_parcels(std::vector<parcel> p, std::vector<write_handler_type> f);
 
         /// This put_parcel() function overload is asynchronous, but no
-        /// callback functor is provided by the user.
+        /// callback is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
@@ -345,18 +345,6 @@ namespace hpx { namespace parcelset
         // operations (nanoseconds)
         std::int64_t get_receiving_serialization_time(
             std::string const& pp_type, bool reset) const;
-
-#if defined(HPX_HAVE_SECURITY)
-        // the total time it took for all sender-side security operations
-        // (nanoseconds)
-        std::int64_t get_sending_security_time(
-            std::string const& pp_type, bool reset) const;
-
-        // the total time it took for all receiver-side security
-        // operations (nanoseconds)
-        std::int64_t get_receiving_security_time(
-            std::string const& pp_type, bool reset) const;
-#endif
 
         // total data sent (bytes)
         std::int64_t get_data_sent(

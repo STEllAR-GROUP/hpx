@@ -12,9 +12,13 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/util/interval_timer.hpp>
+#include <hpx/util/itt_notify.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <map>
+#endif
 #include <string>
 #include <vector>
 
@@ -30,9 +34,10 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
+            std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest,
             std::string const& form, std::vector<std::string> const& shortnames,
-            bool csv_header);
+            bool csv_header, bool print_counters_locally);
 
         void start();
         void stop_evaluating_counters();
@@ -49,11 +54,11 @@ namespace hpx { namespace util
         void find_counters();
 
         bool print_raw_counters(bool destination_is_cout, bool reset,
-            char const* description,
+            bool no_output, char const* description,
             std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
         bool print_array_counters(bool destination_is_cout, bool reset,
-            char const* description,
+            bool no_output, char const* description,
             std::vector<performance_counters::counter_info> const& infos,
             error_code& ec);
 
@@ -62,16 +67,16 @@ namespace hpx { namespace util
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream, typename Future>
-        void print_values(Stream& output, std::vector<Future> &&,
+        void print_values(Stream* output, std::vector<Future> &&,
             std::vector<std::size_t> && indicies,
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
-        void print_value(Stream& out, std::string const& name,
+        void print_value(Stream* out, std::string const& name,
             performance_counters::counter_value const& value,
             std::string const& uom);
         template <typename Stream>
-        void print_value(Stream& out, std::string const& name,
+        void print_value(Stream* out, std::string const& name,
             performance_counters::counter_values_array const& value,
             std::string const& uom);
 
@@ -80,10 +85,10 @@ namespace hpx { namespace util
             std::string const& name);
 
         template <typename Stream>
-        void print_value_csv(Stream& out,
+        void print_value_csv(Stream* out, std::string const& name,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value_csv(Stream& out,
+        void print_value_csv(Stream* out, std::string const& name,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
@@ -95,14 +100,20 @@ namespace hpx { namespace util
         mutex_type mtx_;
 
         std::vector<std::string> names_;
+        std::vector<std::string> reset_names_;
         performance_counters::performance_counter_set counters_;
 
         std::string destination_;
         std::string format_;
         std::vector<std::string> counter_shortnames_;
         bool csv_header_;
+        bool print_counters_locally_;
 
         interval_timer timer_;
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        std::map<std::string, util::itt::counter> itt_counters_;
+#endif
     };
 }}
 

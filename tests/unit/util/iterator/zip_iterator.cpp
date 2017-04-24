@@ -44,8 +44,8 @@ int main(void)
 {
     category_test();
 
-    size_t num_successful_tests = 0;
-    size_t num_failed_tests = 0;
+//     size_t num_successful_tests = 0;
+//     size_t num_failed_tests = 0;
 
     /////////////////////////////////////////////////////////////////////////////
     //

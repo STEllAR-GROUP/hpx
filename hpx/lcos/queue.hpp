@@ -54,8 +54,8 @@ namespace hpx { namespace lcos
                 lcos::base_lco_with_value<ValueType, RemoteType>::get_value_action
             action_type;
 
-            HPX_ASSERT(this->get_gid());
-            return hpx::async<action_type>(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            return hpx::async<action_type>(this->get_id());
         }
 
         future<void> set_value(RemoteType && val)
@@ -64,8 +64,8 @@ namespace hpx { namespace lcos
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
 
-            HPX_ASSERT(this->get_gid());
-            return hpx::async<action_type>(this->get_gid(), std::move(val));
+            HPX_ASSERT(this->get_id());
+            return hpx::async<action_type>(this->get_id(), std::move(val));
         }
 
         future<void> set_value(RemoteType val)
@@ -74,18 +74,18 @@ namespace hpx { namespace lcos
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
 
-            HPX_ASSERT(this->get_gid());
-            return hpx::async<action_type>(this->get_gid(), std::move(val));
+            HPX_ASSERT(this->get_id());
+            return hpx::async<action_type>(this->get_id(), std::move(val));
         }
 
         future<void> abort_pending()
         {
             typedef lcos::base_lco::set_exception_action action_type;
 
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             boost::exception_ptr exception =
                 HPX_GET_EXCEPTION(hpx::no_success, "queue::abort_pending", "");
-            return hpx::async<action_type>(this->get_gid(), exception);
+            return hpx::async<action_type>(this->get_id(), exception);
         }
 
         ///////////////////////////////////////////////////////////////////////

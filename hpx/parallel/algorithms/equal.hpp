@@ -19,6 +19,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/range/functions.hpp>
 
@@ -115,6 +116,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         util::loop_n<ExPolicy>(
                             it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
@@ -290,6 +293,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         util::loop_n<ExPolicy>(
                             it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)

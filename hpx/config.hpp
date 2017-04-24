@@ -391,7 +391,7 @@
 // Count number of busy thread manager loop executions before forcefully
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
-#  define HPX_BUSY_LOOP_COUNT_MAX 200000
+#  define HPX_BUSY_LOOP_COUNT_MAX 2000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -460,7 +460,7 @@
 #    if defined(HPX_DEBUG)
 #      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
-#      if defined(__powerpc__)
+#      if defined(__powerpc__) || defined(__INTEL_COMPILER)
 #         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #      else
 #         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte

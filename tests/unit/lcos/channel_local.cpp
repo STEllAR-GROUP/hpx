@@ -109,6 +109,7 @@ void dispatch_work()
             {
                 hpx::error_code ec(hpx::lightweight);
                 int next = jobs.get(hpx::launch::sync, ec);
+                (void)next;
                 if (!ec)
                 {
                     ++received_jobs;
@@ -147,6 +148,7 @@ void channel_range()
 
     for (auto const& elem : queue)
     {
+        (void)elem;
         ++received_elements;
     }
 
@@ -165,6 +167,7 @@ void channel_range_void()
 
     for (auto const& elem : queue)
     {
+        (void)elem;
         ++received_elements;
     }
 
@@ -179,6 +182,7 @@ void deadlock_test()
         hpx::lcos::local::channel<int> c;
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
+        (void)value;
     }
     catch(hpx::exception const&) {
         caught_exception = true;
@@ -195,6 +199,7 @@ void closed_channel_get()
 
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
+        (void)value;
     }
     catch(hpx::exception const&) {
         caught_exception = true;
@@ -214,6 +219,7 @@ void closed_channel_get_generation()
 
         int value = c.get(hpx::launch::sync, 123); // asking for generation 123
         HPX_TEST(false);
+        (void)value;
     }
     catch(hpx::exception const&) {
         caught_exception = true;

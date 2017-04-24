@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
@@ -13,6 +13,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/thread/mutex.hpp>
@@ -35,6 +36,8 @@ namespace hpx { namespace util
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
+        LPROGRESS_ << pool_name;
+
         if (pool_size == 0)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -61,6 +64,8 @@ namespace hpx { namespace util
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
+        LPROGRESS_ << pool_name;
+
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
             io_services_.emplace_back(new boost::asio::io_service);

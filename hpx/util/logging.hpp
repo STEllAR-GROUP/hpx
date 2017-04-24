@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,21 @@
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
+#include <boost/current_function.hpp>
+
 HPX_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
+
+///////////////////////////////////////////////////////////////////////////////
+// specific logging
+#define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
+#define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
+#define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
+#define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
+#define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
+#define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
+#define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
+#define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
+#define LSEC_(lvl)  LHPX_(lvl, " [SEC] ")   /* security */
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -64,6 +78,11 @@ namespace hpx { namespace util
         HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                  \
             hpx::util::timing_level(), lvl)                                   \
         << hpx::util::levelname(::hpx::util::logging::level::lvl) << " "      \
+    /**/
+    #define LPROGRESS_                                                        \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::timing_logger(),                  \
+            hpx::util::timing_level(), fatal) << " "                          \
+        << __FILE__ << ":" << __LINE__ << " " << BOOST_CURRENT_FUNCTION << " "\
     /**/
 
     #define LTIM_ENABLED(lvl)                                                 \
@@ -209,6 +228,19 @@ namespace hpx { namespace util
             hpx::util::logging::level::error))                                \
 /**/
 
+// helper type to forward logging during bootstrap to two destinations
+struct bootstrap_logging { constexpr bootstrap_logging() {} };
+
+template <typename T>
+bootstrap_logging const& operator<< (bootstrap_logging const& l, T const& t)
+{
+    LBT_(info) << t;
+    LPROGRESS_ << t;
+    return l;
+}
+
+constexpr bootstrap_logging lbt_;
+
 #else
 // logging is disabled all together
 
@@ -219,15 +251,28 @@ namespace hpx { namespace util { namespace detail
     // with logging specific data
     HPX_EXPORT std::vector<std::string> get_logging_data();
 
-    struct dummy_log_impl {};
-    HPX_EXPORT extern dummy_log_impl dummy_log;
+    struct dummy_log_impl { constexpr dummy_log_impl() {} };
+    constexpr dummy_log_impl dummy_log;
 
     template <typename T>
-    inline dummy_log_impl& operator<<(dummy_log_impl& l, T&&) { return l; }
+    dummy_log_impl const& operator<<(dummy_log_impl const& l, T&&)
+    {
+        return l;
+    }
+
+    struct bootstrap_logging { constexpr bootstrap_logging() {} };
+    constexpr bootstrap_logging lbt_;
+
+    template <typename T>
+    bootstrap_logging const& operator<< (bootstrap_logging const& l, T&&)
+    {
+        return l;
+    }
 
     #define LAGAS_(lvl)           if(true) {} else hpx::util::detail::dummy_log
     #define LPT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
     #define LTIM_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LPROGRESS_            if(true) {} else hpx::util::detail::dummy_log
     #define LHPX_(lvl, cat)       if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LDEB_                 if(true) {} else hpx::util::detail::dummy_log
@@ -250,19 +295,6 @@ namespace hpx { namespace util { namespace detail
 }}}
 
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-// specific logging
-#define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
-#define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
-#define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
-#define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
-#define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
-#define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
-#define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
-#define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
-#define LSEC_(lvl)  LHPX_(lvl, " [SEC] ")   /* security */
-
 #endif
 
 

@@ -91,11 +91,25 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).
-        HPX_EXPORT bool notify_one(
-            std::unique_lock<mutex_type> lock, error_code& ec = throws);
+        HPX_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
+            threads::thread_priority priority, error_code& ec = throws);
 
-        HPX_EXPORT void notify_all(
-            std::unique_lock<mutex_type> lock, error_code& ec = throws);
+        HPX_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
+            threads::thread_priority priority, error_code& ec = throws);
+
+        bool notify_one(std::unique_lock<mutex_type> lock,
+            error_code& ec = throws)
+        {
+            return notify_one(std::move(lock),
+                threads::thread_priority_default, ec);
+        }
+
+        void notify_all(std::unique_lock<mutex_type> lock,
+            error_code& ec = throws)
+        {
+            return notify_all(std::move(lock),
+                threads::thread_priority_default, ec);
+        }
 
         HPX_EXPORT void abort_all(
             std::unique_lock<mutex_type> lock);

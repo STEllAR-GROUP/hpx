@@ -19,11 +19,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/capability.hpp>
-#include <hpx/components/security/certificate.hpp>
-#include <hpx/components/security/signed_type.hpp>
-#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -262,9 +257,6 @@ namespace hpx { namespace applier
 
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm)
       : parcel_handler_(ph), thread_manager_(tm)
-#if defined(HPX_HAVE_SECURITY)
-      , verify_capabilities_(false)
-#endif
     {}
 
     void applier::initialize(std::uint64_t rts, std::uint64_t mem)

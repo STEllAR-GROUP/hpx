@@ -70,8 +70,6 @@ namespace hpx { namespace actions {
             auto result = util::invoke(std::forward<F>(f),
                 std::forward<Ts>(vs)...);
 
-            typedef typename hpx::util::decay<decltype(result)>::type future_type;
-
             deferred_trigger trigger;
 
             if(result.is_ready())

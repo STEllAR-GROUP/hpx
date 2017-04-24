@@ -110,15 +110,20 @@ namespace hpx { namespace compute { namespace cuda
         }
 
     public:
+
 #if defined(__CUDA_ARCH__)
         HPX_DEVICE operator T*() const
         {
             return this->base();
         }
 #else
-        explicit operator T*() const
+        // Note : need to define implicit cast at host_side because of invoke()
+        //        which is defined host_device. This function should never be
+        //        executed.
+        HPX_HOST operator T*() const
         {
-            return this->base();
+            HPX_ASSERT(false);
+            return nullptr;
         }
 
     private:

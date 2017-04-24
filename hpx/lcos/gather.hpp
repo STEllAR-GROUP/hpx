@@ -144,6 +144,7 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -251,6 +252,7 @@ namespace hpx { namespace lcos
             return async(action_type(), id, site, result.get()).then(
                 [id](hpx::future<std::vector<T> > && f)
                 {
+                    HPX_UNUSED(id);
                     return f.get();
                 });
         }

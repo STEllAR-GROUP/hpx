@@ -7,7 +7,7 @@
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
@@ -25,8 +25,8 @@ namespace hpx { namespace iostreams { namespace detail
 {
     struct buffer
     {
-    private:
-        typedef lcos::local::spinlock mutex_type;
+    protected:
+        typedef lcos::local::recursive_mutex mutex_type;
 
     public:
         buffer()
@@ -64,13 +64,22 @@ namespace hpx { namespace iostreams { namespace detail
         bool empty() const
         {
             std::lock_guard<mutex_type> l(mtx_);
+            return empty_locked();
+        }
+
+        bool empty_locked() const
+        {
             return !data_.get() || data_->empty();
         }
 
         buffer init()
         {
             std::lock_guard<mutex_type> l(mtx_);
+            return init_locked();
+        }
 
+        buffer init_locked()
+        {
             buffer b;
             boost::swap(b.data_, data_);
             return b;
@@ -112,6 +121,7 @@ namespace hpx { namespace iostreams { namespace detail
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
+    protected:
         mutable mutex_type mtx_;
     };
 }}}

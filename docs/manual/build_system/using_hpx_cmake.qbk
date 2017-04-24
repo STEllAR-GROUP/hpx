@@ -108,7 +108,7 @@ After adding the component, the way you add the executable is as follows:
     add_hpx_executable(hello_world
         ESSENTIAL
         SOURCES hello_world_client.cpp
-        COMPONENT_DEPENDENCIES hello_world_component)
+        COMPONENT_DEPENDENCIES hello_world)
 ``
 
 When you configure your application, all you need to do is set the

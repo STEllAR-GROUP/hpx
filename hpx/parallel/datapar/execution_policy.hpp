@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR dataseq_policy() {}
+        HPX_CONSTEXPR dataseq_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new dataseq_task_policy.
@@ -453,7 +453,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
     };
 
     /// Default sequential execution policy object.
-    static dataseq_policy HPX_CONSTEXPR_OR_CONST dataseq;
+    HPX_STATIC_CONSTEXPR dataseq_policy dataseq;
 
     /// The class dataseq_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -767,7 +767,7 @@ namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR datapar_policy() {}
+        HPX_CONSTEXPR datapar_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new datapar_policy referencing a chunk size.
@@ -1368,8 +1368,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         execution::datapar_policy_shim<Executor, Parameters>;
 
     ///////////////////////////////////////////////////////////////////////////
-    static dataseq_execution_policy HPX_CONSTEXPR_OR_CONST dataseq_execution;
-    static datapar_execution_policy HPX_CONSTEXPR_OR_CONST datapar_execution;
+    HPX_STATIC_CONSTEXPR dataseq_execution_policy dataseq_execution;
+    HPX_STATIC_CONSTEXPR datapar_execution_policy datapar_execution;
 }}}
 #endif
 

@@ -8,10 +8,24 @@ set(example_programs)
 
 if(HPX_WITH_CUDA)
   set(example_programs ${example_programs}
+      cublas_matmul
       data_copy
       hello_compute
-      partitioned_vector
     )
+
+# Append example programs that only compiles with Cuda Clang
+  if(HPX_WITH_CUDA_CLANG)
+    list(APPEND example_programs
+         partitioned_vector
+        )
+  endif()
+
+  include_directories(${CUDA_INCLUDE_DIRS})
+
+  set(cublas_matmul_FLAGS
+      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+
+  set(cublas_matmul_CUDA Off)
   set(data_copy_CUDA On)
   set(hello_compute_CUDA On)
   set(partitioned_vector_CUDA ON)

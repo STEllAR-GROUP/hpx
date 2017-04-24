@@ -88,6 +88,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first, std::distance(first, last),
                     [op, policy](FwdIter part_begin, std::size_t part_size) -> T
                     {
+                        HPX_UNUSED(policy);
+
                         T ret = *part_begin;
                         if(part_size > 1)
                         {
@@ -104,6 +106,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     hpx::util::unwrapped(
                         [op, policy](std::vector<T>&& results) -> T
                         {
+                            HPX_UNUSED(policy);
+
                             T ret = *results.begin();
                             if(results.size() > 1)
                             {

@@ -60,6 +60,11 @@ by section basis below.
     lock_detection = ${HPX_LOCK_DETECTION:0}
     throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}
     minimal_deadlock_detection = <debug>
+    spinlock_deadlock_detection = <debug>
+    spinlock_deadlock_detection_limit = ${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}
+    max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
+    max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
+    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -115,6 +120,32 @@ by section basis below.
       RelWithDebInfo, RelMinSize builds), this setting is effective only if
       `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
+    [[`hpx.spinlock_deadlock_detection`]
+     [This setting verifies that spinlocks don't spin longer than specified using
+      the `hpx.spinlock_deadlock_detection_limit`. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1` (for Debug builds) or to `0` (for Release,
+      RelWithDebInfo, RelMinSize builds).]]
+    [[`hpx.spinlock_deadlock_detection_limit`]
+     [This setting specifies the upper limit of allowed number of spins that
+      spinlocks are allowed to perform. This setting is applicable only
+      if `HPX_WITH_SPINLOCK_DEADLOCK_DETECTION` is set during configuration in
+      CMake. By default this is set to `1000000`.]]
+    [[`hpx.max_background_threads`]
+     [This setting defines the number of threads in the scheduler which are used
+      to execute background work. By default this is the same as the number of
+      cores used for the scheduler.]]
+    [[`hpx.max_idle_loop_count`]
+     [This setting defines the maximum value of the idle-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_IDLE_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+    [[`hpx.max_busy_loop_count`]
+     [This setting defines the maximum value of the busy-loop counter in the
+      scheduler. By default this is defined by the preprocessor constant
+      `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
+      change only if you know exactly what you are doing.]]
+
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
       Set by default to the value of the compile time preprocessor constant
@@ -164,6 +195,47 @@ by section basis below.
     [[`hpx.threadpools.timer_pool_size`]
      [The value of this property defines the number of OS-threads created for
       the internal timer thread pool.]]
+]
+
+['[*The `hpx.thread_queue` Configuration Section]]
+
+[important These setting control internal values used by the thread scheduling
+    queues in the __hpx__ scheduler. You should not modify these settings except
+    if you know exactly what you are doing]
+
+[teletype]
+``
+    [hpx.thread_queue]
+    min_tasks_to_steal_pending = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}
+    min_tasks_to_steal_staged = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}
+    min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}
+    max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}
+    max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}
+``
+[c++]
+
+[table:ini_hpx_thread_queue
+    [[Property]                 [Description]]
+    [[`hpx.thread_queue.min_tasks_to_steal_pending`]
+     [The value of this property defines the number of pending __hpx__ threads
+      which have to be available before neighboring cores are allowed to steal
+      work. The default is to allow stealing always.]]
+    [[`hpx.thread_queue.min_tasks_to_steal_staged`]
+     [The value of this property defines the number of staged __hpx__ tasks have
+      which to be available before neighboring cores are allowed to steal work.
+      The default is to allow stealing only if there are more tan 10 tasks
+      available.]]
+    [[`hpx.thread_queue.min_add_new_count`]
+     [The value of this property defines the minimal number tasks to be
+      converted into __hpx__ threads whenever the thread queues for a core have
+      run empty.]]
+    [[`hpx.thread_queue.max_add_new_count`]
+     [The value of this property defines the maximal number tasks to be
+      converted into __hpx__ threads whenever the thread queues for a core have
+      run empty.]]
+    [[`hpx.thread_queue.max_delete_count`]
+     [The value of this property defines the number number of terminated __hpx__
+      threads to discard during each invocation of the corresponding function.]]
 ]
 
 ['[*The `hpx.components` Configuration Section]]
@@ -302,7 +374,7 @@ The following settings relate to the TCP/IP parcelport.
 [teletype]
 ``
     [hpx.parcel.tcp]
-    enable = ${HPX_HAVE_PARCELPORT_TCP:1}
+    enable = ${HPX_HAVE_PARCELPORT_TCP:$[hpx.parcel.enabled]}
     array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
     async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
@@ -361,144 +433,6 @@ The following settings relate to the TCP/IP parcelport.
       taken from `hpx.parcel.max_outbound_connections`.]]
 ]
 
-The following settings relate to the shared memory parcelport (which is usable
-for communication between two localities on the same node). These settings take
-effect only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` is set
-(the equivalent cmake variable is `HPX_WITH_PARCELPORT_IPC`, and has to be set to `ON`).
-
-[teletype]
-``
-    [hpx.parcel.ipc]
-    enable = ${HPX_HAVE_PARCELPORT_IPC:0}
-    data_buffer_cache_size=${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}
-    array_optimization = ${HPX_PARCEL_IPC_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-    async_serialization = ${HPX_PARCEL_IPC_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-    enable_security = ${HPX_PARCEL_IPC_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
-    parcel_pool_size = ${HPX_PARCEL_IPC_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
-    max_connections =  ${HPX_PARCEL_IPC_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
-    max_connections_per_locality = ${HPX_PARCEL_IPC_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
-    max_message_size =  ${HPX_PARCEL_IPC_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
-    max_outbound_message_size =  ${HPX_PARCEL_IPC_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
-``
-[c++]
-
-[table:ini_hpx_parcel_ipc
-    [[Property]                 [Description]]
-    [[`hpx.parcel.ipc.enable`]
-     [Enable the use of the shared memory parcelport for connections between
-      localities running on the same node. Note that the initial bootstrap
-      of the overall __hpx__ application will still be performed using the
-      default ipc connections. This parcelport is disabled by default.]]
-    [[`hpx.parcel.ipc.data_buffer_cache_size`]
-     [This property specifies the number of cached data buffers used for
-      interprocess communication between localities on the same node. The
-      default depends on the compile time preprocessor constant
-      `HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE` (`512`).]]
-    [[`hpx.parcel.ipc.array_optimization`]
-     [This property defines whether this locality is allowed to utilize array
-      optimizations in the shared memory parcelport during serialization of parcel data.
-      The default is the same value as set for `hpx.parcel.array_optimization`.]]
-    [[`hpx.parcel.ipc.async_serialization`]
-     [This property defines whether this locality is allowed to spawn a new thread
-      for serialization in the shared memory parcelport (this is both for encoding
-      and decoding parcels). The default is the same value as set for
-      `hpx.parcel.async_serialization`.]]
-    [[`hpx.parcel.ipc.enable_security`]
-     [This property defines whether this locality is encrypting parcels in the
-      shared memory parcelport. The default is the same value as set for
-      `hpx.parcel.enable_security`.]]
-    [[`hpx.parcel.ipc.parcel_pool_size`]
-     [The value of this property defines the number of OS-threads created for
-      the internal parcel thread pool of the ipc parcel port. The default is
-      taken from `hpx.threadpools.parcel_pool_size`.]]
-    [[`hpx.parcel.ipc.max_connections`]
-     [This property defines how many network connections between different
-      localities are overall kept alive by each of locality. The default is
-      taken from `hpx.parcel.max_connections`.]]
-    [[`hpx.parcel.ipc.max_connections_per_locality`]
-     [This property defines the maximum number of network connections that one
-      locality will open to another locality. The default is
-      taken from `hpx.parcel.max_connections_per_locality`.]]
-    [[`hpx.parcel.ipc.max_message_size`]
-     [This property defines the maximum allowed message size which will be
-      transferrable through the parcel layer. The default is
-      taken from `hpx.parcel.max_message_size`.]]
-    [[`hpx.parcel.ipc.max_outbound_message_size`]
-     [This property defines the maximum allowed outbound coalesced message size which
-      will be transferrable through the parcel layer. The default is
-      taken from `hpx.parcel.max_outbound_connections`.]]
-]
-
-The following settings relate to the Infiniband parcelport. These settings take
-effect only if the compile time constant `HPX_PARCELPORT_IBVERBS` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_IBVERBS`, and has to be
-set to `ON`).
-
-[teletype]
-``
-    [hpx.parcel.ibverbs]
-    enable = ${HPX_PARCELPORT_IBVERBS:0}
-    buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
-    array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-    async_serialization = ${HPX_PARCEL_IBVERBS_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-    enable_security = ${HPX_PARCEL_IBVERBS_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
-    parcel_pool_size = ${HPX_PARCEL_IBVERBS_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
-    max_connections =  ${HPX_PARCEL_IBVERBS_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
-    max_connections_per_locality = ${HPX_PARCEL_IBVERBS_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
-    max_message_size =  ${HPX_PARCEL_IBVERBS_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
-    max_outbound_message_size =  ${HPX_PARCEL_IBVERBS_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
-``
-[c++]
-
-[table:ini_hpx_parcel_ibverbs
-    [[Property]                 [Description]]
-    [[`hpx.parcel.ibverbs.enable`]
-     [Enable the use of the ibverbs parcelport for connections between
-      localities running on a node with infiniband capable hardware. Note
-      that the initial bootstrap of the overall __hpx__ application will
-      still be performed using the default TCP/IP connections.
-      This parcelport is disabled by default.]]
-    [[`hpx.parcel.ibverbs.buffer_size`]
-     [This property specifies the size in bytes of the buffers registered to
-      the infiniband hardware. Parcels which are smaller than this will be
-      serialized and sent over the network in a zero-copy fashion. Parcels
-      bigger than this will be transparently copied to a big enough temporary
-      buffer.]]
-    [[`hpx.parcel.ibverbs.array_optimization`]
-     [This property defines whether this locality is allowed to utilize array
-      optimizations in the ibverbs parcelport during serialization of parcel data.
-      The default is the same value as set for `hpx.parcel.array_optimization`.]]
-    [[`hpx.parcel.ibverbs.async_serialization`]
-     [This property defines whether this locality is allowed to spawn a new thread
-      for serialization in the ibverbs parcelport (this is both for encoding
-      and decoding parcels). The default is the same value as set for
-      `hpx.parcel.async_serialization`.]]
-    [[`hpx.parcel.ibverbs.enable_security`]
-     [This property defines whether this locality is encrypting parcels in the
-      ibverbs parcelport. The default is the same value as set for
-      `hpx.parcel.enable_security`.]]
-    [[`hpx.parcel.ibverbs.parcel_pool_size`]
-     [The value of this property defines the number of OS-threads created for
-      the internal parcel thread pool of the ibverbs parcel port. The default is
-      taken from `hpx.threadpools.parcel_pool_size`.]]
-    [[`hpx.parcel.ibverbs.max_connections`]
-     [This property defines how many network connections between different
-      localities are overall kept alive by each of locality. The default is
-      taken from `hpx.parcel.max_connections`.]]
-    [[`hpx.parcel.ibverbs.max_connections_per_locality`]
-     [This property defines the maximum number of network connections that one
-      locality will open to another locality. The default is
-      taken from `hpx.parcel.max_connections_per_locality`.]]
-    [[`hpx.parcel.ibverbs.max_message_size`]
-     [This property defines the maximum allowed message size which will be
-      transferrable through the parcel layer. The default is
-      taken from `hpx.parcel.max_message_size`.]]
-    [[`hpx.parcel.ibverbs.max_outbound_message_size`]
-     [This property defines the maximum allowed outbound coalesced message size which
-      will be transferrable through the parcel layer. The default is
-      taken from `hpx.parcel.max_outbound_connections`.]]
-]
-
 The following settings relate to the MPI parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` is set
 (the equivalent cmake variable is `HPX_WITH_PARCELPORT_MPI`, and has to be set
@@ -507,7 +441,7 @@ to `ON`).
 [teletype]
 ``
     [hpx.parcel.mpi]
-    enable = ${HPX_HAVE_PARCELPORT_MPI:1}
+    enable = ${HPX_HAVE_PARCELPORT_MPI:$[hpx.parcel.enabled]}
     env = ${HPX_HAVE_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
     multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
@@ -540,7 +474,7 @@ to `ON`).
     [[`hpx.parcel.mpi.multithreaded`]
      [This property is used to determine what threading mode to use when
       initializing MPI. If this setting is `0`, __hpx__ will initialize MPI
-      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will 
+      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will
       initialize MPI with `MPI_THREAD_MULTI`.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]]

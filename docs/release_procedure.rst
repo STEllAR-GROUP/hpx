@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2013 Louisiana State University
+.. Copyright (c) 2007-2017 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,17 +16,17 @@ Please update it as appropriate.
 One way to use this procedure is to print a copy and check off
 the lines as they are completed to avoid confusion.
 
-#.  Notify developers that a release is imminent. 
+#.  Notify developers that a release is imminent.
 
 #.  Make a list of examples and benchmarks that should not go into the release.
     Build all examples and benchmarks that will go in the release and make sure
-    they build and run as expected. 
+    they build and run as expected.
 
     *   Make sure all examples and benchmarks have example input files, and
-        usage documentation, either in the form of comments or a readme. 
+        usage documentation, either in the form of comments or a readme.
 
 #.  Send the list of examples and benchmarks that will be included in the
-    release to hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu, and ask 
+    release to hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu, and ask
     for feedback. Update the list as necessary.
 
 #.  Write release notes for the blog to summarize the major changes listed in
@@ -40,7 +40,7 @@ the lines as they are completed to avoid confusion.
 #.  Build the docs, and proof-read them. Update any documentation that may have
     changed, and correct any typos. Pay special attention to:
 
-    *   ``$HPX_SOURCE/README.rst`` 
+    *   ``$HPX_SOURCE/README.rst``
          *   Update grant information
     *   ``docs/whats_new.qbk``
     *   ``docs/people.qbk``
@@ -53,23 +53,39 @@ the lines as they are completed to avoid confusion.
 
 #.  Delete the old release branch, and create a new one by branching a stable
     point from master.
-    
+
     *   ``git push origin --delete [branch name]``
     *   ``git branch -D [branch name]``
     *   ``git branch [new branch name]``
     *   ``git push origin [new branch name]``
     *   ``git branch --set-upstream-to=origin/[branch name] [branch name]``
-    
+
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
-    
-#.  Change logo for release documentation by removing '_draft' suffix 
+
+#.  Change logo for release documentation by removing '_draft' suffix
     in ``docs/cmakelist.txt`` on line 234. Update logo size accordingly on
     lines 330/331.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
+
+#.  Remove features which have been deprecated for at least 2 releases. This
+    involves removing build options which enable those features from the main
+    CMakeLists.txt and also deleting all related code and tests from the main
+    source tree.
+
+    The general deprecation policy involves a three-step process we have to go
+    through in order to introduce a breaking change
+
+    a. First release cycle: add a build option which allows to explicitly disable
+       any old (now deprecated) code.
+    b. Second release cycle: turn this build option OFF by default.
+    c. Third release cycle: completely remove the old code.
+
+    The main CMakeLists.txt contains a comment indicating for which version
+    the breaking change was introduced first.
 
 #.  Tag a release candidate from the release branch.
 
@@ -83,9 +99,9 @@ the lines as they are completed to avoid confusion.
     *   Line 120
 
 #.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
-    availability of the release candidate. Ask users to test the candidate by 
+    availability of the release candidate. Ask users to test the candidate by
     checking out the release candidate tag.
-    
+
 #.  Allow at least a week for testing of the release candidate.
 
     *   Use ``git merge`` when possible, and fall back to ``git cherry-pick``
@@ -99,15 +115,18 @@ the lines as they are completed to avoid confusion.
     *   ``CMakeLists.txt``
     *   Grep for old version number
 
-#.  Create new logos for documentation. Update the logo used on line 234 
-    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt`` 
+#.  Create new logos for documentation. Update the logo used on line 234
+    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt``
     lines 330/331.
 
-#.  Update ``$HPX_SOURCE/README.rst`` 
+#.  Update ``$HPX_SOURCE/README.rst``
 
     *   Update version
     *   Update links to documentation
-     
+
+#.  Push changes to new branch numbered after the next release (not the current
+    one).
+
 #.  Tag the release.
 
 #.  Roll a release candidate using ``tools/roll_release.sh`` (from root directory), and add the
@@ -128,11 +147,23 @@ the lines as they are completed to avoid confusion.
 
 #.  Write a new blog post announcing the release.
 
-#.  Create a DOI number using Zenodo
-   
-    *   https://zenodo.org/
+#.  Create a release on github
 
-#.  Announce the release on hpx-users@stellar.cct.lsu.edu, 
+    *   A DOI number using Zenodo is automatically assigned once the release is
+        created as such on github.
+    *   Verify on Zenodo (https://zenodo.org/) that release was uploaded.
+        Logging into zenodo using the github credentials might be necessary to
+        see the new release as it usually takes a while for it to propagate to
+        the search engine used on zenodo.
+    *   Fix zenodo reference number in main Readme.rst on the branch which holds
+        the versioning changes.
+
+#.  Merge release branch into master.
+
+#.  Merge new branch containing next version numbers to master, resolve conflicts
+    if necessary.
+
+#.  Announce the release on hpx-users@stellar.cct.lsu.edu,
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
     xpress@crest.iu.edu, Sonia Sachs, our list of external collaborators,
     isocpp.org, HPC Wire, Inside HPC, and a CCT press release.

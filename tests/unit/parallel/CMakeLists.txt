@@ -5,6 +5,7 @@
 
 # add tests
 set(tests
+    spmd_block
     task_block
     task_block_executor
     task_block_par

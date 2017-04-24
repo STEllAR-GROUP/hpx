@@ -121,7 +121,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         // -------------------------------------------------------------------
-        // functor that actually computes the state using the stencil iterator
+        // callable that actually computes the state using the stencil iterator
         // -------------------------------------------------------------------
         template<
             typename Transformer, typename StencilIterType,

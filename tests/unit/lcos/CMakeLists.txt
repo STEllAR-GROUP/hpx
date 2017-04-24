@@ -38,6 +38,7 @@ set(tests
     local_barrier
     local_dataflow
     local_dataflow_executor
+    local_dataflow_std_array
     local_event
     local_mutex
     make_future
@@ -50,9 +51,14 @@ set(tests
     shared_future
     sliding_semaphore
     unwrapped
+    wait_all_std_array
+    wait_any_std_array
     when_all
+    when_all_std_array
     when_any
+    when_any_std_array
     when_some
+    when_some_std_array
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)

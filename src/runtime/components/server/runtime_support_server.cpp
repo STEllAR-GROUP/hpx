@@ -587,7 +587,9 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::size_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
             util::detail::yield_k(k, "runtime_support::dijkstra_termination");
         }
@@ -623,7 +625,9 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 util::detail::yield_k(k,
                     "runtime_support::dijkstra_termination_detection");
@@ -682,7 +686,9 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
             util::detail::yield_k(k,
                 "runtime_support::send_dijkstra_termination_token");
@@ -756,7 +762,9 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 util::detail::yield_k(k,
                     "runtime_support::dijkstra_termination_detection");
@@ -1085,7 +1093,9 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
@@ -1106,7 +1116,9 @@ namespace hpx { namespace components { namespace server
                 // now we have to wait for all threads to be aborted
                 start_time = t.elapsed();
 
-                for (std::size_t k = 0; tm.get_thread_count() > 1; ++k)
+                for (std::size_t k = 0;
+                    tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                    ++k)
                 {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
@@ -1126,7 +1138,6 @@ namespace hpx { namespace components { namespace server
 
             // Drop the locality from the partition table.
             naming::gid_type here = agas_client.get_local_locality();
-            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1134,6 +1145,11 @@ namespace hpx { namespace components { namespace server
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
+
+            agas_client.unregister_locality(here, ec);
+
+            if (remove_from_remote_caches)
+                remove_here_from_console_connection_cache();
 
             if (respond_to) {
                 // respond synchronously
@@ -1343,7 +1359,7 @@ namespace hpx { namespace components { namespace server
                     rt.report_error(boost::current_exception());
                 }
             }
-            lcos::barrier::get_global_barrier().release();
+            lcos::barrier::get_global_barrier().detach();
         }
     }
 
@@ -1404,12 +1420,36 @@ namespace hpx { namespace components { namespace server
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
+            // console is handled separately
+            if (naming::get_locality_id_from_id(id) == 0)
+                continue;
+
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+    }
+
+    void runtime_support::remove_here_from_console_connection_cache()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+            return;
+
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
+        action_type act;
+        indirect_packaged_task ipt;
+        future<void> callback = ipt.get_future();
+
+        // handle console separately
+        id_type id = naming::get_id_from_locality_id(0);
+        apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+
+        callback.wait();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -2404,51 +2444,6 @@ namespace hpx { namespace components { namespace server
 
         modules_.insert(std::make_pair(HPX_MANGLE_STRING(plugin), d));
         return true;    // plugin got loaded
-    }
-#endif
-
-#if defined(HPX_HAVE_SECURITY)
-    components::security::capability
-        runtime_support::get_factory_capabilities(components::component_type type)
-    {
-        components::security::capability caps;
-
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (component type not found in map)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        if (!(*it).second.first) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (map entry is nullptr)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        std::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_guard<std::unique_lock<component_map_mutex_type> > ul(l);
-            caps = factory->get_required_capabilities();
-        }
-        return caps;
     }
 #endif
 }}}

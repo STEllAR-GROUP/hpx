@@ -93,6 +93,41 @@ namespace hpx { namespace performance_counters { namespace memory
 
         return pmc.PrivateUsage;
     }
+
+    // Returns total available memory
+    std::uint64_t read_total_mem_avail(bool)
+    {
+        MEMORYSTATUSEX mem_status;
+        std::memset(&mem_status, '\0', sizeof(MEMORYSTATUSEX));
+        mem_status.dwLength = sizeof(MEMORYSTATUSEX);
+
+        if (!GlobalMemoryStatusEx(&mem_status))
+        {
+            HRESULT hr = GetLastError();
+            LPVOID buffer = 0;
+            if (!FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                nullptr, hr,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+                (LPTSTR) &buffer, 0, nullptr))
+            {
+                HPX_THROW_EXCEPTION(kernel_error,
+                    "hpx::performance_counters::memory::read_total_mem_avail",
+                    boost::str(boost::format("format message failed with %x (while "
+                        "retrieving message for %x)") % GetLastError() % hr));
+                return std::uint64_t(-1);
+            }
+
+            std::string msg(static_cast<char*>(buffer));
+            LocalFree(buffer);
+            HPX_THROW_EXCEPTION(kernel_error,
+                "hpx::performance_counters::memory::read_total_mem_avail", msg);
+            return std::uint64_t(-1);
+        }
+
+        return mem_status.ullAvailPhys;
+    }
 }}}
 
 #endif

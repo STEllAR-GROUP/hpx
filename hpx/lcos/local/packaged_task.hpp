@@ -12,6 +12,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -29,6 +30,8 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task<R(Ts...)>
     {
         HPX_MOVABLE_ONLY(packaged_task);
+
+        typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
         // construction and destruction
@@ -80,6 +83,8 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
+            hpx::util::annotate_function annotate(function_);
+            (void)annotate;     // suppress warning about unused variable
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -139,7 +144,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        util::unique_function_nonser<R(Ts...)> function_;
+        function_type function_;
         local::promise<R> promise_;
     };
 }}}

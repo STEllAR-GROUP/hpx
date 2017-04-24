@@ -40,9 +40,12 @@ namespace hpx { namespace threads
                                  allows to reference staged task descriptions,
                                  which eventually will be converted into
                                  thread objects */
-        pending_do_not_schedule = 7 /*< this is not a real thread state,
+        pending_do_not_schedule = 7, /*< this is not a real thread state,
                                  but allows to create a thread in pending state
                                  without scheduling it (internal, do not use) */
+        pending_boost = 8   /*< this is not a real thread state,
+                                 but allows to suspend a thread in pending state
+                                 without high priority rescheduling */
     };
 
     /// Get the readable string representing the name of the given
@@ -108,6 +111,8 @@ namespace hpx { namespace threads
         thread_stacksize_medium = 2,        ///< use medium sized stack size
         thread_stacksize_large = 3,         ///< use large stack size
         thread_stacksize_huge = 4,          ///< use very large stack size
+
+        thread_stacksize_current = 5,      ///< use size of current thread's stack
 
         thread_stacksize_default = thread_stacksize_small,  ///< use default stack size
         thread_stacksize_minimal = thread_stacksize_small,  ///< use minimally stack size

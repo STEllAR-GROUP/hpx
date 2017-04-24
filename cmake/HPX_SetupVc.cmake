@@ -34,15 +34,19 @@
 # Vc_AVX_INTRINSICS_BROKEN
 
 find_package(Vc ${Vc_FIND_VERSION} QUIET NO_MODULE PATHS ${Vc_ROOT})
-if(NOT Vc_FOUND)
+if(NOT Vc_FOUND AND NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
   hpx_error("Vc was not found while datapar support was requested. Set Vc_ROOT to the installation path of Vc")
 endif()
 
 include_directories(SYSTEM ${Vc_INCLUDE_DIR})
-link_directories(${Vc_LIB_DIR})
+if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
+  link_directories(${Vc_LIB_DIR})
+endif()
 
-hpx_library_dir(${Vc_LIB_DIR})
-hpx_libraries(${Vc_LIBRARIES})
+if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
+  hpx_library_dir(${Vc_LIB_DIR})
+  hpx_libraries(${Vc_LIBRARIES})
+endif()
 
 foreach(_flag ${Vc_DEFINITIONS})
   # remove leading '-D'

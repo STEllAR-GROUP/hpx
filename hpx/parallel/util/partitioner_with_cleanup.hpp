@@ -21,6 +21,7 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -165,6 +166,8 @@ namespace hpx { namespace parallel { namespace util
                     [f2, f3, errors, scoped_param](
                         std::vector<hpx::future<Result> > && r) mutable -> R
                     {
+                        HPX_UNUSED(scoped_param);
+
                         detail::handle_local_exceptions<ExPolicy>::call(
                             r, errors, std::forward<F3>(f3));
                         return f2(std::move(r));

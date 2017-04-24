@@ -5,8 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_start.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/future.hpp>
+#include <utility>
 
 namespace mynamespace
 {
@@ -16,6 +18,13 @@ namespace mynamespace
     }
 
     HPX_DEFINE_PLAIN_ACTION(test, test_action);
+
+    static auto t =
+        hpx::actions::lambda_to_action(
+        []()
+        {
+            hpx::cout << "test" << hpx::endl;
+        });
 }
 
 HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
@@ -26,6 +35,11 @@ int hpx_main(int argc, char* argv[])
     {
         typedef mynamespace::test_action func;
         hpx::async<func>(hpx::find_here());
+    }
+
+    // Same test with lambdas
+    {
+        hpx::async(std::move(mynamespace::t), hpx::find_here());
     }
 
     // End the program

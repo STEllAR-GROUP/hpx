@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -20,6 +21,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -51,12 +53,11 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class local_priority_queue_scheduler : public scheduler_base
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT local_priority_queue_scheduler : public scheduler_base
     {
     protected:
         // The maximum number of active threads this thread manager should
@@ -489,7 +490,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -502,7 +503,8 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues)
             {
                 this_high_priority_queue = high_priority_queues_[num_thread];
-                bool result = this_high_priority_queue->get_next_thread(thrd);
+                bool result =
+                    this_high_priority_queue->get_next_thread(thrd);
 
                 this_high_priority_queue->increment_num_pending_accesses();
                 if (result)
@@ -534,7 +536,7 @@ namespace hpx { namespace threads { namespace policies
                     num_thread < high_priority_queues)
                 {
                     thread_queue_type* q = high_priority_queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         this_high_priority_queue->
@@ -543,7 +545,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-                if (queues_[idx]->get_next_thread(thrd))
+                if (queues_[idx]->get_next_thread(thrd, running))
                 {
                     queues_[idx]->increment_num_stolen_from_pending();
                     this_queue->increment_num_stolen_to_pending();
@@ -934,7 +936,6 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
             if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
@@ -991,105 +992,104 @@ namespace hpx { namespace threads { namespace policies
                 low_priority_queue_.on_start_thread(num_thread);
 
             queues_[num_thread]->on_start_thread(num_thread);
-//         }
-//
-//         void setup_stealing()
-//         {
+
             std::size_t num_threads = queues_.size();
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
-            for (std::size_t num_thread = 0; num_thread != num_threads; ++num_thread)
+            for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = get_pu_num(num_thread);
-                numa_masks[num_thread] =
+                std::size_t num_pu = get_pu_num(i);
+                numa_masks[i] =
                     topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
-                core_masks[num_thread] =
+                core_masks[i] =
                     topology_.get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
             }
 
             // iterate over the number of threads again to determine where to
             // steal from
-            int radius = int((num_threads / 2.0) + 0.5);
-//             if (radius > 128) radius = 128;
-//             for (std::size_t num_thread = 0; num_thread != num_threads; ++num_thread)
-//             {
-                victim_threads_[num_thread].reserve(num_threads);
-                std::size_t num_pu = get_pu_num(num_thread);
-                mask_cref_type pu_mask =
-                    topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
-                mask_cref_type numa_mask = numa_masks[num_thread];
-                mask_cref_type core_mask = core_masks[num_thread];
-                // we allow the thread on the boundary of the NUMA domain to steal
-                mask_type first_mask = mask_type();
-                resize(first_mask, mask_size(pu_mask));
+            std::ptrdiff_t radius =
+                static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
+            victim_threads_[num_thread].reserve(num_threads);
+            std::size_t num_pu = get_pu_num(num_thread);
+            mask_cref_type pu_mask =
+                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
+            mask_cref_type numa_mask = numa_masks[num_thread];
+            mask_cref_type core_mask = core_masks[num_thread];
 
-                std::size_t first = find_first(numa_mask);
-                if (first != std::size_t(-1))
-                    set(first_mask, first);
-                else
-                    first_mask = pu_mask;
+            // we allow the thread on the boundary of the NUMA domain to steal
+            mask_type first_mask = mask_type();
+            resize(first_mask, mask_size(pu_mask));
 
-                auto iterate = [&](hpx::util::function_nonser<bool(std::size_t)> f)
+            std::size_t first = find_first(numa_mask);
+            if (first != std::size_t(-1))
+                set(first_mask, first);
+            else
+                first_mask = pu_mask;
+
+            auto iterate = [&](hpx::util::function_nonser<bool(std::size_t)> f)
+            {
+                // check our neighbors in a radial fashion (left and right
+                // alternating, increasing distance each iteration)
+                int i = 1;
+                for (/**/; i < radius; ++i)
                 {
-                    // check our neighbors in a radial fashion (left and right
-                    // alternating, increasing distance each iteration)
-                    int i = 1;
-                    for (; i < radius; ++i)
-                    {
-                        int left = (int(num_thread) - i) % int(num_threads);
-                        if (left < 0)
-                            left = num_threads + left;
-                        if (f(std::size_t(left)))
-                        {
-                            victim_threads_[num_thread].push_back(std::size_t(left));
-                        }
+                    std::ptrdiff_t left =
+                        (static_cast<std::ptrdiff_t>(num_thread) - i) %
+                            static_cast<std::ptrdiff_t>(num_threads);
+                    if (left < 0)
+                        left = num_threads + left;
 
-                        std::size_t right = (num_thread + i) % num_threads;
-                        if (f(right))
-                        {
-                            victim_threads_[num_thread].push_back(right);
-                        }
-                    }
-                    if ((num_threads % 2) == 0)
+                    if (f(std::size_t(left)))
                     {
-                        std::size_t right = (num_thread + i) % num_threads;
-                        if (f(right))
-                        {
-                            victim_threads_[num_thread].push_back(right);
-                        }
+                        victim_threads_[num_thread].push_back(
+                            static_cast<std::size_t>(left));
                     }
-                };
 
-                // check for threads which share the same core...
-                iterate(
-                    [&](std::size_t other_num_thread)
+                    std::size_t right = (num_thread + i) % num_threads;
+                    if (f(right))
                     {
-                        return any(core_mask & core_masks[other_num_thread]);
+                        victim_threads_[num_thread].push_back(right);
                     }
-                );
-
-                // check for threads which share the same numa domain...
-                iterate(
-                    [&](std::size_t other_num_thread)
-                    {
-                        return
-                            !any(core_mask & core_masks[other_num_thread])
-                            && any(numa_mask & numa_masks[other_num_thread]);
-                    }
-                );
-
-                // check for the rest and if we are numa aware
-                if (numa_sensitive_ != 2 && any(first_mask & pu_mask))
-                {
-                    iterate(
-                        [&](std::size_t other_num_thread)
-                        {
-                            return !any(numa_mask & numa_masks[other_num_thread]);
-                        }
-                    );
                 }
-//             }
+                if ((num_threads % 2) == 0)
+                {
+                    std::size_t right = (num_thread + i) % num_threads;
+                    if (f(right))
+                    {
+                        victim_threads_[num_thread].push_back(right);
+                    }
+                }
+            };
+
+            // check for threads which share the same core...
+            iterate(
+                [&](std::size_t other_num_thread)
+                {
+                    return any(core_mask & core_masks[other_num_thread]);
+                }
+            );
+
+            // check for threads which share the same numa domain...
+            iterate(
+                [&](std::size_t other_num_thread)
+                {
+                    return
+                        !any(core_mask & core_masks[other_num_thread])
+                        && any(numa_mask & numa_masks[other_num_thread]);
+                }
+            );
+
+            // check for the rest and if we are numa aware
+            if (numa_sensitive_ != 2 && any(first_mask & pu_mask))
+            {
+                iterate(
+                    [&](std::size_t other_num_thread)
+                    {
+                        return !any(numa_mask & numa_masks[other_num_thread]);
+                    }
+                );
+            }
         }
 
         void on_stop_thread(std::size_t num_thread)

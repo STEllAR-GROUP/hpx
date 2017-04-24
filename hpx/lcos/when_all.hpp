@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -247,12 +247,13 @@ namespace hpx { namespace lcos
 
                 for (/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
-                        traits::detail::get_shared_state(*next);
+                    typename traits::detail::shared_state_ptr<
+                            future_result_type
+                        >::type next_future_data =
+                            traits::detail::get_shared_state(*next);
 
-                    if (!next_future_data->is_ready())
+                    if (next_future_data.get() != nullptr &&
+                        !next_future_data->is_ready())
                     {
                         next_future_data->execute_deferred();
 
@@ -297,12 +298,13 @@ namespace hpx { namespace lcos
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data =
-                    traits::detail::get_shared_state(f_);
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(f_);
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 

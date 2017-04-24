@@ -23,6 +23,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/atomic.hpp>
@@ -258,6 +259,13 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_scheduler_utilization() const
+    {
+        return (std::accumulate(tasks_active_.begin(), tasks_active_.end(),
+            std::int64_t(0)) * 100) / thread_count_.load();
+    }
+
+    template <typename Scheduler>
     bool thread_pool<Scheduler>::enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state) const
@@ -307,7 +315,12 @@ namespace hpx { namespace threads { namespace detail
         tfunc_times_.resize(num_threads);
         exec_times_.resize(num_threads);
 
+        idle_loop_counts_.resize(num_threads);
+        busy_loop_counts_.resize(num_threads);
+
         reset_tfunc_times_.resize(num_threads);
+
+        tasks_active_.resize(num_threads);
 
         // scale timestamps to nanoseconds
         std::uint64_t base_timestamp = util::hardware::timestamp();
@@ -613,7 +626,9 @@ namespace hpx { namespace threads { namespace detail
                     detail::scheduling_counters counters(
                         executed_threads_[num_thread],
                         executed_thread_phases_[num_thread],
-                        tfunc_times_[num_thread], exec_times_[num_thread]);
+                        tfunc_times_[num_thread], exec_times_[num_thread],
+                        idle_loop_counts_[num_thread], busy_loop_counts_[num_thread],
+                        tasks_active_[num_thread]);
 
                     detail::scheduling_callbacks callbacks(
                         util::bind( //-V107
@@ -1394,6 +1409,27 @@ namespace hpx { namespace threads { namespace detail
     }
 #endif
 
+    template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_idle_loop_count(std::size_t num) const
+    {
+        if (num == std::size_t(-1))
+        {
+            return std::accumulate(idle_loop_counts_.begin(),
+                idle_loop_counts_.end(), 0ll);
+        }
+        return idle_loop_counts_[num];
+    }
+
+    template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_busy_loop_count(std::size_t num) const
+    {
+        if (num == std::size_t(-1))
+        {
+            return std::accumulate(busy_loop_counts_.begin(),
+                busy_loop_counts_.end(), 0ll);
+        }
+        return busy_loop_counts_[num];
+    }
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1424,11 +1460,19 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<> >;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_fifo
+    > >;
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_lifo
+    > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::abp_fifo_priority_queue_scheduler>;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+    > >;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)

@@ -33,11 +33,6 @@ private:
     static mask_type empty_mask;
 
 public:
-    std::size_t get_pu_number(std::size_t num_thread, error_code& ec = throws) const
-    {
-        return 0;
-    }
-
     std::size_t get_numa_node_number(
         std::size_t thread_num
       , error_code& ec = throws

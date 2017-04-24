@@ -1,5 +1,5 @@
 # Copyright (c) 2014      Thomas Heller
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,6 +43,19 @@ function(hpx_setup_target target)
 
   if(target_FOLDER)
     set_target_properties(${target} PROPERTIES FOLDER "${target_FOLDER}")
+  endif()
+
+  get_target_property(target_SOURCES ${target} SOURCES)
+
+  # Manage files with .cu extension in case When Cuda Clang is used
+  if(target_SOURCES AND HPX_WITH_CUDA_CLANG)
+    foreach(source ${target_SOURCES})
+      get_filename_component(extension ${source} EXT)
+      if(${extension} STREQUAL ".cu")
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
+          COMPILE_FLAGS "${HPX_CUDA_CLANG_FLAGS}")
+      endif()
+    endforeach()
   endif()
 
   if(target_COMPILE_FLAGS)
@@ -198,11 +211,7 @@ function(hpx_setup_target target)
     target_compile_options(${target} PUBLIC ${CXX_FLAG})
   endif()
 
-if(NOT HPX_WITH_CUDA)  # Cuda needs plain target_link_libraries() signature
-  target_link_libraries(${target} PUBLIC ${hpx_libs} ${target_DEPENDENCIES})
-else()
-  target_link_libraries(${target} ${hpx_libs} ${target_DEPENDENCIES})
-endif()
+  target_link_libraries(${target} ${HPX_TLL_PUBLIC} ${hpx_libs} ${target_DEPENDENCIES})
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 

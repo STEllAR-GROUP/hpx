@@ -90,8 +90,8 @@ namespace hpx { namespace actions { namespace detail
 #define HPX_REGISTER_ACTION_INVOCATION_COUNT(Action)                          \
     namespace hpx { namespace actions { namespace detail                      \
     {                                                                         \
-        template register_action_invocation_count<Action>                     \
-            register_action_invocation_count<Action>::instance;               \
+        template register_action_invocation_count< Action>                    \
+            register_action_invocation_count< Action>::instance;              \
     }}}                                                                       \
 /**/
 

@@ -93,7 +93,12 @@ namespace hpx { namespace parallel { namespace util
                             .on(executors_[i])
                             .with(hpx::parallel::static_chunk_size()),
                         begin, end,
-                        [this, i](T& val)
+#if defined(HPX_DEBUG)
+                        [this, i]
+#else
+                        []
+#endif
+                        (T& val)
                         {
                             // touch first byte of every object
                             *reinterpret_cast<char*>(&val) = 0;

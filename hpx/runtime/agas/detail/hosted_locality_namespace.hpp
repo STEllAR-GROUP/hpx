@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
@@ -21,9 +22,7 @@
 #include <hpx/runtime/naming/address.hpp>
 
 #include <cstdint>
-#include <string>
-#include <vector>
-
+#include <map>
 #include <string>
 #include <vector>
 
@@ -75,5 +74,8 @@ namespace hpx { namespace agas { namespace detail
         naming::address addr_;
     };
 }}}
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    parcelset::endpoints_type, parcelset_endpoints_type)
 
 #endif

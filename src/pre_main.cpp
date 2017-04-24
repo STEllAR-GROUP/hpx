@@ -31,8 +31,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 static void garbage_collect_non_blocking()
 {
     hpx::agas::garbage_collect_non_blocking();
@@ -50,21 +48,21 @@ namespace hpx
 // Install performance counter startup functions for core subsystems.
 static void register_counter_types()
 {
-     naming::get_agas_client().register_counter_types();
-     LBT_(info) << "(2nd stage) pre_main: registered AGAS client-side "
-                   "performance counter types";
+    naming::get_agas_client().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered AGAS client-side "
+            "performance counter types";
 
-     get_runtime().register_counter_types();
-     LBT_(info) << "(2nd stage) pre_main: registered runtime performance "
-                   "counter types";
+    get_runtime().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered runtime performance "
+            "counter types";
 
-     threads::get_thread_manager().register_counter_types();
-     LBT_(info) << "(2nd stage) pre_main: registered thread-manager performance "
-                   "counter types";
+    threads::get_thread_manager().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
+            "counter types";
 
-     applier::get_applier().get_parcel_handler().register_counter_types();
-     LBT_(info) << "(2nd stage) pre_main: registered parcelset performance "
-                   "counter types";
+    applier::get_applier().get_parcel_handler().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered parcelset performance "
+            "counter types";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,6 +77,7 @@ static void register_message_handlers()
         error_code ec(lightweight);
         rt.register_message_handler(util::get<0>(t), util::get<1>(t), ec);
     }
+    lbt_ << "(3rd stage) pre_main: registered message handlers";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,13 +98,13 @@ int pre_main(runtime_mode mode)
     int exit_code = 0;
     if (runtime_mode_connect == mode)
     {
-        LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
-                      "skipping 2nd and 3rd stage startup synchronization";
-        LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
+        lbt_ << "(2nd stage) pre_main: locality is in connect mode, "
+                "skipping 2nd and 3rd stage startup synchronization";
+        lbt_ << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
         exit_code = runtime_support::load_components(find_here());
-        LBT_(info) << "(2nd stage) pre_main: loaded components"
+        lbt_ << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
         // Work on registration requests for message handler plugins
@@ -117,19 +116,19 @@ int pre_main(runtime_mode mode)
 
         rt.set_state(state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
-        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+        lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
         rt.set_state(state_startup);
         runtime_support::call_startup_functions(find_here(), false);
-        LBT_(info) << "(3rd stage) pre_main: ran startup functions";
+        lbt_ << "(4th stage) pre_main: ran startup functions";
     }
     else
     {
-        LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
+        lbt_ << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
         exit_code = runtime_support::load_components(find_here());
-        LBT_(info) << "(2nd stage) pre_main: loaded components"
+        lbt_ << "(2nd stage) pre_main: loaded components"
             << (exit_code ? ", application exit has been requested" : "");
 
         // {{{ Second and third stage barrier creation.
@@ -143,19 +142,23 @@ int pre_main(runtime_mode mode)
                     , "no console locality registered");
             }
 
-            LBT_(info) << "(2nd stage) pre_main: created \
-                           2nd and 3rd stage boot barriers";
+            lbt_ << "(2nd stage) pre_main: creating 2nd and 3rd stage boot barriers";
         }
         else // Hosted.
         {
-            LBT_(info)
-                << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
+            lbt_ << "(2nd stage) pre_main: finding 2nd and 3rd stage boot barriers";
         }
         // }}}
 
         // create our global barrier...
         hpx::lcos::barrier::get_global_barrier() =
             hpx::lcos::barrier::create_global_barrier();
+
+        // Second stage bootstrap synchronizes component loading across all
+        // localities, ensuring that the component namespace tables are fully
+        // populated before user code is executed.
+        lcos::barrier::synchronize();
+        lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
         // Work on registration requests for message handler plugins
         register_message_handlers();
@@ -164,35 +167,33 @@ int pre_main(runtime_mode mode)
         // executed.
         register_counter_types();
 
-
-        // Second stage bootstrap synchronizes component loading across all
-        // localities, ensuring that the component namespace tables are fully
-        // populated before user code is executed.
+        // Second stage bootstrap synchronizes performance counter loading
+        // across all localities.
         lcos::barrier::synchronize();
-        LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
+        lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
         runtime_support::call_startup_functions(find_here(), true);
-        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+        lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
         // Third stage separates pre-startup and startup function phase.
         lcos::barrier::synchronize();
-        LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+        lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
 
         runtime_support::call_startup_functions(find_here(), false);
-        LBT_(info) << "(4th stage) pre_main: ran startup functions";
+        lbt_ << "(4th stage) pre_main: ran startup functions";
 
         // Forth stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
         // all user code, including startup functions, are only run after the
         // component tables are populated.
         lcos::barrier::synchronize();
-        LBT_(info) << "(4th stage) pre_main: passed 4th stage boot barrier";
+        lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
     }
 
     // Enable logging. Even if we terminate at this point we will see all
     // pending log messages so far.
     components::activate_logging();
-    LBT_(info) << "(4th stage) pre_main: activated logging";
+    lbt_ << "(last stage) pre_main: activated logging";
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.
