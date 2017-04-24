@@ -7,7 +7,7 @@
  HPX
 *****
 
-HPX is a C++ Standards Library for Concurrency and Parallelism. It implements
+HPX is a C++ Standard Library for Concurrency and Parallelism. It implements
 all of the corresponding facilities as defined by the C++ Standard.
 Additionally, in HPX we implement functionalities proposed as part of the
 ongoing C++ standardization process. We also extend the C++ Standard APIs to
