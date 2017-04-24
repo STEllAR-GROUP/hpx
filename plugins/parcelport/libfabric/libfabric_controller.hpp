@@ -59,8 +59,24 @@
 #endif
 
 #ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
-#include <pmi2.h>
-#include <plugins/parcelport/libfabric/base64.hpp>
+//
+# include <pmi2.h>
+//
+# include <boost/archive/iterators/base64_from_binary.hpp>
+# include <boost/archive/iterators/binary_from_base64.hpp>
+# include <boost/archive/iterators/transform_width.hpp>
+
+    using namespace boost::archive::iterators;
+
+    typedef
+        base64_from_binary<
+            transform_width<std::string::const_iterator, 6, 8>
+            > base64_t;
+
+    typedef
+        transform_width<
+            binary_from_base64<std::string::const_iterator>, 8, 6
+    > binary_t;
 #endif
 
 namespace hpx {
@@ -169,19 +185,18 @@ namespace libfabric
 
             // we must pass out libfabric data to other nodes
             // encode it as a string to put into the PMI KV store
-            constexpr int encoded_length = Base64::EncodedLength(locality::array_size);
-            char encoded_locality[encoded_length + 1] = {0};
-            Base64::Encode(static_cast<const char*>(here_.fabric_data()),
-                locality::array_size, encoded_locality, encoded_length);
+            std::string encoded_locality(
+                base64_t((const char*)(here_.fabric_data())),
+                base64_t((const char*)(here_.fabric_data()) + locality::array_size));
+            int encoded_length = encoded_locality.size();
             LOG_DEBUG_MSG("Encoded locality as " << encoded_locality
                 << " with length " << decnumber(encoded_length));
 
             // Key name for PMI
             std::string pmi_key = "hpx_libfabric_" + std::to_string(rank);
-
             // insert out data in the KV store
             LOG_DEBUG_MSG("Calling PMI2_KVS_Put on rank " << decnumber(rank));
-            PMI2_KVS_Put(pmi_key.data(), encoded_locality);
+            PMI2_KVS_Put(pmi_key.data(), encoded_locality.data());
 
             // Wait for all to do the same
             LOG_DEBUG_MSG("Calling PMI2_KVS_Fence on rank " << decnumber(rank));
@@ -192,7 +207,7 @@ namespace libfabric
             {
                 // read one locality key
                 std::string pmi_key = "hpx_libfabric_" + std::to_string(i);
-                char encoded_data[encoded_length + 1] = {0};
+                char encoded_data[locality::array_size*2];
                 int length = 0;
                 PMI2_KVS_Get(0, i, pmi_key.data(), encoded_data, encoded_length + 1, &length);
                 if (length != encoded_length)
@@ -205,9 +220,9 @@ namespace libfabric
                 LOG_DEBUG_MSG("Calling decode for " << decnumber(i)
                     << " locality data on rank " << decnumber(rank));
                 locality new_locality;
-                Base64::Decode(encoded_data, encoded_length,
-                   reinterpret_cast<char*>(const_cast<void*>(new_locality.fabric_data())),
-                   locality::array_size);
+                std::copy(binary_t(encoded_data),
+                          binary_t(encoded_data + encoded_length),
+                          (char*)(new_locality.fabric_data()));
 
                 // insert locality into address vector
                 LOG_DEBUG_MSG("Calling insert_address for " << decnumber(i)
