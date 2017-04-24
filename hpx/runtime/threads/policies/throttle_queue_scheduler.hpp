@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2014      Allan Porterfield
 //
@@ -10,12 +10,13 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
-
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
 #include <apex_api.hpp>
 
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
 #include <cstddef>
@@ -68,12 +69,11 @@ namespace hpx { namespace threads { namespace policies
     /// The throttle_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class throttle_queue_scheduler
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT throttle_queue_scheduler
       : public local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>
     {
@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             bool ret = throttle(num_thread, apex_current_threads_ <
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace policies
 
             // grab work if available
             return this->base_type::get_next_thread(
-                num_thread, idle_loop_count, thrd);
+                num_thread, running, idle_loop_count, thrd);
         }
 
     protected:

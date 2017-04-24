@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -98,6 +99,17 @@ namespace hpx { namespace util
                     >::call(_f);
             }
 
+            char const* get_function_annotation() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation<
+                        typename util::decay_unwrap<F>::type
+                    >::call(_f);
+#else
+                return nullptr;
+#endif
+            }
+
         private:
             typename util::decay_unwrap<F>::type _f;
             util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
@@ -142,6 +154,19 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_annotation<util::detail::deferred<Sig> >
+    {
+        static char const*
+            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_annotation();
+        }
+    };
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

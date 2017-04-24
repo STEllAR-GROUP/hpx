@@ -30,6 +30,7 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -416,6 +417,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                        zip_iterator part_begin, std::size_t part_size
                     )   -> std::size_t
                     {
+                        HPX_UNUSED(flags);
+                        HPX_UNUSED(policy);
+
                         std::size_t curr = 0;
 
                         // MSVC complains if proj is captured by ref below
@@ -439,6 +443,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         hpx::shared_future<std::size_t> next
                     ) mutable
                     {
+                        HPX_UNUSED(flags);
+                        HPX_UNUSED(policy);
+
                         next.get();     // rethrow exceptions
 
                         std::advance(dest, curr.get());
@@ -467,6 +474,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::vector<hpx::future<void> > &&) mutable
                     ->  std::pair<FwdIter, OutIter>
                     {
+                        HPX_UNUSED(flags);
+
                         std::advance(dest, items.back().get());
                         return std::make_pair(last, dest);
                     });

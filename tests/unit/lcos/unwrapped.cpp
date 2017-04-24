@@ -15,6 +15,9 @@
 
 #include <boost/atomic.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 #include <cstddef>
 #include <numeric>
 #include <string>
@@ -152,6 +155,22 @@ int hpx_main(
             void_counter.store(0);
         }
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+        // Sync wait, array of futures, void return.
+        {
+            std::array<future<void>, 64> futures;
+
+            for (std::size_t i = 0; i < 64; ++i)
+                futures[i] = async<null_action>(here_);
+
+            unwrapped(futures);
+
+            HPX_TEST_EQ(64U, void_counter.load());
+
+            void_counter.store(0);
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, vector of futures, non-void return.
         {
@@ -174,6 +193,25 @@ int hpx_main(
             result_counter.store(0);
         }
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+        // Sync wait, array of futures, non-void return.
+        {
+            std::array<future<bool>, 64> futures;
+
+            for (std::size_t i = 0; i < 64; ++i)
+                futures[i] = async<null_result_action>(here_);
+
+            std::array<bool, 64> values = unwrapped(futures);
+
+            HPX_TEST_EQ(64U, result_counter.load());
+
+            for (std::size_t i = 0; i < 64; ++i)
+                HPX_TEST_EQ(true, values[i]);
+
+            result_counter.store(0);
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, vector of futures, non-void return ignored.
         {
@@ -189,6 +227,22 @@ int hpx_main(
 
             result_counter.store(0);
         }
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+        // Sync wait, array of futures, non-void return ignored.
+        {
+            std::array<future<bool>, 64> futures;
+
+            for (std::size_t i = 0; i < 64; ++i)
+                futures[i] = async<null_result_action>(here_);
+
+            unwrapped(futures);
+
+            HPX_TEST_EQ(64U, result_counter.load());
+
+            result_counter.store(0);
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Functional wrapper, single future

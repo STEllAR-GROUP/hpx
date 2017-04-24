@@ -82,12 +82,16 @@ namespace hpx { namespace serialization
     {
         typedef std::integral_constant<bool,
             hpx::traits::is_bitwise_serializable<
-                typename compute::vector<T, Allocator>::value_type
+                typename std::remove_const<
+                    typename compute::vector<T, Allocator>::value_type
+                >::type
             >::value> use_optimized;
 
         v.clear();
         detail::load_impl(ar, v, use_optimized());
     }
+
+
 
     // save compute::vector<T>
     namespace detail
@@ -97,9 +101,7 @@ namespace hpx { namespace serialization
             compute::vector<T, Allocator> const& vs, std::false_type)
         {
             // normal save ...
-            typedef typename compute::vector<T, Allocator>::value_type
-                value_type;
-            for(value_type const& v : vs)
+            for(auto const & v : vs)
             {
                 ar << v;
             }
@@ -129,7 +131,9 @@ namespace hpx { namespace serialization
     {
         typedef std::integral_constant<bool,
             hpx::traits::is_bitwise_serializable<
-                typename compute::vector<T, Allocator>::value_type
+                typename std::remove_const<
+                    typename compute::vector<T, Allocator>::value_type
+                >::type
             >::value> use_optimized;
 
         ar << v.size(); //-V128

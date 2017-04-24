@@ -10,6 +10,7 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <complex>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {
@@ -33,7 +34,7 @@ namespace hpx { namespace traits
 {
     template <typename T>
     struct is_bitwise_serializable<std::complex<T> >
-      : is_bitwise_serializable<T>
+      : is_bitwise_serializable<typename std::remove_const<T>::type>
     {};
 }}
 

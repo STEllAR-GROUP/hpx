@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@ set(benchmarks
     wait_all_timings
 )
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD OR HPX_WITH_DATAPAR_LIBFLATARRAY)
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(benchmarks
       ${benchmarks}
       transform_reduce_binary
@@ -127,6 +127,9 @@ if(HPX_WITH_CXX11_LAMBDAS)
 
   if(HPX_WITH_CUDA)
     set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+  endif()
+  if(HPX_WITH_CUDA_CLANG)
+    set_source_files_properties(stream.cpp PROPERTIES COMPILE_FLAGS -xcuda)
   endif()
 endif()
 

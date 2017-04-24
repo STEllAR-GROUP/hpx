@@ -182,7 +182,7 @@ inline std::uint32_t get_num_localities(
   , error_code& ec = throws
     )
 {
-    return agas::get_num_localities(launch::sync,
+    return hpx::agas::get_num_localities(launch::sync,
         components::component_invalid, ec);
 }
 
@@ -193,7 +193,7 @@ inline std::uint32_t get_num_localities_sync(
   , error_code& ec = throws
     )
 {
-    return get_num_localities(launch::sync, type, ec);
+    return hpx::agas::get_num_localities(launch::sync, type, ec);
 }
 
 HPX_DEPRECATED(HPX_DEPRECATED_MSG)
@@ -201,7 +201,8 @@ inline std::uint32_t get_num_localities_sync(
     error_code& ec = throws
     )
 {
-    return get_num_localities(launch::sync, components::component_invalid, ec);
+    return hpx::agas::get_num_localities(launch::sync,
+        components::component_invalid, ec);
 }
 #endif
 

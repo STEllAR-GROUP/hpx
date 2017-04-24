@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -85,6 +85,10 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::performance_counters::counter_value, hpx_counter_value,
     hpx::actions::base_lco_with_value_hpx_counter_value_get,
     hpx::actions::base_lco_with_value_hpx_counter_value_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::performance_counters::counter_values_array, hpx_counter_values_array,
+    hpx::actions::base_lco_with_value_hpx_counter_values_array_get,
+    hpx::actions::base_lco_with_value_hpx_counter_values_array_set)
 
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter)

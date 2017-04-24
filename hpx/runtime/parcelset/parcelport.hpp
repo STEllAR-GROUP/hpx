@@ -22,6 +22,8 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdint>
@@ -228,16 +230,6 @@ namespace hpx { namespace parcelset
         /// operations (nanoseconds)
         std::int64_t get_receiving_serialization_time(bool reset);
 
-#if defined(HPX_HAVE_SECURITY)
-        /// the total time it took for all sender-side security operations
-        /// (nanoseconds)
-        std::int64_t get_sending_security_time(bool reset);
-
-        /// the total time it took for all receiver-side security
-        /// operations (nanoseconds)
-        std::int64_t get_receiving_security_time(bool reset);
-#endif
-
         /// total data sent (bytes)
         std::int64_t get_data_sent(bool reset);
 
@@ -366,6 +358,7 @@ namespace hpx { namespace parcelset
 
         typedef std::set<locality> pending_parcels_destinations;
         pending_parcels_destinations parcel_destinations_;
+        boost::atomic<std::uint32_t> num_parcel_destinations_;
 
         /// The local locality
         locality here_;

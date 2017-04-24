@@ -10,8 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/tagged_tuple.hpp>
@@ -30,6 +35,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -103,14 +109,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     1, typename Iter::iterator_tuple_type
                 >::type
             >
-            operator()(Iter part_begin, std::size_t part_size,
-                std::size_t /*part_index*/)
+            execute(Iter part_begin, std::size_t part_size)
             {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
                     hpx::util::get<0>(iters), part_size,
                     hpx::util::get<1>(iters),
                     transform_projected<F, Proj>{f_, proj_});
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            std::pair<
+                typename hpx::util::tuple_element<
+                    0, typename Iter::iterator_tuple_type
+                >::type,
+                typename hpx::util::tuple_element<
+                    1, typename Iter::iterator_tuple_type
+                >::type
+            >
+            operator()(Iter part_begin, std::size_t part_size,
+                std::size_t /*part_index*/)
+            {
+                hpx::util::annotate_function annotate(f_);
+                (void)annotate;     // suppress warning about unused variable
+                return execute(part_begin, part_size);
             }
         };
 
@@ -787,5 +810,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_address<
+        parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
+    {
+        static std::size_t call(
+            parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_annotation<
+        parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
+    {
+        static char const* call(
+            parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif

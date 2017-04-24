@@ -60,7 +60,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             int i = blockDim.x * blockIdx.x + threadIdx.x;
             if(i < N)
                 C[i] = A[i] + B[i];
-        }, d_A.device_data(), d_B.device_data(), d_C.device_data());
+        }, d_A.data(), d_B.data(), d_C.data());
 
 
     hpx::parallel::copy(

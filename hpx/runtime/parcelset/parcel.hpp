@@ -21,10 +21,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
-#include <unordered_map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -75,7 +75,7 @@ namespace hpx { namespace parcelset
     private:
 
         typedef
-            std::unordered_map<naming::gid_type, naming::gid_type>
+            std::map<const naming::gid_type*, naming::gid_type>
             split_gids_type;
 
 #if defined(HPX_DEBUG)
@@ -159,11 +159,11 @@ namespace hpx { namespace parcelset
 
         std::size_t & size();
 
-        void schedule_action();
+        void schedule_action(std::size_t num_thread = std::size_t(-1));
 
         // returns true if parcel was migrated, false if scheduled locally
         bool load_schedule(serialization::input_archive & ar,
-            std::size_t num_thread);
+            std::size_t num_thread, bool& deferred_schedule);
 
         // generate unique parcel id
         static naming::gid_type generate_unique_id(

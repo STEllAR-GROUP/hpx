@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
@@ -24,6 +25,7 @@
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -192,8 +194,7 @@ namespace hpx { namespace lcos { namespace detail
         void execute(util::detail::pack_c<std::size_t, Is...>, std::false_type)
         {
             try {
-                result_type res =
-                    util::invoke_fused(func_, std::move(futures_));
+                result_type res = util::invoke_fused(func_, std::move(futures_));
 
                 // reset futures
                 reset_dataflow_future reset;
@@ -230,42 +231,80 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        HPX_FORCEINLINE
-        void finalize(launch policy)
+        HPX_FORCEINLINE void done()
         {
-            if (policy == hpx::launch::sync)
-            {
-                execute(indices_type(), is_void());
-                return;
-            }
+            hpx::util::annotate_function annotate(func_);
+            (void)annotate;     // suppress warning about unused variable
+            execute(indices_type(), is_void());
+        }
 
-            util::thread_description desc(func_, "dataflow_frame::finalize");
-
+        ///////////////////////////////////////////////////////////////////////
+        void finalize(hpx::detail::async_policy policy)
+        {
             // schedule the final function invocation with high priority
-            execute_function_type f = &dataflow_frame::execute;
+            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            // simply schedule new thread
             threads::register_thread_nullary(
-                util::deferred_call(
-                    f, std::move(this_), indices_type(), is_void())
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
               , desc
               , threads::pending
               , true
-              , threads::thread_priority_boost);
+              , policy.priority()
+              , std::size_t(-1)
+              , threads::thread_stacksize_current);
         }
 
         HPX_FORCEINLINE
         void finalize(hpx::detail::sync_policy)
         {
-            execute(indices_type(), is_void());
+            done();
+        }
+
+        void finalize(hpx::detail::fork_policy policy)
+        {
+            // schedule the final function invocation with high priority
+            util::thread_description desc(func_, "dataflow_frame::finalize");
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            threads::thread_id_type tid = threads::register_thread_nullary(
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
+              , desc
+              , threads::pending_do_not_schedule
+              , true
+              , policy.priority()
+              , get_worker_thread_num()
+              , threads::thread_stacksize_current);
+
+            if (tid)
+            {
+                // make sure this thread is executed last
+                hpx::this_thread::yield_to(thread::id(std::move(tid)));
+            }
+        }
+
+        void finalize(launch policy)
+        {
+            if (policy == launch::sync)
+            {
+                finalize(launch::sync);
+            }
+            else if (policy == launch::fork)
+            {
+                finalize(launch::fork);
+            }
+            else
+            {
+                finalize(launch::async);
+            }
         }
 
         HPX_FORCEINLINE
         void finalize(threads::executor& sched)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(sched, f, std::move(this_), indices_type(), is_void());
+            hpx::apply(sched, &dataflow_frame::done, std::move(this_));
         }
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
@@ -277,11 +316,9 @@ namespace hpx { namespace lcos { namespace detail
         >::type
         finalize(Executor& exec)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
             parallel::executor_traits<Executor>::apply_execute(exec,
-                f, std::move(this_), indices_type(), is_void());
+                &dataflow_frame::done, std::move(this_));
         }
 #endif
 
@@ -355,12 +392,13 @@ namespace hpx { namespace lcos { namespace detail
                     typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data
-                    = traits::detail::get_shared_state(*next);
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(*next);
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 
@@ -414,12 +452,13 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::future_traits<future_type>::type
                 future_result_type;
 
-            boost::intrusive_ptr<
-                lcos::detail::future_data<future_result_type>
-            > next_future_data
-                = traits::detail::get_shared_state(f_);
+            typename traits::detail::shared_state_ptr<
+                    future_result_type
+                >::type next_future_data =
+                    traits::detail::get_shared_state(f_);
 
-            if(!next_future_data->is_ready())
+            if (next_future_data.get() != nullptr &&
+                !next_future_data->is_ready())
             {
                 next_future_data->execute_deferred();
 

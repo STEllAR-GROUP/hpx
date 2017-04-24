@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR sequenced_policy() {}
+        HPX_CONSTEXPR sequenced_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new sequenced_task_policy.
@@ -489,7 +489,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default sequential execution policy object.
-    static sequenced_policy HPX_CONSTEXPR_OR_CONST seq;
+    HPX_STATIC_CONSTEXPR sequenced_policy seq;
 
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -972,7 +972,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_policy() {}
+        HPX_CONSTEXPR parallel_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new parallel_policy referencing a chunk size.
@@ -1077,7 +1077,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default parallel execution policy object.
-    static parallel_policy HPX_CONSTEXPR_OR_CONST par;
+    HPX_STATIC_CONSTEXPR parallel_policy par;
 
     /// The class parallel_policy_shim is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
@@ -1249,7 +1249,7 @@ namespace hpx { namespace parallel { namespace execution
         typedef parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_unsequenced_policy() {}
+        HPX_CONSTEXPR parallel_unsequenced_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new parallel_unsequenced_policy from itself
@@ -1291,7 +1291,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default vector execution policy object.
-    static parallel_unsequenced_policy HPX_CONSTEXPR_OR_CONST par_unseq;
+    HPX_STATIC_CONSTEXPR parallel_unsequenced_policy par_unseq;
 
     ///////////////////////////////////////////////////////////////////////////
     // Allow to detect execution policies which were created as a result
@@ -1510,11 +1510,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     using task_execution_policy_tag = parallel::execution::task_policy_tag;
 
     ///////////////////////////////////////////////////////////////////////////
-    static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;
-    static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par;
-    static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
+    HPX_STATIC_CONSTEXPR sequential_execution_policy seq;
+    HPX_STATIC_CONSTEXPR parallel_execution_policy par;
+    HPX_STATIC_CONSTEXPR parallel_vector_execution_policy par_vec;
 
-    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
+    HPX_STATIC_CONSTEXPR task_execution_policy_tag task;
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////

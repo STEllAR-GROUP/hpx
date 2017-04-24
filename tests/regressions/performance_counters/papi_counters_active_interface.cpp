@@ -68,8 +68,12 @@ int check(int fd)
         ssize_t n = read(fd, buf, 1024);
         if (n > 0)
         {
-            out += buf;
-            size_t pos = out.find(counter_name);
+            out += std::string(buf, buf + n);
+            size_t pos = out.find("invalid");
+            if (pos != out.npos)
+                return 0;
+
+            pos = out.find(counter_name);
             if (pos != out.npos)
             { // counter name found
                 out.erase(0, pos);

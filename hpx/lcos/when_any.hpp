@@ -230,7 +230,8 @@ namespace hpx { namespace lcos
                     shared_state_ptr const& shared_state =
                         traits::detail::get_shared_state(future);
 
-                    if (!shared_state->is_ready())
+                    if (shared_state.get() != nullptr &&
+                        !shared_state->is_ready())
                     {
                         // handle future only if not enough futures are ready
                         // yet also, do not touch any futures which are already

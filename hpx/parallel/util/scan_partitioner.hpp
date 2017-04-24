@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2015 Daniel Bourgeois
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 #include <boost/range/functions.hpp>
@@ -102,28 +103,18 @@ namespace hpx { namespace parallel { namespace util
                         HPX_ASSERT(count_ > count);
 
                         hpx::shared_future<Result1> curr = workitems[1];
+                        finalitems.push_back(dataflow(hpx::launch::sync,
+                            f3, first_, count_ - count, workitems[0], curr));
+
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
-
-                        // FIXME: this should really work with executors...
-                        finalitems.push_back(dataflow(hpx::launch::sync,
-                            //policy.executor(),
-                            f3, first_, count_ - count, workitems[0], curr));
                     }
-
-                    std::size_t parts = workitems.size();
 
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        // FIXME: this should really work with executors or async
-                        // continuations in general
-                        hpx::launch p = hpx::launch::sync;
-//                         if (parts & 0x7)
-//                             p = hpx::launch::sync;
-
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
 
@@ -131,12 +122,11 @@ namespace hpx { namespace parallel { namespace util
                         auto curr = execution::async_execute(
                             policy.executor(), f1, it, size).share();
 
-                        workitems.push_back(dataflow(p, f2, prev, curr));
-
-                        finalitems.push_back(dataflow(p, //olicy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, it, size, prev, curr));
 
-                        ++parts;
+                        workitems.push_back(dataflow(hpx::launch::sync,
+                            f2, prev, curr));
                     }
                 }
                 catch (...) {
@@ -227,28 +217,18 @@ namespace hpx { namespace parallel { namespace util
                         HPX_ASSERT(count_ > count);
 
                         hpx::shared_future<Result1> curr = workitems[1];
+                        finalitems.push_back(dataflow(hpx::launch::sync,
+                            f3, first_, count_ - count, workitems[0], curr));
+
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
-
-                        // FIXME: this should really work with executors...
-                        finalitems.push_back(dataflow(hpx::launch::sync,
-                            //policy.executor(),
-                            f3, first_, count_ - count, workitems[0], curr));
                     }
-
-                    std::size_t parts = workitems.size();
 
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
                     for(auto const& elem: shape)
                     {
-                        // FIXME: this should really work with executors or async
-                        // continuations in general
-                        hpx::launch p = hpx::launch::sync;
-//                         if (parts & 0x7)
-//                             p = hpx::launch::sync;
-
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
 
@@ -256,12 +236,11 @@ namespace hpx { namespace parallel { namespace util
                         auto curr = execution::async_execute(
                             policy.executor(), f1, it, size).share();
 
-                        workitems.push_back(dataflow(p, f2, prev, curr));
+                        workitems.push_back(dataflow(hpx::launch::sync,
+                            f2, prev, curr));
 
-                        finalitems.push_back(dataflow(p, //olicy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, it, size, prev, curr));
-
-                        ++parts;
                     }
                 }
                 catch (std::bad_alloc const&) {
@@ -279,6 +258,8 @@ namespace hpx { namespace parallel { namespace util
                         std::vector<hpx::future<Result2> >&& fitems
                     ) mutable -> R
                     {
+                        HPX_UNUSED(scoped_param);
+
                         handle_local_exceptions<ExPolicy>::call(witems, errors);
                         handle_local_exceptions<ExPolicy>::call(fitems, errors);
 

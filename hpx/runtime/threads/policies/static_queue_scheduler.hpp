@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,16 +8,19 @@
 #define HPX_THREADMANAGER_SCHEDULING_STATIC_QUEUE_JUL_22_2015_0103PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/atomic.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -44,11 +47,10 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
+    template <typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
     class static_queue_scheduler
         : public local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
@@ -72,7 +74,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
+        virtual bool get_next_thread(std::size_t num_thread, bool,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             typedef typename base_type::thread_queue_type thread_queue_type;
@@ -146,5 +148,6 @@ namespace hpx { namespace threads { namespace policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif
 

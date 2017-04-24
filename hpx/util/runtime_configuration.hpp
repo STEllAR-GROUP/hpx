@@ -78,11 +78,6 @@ namespace hpx { namespace util
 
         std::size_t get_agas_max_pending_refcnt_requests() const;
 
-        // Get whether the AGAS server is running as a dedicated runtime.
-        // This decides whether the AGAS actions are executed with normal
-        // priority (if dedicated) or with high priority (non-dedicated)
-        bool get_agas_dedicated_server() const;
-
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
         bool load_application_configuration(char const* filename,

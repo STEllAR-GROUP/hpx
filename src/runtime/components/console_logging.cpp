@@ -96,7 +96,8 @@ namespace hpx { namespace components
 
     bool pending_logs::is_active()
     {
-        return threads::threadmanager_is(state_running) && threads::get_self_ptr() &&
+        return threads::get_self_ptr() &&
+            threads::threadmanager_is(state_running) &&
             activated_.load();
     }
 

@@ -12,10 +12,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/capability.hpp>
-#endif
-
 #include <cstdint>
 #include <string>
 
@@ -66,13 +62,6 @@ namespace hpx { namespace components
 
         // AGAS symbolic naming services.
         component_agas_symbol_namespace = 13,
-
-#if defined(HPX_HAVE_SODIUM)
-        // root CA, subordinate CA
-        signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
-        component_root_certificate_authority = 15,
-        component_subordinate_certificate_authority = 16,
-#endif
 
         component_last,
         component_first_dynamic = component_last,
@@ -136,24 +125,6 @@ namespace hpx { namespace components
         return lhs_base == rhs_base;
     }
 
-#if defined(HPX_HAVE_SECURITY)
-    inline components::security::capability default_component_creation_capabilities(
-        components::security::traits::capability<>::capabilities caps)
-    {
-        using namespace components::security;
-
-        // if we're asked for required capabilities related to creating
-        // an instance of this component then require 'write' capabilities
-        if (caps & traits::capability<>::capability_create_component)
-        {
-            return capability(traits::capability<>::capability_non_const);
-        }
-
-        // otherwise require no capabilities
-        return capability();
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     inline component_type get_component_type()
@@ -173,10 +144,10 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return value; }                                                 \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(                         \
+        void component_type_database< component>::set(                        \
             components::component_type t) { value = t; }                      \
     }}                                                                        \
 /**/
@@ -206,11 +177,11 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return type; }                                                  \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(components::component_type) \
-            { HPX_ASSERT(false); }                                          \
+        void component_type_database< component>::set(components::component_type)\
+            { HPX_ASSERT(false); }                                            \
     }}                                                                        \
 /**/
 

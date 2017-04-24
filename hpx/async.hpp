@@ -115,13 +115,13 @@ namespace hpx { namespace detail
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
         >::type
-        call(launch launch_policy, F && f, Ts&&... ts)
+        call(launch policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
                     F(Ts&&...)
                 >::type result_type;
 
-            if (launch_policy == launch::sync)
+            if (policy == launch::sync)
             {
                 return detail::call_sync(
                     util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
@@ -130,10 +130,10 @@ namespace hpx { namespace detail
 
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-            if (hpx::detail::has_async_policy(launch_policy))
+            if (hpx::detail::has_async_policy(policy))
             {
-                threads::thread_id_type tid = p.apply(launch_policy);
-                if (launch_policy == launch::fork)
+                threads::thread_id_type tid = p.apply(policy, policy.priority());
+                if (policy == launch::fork)
                 {
                     // make sure this thread is executed last
                     hpx::this_thread::yield_to(thread::id(std::move(tid)));
@@ -168,7 +168,7 @@ namespace hpx { namespace detail
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
         >::type
-        call(hpx::detail::async_policy, F && f, Ts&&... ts)
+        call(hpx::detail::async_policy policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
                 result_type;
@@ -176,7 +176,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(launch::async);
+            p.apply(policy, policy.priority());
             return p.retrieve_future();
         }
 
@@ -188,7 +188,7 @@ namespace hpx { namespace detail
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
         >::type
-        call(hpx::detail::fork_policy, F && f, Ts&&... ts)
+        call(hpx::detail::fork_policy policy, F && f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<F(Ts&&...)>::type
                 result_type;
@@ -197,7 +197,7 @@ namespace hpx { namespace detail
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
             // make sure this thread is executed last
-            threads::thread_id_type tid = p.apply(launch::fork);
+            threads::thread_id_type tid = p.apply(policy, policy.priority());
             hpx::this_thread::yield_to(thread::id(std::move(tid)));
             return p.retrieve_future();
         }

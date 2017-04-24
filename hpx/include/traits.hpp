@@ -8,7 +8,6 @@
 
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/action_capability_provider.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
@@ -29,6 +28,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/has_xxx.hpp>

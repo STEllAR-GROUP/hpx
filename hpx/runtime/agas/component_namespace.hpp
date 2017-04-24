@@ -46,7 +46,7 @@ namespace hpx { namespace agas
         virtual lcos::future<std::uint32_t>
         get_num_localities(components::component_type type)=0;
 
-        virtual naming::gid_type statistics_counter(std::string const& name)=0;;
+        virtual naming::gid_type statistics_counter(std::string const& name)=0;
 
         virtual void register_counter_types()
         {}

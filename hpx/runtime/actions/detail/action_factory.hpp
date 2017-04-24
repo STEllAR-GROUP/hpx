@@ -92,7 +92,7 @@ namespace hpx { namespace actions { namespace detail
     }
 
     template <std::uint32_t Id>
-    std::string get_action_name_id();
+    HPX_ALWAYS_EXPORT std::string get_action_name_id();
 
     template <std::uint32_t Id>
     struct add_constant_entry
@@ -117,11 +117,11 @@ namespace hpx { namespace actions { namespace detail
 
 #define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                                \
     namespace hpx { namespace actions { namespace detail {                      \
-        template <> std::string get_action_name_id<Id>()                        \
+        template <> HPX_ALWAYS_EXPORT std::string get_action_name_id< Id>()     \
         {                                                                       \
             return BOOST_PP_STRINGIZE(Name);                                    \
         }                                                                       \
-        template add_constant_entry<Id> add_constant_entry<Id>::instance;       \
+        template add_constant_entry< Id> add_constant_entry< Id>::instance;     \
     }}}                                                                         \
 /**/
 

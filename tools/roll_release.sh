@@ -52,13 +52,19 @@ rm -rf packages/tar.bz2/hpx_$DOT_VERSION
 (cd packages/tar.bz2 && tar -xf ../$TARBZ2)
 echo "DONE"
 
+if type -t "7za" > /dev/null; 
+then
+	SEVENZIP=7za
+else
+	SEVENZIP=7zr
+fi
 echo -n "Packaging $SEVENZ... "
-7zr a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null
-(cd packages/7z/hpx_$DOT_VERSION && 7zr x ../../$SEVENZ > /dev/null)
+$SEVENZIP a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null
+(cd packages/7z/hpx_$DOT_VERSION && $SEVENZIP x ../../$SEVENZ > /dev/null)
 rm -f packages/$SEVENZ
-(cd packages/7z && 7zr a ../$SEVENZ hpx_$DOT_VERSION > /dev/null)
+(cd packages/7z && $SEVENZIP a ../$SEVENZ hpx_$DOT_VERSION > /dev/null)
 rm -rf packages/7z/hpx_$DOT_VERSION
-(cd packages/7z && 7zr x ../$SEVENZ > /dev/null)
+(cd packages/7z && $SEVENZIP x ../$SEVENZ > /dev/null)
 echo "DONE"
 
 ZIP_MD5=`md5sum packages/$ZIP | awk {'print $1'}`

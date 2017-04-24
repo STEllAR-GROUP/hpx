@@ -29,12 +29,17 @@ void test_for_loop(executor_type& exec,
     target_vector& d_A, target_vector& d_B, target_vector& d_C,
     std::vector<int> const& ref)
 {
+    // FIXME : Lambda function given to for_loop_n() is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used inside for_each()) to get the return
+    //         type
+
     hpx::parallel::for_loop_n(
         hpx::parallel::execution::par.on(exec),
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
         hpx::parallel::induction(d_C.data()),
-        [] HPX_DEVICE (int* A, int* B, int* C)
+        [] HPX_HOST_DEVICE (int* A, int* B, int* C)
         {
             *C = *A + 3.0 * *B;
         });

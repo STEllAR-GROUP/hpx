@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,9 @@ namespace hpx { namespace parallel { namespace traits
     struct is_vector_pack : std::false_type {};
 
     template <typename T, typename Enable = void>
+    struct is_scalar_vector_pack;
+
+    template <typename T, typename Enable>
     struct is_scalar_vector_pack : std::false_type {};
 
     template <typename T, typename Enable = void>
@@ -68,7 +71,6 @@ namespace hpx { namespace parallel { namespace traits
 #if !defined(__CUDACC__)
 #include <hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/detail/boost_simd/vector_pack_alignment_size.hpp>
-#include <hpx/parallel/traits/detail/libflatarray/vector_pack_alignment_size.hpp>
 #endif
 
 #endif

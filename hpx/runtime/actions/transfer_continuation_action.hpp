@@ -11,9 +11,6 @@
 #define HPX_RUNTIME_ACTIONS_TRANSFER_CONTINUATION_ACTION_HPP
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/traits/action_capability_provider.hpp>
-#endif
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -96,7 +93,7 @@ namespace hpx { namespace actions
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread);
+            std::size_t num_thread, bool& deferred_schedule);
 
     private:
         continuation_type cont_;
@@ -173,7 +170,7 @@ namespace hpx { namespace actions
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
             std::move(data), std::move(cont_), target, lva, this->priority_,
-            util::get<Is>(std::move(this->arguments_))...);
+            std::move(util::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>
@@ -210,10 +207,23 @@ namespace hpx { namespace actions
     void transfer_continuation_action<Action>::load_schedule(
         serialization::input_archive& ar,
         naming::gid_type&& target, naming::address_type lva,
-        std::size_t num_thread)
+        std::size_t num_thread, bool& deferred_schedule)
     {
         // First, serialize, then schedule
         load(ar);
+
+        if (deferred_schedule)
+        {
+            // If this is a direct action and deferred schedule was requested, that
+            // is we are not the last parcel, return immediately
+            if (base_type::direct_execution::value)
+                return;
+
+            // If this is not a direct action, we can safely set deferred_schedule
+            // to false
+            deferred_schedule = false;
+        }
+
         schedule_thread(std::move(target), lva, num_thread);
     }
 }}

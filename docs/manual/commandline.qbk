@@ -85,8 +85,9 @@ described in the table below:
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
-                                 'local/l', 'local-priority/lo', 'abp/a', 'abp-priority',
-                                 'hierarchy/h', and 'periodic/pe' (default: local-priority/lo)]]
+                                 'local/l', 'local-priority-fifo/lo', 'local-priority-lifo', 'abp/a',
+                                 'abp-priority', 'hierarchy/h', and 'periodic/pe'
+                                 (default: local-priority-fifo/lo)]]
     [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
                                  `--hpx:queuing=hierarchy` only (default: 2)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
@@ -121,6 +122,9 @@ described in the table below:
                                        log channel and send all parcel transport
                                        logs to the target destination (default:
                                        cout)]]
+    [[`--hpx:debug-timing-log [arg]`] [enable all messages on the timing log
+                                       channel and send all timing logs to the
+                                       target destination (default: cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
                                     `startup` or `exception` (default: startup)]]
@@ -128,6 +132,10 @@ described in the table below:
     [[[*__hpx__ options related to performance counters]]]
     [[`--hpx:print-counter`]    [print the specified performance counter either
         repeatedly and/or at the times specified by `--hpx:print-counter-at`
+        (see also option `--hpx:print-counter-interval`)]]
+    [[`--hpx:print-counter-reset`] [print the specified performance counter either
+        repeatedly and/or at the times specified by `--hpx:print-counter-at`,
+        reset the counter after the value is queried.
         (see also option `--hpx:print-counter-interval`)]]
     [[`--hpx:print-counter-interval`][print the performance counter(s)
         specified with `--hpx:print-counter` repeatedly after the time interval
@@ -153,10 +161,20 @@ described in the table below:
         `--hpx:print-counter` and `csv` or `csv-short` format specified with
         `--hpx:print-counter-format` without header]]
     [[`--hpx:printer-counter-at arg`][print the performance counter(s)
-        specified with `--hpx:print-counter` at the given point in time,
+        specified with `--hpx:print-counter` (or `--hpx:print-counter-reset`)
+        at the given point in time,
         possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
-    [[`--hpx:reset-counters`][reset the performance counter(s) specified with
+    [[`--hpx:reset-counters`][reset all performance counter(s) specified with
         `--hpx:print-counter` after they have been evaluated]]
+    [[`--hpx:print-counter-at`][print the performance counter(s) specified with
+        `--hpx:print-counter` (or `--hpx:print-counter-reset`) at the given
+        point in time, possible argument are values: 'startup',
+        'shutdown' (default), 'noshutdown'.]]
+    [[`--hpx:print-counters-locally`]
+     [Each locality prints only its own local counters. If this is used with
+      `--hpx-print-counter-destination=<file>, the code will append a
+      `".<locality_id>"` to the file name in order to avoid clashes between
+      localities.]]
 ]
 
 [heading Command Line Argument Shortcuts]

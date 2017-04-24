@@ -37,9 +37,9 @@ namespace hpx
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     ///
-    /// \param futures  A vector holding an arbitrary amount of \a future or
-    ///                 \a shared_future objects for which \a wait_all should
-    ///                 wait.
+    /// \param futures  A vector or array holding an arbitrary amount of
+    ///                 \a future or \a shared_future objects for which
+    ///                 \a wait_all should wait.
     ///
     /// \note The function \a wait_all returns after all futures have become
     ///       ready. All input futures are still valid after \a wait_all
@@ -47,6 +47,21 @@ namespace hpx
     ///
     template <typename R>
     void wait_all(std::vector<future<R>>&& futures);
+
+    /// The function \a wait_all is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns after they finished executing.
+    ///
+    /// \param futures  A vector or array holding an arbitrary amount of
+    ///                 \a future or \a shared_future objects for which
+    ///                 \a wait_all should wait.
+    ///
+    /// \note The function \a wait_all returns after all futures have become
+    ///       ready. All input futures are still valid after \a wait_all
+    ///       returns.
+    ///
+    template <typename R, std::size_t N>
+    void wait_all(std::array<future<R>, N>&& futures);
 
     /// The function \a wait_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -107,6 +122,9 @@ namespace hpx
 #include <boost/ref.hpp>
 
 #include <algorithm>
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -144,13 +162,20 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         template <typename Range, typename Enable = void>
         struct is_future_or_shared_state_range
-            : std::false_type
+          : std::false_type
         {};
 
         template <typename T>
         struct is_future_or_shared_state_range<std::vector<T> >
-            : is_future_or_shared_state<T>
+          : is_future_or_shared_state<T>
         {};
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+        template <typename T, std::size_t N>
+        struct is_future_or_shared_state_range<std::array<T, N> >
+          : is_future_or_shared_state<T>
+        {};
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
@@ -209,7 +234,7 @@ namespace hpx { namespace lcos
                 this->set_value(util::unused);     // simply make ourself ready
             }
 
-            // Current element is a range (vector) of futures
+            // Current element is a range (vector or array) of futures
             template <std::size_t I, typename Iter>
             void await_range(Iter next, Iter end)
             {
@@ -224,12 +249,13 @@ namespace hpx { namespace lcos
 
                 for (/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
+                    typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
                         traits::detail::get_shared_state(*next);
 
-                    if (!next_future_data->is_ready())
+                    if (next_future_data.get() != nullptr &&
+                        !next_future_data->is_ready())
                     {
                         next_future_data->execute_deferred();
 
@@ -275,12 +301,13 @@ namespace hpx { namespace lcos
                         future_type
                     >::type future_result_type;
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data = traits::detail::get_shared_state(
-                    util::get<I>(t_));
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(util::get<I>(t_));
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 
@@ -363,6 +390,35 @@ namespace hpx { namespace lcos
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, std::size_t N>
+    void wait_all(std::array<Future, N> const& values)
+    {
+        typedef util::tuple<std::array<Future, N> const&> result_type;
+        typedef detail::wait_all_frame<result_type> frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
+
+        result_type data(values);
+        boost::intrusive_ptr<frame_type> frame(
+            new frame_type(data, init_no_addref()), false);
+        frame->wait_all();
+    }
+
+    template <typename Future, std::size_t N>
+    HPX_FORCEINLINE void wait_all(std::array<Future, N>& values)
+    {
+        lcos::wait_all(const_cast<std::array<Future, N> const&>(values));
+    }
+
+    template <typename Future, std::size_t N>
+    HPX_FORCEINLINE void wait_all(std::array<Future, N>&& values)
+    {
+        lcos::wait_all(const_cast<std::array<Future, N> const&>(values));
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type

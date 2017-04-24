@@ -8,6 +8,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/bind.hpp>
@@ -25,15 +26,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
-    performance_counter_set::performance_counter_set(std::string const& name)
+    performance_counter_set::performance_counter_set(std::string const& name,
+        bool reset)
     {
-        add_counters(name);
+        add_counters(name, reset);
     }
 
     performance_counter_set::performance_counter_set(
-        std::vector<std::string> const& names)
+        std::vector<std::string> const& names, bool reset)
     {
-        add_counters(names);
+        add_counters(names, reset);
     }
 
     void performance_counter_set::release()
@@ -61,8 +63,23 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     bool performance_counter_set::find_counter(counter_info const& info,
-        error_code& ec)
+        bool reset, error_code& ec)
     {
+        // keep only local counters if requested
+        if (print_counters_locally_)
+        {
+            counter_path_elements p;
+            get_counter_path_elements(info.fullname_, p, ec);
+            if (ec) return false;
+
+            if (p.parentinstanceindex_ != hpx::get_locality_id())
+            {
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+        }
+
         naming::id_type id = get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
@@ -78,6 +95,7 @@ namespace hpx { namespace performance_counters
             std::unique_lock<mutex_type> l(mtx_);
             infos_.push_back(info);
             ids_.push_back(id);
+            reset_.push_back(reset ? 1 : 0);
         }
 
         if (&ec != &throws)
@@ -87,13 +105,13 @@ namespace hpx { namespace performance_counters
     }
 
     void performance_counter_set::add_counters(std::string const& name,
-        error_code& ec)
+        bool reset, error_code& ec)
     {
         using util::placeholders::_1;
         using util::placeholders::_2;
 
-        discover_counter_func func =
-            util::bind(&performance_counter_set::find_counter, this, _1, _2);
+        discover_counter_func func = util::bind(
+            &performance_counter_set::find_counter, this, _1, reset, _2);
 
         // do INI expansion on counter name
         std::string n(name);
@@ -107,13 +125,13 @@ namespace hpx { namespace performance_counters
     }
 
     void performance_counter_set::add_counters(
-        std::vector<std::string> const& names, error_code& ec)
+        std::vector<std::string> const& names, bool reset, error_code& ec)
     {
         using util::placeholders::_1;
         using util::placeholders::_2;
 
-        discover_counter_func func =
-            util::bind(&performance_counter_set::find_counter, this, _1, _2);
+        discover_counter_func func = util::bind(
+            &performance_counter_set::find_counter, this, _1, reset, _2);
 
         for (std::string const& name : names)
         {
@@ -252,7 +270,7 @@ namespace hpx { namespace performance_counters
 
             using performance_counters::stubs::performance_counter;
             v.push_back(performance_counter::get_value(
-                launch::async, ids[i], reset));
+                launch::async, ids[i], reset || reset_[i]));
         }
 
         return v;
@@ -293,7 +311,7 @@ namespace hpx { namespace performance_counters
 
             using performance_counters::stubs::performance_counter;
             v.push_back(performance_counter::get_values_array(
-                launch::async, ids[i], reset));
+                launch::async, ids[i], reset || reset_[i]));
         }
 
         return v;
