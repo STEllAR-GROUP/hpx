@@ -13,9 +13,11 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <Vc/Vc>
+#include <Vc/global.h>
 
-#if Vc_IS_VERSION_1
+#if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
+
+#include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
@@ -134,20 +136,17 @@ namespace hpx { namespace parallel { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Abi>
-    struct is_scalar_vector_pack
-      : std::false_type
-    {};
-
     template <typename T>
-    struct is_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> >
+    struct is_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> > >
       : std::true_type
     {};
 
+/*
     template <typename T>
     struct is_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::scalar> >
       : std::true_type
     {};
+*/
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
@@ -156,14 +155,16 @@ namespace hpx { namespace parallel { namespace traits
     {};
 
     template <typename T>
-    struct is_non_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> >
+    struct is_non_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::fixed_size<1> > >
       : std::false_type
     {};
 
+/*
     template <typename T>
     struct is_non_scalar_vector_pack<Vc::datapar<T, Vc::datapar_abi::scalar> >
       : std::false_type
     {};
+*/
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>

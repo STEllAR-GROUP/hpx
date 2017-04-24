@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,7 +74,13 @@ namespace hpx { namespace applier { namespace detail
             data.lva = lva;
 #endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            data.description = util::thread_description(
+                actions::detail::get_action_name<Action>(),
+                actions::detail::get_action_name_itt<Action>());
+#else
             data.description = actions::detail::get_action_name<Action>();
+#endif
 #endif
             data.priority = fix_priority<Action>(priority);
             data.stacksize = threads::get_stack_size(
@@ -107,7 +113,13 @@ namespace hpx { namespace applier { namespace detail
             data.lva = lva;
 #endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            data.description = util::thread_description(
+                actions::detail::get_action_name<Action>(),
+                actions::detail::get_action_name_itt<Action>());
+#else
             data.description = actions::detail::get_action_name<Action>();
+#endif
 #endif
             data.priority = fix_priority<Action>(priority);
             data.stacksize = threads::get_stack_size(
@@ -139,7 +151,7 @@ namespace hpx { namespace applier { namespace detail
             // Direct actions should be able to be executed from a non-HPX thread
             // as well
             if (this_thread::has_sufficient_stack_space() ||
-                hpx::threads::get_self_ptr() == nullptr)
+                !threads::threadmanager_is_at_least(state_running))
             {
                 Action::execute_function(lva, std::forward<Ts>(vs)...);
             }
@@ -159,7 +171,7 @@ namespace hpx { namespace applier { namespace detail
             // Direct actions should be able to be executed from a non-HPX thread
             // as well
             if (this_thread::has_sufficient_stack_space() ||
-                hpx::threads::get_self_ptr() == nullptr)
+                !threads::threadmanager_is_at_least(state_running))
             {
                 try {
                     cont.trigger_value(Action::execute_function(lva,

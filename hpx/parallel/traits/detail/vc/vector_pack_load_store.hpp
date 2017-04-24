@@ -15,9 +15,11 @@
 #include <iterator>
 #include <memory>
 
-#include <Vc/Vc>
+#include <Vc/global.h>
 
-#if Vc_IS_VERSION_1
+#if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
+
+#include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
@@ -202,7 +204,7 @@ namespace hpx { namespace parallel { namespace traits
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return vector_pack_type(std::addressof(*iter),
-                Vc::flags::vector_aligned_tag);
+                Vc::flags::vector_aligned);
         }
 
         template <typename Iter>
@@ -211,7 +213,7 @@ namespace hpx { namespace parallel { namespace traits
         {
             typedef typename rebind_pack<V, ValueType>::type vector_pack_type;
             return vector_pack_type(std::addressof(*iter),
-                Vc::flags::element_aligned_tag);
+                Vc::flags::element_aligned);
         }
     };
 
@@ -222,13 +224,13 @@ namespace hpx { namespace parallel { namespace traits
         template <typename Iter>
         static void aligned(V const& value, Iter const& iter)
         {
-            value.copy_to(std::addressof(*iter), Vc::flags::vector_aligned_tag);
+            value.copy_to(std::addressof(*iter), Vc::flags::vector_aligned);
         }
 
         template <typename Iter>
         static void unaligned(V const& value, Iter const& iter)
         {
-            value.copy_to(std::addressof(*iter), Vc::flags::element_aligned_tag);
+            value.copy_to(std::addressof(*iter), Vc::flags::element_aligned);
         }
     };
 }}}

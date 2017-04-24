@@ -23,13 +23,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/lcos/local/spinlock.hpp>
-#endif
-
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/certificate_store.hpp>
-#endif
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -75,13 +68,6 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
-
-#if defined(HPX_HAVE_SECURITY)
-    namespace detail
-    {
-        struct manage_security_data;
-    }
-#endif
 
     class HPX_EXPORT runtime
     {
@@ -327,53 +313,12 @@ namespace hpx
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec = throws);
 
-#if defined(HPX_HAVE_SECURITY)
-        components::security::signed_certificate
-            get_root_certificate(error_code& ec = throws) const;
-        components::security::signed_certificate
-            get_certificate(error_code& ec = throws) const;
-
-        // add a certificate for another locality
-        void add_locality_certificate(
-            components::security::signed_certificate const& cert);
-
-        components::security::signed_certificate const&
-            get_locality_certificate(error_code& ec) const;
-        components::security::signed_certificate const&
-            get_locality_certificate(std::uint32_t locality_id, error_code& ec) const;
-
-        void sign_parcel_suffix(
-            components::security::parcel_suffix const& suffix,
-            components::security::signed_parcel_suffix& signed_suffix,
-            error_code& ec) const;
-
-        template <typename Buffer>
-        bool verify_parcel_suffix(Buffer const& data,
-            naming::gid_type& parcel_id, error_code& ec) const;
-
-        components::security::signed_certificate_signing_request
-            get_certificate_signing_request() const;
-        components::security::signed_certificate
-            sign_certificate_signing_request(
-                components::security::signed_certificate_signing_request csr);
-
-        void store_root_certificate(
-            components::security::signed_certificate const& root_cert);
-
-        void store_subordinate_certificate(
-            components::security::signed_certificate const& root_subca_cert,
-            components::security::signed_certificate const& subca_cert);
-
-    protected:
-        void init_security();
-#endif
-
     protected:
         void init_tss();
         void deinit_tss();
 
     public:
-        void set_state(state s) { state_.store(s); }
+        void set_state(state s);
 
     protected:
         util::reinit_helper reinit_;
@@ -405,13 +350,6 @@ namespace hpx
 
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;
-
-#if defined(HPX_HAVE_SECURITY)
-        // allocate dynamically to reduce dependencies
-        mutable lcos::local::spinlock security_mtx_;
-        std::unique_ptr<detail::manage_security_data> security_data_;
-        components::security::certificate_store const * cert_store(error_code& ec) const;
-#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -421,19 +359,6 @@ namespace hpx
     /// loading of external libraries.
     HPX_EXPORT bool keep_factory_alive(components::component_type type);
 }   // namespace hpx
-
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/verify.hpp>
-namespace hpx {
-    template <typename Buffer>
-    bool runtime::verify_parcel_suffix(Buffer const& data,
-        naming::gid_type& parcel_id, error_code& ec) const
-    {
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        return components::security::verify(*cert_store(ec), data, parcel_id);
-    }
-}
-#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

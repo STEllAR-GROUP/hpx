@@ -97,19 +97,23 @@ namespace hpx { namespace util
 
         reinitializable_static()
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
             boost::call_once(constructed_,
                 &reinitializable_static::default_constructor);
+#endif
         }
 
         template <typename U>
         reinitializable_static(U const& val)
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
             boost::call_once(constructed_,
                 util::bind(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const *>(std::addressof(val))));
+#endif
         }
 
         operator reference()

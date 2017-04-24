@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
 
@@ -28,8 +29,22 @@ namespace hpx { namespace util { namespace detail
         std::size_t (*get_function_address)(void**);
 
         template <typename T>
+        HPX_FORCEINLINE static char const* _get_function_annotation(void** f)
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            return traits::get_function_annotation<T>::call(vtable::get<T>(f));
+#else
+            return nullptr;
+#endif
+        }
+        char const* (*get_function_annotation)(void**);
+
+        template <typename T>
         HPX_CONSTEXPR callable_vtable_base(construct_vtable<T>) HPX_NOEXCEPT
-          : get_function_address(&callable_vtable_base::template _get_function_address<T>)
+          : get_function_address(
+                &callable_vtable_base::template _get_function_address<T>)
+          , get_function_annotation(
+                &callable_vtable_base::template _get_function_annotation<T>)
         {}
     };
 

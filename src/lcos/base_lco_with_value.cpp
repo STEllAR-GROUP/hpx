@@ -31,9 +31,17 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(
     hpx::naming::id_type, hpx::naming::gid_type, id_type,
     hpx::actions::base_lco_with_value_id_get,
     hpx::actions::base_lco_with_value_id_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::naming::id_type, naming_id_type,
+    hpx::actions::base_lco_with_value_id_type_get,
+    hpx::actions::base_lco_with_value_id_type_set)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(
     std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>,
-        vector_id_type,
+    vector_id_gid_type,
+    hpx::actions::base_lco_with_value_vector_id_gid_get,
+    hpx::actions::base_lco_with_value_vector_id_gid_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<hpx::naming::id_type>, vector_id_type,
     hpx::actions::base_lco_with_value_vector_id_get,
     hpx::actions::base_lco_with_value_vector_id_set)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(

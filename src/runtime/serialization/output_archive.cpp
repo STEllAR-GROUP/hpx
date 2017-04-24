@@ -28,7 +28,7 @@ namespace hpx { namespace serialization
     {
         if(!split_gids_) return naming::gid_type();
 
-        split_gids_type::iterator it = split_gids_->find(gid);
+        split_gids_type::iterator it = split_gids_->find(&gid);
         HPX_ASSERT(it != split_gids_->end());
         HPX_ASSERT(it->second != naming::invalid_gid);
         naming::gid_type new_gid = it->second;

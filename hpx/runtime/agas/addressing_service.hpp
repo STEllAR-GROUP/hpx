@@ -1405,6 +1405,9 @@ public:
 
     /// Remove the given object from the table of migrated objects
     void unmark_as_migrated(naming::gid_type const& gid);
+
+    // Pre-cache locality endpoints in hosted locality namespace
+    void pre_cache_endpoints(std::vector<parcelset::endpoints_type> const&);
 };
 
 }}

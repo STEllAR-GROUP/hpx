@@ -14,9 +14,11 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <Vc/Vc>
+#include <Vc/global.h>
 
-#if Vc_IS_VERSION_1
+#if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
+
+#include <Vc/Vc>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
@@ -98,7 +100,7 @@ namespace hpx { namespace parallel { namespace traits
         struct vector_pack_type<T, 0, Abi>
         {
             typedef typename std::conditional<
-                    std::is_void<Abi>::value, Vc::datapar_abi::native, Abi
+                    std::is_void<Abi>::value, Vc::datapar_abi::native<T>, Abi
                 >::type abi_type;
 
             typedef Vc::datapar<T, abi_type> type;

@@ -109,7 +109,7 @@ namespace hpx { namespace threads
             using namespace std;    // some systems have memset in namespace std
             memset (ret, initial_value, sizeof(thread_data));
 #endif
-            return new (ret) thread_data(init_data, pool, newstate);
+            return new (ret) thread_data(init_data, &pool, newstate);
         }
 
         ~thread_data()
@@ -146,7 +146,8 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state_enum state, thread_state_ex_enum state_ex)
+        thread_state set_state(thread_state_enum state,
+            thread_state_ex_enum state_ex = wait_unknown)
         {
             thread_state prev_state =
                 current_state_.load(boost::memory_order_acquire);
@@ -158,6 +159,9 @@ namespace hpx { namespace threads
                 std::int64_t tag = tmp.tag();
                 if (state != tmp.state())
                     ++tag;
+
+                if (state_ex == wait_unknown)
+                    state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
                         thread_state(state, state_ex, tag))))
@@ -541,6 +545,13 @@ namespace hpx { namespace threads
             return coroutine_.set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            return coroutine_.get_apex_data();
+        }
+#endif
+
         void rebind(thread_init_data& init_data,
             thread_state_enum newstate)
         {
@@ -562,10 +573,9 @@ namespace hpx { namespace threads
         friend HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
         friend HPX_EXPORT void intrusive_ptr_release(thread_data* p);
 
-    private:
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data,
-                pool_type& pool, thread_state_enum newstate)
+            pool_type* pool, thread_state_enum newstate)
           : current_state_(thread_state(newstate, wait_signaled)),
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_(init_data.lva),
@@ -594,7 +604,7 @@ namespace hpx { namespace threads
             stacksize_(init_data.stacksize),
             coroutine_(std::move(init_data.func),
                 this_(), init_data.stacksize),
-            pool_(&pool)
+            pool_(pool)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -617,6 +627,7 @@ namespace hpx { namespace threads
             HPX_ASSERT(coroutine_.is_ready());
         }
 
+    private:
         void rebind_base(thread_init_data& init_data, thread_state_enum newstate)
         {
             free_thread_exit_callbacks();
@@ -714,7 +725,7 @@ namespace hpx { namespace threads
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
-        //reference count
+        // reference count
         util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;

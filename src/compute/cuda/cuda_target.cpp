@@ -89,28 +89,20 @@ namespace hpx { namespace compute { namespace cuda
             future_data* this_ = static_cast<future_data*>(user_data);
 
             runtime_registration_wrapper wrap(this_->rt_);
+            release_on_exit on_exit(this_);
 
-            // We need to run this as an HPX thread ...
-            hpx::applier::register_thread_nullary(
-                [this_, error] ()
-                {
-                    release_on_exit on_exit(this_);
+            if (error != cudaSuccess)
+            {
+                this_->set_exception(
+                    HPX_GET_EXCEPTION(kernel_error,
+                        "cuda::detail::future_data::stream_callback()",
+                        std::string("cudaStreamAddCallback failed: ") +
+                            cudaGetErrorString(error))
+                );
+                return;
+            }
 
-                    if (error != cudaSuccess)
-                    {
-                        this_->set_exception(
-                            HPX_GET_EXCEPTION(kernel_error,
-                                "cuda::detail::future_data::stream_callback()",
-                                std::string("cudaStreamAddCallback failed: ") +
-                                    cudaGetErrorString(error))
-                        );
-                        return;
-                    }
-
-                    this_->set_data(hpx::util::unused);
-                },
-                "hpx::compute::cuda::future_data::stream_callback"
-            );
+            this_->set_data(hpx::util::unused);
         }
 
         future_data::future_data()
@@ -155,26 +147,29 @@ namespace hpx { namespace compute { namespace cuda
         std::size_t mp = props.multiProcessorCount;
         switch(props.major)
         {
-            case 2:
-                if(props.minor == 1)
-                {
+            case 2: // Fermi
+                if (props.minor == 1) {
                     mp = mp * 48;
                 }
-                else
-                {
+                else {
                     mp = mp * 32;
                 }
                 break;
-            case 3:
+            case 3: // Kepler
                 mp = mp * 192;
                 break;
-            case 5:
+            case 5: // Maxwell
                 mp = mp * 128;
                 break;
-            default:
+            case 6: // Pascal
+                mp = mp * 64;
+                break;
+             default:
                 break;
         }
         processing_units_ = mp;
+        processor_family_ = props.major;
+        processor_name_ = props.name;
     }
 
     target::native_handle_type::native_handle_type(int device)
@@ -198,6 +193,8 @@ namespace hpx { namespace compute { namespace cuda
             target::native_handle_type const& rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
         processing_units_(rhs.processing_units_),
+        processor_family_(rhs.processor_family_),
+        processor_name_(rhs.processor_name_),
         stream_(0)
     {
     }
@@ -206,6 +203,8 @@ namespace hpx { namespace compute { namespace cuda
             target::native_handle_type && rhs) HPX_NOEXCEPT
       : device_(rhs.device_),
         processing_units_(rhs.processing_units_),
+        processor_family_(rhs.processor_family_),
+        processor_name_(rhs.processor_name_),
         stream_(rhs.stream_)
     {
         rhs.stream_ = 0;
@@ -219,6 +218,8 @@ namespace hpx { namespace compute { namespace cuda
 
         device_ = rhs.device_;
         processing_units_ = rhs.processing_units_;
+        processor_family_ = rhs.processor_family_;
+        processor_name_ = rhs.processor_name_;
         reset();
 
         return *this;
@@ -232,6 +233,8 @@ namespace hpx { namespace compute { namespace cuda
 
         device_ = rhs.device_;
         processing_units_ = rhs.processing_units_;
+        processor_family_ = rhs.processor_family_;
+        processor_name_ = rhs.processor_name_;
         stream_ = rhs.stream_;
         rhs.stream_ = 0;
 

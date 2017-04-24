@@ -9,6 +9,9 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_FWD_HPP
 
 #include <hpx/config.hpp>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 namespace hpx { namespace actions
 {
@@ -24,6 +27,11 @@ namespace hpx { namespace actions
     {
         template <typename Action>
         char const* get_action_name();
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        template <typename Action>
+        util::itt::string_handle const& get_action_name_itt();
+#endif
     }
 }}
 

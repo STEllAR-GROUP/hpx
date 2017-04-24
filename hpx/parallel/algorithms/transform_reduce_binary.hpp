@@ -22,6 +22,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -160,6 +161,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         zip_iterator part_begin, std::size_t part_size
                     ) mutable -> T
                     {
+                        HPX_UNUSED(policy);
+
                         auto iters = part_begin.get_iterator_tuple();
                         FwdIter1 it1 = hpx::util::get<0>(iters);
                         FwdIter2 it2 = hpx::util::get<1>(iters);

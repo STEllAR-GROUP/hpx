@@ -13,7 +13,6 @@
 #include <hpx/async.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -163,12 +162,12 @@ namespace hpx { namespace iostreams
 
         typedef typename stream_base_type::traits_type stream_traits_type;
         typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
-        typedef lcos::local::recursive_mutex mutex_type;
+        typedef detail::buffer::mutex_type mutex_type;
 
         HPX_MOVABLE_ONLY(ostream);
 
     private:
-        mutex_type mtx_;
+        using detail::buffer::mtx_;
         boost::atomic<std::uint64_t> generational_count_;
 
         // Performs a lazy streaming operation.
@@ -189,10 +188,10 @@ namespace hpx { namespace iostreams
 
             // If the buffer isn't empty, send it asynchronously to the
             // destination.
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
@@ -215,10 +214,10 @@ namespace hpx { namespace iostreams
             *static_cast<stream_base_type*>(this) << subject;
 
             // If the buffer isn't empty, send it to the destination.
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
@@ -242,13 +241,19 @@ namespace hpx { namespace iostreams
         bool flush()
         {
             std::unique_lock<mutex_type> l(mtx_);
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
+
+                // since mtx_ is recursive and apply will do an AGAS lookup,
+                // we need to ignore the lock here in case we are called
+                // recursively
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type> >
+                    il(&l);
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.

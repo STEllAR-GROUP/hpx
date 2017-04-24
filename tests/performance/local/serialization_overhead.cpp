@@ -82,7 +82,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     {
         std::string zero_copy_optimization =
             hpx::get_config_entry("hpx.parcel.zero_copy_optimization", "1");
-        if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+        if (!zerocopy || boost::lexical_cast<int>(zero_copy_optimization) == 0)
         {
             out_archive_flags |= hpx::serialization::disable_data_chunking;
         }

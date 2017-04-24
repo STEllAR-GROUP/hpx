@@ -60,7 +60,8 @@ namespace hpx { namespace util
             if (p == std::string::npos)
                 return false;
 
-            if (hpx::util::safe_lexical_cast(s.substr(hpx_prefix_len, p-hpx_prefix_len),
+            if (hpx::util::safe_lexical_cast(
+                    s.substr(hpx_prefix_len, p-hpx_prefix_len),
                     std::size_t(-1)) == node)
             {
                 // this option is for the current locality only
@@ -343,8 +344,8 @@ namespace hpx { namespace util
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode,\
-                         but connecting late")
+                    ("hpx:connect", "run this instance in worker mode, "
+                         "but connecting late")
                 ;
                 break;
 
@@ -357,8 +358,8 @@ namespace hpx { namespace util
                 hidden_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode,\
-                        but connecting late")
+                    ("hpx:connect", "run this instance in worker mode, "
+                        "but connecting late")
                 ;
                 break;
 
@@ -370,15 +371,12 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-                ("hpx:run-agas-server",
-                  "run AGAS server as part of this runtime instance")
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
                 ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
-                ("hpx:run-agas-server-only", "run only the AGAS server")
                 ("hpx:hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
@@ -451,7 +449,8 @@ namespace hpx { namespace util
                  "the number of total cores in the system)")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
-                  "'local', 'local-priority', 'abp-priority', "
+                  "'local', 'local-priority-fifo','local-priority-lifo', "
+                  "'abp-priority', "
                   "'hierarchy', 'static', 'static-priority', and "
                   "'periodic-priority' (default: 'local-priority'; "
                   "all option values can be abbreviated)")
@@ -499,6 +498,9 @@ namespace hpx { namespace util
                 ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the parcel transport log channel and send all "
                   "parcel transport logs to the target destination")
+                ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the timing log channel and send all "
+                  "timing logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
@@ -514,16 +516,24 @@ namespace hpx { namespace util
                 "HPX options related to performance counters");
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
-                  "print the specified performance counter either repeatedly or "
-                  "before shutting down the system \
-                     (see option --hpx:print-counter-interval)")
+                  "print the specified performance counter either repeatedly "
+                  "and/or at the times specified by --hpx:print-counter-at "
+                    "(see also option --hpx:print-counter-interval)")
+                ("hpx:print-counter-reset",
+                        value<std::vector<std::string> >()->composing(),
+                  "print the specified performance counter either repeatedly "
+                  "and/or at the times specified by --hpx:print-counter-at, "
+                    "reset the counter after the "
+                    "value is queried (see also option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
                   "(default: 0, which means print once at shutdown)")
                 ("hpx:print-counter-destination", value<std::string>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
-                  "to the given file (default: console)")
+                  "to the given file (default: console (cout), "
+                  "possible values: 'cout' (console), 'none' (no output), or "
+                  "any file name")
                 ("hpx:list-counters", value<std::string>()->implicit_value("minimal"),
                   "list the names of all registered performance counters, "
                   "possible values:\n"
@@ -549,11 +559,14 @@ namespace hpx { namespace util
                 ("hpx:print-counter-at",
                     value<std::vector<std::string> >()->composing(),
                   "print the performance counter(s) specified with "
-                  "--hpx:print-counter at the given point in time, possible "
+                  "--hpx:print-counter (or --hpx:print-counter-reset) at the given "
+                  "point in time, possible "
                   "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
                 ("hpx:reset-counters",
-                  "reset the performance counter(s) specified with --hpx:print-counter "
+                  "reset all performance counter(s) specified with --hpx:print-counter "
                   "after they have been evaluated")
+                ("hpx:print-counters-locally",
+                  "each locality prints only its own local counters")
             ;
 
             hidden_options.add_options()

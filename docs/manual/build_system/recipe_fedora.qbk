@@ -38,7 +38,7 @@ HPX on Fedora 22].]
 
 [note To build HPX without examples use:
 ``
-   cmake -DCMAKE_INSTALL_PREFIX=/opt/hpx -DHPX_BUILD_EXAMPLES=Off ..
+   cmake -DCMAKE_INSTALL_PREFIX=/opt/hpx -DHPX_WITH_EXAMPLES=Off ..
 ``
    ]
 

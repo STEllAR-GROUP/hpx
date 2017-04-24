@@ -27,6 +27,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/compute.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
@@ -227,7 +228,12 @@ struct multiply_step
 {
     multiply_step(T factor) : factor_(factor) {}
 
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val) const
+    // FIXME : call operator of multiply_step is momentarily defined with
+    //         a generic parameter to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
     {
         return val * factor_;
     }
@@ -238,7 +244,12 @@ struct multiply_step
 template <typename T>
 struct add_step
 {
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    // FIXME : call operator of add_step is momentarily defined with
+    //         generic parameters to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2;
     }
@@ -249,7 +260,12 @@ struct triad_step
 {
     triad_step(T factor) : factor_(factor) {}
 
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    // FIXME : call operator of triad_step is momentarily defined with
+    //         generic parameters to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2 * factor_;
     }
@@ -378,6 +394,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
+
+    HPX_UNUSED(chunk_size);
 
     std::string chunker = vm["chunker"].as<std::string>();
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,10 +31,32 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        struct future_data_void {};
+
+        template <typename Result>
+        struct shared_state_ptr_result
+        {
+            typedef Result type;
+        };
+
+        template <typename Result>
+        struct shared_state_ptr_result<Result&>
+        {
+            typedef Result& type;
+        };
+
+        template <>
+        struct shared_state_ptr_result<void>
+        {
+            typedef future_data_void type;
+        };
+
         template <typename R>
         struct shared_state_ptr
         {
-            typedef boost::intrusive_ptr<lcos::detail::future_data<R> > type;
+            typedef typename shared_state_ptr_result<R>::type result_type;
+            typedef boost::intrusive_ptr<lcos::detail::future_data<result_type> >
+                type;
         };
 
         template <typename Future, typename Enable = void>
@@ -60,10 +82,10 @@ namespace hpx { namespace traits
         template <typename Future>
         struct shared_state_ptr_for<std::vector<Future> >
         {
-            typedef typename traits::future_traits<Future>::type data_type;
-            typedef std::vector<boost::intrusive_ptr<
-                    lcos::detail::future_data<data_type>
-                > > type;
+//             typedef typename traits::future_traits<Future>::type data_type;
+            typedef std::vector<
+                    typename shared_state_ptr_for<Future>::type
+                > type;
         };
     }
 
@@ -121,6 +143,15 @@ namespace hpx { namespace traits
         {
             return f.shared_state_;
         }
+
+#if BOOST_VERSION >= 105600
+        HPX_FORCEINLINE static
+        typename traits::detail::shared_state_ptr<R>::type::element_type*
+        detach_shared_state(lcos::future<R> && f)
+        {
+            return f.shared_state_.detach();
+        }
+#endif
     };
 
     template <typename R>
@@ -154,6 +185,15 @@ namespace hpx { namespace traits
         {
             return f.shared_state_;
         }
+
+#if BOOST_VERSION >= 105600
+        HPX_FORCEINLINE static
+        typename traits::detail::shared_state_ptr<R>::type::element_type*
+        detach_shared_state(lcos::shared_future<R> const& f)
+        {
+            return f.shared_state_.get();
+        }
+#endif
     };
 }}
 

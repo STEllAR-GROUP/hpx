@@ -56,6 +56,12 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
 
             cond_.wait(l, ec);
+
+            // We need to ignore our internal mutex for the user provided lock
+            // being able to be reacquired without a lock held during suspension
+            // error. We can't use RAII here since the guard object would get
+            // destructed before the unlock_guard.
+            hpx::util::ignore_lock(&mtx_);
         }
 
         template <class Predicate>
@@ -82,6 +88,12 @@ namespace hpx { namespace lcos { namespace local
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
+
+            // We need to ignore our internal mutex for the user provided lock
+            // being able to be reacquired without a lock held during suspension
+            // error. We can't use RAII here since the guard object would get
+            // destructed before the unlock_guard.
+            hpx::util::ignore_lock(&mtx_);
 
             if (ec) return cv_status::error;
 
@@ -153,6 +165,12 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<Lock> unlock(lock);
 
             cond_.wait(l, ec);
+
+            // We need to ignore our internal mutex for the user provided lock
+            // being able to be reacquired without a lock held during suspension
+            // error. We can't use RAII here since the guard object would get
+            // destructed before the unlock_guard.
+            hpx::util::ignore_lock(&mtx_);
         }
 
         template <class Lock, class Predicate>
@@ -179,6 +197,12 @@ namespace hpx { namespace lcos { namespace local
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
+
+            // We need to ignore our internal mutex for the user provided lock
+            // being able to be reacquired without a lock held during suspension
+            // error. We can't use RAII here since the guard object would get
+            // destructed before the unlock_guard.
+            hpx::util::ignore_lock(&mtx_);
 
             if (ec) return cv_status::error;
 

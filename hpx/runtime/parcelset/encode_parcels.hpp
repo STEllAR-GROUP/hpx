@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>

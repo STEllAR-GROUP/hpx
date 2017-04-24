@@ -60,7 +60,7 @@
            ``
            and in order to build (and install) all examples invoke:
            ``
-               cmake -DHPX_BUILD_EXAMPLES=On .
+               cmake -DHPX_WITH_EXAMPLES=On .
                gmake examples
                gmake install
            ``

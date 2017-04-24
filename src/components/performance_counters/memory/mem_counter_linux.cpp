@@ -152,6 +152,26 @@ namespace hpx { namespace performance_counters { namespace memory
         // ps.resident is in pages, but we need to return the number of bytes.
         return ps.resident * EXEC_PAGESIZE;
     }
+
+    // Returns total available memory
+    std::uint64_t read_total_mem_avail(bool)
+    {
+        std::string file = "/proc/meminfo";
+        std::ifstream in;
+
+        char buffer[1024];
+        in.open(file.c_str());
+
+        //Available Memory is on 3rd line
+        for (int k = 0; k < 3; k++) {
+          in.getline(buffer, 1024);
+        }
+        in.close();
+        std::string tbuf = buffer;
+        tbuf.copy(buffer, 11, 13);
+        return atol(buffer);
+    }
+
 }}}
 
 #endif

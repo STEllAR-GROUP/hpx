@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>
 #else
 #include <boost/optional.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace threads
             // Using the optional for storing the returned result value
             // allows to support non-default-constructible and move-only
             // types.
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
             std::experimental::optional<result_type> result;
 #else
             boost::optional<result_type> result;
@@ -62,7 +62,7 @@ namespace hpx { namespace threads
                     // Execute the given function, forward all parameters,
                     // store result.
 
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
+#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
                     result.emplace(util::invoke_fused(f, std::move(args)));
 #elif BOOST_VERSION < 105600
                     result = boost::in_place(

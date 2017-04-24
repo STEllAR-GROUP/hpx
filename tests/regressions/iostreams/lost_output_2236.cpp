@@ -528,6 +528,7 @@ int hpx_main()
             gc::collectable c2(
                 hpx::components::new_<gc::server::collectable>(loc));
             int index = c1.add_ref(c2.get_id()).get();
+            (void)index;
             c2.add_ref(c1.get_id()).wait();
         }
     }

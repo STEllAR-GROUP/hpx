@@ -22,6 +22,42 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
+    template<typename InputIterator, typename Distance>
+    HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
+        std::random_access_iterator_tag)
+    {
+        i += n;
+    }
+
+    template<typename InputIterator, typename Distance>
+    HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
+        std::bidirectional_iterator_tag)
+    {
+        if (n < 0)
+        {
+            while (n++) --i;
+        }
+        else
+        {
+            while (n--) ++i;
+        }
+    }
+
+    template<typename InputIterator, typename Distance>
+    HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,
+        std::input_iterator_tag)
+    {
+        HPX_ASSERT(n >= 0);
+        while (n--) ++i;
+    }
+
+    template<typename InputIterator, typename Distance>
+    HPX_HOST_DEVICE void advance (InputIterator& i, Distance n)
+    {
+        advance_impl(i, n,
+        typename std::iterator_traits<InputIterator>::iterator_category());
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterable, typename Enable = void>
     struct calculate_distance
@@ -116,7 +152,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_HOST_DEVICE
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+            hpx::parallel::v1::detail::advance(iter, offset);
+#else
             std::advance(iter, offset);
+#endif
             return iter;
         }
 
@@ -152,7 +192,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         HPX_HOST_DEVICE
         HPX_FORCEINLINE static Iter call(Iter iter, Stride offset)
         {
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+            hpx::parallel::v1::detail::advance(iter, offset);
+#else
             std::advance(iter, offset);
+#endif
             return iter;
         }
 
@@ -166,7 +210,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             {
                 // NVCC seems to have a bug with std::min...
                 offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+                hpx::parallel::v1::detail::advance(iter, offset);
+#else
                 std::advance(iter, offset);
+#endif
             }
             else
             {
@@ -174,7 +222,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         // NVCC seems to have a bug with std::min...
                         max_count < negate(offset) ? max_count : negate(offset)
                     ));
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+                hpx::parallel::v1::detail::advance(iter, offset);
+#else
                 std::advance(iter, offset);
+#endif
             }
             return iter;
         }
@@ -187,7 +239,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             // advance through the end or max number of elements
             // NVCC seems to have a bug with std::min...
             offset = Stride(max_count < std::size_t(offset) ? max_count : offset);
+#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+            hpx::parallel::v1::detail::advance(iter, offset);
+#else
             std::advance(iter, offset);
+#endif
             return iter;
         }
 

@@ -31,7 +31,7 @@ void inclusive_scan_benchmark()
 
       double const val(0);
       auto op =
-          [val](double v1, double v2) {
+          [](double v1, double v2) {
               return v1 + v2;
           };
 
@@ -76,7 +76,7 @@ void test_inclusive_scan1(ExPolicy && policy, IteratorTag)
 
     std::size_t const val(0);
     auto op =
-        [val](std::size_t v1, std::size_t v2) {
+        [](std::size_t v1, std::size_t v2) {
             return v1 + v2;
         };
 
@@ -104,7 +104,7 @@ void test_inclusive_scan1_async(ExPolicy && p, IteratorTag)
 
     std::size_t const val(0);
     auto op =
-        [val](std::size_t v1, std::size_t v2) {
+        [](std::size_t v1, std::size_t v2) {
             return v1 + v2;
         };
 
