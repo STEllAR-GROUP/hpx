@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -557,7 +558,7 @@ namespace hpx
     std::uint32_t runtime::assign_cores(std::string const& locality_basename,
         std::uint32_t cores_needed)
     {
-        std::lock_guard<boost::mutex> l(mtx_);
+        std::lock_guard<compat::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())

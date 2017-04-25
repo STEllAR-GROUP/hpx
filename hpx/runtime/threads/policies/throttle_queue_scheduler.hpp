@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
 #include <apex_api.hpp>
 
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
 #include <cstddef>
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace policies
     /// The throttle_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
