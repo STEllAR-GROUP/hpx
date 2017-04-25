@@ -163,7 +163,7 @@ namespace libfabric
     void receiver::pre_post_receive()
     {
         FUNC_START_DEBUG_MSG;
-        void* desc = header_region_->get_desc();
+        void *desc = header_region_->get_local_key();
         LOG_DEBUG_MSG("Pre-Posting receive "
             << *header_region_
             << "context " << hexpointer(this));

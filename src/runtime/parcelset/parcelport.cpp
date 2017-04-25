@@ -69,6 +69,18 @@ namespace hpx { namespace parcelset
         }
     }
 
+    // default behaviour is to return a nullptr indicating that the parcelport
+    // does not support rdma operations
+    rma_memory_region_base *parcelport::allocate_region(std::size_t size)
+    {
+        return nullptr;
+    }
+
+    int parcelport::deallocate_region(rma_memory_region_base *region)
+    {
+        return 0;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Update performance counter data
     void parcelport::add_received_data(

@@ -29,17 +29,30 @@ namespace libfabric
         typedef struct fid_mr     provider_region;
         typedef struct fid_domain provider_domain;
 
+        // register region
         template <typename... Args>
         static int register_memory(Args &&... args) {
             return fi_mr_reg(std::forward<Args>(args)...);
         }
 
+        // unregister region
         static int unregister_memory(provider_region *region) {
             return fi_close(&region->fid);
         }
 
+        // Default registration flags for this provider
         static int flags() { return
             FI_READ | FI_WRITE | FI_RECV | FI_SEND | FI_REMOTE_READ | FI_REMOTE_WRITE;
+        }
+
+        // Get the local descriptor of the memory region.
+        static void *get_local_key(provider_region *region) {
+            return fi_mr_desc(region);
+        }
+
+        // Get the remote key of the memory region.
+        static uint64_t get_remote_key(provider_region *region) {
+            return fi_mr_key(region);
         }
     };
 

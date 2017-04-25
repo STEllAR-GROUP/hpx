@@ -21,6 +21,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
+#include <plugins/parcelport/rma_memory_region_base.hpp>
+
 
 #include <atomic>
 #include <cstddef>
@@ -195,6 +197,15 @@ namespace hpx { namespace parcelset
 
         virtual locality agas_locality(util::runtime_configuration const& ini)
             const = 0;
+
+        /// \brief provide a mechanism to allocate and deallocate memory blocks
+        /// that can be used for RDMA operations
+        ///
+        /// Allocate and deallocate memory blocks that are 'pinned' so that
+        /// the network layer can use them for RDMA operations
+        virtual rma_memory_region_base *allocate_region(std::size_t size);
+
+        virtual int deallocate_region(rma_memory_region_base *region);
 
         /// Performance counter data
 

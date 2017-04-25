@@ -298,7 +298,7 @@ namespace libfabric
             << "fi_addr " << hexpointer(src_addr_)
             << "tag " << hexuint64(header_->tag())
             << "local addr " << hexpointer(get_region->get_address())
-            << "local desc " << hexpointer(get_region->get_desc())
+            << "local local key " << hexpointer(get_region->get_local_key())
             << "size " << hexlength(get_region->get_message_length())
             << "rkey " << hexpointer(rkey)
             << "remote cpos " << hexpointer(remoteAddr));
@@ -320,7 +320,7 @@ namespace libfabric
                     );
 
                 ssize_t ret = fi_read(endpoint_, get_region->get_address(),
-                    get_region->get_message_length(), get_region->get_desc(),
+                    get_region->get_message_length(), get_region->get_local_key(),
                     src_addr_, (uint64_t)(remoteAddr), rkey, this);
 
                 if (ret == -FI_EAGAIN)

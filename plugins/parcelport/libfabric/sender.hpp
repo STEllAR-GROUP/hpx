@@ -143,7 +143,7 @@ namespace libfabric
         util::function_nonser<void(sender*)>                  postprocess_handler_;
         //
         struct iovec region_list_[2];
-        void        *desc_[2];
+        void*        desc_[2];
     };
 }}}}
 

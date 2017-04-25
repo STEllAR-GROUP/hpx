@@ -112,8 +112,8 @@ namespace libfabric
         region_list_[1] = {
             message_region_->get_address(), message_region_->get_message_length() };
 
-        desc_[0] = header_region_->get_desc();
-        desc_[1] = message_region_->get_desc();
+        desc_[0] = header_region_->get_local_key();
+        desc_[1] = message_region_->get_local_key();
         if (rma_regions_.size()>0 || !header_->message_piggy_back()) {
             completion_count_ = 2;
         }

@@ -152,6 +152,20 @@ namespace hpx { namespace parcelset
         return std::shared_ptr<parcelport>();
     }
 
+    std::shared_ptr<parcelport> parcelhandler::get_default_parcelport() const
+    {
+      for (pports_type::value_type const& pp : pports_)
+      {
+        if (pp.first > 0)
+        {
+          return pp.second;
+        }
+      }
+
+      HPX_THROW_EXCEPTION(invalid_status,
+        "no default parcelport available",
+        "parcelhandler::get_default_parcelport()");
+    }
 
     void parcelhandler::initialize(naming::resolver_client &resolver,
         applier::applier *applier)

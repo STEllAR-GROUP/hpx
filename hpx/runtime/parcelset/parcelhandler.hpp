@@ -97,6 +97,8 @@ namespace hpx { namespace parcelset
 
         std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
+        std::shared_ptr<parcelport> get_default_parcelport() const;
+
         void initialize(naming::resolver_client &resolver, applier::applier *applier);
 
         void flush_parcels();

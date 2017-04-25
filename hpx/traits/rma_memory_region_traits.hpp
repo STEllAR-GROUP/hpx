@@ -32,6 +32,14 @@ namespace hpx { namespace traits
         static int flags() {
             return RegionProvider::flags();
         }
+        //
+        static void *get_local_key(provider_region *mr) {
+            return RegionProvider::get_local_key(mr);
+        }
+        //
+        static uint64_t get_remote_key(provider_region *mr) {
+            return RegionProvider::get_remote_key(mr);
+        }
     };
 }}
 

@@ -182,6 +182,19 @@ namespace libfabric
 
         parcelset::locality create_locality() const;
 
+        rma_memory_region_base *allocate_region(std::size_t size) override {
+            return libfabric_controller_->get_memory_pool().allocate_region(size);
+        }
+
+        int deallocate_region(rma_memory_region_base *region) {
+            rma_memory_region<libfabric_region_provider> *r =
+                dynamic_cast<rma_memory_region<libfabric_region_provider>*>(region);
+            HPX_ASSERT(r);
+            libfabric_controller_->get_memory_pool().deallocate(r);
+            return 0;
+        }
+
+
         static void suspended_task_debug(const std::string &match);
 
         void do_stop();
