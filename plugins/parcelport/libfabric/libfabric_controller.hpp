@@ -155,7 +155,8 @@ namespace libfabric
             open_fabric(provider, domain, endpoint);
 
             // Create a memory pool for pinned buffers
-            memory_pool_.reset(new rdma_memory_pool(fabric_domain_));
+            memory_pool_.reset(
+                new rma_memory_pool<libfabric_region_provider>(fabric_domain_));
 
             // setup a passive listener, or an active RDM endpoint
             here_ = create_local_endpoint();
@@ -759,7 +760,8 @@ namespace libfabric
                 else if (entry.flags == (FI_MSG | FI_RECV)) {
                     LOG_DEBUG_MSG("Received an rxcq recv completion "
                         << hexpointer(entry.op_context));
-                    reinterpret_cast<receiver *>(entry.op_context)->handle_recv(src_addr, entry.len);
+                    reinterpret_cast<receiver *>(entry.op_context)->
+                        handle_recv(src_addr, entry.len);
                 }
                 else {
                     LOG_DEBUG_MSG("Received an unknown rxcq completion "
@@ -904,7 +906,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        inline rdma_memory_pool& get_memory_pool() {
+        inline rma_memory_pool<libfabric_region_provider>& get_memory_pool() {
             return *memory_pool_;
         }
 
@@ -1099,7 +1101,7 @@ namespace libfabric
         DisconnectionFunction disconnection_function_;
 
         // Pinned memory pool used for allocating buffers
-        std::unique_ptr<rdma_memory_pool>  memory_pool_;
+        std::unique_ptr<rma_memory_pool<libfabric_region_provider>>  memory_pool_;
 
         // Shared completion queue for all endoints
         // Count outstanding receives posted to SRQ + Completion queue

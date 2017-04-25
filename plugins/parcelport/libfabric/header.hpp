@@ -135,7 +135,6 @@ namespace libfabric
         // --------------------------------------------------------------------
         friend std::ostream & operator<<(std::ostream & os, header<SIZE> & h)
         {
-            boost::io::ios_flags_saver ifs(os);
             os  << "Flags " << hexbyte(h.message_header.flags)
                 << "chunk_data_offset " << decnumber(h.chunk_data_offset())
                 << "rma_info_offset " << decnumber(h.rma_info_offset())

@@ -21,7 +21,7 @@ namespace libfabric
     rma_receiver::rma_receiver(
         parcelport* pp,
         fid_ep* endpoint,
-        rdma_memory_pool* memory_pool,
+        rma_memory_pool<region_provider>* memory_pool,
         completion_handler&& handler)
       : pp_(pp),
         endpoint_(endpoint),
@@ -39,7 +39,7 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    void rma_receiver::read_message(libfabric_memory_region* rrregion,
+    void rma_receiver::read_message(region_type* rrregion,
         fi_addr_t const& src_addr)
     {
         start_time_ = util::high_resolution_clock::now();
@@ -98,7 +98,8 @@ namespace libfabric
             CRC32_MEM(piggy_back, header_->message_size(),
                 "(Message region recv piggybacked - no rdma)"));
 
-        typedef pinned_memory_vector<char, header_size> rcv_data_type;
+        typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
+            rcv_data_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
 
         // when parcel decoding from the wrapped pointer buffer has completed,
@@ -157,7 +158,7 @@ namespace libfabric
         {
             if (c.type_ == serialization::chunk_type_pointer)
             {
-                libfabric_memory_region *get_region =
+                region_type *get_region =
                     memory_pool_->allocate_region(c.size_);
                 LOG_TRACE_MSG(
                     CRC32_MEM(get_region->get_address(), c.size_,
@@ -288,7 +289,8 @@ namespace libfabric
         // wrap the message and chunks into a pinned vector so that they
         // can be passed into the parcel decode functions and when released have
         // the pinned buffers returned to the memory pool
-        typedef pinned_memory_vector<char, header_size> rcv_data_type;
+        typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
+            rcv_data_type;
         typedef parcel_buffer<rcv_data_type, std::vector<char>> rcv_buffer_type;
 
         rcv_data_type wrapped_pointer(message, message_length,

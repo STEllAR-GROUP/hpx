@@ -4,9 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
-#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
@@ -52,8 +51,8 @@ namespace libfabric
                 LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
 
                 // create a new memory region from the user supplied pointer
-                libfabric_memory_region *zero_copy_region =
-                    new libfabric_memory_region(domain_, c.data_.cpos_, c.size_);
+                region_type *zero_copy_region =
+                    new region_type(domain_, c.data_.cpos_, c.size_);
 
                 rma_regions_.push_back(zero_copy_region);
 

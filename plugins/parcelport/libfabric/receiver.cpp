@@ -6,9 +6,8 @@
 
 #include <plugins/parcelport/libfabric/receiver.hpp>
 
-#include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
-#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
@@ -24,7 +23,8 @@ namespace policies {
 namespace libfabric
 {
     // --------------------------------------------------------------------
-    receiver::receiver(parcelport* pp, fid_ep* endpoint, rdma_memory_pool& memory_pool)
+    receiver::receiver(parcelport* pp, fid_ep* endpoint,
+        rma_memory_pool<region_provider>& memory_pool)
         : pp_(pp)
         , endpoint_(endpoint)
         , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
@@ -140,7 +140,7 @@ namespace libfabric
 
         // We save the received region and swap it with a newly allocated
         // to be able to post a recv again as soon as possible.
-        libfabric_memory_region* region = header_region_;
+        region_type* region = header_region_;
         header_region_ = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
         pre_post_receive();
 

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 //
 #include <vector>
 #include <functional>
@@ -25,7 +25,7 @@ namespace libfabric
     // it is used by the verbs parcelport to pass an rdma memory chunk with received
     // data into the decode parcel buffer routines.
     // it cannot be resized or changed once created and does not delete wrapped memory
-    template<class T, int Offset, class Allocator = rdma_memory_pool>
+    template<typename T, int Offset, typename Region, typename Allocator>
     class pinned_memory_vector
     {
     public:
@@ -36,7 +36,11 @@ namespace libfabric
         typedef T const * const_iterator;
         typedef typename std::vector<T>::difference_type difference_type;
         typedef typename std::vector<T>::size_type size_type;
+        //
         typedef Allocator allocator_type;
+        typedef Region    region_type;
+
+        typedef pinned_memory_vector<T, Offset, region_type, allocator_type> vector_type;
 
         typedef std::function<void(void)> deleter_callback;
 
@@ -45,7 +49,7 @@ namespace libfabric
         std::size_t          m_size_;
         deleter_callback     m_cb_;
         allocator_type      *m_alloc_;
-        libfabric_memory_region *m_region_;
+        region_type         *m_region_;
 
         // construct with a memory pool allocator
         pinned_memory_vector(allocator_type* alloc) :
@@ -60,7 +64,7 @@ namespace libfabric
 
         // construct from existing memory chunk, provide allocator, deleter etc
         pinned_memory_vector(T* p, std::size_t s, deleter_callback cb,
-            allocator_type* alloc, libfabric_memory_region *r) :
+            allocator_type* alloc, region_type *r) :
                 m_array_(p), m_size_(s), m_cb_(cb), m_alloc_(alloc), m_region_(r)
         {
             LOG_DEBUG_MSG("pinned_memory_vector exist "
@@ -71,9 +75,9 @@ namespace libfabric
         }
 
         // move constructor,
-        pinned_memory_vector(pinned_memory_vector<T,Offset> && other) :
+        pinned_memory_vector(vector_type && other) :
             m_array_(other.m_array_), m_size_(other.m_size_),
-            m_cb_(other.m_cb_), m_alloc_(std::move(other.m_alloc_)),
+            m_cb_(std::move(other.m_cb_)), m_alloc_(other.m_alloc_),
             m_region_(other.m_region_)
         {
             LOG_DEBUG_MSG("pinned_memory_vector moved "
@@ -100,7 +104,7 @@ namespace libfabric
         }
 
         // move copy operator
-        pinned_memory_vector & operator=(pinned_memory_vector && other)
+        vector_type & operator=(vector_type && other)
         {
             m_array_  = other.m_array_;
             m_size_   = other.m_size_;
@@ -208,7 +212,7 @@ namespace libfabric
         }
 
     private:
-        pinned_memory_vector(pinned_memory_vector<T,Offset> const & other);
+        pinned_memory_vector(vector_type const & other);
 
     };
 }}}}

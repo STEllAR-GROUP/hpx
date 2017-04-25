@@ -28,9 +28,7 @@
 // still allow code that uses the counters in arithmetic to compile.
 //
 namespace hpx {
-namespace parcelset {
-namespace policies {
-namespace libfabric
+namespace parcelset
 {
     template <bool B, typename T = void>
     using enable_if_t = typename std::enable_if<B, T>::type;
@@ -110,7 +108,7 @@ namespace libfabric
             return os;
         }
     };
-}}}}
+}}
 
 #endif
 

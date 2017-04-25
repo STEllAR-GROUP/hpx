@@ -7,11 +7,11 @@
 #ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_SENDER_HPP
 
-#include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
-#include <plugins/parcelport/libfabric/performance_counter.hpp>
 #include <plugins/parcelport/libfabric/rma_base.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -34,19 +34,23 @@ namespace libfabric
 
     struct sender : public rma_base
     {
+        typedef libfabric_region_provider                region_provider;
+        typedef rma_memory_region<region_provider>       region_type;
+        typedef rma_memory_pool<region_provider>         memory_pool_type;
+
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;
 
-        typedef rdma_memory_pool                                 memory_pool_type;
-        typedef pinned_memory_vector<char, header_size>          snd_data_type;
-        typedef parcel_buffer<snd_data_type,serialization::serialization_chunk>
+        typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
+            snd_data_type;
+        typedef parcel_buffer<snd_data_type, serialization::serialization_chunk>
             snd_buffer_type;
 
-        typedef boost::container::small_vector<libfabric_memory_region*,8> zero_copy_vector;
+        typedef boost::container::small_vector<region_type*,8> zero_copy_vector;
 
         // --------------------------------------------------------------------
         sender(parcelport* pp, fid_ep* endpoint, fid_domain* domain,
-            rdma_memory_pool* memory_pool)
+            memory_pool_type* memory_pool)
           : parcelport_(pp)
           , endpoint_(endpoint)
           , domain_(domain)
@@ -74,7 +78,8 @@ namespace libfabric
         // --------------------------------------------------------------------
         snd_buffer_type get_new_buffer()
         {
-            LOG_DEBUG_MSG("Returning a new buffer object from sender " << hexpointer(this));
+            LOG_DEBUG_MSG("Returning a new buffer object from sender "
+                << hexpointer(this));
             return snd_buffer_type(snd_data_type(memory_pool_), memory_pool_);
         }
 
@@ -117,11 +122,11 @@ namespace libfabric
         parcelport               *parcelport_;
         fid_ep                   *endpoint_;
         fid_domain               *domain_;
-        rdma_memory_pool         *memory_pool_;
+        memory_pool_type         *memory_pool_;
         fi_addr_t                 dst_addr_;
         snd_buffer_type           buffer_;
-        libfabric_memory_region  *header_region_;
-        libfabric_memory_region  *message_region_;
+        region_type              *header_region_;
+        region_type              *message_region_;
         header_type              *header_;
         zero_copy_vector          rma_regions_;
         hpx::util::atomic_count   completion_count_;

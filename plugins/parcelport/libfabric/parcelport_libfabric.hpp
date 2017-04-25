@@ -46,17 +46,14 @@
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
 
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
+#include <plugins/parcelport/libfabric/rdma_locks.hpp>
+#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/libfabric/connection_handler.hpp>
-//#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
-#include <plugins/parcelport/libfabric/performance_counter.hpp>
-//
-// rdma libfabric utilities
-#include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
-#include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
-#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 
 //
 #if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
@@ -99,7 +96,8 @@ namespace libfabric
         typedef hpx::lcos::local::spinlock                                   mutex_type;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
-
+        typedef rma_memory_region<libfabric_region_provider>                 region_type;
+        typedef memory_region_allocator<libfabric_region_provider>        allocator_type;
 
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
@@ -121,8 +119,9 @@ namespace libfabric
 
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;
-        typedef rdma_memory_pool                                   memory_pool_type;
-        typedef pinned_memory_vector<char, header_size>            snd_data_type;
+        typedef rma_memory_pool<libfabric_region_provider>         memory_pool_type;
+        typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
+            snd_data_type;
         typedef parcel_buffer<snd_data_type>                       snd_buffer_type;
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
@@ -158,8 +157,7 @@ namespace libfabric
         // return a sender object back to the parcelport_impl
         // this is used by the send_immediate version of parcelport_impl
         // --------------------------------------------------------------------
-        sender* get_connection(
-            parcelset::locality const& dest, fi_addr_t &fi_addr);
+        sender* get_connection(parcelset::locality const& dest, fi_addr_t &fi_addr);
 
         // --------------------------------------------------------------------
         // return a sender object back to the parcelport_impl

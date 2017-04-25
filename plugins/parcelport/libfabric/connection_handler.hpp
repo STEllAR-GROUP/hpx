@@ -25,13 +25,15 @@ namespace libfabric
     struct HPX_EXPORT parcelport;
 }}
 
+    using namespace hpx::parcelset::policies::libfabric;
+
     template <>
     struct connection_handler_traits<policies::libfabric::parcelport>
     {
         typedef policies::libfabric::sender                 connection_type;
         typedef HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING send_early_parcel;
         typedef std::true_type                              do_background_work;
-        typedef std::true_type                             send_immediate_parcels;
+        typedef std::true_type                              send_immediate_parcels;
 
         static const char * type()
         {

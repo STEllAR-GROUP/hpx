@@ -55,15 +55,12 @@
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
 
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/connection_handler.hpp>
-//#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
-#include <plugins/parcelport/libfabric/performance_counter.hpp>
-//
-// rdma libfabric utilities
 #include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/libfabric/libfabric_memory_region.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/rdma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 
 //

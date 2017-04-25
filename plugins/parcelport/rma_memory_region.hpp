@@ -3,44 +3,39 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_MEMORY_REGION_HPP
-#define HPX_PARCELSET_POLICIES_LIBFABRIC_MEMORY_REGION_HPP
+#ifndef HPX_PARCELSET_POLICIES_rma_memory_region_HPP
+#define HPX_PARCELSET_POLICIES_rma_memory_region_HPP
 
+#include <hpx/traits/rma_memory_region_traits.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/libfabric/fabric_error.hpp>
-//
-#include <rdma/fabric.h>
-#include <rdma/fi_cm.h>
-#include <rdma/fi_domain.h>
-#include <rdma/fi_endpoint.h>
-#include <rdma/fi_eq.h>
-#include <rdma/fi_errno.h>
 //
 #include <memory>
 //
 namespace hpx {
-namespace parcelset {
-namespace policies {
-namespace libfabric
+namespace parcelset
 {
-    struct libfabric_memory_region
+    // --------------------------------------------------------------------
+    template <typename RegionProvider>
+    struct rma_memory_region
     {
+        typedef typename RegionProvider::provider_domain provider_domain;
+        typedef typename RegionProvider::provider_region provider_region;
 
         // --------------------------------------------------------------------
-        libfabric_memory_region() :
+        rma_memory_region() :
             region_(nullptr), address_(nullptr), base_addr_(nullptr),
                 size_(0), used_space_(0), flags_(0) {}
 
         // --------------------------------------------------------------------
-        libfabric_memory_region(struct fid_mr *region, char * address,
-            char *base_address, uint64_t size, uint32_t flags) :
-                region_(region), address_(address), base_addr_(base_address),
-                size_(size), used_space_(0), flags_(flags) {}
+        rma_memory_region(
+            provider_region *region, char *address,
+            char *base_address, uint64_t size, uint32_t flags)
+            : region_(region), address_(address), base_addr_(base_address)
+            , size_(size), used_space_(0), flags_(flags) {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
-        libfabric_memory_region(struct fid_domain *pd,
-            const void *buffer, const uint64_t length)
+        rma_memory_region(provider_domain *pd, const void *buffer, const uint64_t length)
         {
             address_    = static_cast<char *>(const_cast<void *>(buffer));
             base_addr_  = address_;
@@ -48,22 +43,20 @@ namespace libfabric
             used_space_ = length;
             flags_      = BLOCK_USER;
 
-            int ret = fi_mr_reg(pd,
-                    const_cast<void*>(buffer), length,
-                    FI_READ | FI_WRITE | FI_RECV | FI_SEND |
-                    FI_REMOTE_READ | FI_REMOTE_WRITE,
-                    0, (uint64_t)address_, 0, &(region_),
-                    NULL);
+            int ret = traits::rma_memory_region_traits<RegionProvider>::register_memory(
+                pd, const_cast<void*>(buffer), length,
+                traits::rma_memory_region_traits<RegionProvider>::flags(),
+                0, (uint64_t)address_, 0, &(region_), NULL);
 
             if (ret) {
                 LOG_ERROR_MSG(
-                    "error registering fi_mr_reg "
+                    "error registering region "
                     << hexpointer(buffer) << hexlength(length));
-                throw fabric_error(ret, "error in fi_mr_reg");
+                throw std::runtime_error("error in memory registration");
             }
             else {
                 LOG_DEBUG_MSG(
-                    "OK registering fi_mr_reg "
+                    "OK registering region "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
                     << "rkey " << hexpointer(fi_mr_key(region_))
@@ -73,7 +66,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // allocate a block of size length and register it
-        int allocate(struct fid_domain * pd, uint64_t length)
+        int allocate(provider_domain *pd, uint64_t length)
         {
             // Allocate storage for the memory region.
             void *buffer = new char[length];
@@ -86,22 +79,20 @@ namespace libfabric
             size_       = length;
             used_space_ = 0;
 
-            int ret = fi_mr_reg(pd,
-                    buffer, length,
-                    FI_READ | FI_WRITE |
-                    FI_RECV | FI_SEND |
-                    FI_REMOTE_READ | FI_REMOTE_WRITE,
-                    0, (uint64_t)address_, 0, &(region_), NULL);
+            int ret = traits::rma_memory_region_traits<RegionProvider>::register_memory(
+                pd, const_cast<void*>(buffer), length,
+                traits::rma_memory_region_traits<RegionProvider>::flags(),
+                0, (uint64_t)address_, 0, &(region_), NULL);
 
             if (ret) {
                 LOG_ERROR_MSG(
-                    "error registering fi_mr_reg "
+                    "error registering region "
                     << hexpointer(buffer) << hexlength(length));
-                throw fabric_error(ret, "error in fi_mr_reg");
+                throw std::runtime_error("error in memory registration");
             }
             else {
                 LOG_DEBUG_MSG(
-                    "OK registering fi_mr_reg "
+                    "OK registering region "
                     << hexpointer(buffer) << hexpointer(address_)
                     << "desc " << hexpointer(fi_mr_desc(region_))
                     << "rkey " << hexpointer(fi_mr_key(region_))
@@ -117,7 +108,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // destroy the region and memory according to flag settings
-        ~libfabric_memory_region()
+        ~rma_memory_region()
         {
             if (get_partial_region()) return;
             release();
@@ -137,7 +128,7 @@ namespace libfabric
                     uint32_t length = get_size();
                 );
                 //
-                if (fi_close(&region_->fid))
+                if (traits::rma_memory_region_traits<RegionProvider>::unregister_memory(region_))
                 {
                     LOG_ERROR_MSG("Error, fi_close mr failed\n");
                     return -1;
@@ -251,9 +242,8 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         friend std::ostream & operator<<(std::ostream & os,
-                                         libfabric_memory_region const & region)
+                                         rma_memory_region const & region)
         {
-            boost::io::ios_flags_saver ifs(os);
             os  << "region " << hexpointer(&region)
                 << "base address " << hexpointer(region.base_addr_)
                 << "address " << hexpointer(region.address_)
@@ -264,8 +254,8 @@ namespace libfabric
         }
 
     private:
-        // The internal Infiniband memory region handle
-        struct fid_mr *region_;
+        // The internal network type dependent memory region handle
+        provider_region *region_;
 
         // we may be a piece of a larger region, this gives the start address
         // of this piece of the region. This is the address that should be used for data
@@ -282,13 +272,11 @@ namespace libfabric
 
         // space used by a message in the memory region.
         uint64_t used_space_;
+
         // flags to control lifetime of blocks
         uint32_t flags_;
     };
 
-    // Smart pointer for libfabric_memory_region object.
-    typedef std::shared_ptr<libfabric_memory_region> libfabric_memory_region_ptr;
-
-}}}}
+}}
 
 #endif
