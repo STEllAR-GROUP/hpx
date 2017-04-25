@@ -121,6 +121,9 @@ add_hpx_library_headers(hpx
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compute/*.hpp"
   APPEND)
+add_hpx_library_headers(hpx
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compat/*.hpp"
+  APPEND)
 
 if(HPX_WITH_STATIC_LINKING)
   add_hpx_library_headers(hpx
