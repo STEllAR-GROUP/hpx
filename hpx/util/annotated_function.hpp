@@ -78,22 +78,33 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : desc_(hpx::threads::set_thread_description(
-                hpx::threads::get_self_id(), name))
-        {}
+        {
+            if (nullptr != hpx::threads::get_self_ptr())
+            {
+                desc_ = hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(), name);
+            }
+        }
         template <typename F>
         explicit annotate_function(F && f)
-          : desc_(hpx::threads::set_thread_description(
-                hpx::threads::get_self_id(),
-                hpx::traits::get_function_annotation<
-                    typename std::decay<F>::type
-                >::call(f)))
-        {}
+        {
+            if (nullptr != hpx::threads::get_self_ptr())
+            {
+                desc_ = hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(),
+                    hpx::traits::get_function_annotation<
+                        typename std::decay<F>::type
+                    >::call(f));
+            }
+        }
 
         ~annotate_function()
         {
-            hpx::threads::set_thread_description(
-                hpx::threads::get_self_id(), desc_);
+            if (nullptr != hpx::threads::get_self_ptr())
+            {
+                hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(), desc_);
+            }
         }
 
         hpx::util::thread_description desc_;
