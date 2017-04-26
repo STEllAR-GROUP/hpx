@@ -12,6 +12,7 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <chrono>
 #include <cstdlib>
