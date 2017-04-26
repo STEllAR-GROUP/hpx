@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Marcin Copik
+# Copyright (c) 2016-2017 Marcin Copik
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,13 +10,14 @@ Installation:
 https://github.com/Valloric/YouCompleteMe
 
 Configuration:
-Configure hpx build, passing location for YCM configuration file with option
-HPX_WITH_VIM_YCM. File will be configured to use HPX compilation flags and
-placed in this directory. Configuration file should be placed in your working
-directory or in any directory above. An optimal choice may be the source
-directory. To avoid asking for confirmation and automatically load config file
+Configure hpx build by enabling an option HPX_WITH_VIM_YCM.
+File will be configured to use HPX compilation flags and
+placed in build directory. To enable support, run 'make configure_ycm' to copy YCM configuration file
+from build to source directory. Please note that this will overwrite existing configuration files which might
+have been created by other builds using the same source tree.
+To avoid asking for confirmation and automatically load config file
 add this information to your .vimrc file:
-let g:ycm_extra_conf_globlist = ['LOCATION_OF_CONFIG_FILE/*']
+let g:ycm_extra_conf_globlist = ['LOCATION_OF_HPX_SOURCE_TREE/*']
 
 YCM uses compilation flags exported by CMake in build directory. Do not remove
 compile_commands.json!
