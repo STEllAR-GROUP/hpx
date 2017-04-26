@@ -1835,7 +1835,7 @@ if(HPX_WITH_VIM_YCM)
     COMMENT "Copying YCM config file to source directory"
     VERBATIM
   )
-  hpx_info("VIM YouCompleteMe: run 'make vim_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
+  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
 
 ################################################################################
