@@ -7,12 +7,15 @@
 #define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
 
 #include <hpx/include/parallel_execution_policy.hpp>
+#include <hpx/include/util.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace test
@@ -20,14 +23,14 @@ namespace test
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
-      : boost::iterator_adaptor<
+      : hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
         base_type;
 
     public:
@@ -84,14 +87,14 @@ namespace test
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct decorated_iterator
-      : boost::iterator_adaptor<
+      : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
         base_type;
 
     public:
@@ -107,7 +110,7 @@ namespace test
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {
@@ -162,17 +165,17 @@ namespace test
     {
         static void call(ExPolicy, hpx::exception_list const& e)
         {
-            // The static partitioner uses the number of threads/cores for the
-            // number chunks to create.
-            HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
+            // The static partitioner uses four times the number of
+            // threads/cores for the number chunks to create.
+            HPX_TEST_LTE(e.size(), 4 * hpx::get_num_worker_threads());
         }
     };
 
     template <typename IteratorTag>
     struct test_num_exceptions<
-        hpx::parallel::sequential_execution_policy, IteratorTag>
+        hpx::parallel::execution::sequenced_policy, IteratorTag>
     {
-        static void call(hpx::parallel::sequential_execution_policy const&,
+        static void call(hpx::parallel::execution::sequenced_policy const&,
             hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
@@ -190,9 +193,9 @@ namespace test
 
     template <>
     struct test_num_exceptions<
-        hpx::parallel::sequential_execution_policy, std::input_iterator_tag>
+        hpx::parallel::execution::sequenced_policy, std::input_iterator_tag>
     {
-        static void call(hpx::parallel::sequential_execution_policy const&,
+        static void call(hpx::parallel::execution::sequenced_policy const&,
             hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
@@ -208,10 +211,12 @@ namespace test
         {
             using namespace hpx::parallel::v1::detail;
 
-            if (policy.type() == typeid(hpx::parallel::sequential_execution_policy)) {
+            if (policy.type() == typeid(hpx::parallel::execution::sequenced_policy))
+            {
                 HPX_TEST_EQ(e.size(), 1u);
             }
-            else {
+            else
+            {
                 // The static partitioner uses the number of threads/cores for
                 // the number chunks to create.
                 HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
@@ -221,7 +226,7 @@ namespace test
 
     template <>
     struct test_num_exceptions<
-        hpx::parallel::execution_policy, std::input_iterator_tag>
+        hpx::parallel::execution::execution_policy, std::input_iterator_tag>
     {
         static void call(hpx::parallel::execution_policy const&,
             hpx::exception_list const& e)

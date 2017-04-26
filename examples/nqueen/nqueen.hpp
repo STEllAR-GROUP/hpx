@@ -12,6 +12,9 @@
 
 #include <examples/nqueen/stubs/nqueen.hpp>
 
+#include <cstddef>
+#include <utility>
+
 namespace nqueen
 {
     class board

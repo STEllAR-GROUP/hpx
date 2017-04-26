@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
+
 #ifndef HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
@@ -14,16 +16,14 @@
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/config.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/type_traits/is_enum.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/cstdint.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -36,7 +36,7 @@ namespace hpx { namespace serialization
         typedef basic_archive<input_archive> base_type;
 
         typedef
-            std::map<boost::uint64_t, detail::ptr_helper_ptr>
+            std::map<std::uint64_t, detail::ptr_helper_ptr>
             pointer_tracker;
 
         template <typename Container>
@@ -50,14 +50,14 @@ namespace hpx { namespace serialization
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            boost::uint64_t endianess = 0ul;
+            std::uint64_t endianess = 0ul;
             load(endianess);
             if (endianess)
                 this->base_type::flags_ = hpx::serialization::endian_big;
 
             // load flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
-            boost::uint32_t flags = 0;
+            std::uint32_t flags = 0;
             load(flags);
             this->base_type::flags_ = flags;
 
@@ -79,31 +79,23 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::disable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            !std::is_integral<T>::value && !std::is_enum<T>::value
         >::type
         load(T & t)
         {
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+            typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
 
             load_bitwise(t, use_optimized());
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            std::is_integral<T>::value || std::is_enum<T>::value
         >::type
         load(T & t) //-V659
         {
-            load_integral(t,
-                typename boost::is_unsigned<T>::type());
+            load_integral(t, std::is_unsigned<T>());
         }
 
         void load(float & f)
@@ -153,7 +145,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void load_bitwise(T & t, std::true_type)
         {
-            static_assert(!boost::is_abstract<T>::value,
+            static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
@@ -166,40 +158,64 @@ namespace hpx { namespace serialization
         }
 
         template <class T>
-        void load_nonintrusively_polymorphic(T& t, boost::mpl::false_)
+        void load_nonintrusively_polymorphic(T& t, std::false_type)
         {
             access::serialize(*this, t, 0);
         }
 
         template <class T>
-        void load_nonintrusively_polymorphic(T& t, boost::mpl::true_)
+        void load_nonintrusively_polymorphic(T& t, std::true_type)
         {
             detail::polymorphic_nonintrusive_factory::instance().load(*this, t);
         }
 
         template <typename T>
-        void load_integral(T & val, boost::mpl::false_)
+        void load_integral(T & val, std::false_type)
         {
-            boost::int64_t l;
+            std::int64_t l;
             load_integral_impl(l);
             val = static_cast<T>(l);
         }
 
         template <typename T>
-        void load_integral(T & val, boost::mpl::true_)
+        void load_integral(T & val, std::true_type)
         {
-            boost::uint64_t ul;
+            std::uint64_t ul;
             load_integral_impl(ul);
             val = static_cast<T>(ul);
         }
 
-#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
-        void load_integral(boost::int128_type& t, boost::mpl::false_)
+#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
+        void load_integral(boost::int128_type& t, std::false_type)
         {
             load_integral_impl(t);
         }
 
-        void load_integral(boost::uint128_type& t, boost::mpl::true_)
+        void load_integral(boost::uint128_type& t, std::true_type)
+        {
+            load_integral_impl(t);
+        }
+
+        // On some platforms (gcc) std::is_integral<int128>::value
+        // evaluates to false. Thus, these functions re-route the
+        // serialization for those types to the proper implementation
+        void load_bitwise(boost::int128_type& t, std::false_type)
+        {
+            load_integral_impl(t);
+        }
+
+        void load_bitwise(boost::int128_type& t, std::true_type)
+        {
+            load_integral_impl(t);
+        }
+
+        void load_bitwise(boost::uint128_type& t, std::false_type)
+        {
+            load_integral_impl(t);
+        }
+
+        void load_bitwise(boost::uint128_type& t, std::true_type)
         {
             load_integral_impl(t);
         }
@@ -243,7 +259,7 @@ namespace hpx { namespace serialization
 
         // make functions visible through adl
         friend void register_pointer(input_archive& ar,
-                boost::uint64_t pos, detail::ptr_helper_ptr helper)
+                std::uint64_t pos, detail::ptr_helper_ptr helper)
         {
             pointer_tracker& tracker = ar.pointer_tracker_;
             HPX_ASSERT(tracker.find(pos) == tracker.end());
@@ -252,11 +268,11 @@ namespace hpx { namespace serialization
         }
 
         template <typename Helper>
-        friend Helper & tracked_pointer(input_archive& ar, boost::uint64_t pos)
+        friend Helper & tracked_pointer(input_archive& ar, std::uint64_t pos)
         {
             // gcc has some lookup problems when using
             // nested type inside friend function
-            std::map<boost::uint64_t, detail::ptr_helper_ptr>::iterator
+            std::map<std::uint64_t, detail::ptr_helper_ptr>::iterator
                 it = ar.pointer_tracker_.find(pos);
             HPX_ASSERT(it != ar.pointer_tracker_.end());
 

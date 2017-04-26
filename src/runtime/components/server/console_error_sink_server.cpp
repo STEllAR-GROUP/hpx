@@ -13,6 +13,7 @@
 // This is needed to get rid of an undefined reference to
 // hpx::actions::detail::register_remote_action_invocation_count
 #include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/util/serialize_exception.hpp>

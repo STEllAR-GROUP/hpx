@@ -8,7 +8,9 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <string>
+#include <utility>
 
 #include "read_values.hpp"
 #include "partition.hpp"

@@ -12,17 +12,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_chunk_allocator.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
+#include <hpx/util/logging.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -46,7 +48,7 @@ namespace hpx
             }
 
             inline void
-            convert_byte(boost::uint8_t b, char* buffer, char const* end)
+            convert_byte(std::uint8_t b, char* buffer, char const* end)
             {
                 *buffer++ = to_digit((b & 0xF0) >> 4);
                 *buffer++ = to_digit(b & 0x0F);
@@ -59,7 +61,7 @@ namespace hpx
                 if (LPT_ENABLED(debug))
                 {
                     result.reserve(buffer.data_.size() * 2 + 1);
-                    for (boost::uint8_t byte: buffer.data_)
+                    for (std::uint8_t byte: buffer.data_)
                     {
                         char b[3] = { 0 };
                         convert_byte(byte, &b[0], &b[3]);
@@ -103,8 +105,8 @@ namespace hpx
                 }
 
                 buffer.num_chunks_ = count_chunks_type(
-                    static_cast<boost::uint32_t>(chunks.size()),
-                    static_cast<boost::uint32_t>(buffer.chunks_.size() - chunks.size())
+                    static_cast<std::uint32_t>(chunks.size()),
+                    static_cast<std::uint32_t>(buffer.chunks_.size() - chunks.size())
                 );
 
                 if (!chunks.empty()) {
@@ -118,37 +120,26 @@ namespace hpx
                     }
                 }
             }
-
-            inline std::size_t
-            get_archive_size(parcel const& p, boost::uint32_t flags,
-                boost::uint32_t dest_locality_id,
-                std::vector<serialization::serialization_chunk>* chunks)
-            {
-                // gather the required size for the archive
-                hpx::serialization::detail::size_gatherer_container gather_size;
-                hpx::serialization::output_archive archive(
-                    gather_size, flags, dest_locality_id, chunks);
-                archive << p;
-                return gather_size.size();
-            }
         }
 
-        template <typename Buffer, typename NewGids>
+        template <typename Buffer>
         std::size_t
-        encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, boost::uint64_t max_outbound_size, NewGids new_gids)
+        encode_parcels(parcelport& pp,
+            parcel const * ps, std::size_t num_parcels, Buffer & buffer,
+            int archive_flags_, std::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
+            std::size_t num_chunks = 0;
             std::size_t arg_size = 0;
-            boost::uint32_t dest_locality_id =
-                ps[0].destination_locality_id();
-
             std::size_t parcels_sent = 0;
-
             std::size_t parcels_size = 1;
+
             if(num_parcels != std::size_t(-1))
+            {
+                arg_size = sizeof(std::int64_t);
                 parcels_size = num_parcels;
+            }
 
             // guard against serialization errors
             try {
@@ -157,50 +148,64 @@ namespace hpx
                         ps[0].get_serialization_filter());
 
                     int archive_flags = archive_flags_;
-                    if (filter.get() != 0)
+                    if (filter.get() != nullptr)
                         archive_flags |= serialization::enable_compression;
 
-                    // Get the chunk size from the allocator if it supports it
-                    size_t chunk_default = hpx::traits::default_chunk_size<
-                            typename Buffer::allocator_type
-                        >::call(buffer.data_.get_allocator());
 
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
                         if (arg_size >= max_outbound_size)
                             break;
-                        arg_size += detail::get_archive_size(ps[parcels_sent],
-                            archive_flags, dest_locality_id, &buffer.chunks_);
+                        arg_size += ps[parcels_sent].size();
+                        num_chunks += ps[parcels_sent].num_chunks();
                     }
 
-                    buffer.data_.reserve((std::max)(chunk_default, arg_size));
+                    buffer.data_.reserve(arg_size);
+
+                    buffer.chunks_.reserve(num_chunks);
 
                     // mark start of serialization
                     util::high_resolution_timer timer;
 
                     {
                         // Serialize the data
-                        if (filter.get() != 0)
+                        if (filter.get() != nullptr)
                             filter->set_max_length(buffer.data_.capacity());
 
                         serialization::output_archive archive(
                             buffer.data_
                           , archive_flags
-                          , dest_locality_id
                           , &buffer.chunks_
-                          , filter.get()
-                          , new_gids);
+                          , filter.get());
 
                         if(num_parcels != std::size_t(-1))
                             archive << parcels_sent; //-V128
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {
-                            LPT_(debug) << ps[i];
-                            archive << ps[i];
-                        }
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            std::size_t archive_pos = archive.current_pos();
+                            std::int64_t serialize_time =
+                                timer.elapsed_nanoseconds();
+#endif
 
+                            LPT_(debug) << ps[i];
+                            archive.set_split_gids(ps[i].split_gids());
+                            archive << ps[i];
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+                            performance_counters::parcels::data_point action_data;
+                            action_data.bytes_ = archive.current_pos() - archive_pos;
+                            action_data.serialization_time_ =
+                                timer.elapsed_nanoseconds() - serialize_time;
+                            action_data.num_parcels_ = 1;
+                            pp.add_sent_data(
+                                ps[i].get_action()->get_action_name(),
+                                action_data);
+#endif
+                        }
+                        archive.flush();
                         arg_size = archive.bytes_written();
                     }
 

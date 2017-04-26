@@ -9,6 +9,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +27,7 @@ bool is_test_action(hpx::parcelset::parcel const& p)
 {
     return dynamic_cast<
             hpx::actions::transfer_action<test_action>*
-        >(p.get_action()) != 0;
+        >(p.get_action()) != nullptr;
 }
 
 void write_handler(boost::system::error_code const&,

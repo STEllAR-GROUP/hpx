@@ -22,6 +22,7 @@
 #include <boost/range/functions.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -49,19 +50,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param dest         Refers to the beginning of the destination range.
     ///
     /// The assignments in the parallel \a copy algorithm invoked with an
-    /// execution policy object of type \a sequential_execution_policy
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a \a hpx::future<OutIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a copy algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
@@ -69,7 +70,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
@@ -137,33 +138,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a \a hpx::future<OutIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a copy_if algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
@@ -173,34 +174,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >
     >::type
     copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f,
-        Proj && proj)
+        Proj && proj = Proj())
     {
         return copy_if(std::forward<ExPolicy>(policy),
             boost::begin(rng), boost::end(rng), dest, std::forward<F>(f),
             std::forward<Proj>(proj));
-    }
-
-    /// \cond NOINTERNAL
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-    HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_indirect_callable<
-            F, traits::projected_range<util::projection_identity, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)
-        >
-    >::type
-    copy_if(ExPolicy && policy, Rng && rng, OutIter dest, F && f)
-    {
-        return copy_if(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng), dest, std::forward<F>(f),
-            util::projection_identity());
     }
     /// \endcond
 }}}

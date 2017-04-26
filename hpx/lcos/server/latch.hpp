@@ -17,6 +17,8 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
@@ -78,6 +80,10 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// This is invoked whenever the is_ready() function is called
+        bool get_value()
+        {
+            return latch_.is_ready();
+        }
         bool get_value(hpx::error_code &)
         {
             return latch_.is_ready();
@@ -125,6 +131,9 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::server::latch::wait_action,
     hpx_lcos_server_latch_wait_action)
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
+    bool, std::ptrdiff_t, bool_std_ptrdiff);
 
 #endif
 

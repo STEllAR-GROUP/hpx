@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -21,15 +23,15 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <sstream>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -50,11 +52,11 @@ namespace hpx
         static void default_errorsink(std::string const&);
 
         //
-        threads::thread_state_enum run_helper(
+        threads::thread_result_type run_helper(
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
+        void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
             bool& running);
 
     public:
@@ -143,7 +145,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
+        void stopped(bool blocking, compat::condition_variable& cond, compat::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -269,20 +271,20 @@ namespace hpx
         ///            returned for. If this is std::size_t(-1) the function
         ///            will return the overall number of executed HPX threads.
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
+        std::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
             return thread_manager_->get_executed_threads(num);
         }
 #endif
 
-        boost::uint64_t get_runtime_support_lva() const
+        std::uint64_t get_runtime_support_lva() const
         {
-            return reinterpret_cast<boost::uint64_t>(runtime_support_.get());
+            return reinterpret_cast<std::uint64_t>(runtime_support_.get());
         }
 
-        boost::uint64_t get_memory_lva() const
+        std::uint64_t get_memory_lva() const
         {
-            return reinterpret_cast<boost::uint64_t>(memory_.get());
+            return reinterpret_cast<std::uint64_t>(memory_.get());
         }
 
         naming::gid_type get_next_id(std::size_t count = 1);
@@ -363,15 +365,12 @@ namespace hpx
     private:
         void deinit_tss();
 
-        void init_tss_ex(char const* context, std::size_t num,
-            char const* postfix, bool service_thread, error_code& ec);
+        void init_tss_ex(std::string const& locality, char const* context,
+            std::size_t num, char const* postfix, bool service_thread,
+            error_code& ec);
 
         void init_tss(char const* context, std::size_t num, char const* postfix,
-            bool service_thread)
-        {
-            error_code ec(lightweight);
-            return init_tss_ex(context, num, postfix, service_thread, ec);
-        }
+            bool service_thread);
 
     private:
         util::unique_id_ranges id_pool_;
@@ -386,11 +385,10 @@ namespace hpx
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
-        util::detail::init_logging init_logging_;
         applier::applier applier_;
         boost::signals2::scoped_connection default_error_sink_;
 
-        boost::mutex mtx_;
+        compat::mutex mtx_;
         boost::exception_ptr exception_;
     };
 }

@@ -11,17 +11,18 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <mutex>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
-boost::uint32_t locality_id = boost::uint32_t(-1);
+std::uint32_t locality_id = std::uint32_t(-1);
 
-boost::int32_t final_result = 0;
+std::int32_t final_result = 0;
 hpx::util::spinlock result_mutex;
 
-void receive_result(boost::int32_t i)
+void receive_result(std::int32_t i)
 {
     std::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
@@ -30,9 +31,9 @@ void receive_result(boost::int32_t i)
 HPX_PLAIN_ACTION(receive_result);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::int32_t> accumulator;
+boost::atomic<std::int32_t> accumulator;
 
-void increment(hpx::id_type const& there, boost::int32_t i)
+void increment(hpx::id_type const& there, std::int32_t i)
 {
     locality_id = hpx::get_locality_id();
 
@@ -45,7 +46,7 @@ HPX_PLAIN_ACTION(increment);
 struct increment_server
   : hpx::components::managed_component_base<increment_server>
 {
-    void call(hpx::id_type const& there, boost::int32_t i) const
+    void call(hpx::id_type const& there, std::int32_t i) const
     {
         accumulator += i;
         hpx::apply(receive_result_action(), there, accumulator.load());
@@ -77,7 +78,7 @@ int hpx_main()
 
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
-    if (hpx::get_num_localities_sync() > 1)
+    if (hpx::get_num_localities(hpx::launch::sync) > 1)
     {
         std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         there = localities[0];
@@ -121,7 +122,7 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
 
-    HPX_TEST_NEQ(boost::uint32_t(-1), locality_id);
+    HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
     HPX_TEST(on_shutdown_executed || 0 != locality_id);
 
     return hpx::util::report_errors();

@@ -20,14 +20,18 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
+
+#include <cstddef>
+#include <cstring>
+#include <cwchar>
 #include <map>
 #include <memory>
 #include <vector>
+#include <utility>
 
-#include <string.h>
-#include <wchar.h>
 
 namespace hpx { namespace util { namespace logging {
 

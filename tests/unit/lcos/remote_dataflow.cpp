@@ -11,11 +11,12 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::uint32_t> void_f_count;
+boost::atomic<std::uint32_t> void_f_count;
 
 void void_f(hpx::future<int> &&) { ++void_f_count; }
 HPX_PLAIN_ACTION(void_f);
@@ -99,10 +100,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

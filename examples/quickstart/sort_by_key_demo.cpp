@@ -11,6 +11,7 @@
 #include <hpx/include/parallel_sort.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ int hpx_main()
         print_sequence(keys, values);
 
         hpx::parallel::sort_by_key(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             keys.begin(),
             keys.end(),
             values.begin());

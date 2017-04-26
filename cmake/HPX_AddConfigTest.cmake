@@ -83,7 +83,7 @@ macro(add_hpx_config_test variable)
         OUTPUT_VARIABLE ${variable}_OUTPUT
         COPY_FILE ${test_binary})
        hpx_debug("Compile test: ${variable}")
-       hpx_debug("Compilation output: \n\n${${variable}_OUTPUT}")
+       hpx_debug("Compilation output: ${${variable}_OUTPUT}")
     endif()
 
     set(_run_msg "Success")
@@ -214,13 +214,6 @@ macro(hpx_check_for_cxx11_function_template_default_args)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_initializer_list)
-  add_hpx_config_test(HPX_WITH_CXX11_INITIALIZER_LIST
-    SOURCE cmake/tests/cxx11_initializer_list.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_inline_namespaces)
   add_hpx_config_test(HPX_WITH_CXX11_INLINE_NAMESPACES
     SOURCE cmake/tests/cxx11_inline_namespaces.cpp
@@ -238,6 +231,13 @@ endmacro()
 macro(hpx_check_for_cxx11_noexcept)
   add_hpx_config_test(HPX_WITH_CXX11_NOEXCEPT
     SOURCE cmake/tests/cxx11_noexcept.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_nsdmi)
+  add_hpx_config_test(HPX_WITH_CXX11_NSDMI
+    SOURCE cmake/tests/cxx11_non_static_data_member_initialization.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -361,6 +361,14 @@ macro(hpx_check_for_cxx11_std_shared_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_thread)
+  add_hpx_config_test(HPX_WITH_CXX11_THREAD
+    SOURCE cmake/tests/cxx11_std_thread.cpp
+    LIBRARIES "-pthread"
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_to_string)
   add_hpx_config_test(HPX_WITH_CXX11_TO_STRING
     SOURCE cmake/tests/cxx11_std_to_string.cpp
@@ -445,8 +453,15 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx_experimental_std_optional)
-  add_hpx_config_test(HPX_WITH_CXX1Y_EXPERIMENTAL_OPTIONAL
-    SOURCE cmake/tests/cxx1y_experimental_std_optional.cpp
+macro(hpx_check_for_libfun_std_experimental_optional)
+  add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
+    SOURCE cmake/tests/libfun_std_experimental_optional.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_mm_prefetch)
+  add_hpx_config_test(HPX_WITH_MM_PREFECTH
+    SOURCE cmake/tests/mm_prefetch.cpp
     FILE ${ARGN})
 endmacro()

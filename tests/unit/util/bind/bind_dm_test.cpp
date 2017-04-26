@@ -23,6 +23,7 @@
 
 namespace placeholders = hpx::util::placeholders;
 
+#include <functional>
 #include <iostream>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -48,7 +49,7 @@ int main()
 
     HPX_TEST( hpx::util::bind( &X::m, x )() == 17041 );
     HPX_TEST( hpx::util::bind( &X::m, px )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, boost::ref(x) )() == 17041 );
+    HPX_TEST( hpx::util::bind( &X::m, std::ref(x) )() == 17041 );
 
 
     X const cx = x;
@@ -59,7 +60,7 @@ int main()
 
     HPX_TEST( hpx::util::bind( &X::m, cx )() == 17041 );
     HPX_TEST( hpx::util::bind( &X::m, pcx )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, boost::ref(cx) )() == 17041 );
+    HPX_TEST( hpx::util::bind( &X::m, std::ref(cx) )() == 17041 );
 
     return hpx::util::report_errors();
 }

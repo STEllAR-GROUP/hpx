@@ -6,8 +6,11 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "jacobi.hpp"
@@ -28,7 +31,7 @@ namespace jacobi_smp {
         {
             // MSVC is unhappy if the OMP loop variable is unsigned
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(boost::int64_t y = 1; y < boost::int64_t(n-1); ++y)
+            for(std::int64_t y = 1; y < std::int64_t(n-1); ++y)
             {
                       double * dst = &(*grid_new)[y * n];
                 const double * src = &(*grid_new)[y * n];

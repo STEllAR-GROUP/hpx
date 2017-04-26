@@ -12,14 +12,18 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_HAVE_HWLOC)
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/util/static.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>
 #endif
+
+#include <cstddef>
 
 namespace hpx { namespace threads
 {
@@ -30,11 +34,6 @@ private:
     static mask_type empty_mask;
 
 public:
-    std::size_t get_pu_number(std::size_t num_thread, error_code& ec = throws) const
-    {
-        return 0;
-    }
-
     std::size_t get_numa_node_number(
         std::size_t thread_num
       , error_code& ec = throws
@@ -80,6 +79,13 @@ public:
         return empty_mask;
     }
 
+    mask_type get_numa_node_affinity_mask_from_numa_node(
+        std::size_t numa_node
+        ) const
+    {
+        return empty_mask;
+    }
+
     mask_cref_type get_core_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
@@ -105,7 +111,7 @@ public:
     }
 
     void set_thread_affinity_mask(
-        boost::thread& thrd
+        compat::thread& thrd
       , mask_cref_type mask
       , error_code& ec = throws
         ) const
@@ -145,7 +151,7 @@ public:
     }
 
     mask_type get_cpubind_mask(
-        boost::thread & handle
+        compat::thread & handle
       , error_code& ec = throws
         ) const
     {
@@ -160,7 +166,7 @@ public:
 #if defined(__ANDROID__) && defined(ANDROID)
         return std::size_t(::android_getCpuCount());
 #else
-        return std::size_t(boost::thread::hardware_concurrency());
+        return std::size_t(compat::thread::hardware_concurrency());
 #endif
     }
 

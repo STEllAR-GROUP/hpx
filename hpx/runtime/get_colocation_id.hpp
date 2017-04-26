@@ -11,6 +11,7 @@
 
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 namespace hpx
@@ -33,15 +34,46 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \see    \a hpx::get_colocation_id()
-    HPX_API_EXPORT naming::id_type get_colocation_id_sync(
+    HPX_API_EXPORT naming::id_type get_colocation_id(launch::sync_policy,
         naming::id_type const& id, error_code& ec = throws);
 
     /// \brief Asynchronously return the id of the locality where the object
     ///        referenced by the given id is currently located on
     ///
-    /// \see    \a hpx::get_colocation_id_sync()
+    /// \param id [in] The id of the object to locate.
+    ///
+    /// \see    \a hpx::get_colocation_id(launch::sync_policy)
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+    /// \brief Return the id of the locality where the object referenced by the
+    ///        given id is currently located on
+    ///
+    /// The function hpx::get_colocation_id() returns the id of the locality
+    /// where the given object is currently located.
+    ///
+    /// \param id [in] The id of the object to locate.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This functions is deprecated, it will be removed in a future
+    ///           version of HPX.
+    ///
+    /// \see    \a hpx::get_colocation_id()
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+    inline naming::id_type get_colocation_id_sync(
+        naming::id_type const& id, error_code& ec = throws)
+    {
+        return get_colocation_id(launch::sync, id, ec);
+    }
+#endif
 }
 
 #endif

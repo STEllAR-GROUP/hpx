@@ -10,8 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
+#include <cstddef>
 #include <iostream>
 #include <vector>
 

@@ -43,6 +43,8 @@ set(tests
     findifnot_bad_alloc
     foreach
     foreach_executors
+    foreach_prefetching
+    foreach_prefetching_executors
     foreach_projection
     foreachn
     foreachn_exception
@@ -63,9 +65,6 @@ set(tests
     includes
     inclusive_scan
     inclusive_scan_executors
-    inner_product
-    inner_product_exception
-    inner_product_bad_alloc
     is_partitioned
     is_sorted
     is_sorted_executors
@@ -99,6 +98,7 @@ set(tests
     sort
     sort_by_key
     sort_exceptions
+    stable_partition
     swapranges
     transform
     transform_binary
@@ -106,6 +106,9 @@ set(tests
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
+    transform_reduce_binary
+    transform_reduce_binary_exception
+    transform_reduce_binary_bad_alloc
     uninitialized_copy
     uninitialized_copy_executors
     uninitialized_copyn

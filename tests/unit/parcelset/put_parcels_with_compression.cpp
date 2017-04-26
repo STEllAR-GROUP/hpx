@@ -11,8 +11,11 @@
 #include <hpx/include/compression_registration.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,16 +25,19 @@ std::size_t const numparcels_default = 10;
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename T>
 hpx::parcelset::parcel
-generate_parcel(hpx::id_type const& dest, hpx::id_type const& cont, T && data)
+generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data)
 {
     hpx::naming::address addr;
-    hpx::parcelset::parcel p(dest, addr,
+    hpx::naming::gid_type dest = dest_id.get_gid();
+    hpx::naming::detail::strip_credits_from_gid(dest);
+    hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
+        std::true_type(), std::move(dest), std::move(addr),
         hpx::actions::typed_continuation<hpx::id_type>(cont),
         Action(), hpx::threads::thread_priority_normal,
         std::forward<T>(data));
 
-    p.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
     p.set_source_id(hpx::find_here());
+    p.size() = 4096;
 
     return p;
 }
@@ -240,14 +246,16 @@ void verify_counters()
         performance_counter const& serialize_counter = serialize_counters[i];
         performance_counter const& data_counter = data_counters[i];
 
-        counter_value serialize_value = serialize_counter.get_counter_value_sync();
-        counter_value data_value = data_counter.get_counter_value_sync();
+        counter_value serialize_value =
+            serialize_counter.get_counter_value(hpx::launch::sync);
+        counter_value data_value =
+            data_counter.get_counter_value(hpx::launch::sync);
 
         double serialize_val = serialize_value.get_value<double>();
         double data_val = data_value.get_value<double>();
 
-        std::string serialize_name = serialize_counter.get_name_sync();
-        std::string data_name = data_counter.get_name_sync();
+        std::string serialize_name = serialize_counter.get_name(hpx::launch::sync);
+        std::string data_name = data_counter.get_name(hpx::launch::sync);
 
         if (data_val != 0 && serialize_val != 0)
         {
@@ -269,7 +277,7 @@ void verify_counters()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

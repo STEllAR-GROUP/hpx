@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/util/function.hpp>
@@ -35,7 +34,11 @@
 #include <boost/spirit/include/qi_directive.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,6 +53,11 @@ HPX_REGISTER_ACTION_ID(
     ::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action,
     hpx::actions::performance_counter_get_counter_value_action_id)
+HPX_REGISTER_ACTION_ID(
+    hpx::performance_counters::server
+    ::base_performance_counter::get_counter_values_array_action,
+    performance_counter_get_counter_values_array_action,
+    hpx::actions::performance_counter_get_counter_values_array_action_id)
 HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server
     ::base_performance_counter::set_counter_value_action,
@@ -77,6 +85,10 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::performance_counters::counter_value, hpx_counter_value,
     hpx::actions::base_lco_with_value_hpx_counter_value_get,
     hpx::actions::base_lco_with_value_hpx_counter_value_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::performance_counters::counter_values_array, hpx_counter_values_array,
+    hpx::actions::base_lco_with_value_hpx_counter_values_array_get,
+    hpx::actions::base_lco_with_value_hpx_counter_values_array_set)
 
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter)
@@ -352,7 +364,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.parent_.index_.empty()) {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    hpx::util::safe_lexical_cast<std::uint64_t>
                     (elements.instance_.parent_.index_);
             }
 
@@ -361,7 +373,7 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.child_.index_.empty()) {
                 path.instanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    hpx::util::safe_lexical_cast<std::uint64_t>
                     (elements.instance_.child_.index_);
             }
         }
@@ -447,7 +459,7 @@ namespace hpx { namespace performance_counters
 
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = "locality";
-            p.parentinstanceindex_ = static_cast<boost::int64_t>(get_locality_id());
+            p.parentinstanceindex_ = static_cast<std::int64_t>(get_locality_id());
             if (p.instancename_.empty())
             {
                 p.instancename_ = "total";
@@ -479,13 +491,14 @@ namespace hpx { namespace performance_counters
             "counter_average_count",
             "counter_aggregating",
             "counter_average_timer",
-            "counter_elapsed_time"
+            "counter_elapsed_time",
+            "counter_histogram",
         };
     }
 
     char const* get_counter_type_name(counter_type type)
     {
-        if (type < counter_text || type > counter_elapsed_time)
+        if (type < counter_text || type > counter_histogram)
             return "unknown";
         return strings::counter_type_names[type];
     }
@@ -551,8 +564,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_types(std::move(func), mode, ec);
     }
@@ -564,8 +577,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_type(name, std::move(func), mode, ec);
     }
@@ -577,8 +590,8 @@ namespace hpx { namespace performance_counters
         using hpx::util::placeholders::_1;
 
         discover_counter_func func(
-            hpx::util::bind(&detail::discover_counters, _1, boost::ref(counters),
-                boost::ref(ec)));
+            hpx::util::bind(&detail::discover_counters, _1, std::ref(counters),
+                std::ref(ec)));
 
         return discover_counter_type(info, std::move(func), mode, ec);
     }
@@ -607,7 +620,7 @@ namespace hpx { namespace performance_counters
     namespace detail
     {
         naming::gid_type create_raw_counter_value(
-            counter_info const& info, boost::int64_t* countervalue,
+            counter_info const& info, std::int64_t* countervalue,
             error_code& ec)
         {
             naming::gid_type gid;
@@ -617,7 +630,7 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t()> const& f, error_code& ec)
+            hpx::util::function_nonser<std::int64_t()> const& f, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -626,7 +639,27 @@ namespace hpx { namespace performance_counters
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t(bool)> const& f, error_code& ec)
+            hpx::util::function_nonser<std::int64_t(bool)> const& f, error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().create_raw_counter(
+                info, f, gid, ec);
+            return gid;
+        }
+
+        naming::gid_type create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
+            error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().create_raw_counter(
+                info, f, gid, ec);
+            return gid;
+        }
+
+        naming::gid_type create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
+            error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
@@ -648,7 +681,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters, error_code& ec)
+            std::vector<std::int64_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
@@ -706,7 +739,7 @@ namespace hpx { namespace performance_counters
 
             if (paths.parentinstancename_ == "locality" &&
                 paths.parentinstanceindex_ !=
-                    static_cast<boost::int64_t>(hpx::get_locality_id()))
+                    static_cast<std::int64_t>(hpx::get_locality_id()))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "attempt to create counter on wrong locality ("
@@ -786,7 +819,7 @@ namespace hpx { namespace performance_counters
             std::size_t num_threads = get_os_thread_count();
             for (std::size_t l = 0; l != num_threads; ++l)
             {
-                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                p.instanceindex_ = static_cast<std::int64_t>(l);
                 counter_status status = get_counter_name(p, i.fullname_, ec);
                 if (!status_is_valid(status) || !f(i, ec) || ec)
                     return false;
@@ -802,7 +835,7 @@ namespace hpx { namespace performance_counters
                 = hpx::threads::get_topology().get_number_of_numa_nodes();
             for (std::size_t l = 0; l != num_nodes; ++l)
             {
-                p.instanceindex_ = static_cast<boost::int64_t>(l);
+                p.instanceindex_ = static_cast<std::int64_t>(l);
                 counter_status status = get_counter_name(p, i.fullname_, ec);
                 if (!status_is_valid(status) || !f(i, ec) || ec)
                     return false;
@@ -827,10 +860,11 @@ namespace hpx { namespace performance_counters
                 expand_nodes = true;
             }
 
-            boost::uint32_t last_locality = get_num_localities_sync();
-            for (boost::uint32_t l = 0; l != last_locality; ++l)
+            std::uint32_t last_locality =
+                get_num_localities(hpx::launch::sync);
+            for (std::uint32_t l = 0; l != last_locality; ++l)
             {
-                p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+                p.parentinstanceindex_ = static_cast<std::int32_t>(l);
                 if (expand_threads) {
                     if (!detail::expand_counter_info_threads(i, p, f, ec))
                         return false;
@@ -915,7 +949,7 @@ namespace hpx { namespace performance_counters
     {
         // register the canonical name with AGAS
         naming::id_type id = f.get();
-        agas::register_name_sync(fullname, id);
+        agas::register_name(launch::sync, fullname, id);
         return id;
     }
 
@@ -934,9 +968,9 @@ namespace hpx { namespace performance_counters
         // pre-pend prefix, if necessary
 
         // ask AGAS for the id of the given counter
-        naming::id_type id;
-        bool result = agas::resolve_name_sync(complemented_info.fullname_, id, ec);
-        if (!result) {
+        naming::id_type id = agas::resolve_name(launch::sync,
+            complemented_info.fullname_, ec);
+        if (id == naming::invalid_id) {
             try {
                 // figure out target locality
                 counter_path_elements p;
@@ -953,8 +987,9 @@ namespace hpx { namespace performance_counters
 
                 if (p.parentinstancename_ == "locality" &&
                         (   p.parentinstanceindex_ < 0 ||
-                            p.parentinstanceindex_ >= static_cast<boost::int32_t>
-                            (get_num_localities_sync())
+                            p.parentinstanceindex_ >=
+                                static_cast<std::int32_t>(
+                                    get_num_localities(hpx::launch::sync))
                         )
                     )
                 {
@@ -970,7 +1005,7 @@ namespace hpx { namespace performance_counters
                 if (p.parentinstanceindex_ >= 0) {
                     f = runtime_support::create_performance_counter_async(
                         naming::get_id_from_locality_id(
-                            static_cast<boost::uint32_t>(p.parentinstanceindex_)),
+                            static_cast<std::uint32_t>(p.parentinstanceindex_)),
                         complemented_info);
                 }
                 else {

@@ -9,6 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 //
 #include <random>
+#include <utility>
 #include <vector>
 
 #include  <boost/nondet_random.hpp>

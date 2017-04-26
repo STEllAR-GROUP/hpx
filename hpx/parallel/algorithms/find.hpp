@@ -19,8 +19,10 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -65,8 +67,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [val, tok](std::size_t base_idx, InIter it,
-                            std::size_t part_size) mutable
+                        [val, tok](InIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -117,19 +119,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param val          the value to compare the elements to
     ///
     /// The comparison operations in the parallel \a find algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a find algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find algorithm returns a \a hpx::future<InIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find algorithm returns the first element in the range
     ///           [first,last) that is equal to \a val.
@@ -138,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find(ExPolicy && policy, InIter first, InIter last, T const& val)
@@ -148,7 +150,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -196,8 +198,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [f, tok](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -262,19 +264,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a Type.
     ///
     /// The comparison operations in the parallel \a find_if algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a find_if algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_if algorithm returns a \a hpx::future<InIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_if algorithm returns the first element in the range
     ///           [first,last) that satisfies the predicate \a f.
@@ -283,7 +285,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if(ExPolicy && policy, InIter first, InIter last, F && f)
@@ -293,7 +295,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -346,8 +348,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [f, tok](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -412,19 +414,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a Type.
     ///
     /// The comparison operations in the parallel \a find_if_not algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a find_if_not algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_if_not algorithm returns a \a hpx::future<InIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_if_not algorithm returns the first element in the range
     ///           [first, last) that does \b not satisfy the predicate \a f.
@@ -433,7 +435,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if_not(ExPolicy && policy, InIter first, InIter last, F && f)
@@ -443,7 +445,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -499,8 +501,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-                        [=](std::size_t base_idx, FwdIter it,
-                            std::size_t part_size) mutable
+                        [=](FwdIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             FwdIter curr = it;
 
@@ -543,83 +545,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Returns the last subsequence of elements [first2,last2) found in the range
-    /// [first,last) using the operator== to compare elements.
-    ///
-    /// \note   Complexity: at most S*(N-S+1) comparisons where
-    ///         \a S = distance(first2, last2) and
-    ///         \a N = distance(first1, last1).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be searching for.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the algorithm will be searching for.
-    ///
-    /// The comparison operations in the parallel \a find_end algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a find_end algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a find_end algorithm returns a \a hpx::future<FwdIter> if the
-    ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a FwdIter otherwise.
-    ///           The \a find_end algorithm returns an iterator to the beginning of
-    ///           the last subsequence [first2, last2) in range [first, last).
-    ///           If the length of the subsequence [first2, last2) is greater
-    ///           than the length of the range [first1, last1), \a last1 is returned.
-    ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, \a last1 is also returned.
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-    >::type
-    find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2)
-    {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
-
-        return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, detail::equal_to());
-    }
-
     /// Returns the last subsequence of elements [first2, last2) found in the range
-    /// [first,last) using the given predicate \a f to compare elements.
+    /// [first, last) using the given predicate \a f to compare elements.
     ///
     /// \note   Complexity: at most S*(N-S+1) comparisons where
     ///         \a S = distance(first2, last2) and
@@ -637,10 +564,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a replace requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a replace requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -652,7 +580,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be searching for.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the algorithm will be searching for.
-    /// \param f            The binary predicate which returns \a true
+    /// \param op           The binary predicate which returns \a true
     ///                     if the elements should be treated as equal. The signature
     ///                     should be equivalent to the following:
     ///                     \code
@@ -666,19 +594,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     to \a Type1 and \a Type2 respectively.
     ///
     /// The comparison operations in the parallel \a find_end algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a find_end algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_end algorithm returns a \a hpx::future<FwdIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a find_end algorithm returns an iterator to the beginning of
     ///           the last subsequence [first2, last2) in range [first, last).
@@ -690,13 +618,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// This overload of \a find_end is available if the user decides to provide the
     /// algorithm their own predicate \a f.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Pred = detail::equal_to>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, F && f)
+        FwdIter2 first2, FwdIter2 last2, Pred && op = Pred())
     {
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -705,11 +634,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::find_end<FwdIter1>().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, std::forward<F>(f));
+            first1, last1, first2, last2, std::forward<Pred>(op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -767,8 +696,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [s_first, s_last, tok, op](std::size_t base_idx, InIter it,
-                            std::size_t part_size) mutable
+                        [s_first, s_last, tok, op](InIter it,
+                            std::size_t part_size, std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -798,86 +727,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses opeartor== to compare elements.
-    ///
-    /// \note   Complexity: at most (S*N) comparisons where
-    ///         \a S = distance(s_first, s_last) and
-    ///         \a N = distance(first, last).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param s_first      Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be searching for.
-    /// \param s_last       Refers to the end of the sequence of elements of
-    ///                     the algorithm will be searching for.
-    ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a find_first_of algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
-    ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a InIter otherwise.
-    ///           The \a find_first_of algorithm returns an iterator to the first element
-    ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last).
-    ///           If the length of the subsequence [s_first, s_last) is
-    ///           greater than the length of the range [first, last),
-    ///           \a last is returned.
-    ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, \a last is also returned.
-    ///
-    template <typename ExPolicy, typename InIter, typename FwdIter>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, InIter>::type
-    >::type
-    find_first_of(ExPolicy && policy, InIter first, InIter last,
-        FwdIter s_first, FwdIter s_last)
-    {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Subsequence requires at least forward iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
-
-        return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, s_first, s_last, detail::equal_to());
-    }
-
-    /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses binary predicate p to compare elements
     ///
     /// \note   Complexity: at most (S*N) comparisons where
@@ -896,10 +745,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
-    ///                     requirements of \a CopyConstructible.
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -925,19 +775,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     to \a Type1 and \a Type2 respectively.
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a find_first_of algorithm returns a \a hpx::future<InIter> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
@@ -951,13 +801,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           the user decides to provide the
     ///           algorithm their own predicate \a f.
     ///
-    template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
+    template <typename ExPolicy, typename InIter, typename FwdIter,
+        typename Pred = detail::equal_to>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_first_of(ExPolicy && policy, InIter first, InIter last,
-        FwdIter s_first, FwdIter s_last, Pred && op)
+        FwdIter s_first, FwdIter s_last, Pred && op = Pred())
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter>::value),
@@ -967,7 +818,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Subsequence requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 

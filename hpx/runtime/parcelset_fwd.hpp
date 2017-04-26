@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parcelset_fwd.hpp
-
 #ifndef HPX_RUNTIME_PARCELSET_FWD_HPP
 #define HPX_RUNTIME_PARCELSET_FWD_HPP
 
@@ -14,6 +12,8 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/system/error_code.hpp>
+
+#include <cstddef>
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
@@ -29,6 +29,11 @@ namespace hpx {
         namespace policies
         {
             struct message_handler;
+        }
+
+        namespace detail
+        {
+            struct create_parcel;
         }
 
         HPX_API_EXPORT policies::message_handler* get_message_handler(

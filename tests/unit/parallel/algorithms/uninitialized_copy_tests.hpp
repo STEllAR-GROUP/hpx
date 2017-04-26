@@ -14,7 +14,10 @@
 #include <boost/atomic.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -24,8 +27,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy(ExPolicy && policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -77,8 +80,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -169,8 +172,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

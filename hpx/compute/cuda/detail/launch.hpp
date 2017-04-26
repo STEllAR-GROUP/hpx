@@ -16,6 +16,7 @@
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <cuda_runtime.h>
 
@@ -23,6 +24,8 @@
 #include <cstring>
 #endif
 #include <string>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail
 {
@@ -43,10 +46,28 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
         fun_type f_;
         args_type args_;
 
-        HPX_HOST_DEVICE void operator()()
+        HPX_HOST_DEVICE closure(fun_type && f, args_type && args)
+          : f_(std::move(f))
+          , args_(std::move(args))
+        {}
+
+        HPX_HOST_DEVICE closure(closure const& rhs)
+          : f_(rhs.f_)
+          , args_(rhs.args_)
+        {}
+
+        HPX_HOST_DEVICE closure(closure && rhs)
+          : f_(std::move(rhs.f_))
+          , args_(std::move(rhs.args_))
+        {}
+
+        HPX_DELETE_COPY_ASSIGN(closure);
+        HPX_DELETE_MOVE_ASSIGN(closure);
+
+        HPX_DEVICE void operator()()
         {
             // FIXME: is it possible to move the arguments?
-            hpx::util::invoke_fused(f_, args_);
+            hpx::util::invoke_fused_r<void>(f_, args_);
         }
     };
 
@@ -71,6 +92,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
             launch_function_type launcher = get_launch_function();
+            HPX_UNUSED(launcher);
             Closure c{std::move(f), std::move(args)};
 
             static_assert(sizeof(Closure) < 256,
@@ -99,7 +121,6 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 #endif
         }
     };
-
 
     // Launch any given function F with the given parameters. This function
     // does not involve any device synchronization.

@@ -10,6 +10,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -21,8 +23,8 @@ template <typename ExPolicy>
 void test_copy_if(ExPolicy policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::forward_iterator_tag> iterator;
@@ -97,8 +99,8 @@ template <typename ExPolicy>
 void test_copy_if_outiter(ExPolicy policy)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::forward_iterator_tag> iterator;
@@ -154,42 +156,42 @@ void test_copy_if()
 {
     using namespace hpx::parallel;
 
-    test_copy_if(seq);
-    test_copy_if(par);
-    test_copy_if(par_vec);
+    test_copy_if(execution::seq);
+    test_copy_if(execution::par);
+    test_copy_if(execution::par_unseq);
 
-    test_copy_if_async(seq(task));
-    test_copy_if_async(par(task));
+    test_copy_if_async(execution::seq(execution::task));
+    test_copy_if_async(execution::par(execution::task));
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if(execution_policy(seq));
-    test_copy_if(execution_policy(par));
-    test_copy_if(execution_policy(par_vec));
+    test_copy_if(execution_policy(execution::seq));
+    test_copy_if(execution_policy(execution::par));
+    test_copy_if(execution_policy(execution::par_unseq));
 
-    test_copy_if(execution_policy(seq(task)));
-    test_copy_if(execution_policy(par(task)));
+    test_copy_if(execution_policy(execution::seq(execution::task)));
+    test_copy_if(execution_policy(execution::par(execution::task)));
 #endif
 
-    test_copy_if_outiter(seq);
-    test_copy_if_outiter(par);
-    test_copy_if_outiter(par_vec);
+    test_copy_if_outiter(execution::seq);
+    test_copy_if_outiter(execution::par);
+    test_copy_if_outiter(execution::par_unseq);
 
-    test_copy_if_outiter_async(seq(task));
-    test_copy_if_outiter_async(par(task));
+    test_copy_if_outiter_async(execution::seq(execution::task));
+    test_copy_if_outiter_async(execution::par(execution::task));
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if_outiter(execution_policy(seq));
-    test_copy_if_outiter(execution_policy(par));
-    test_copy_if_outiter(execution_policy(par_vec));
+    test_copy_if_outiter(execution_policy(execution::seq));
+    test_copy_if_outiter(execution_policy(execution::par));
+    test_copy_if_outiter(execution_policy(execution::par_unseq));
 
-    test_copy_if_outiter(execution_policy(seq(task)));
-    test_copy_if_outiter(execution_policy(par(task)));
+    test_copy_if_outiter(execution_policy(execution::seq(execution::task)));
+    test_copy_if_outiter(execution_policy(execution::par(execution::task)));
 #endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -213,9 +215,9 @@ int main(int argc, char* argv[])
         ;
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

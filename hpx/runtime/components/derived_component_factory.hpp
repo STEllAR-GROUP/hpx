@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
@@ -23,6 +22,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,21 +246,6 @@ namespace hpx { namespace components
         {
             return refcnt_;
         }
-
-#if defined(HPX_HAVE_SECURITY)
-        /// \brief Return the required capabilities necessary to create an
-        ///        instance of a component using this factory instance.
-        ///
-        /// \return Returns required capabilities necessary to create a new
-        ///         instance of a component using this factory instance.
-        virtual components::security::capability
-            get_required_capabilities() const
-        {
-            using namespace components::security;
-            return Component::get_required_capabilities(
-                traits::capability<>::capability_create_component);
-        }
-#endif
 
     protected:
         util::section global_settings_;

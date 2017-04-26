@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,25 +11,22 @@
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/request.hpp>
-#include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/logging.hpp>
-
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
 
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
+
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace agas
 {
@@ -57,9 +55,7 @@ struct HPX_EXPORT symbol_namespace
     typedef std::map<std::string, std::shared_ptr<naming::gid_type> >
         gid_table_type;
 
-    typedef std::multimap<
-        std::pair<std::string, namespace_action_code>, hpx::id_type
-    > on_event_data_map_type;
+    typedef std::multimap<std::string, hpx::id_type> on_event_data_map_type;
     // }}}
 
   private:
@@ -67,8 +63,6 @@ struct HPX_EXPORT symbol_namespace
     gid_table_type gids_;
     std::string instance_name_;
     on_event_data_map_type on_event_data_;
-
-    struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
@@ -86,8 +80,8 @@ struct HPX_EXPORT symbol_namespace
               , time_(0)
             {}
 
-            boost::atomic<boost::int64_t> count_;
-            boost::atomic<boost::int64_t> time_;
+            boost::atomic<std::int64_t> count_;
+            boost::atomic<std::int64_t> time_;
         };
 
         counter_data()
@@ -95,19 +89,19 @@ struct HPX_EXPORT symbol_namespace
 
     public:
         // access current counter values
-        boost::int64_t get_bind_count(bool);
-        boost::int64_t get_resolve_count(bool);
-        boost::int64_t get_unbind_count(bool);
-        boost::int64_t get_iterate_names_count(bool);
-        boost::int64_t get_on_event_count(bool);
-        boost::int64_t get_overall_count(bool);
+        std::int64_t get_bind_count(bool);
+        std::int64_t get_resolve_count(bool);
+        std::int64_t get_unbind_count(bool);
+        std::int64_t get_iterate_names_count(bool);
+        std::int64_t get_on_event_count(bool);
+        std::int64_t get_overall_count(bool);
 
-        boost::int64_t get_bind_time(bool);
-        boost::int64_t get_resolve_time(bool);
-        boost::int64_t get_unbind_time(bool);
-        boost::int64_t get_iterate_names_time(bool);
-        boost::int64_t get_on_event_time(bool);
-        boost::int64_t get_overall_time(bool);
+        std::int64_t get_bind_time(bool);
+        std::int64_t get_resolve_time(bool);
+        std::int64_t get_unbind_time(bool);
+        std::int64_t get_iterate_names_time(bool);
+        std::int64_t get_on_event_time(bool);
+        std::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_bind_count();
@@ -128,54 +122,12 @@ struct HPX_EXPORT symbol_namespace
     };
     counter_data counter_data_;
 
-    struct update_time_on_exit
-    {
-        update_time_on_exit(boost::atomic<boost::int64_t>& t)
-          : started_at_(hpx::util::high_resolution_clock::now())
-          , t_(t)
-        {}
-
-        ~update_time_on_exit()
-        {
-            t_ += (hpx::util::high_resolution_clock::now() - started_at_);
-        }
-
-        boost::uint64_t started_at_;
-        boost::atomic<boost::int64_t>& t_;
-    };
-
   public:
     symbol_namespace()
       : base_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB)
     {}
 
     void finalize();
-
-    response remote_service(
-        request const& req
-        )
-    {
-        return service(req, throws);
-    }
-
-    response service(
-        request const& req
-      , error_code& ec
-        );
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> remote_bulk_service(
-        std::vector<request> const& reqs
-        )
-    {
-        return bulk_service(reqs, throws);
-    }
-
-    /// Maps \a service over \p reqs in parallel.
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , error_code& ec
-        );
 
     // register all performance counter types exposed by this component
     static void register_counter_types(
@@ -187,7 +139,7 @@ struct HPX_EXPORT symbol_namespace
 
     void register_server_instance(
         char const* servicename
-      , boost::uint32_t locality_id = naming::invalid_locality_id
+      , std::uint32_t locality_id = naming::invalid_locality_id
       , error_code& ec = throws
         );
 
@@ -195,71 +147,78 @@ struct HPX_EXPORT symbol_namespace
         error_code& ec = throws
         );
 
-    response bind(
-        request const& req
-      , error_code& ec = throws
+    bool bind(
+        std::string key
+      , naming::gid_type gid
         );
 
-    response resolve(
-        request const& req
-      , error_code& ec = throws
+    naming::gid_type resolve(std::string const& key);
+
+    naming::gid_type unbind(std::string const& key);
+
+    void iterate(iterate_names_function_type const& f);
+
+    bool on_event(
+        std::string const& name
+      , bool call_for_past_events
+      , hpx::id_type lco
         );
 
-    response unbind(
-        request const& req
-      , error_code& ec = throws
-        );
+    naming::gid_type statistics_counter(std::string const& key);
 
-    response iterate(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response on_event(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response statistics_counter(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    enum actions
-    { // {{{ action enum
-        // Actual actions
-        namespace_service            = symbol_ns_service
-      , namespace_bulk_service       = symbol_ns_bulk_service
-
-        // Pseudo-actions
-      , namespace_bind               = symbol_ns_bind
-      , namespace_resolve            = symbol_ns_resolve
-      , namespace_unbind             = symbol_ns_unbind
-      , namespace_iterate_names      = symbol_ns_iterate_names
-      , namespace_on_event           = symbol_ns_on_event
-      , namespace_statistics_counter = symbol_ns_statistics_counter
-    }; // }}}
-
-    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service,
-        bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, bind);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, resolve);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, unbind);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, iterate);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, on_event);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, statistics_counter);
 };
 
 }}}
 
 HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::symbol_namespace::service_action)
+    hpx::agas::server::symbol_namespace::bind_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::symbol_namespace::bind_action,
+    symbol_namespace_bind_action)
 
 HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::symbol_namespace::bulk_service_action)
+    hpx::agas::server::symbol_namespace::resolve_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::symbol_namespace::bulk_service_action,
-    symbol_namespace_bulk_service_action)
+    hpx::agas::server::symbol_namespace::resolve_action,
+    symbol_namespace_resolve_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::symbol_namespace::unbind_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::symbol_namespace::service_action,
-    symbol_namespace_service_action)
+    hpx::agas::server::symbol_namespace::unbind_action,
+    symbol_namespace_unbind_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::symbol_namespace::iterate_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::symbol_namespace::iterate_action,
+    symbol_namespace_iterate_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::symbol_namespace::on_event_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::symbol_namespace::on_event_action,
+    symbol_namespace_on_event_action)
+
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::agas::server::symbol_namespace::statistics_counter_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::symbol_namespace::statistics_counter_action,
+    symbol_namespace_statistics_counter_action)
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 

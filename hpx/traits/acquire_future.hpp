@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,17 +7,21 @@
 #define HPX_TRAITS_ACQUIRE_FUTURE_DEC_23_2014_0911AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
+#include <cstddef>
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace traits
@@ -47,8 +51,8 @@ namespace hpx { namespace traits
     {
         template <typename T>
         struct acquire_future_impl<T,
-            typename boost::disable_if_c<
-                is_future_or_future_range<T>::value
+            typename std::enable_if<
+                !is_future_or_future_range<T>::value
             >::type>
         {
             typedef T type;
@@ -96,14 +100,14 @@ namespace hpx { namespace traits
         template <typename Future, typename Range>
         HPX_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>&, Range const&,
-            boost::mpl::false_)
+            std::false_type)
         {
         }
 
         template <typename Future, typename Range>
         HPX_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>& v, Range const& r,
-            boost::mpl::true_)
+            std::true_type)
         {
             v.reserve(boost::size(r));
         }
@@ -123,9 +127,9 @@ namespace hpx { namespace traits
                     typename Range::iterator
                 >::iterator_category iterator_category;
 
-            typedef typename boost::is_same<
+            typedef std::is_same<
                     iterator_category, std::random_access_iterator_tag
-                >::type is_random_access;
+                > is_random_access;
 
             reserve_if_random_access(v, r, is_random_access());
         }
@@ -144,9 +148,12 @@ namespace hpx { namespace traits
         }
 
         ///////////////////////////////////////////////////////////////////////
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back);
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Range>
         struct acquire_future_impl<Range,
-            typename boost::enable_if_c<
+            typename std::enable_if<
                 traits::is_future_range<Range>::value
             >::type>
         {
@@ -162,15 +169,35 @@ namespace hpx { namespace traits
             }
 
             template <typename Range_>
-            HPX_FORCEINLINE Range
-            operator()(Range_&& futures) const
+            typename std::enable_if<
+                has_push_back<typename std::decay<Range_>::type>::value
+            >::type
+            transform_future_disp(Range_ && futures, Range& values) const
             {
-                Range values;
                 detail::reserve_if_random_access(values, futures);
-
                 std::transform(boost::begin(futures), boost::end(futures),
                     std::back_inserter(values), acquire_future_disp());
+            }
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+            template <typename Range_>
+            typename std::enable_if<
+                !has_push_back<typename std::decay<Range_>::type>::value
+            >::type
+            transform_future_disp(Range_ && futures, Range& values) const
+            {
+                detail::reserve_if_random_access(values, futures);
+                std::transform(boost::begin(futures), boost::end(futures),
+                    boost::begin(values), acquire_future_disp());
+            }
+#endif
+
+            template <typename Range_>
+            HPX_FORCEINLINE Range
+            operator()(Range_ && futures) const
+            {
+                Range values;
+                transform_future_disp(std::forward<Range_>(futures), values);
                 return values;
             }
         };

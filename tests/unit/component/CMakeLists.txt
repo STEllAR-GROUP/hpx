@@ -4,6 +4,8 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+add_subdirectory(components)
+
 set(tests
     action_invoke_no_more_than
     copy_component
@@ -27,16 +29,28 @@ set(tests
     partitioned_vector_handle_values
     partitioned_vector_iter
     partitioned_vector_move
+    partitioned_vector_target
     partitioned_vector_transform_reduce
     partitioned_vector_fill
+    partitioned_vector_inclusive_scan
+    partitioned_vector_exclusive_scan
    )
+
+# add dependencies to partitioned_vector_target when Cuda is enabled
+if(HPX_WITH_CUDA)
+  include_directories(${CUDA_INCLUDE_DIRS})
+
+  set(partitioned_vector_target_FLAGS
+      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+endif()
 
 # add executable needed for launch_process_test
 add_hpx_executable(launched_process_test
   SOURCES launched_process.cpp
   EXCLUDE_FROM_ALL
   HPX_PREFIX ${HPX_BUILD_PREFIX}
-  FOLDER "Tests/Unit/Components")
+  FOLDER "Tests/Unit/Components"
+  COMPONENT_DEPENDENCIES launch_process_test_server)
 
 set(action_invoke_no_more_than_PARAMETERS
     LOCALITIES 2
@@ -57,7 +71,11 @@ set(get_ptr_PARAMETERS
     THREADS_PER_LOCALITY 2)
 
 set(launch_process_FLAGS
-    DEPENDENCIES iostreams_component process_component)
+    DEPENDENCIES iostreams_component process_component
+                 launch_process_test_server_component)
+set(launch_process_PARAMETERS
+  --launch=$<TARGET_FILE:launched_process_test_exe>
+)
 
 set(migrate_component_PARAMETERS
     LOCALITIES 2
@@ -99,6 +117,16 @@ set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_compo
 set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+
+set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_inclusive_scan_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_exclusive_scan_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -26,19 +26,19 @@
 //  HPX_VERSION_DATE   YYYYMMDD is the date of the release
 //                               (estimated release date for master branch)
 //
-#define HPX_VERSION_FULL         0x000912
+#define HPX_VERSION_FULL         0x010100
 
-#define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        9
-#define HPX_VERSION_SUBMINOR     12
+#define HPX_VERSION_MAJOR        1
+#define HPX_VERSION_MINOR        1
+#define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20151111
+#define HPX_VERSION_DATE         20170424
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"

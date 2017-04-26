@@ -9,15 +9,17 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 int hpx_main(int argc, char* argv[])
 {
     // check number of localities
     HPX_TEST_EQ(
-        boost::lexical_cast<boost::uint32_t>(
+        boost::lexical_cast<std::uint32_t>(
             hpx::get_config_entry("hpx.localities", "")),
-                hpx::get_num_localities_sync());
+                hpx::get_num_localities(hpx::launch::sync));
     HPX_TEST_EQ(
         boost::lexical_cast<std::size_t>(
             hpx::get_config_entry("hpx.os_threads", "")),

@@ -11,6 +11,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
 {
@@ -46,7 +48,7 @@ namespace examples { namespace server
     //]
     {
     public:
-        typedef boost::int64_t argument_type;
+        typedef std::int64_t argument_type;
 
         //[accumulator_server_ctor
         accumulator() : value_(0) {}

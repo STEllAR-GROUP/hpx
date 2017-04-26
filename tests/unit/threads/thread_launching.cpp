@@ -8,8 +8,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -89,7 +88,7 @@ void test_thread_callable_object_ref_no_arguments()
 {
     callable_noncopyable_no_args func;
 
-    hpx::thread callable(boost::ref(func));
+    hpx::thread callable(std::ref(func));
     callable.join();
     HPX_TEST(callable_noncopyable_no_args::called);
 }

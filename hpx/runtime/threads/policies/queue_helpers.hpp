@@ -12,6 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/unused.hpp>
+
+#include <cstddef>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -35,11 +39,11 @@ namespace detail
     // this returns true if all threads in the map are currently suspended
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, boost::int64_t& idle_loop_count, bool running) HPX_COLD;
+        Map& tm, std::int64_t& idle_loop_count, bool running) HPX_COLD;
 
     template <typename Map>
     bool dump_suspended_threads(std::size_t num_thread,
-        Map& tm, boost::int64_t& idle_loop_count, bool running)
+        Map& tm, std::int64_t& idle_loop_count, bool running)
     {
 #ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         HPX_UNUSED(tm);

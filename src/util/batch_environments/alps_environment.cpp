@@ -7,6 +7,7 @@
 #include <hpx/util/batch_environments/alps_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -20,7 +21,7 @@ namespace hpx { namespace util { namespace batch_environments
       , valid_(false)
     {
         char *node_num = std::getenv("ALPS_APP_PE");
-        valid_ = node_num != 0;
+        valid_ = node_num != nullptr;
         if(valid_)
         {
             // Initialize our node number

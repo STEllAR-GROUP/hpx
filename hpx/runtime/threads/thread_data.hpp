@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
@@ -98,7 +99,7 @@ namespace hpx { namespace threads
             thread_state_enum newstate)
         {
             thread_data* ret = pool.allocate();
-            if (ret == 0)
+            if (ret == nullptr)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
                     "thread_data::operator new",
@@ -108,7 +109,7 @@ namespace hpx { namespace threads
             using namespace std;    // some systems have memset in namespace std
             memset (ret, initial_value, sizeof(thread_data));
 #endif
-            return new (ret) thread_data(init_data, pool, newstate);
+            return new (ret) thread_data(init_data, &pool, newstate);
         }
 
         ~thread_data()
@@ -145,7 +146,8 @@ namespace hpx { namespace threads
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_state_enum state, thread_state_ex_enum state_ex)
+        thread_state set_state(thread_state_enum state,
+            thread_state_ex_enum state_ex = wait_unknown)
         {
             thread_state prev_state =
                 current_state_.load(boost::memory_order_acquire);
@@ -157,6 +159,9 @@ namespace hpx { namespace threads
                 std::int64_t tag = tmp.tag();
                 if (state != tmp.state())
                     ++tag;
+
+                if (state_ex == wait_unknown)
+                    state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
                         thread_state(state, state_ex, tag))))
@@ -264,7 +269,7 @@ namespace hpx { namespace threads
 
     public:
         /// Return the id of the component this thread is running in
-        naming::address::address_type get_component_id() const
+        naming::address_type get_component_id() const
         {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
             return 0;
@@ -372,20 +377,20 @@ namespace hpx { namespace threads
 # ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
-            return 0;
+            return nullptr;
         }
         char const* set_backtrace(char const*)
         {
-            return 0;
+            return nullptr;
         }
 # else
         util::backtrace const* get_backtrace() const
         {
-            return 0;
+            return nullptr;
         }
         util::backtrace const* set_backtrace(util::backtrace const*)
         {
-            return 0;
+            return nullptr;
         }
 # endif
 
@@ -507,14 +512,15 @@ namespace hpx { namespace threads
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        thread_state_enum operator()()
+        coroutine_type::result_type operator()()
         {
-            HPX_ASSERT(this_() == coroutine_.get_thread_id());
+            HPX_ASSERT(this == coroutine_.get_thread_id());
             return coroutine_(set_state_ex(wait_signaled));
         }
 
         thread_id_type get_thread_id() const
         {
+            HPX_ASSERT(this == coroutine_.get_thread_id());
             return thread_id_type(
                     reinterpret_cast<thread_data*>(coroutine_.get_thread_id())
                 );
@@ -529,7 +535,6 @@ namespace hpx { namespace threads
 #endif
         }
 
-#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();
@@ -538,6 +543,12 @@ namespace hpx { namespace threads
         std::size_t set_thread_data(std::size_t data)
         {
             return coroutine_.set_thread_data(data);
+        }
+
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            return coroutine_.get_apex_data();
         }
 #endif
 
@@ -550,8 +561,7 @@ namespace hpx { namespace threads
 
             rebind_base(init_data, newstate);
 
-            coroutine_.rebind(std::move(init_data.func),
-                std::move(init_data.target), this_());
+            coroutine_.rebind(std::move(init_data.func), this_());
 
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
@@ -563,10 +573,9 @@ namespace hpx { namespace threads
         friend HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
         friend HPX_EXPORT void intrusive_ptr_release(thread_data* p);
 
-    private:
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data,
-                pool_type& pool, thread_state_enum newstate)
+            pool_type* pool, thread_state_enum newstate)
           : current_state_(thread_state(newstate, wait_signaled)),
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_(init_data.lva),
@@ -584,7 +593,7 @@ namespace hpx { namespace threads
             marked_state_(unknown),
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_(0),
+            backtrace_(nullptr),
 #endif
             priority_(init_data.priority),
             requested_interrupt_(false),
@@ -593,9 +602,9 @@ namespace hpx { namespace threads
             scheduler_base_(init_data.scheduler_base),
             count_(0),
             stacksize_(init_data.stacksize),
-            coroutine_(std::move(init_data.func), std::move(init_data.target),
+            coroutine_(std::move(init_data.func),
                 this_(), init_data.stacksize),
-            pool_(&pool)
+            pool_(pool)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
@@ -603,7 +612,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
-            if (0 == parent_thread_id_) {
+            if (nullptr == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
@@ -618,6 +627,7 @@ namespace hpx { namespace threads
             HPX_ASSERT(coroutine_.is_ready());
         }
 
+    private:
         void rebind_base(thread_init_data& init_data, thread_state_enum newstate)
         {
             free_thread_exit_callbacks();
@@ -640,7 +650,7 @@ namespace hpx { namespace threads
             set_marked_state(unknown);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            backtrace_ = 0;
+            backtrace_ = nullptr;
 #endif
             priority_ = init_data.priority;
             requested_interrupt_ = false;
@@ -657,7 +667,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
-            if (0 == parent_thread_id_) {
+            if (nullptr == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
@@ -675,7 +685,7 @@ namespace hpx { namespace threads
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-        naming::address::address_type component_id_;
+        naming::address_type component_id_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -715,7 +725,7 @@ namespace hpx { namespace threads
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
-        //reference count
+        // reference count
         util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;

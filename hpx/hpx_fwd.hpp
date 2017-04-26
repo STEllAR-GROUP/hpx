@@ -32,12 +32,11 @@
 #include <winsock2.h>
 #endif
 
-#include <boost/cstdint.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -84,7 +83,7 @@ namespace hpx
 
 // Including declarations of various API function declarations
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>

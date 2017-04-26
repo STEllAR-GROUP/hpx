@@ -12,6 +12,8 @@
 #include <boost/range/functions.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -21,8 +23,8 @@ template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each(ExPolicy && policy, IteratorTag, Proj && proj)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -75,8 +77,8 @@ template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_exception(ExPolicy policy, IteratorTag, Proj && proj)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -143,8 +145,8 @@ template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_bad_alloc(ExPolicy policy, IteratorTag, Proj && proj)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

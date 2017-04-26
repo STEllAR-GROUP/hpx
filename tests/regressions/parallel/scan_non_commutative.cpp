@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -24,7 +25,8 @@ void test_scan_non_commutative() {
     for (unsigned int i = 0; i < vs.size(); ++i) {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::inclusive_scan(
-            hpx::parallel::par.with(hpx::parallel::static_chunk_size(i)),
+            hpx::parallel::execution::par.with(
+                hpx::parallel::static_chunk_size(i)),
             vs.cbegin(), vs.cend(),
             rs.begin()
         );
@@ -36,7 +38,8 @@ void test_scan_non_commutative() {
     for (unsigned int i = 0; i < vs.size(); ++i) {
         std::vector<std::string> rs(vs.size());
         hpx::parallel::exclusive_scan(
-            hpx::parallel::par.with(hpx::parallel::static_chunk_size(i)),
+            hpx::parallel::execution::par.with(
+                hpx::parallel::static_chunk_size(i)),
             vs.cbegin(), vs.cend(),
             rs.begin(), std::string("0")
         );
@@ -63,9 +66,9 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

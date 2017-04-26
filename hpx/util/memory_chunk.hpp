@@ -19,9 +19,11 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace util
 {

@@ -13,6 +13,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
+#include <iostream>
 #include <memory>
 
 // this function will be executed by a dedicated OS thread

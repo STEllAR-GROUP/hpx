@@ -18,6 +18,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <list>
 #include <mutex>
 #include <utility>
@@ -71,12 +72,20 @@ namespace hpx { namespace lcos { namespace local
         bool trigger_conditions(error_code& ec = throws)
         {
             bool triggered = false;
-            error_code rc(lightweight);
-            for (conditional_trigger* c : conditions_)
+            if (!conditions_.empty())
             {
-                triggered |= c->set(rc);
-                if (rc && (&ec != &throws))
-                    ec = rc;
+                error_code rc(lightweight);
+                for (conditional_trigger* c : conditions_)
+                {
+                    triggered |= c->set(rc);
+                    if (rc && (&ec != &throws))
+                        ec = rc;
+                }
+            }
+            else
+            {
+                if (&ec != &throws)
+                    ec = make_success_code();
             }
             return triggered;
         }
@@ -87,14 +96,14 @@ namespace hpx { namespace lcos { namespace local
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // by default we use as many segments as specified during construction
             if (count == std::size_t(-1))
                 count = received_segments_.size();
             HPX_ASSERT(count != 0);
 
-            init_locked(count, ec);
+            init_locked(l, count, ec);
             if (!ec) {
                 HPX_ASSERT(generation_ != std::size_t(-1));
                 ++generation_;
@@ -117,6 +126,7 @@ namespace hpx { namespace lcos { namespace local
             if (which >= received_segments_.size())
             {
                 // out of bounds index
+                l.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
                     "index is out of range for this base_and_gate");
                 return false;
@@ -124,6 +134,7 @@ namespace hpx { namespace lcos { namespace local
             if (received_segments_.test(which))
             {
                 // segment already filled, logic error
+                l.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
                     "input with the given index has already been triggered");
                 return false;
@@ -214,6 +225,7 @@ namespace hpx { namespace lcos { namespace local
 
             if (generation_value < generation_)
             {
+                l.unlock();
                 HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
                     "sequencing error, generational counter too small");
                 return;
@@ -257,17 +269,20 @@ namespace hpx { namespace lcos { namespace local
         }
 
     protected:
-        void init_locked(std::size_t count, error_code& ec = throws)
+        template <typename Lock>
+        void init_locked(Lock& l, std::size_t count, error_code& ec = throws)
         {
             if (0 != received_segments_.count())
             {
                 // reset happens while part of the slots are filled
+                l.unlock();
                 HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::init",
                     "initializing this base_and_gate while slots are filled");
                 return;
             }
 
-            received_segments_.resize(count);   // resize the bitmap
+            if (received_segments_.size() != count)
+                received_segments_.resize(count);   // resize the bitmap
             received_segments_.reset();         // reset all existing bits
 
             if (&ec != &throws)

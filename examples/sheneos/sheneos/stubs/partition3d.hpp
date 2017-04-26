@@ -10,6 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,7 @@ namespace sheneos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<std::vector<double> >
         interpolate_async(hpx::naming::id_type const& gid,
-            double ye, double temp, double rho, boost::uint32_t eosvalues)
+            double ye, double temp, double rho, std::uint32_t eosvalues)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
@@ -52,7 +53,7 @@ namespace sheneos { namespace stubs
         }
 
         static std::vector<double> interpolate(hpx::naming::id_type const& gid,
-            double ye, double temp, double rho, boost::uint32_t eosvalues)
+            double ye, double temp, double rho, std::uint32_t eosvalues)
         {
             return interpolate_async(gid, ye, temp, rho, eosvalues).get();
         }
@@ -60,7 +61,7 @@ namespace sheneos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<double>
         interpolate_one_async(hpx::naming::id_type const& gid,
-            double ye, double temp, double rho, boost::uint32_t eosvalues)
+            double ye, double temp, double rho, std::uint32_t eosvalues)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
@@ -69,7 +70,7 @@ namespace sheneos { namespace stubs
         }
 
         static double interpolate_one(hpx::naming::id_type const& gid,
-            double ye, double temp, double rho, boost::uint32_t eosvalues)
+            double ye, double temp, double rho, std::uint32_t eosvalues)
         {
             return interpolate_one_async(gid, ye, temp, rho, eosvalues).get();
         }
@@ -77,7 +78,7 @@ namespace sheneos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(hpx::naming::id_type const& gid,
-            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalue)
+            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalue)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
@@ -88,7 +89,7 @@ namespace sheneos { namespace stubs
 
         static std::vector<double>
         interpolate_one_bulk(hpx::naming::id_type const& gid,
-            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
+            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalues)
         {
             return interpolate_one_bulk_async(gid, coords, eosvalues).get();
         }
@@ -96,7 +97,7 @@ namespace sheneos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<std::vector<std::vector<double> > >
         interpolate_bulk_async(hpx::naming::id_type const& gid,
-            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
+            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalues)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
@@ -107,7 +108,7 @@ namespace sheneos { namespace stubs
 
         static std::vector<std::vector<double> >
         interpolate_bulk(hpx::naming::id_type const& gid,
-            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
+            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalues)
         {
             return interpolate_bulk_async(gid, coords, eosvalues).get();
         }

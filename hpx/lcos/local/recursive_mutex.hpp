@@ -15,6 +15,9 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <cstdint>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -63,7 +66,7 @@ namespace hpx { namespace lcos { namespace local
             typedef typename thread_id_from_mutex<Mutex>::thread_id_type
                 thread_id_type;
 
-            boost::atomic<boost::uint64_t> recursion_count;
+            boost::atomic<std::uint64_t> recursion_count;
             boost::atomic<thread_id_type> locking_thread_id;
             Mutex mtx;
 
@@ -157,11 +160,11 @@ namespace hpx { namespace lcos { namespace local
             ///         outside of a HPX-thread.
             void unlock()
             {
-                util::unregister_lock(this);
                 if (0 == --recursion_count)
                 {
-                    locking_thread_id.exchange(thread_id_from_mutex<Mutex>
-                        ::invalid_id());
+                    locking_thread_id.exchange(
+                        thread_id_from_mutex<Mutex>::invalid_id());
+                    util::unregister_lock(this);
                     util::reset_ignored(&mtx);
                     mtx.unlock();
                 }
@@ -173,8 +176,8 @@ namespace hpx { namespace lcos { namespace local
                 if (locking_thread_id.load(boost::memory_order_acquire) ==
                     current_thread_id)
                 {
-                    util::register_lock(this);
-                    ++recursion_count;
+                    if (++recursion_count == 1)
+                        util::register_lock(this);
                     return true;
                 }
                 return false;

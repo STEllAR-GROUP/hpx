@@ -7,10 +7,11 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -22,8 +23,6 @@ namespace hpx { namespace performance_counters
         hpx::actions::detail::invocation_count_registry& registry,
         error_code& ec)
     {
-        performance_counters::counter_info i = info;
-
         // compose the counter name templates
         performance_counters::counter_path_elements p;
         performance_counters::counter_status status =

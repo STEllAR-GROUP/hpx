@@ -15,10 +15,14 @@
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/inner_product.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+#include <hpx/parallel/algorithms/inner_product.hpp>
+#endif
 
 #endif

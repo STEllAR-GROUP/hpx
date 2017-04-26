@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util {

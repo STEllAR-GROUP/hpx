@@ -14,6 +14,7 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -31,7 +32,7 @@ namespace hpx { namespace util { namespace batch_environments
         , valid_(false)
     {
         char *node_num = std::getenv("PBS_NODENUM");
-        valid_ = node_num != 0;
+        valid_ = node_num != nullptr;
         if(valid_)
         {
             // Initialize our node number
@@ -51,7 +52,7 @@ namespace hpx { namespace util { namespace batch_environments
             }
 
             char * thread_num = std::getenv("PBS_NUM_PPN");
-            if (thread_num != 0)
+            if (thread_num != nullptr)
             {
                 // Initialize number of cores to run on
                 num_threads_ = safe_lexical_cast<std::size_t>(

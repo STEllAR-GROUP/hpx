@@ -4,6 +4,9 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::shared_ptr
+
 #ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 #define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 

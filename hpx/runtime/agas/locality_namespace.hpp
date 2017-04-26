@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,75 +11,60 @@
 #define HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/stubs/locality_namespace.hpp>
-#include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/address.hpp>
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+#include <string>
 #include <vector>
 
 namespace hpx { namespace agas
 {
-
-struct locality_namespace
-  : components::client_base<locality_namespace, stubs::locality_namespace>
-{
-    typedef components::client_base<locality_namespace, stubs::locality_namespace>
-        base_type;
-
-    typedef server::locality_namespace server_type;
-
-    locality_namespace()
-      : base_type(bootstrap_locality_namespace_id())
-    {}
-
-    explicit locality_namespace(naming::id_type const& id)
-      : base_type(id)
-    {}
-
-    response service(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
+    struct locality_namespace
     {
-        return this->base_type::service(this->get_id(), req, priority, ec);
-    }
+        virtual ~locality_namespace();
 
-    template <typename Result>
-    future<Result> service_async(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        return this->base_type::service_async<Result>(this->get_id(), req, priority);
-    }
+        virtual naming::address::address_type ptr() const = 0;
+        virtual naming::address addr() const = 0;
+        virtual naming::id_type gid() const = 0;
 
-    void service_non_blocking(
-        request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        this->base_type::service_non_blocking(this->get_id(), req, priority);
-    }
+        virtual std::uint32_t allocate(
+            parcelset::endpoints_type const& endpoints
+          , std::uint64_t count
+          , std::uint32_t num_threads
+          , naming::gid_type suggested_prefix
+            ) = 0;
 
-    std::vector<response> bulk_service(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
-    {
-        return this->base_type::bulk_service(this->get_id(), reqs, priority, ec);
-    }
+        virtual void free(naming::gid_type locality) = 0;
 
-    void bulk_service_non_blocking(
-        std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        this->base_type::bulk_service_non_blocking(this->get_id(), reqs, priority);
-    }
-};
+        virtual std::vector<std::uint32_t> localities() = 0;
 
+        virtual parcelset::endpoints_type resolve_locality(
+            naming::gid_type locality) = 0;
+
+        virtual std::uint32_t get_num_localities() = 0;
+        virtual hpx::future<std::uint32_t> get_num_localities_async() = 0;
+
+        virtual std::vector<std::uint32_t> get_num_threads() = 0;
+        virtual hpx::future<std::vector<std::uint32_t> > get_num_threads_async() = 0;
+
+        virtual std::uint32_t get_num_overall_threads() = 0;
+        virtual hpx::future<std::uint32_t> get_num_overall_threads_async() = 0;
+
+        virtual naming::gid_type statistics_counter(std::string name) = 0;
+
+        virtual void register_counter_types() {}
+
+        virtual void register_server_instance(std::uint32_t locality_id) {}
+
+        virtual void unregister_server_instance(error_code& ec) {}
+    };
 }}
 
 #endif

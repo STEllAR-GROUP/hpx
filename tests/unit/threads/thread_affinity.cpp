@@ -16,11 +16,11 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <list>
 #include <set>
 #include <vector>
-
-#include <boost/ref.hpp>
 
 #if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
 #  include <hwloc.h>
@@ -136,7 +136,7 @@ void thread_affinity_foreman()
         // all the futures in the vector have returned.
         using hpx::util::placeholders::_1;
         hpx::lcos::wait_each(hpx::util::unwrapped(
-            hpx::util::bind(&check_in, boost::ref(attendance), _1)), futures);
+            hpx::util::bind(&check_in, std::ref(attendance), _1)), futures);
     }
 }
 

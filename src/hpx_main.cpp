@@ -5,10 +5,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 
 #include <boost/program_options/parsers.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -45,7 +46,7 @@ int hpx_main()
     }
 
     // add a single nullptr in the end as some application rely on that
-    argv[argcount] = 0;
+    argv[argcount] = nullptr;
 
     // Invoke hpx_main
     return hpx_main(static_cast<int>(argcount), argv.data());

@@ -11,8 +11,11 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,16 +25,19 @@ std::size_t const numparcels_default = 10;
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename T>
 hpx::parcelset::parcel
-generate_parcel(hpx::id_type const& dest, hpx::id_type const& cont, T && data)
+generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data)
 {
     hpx::naming::address addr;
-    hpx::parcelset::parcel p(dest, addr,
+    hpx::naming::gid_type dest = dest_id.get_gid();
+    hpx::naming::detail::strip_credits_from_gid(dest);
+    hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
+        std::true_type(), std::move(dest), std::move(addr),
         hpx::actions::typed_continuation<hpx::id_type>(cont),
         Action(), hpx::threads::thread_priority_normal,
-        std::forward<T>(data));
+        std::forward<T>(data)));
 
-    p.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
     p.set_source_id(hpx::find_here());
+    p.size() = 4096;
 
     return p;
 }
@@ -215,11 +221,11 @@ void print_counters(char const* name)
 
     for (performance_counter const& c : counters)
     {
-        counter_value value = c.get_counter_value_sync();
+        counter_value value = c.get_counter_value(hpx::launch::sync);
         HPX_TEST_NEQ(value.get_value<double>(), 0.0);
 
         hpx::cout
-            << "counter: " << c.get_name_sync()
+            << "counter: " << c.get_name(hpx::launch::sync)
             << ", value: " << value.get_value<double>()
             << std::endl;
     }
@@ -228,7 +234,7 @@ void print_counters(char const* name)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -265,8 +271,9 @@ int main(int argc, char* argv[])
         ;
 
     // explicitly enable message handlers (parcel coalescing)
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.parcel.message_handlers=1");
+    std::vector<std::string> const cfg = {
+        "hpx.parcel.message_handlers=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

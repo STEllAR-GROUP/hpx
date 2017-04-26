@@ -9,6 +9,8 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
+#include <cstddef>
 #include <deque>
 #include <list>
 #include <memory>
@@ -16,13 +18,11 @@
 #include <utility>
 #include <vector>
 
-#include <boost/assign/std/vector.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 template<unsigned id>
 unsigned make_unsigned_slowly()
 {
-    hpx::this_thread::sleep_for(boost::chrono::milliseconds(100));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
     return id;
 }
 
@@ -62,11 +62,11 @@ void test_when_each_from_list()
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
 
         futures2.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
     }
 
@@ -123,11 +123,11 @@ void test_when_each_from_list_iterators()
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
 
         futures2.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
     }
 
@@ -188,11 +188,11 @@ void test_when_each_n_from_list_iterators()
     for (unsigned j = 0; j < count; ++j)
     {
         futures1.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
 
         futures2.push_back(
-            hpx::make_ready_future_after(boost::chrono::milliseconds(100), j)
+            hpx::make_ready_future_after(std::chrono::milliseconds(100), j)
         );
     }
 
@@ -667,10 +667,9 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

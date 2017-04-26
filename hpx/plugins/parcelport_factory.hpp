@@ -1,8 +1,10 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
 
 #if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_HPP)
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
@@ -18,9 +20,10 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign.hpp>
+#include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -76,7 +79,7 @@ namespace hpx { namespace plugins
             fillini += "name = " HPX_PLUGIN_STRING;
             fillini += std::string("path = ") +
                 util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
-            fillini += "enable = 1";
+            fillini += "enable = $[hpx.parcel.enable]";
 
             std::string name_uc = boost::to_upper_copy(name);
             // basic parcelport configuration ...

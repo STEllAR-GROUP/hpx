@@ -15,6 +15,8 @@
 #include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <vector>
 
@@ -77,13 +79,13 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
             t.restart();
 
         using hpx::parallel::for_each;
-        using hpx::parallel::par;
+        using hpx::parallel::execution::par;
 
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
-            [&](boost::uint64_t j)
+            [&](std::uint64_t j)
             {
                 send(dest, buffer_type(
                     send_buffer.get(), size, buffer_type::reference));

@@ -21,7 +21,10 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/ini.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components { namespace stubs
@@ -270,14 +273,8 @@ namespace hpx { namespace components { namespace stubs
         static void call_startup_functions(naming::id_type const& gid,
             bool pre_startup);
 
-        static lcos::future<void>
-        call_shutdown_functions_async(naming::id_type const& gid,
-            bool pre_shutdown);
-
-        static void call_shutdown_functions(naming::id_type const& gid,
-            bool pre_shutdown);
         static void free_component_sync(agas::gva const& g,
-            naming::gid_type const& gid, boost::uint64_t count = 1);
+            naming::gid_type const& gid, std::uint64_t count = 1);
         static void free_component_locally(agas::gva const& g,
             naming::gid_type const& gid);
 
@@ -310,12 +307,12 @@ namespace hpx { namespace components { namespace stubs
         static void
         update_agas_cache_entry(naming::id_type const& targetgid,
             naming::gid_type const& gid, naming::address const& g,
-            boost::uint64_t count, boost::uint64_t offset);
+            std::uint64_t count, std::uint64_t offset);
 
         static void
         update_agas_cache_entry_colocated(naming::id_type const& targetgid,
             naming::gid_type const& gid, naming::address const& g,
-            boost::uint64_t count, boost::uint64_t offset);
+            std::uint64_t count, std::uint64_t offset);
 
         ///////////////////////////////////////////////////////////////////////
         static void
@@ -345,9 +342,9 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
-        static lcos::future<boost::int32_t > get_instance_count_async(
+        static lcos::future<std::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
-        static boost::int32_t  get_instance_count(
+        static std::int32_t  get_instance_count(
             naming::id_type const& targetgid,
             components::component_type type);
 

@@ -14,6 +14,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -56,10 +57,7 @@ int hpx_main()
             if (!cmd.empty() && !cmd[0].empty())
             {
                 if (cmd[0] == "reset")
-                    accu.reset_sync();
-
-                if (cmd[0] == "reset")
-                    accu.reset_sync();
+                    accu.reset();
 
                 else if (cmd[0] == "addint")
                 {
@@ -68,7 +66,7 @@ int hpx_main()
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
-                        accu.add_sync(boost::lexical_cast<int>(cmd[1]));
+                        accu.add(boost::lexical_cast<int>(cmd[1]));
                 }
 
                 else if (cmd[0] == "addfloat")
@@ -78,11 +76,11 @@ int hpx_main()
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
-                        accu.add_sync(boost::lexical_cast<double>(cmd[1]));
+                        accu.add(boost::lexical_cast<double>(cmd[1]));
                 }
 
                 else if (cmd[0] == "query")
-                    std::cout << accu.query_sync() << std::endl;
+                    std::cout << accu.query() << std::endl;
 
                 else if (cmd[0] == "help")
                     std::cout << help << std::endl;
@@ -109,8 +107,9 @@ int main(int argc, char* argv[])
 {
     // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=2");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=2"
+    };
 
     // Initialize and run HPX.
     return hpx::init(argc, argv, cfg);

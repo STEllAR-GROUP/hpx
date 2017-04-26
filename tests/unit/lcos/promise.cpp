@@ -9,9 +9,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign.hpp>
-#include <boost/ref.hpp>
-
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -90,7 +88,7 @@ int hpx_main(boost::program_options::variables_map&)
 
         hpx::lcos::shared_future<int> f = hpx::async<test_action>(hpx::find_here());
         hpx::lcos::future<int> p = f.then(hpx::util::bind(future_callback,
-            boost::ref(data_cb_called), boost::ref(error_cb_called),
+            std::ref(data_cb_called), std::ref(error_cb_called),
             hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
@@ -106,8 +104,8 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::lcos::shared_future<int> f = hpx::async(do_test, hpx::find_here());
 
         hpx::lcos::future<int> p = f.then(
-                hpx::util::bind(future_callback, boost::ref(data_cb_called),
-                    boost::ref(error_cb_called), hpx::util::placeholders::_1));
+                hpx::util::bind(future_callback, std::ref(data_cb_called),
+                    std::ref(error_cb_called), hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
@@ -164,7 +162,7 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::lcos::shared_future<int> f =
             hpx::async<test_error_action>(hpx::find_here());
         hpx::lcos::future<int> p = f.then(hpx::util::bind(future_callback,
-            boost::ref(data_cb_called), boost::ref(error_cb_called),
+            std::ref(data_cb_called), std::ref(error_cb_called),
             hpx::util::placeholders::_1));
 
         std::string what_msg;
@@ -197,8 +195,8 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::lcos::shared_future<int> f = hpx::async(do_test_error, hpx::find_here());
 
         hpx::lcos::future<int> p = f.then(
-                hpx::util::bind(future_callback, boost::ref(data_cb_called),
-                    boost::ref(error_cb_called), hpx::util::placeholders::_1));
+                hpx::util::bind(future_callback, std::ref(data_cb_called),
+                    std::ref(error_cb_called), hpx::util::placeholders::_1));
 
         std::string what_msg;
         bool caught_exception = false;
@@ -234,10 +232,9 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

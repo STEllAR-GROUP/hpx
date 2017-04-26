@@ -53,7 +53,7 @@ namespace boost
       }
 
       //  allowable initial character
-      if ( std::strchr( initial_char, leaf[0] ) == 0 )
+      if ( std::strchr( initial_char, leaf[0] ) == nullptr )
       {
         ++m_name_errors;
         error( library_name, full_path, loclink(full_path, string(name()))

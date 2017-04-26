@@ -10,6 +10,7 @@
 
 #include "ascii_check.hpp"
 #include "function_hyper.hpp"
+#include <cstddef>
 #include <functional>
 
 namespace boost

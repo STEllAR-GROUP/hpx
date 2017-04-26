@@ -20,8 +20,8 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -44,7 +44,7 @@ namespace hpx { namespace applier
         ~applier()
         {}
 
-        void initialize(boost::uint64_t rts, boost::uint64_t mem);
+        void initialize(std::uint64_t rts, std::uint64_t mem);
 
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
@@ -79,7 +79,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
-        boost::uint32_t get_locality_id(error_code& ec = throws) const;
+        std::uint32_t get_locality_id(error_code& ec = throws) const;
 
         /// \brief Return list of localities of all remote localities
         ///        registered with the AGAS service for a specific component
@@ -161,17 +161,6 @@ namespace hpx { namespace applier
             return memory_id_;
         }
 
-        /// Schedule  threads based on the given parcel
-        void schedule_action(parcelset::parcel p,
-            std::size_t num_thread = std::size_t(-1));
-
-#if defined(HPX_HAVE_SECURITY)
-        void enable_verify_capabilities()
-        {
-            verify_capabilities_ = true;
-        }
-#endif
-
     public:
         // the TSS holds a pointer to the applier associated with a given
         // OS thread
@@ -185,9 +174,6 @@ namespace hpx { namespace applier
         threads::threadmanager_base& thread_manager_;
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;
-#if defined(HPX_HAVE_SECURITY)
-        bool verify_capabilities_;
-#endif
     };
 }}
 

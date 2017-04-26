@@ -12,12 +12,14 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/gather.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/shared_array.hpp>
-#include <boost/cstdint.hpp>
 
 #include "print_time_results.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <stack>
@@ -336,9 +338,10 @@ struct stepper_server : hpx::components::component_base<stepper_server>
         U_(2)
     {}
 
-    // do all the work on 'np' local partitions, 'nx' data points each, for
-    // 'nt' time steps
-    space do_work(std::size_t local_np, std::size_t nx, std::size_t nt);
+    // Do all the work on 'np' partitions, 'nx' data points each, for 'nt'
+    // time steps, limit depth of dependency tree to 'nd'.
+    space do_work(std::size_t local_np, std::size_t nx, std::size_t nt,
+        std::uint64_t nd);
 
     HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action);
 
@@ -466,9 +469,9 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
     }
 
     hpx::future<stepper_server::space> do_work(
-        std::size_t local_np, std::size_t nx, std::size_t nt)
+        std::size_t local_np, std::size_t nx, std::size_t nt, std::uint64_t nd)
     {
-        return hpx::async(do_work_action(), get_id(), local_np, nx, nt);
+        return hpx::async(do_work_action(), get_id(), local_np, nx, nt, nd);
     }
 };
 
@@ -485,6 +488,8 @@ partition stepper_server::heat_part(partition const& left,
         hpx::util::unwrapped(
             [middle](partition_data const& m) -> partition_data
             {
+                HPX_UNUSED(middle);
+
                 // All local operations are performed once the middle data of
                 // the previous time step becomes available.
                 std::size_t size = m.size();
@@ -502,6 +507,9 @@ partition stepper_server::heat_part(partition const& left,
             [left, middle, right](partition_data next, partition_data const& l,
                 partition_data const& m, partition_data const& r) -> partition
             {
+                HPX_UNUSED(left);
+                HPX_UNUSED(right);
+
                 // Calculate the missing boundary elements once the
                 // corresponding data has become available.
                 std::size_t size = m.size();
@@ -522,8 +530,11 @@ partition stepper_server::heat_part(partition const& left,
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is the implementation of the time step loop
+//
+// Do all the work on 'np' partitions, 'nx' data points each, for 'nt'
+// time steps, limit depth of dependency tree to 'nd'.
 stepper_server::space stepper_server::do_work(std::size_t local_np,
-    std::size_t nx, std::size_t nt)
+    std::size_t nx, std::size_t nt, std::uint64_t nd)
 {
     // U[t][i] is the state of position i at time t.
     for (space& s: U_)
@@ -540,6 +551,9 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         send_left(0, U_[0][0]);
         send_right(0, U_[0][local_np-1]);
     }
+
+    // limit depth of dependency tree
+    hpx::lcos::local::sliding_semaphore sem(nd);
 
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -587,6 +601,22 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
             // send to right if not last time step
             if (t != nt-1) send_right(t + 1, next[local_np-1]);
         }
+
+        // every nd time steps, attach additional continuation which will
+        // trigger the semaphore once computation has reached this point
+        if ((t % nd) == 0)
+        {
+            next[0].then(
+                [&sem, t](partition &&)
+                {
+                    // inform semaphore about new lower limit
+                    sem.signal(t);
+                });
+        }
+
+        // suspend if the tree has become too deep, the continuation above
+        // will resume this thread once the computation has caught up
+        sem.wait(t);
     }
 
     return U_[nt % 2];
@@ -595,7 +625,8 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
 HPX_REGISTER_GATHER(stepper_server::space, stepper_server_space_gatherer);
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
+void do_all_work(std::uint64_t nt, std::uint64_t nx, std::uint64_t np,
+    std::uint64_t nd)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
@@ -611,15 +642,15 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
     stepper step(nl);
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Perform all work and wait for it to finish
-    hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt);
+    hpx::future<stepper_server::space> result = step.do_work(np/nl, nx, nt, nd);
 
     // Gather results from all localities
     if (0 == hpx::get_locality_id())
     {
-        boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+        std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
 
         hpx::future<std::vector<stepper_server::space> > overall_result =
             hpx::lcos::gather_here(gather_basename, std::move(result), nl);
@@ -634,7 +665,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
             }
         }
 
-        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
         // Print the solution at time-step 'nt'.
         if (print_results)
@@ -651,7 +682,7 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
             }
         }
 
-        print_time_results(boost::uint32_t(nl), num_worker_threads, elapsed,
+        print_time_results(std::uint32_t(nl), num_worker_threads, elapsed,
             nx, np, nt, header);
     }
     else
@@ -663,16 +694,17 @@ void do_all_work(boost::uint64_t nt, boost::uint64_t nx, boost::uint64_t np)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
+    std::uint64_t nd = vm["nd"].as<std::uint64_t>();   // Max depth of dep tree.
 
     if (vm.count("no-header"))
         header = false;
     if (vm.count("results"))
         print_results = true;
 
-    do_all_work(nt, nx, np);
+    do_all_work(nt, nx, np, nd);
 
     return hpx::finalize();
 }
@@ -684,11 +716,13 @@ int main(int argc, char* argv[])
     options_description desc_commandline;
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<std::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<std::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(10),
+        ("nd", value<std::uint64_t>()->default_value(10),
+         "Number of time steps to allow the dependency tree to grow to")
+        ("np", value<std::uint64_t>()->default_value(10),
          "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")
@@ -701,8 +735,9 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

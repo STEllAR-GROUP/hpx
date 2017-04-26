@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -86,21 +87,35 @@ namespace hpx { namespace performance_counters
         /// \brief Create a new performance counter instance of type
         ///        raw_counter based on given counter value
         counter_status create_raw_counter_value(counter_info const& info,
-            boost::int64_t* countervalue, naming::gid_type& id,
+            std::int64_t* countervalue, naming::gid_type& id,
             error_code& ec = throws);
 
         /// \brief Create a new performance counter instance of type
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t()> const& f,
+            hpx::util::function_nonser<std::int64_t()> const& f,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance of type
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<boost::int64_t(bool)> const& f,
+            hpx::util::function_nonser<std::int64_t(bool)> const& f,
+            naming::gid_type& id, error_code& ec = throws);
+
+        /// \brief Create a new performance counter instance of type
+        ///        raw_counter based on given function returning the counter
+        ///        value
+        counter_status create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
+            naming::gid_type& id, error_code& ec = throws);
+
+        /// \brief Create a new performance counter instance of type
+        ///        raw_counter based on given function returning the counter
+        ///        value
+        counter_status create_raw_counter(counter_info const& info,
+            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given
@@ -113,7 +128,7 @@ namespace hpx { namespace performance_counters
         ///        (milliseconds).
         counter_status create_statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters,
+            std::vector<std::int64_t> const& parameters,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new arithmetics performance counter instance based

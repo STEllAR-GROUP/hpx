@@ -12,6 +12,8 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/util/interval_timer.hpp>
 
+#include <cstdint>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -29,6 +31,7 @@ namespace hpx { namespace performance_counters { namespace server
     {
         typedef components::component_base<
             arithmetics_counter<Operation> > base_type;
+        typedef lcos::local::spinlock mutex_type;
 
     public:
         typedef arithmetics_counter type_holder;
@@ -68,18 +71,18 @@ namespace hpx { namespace performance_counters { namespace server
 
     protected:
         bool evaluate_base_counter(naming::id_type& base_counter_id,
-            std::string const& name, counter_value& value);
+            std::string const& name, counter_value& value,
+            std::unique_lock<mutex_type>& l);
         bool ensure_base_counter(naming::id_type& base_counter_id,
-            std::string const& name);
+            std::string const& name, std::unique_lock<mutex_type>& l);
 
     private:
-        typedef lcos::local::spinlock mutex_type;
         mutable mutex_type mtx_;
 
         std::vector<std::string> base_counter_names_;
         ///^ names of base counters to be queried
         std::vector<naming::id_type> base_counter_ids_;
-        boost::uint64_t invocation_count_;
+        std::uint64_t invocation_count_;
     };
 }}}
 

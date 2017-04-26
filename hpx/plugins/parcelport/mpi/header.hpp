@@ -20,7 +20,10 @@
 
 #include <boost/array.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -43,8 +46,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         template <typename Buffer>
         header(Buffer const & buffer, int tag)
         {
-            boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
-            boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
+            std::int64_t size = static_cast<std::int64_t>(buffer.size_);
+            std::int64_t numbytes = static_cast<std::int64_t>(buffer.data_size_);
 
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
             HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
@@ -123,7 +126,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(data_[pos_piggy_back_flag])
                 return &data_[pos_piggy_back_data];
-            return 0;
+            return nullptr;
         }
 
     private:

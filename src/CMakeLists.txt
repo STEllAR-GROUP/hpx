@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -91,9 +91,6 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
   EXCLUDE ".*hpx_main.*[.]hpp")
 add_hpx_library_headers(hpx
-  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/preprocessed/*.hpp"
-  APPEND)
-add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
@@ -179,6 +176,22 @@ endif()
 add_static_parcelports()
 set(hpx_HEADERS ${hpx_HEADERS} ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS})
 set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
+#
+# set_source_files_properties and set_property appear to be broken when setting
+# INCLUDE_DIRECTORIES, so work around by adding compile flags for the include
+# locations needed by parcelport plugin sources
+#
+foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
+  if (_parcelport_${_plugin}_INCLUDE_DIRECTORIES)
+    string (REPLACE ";" " -I" _INCLUDE_STRING "${_parcelport_${_plugin}_INCLUDE_DIRECTORIES}")
+    set_property(
+      SOURCE
+        ${_parcelport_${_plugin}_SOURCES}
+      APPEND_STRING PROPERTY COMPILE_FLAGS
+        " -I${_INCLUDE_STRING}"
+    )
+  endif()
+endforeach()
 
 ################################################################################
 # libhpx
@@ -221,14 +234,20 @@ else()
     FOLDER "Core")
 endif()
 
-target_link_libraries(hpx
-  #PUBLIC ${HPX_LIBRARIES})
-  ${HPX_LIBRARIES})
+target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_LIBRARIES})
 if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
-  target_link_libraries(hpx
-    #PRIVATE ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
-    ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+  target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
 endif()
+if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
+  target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
+endif()
+
+foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
+  if (_parcelport_${_plugin}_LIBRARIES)
+    target_link_libraries(hpx ${HPX_TLL_PUBLIC} ${_parcelport_${_plugin}_LIBRARIES})
+    hpx_export_targets(${_parcelport_${_plugin}_LIBRARIES})
+  endif()
+endforeach()
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -283,7 +302,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
 
-get_property(HPX_TARGET_COMPILE_DEFININTIONS_VAR
+get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
   GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
 foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
   target_compile_definitions(hpx INTERFACE ${_flag})

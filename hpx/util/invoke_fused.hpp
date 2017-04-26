@@ -1,4 +1,5 @@
 //  Copyright (c) 2013-2015 Agustin Berge
+//  Copyright (c) 2016 Antoine Tran Tan
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +12,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/void_guard.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -55,75 +57,50 @@ namespace hpx { namespace util
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Tuple, std::size_t ...Is>
+        template <typename R, typename F, typename Tuple, std::size_t ...Is>
         HPX_HOST_DEVICE
-        inline typename fused_result_of<F&&(Tuple&&)>::type
+        inline R
         invoke_fused_impl(F&&f, Tuple&& t, pack_c<std::size_t, Is...>)
         {
             using util::get;
-            return util::invoke(std::forward<F>(f),
+            return util::invoke_r<R>(std::forward<F>(f),
                 get<Is>(std::forward<Tuple>(t))...);
         }
     }
 
     template <typename F, typename Tuple>
-    HPX_HOST_DEVICE
-    inline typename detail::fused_result_of<F&&(Tuple&&)>::type
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename detail::fused_result_of<F&&(Tuple&&)>::type
     invoke_fused(F&& f, Tuple&& t)
     {
-        return detail::invoke_fused_impl(
+        typedef typename detail::fused_result_of<F&&(Tuple&&)>::type R;
+
+        return detail::invoke_fused_impl<R>(
             std::forward<F>(f), std::forward<Tuple>(t),
             typename detail::fused_index_pack<Tuple>::type());
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename R>
-        struct invoke_fused_guard
-        {
-            template <typename F, typename Tuple>
-            HPX_HOST_DEVICE
-            inline R operator()(F&& f, Tuple&& t)
-            {
-                return detail::invoke_fused_impl(
-                    std::forward<F>(f), std::forward<Tuple>(t),
-                    typename detail::fused_index_pack<Tuple>::type());
-            }
-        };
-
-        template <>
-        struct invoke_fused_guard<void>
-        {
-            template <typename F, typename Tuple>
-            HPX_HOST_DEVICE
-            inline void operator()(F&& f, Tuple&& t)
-            {
-                detail::invoke_fused_impl(
-                    std::forward<F>(f), std::forward<Tuple>(t),
-                    typename detail::fused_index_pack<Tuple>::type());
-            }
-        };
-    }
-
     template <typename R, typename F, typename Tuple>
-    HPX_HOST_DEVICE
-    inline R invoke_fused(F&& f, Tuple&& t)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+    R invoke_fused_r(F&& f, Tuple&& t)
     {
-        return detail::invoke_fused_guard<R>()(
-            std::forward<F>(f), std::forward<Tuple>(t));
+        return detail::invoke_fused_impl<R>(
+            std::forward<F>(f), std::forward<Tuple>(t),
+            typename detail::fused_index_pack<Tuple>::type());
     }
-
+    ///////////////////////////////////////////////////////////////////////////
     namespace functional
     {
         struct invoke_fused
         {
             template <typename F, typename Tuple>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             typename util::detail::fused_result_of<F&&(Tuple&&)>::type
             operator()(F&& f, Tuple&& args)
             {
-                return util::invoke_fused(
+                typedef typename util::detail::fused_result_of<F&&(Tuple&&)>::type R;
+
+                return hpx::util::void_guard<R>(), util::invoke_fused(
                     std::forward<F>(f),
                     std::forward<Tuple>(args));
             }
@@ -133,10 +110,10 @@ namespace hpx { namespace util
         struct invoke_fused_r
         {
             template <typename F, typename Tuple>
-            HPX_HOST_DEVICE
+            HPX_HOST_DEVICE HPX_FORCEINLINE
             R operator()(F&& f, Tuple&& args)
             {
-                return util::invoke_fused<R>(
+                return hpx::util::void_guard<R>(), util::invoke_fused_r<R>(
                     std::forward<F>(f),
                     std::forward<Tuple>(args));
             }

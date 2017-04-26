@@ -14,12 +14,14 @@
 
 #include "htts2.hpp"
 
-#include <boost/assign/std/vector.hpp>
-
+#include <chrono>
+#include <cstdint>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
@@ -29,17 +31,17 @@ struct hpx_driver : htts2::driver
 
     void run()
     {
-        using namespace boost::assign;
-        std::vector<std::string> cfg;
-        cfg += "hpx.os_threads=" + std::to_string(osthreads_);
-        cfg += "hpx.run_hpx_main!=0";
-        cfg += "hpx.commandline.allow_unknown!=1";
+        std::vector<std::string> const cfg = {
+            "hpx.os_threads=" + std::to_string(osthreads_),
+            "hpx.run_hpx_main!=0",
+            "hpx.commandline.allow_unknown!=1"
+        };
 
         hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
         boost::program_options::options_description desc;
 
         using hpx::util::placeholders::_1;
-        hpx::init(hpx::util::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
+        hpx::init(hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1),
             desc, argc_, argv_, cfg);
     }
 
@@ -56,18 +58,18 @@ struct hpx_driver : htts2::driver
         return hpx::finalize();
     }
 
-    hpx::threads::thread_state_enum payload_thread_function(
+    hpx::threads::thread_result_type payload_thread_function(
         hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
         )
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
-        return hpx::threads::terminated;
+        return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
     }
 
-    void stage_tasks(boost::uint64_t target_osthread)
+    void stage_tasks(std::uint64_t target_osthread)
     {
-        boost::uint64_t const this_osthread = hpx::get_worker_thread_num();
+        std::uint64_t const this_osthread = hpx::get_worker_thread_num();
 
         // This branch is very rarely taken (I've measured); this only occurs
         // if we are unlucky enough to be stolen from our intended queue.
@@ -76,7 +78,7 @@ struct hpx_driver : htts2::driver
             // Reschedule in an attempt to correct.
             hpx::threads::register_work(
                 hpx::util::bind(&hpx_driver::stage_tasks,
-                    boost::ref(*this), target_osthread)
+                    std::ref(*this), target_osthread)
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
@@ -84,12 +86,12 @@ struct hpx_driver : htts2::driver
                 );
         }
 
-        for (boost::uint64_t i = 0; i < this->tasks_; ++i)
+        for (std::uint64_t i = 0; i < this->tasks_; ++i)
         {
             using hpx::util::placeholders::_1;
             hpx::threads::register_thread_plain(
                 hpx::util::bind(&hpx_driver::payload_thread_function,
-                    boost::ref(*this), _1)
+                    std::ref(*this), _1)
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , false // Do not run immediately.
@@ -101,21 +103,21 @@ struct hpx_driver : htts2::driver
 
     void wait_for_tasks(hpx::lcos::local::barrier& finished)
     {
-        boost::uint64_t const pending_count =
+        std::uint64_t const pending_count =
             get_thread_count(hpx::threads::thread_priority_normal
                            , hpx::threads::pending);
 
         if (pending_count == 0)
         {
-            boost::uint64_t const all_count =
+            std::uint64_t const all_count =
                 get_thread_count(hpx::threads::thread_priority_normal);
 
             if (all_count != 1)
             {
                 register_work(
                         hpx::util::bind(&hpx_driver::wait_for_tasks
-                                  , boost::ref(*this)
-                                  , boost::ref(finished)
+                                  , std::ref(*this)
+                                  , std::ref(finished)
                                    )
                       , nullptr, hpx::threads::pending
                       , hpx::threads::thread_priority_low);
@@ -136,18 +138,18 @@ struct hpx_driver : htts2::driver
 
         results_type results;
 
-        boost::uint64_t const this_osthread = hpx::get_worker_thread_num();
+        std::uint64_t const this_osthread = hpx::get_worker_thread_num();
 
         htts2::timer<BaseClock> t;
 
         ///////////////////////////////////////////////////////////////////////
         // Warmup Phase
-        for (boost::uint64_t i = 0; i < this->osthreads_; ++i)
+        for (std::uint64_t i = 0; i < this->osthreads_; ++i)
         {
             if (this_osthread == i) continue;
 
             hpx::threads::register_work(
-                hpx::util::bind(&hpx_driver::stage_tasks, boost::ref(*this), i)
+                hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this), i)
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
@@ -175,8 +177,8 @@ struct hpx_driver : htts2::driver
         hpx::lcos::local::barrier finished(2);
 
         register_work(hpx::util::bind(&hpx_driver::wait_for_tasks
-                                , boost::ref(*this)
-                                , boost::ref(finished)
+                                , std::ref(*this)
+                                , std::ref(finished)
                                  )
             , nullptr, hpx::threads::pending
             , hpx::threads::thread_priority_low);
@@ -211,7 +213,7 @@ struct hpx_driver : htts2::driver
             ;
     }
 
-//    boost::atomic<boost::uint64_t> count_;
+//    boost::atomic<std::uint64_t> count_;
 };
 
 int main(int argc, char** argv)

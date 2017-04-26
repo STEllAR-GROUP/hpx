@@ -18,8 +18,8 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <cstddef>
 #include <mutex>
-
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,13 +96,14 @@ namespace hpx { namespace components
 
     bool pending_logs::is_active()
     {
-        return threads::threadmanager_is(state_running) && threads::get_self_ptr() &&
+        return threads::get_self_ptr() &&
+            threads::threadmanager_is(state_running) &&
             activated_.load();
     }
 
     void pending_logs::add(message_type const& msg)
     {
-        if (0 == hpx::get_runtime_ptr()) {
+        if (nullptr == hpx::get_runtime_ptr()) {
             // This branch will be taken if it's too early or too late in the
             // game. We do local logging only. Any queued messages which may be
             // still left in the queue are logged locally as well.

@@ -49,7 +49,7 @@ namespace hpx
     /// This function (or one of its overloads below) should be called from the
     /// users `main()` function. It will set up the HPX runtime environment and
     /// schedule the function given by \p f as a HPX thread. It will return
-    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool start(
         util::function_nonser<
@@ -75,7 +75,7 @@ namespace hpx
     /// This function (or one of its overloads below) should be called from the
     /// users `main()` function. It will set up the HPX runtime environment and
     /// schedule the function given by \p f as a HPX thread. It will return
-    /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
+    /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool
     start(int (*f)(boost::program_options::variables_map& vm),
@@ -93,7 +93,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will be
     /// set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(boost::program_options::options_description const& desc_cmdline,
@@ -109,7 +109,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(boost::program_options::options_description const& desc_cmdline,
@@ -126,7 +126,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(int argc, char** argv, std::vector<std::string> const& cfg,
@@ -146,7 +146,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(boost::program_options::options_description const& desc_cmdline,
@@ -161,7 +161,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(boost::program_options::options_description const& desc_cmdline,
@@ -177,7 +177,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
     start(std::string const& app_name, int argc, char** argv,
@@ -192,7 +192,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool start(int argc, char** argv, hpx::runtime_mode mode)
     {
@@ -205,7 +205,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool start(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
@@ -215,7 +215,7 @@ namespace hpx
         options_description desc_commandline(
             std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
 
-        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), 0 };
+        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
 
         return start(static_cast<hpx_main_type>(::hpx_main), desc_commandline,
             1, dummy_argv, cfg, startup_function_type(),
@@ -227,7 +227,7 @@ namespace hpx
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
-    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool start(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
@@ -238,9 +238,9 @@ namespace hpx
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        if (argc == 0 || argv == 0)
+        if (argc == 0 || argv == nullptr)
         {
-            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), 0 };
+            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), nullptr };
             return start(desc_commandline, 1, dummy_argv, mode);
         }
 
@@ -279,7 +279,7 @@ namespace hpx
             main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
         std::vector<std::string> cfg;
 
-        HPX_ASSERT(argc != 0 && argv != 0);
+        HPX_ASSERT(argc != 0 && argv != nullptr);
 
         return start(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);
@@ -306,7 +306,7 @@ namespace hpx
         util::function_nonser<int(boost::program_options::variables_map& vm)>
             main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
 
-        HPX_ASSERT(argc != 0 && argv != 0);
+        HPX_ASSERT(argc != 0 && argv != nullptr);
 
         return start(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);

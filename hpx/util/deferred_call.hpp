@@ -8,12 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -58,15 +60,16 @@ namespace hpx { namespace util
         public:
             deferred() {} // needed for serialization
 
-            explicit deferred(F&& f, Ts&&... vs)
+            explicit HPX_HOST_DEVICE deferred(F&& f, Ts&&... vs)
               : _f(std::forward<F>(f))
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
-            deferred(deferred&& other)
+            HPX_HOST_DEVICE deferred(deferred&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}
@@ -94,6 +97,17 @@ namespace hpx { namespace util
                 return traits::get_function_address<
                         typename util::decay_unwrap<F>::type
                     >::call(_f);
+            }
+
+            char const* get_function_annotation() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation<
+                        typename util::decay_unwrap<F>::type
+                    >::call(_f);
+#else
+                return nullptr;
+#endif
             }
 
         private:
@@ -140,6 +154,19 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_annotation<util::detail::deferred<Sig> >
+    {
+        static char const*
+            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_annotation();
+        }
+    };
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

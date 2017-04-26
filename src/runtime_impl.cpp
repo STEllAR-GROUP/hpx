@@ -5,31 +5,36 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/set_thread_name.hpp>
-#include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/latch.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
-#include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/server/console_error_sink.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
-#include <hpx/lcos/latch.hpp>
+#include <hpx/runtime_impl.hpp>
+#include <hpx/state.hpp>
+#include <hpx/util/apex.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/set_thread_name.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/ref.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <mutex>
@@ -154,9 +159,10 @@ namespace hpx {
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
-        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_)
     {
+        LPROGRESS_;
+
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
 
@@ -164,23 +170,14 @@ namespace hpx {
         // and get_runtime_ptr) is already initialized at this point.
         applier_.init_tss();
 
-#if defined(HPX_HAVE_SECURITY)
-        // once all has been initialized, finalize security data for bootstrap
-        this->init_security();
-#endif
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
-            parcel_handler_, boost::uint64_t(runtime_support_.get()),
-            boost::uint64_t(memory_.get()));
+            parcel_handler_, std::uint64_t(runtime_support_.get()),
+            std::uint64_t(memory_.get()));
         parcel_handler_.initialize(agas_client_, &applier_);
 
-        applier_.initialize(boost::uint64_t(runtime_support_.get()),
-        boost::uint64_t(memory_.get()));
-
-#if defined(HPX_HAVE_SECURITY)
-        // enable parcel capability checking
-        applier_.enable_verify_capabilities();
-#endif
+        applier_.initialize(std::uint64_t(runtime_support_.get()),
+        std::uint64_t(memory_.get()));
 
         // copy over all startup functions registered so far
         for (startup_function_type& f : global_pre_startup_functions)
@@ -228,16 +225,18 @@ namespace hpx {
         runtime_support_->tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
+
+        LPROGRESS_;
     }
 
     int pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy>
-    threads::thread_state_enum
+    threads::thread_result_type
     runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
-        LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
+        lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
@@ -245,12 +244,12 @@ namespace hpx {
         // Finish the bootstrap
         result = hpx::pre_main(mode_);
         if (result) {
-            LBT_(info) << "runtime_impl::run_helper: bootstrap "
-                          "aborted, bailing out";
-            return threads::terminated;
+            lbt_ << "runtime_impl::run_helper: bootstrap "
+                    "aborted, bailing out";
+            return threads::thread_result_type(threads::terminated, nullptr);
         }
 
-        LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
+        lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         set_state(state_running);
 
         parcel_handler_.enable_alternative_parcelports();
@@ -285,7 +284,7 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     template <typename SchedulingPolicy>
@@ -304,23 +303,23 @@ namespace hpx {
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
-        LBT_(info) << "(1st stage) runtime_impl::start: booting locality " //-V128
+        lbt_ << "(1st stage) runtime_impl::start: booting locality " //-V128
                    << here() << " on " << num_threads_ << " OS-thread"
                    << ((num_threads_ == 1) ? "" : "s");
 
         // start runtime_support services
         runtime_support_->run();
-        LBT_(info) << "(1st stage) runtime_impl::start: started "
+        lbt_ << "(1st stage) runtime_impl::start: started "
                       "runtime_support component";
 
         // start the io pool
         io_pool_.run(false);
-        LBT_(info) << "(1st stage) runtime_impl::start: started the application "
+        lbt_ << "(1st stage) runtime_impl::start: started the application "
                       "I/O service pool";
 
         // start the thread manager
         thread_manager_->run(num_threads_);
-        LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
+        lbt_ << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
         // invoke the AGAS v2 notifications
@@ -328,12 +327,12 @@ namespace hpx {
 
         // {{{ launch main
         // register the given main function with the thread manager
-        LBT_(info) << "(1st stage) runtime_impl::start: launching run_helper "
+        lbt_ << "(1st stage) runtime_impl::start: launching run_helper "
                       "HPX thread";
 
         threads::thread_init_data data(
             util::bind(&runtime_impl::run_helper, this, func,
-                boost::ref(result_)),
+                std::ref(result_)),
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
 
@@ -361,26 +360,50 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::string locality_prefix(util::runtime_configuration const& cfg)
+    {
+        std::string localities = cfg.get_entry("hpx.localities", "1");
+        std::size_t num_localities =
+            util::safe_lexical_cast<std::size_t>(localities, 1);
+        if (num_localities > 1)
+        {
+            std::string locality = cfg.get_entry("hpx.locality", "");
+            if (!locality.empty())
+            {
+                locality = "locality#" + locality;
+            }
+            return locality;
+        }
+        return "";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
+        compat::mutex& mtx, compat::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
-            std::lock_guard<boost::mutex> lk(mtx);
+            std::lock_guard<compat::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
 
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
         // register this thread with any possibly active Intel tool
-        HPX_ITT_THREAD_SET_NAME("main-thread#wait_helper");
+        std::string thread_name (locality + "main-thread#wait_helper");
+        HPX_ITT_THREAD_SET_NAME(thread_name.c_str());
 
         // set thread name as shown in Visual Studio
-        util::set_thread_name("main-thread#wait_helper");
+        util::set_thread_name(thread_name.c_str());
 
 #if defined(HPX_HAVE_APEX)
-        apex::register_thread("main-thread#wait_helper");
+        // not registering helper threads - for now
+        //apex::register_thread(thread_name.c_str());
 #endif
+
         // wait for termination
         runtime_support_->wait();
 
@@ -394,18 +417,18 @@ namespace hpx {
         LRT_(info) << "runtime_impl: about to enter wait state";
 
         // start the wait_helper in a separate thread
-        boost::mutex mtx;
-        boost::condition_variable cond;
+        compat::mutex mtx;
+        compat::condition_variable cond;
         bool running = false;
 
-        boost::thread t (util::bind(
+        compat::thread t (util::bind(
                 &runtime_impl<SchedulingPolicy>::wait_helper,
-                this, boost::ref(mtx), boost::ref(cond), boost::ref(running)
+                this, std::ref(mtx), std::ref(cond), std::ref(running)
             ));
 
         // wait for the thread to run
         {
-            boost::unique_lock<boost::mutex> lk(mtx);
+            std::unique_lock<compat::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -443,12 +466,12 @@ namespace hpx {
             // this is necessary as this function (stop()) might have been called
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
-            boost::mutex mtx;
-            boost::condition_variable cond;
-            boost::unique_lock<boost::mutex> l(mtx);
+            compat::mutex mtx;
+            compat::condition_variable cond;
+            std::unique_lock<compat::mutex> l(mtx);
 
-            boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
-                boost::ref(cond), boost::ref(mtx)));
+            compat::thread t(util::bind(&runtime_impl::stopped, this, blocking,
+                std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
             t.join();
@@ -476,7 +499,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
+        bool blocking, compat::condition_variable& cond, compat::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -487,7 +510,7 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        std::lock_guard<boost::mutex> l(mtx);
+        std::lock_guard<compat::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -504,9 +527,10 @@ namespace hpx {
 
             // store the exception to be able to rethrow it later
             {
-                std::lock_guard<boost::mutex> l(mtx_);
+                std::lock_guard<compat::mutex> l(mtx_);
                 exception_ = e;
             }
+            lcos::barrier::get_global_barrier().detach();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();
@@ -548,7 +572,7 @@ namespace hpx {
     {
         if (state_.load() > state_running)
         {
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;
@@ -622,9 +646,20 @@ namespace hpx {
     }
 
     template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::init_tss(char const* context,
+        std::size_t num, char const* postfix, bool service_thread)
+    {
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
+        error_code ec(lightweight);
+        return init_tss_ex(locality, context, num, postfix, service_thread, ec);
+    }
+
+    template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::init_tss_ex(
-        char const* context, std::size_t num, char const* postfix,
-        bool service_thread, error_code& ec)
+        std::string const& locality, char const* context, std::size_t num,
+        char const* postfix, bool service_thread, error_code& ec)
     {
         // initialize our TSS
         this->runtime::init_tss();
@@ -635,7 +670,10 @@ namespace hpx {
         // set the thread's name, if it's not already set
         if (nullptr == runtime::thread_name_.get())
         {
-            std::string* fullname = new std::string(context);
+            std::string* fullname = new std::string(locality);
+            if (!locality.empty())
+                *fullname += "/";
+            *fullname += context;
             if (postfix && *postfix)
                 *fullname += postfix;
             *fullname += "#" + std::to_string(num);
@@ -656,7 +694,8 @@ namespace hpx {
             util::set_thread_name(name);
 
 #if defined(HPX_HAVE_APEX)
-            apex::register_thread(name);
+            if (std::strstr(name, "worker") != nullptr)
+                apex::register_thread(name);
 #endif
         }
 
@@ -746,7 +785,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::
         get_thread_pool(char const* name)
     {
-        HPX_ASSERT(name != 0);
+        HPX_ASSERT(name != nullptr);
 
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
@@ -757,7 +796,7 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4)) //-V112
             return &main_pool_;
 
-        return 0;
+        return nullptr;
     }
 
     /// Register an external OS-thread with HPX
@@ -769,10 +808,14 @@ namespace hpx {
         if (nullptr != runtime::thread_name_.get())
             return false;       // already registered
 
+        // prefix thread name with locality number, if needed
+        std::string locality = locality_prefix(get_config());
+
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), num, 0, service_thread, ec);
+        init_tss_ex(locality, thread_name.c_str(), num, nullptr,
+            service_thread, ec);
 
         return !ec ? true : false;
     }
@@ -825,11 +868,19 @@ template class HPX_EXPORT hpx::runtime_impl<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::local_priority_queue_scheduler<> >;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
+    > >;
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
+    > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::abp_fifo_priority_queue_scheduler>;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
+    > >;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)

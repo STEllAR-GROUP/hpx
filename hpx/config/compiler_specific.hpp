@@ -6,14 +6,14 @@
 #if !defined(HPX_COMPILER_SPECIFIC_201204261048)
 #define HPX_COMPILER_SPECIFIC_201204261048
 
+#include <hpx/config/defines.hpp>
+
 #if defined(__GNUC__)
 
 // macros to facilitate handling of compiler-specific issues
 #  define HPX_GCC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__)
 
-#  if HPX_GCC_VERSION >= 40600
-#    define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
-#  endif
+#  define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
 
 #  undef HPX_CLANG_VERSION
 #  undef HPX_INTEL_VERSION
@@ -62,28 +62,32 @@
 #endif
 
 #if defined(_MSC_VER)
-#   define HPX_MSVC _MSC_VER
-#   define HPX_WINDOWS
-#   if defined(__NVCC__)
-#       define HPX_SINGLE_INHERITANCE __single_inheritance
-#   endif
+#  define HPX_MSVC _MSC_VER
+#  define HPX_WINDOWS
+#  if defined(__NVCC__)
+#    define HPX_MSVC_NVCC
+#  endif
+#  define HPX_CDECL __cdecl
 #endif
 
 #if defined(__MINGW32__)
 #   define HPX_WINDOWS
 #endif
 
-#if defined(__CUDACC__)
+#if (defined(__NVCC__) || defined(__CUDACC__)) && defined(HPX_HAVE_CUDA)
 #define HPX_DEVICE __device__
 #define HPX_HOST __host__
+#define HPX_CONSTANT __constant__
 #else
 #define HPX_DEVICE
 #define HPX_HOST
+#define HPX_CONSTANT
 #endif
 #define HPX_HOST_DEVICE HPX_HOST HPX_DEVICE
 
-#if !defined(HPX_SINGLE_INHERITANCE)
-#define HPX_SINGLE_INHERITANCE /* empty */
+
+#if !defined(HPX_CDECL)
+#define HPX_CDECL
 #endif
 
 #endif

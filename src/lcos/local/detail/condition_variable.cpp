@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,8 +13,8 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -63,7 +63,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
     bool condition_variable::notify_one(
-        std::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, threads::thread_priority priority,
+        error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -90,8 +91,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data*>(id)),
-                threads::pending, threads::wait_signaled,
-                threads::thread_priority_default, ec);
+                threads::pending, threads::wait_signaled, priority, ec);
+
             return not_empty;
         }
 
@@ -102,7 +103,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     void condition_variable::notify_all(
-        std::unique_lock<mutex_type> lock, error_code& ec)
+        std::unique_lock<mutex_type> lock, threads::thread_priority priority,
+        error_code& ec)
     {
         HPX_ASSERT(lock.owns_lock());
 
@@ -137,8 +139,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 error_code local_ec;
                 threads::set_thread_state(threads::thread_id_type(
                         reinterpret_cast<threads::thread_data*>(id)),
-                    threads::pending, threads::wait_signaled,
-                    threads::thread_priority_default, local_ec);
+                    threads::pending, threads::wait_signaled, priority, local_ec);
 
                 if (local_ec)
                 {
@@ -172,10 +173,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait(
-        std::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>& lock,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
@@ -186,7 +187,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
             // yield this thread
-            lock.unlock();
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
             reason = this_thread::suspend(threads::suspended, description, ec);
             if (ec) return threads::wait_unknown;
         }
@@ -196,11 +197,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     }
 
     threads::thread_state_ex_enum condition_variable::wait_until(
-        std::unique_lock<mutex_type>&& lock,
+        std::unique_lock<mutex_type>& lock,
         util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
@@ -211,7 +212,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         threads::thread_state_ex_enum reason = threads::wait_unknown;
         {
             // yield this thread
-            lock.unlock();
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(lock);
             reason = this_thread::suspend(abs_time, description, ec);
             if (ec) return threads::wait_unknown;
         }

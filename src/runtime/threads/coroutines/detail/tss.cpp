@@ -16,6 +16,7 @@
 
 #include <hpx/runtime/threads_fwd.hpp>
 
+#include <cstddef>
 #include <map>
 #include <memory>
 
@@ -25,12 +26,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     void tss_data_node::cleanup(bool cleanup_existing)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        if (cleanup_existing && func_ && (value_ != 0))
+        if (cleanup_existing && func_ && (value_ != nullptr))
         {
             (*func_)(value_);
         }
         func_.reset();
-        value_ = 0;
+        value_ = nullptr;
 #endif
     }
 
@@ -42,8 +43,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
-        return 0;
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+        return nullptr;
 #endif
     }
 
@@ -77,7 +78,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -113,7 +114,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -126,19 +127,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         if (nullptr == self)
         {
             boost::throw_exception(null_thread_id_exception());
-            return 0;
+            return nullptr;
         }
 
         detail::tss_storage* tss_map = self->get_thread_tss_data();
         if (nullptr == tss_map)
-            return 0;
+            return nullptr;
 
         return tss_map->find(key);
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
-        return 0;
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+        return nullptr;
 #endif
     }
 

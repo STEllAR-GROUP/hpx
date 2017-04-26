@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/assert.hpp>
@@ -27,14 +28,15 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +55,7 @@ namespace hpx { namespace server
             {}
 
             partition_data(id_type const& part, std::size_t size,
-                    boost::uint32_t locality_id)
+                    std::uint32_t locality_id)
               : partition_(part),
                 size_(size), locality_id_(locality_id)
             {}
@@ -65,7 +67,7 @@ namespace hpx { namespace server
 
             hpx::id_type partition_;
             std::size_t size_;
-            boost::uint32_t locality_id_;
+            std::uint32_t locality_id_;
 
         private:
             friend class hpx::serialization::access;
@@ -156,7 +158,7 @@ namespace hpx
         typedef T reference;
         typedef T const const_reference;
 
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
         typedef T* pointer;
         typedef T const* const_pointer;
 #else
@@ -185,7 +187,7 @@ namespace hpx
                 base_type;
 
             partition_data(id_type const& part, std::size_t size,
-                    boost::uint32_t locality_id)
+                    std::uint32_t locality_id)
               : base_type(part, size, locality_id)
             {}
 
@@ -267,7 +269,7 @@ namespace hpx
             std::move(data.partitions_.begin(), data.partitions_.end(),
                 std::back_inserter(partitions_));
 
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             typedef typename partitions_vector_type::const_iterator const_iterator;
@@ -318,10 +320,18 @@ namespace hpx
                 util::bind(&partitioned_vector::connect_to_helper, this, _1));
         }
 
-        void connect_to_sync(std::string const& symbolic_name)
+        void connect_to(launch::sync_policy, std::string const& symbolic_name)
         {
             connect_to(symbolic_name).get();
         }
+
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void connect_to_sync(std::string const& symbolic_name)
+        {
+            connect_to(launch::sync, symbolic_name);
+        }
+#endif
 
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
@@ -343,10 +353,18 @@ namespace hpx
 
             return this->base_type::register_as(symbolic_name);
         }
-        void register_as_sync(std::string const& symbolic_name)
+
+        void register_as(launch::sync_policy, std::string const& symbolic_name)
         {
             register_as(symbolic_name).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void register_as_sync(std::string const& symbolic_name)
+        {
+            register_as(launch::sync, symbolic_name);
+        }
+#endif
 
         // construct from id
         partitioned_vector(future<id_type> && f)
@@ -533,7 +551,7 @@ namespace hpx
                 creator(policy, num_parts, part_size);
 
             // now initialize our data structures
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             std::size_t num_part = 0;
@@ -543,7 +561,7 @@ namespace hpx
             for (bulk_locality_result const& r: f.get())
             {
                 using naming::get_locality_id_from_id;
-                boost::uint32_t locality = get_locality_id_from_id(r.first);
+                std::uint32_t locality = get_locality_id_from_id(r.first);
                 for (hpx::id_type const& id: r.second)
                 {
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
@@ -630,14 +648,14 @@ namespace hpx
             }
             wait_all(objs);
 
-            boost::uint32_t this_locality = get_locality_id();
+            std::uint32_t this_locality = get_locality_id();
             std::vector<future<void> > ptrs;
 
             partitions_vector_type partitions;
             partitions.reserve(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
-                boost::uint32_t locality = rhs.partitions_[i].locality_id_;
+                std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
                 partitions.push_back(partition_data(objs[i].get(),
                     rhs.partitions_[i].size_, locality));
@@ -788,7 +806,7 @@ namespace hpx
         ///
         T operator[](size_type pos) const
         {
-            return get_value_sync(pos);
+            return get_value(launch::sync, pos);
         }
 
         /// Copy assignment operator, performs deep copy of the right hand side
@@ -843,11 +861,18 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
+        T get_value(launch::sync_policy, size_type pos) const
+        {
+            return get_value(launch::sync, get_partition(pos),
+                get_local_index(pos));
+        }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         T get_value_sync(size_type pos) const
         {
-            return get_value_sync(get_partition(pos), get_local_index(pos));
+            return get_value(launch::sync, pos);
         }
-
+#endif
         /// Returns the element at position \a pos in the vector container.
         ///
         /// \param part  Sequence number of the partition
@@ -856,15 +881,22 @@ namespace hpx
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
         ///
-        T get_value_sync(size_type part, size_type pos) const
+        T get_value(launch::sync_policy, size_type part, size_type pos) const
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
                 return part_data.local_data_->get_value(pos);
 
             return partitioned_vector_partition_client(part_data.partition_)
-                .get_value_sync(pos);
+                .get_value(launch::sync, pos);
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        T get_value_sync(size_type part, size_type pos) const
+        {
+            return get_value(launch::sync, part, pos);
+        }
+#endif
 
         /// Returns the element at position \a pos in the vector container
         /// asynchronously.
@@ -910,15 +942,23 @@ namespace hpx
         ///         \a pos.
         ///
         std::vector<T>
-        get_values_sync(size_type part, std::vector<size_type> const& pos) const
+        get_values(launch::sync_policy, size_type part,
+            std::vector<size_type> const& pos) const
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
                 return part_data.local_data_->get_values(pos);
 
             return partitioned_vector_partition_client(part_data.partition_)
-                .get_values_sync(pos);
+                .get_values(launch::sync, pos);
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) std::vector<T>
+        get_values_sync(size_type part, std::vector<size_type> const& pos) const
+        {
+            return get_values(part, pos);
+        }
+#endif
 
         /// Asynchronously returns the elements at the positions \a pos from
         /// the given partition in the vector container.
@@ -1031,10 +1071,18 @@ namespace hpx
         ///         \a pos.
         ///
         std::vector<T>
-        get_values_sync(std::vector<size_type> const & pos_vec) const
+        get_values(launch::sync_policy,
+            std::vector<size_type> const & pos_vec) const
         {
             return get_values(pos_vec).get();
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) std::vector<T>
+        get_values_sync(std::vector<size_type> const & pos_vec) const
+        {
+            return get_values(launch::sync, pos_vec);
+        }
+#endif
 
 //         //FRONT (never throws exception)
 //         /** @brief Access the value of first element in the vector.
@@ -1179,11 +1227,19 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
+        void set_value(launch::sync_policy, size_type pos, T_ && val)
+        {
+            return set_value(launch::sync, get_partition(pos),
+                get_local_index(pos), std::forward<T_>(val));
+        }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        template <typename T_>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_value_sync(size_type pos, T_ && val)
         {
-            return set_value_sync(get_partition(pos), get_local_index(pos),
-                std::forward<T_>(val));
+            return set_value(launch::sync, pos, std::forward<T_>(val));
         }
+#endif
 
         /// Copy the value of \a val in the element at position \a pos in
         /// the vector container.
@@ -1193,7 +1249,8 @@ namespace hpx
         /// \param val   The value to be copied
         ///
         template <typename T_>
-        void set_value_sync(size_type part, size_type pos, T_ && val)
+        void set_value(launch::sync_policy, size_type part, size_type pos,
+            T_ && val)
         {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
@@ -1203,9 +1260,17 @@ namespace hpx
             else
             {
                 partitioned_vector_partition_client(part_data.partition_)
-                    .set_value_sync(pos, std::forward<T_>(val));
+                    .set_value(launch::sync, pos, std::forward<T_>(val));
             }
         }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        template <typename T_>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void set_value_sync(size_type part, size_type pos, T_ && val)
+        {
+            return set_value(launch::sync, part, pos, std::forward<T_>(val));
+        }
+#endif
 
         /// Asynchronous set the element at position \a pos of the partition
         /// \a part to the given value \a val.
@@ -1254,11 +1319,19 @@ namespace hpx
         /// \param pos   Position of the element in the vector
         /// \param val   The value to be copied
         ///
+        void set_values(launch::sync_policy, size_type part,
+            std::vector<size_type> const& pos, std::vector<T> const& val)
+        {
+            set_values(pos, val).get();
+        }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_values_sync(size_type part, std::vector<size_type> const& pos,
             std::vector<T> const& val)
         {
-            set_value(pos, val).get();
+            set_values(launch::sync, pos, val);
         }
+#endif
 
         /// Asynchronously set the element at position \a pos in
         /// the partition \part to the given value \a val.
@@ -1358,11 +1431,19 @@ namespace hpx
             return when_all(part_futures);
         }
 
+        void set_values(launch::sync_policy, std::vector<size_type> const& pos,
+            std::vector<T> const& val)
+        {
+            return set_values(pos, val).get();
+        }
+#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_values_sync(std::vector<size_type> const& pos,
             std::vector<T> const& val)
         {
-            return set_value(pos, val).get();
+            return set_values(launch::sync, pos, val);
         }
+#endif
 
 //   //CLEAR
 //   //TODO if number of partitions is kept constant every time then
@@ -1420,42 +1501,42 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        iterator begin(boost::uint32_t id)
+        iterator begin(std::uint32_t id)
         {
             return iterator(this, get_global_index(segment_begin(id), 0));
         }
 
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        const_iterator begin(boost::uint32_t id) const
+        const_iterator begin(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the beginning of the first partition of the
         /// vector on the given locality.
-        const_iterator cbegin(boost::uint32_t id) const
+        const_iterator cbegin(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cbegin(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        iterator end(boost::uint32_t id)
+        iterator end(std::uint32_t id)
         {
             return iterator(this, get_global_index(segment_end(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        const_iterator end(boost::uint32_t id) const
+        const_iterator end(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0));
         }
 
         /// Return the iterator at the end of the last partition of the
         /// vector on the given locality.
-        const_iterator cend(boost::uint32_t id) const
+        const_iterator cend(std::uint32_t id) const
         {
             return const_iterator(this, get_global_index(segment_cend(id), 0));
         }
@@ -1543,7 +1624,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // Return local segment iterator
-        local_segment_iterator segment_begin(boost::uint32_t id)
+        local_segment_iterator segment_begin(std::uint32_t id)
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1552,7 +1633,7 @@ namespace hpx
                 partitions_.end(), id);
         }
 
-        const_local_segment_iterator segment_begin(boost::uint32_t id) const
+        const_local_segment_iterator segment_begin(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1561,7 +1642,7 @@ namespace hpx
                 partitions_.cend(), id);
         }
 
-        const_local_segment_iterator segment_cbegin(boost::uint32_t id) const
+        const_local_segment_iterator segment_cbegin(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1570,7 +1651,7 @@ namespace hpx
                 partitions_.cend(), id);
         }
 
-        local_segment_iterator segment_end(boost::uint32_t id)
+        local_segment_iterator segment_end(std::uint32_t id)
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1578,7 +1659,7 @@ namespace hpx
             return local_segment_iterator(partitions_.end());
         }
 
-        const_local_segment_iterator segment_end(boost::uint32_t id) const
+        const_local_segment_iterator segment_end(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives
@@ -1586,7 +1667,7 @@ namespace hpx
             return const_local_segment_iterator(partitions_.cend());
         }
 
-        const_local_segment_iterator segment_cend(boost::uint32_t id) const
+        const_local_segment_iterator segment_cend(std::uint32_t id) const
         {
             // local_segement_iterators are only valid on the locality where
             // the data lives

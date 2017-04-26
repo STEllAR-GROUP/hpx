@@ -19,6 +19,8 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      A future referring to the value to transmit to the
     ///                     central gather point from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -26,7 +28,7 @@ namespace hpx { namespace lcos
     ///                     base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -57,7 +59,7 @@ namespace hpx { namespace lcos
     ///                     and defaults to 0.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.
@@ -76,6 +78,8 @@ namespace hpx { namespace lcos
     /// \param  basename    The base name identifying the gather operation
     /// \param  result      The value to transmit to the central gather point
     ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -83,7 +87,7 @@ namespace hpx { namespace lcos
     ///                     base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -114,7 +118,7 @@ namespace hpx { namespace lcos
     ///                     and defaults to 0.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_ocality_id() returns.
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.
@@ -133,17 +137,22 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos
@@ -237,7 +246,15 @@ namespace hpx { namespace lcos
             hpx::future<T> result)
         {
             typedef typename gather_server<T>::get_result_action action_type;
-            return async(action_type(), f.get(), site, result.get());
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            return async(action_type(), id, site, result.get()).then(
+                [id](hpx::future<std::vector<T> > && f)
+                {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
         }
 
         template <typename T>
@@ -259,7 +276,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -306,7 +323,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -343,7 +360,7 @@ namespace hpx { namespace lcos
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities_sync();
+            num_sites = hpx::get_num_localities(hpx::launch::sync);
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 

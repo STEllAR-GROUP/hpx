@@ -15,22 +15,25 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/iterator_adaptor.hpp>
+#include <hpx/util/iterator_facade.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <boost/integer.hpp>
-#include <boost/iterator/filter_iterator.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
-#include <boost/iterator/iterator_facade.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx
@@ -39,12 +42,12 @@ namespace hpx
     // This class wraps plain a vector<>::iterator or vector<>::const_iterator
     template <typename T, typename Data, typename BaseIter>
     class local_raw_vector_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
             > base_type;
         typedef BaseIter base_iterator;
@@ -65,7 +68,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
             return local_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
@@ -73,7 +76,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -83,12 +86,12 @@ namespace hpx
 
     template <typename T, typename Data, typename BaseIter>
     class const_local_raw_vector_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             const_local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 const_local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
             > base_type;
         typedef BaseIter base_iterator;
@@ -109,7 +112,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
@@ -117,7 +120,7 @@ namespace hpx
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
-                partitioned_vector_partition<T>(data_->get_id()),
+                partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
@@ -140,7 +143,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value_sync(
+                    return it_.get_partition().get_value(launch::sync,
                         it_.get_local_index());
                 }
                 return *(it_.get_data()->begin() + it_.get_local_index());
@@ -151,7 +154,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    it_.get_partition().set_value_sync(
+                    it_.get_partition().set_value(launch::sync,
                         it_.get_local_index(), std::forward<T_>(value));
                 }
                 else
@@ -177,7 +180,7 @@ namespace hpx
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value_sync(
+                    return it_.get_partition().get_value(launch::sync,
                         it_.get_local_index());
                 }
                 return *it_.local();
@@ -197,13 +200,13 @@ namespace hpx
 
             operator T() const
             {
-                return v_.get_value_sync(index_);
+                return v_.get_value(launch::sync, index_);
             }
 
             template <typename T_>
             vector_value_proxy& operator=(T_ && value)
             {
-                v_.set_value_sync(index_, std::forward<T_>(value));
+                v_.set_value(launch::sync, index_, std::forward<T_>(value));
                 return *this;
             }
 
@@ -217,14 +220,14 @@ namespace hpx
     /// partitioned backend of a hpx::vector.
     template <typename T, typename Data>
     class local_vector_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             local_vector_iterator<T, Data>, T,
             std::random_access_iterator_tag,
             detail::local_vector_value_proxy<T, Data>
         >
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 local_vector_iterator<T, Data>, T,
                 std::random_access_iterator_tag,
                 detail::local_vector_value_proxy<T, Data>
@@ -284,7 +287,7 @@ namespace hpx
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(local_vector_iterator const& other) const
         {
@@ -319,8 +322,14 @@ namespace hpx
         }
 
     public:
-        partitioned_vector_partition<T>& get_partition() { return partition_; }
-        partitioned_vector_partition<T> get_partition() const { return partition_; }
+        partitioned_vector_partition<T, Data>& get_partition()
+        {
+            return partition_;
+        }
+        partitioned_vector_partition<T, Data> get_partition() const
+        {
+            return partition_;
+        }
 
         size_type get_local_index() const { return local_index_; }
 
@@ -351,14 +360,14 @@ namespace hpx
 
     template <typename T, typename Data>
     class const_local_vector_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             const_local_vector_iterator<T, Data>, T const,
             std::random_access_iterator_tag,
             detail::const_local_vector_value_proxy<T, Data>
         >
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 const_local_vector_iterator<T, Data>, T const,
                 std::random_access_iterator_tag,
                 detail::const_local_vector_value_proxy<T, Data>
@@ -423,7 +432,7 @@ namespace hpx
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(const_local_vector_iterator const& other) const
         {
@@ -458,7 +467,7 @@ namespace hpx
         }
 
     public:
-        partitioned_vector_partition<T> const& get_partition() const
+        partitioned_vector_partition<T, Data> const& get_partition() const
         {
             return partition_;
         }
@@ -493,12 +502,12 @@ namespace hpx
     /// This class implement the segmented iterator for the hpx::vector
     template <typename T, typename Data, typename BaseIter>
     class segment_vector_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             segment_vector_iterator<T, Data, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 segment_vector_iterator<T, Data, BaseIter>, BaseIter
             > base_type;
 
@@ -517,7 +526,7 @@ namespace hpx
 
         bool is_at_end() const
         {
-            return data_ == 0 ||
+            return data_ == nullptr ||
                 this->base_type::base_reference() == data_->partitions_.end();
         }
 
@@ -527,12 +536,12 @@ namespace hpx
 
     template <typename T, typename Data, typename BaseIter>
     class const_segment_vector_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             const_segment_vector_iterator<T, Data, BaseIter>, BaseIter
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 const_segment_vector_iterator<T, Data, BaseIter>, BaseIter
             > base_type;
 
@@ -550,7 +559,7 @@ namespace hpx
 
         bool is_at_end() const
         {
-            return data_ == 0 ||
+            return data_ == nullptr ||
                 this->base_type::base_reference() == data_->partitions_.end();
         }
 
@@ -567,7 +576,7 @@ namespace hpx
             typedef typename std::iterator_traits<BaseIterator>::reference
                 reference;
 
-            is_requested_locality(boost::uint32_t locality_id =
+            is_requested_locality(std::uint32_t locality_id =
                     naming::invalid_locality_id)
               : locality_id_(locality_id)
             {}
@@ -578,20 +587,20 @@ namespace hpx
                        locality_id_ == val.locality_id_;
             }
 
-            boost::uint32_t locality_id_;
+            std::uint32_t locality_id_;
         };
     }
 
     /// This class implement the local segmented iterator for the hpx::vector
     template <typename T, typename Data, typename BaseIter>
     class local_segment_vector_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             local_segment_vector_iterator<T, Data, BaseIter>, BaseIter,
             Data, std::forward_iterator_tag
         >
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
                 local_segment_vector_iterator<T, Data, BaseIter>, BaseIter,
                 Data, std::forward_iterator_tag
             > base_type;
@@ -607,7 +616,7 @@ namespace hpx
 
         local_segment_vector_iterator(
                 BaseIter const& it, BaseIter const& end,
-                boost::uint32_t locality_id)
+                std::uint32_t locality_id)
           : base_type(it), predicate_(locality_id), end_(end)
         {
             satisfy_predicate();
@@ -619,7 +628,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {
@@ -654,13 +663,13 @@ namespace hpx
     /// This class implements the (global) iterator functionality for hpx::vector.
     template <typename T, typename Data>
     class vector_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             vector_iterator<T, Data>, T, std::random_access_iterator_tag,
             detail::vector_value_proxy<T, Data>
         >
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 vector_iterator<T, Data>, T, std::random_access_iterator_tag,
                 detail::vector_value_proxy<T, Data>
             > base_type;
@@ -690,7 +699,7 @@ namespace hpx
         size_type get_global_index() const { return global_index_; }
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(vector_iterator const& other) const
         {
@@ -739,13 +748,13 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     class const_vector_iterator
-      : public boost::iterator_facade<
+      : public hpx::util::iterator_facade<
             const_vector_iterator<T, Data>, T const,
             std::random_access_iterator_tag, T const
         >
     {
     private:
-        typedef boost::iterator_facade<
+        typedef hpx::util::iterator_facade<
                 const_vector_iterator<T, Data>, T const,
                 std::random_access_iterator_tag, T const
             > base_type;
@@ -773,7 +782,7 @@ namespace hpx
         size_type get_global_index() const { return global_index_; }
 
     protected:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(const_vector_iterator const& other) const
         {
@@ -783,7 +792,7 @@ namespace hpx
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(data_);
-            return data_->get_value_sync(global_index_);
+            return data_->get_value(launch::sync, global_index_);
         }
 
         void increment()
@@ -1050,6 +1059,17 @@ namespace hpx { namespace traits
             return it.remote();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Data>
+    struct is_value_proxy<hpx::detail::local_vector_value_proxy<T, Data> >
+      : std::true_type
+    {};
+
+    template <typename T, typename Data>
+    struct is_value_proxy<hpx::detail::vector_value_proxy<T, Data> >
+      : std::true_type
+    {};
 }}
 
 #endif //  SEGMENTED_ITERATOR_HPP

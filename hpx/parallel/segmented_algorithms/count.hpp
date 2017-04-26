@@ -24,6 +24,7 @@
 #include <list>
 #include <numeric>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -190,7 +191,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy>is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                >is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;
@@ -396,7 +399,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy>is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             typedef typename std::iterator_traits<InIter>::difference_type
                 difference_type;

@@ -18,7 +18,7 @@ namespace hpx { namespace traits
         // by default no additional config data is injected into the factory
         static char const* call()
         {
-            return 0;
+            return nullptr;
         }
     };
 }}

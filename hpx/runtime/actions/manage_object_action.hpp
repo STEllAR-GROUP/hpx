@@ -14,8 +14,8 @@
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -35,11 +35,11 @@ namespace hpx { namespace actions
         typedef serialization::input_archive iarchive_type;
 
         typedef void (*serialize_save_function)(
-            boost::uint8_t const*, std::size_t, oarchive_type&,
-            const unsigned int, boost::uint8_t const*);
+            std::uint8_t const*, std::size_t, oarchive_type&,
+            const unsigned int, std::uint8_t const*);
         typedef void (*serialize_load_function)(
-            boost::uint8_t*, std::size_t, iarchive_type&,
-            const unsigned int, boost::uint8_t const*);
+            std::uint8_t*, std::size_t, iarchive_type&,
+            const unsigned int, std::uint8_t const*);
 
     private:
         static void construct_(void*, std::size_t) {}
@@ -55,15 +55,15 @@ namespace hpx { namespace actions
         }
         static void destruct_(void*) {}
 
-        static void save_(boost::uint8_t const* data, std::size_t size,
+        static void save_(std::uint8_t const* data, std::size_t size,
             oarchive_type& ar, const unsigned int,
-            boost::uint8_t const*)
+            std::uint8_t const*)
         {
             ar << hpx::serialization::make_array(data, size);
         }
-        static void load_(boost::uint8_t* data, std::size_t size,
+        static void load_(std::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int,
-            boost::uint8_t const*)
+            std::uint8_t const*)
         {
             ar >> hpx::serialization::make_array(data, size);
         }
@@ -147,15 +147,15 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
-        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
+        static void save_(std::uint8_t const* data, std::size_t /*size*/,
             oarchive_type& ar, const unsigned int /*version*/,
-            boost::uint8_t const* /*config*/)
+            std::uint8_t const* /*config*/)
         {
             ar << *reinterpret_cast<T const*>(data);
         }
-        static void load_(boost::uint8_t* data, std::size_t /*size*/,
+        static void load_(std::uint8_t* data, std::size_t /*size*/,
             iarchive_type& ar, const unsigned int /*version*/,
-            boost::uint8_t const* /*config*/)
+            std::uint8_t const* /*config*/)
         {
             ar >> *reinterpret_cast<T*>(data);
         }
@@ -214,7 +214,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct manage_object_action<boost::uint8_t> : manage_object_action_base
+    struct manage_object_action<std::uint8_t> : manage_object_action_base
     {
         manage_object_action() {}
 
@@ -235,7 +235,7 @@ namespace hpx { namespace actions
     manage_object_action_base::get_instance() const
     {
         // ensure thread-safe initialization
-        util::reinitializable_static<manage_object_action<boost::uint8_t>,
+        util::reinitializable_static<manage_object_action<std::uint8_t>,
             manage_object_action_base::tag> instance;
         return instance.get();
     }
@@ -256,16 +256,16 @@ namespace hpx { namespace actions
             serialize_load_function;
 
     private:
-        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
+        static void save_(std::uint8_t const* data, std::size_t /*size*/,
             oarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            std::uint8_t const* config)
         {
             reinterpret_cast<T const*>(data)->save(ar, version,
                 reinterpret_cast<Config const*>(config));
         }
-        static void load_(boost::uint8_t* data, std::size_t /*size*/,
+        static void load_(std::uint8_t* data, std::size_t /*size*/,
             iarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            std::uint8_t const* config)
         {
             reinterpret_cast<T*>(data)->load(ar, version,
                 reinterpret_cast<Config const*>(config));

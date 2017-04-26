@@ -28,12 +28,12 @@
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace util
@@ -42,13 +42,13 @@ namespace hpx { namespace util
 
     void set_hpx_prefix(const char * prefix)
     {
-        if (prefix_ == 0)
+        if (prefix_ == nullptr)
             prefix_ = prefix;
     }
 
     char const* hpx_prefix()
     {
-        HPX_ASSERT(0 != prefix_);
+        HPX_ASSERT(nullptr != prefix_);
         return prefix_;
     }
 
@@ -93,9 +93,19 @@ namespace hpx { namespace util
             result += *it;
             result += suffix;
 
+#if defined(HPX_MSVC)
             result += HPX_INI_PATH_DELIMITER;
             result += *it;
+            result += "/bin";
+#endif
+
+            result += HPX_INI_PATH_DELIMITER;
+            result += *it;
+#if defined(HPX_MSVC)
+            result += "/bin";
+#else
             result += "/lib";
+#endif
             result += suffix;
         }
         return result;
@@ -172,7 +182,7 @@ namespace hpx { namespace util
                     boost::algorithm::is_any_of(":"),
                     boost::algorithm::token_compress_on);
 
-                for (boost::uint64_t i = 0; i < path_dirs.size(); ++i)
+                for (std::uint64_t i = 0; i < path_dirs.size(); ++i)
                 {
                     r = path_dirs[i];
                     r += '/';
@@ -203,7 +213,7 @@ namespace hpx { namespace util
         HPX_UNUSED(argv0);
 
         char exe_path[PATH_MAX + 1];
-        boost::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
+        std::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
 
         if (0 != _NSGetExecutablePath(exe_path, &len))
         {

@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
@@ -18,16 +20,52 @@ using hpx::agas::server::component_namespace;
 HPX_REGISTER_COMPONENT(
     hpx::components::fixed_component<component_namespace>,
     component_namespace, hpx::components::factory_enabled)
+
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     component_namespace, component_agas_component_namespace)
 
 HPX_REGISTER_ACTION_ID(
-    component_namespace::service_action,
-    component_namespace_service_action,
-    hpx::actions::component_namespace_service_action_id)
+    hpx::agas::server::component_namespace::bind_prefix_action,
+    component_namespace_bind_prefix_action,
+    hpx::actions::component_namespace_bind_prefix_action_id)
 
 HPX_REGISTER_ACTION_ID(
-    component_namespace::bulk_service_action,
-    component_namespace_bulk_service_action,
-    hpx::actions::component_namespace_bulk_service_action_id)
+    hpx::agas::server::component_namespace::bind_name_action,
+    component_namespace_bind_name_action,
+    hpx::actions::component_namespace_bind_name_action_id)
 
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::resolve_id_action,
+    component_namespace_resolve_id_action,
+    hpx::actions::component_namespace_resolve_id_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::unbind_action,
+    component_namespace_unbind_action,
+    hpx::actions::component_namespace_unbind_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::iterate_types_action,
+    component_namespace_iterate_types_action,
+    hpx::actions::component_namespace_iterate_types_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::get_component_type_name_action,
+    component_namespace_get_component_type_action,
+    hpx::actions::component_namespace_get_component_type_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::get_num_localities_action,
+    component_namespace_get_num_localities_action,
+    hpx::actions::component_namespace_get_num_localities_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    hpx::agas::server::component_namespace::statistics_counter_action,
+    component_namespace_statistics_counter_action,
+    hpx::actions::component_namespace_statistics_counter_action_id)
+
+namespace hpx { namespace agas
+{
+    component_namespace::~component_namespace()
+    {}
+}}

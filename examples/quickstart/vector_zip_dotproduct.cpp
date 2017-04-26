@@ -29,15 +29,15 @@ int hpx_main()
 
     double result =
         hpx::parallel::transform_reduce(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
+            0.0,
+            std::plus<double>(),
             [](tuple<double, double> r)
             {
                 return get<0>(r) * get<1>(r);
-            },
-            0.0,
-            std::plus<double>()
+            }
         );
     // print the result
     hpx::cout << result << hpx::endl;
@@ -48,9 +48,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);

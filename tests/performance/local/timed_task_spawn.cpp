@@ -9,19 +9,21 @@
 // FIXME: Calling the tasks "workers" overloads the term worker-thread (which
 // refers to OS-threads).
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/format.hpp>
 #include <boost/math/common_factor.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include <cstdint>
+#include <functional>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -40,7 +42,6 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
-using hpx::applier::register_thread_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -55,16 +56,16 @@ using std::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t suspended_tasks = 0;
-boost::uint64_t delay = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t suspended_tasks = 0;
+std::uint64_t delay = 0;
 bool header = true;
 bool csv_header = false;
 std::string scaling("weak");
 std::string distribution("static-balanced");
 
-boost::uint64_t suspend_step = 0;
-boost::uint64_t no_suspend_step = 1;
+std::uint64_t suspend_step = 0;
+std::uint64_t no_suspend_step = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
@@ -79,7 +80,7 @@ std::string format_build_date(std::string timestamp)
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    std::uint64_t cores
   , double walltime
   , double warmup_estimate
   , std::vector<std::string> const& counter_shortnames
@@ -89,14 +90,14 @@ void print_results(
     std::vector<hpx::performance_counters::counter_value> counter_values;
 
     if (ac)
-        counter_values = ac->evaluate_counters_sync();
+        counter_values = ac->evaluate_counters(hpx::launch::sync);
 
     if (csv_header)
     {
         header = false;
         cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
 
-        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
             cout << "," << counter_shortnames[i];
         }
@@ -127,9 +128,9 @@ void print_results(
                 "## 5:WARMUP:Total Walltime [seconds]\n"
                 ;
 
-        boost::uint64_t const last_index = 5;
+        std::uint64_t const last_index = 5;
 
-        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
             cout << "## "
                  << (i + 1 + last_index) << ":"
@@ -154,7 +155,7 @@ void print_results(
 
     if (ac)
     {
-        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(", %.14g")
                     % counter_values[i].get_value<double>());
     }
@@ -165,22 +166,22 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(
     hpx::lcos::local::barrier& finished
-  , boost::uint64_t suspended_tasks
+  , std::uint64_t suspended_tasks
     )
 {
-    boost::uint64_t const pending_count =
+    std::uint64_t const pending_count =
         get_thread_count(hpx::threads::thread_priority_normal
                        , hpx::threads::pending);
 
     if (pending_count == 0)
     {
-        boost::uint64_t const all_count =
+        std::uint64_t const all_count =
             get_thread_count(hpx::threads::thread_priority_normal);
 
         if (all_count != suspended_tasks + 1)
         {
             register_work(hpx::util::bind(&wait_for_tasks
-                                    , boost::ref(finished)
+                                    , std::ref(finished)
                                     , suspended_tasks)
                 , "wait_for_tasks", hpx::threads::pending
                 , hpx::threads::thread_priority_low);
@@ -192,15 +193,15 @@ void wait_for_tasks(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::threads::thread_state_enum invoke_worker_timed_no_suspension(
+hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
     worker_timed(delay * 1000);
-    return hpx::threads::terminated;
+    return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
 }
 
-hpx::threads::thread_state_enum invoke_worker_timed_suspension(
+hpx::threads::thread_result_type invoke_worker_timed_suspension(
     hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
     )
 {
@@ -209,14 +210,14 @@ hpx::threads::thread_state_enum invoke_worker_timed_suspension(
     hpx::error_code ec(hpx::lightweight);
     hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
 
-    return hpx::threads::terminated;
+    return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef void (*stage_worker_function)(boost::uint64_t, bool);
+typedef void (*stage_worker_function)(std::uint64_t, bool);
 
 void stage_worker_static_balanced_stackbased(
-    boost::uint64_t target_thread
+    std::uint64_t target_thread
   , bool suspend
     )
 {
@@ -241,7 +242,7 @@ void stage_worker_static_balanced_stackbased(
 }
 
 void stage_worker_static_imbalanced(
-    boost::uint64_t target_thread
+    std::uint64_t target_thread
   , bool suspend
     )
 {
@@ -266,7 +267,7 @@ void stage_worker_static_imbalanced(
 }
 
 void stage_worker_round_robin(
-    boost::uint64_t target_thread
+    std::uint64_t target_thread
   , bool suspend
     )
 {
@@ -287,12 +288,12 @@ void stage_worker_round_robin(
 }
 
 void stage_workers(
-    boost::uint64_t target_thread
-  , boost::uint64_t local_tasks
+    std::uint64_t target_thread
+  , std::uint64_t local_tasks
   , stage_worker_function stage_worker
     )
 {
-    boost::uint64_t num_thread = hpx::get_worker_thread_num();
+    std::uint64_t num_thread = hpx::get_worker_thread_num();
 
     if (num_thread != target_thread)
     {
@@ -308,14 +309,14 @@ void stage_workers(
         return;
     }
 
-    for (boost::uint64_t i = 0; i < local_tasks;)
+    for (std::uint64_t i = 0; i < local_tasks;)
     {
-        for (boost::uint64_t j = 0; j < suspend_step; ++j)
+        for (std::uint64_t j = 0; j < suspend_step; ++j)
         {
             stage_worker(target_thread, true);
             ++i;
         }
-        for (boost::uint64_t j = 0; j < no_suspend_step; ++j)
+        for (std::uint64_t j = 0; j < no_suspend_step; ++j)
         {
             stage_worker(target_thread, false);
             ++i;
@@ -342,7 +343,7 @@ int hpx_main(
             throw std::invalid_argument(
                 "suspended tasks must be smaller than tasks\n");
 
-        boost::uint64_t const os_thread_count = get_os_thread_count();
+        std::uint64_t const os_thread_count = get_os_thread_count();
 
         ///////////////////////////////////////////////////////////////////////
         stage_worker_function stage_worker;
@@ -360,10 +361,10 @@ int hpx_main(
                 );
 
         ///////////////////////////////////////////////////////////////////////
-        boost::uint64_t tasks_per_feeder = 0;
-        //boost::uint64_t total_tasks = 0;
-        boost::uint64_t suspended_tasks_per_feeder = 0;
-        boost::uint64_t total_suspended_tasks = 0;
+        std::uint64_t tasks_per_feeder = 0;
+        //std::uint64_t total_tasks = 0;
+        std::uint64_t suspended_tasks_per_feeder = 0;
+        std::uint64_t total_suspended_tasks = 0;
 
         if ("strong" == scaling)
         {
@@ -396,7 +397,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
         {
-            boost::uint64_t gcd = boost::math::gcd(tasks_per_feeder
+            std::uint64_t gcd = boost::math::gcd(tasks_per_feeder
                                                  , suspended_tasks_per_feeder);
 
             suspend_step = suspended_tasks_per_feeder / gcd;
@@ -413,7 +414,7 @@ int hpx_main(
             std::vector<std::string> raw_counters =
                 vm["counter"].as<std::vector<std::string> >();
 
-            for (boost::uint64_t i = 0; i < raw_counters.size(); ++i)
+            for (std::uint64_t i = 0; i < raw_counters.size(); ++i)
             {
                 std::vector<std::string> entry;
                 boost::algorithm::split(entry, raw_counters[i],
@@ -441,9 +442,9 @@ int hpx_main(
         // This needs to stay here; we may have suspended as recently as the
         // performance counter reset (which is called just before the staging
         // function).
-        boost::uint64_t const num_thread = hpx::get_worker_thread_num();
+        std::uint64_t const num_thread = hpx::get_worker_thread_num();
 
-        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+        for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (num_thread == i) continue;
 
@@ -469,7 +470,7 @@ int hpx_main(
         hpx::lcos::local::barrier finished(2);
 
         register_work(hpx::util::bind(&wait_for_tasks
-                                , boost::ref(finished)
+                                , std::ref(finished)
                                 , total_suspended_tasks
                                  )
             , "wait_for_tasks", hpx::threads::pending
@@ -512,19 +513,19 @@ int main(
           "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke (when strong-scaling, this is the total "
           "number of tasks invoked; when weak-scaling, it is the number of "
           "tasks per core)")
 
         ( "suspended-tasks"
-        , value<boost::uint64_t>(&suspended_tasks)->default_value(0)
+        , value<std::uint64_t>(&suspended_tasks)->default_value(0)
         , "number of tasks to suspend (when strong-scaling, this is the total "
           "number of tasks suspended; when weak-scaling, it is the number of "
           "suspended per core)")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(5)
+        , value<std::uint64_t>(&delay)->default_value(5)
         , "duration of delay in microseconds")
 
         ( "counter"

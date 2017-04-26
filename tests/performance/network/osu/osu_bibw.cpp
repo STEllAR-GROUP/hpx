@@ -13,6 +13,8 @@
 
 #include <boost/range/irange.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,15 +45,15 @@ send_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
 
     std::size_t const start = 0;
 
     auto range = boost::irange(start, window_size);
     return for_each(
         par(task), boost::begin(range), boost::end(range),
-        [=](boost::uint64_t j)
+        [=](std::uint64_t j)
         {
             // Note: The original benchmark uses MPI_Isend which does not
             //       create a copy of the passed buffer.
@@ -75,15 +77,15 @@ recv_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     using hpx::parallel::for_each;
-    using hpx::parallel::par;
-    using hpx::parallel::task;
+    using hpx::parallel::execution::par;
+    using hpx::parallel::execution::task;
 
     std::size_t const start = 0;
 
     auto range = boost::irange(start, window_size);
     return for_each(
         par(task), boost::begin(range), boost::end(range),
-        [=](boost::uint64_t j)
+        [=](std::uint64_t j)
         {
             irecv_action recv;
             recv(dest, size);

@@ -13,6 +13,9 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -51,6 +54,9 @@ namespace hpx { namespace lcos
         /// \a server#latch instance with the given global id \a id.
         latch(hpx::shared_future<naming::id_type> const& id)
           : base_type(id)
+        {}
+        latch(hpx::shared_future<naming::id_type> && id)
+          : base_type(std::move(id))
         {}
 
         ///////////////////////////////////////////////////////////////////////

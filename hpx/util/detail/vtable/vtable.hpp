@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
-//  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2014-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,23 +10,41 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <memory>
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct construct_vtable {};
+
+    template <typename VTable, typename T>
+    struct vtables
+    {
+        static VTable const instance;
+    };
+
+    template <typename VTable, typename T>
+    VTable const vtables<VTable, T>::instance = construct_vtable<T>();
+
+    template <typename VTable, typename T>
+    HPX_CONSTEXPR inline VTable const* get_vtable() HPX_NOEXCEPT
+    {
+        static_assert(
+            std::is_same<T, typename std::decay<T>::type>::value,
+            "T shall have no cv-ref-qualifiers");
+
+        return &vtables<VTable, T>::instance;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct vtable
     {
         static const std::size_t function_storage_size = 3*sizeof(void*);
-
-        template <typename T>
-        HPX_FORCEINLINE static std::type_info const& get_type()
-        {
-            return typeid(T);
-        }
-        typedef std::type_info const& (*get_type_t)();
 
         template <typename T>
         HPX_FORCEINLINE static T& get(void** v)
@@ -75,32 +93,43 @@ namespace hpx { namespace util { namespace detail
         template <typename T, typename Arg>
         HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
         {
-            delete_<T>(v);
+            _delete<T>(v);
             construct<T, Arg>(v, std::forward<Arg>(arg));
         }
 
         template <typename T>
-        HPX_FORCEINLINE static void destruct(void** v)
+        HPX_FORCEINLINE static std::type_info const& _get_type()
+        {
+            return typeid(T);
+        }
+        std::type_info const& (*get_type)();
+
+        template <typename T>
+        HPX_FORCEINLINE static void _destruct(void** v)
         {
             get<T>(v).~T();
         }
-        typedef void (*destruct_t)(void**);
+        void (*destruct)(void**);
 
         template <typename T>
-        HPX_FORCEINLINE static void delete_(void** v)
+        HPX_FORCEINLINE static void _delete(void** v)
         {
             if (sizeof(T) <= function_storage_size)
             {
-                destruct<T>(v);
+                _destruct<T>(v);
             } else {
                 delete &get<T>(v);
             }
         }
-        typedef void (*delete_t)(void**);
-    };
+        void (*delete_)(void**);
 
-    template <typename T>
-    struct construct_vtable {};
+        template <typename T>
+        HPX_CONSTEXPR vtable(construct_vtable<T>) HPX_NOEXCEPT
+          : get_type(&vtable::template _get_type<T>)
+          , destruct(&vtable::template _destruct<T>)
+          , delete_(&vtable::template _delete<T>)
+        {}
+    };
 }}}
 
 #endif

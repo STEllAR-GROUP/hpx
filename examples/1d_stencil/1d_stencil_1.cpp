@@ -13,6 +13,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include "print_time_results.hpp"
@@ -74,8 +77,8 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -84,7 +87,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points.
     stepper::space solution = step.do_work(nx, nt);
@@ -96,9 +99,9 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    std::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, nt, header);
 
     return hpx::finalize();
@@ -111,9 +114,9 @@ int main(int argc, char* argv[])
     po::options_description desc_commandline;
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", po::value<boost::uint64_t>()->default_value(100),
+        ("nx", po::value<std::uint64_t>()->default_value(100),
          "Local x dimension")
-        ("nt", po::value<boost::uint64_t>()->default_value(45),
+        ("nt", po::value<std::uint64_t>()->default_value(45),
          "Number of time steps")
         ("k", po::value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

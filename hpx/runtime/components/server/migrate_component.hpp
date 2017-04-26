@@ -15,7 +15,9 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/is_component.hpp>
 
+#include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace components { namespace server
 {
@@ -131,7 +133,7 @@ namespace hpx { namespace components { namespace server
         {
             using components::stubs::runtime_support;
 
-            boost::uint32_t pin_count = ptr->pin_count();
+            std::uint32_t pin_count = ptr->pin_count();
 
             if (pin_count == ~0x0u)
             {

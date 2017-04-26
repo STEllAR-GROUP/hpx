@@ -10,13 +10,14 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <functional>
 #include <numeric>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <boost/range/functions.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id async_test(int passed_through)
@@ -47,7 +48,7 @@ void test_apply(Executor& exec)
     hpx::thread::id id;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::apply_execute(exec, &apply_test, boost::ref(l), boost::ref(id), 42);
+    traits::apply_execute(exec, &apply_test, std::ref(l), std::ref(id), 42);
     l.count_down_and_wait();
 
     HPX_TEST(id != hpx::this_thread::get_id());
@@ -114,7 +115,7 @@ void test_executor()
             Executor
         >::execution_category execution_category;
 
-    HPX_TEST((boost::is_same<
+    HPX_TEST((std::is_same<
             hpx::parallel::parallel_execution_tag, execution_category
         >::value));
 
@@ -203,9 +204,9 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

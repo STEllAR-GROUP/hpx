@@ -5,6 +5,8 @@
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
+#include <hpx/compat/thread.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
@@ -23,20 +25,19 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/ref.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iomanip>
 #include <mutex>
 #include <numeric>
@@ -93,9 +94,12 @@ namespace hpx { namespace threads { namespace detail
         // get_worker_thread_num returns the global thread number which might
         // be too large. This function might get called from within
         // background_work inside the os executors
-        std::size_t num_thread = get_worker_thread_num() % thread_count_;
-        if (num_thread != std::size_t(-1))
-            return get_state(num_thread);
+        if (thread_count_ != 0)
+        {
+            std::size_t num_thread = get_worker_thread_num() % thread_count_;
+            if (num_thread != std::size_t(-1))
+                return get_state(num_thread);
+        }
         return sched_.get_minmax_state().second;
     }
 
@@ -239,7 +243,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    boost::thread& thread_pool<Scheduler>::get_os_thread_handle(
+    compat::thread& thread_pool<Scheduler>::get_os_thread_handle(
         std::size_t num_thread)
     {
         HPX_ASSERT(num_thread < threads_.size());
@@ -252,6 +256,21 @@ namespace hpx { namespace threads { namespace detail
         std::size_t num, bool reset) const
     {
         return sched_.Scheduler::get_thread_count(state, priority, num, reset);
+    }
+
+    template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_scheduler_utilization() const
+    {
+        return (std::accumulate(tasks_active_.begin(), tasks_active_.end(),
+            std::int64_t(0)) * 100) / thread_count_.load();
+    }
+
+    template <typename Scheduler>
+    bool thread_pool<Scheduler>::enumerate_threads(
+        util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state) const
+    {
+        return sched_.Scheduler::enumerate_threads(f, state);
     }
 
     template <typename Scheduler>
@@ -269,7 +288,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    bool thread_pool<Scheduler>::run(std::unique_lock<boost::mutex>& l,
+    bool thread_pool<Scheduler>::run(std::unique_lock<compat::mutex>& l,
         std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
@@ -296,7 +315,12 @@ namespace hpx { namespace threads { namespace detail
         tfunc_times_.resize(num_threads);
         exec_times_.resize(num_threads);
 
+        idle_loop_counts_.resize(num_threads);
+        busy_loop_counts_.resize(num_threads);
+
         reset_tfunc_times_.resize(num_threads);
+
+        tasks_active_.resize(num_threads);
 
         // scale timestamps to nanoseconds
         std::uint64_t base_timestamp = util::hardware::timestamp();
@@ -364,13 +388,12 @@ namespace hpx { namespace threads { namespace detail
             << " timestamp_scale: " << timestamp_scale_; //-V128
 
         try {
-            HPX_ASSERT(startup_.get() == 0);
+            HPX_ASSERT(startup_.get() == nullptr);
             startup_.reset(
                 new boost::barrier(static_cast<unsigned>(num_threads+1))
             );
 
             // run threads and wait for initialization to complete
-            sched_.set_all_states(state_running);
 
             topology const& topology_ = get_topology();
 
@@ -391,9 +414,9 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
                 // create a new thread
-                threads_.push_back(boost::thread(
+                threads_.push_back(compat::thread(
                         &thread_pool::thread_func, this, thread_num,
-                        boost::ref(topology_), boost::ref(*startup_)
+                        std::ref(topology_), std::ref(*startup_)
                     ));
 
                 // set the new threads affinity (on Windows systems)
@@ -422,6 +445,9 @@ namespace hpx { namespace threads { namespace detail
             // the main thread needs to have a unique thread_num
             init_tss(num_threads);
             startup_->wait();
+
+            // The scheduler is now running.
+            sched_.set_all_states(state_running);
         }
         catch (std::exception const& e) {
             LTM_(always)
@@ -429,7 +455,7 @@ namespace hpx { namespace threads { namespace detail
                 << " failed with: " << e.what();
 
             // trigger the barrier
-            if (startup_.get() != 0)
+            if (startup_.get() != nullptr)
             {
                 while (num_threads-- != 0 && !startup_->wait())
                     ;
@@ -448,7 +474,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void thread_pool<Scheduler>::stop (
-        std::unique_lock<boost::mutex>& l, bool blocking)
+        std::unique_lock<compat::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -600,7 +626,9 @@ namespace hpx { namespace threads { namespace detail
                     detail::scheduling_counters counters(
                         executed_threads_[num_thread],
                         executed_thread_phases_[num_thread],
-                        tfunc_times_[num_thread], exec_times_[num_thread]);
+                        tfunc_times_[num_thread], exec_times_[num_thread],
+                        idle_loop_counts_[num_thread], busy_loop_counts_[num_thread],
+                        tasks_active_[num_thread]);
 
                     detail::scheduling_callbacks callbacks(
                         util::bind( //-V107
@@ -1381,6 +1409,27 @@ namespace hpx { namespace threads { namespace detail
     }
 #endif
 
+    template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_idle_loop_count(std::size_t num) const
+    {
+        if (num == std::size_t(-1))
+        {
+            return std::accumulate(idle_loop_counts_.begin(),
+                idle_loop_counts_.end(), 0ll);
+        }
+        return idle_loop_counts_[num];
+    }
+
+    template <typename Scheduler>
+    std::int64_t thread_pool<Scheduler>::get_busy_loop_count(std::size_t num) const
+    {
+        if (num == std::size_t(-1))
+        {
+            return std::accumulate(busy_loop_counts_.begin(),
+                busy_loop_counts_.end(), 0ll);
+        }
+        return busy_loop_counts_[num];
+    }
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1411,11 +1460,19 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::local_priority_queue_scheduler<> >;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
+    > >;
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
+    > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::abp_fifo_priority_queue_scheduler>;
+    hpx::threads::policies::local_priority_queue_scheduler<
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
+    > >;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)

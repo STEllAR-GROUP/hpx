@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/multi_array.hpp>
@@ -14,6 +17,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <array>
+#include <cstddef>
 #include <numeric>
 #include <vector>
 
@@ -39,7 +44,8 @@ void test(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::vector<T> os;
         for(T c = minval; c < maxval; ++c)
         {
@@ -58,7 +64,8 @@ void test(T minval, T maxval)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::vector<A<T> > os;
         for(T c = minval; c < maxval; ++c)
         {
@@ -82,7 +89,8 @@ void test_fp(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::vector<T> os;
         for(T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -101,7 +109,8 @@ void test_fp(T minval, T maxval)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::vector<A<T> > os;
         for(T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -125,7 +134,8 @@ void test_boost_array(T first)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         boost::array<T, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -140,7 +150,8 @@ void test_boost_array(T first)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         boost::array<A<T>, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -161,7 +172,8 @@ void test_std_array(T first)
 {
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::array<T, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -176,7 +188,8 @@ void test_std_array(T first)
     }
     {
         std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        hpx::serialization::output_archive oarchive(buffer,
+            hpx::serialization::disable_data_chunking);
         std::array<A<T>, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -196,7 +209,8 @@ template <class T>
 void test_multi_array(T first)
 {
     std::vector<char> buffer;
-    hpx::serialization::output_archive oarchive(buffer);
+    hpx::serialization::output_archive oarchive(buffer,
+        hpx::serialization::disable_data_chunking);
     boost::multi_array<T, 3u> oarray(boost::extents[3][4][2]);
 
     for(std::size_t i = 0; i < 3; ++i)
@@ -226,7 +240,8 @@ void test_plain_array()
         oarray[i] = -1;
     }
 
-    hpx::serialization::output_archive oarchive(buffer);
+    hpx::serialization::output_archive oarchive(buffer,
+        hpx::serialization::disable_data_chunking);
     oarchive << iarray;
 
     hpx::serialization::input_archive iarchive(buffer);
@@ -250,7 +265,8 @@ void test_array_of_vectors()
         }
     }
 
-    hpx::serialization::output_archive oarchive(buffer);
+    hpx::serialization::output_archive oarchive(buffer,
+        hpx::serialization::disable_data_chunking);
     oarchive << iarray;
 
     hpx::serialization::input_archive iarchive(buffer);
@@ -316,3 +332,5 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#endif

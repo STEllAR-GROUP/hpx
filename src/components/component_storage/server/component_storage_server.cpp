@@ -7,6 +7,7 @@
 #include <hpx/components/component_storage/server/component_storage.hpp>
 #include <hpx/runtime/find_localities.hpp>
 
+#include <sstream>
 #include <vector>
 
 namespace hpx { namespace components { namespace server
@@ -26,7 +27,7 @@ namespace hpx { namespace components { namespace server
         // rebind the object to this storage locality
         naming::address addr(current_lva);
         addr.address_ = 0;       // invalidate lva
-        if (!agas::bind_sync(gid, addr, this->gid_))
+        if (!agas::bind(launch::sync, gid, addr, this->gid_))
         {
             std::ostringstream strm;
             strm << "failed to rebind id " << id
@@ -46,7 +47,8 @@ namespace hpx { namespace components { namespace server
         naming::gid_type const& id)
     {
         // return the stored data and erase it from the map
-        return data_.get_value_sync(naming::detail::get_stripped_gid(id), true);
+        return data_.get_value(launch::sync,
+            naming::detail::get_stripped_gid(id), true);
     }
 }}}
 

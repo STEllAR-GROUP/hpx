@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -146,11 +146,10 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/ref.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -197,6 +196,7 @@ namespace hpx { namespace lcos
         {
             typedef typename when_all_result<Tuple>::type result_type;
             typedef hpx::lcos::future<result_type> type;
+            typedef hpx::lcos::detail::future_data<result_type> base_type;
 
         private:
             // workaround gcc regression wrongly instantiating constructors
@@ -212,9 +212,16 @@ namespace hpx { namespace lcos
             {};
 
         public:
+            typedef typename base_type::init_no_addref init_no_addref;
+
             template <typename Tuple_>
             when_all_frame(Tuple_&& t)
               : t_(std::forward<Tuple_>(t))
+            {}
+
+            template <typename Tuple_>
+            when_all_frame(Tuple_&& t, init_no_addref no_addref)
+              : base_type(no_addref), t_(std::forward<Tuple_>(t))
             {}
 
         protected:
@@ -240,12 +247,13 @@ namespace hpx { namespace lcos
 
                 for (/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
-                        traits::detail::get_shared_state(*next);
+                    typename traits::detail::shared_state_ptr<
+                            future_result_type
+                        >::type next_future_data =
+                            traits::detail::get_shared_state(*next);
 
-                    if (!next_future_data->is_ready())
+                    if (next_future_data.get() != nullptr &&
+                        !next_future_data->is_ready())
                     {
                         next_future_data->execute_deferred();
 
@@ -269,17 +277,17 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::false_, boost::mpl::true_)
+            void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(boost::unwrap_ref(util::get<I>(t_))),
-                    boost::end(boost::unwrap_ref(util::get<I>(t_))));
+                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
+                    boost::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::true_, boost::mpl::false_)
+            void await_next(std::true_type, std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -290,15 +298,13 @@ namespace hpx { namespace lcos
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                using boost::mpl::false_;
-                using boost::mpl::true_;
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(f_);
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data =
-                    traits::detail::get_shared_state(f_);
-
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 
@@ -308,12 +314,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (when_all_frame::*f)(true_, false_) =
+                        void (when_all_frame::*f)(std::true_type, std::false_type) =
                             &when_all_frame::await_next<I>;
 
                         boost::intrusive_ptr<when_all_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), true_(), false_()));
+                            f, std::move(this_), std::true_type(), std::false_type()));
                         return;
                     }
                 }
@@ -329,8 +335,8 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef typename traits::is_future<future_type>::type is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef traits::is_future<future_type> is_future;
+                typedef traits::is_future_range<future_type> is_range;
 
                 await_next<I>(is_future(), is_range());
             }
@@ -352,12 +358,12 @@ namespace hpx { namespace lcos
         lcos::future<typename std::decay<Range>::type> >::type //-V659
     when_all(Range&& values)
     {
-        typedef detail::when_all_frame<
-                util::tuple<Range>
-            > frame_type;
+        typedef detail::when_all_frame<util::tuple<Range> > frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
-            util::forward_as_tuple(std::move(values))));
+            util::forward_as_tuple(std::move(values)), init_no_addref()),
+            false);
         p->do_await();
 
         using traits::future_access;
@@ -426,11 +432,13 @@ namespace hpx { namespace lcos
                 typename traits::acquire_future<Ts>::type...
             > result_type;
         typedef detail::when_all_frame<result_type> frame_type;
+        typedef typename frame_type::init_no_addref init_no_addref;
 
         traits::acquire_future_disp func;
         result_type values(func(std::forward<Ts>(ts))...);
 
-        boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
+        boost::intrusive_ptr<frame_type> p(
+            new frame_type(std::move(values), init_no_addref()), false);
         p->do_await();
 
         using traits::future_access;

@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
+
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -10,6 +12,7 @@
 
 #include <boost/cstdint.hpp>
 
+#include <cstdint>
 #include <vector>
 
 template <typename T>
@@ -32,18 +35,18 @@ struct A
 #if defined(BOOST_HAS_INT128)
 std::ostream& operator<<(std::ostream& s, boost::int128_type i)
 {
-    boost::int64_t low = i;
+    std::int64_t low = i;
     i >>= 64;
-    boost::int64_t high = i;
+    std::int64_t high = i;
     s << std::hex << "high: i" << high << "; low: " << low;
     return s;
 }
 
 std::ostream& operator<<(std::ostream& s, boost::uint128_type i)
 {
-    boost::uint64_t low = i;
+    std::uint64_t low = i;
     i >>= 64;
-    boost::uint64_t high = i;
+    std::uint64_t high = i;
     s << std::hex << "high: i" << high << "; low: " << low;
     return s;
 }

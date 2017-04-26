@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime.hpp>
@@ -11,10 +12,10 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/thread.hpp>
-
+#include <chrono>
+#include <cstddef>
+#include <iostream>
 #include <mutex>
-
 #include <string>
 
 #include "throttle.hpp"
@@ -93,11 +94,9 @@ namespace throttle { namespace server
 
         {
             // put this shepherd thread to sleep for 100ms
-            boost::system_time xt(boost::get_system_time() +
-                boost::posix_time::milliseconds(100));
-
             hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
-            boost::thread::sleep(xt);
+
+            hpx::compat::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         // if this thread still needs to be suspended, re-schedule this routine

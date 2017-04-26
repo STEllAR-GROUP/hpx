@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2014-2015 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,14 +6,18 @@
 
 # We explicitly disable ibverbs and ipc for now as they don't work currently
 
-set(parcelport_plugins
-  #ibverbs
-  #ipc
-  mpi
-  tcp)
+set(parcelport_plugins)
+
+if(HPX_WITH_NETWORKING)
+  set(parcelport_plugins ${parcelport_plugins}
+    verbs
+    mpi
+    tcp)
+endif()
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
+set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES "" CACHE INTERNAL "" FORCE)
 
 macro(add_parcelport name)
   set(name_short ${name})
@@ -22,12 +26,6 @@ macro(add_parcelport name)
   set(one_value_args FOLDER)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
-  set_source_files_properties(
-    ${${name}_SOURCES}
-    PROPERTIES
-    INCLUDE_DIRECTORIES "${${name}_INCLUDE_DIRECTORIES}"
-  )
 
   if(${${name}_STATIC})
     hpx_debug("adding static parcelport: ${name}")
@@ -65,7 +63,7 @@ macro(add_parcelport name)
       ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
       CACHE INTERNAL "" FORCE)
 
-    set(HPX_LIBRARIES ${HPX_LIBRARIES} ${${name}_DEPENDENCIES})
+    hpx_libraries(${${name}_DEPENDENCIES})
 
   else()
     hpx_debug("adding parcelport plugin: ${name}")
@@ -91,24 +89,26 @@ foreach(type ${parcelport_plugins})
 endforeach()
 
 macro(add_static_parcelports)
-  add_parcelport_tcp_module()
-  add_parcelport_mpi_module()
+  if(HPX_WITH_NETWORKING)
+    add_parcelport_tcp_module()
+    add_parcelport_mpi_module()
+    add_parcelport_verbs_module()
+  endif()
 endmacro()
 
 macro(add_parcelport_modules)
-  #add_parcelport_ibverbs_module()
-  #add_parcelport_ipc_module()
+  if(HPX_WITH_NETWORKING)
+    hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
 
-  hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
-
-  set(_parcelport_export)
-  set(_parcelport_init)
-  foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
-    set(_parcelport_export
-      "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
-    set(_parcelport_init
-      "${_parcelport_init}        parcelport_${parcelport}_factory_init(factories);\n")
-  endforeach()
+    set(_parcelport_export)
+    set(_parcelport_init)
+    foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
+      set(_parcelport_export
+        "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
+      set(_parcelport_init
+        "${_parcelport_init}        parcelport_${parcelport}_factory_init(factories);\n")
+    endforeach()
+  endif()
 
   configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
                  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"

@@ -9,9 +9,13 @@
 #define HPX_NO_VERSION_CHECK
 #include "htts2.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <iostream>
+
 #include <omp.h>
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct omp_driver : htts2::driver
 {
     omp_driver(int argc, char** argv)
@@ -45,11 +49,11 @@ struct omp_driver : htts2::driver
         #pragma omp single
         {
             // One stager per OS-thread.
-            for (boost::uint64_t n = 0; n < this->osthreads_; ++n)
+            for (std::uint64_t n = 0; n < this->osthreads_; ++n)
                 #if _OPENMP>=200805
                 #pragma omp task untied
                 #endif
-                for (boost::uint64_t m = 0; m < this->tasks_; ++m)
+                for (std::uint64_t m = 0; m < this->tasks_; ++m)
                     #if _OPENMP>=200805
                     #pragma omp task untied
                     #endif

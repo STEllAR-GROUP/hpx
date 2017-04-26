@@ -24,7 +24,7 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -62,7 +62,7 @@ template<class type> struct logger_holder {
     logger_base_type * base()                { return m_base; }
 
 protected:
-    logger_holder() : m_log(0), m_base(0) {}
+    logger_holder() : m_log(nullptr), m_base(nullptr) {}
     virtual ~logger_holder() {}
 
     void init(type * log) {
@@ -147,11 +147,11 @@ private:
 */
 struct ensure_early_log_creation {
     template<class type> ensure_early_log_creation ( type & log) {
-    typedef boost::int64_t long_type ;
+    typedef std::int64_t long_type ;
         long_type ignore = reinterpret_cast<long_type>(&log);
         // we need to force the compiler to force creation of the log
-        if ( time(0) < 0)
-            if ( time(0) < (time_t)ignore) {
+        if ( time(nullptr) < 0)
+            if ( time(nullptr) < (time_t)ignore) {
                 printf("LOGGING LIB internal error - should NEVER happen. \
                     Please report this to the author of the lib");
                 exit(0);

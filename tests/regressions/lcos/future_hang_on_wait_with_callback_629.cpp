@@ -9,11 +9,14 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+#include <iostream>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -54,18 +57,18 @@ inline bool compare_real(T x, T y, T epsilon)
 }
 
 double null_function(
-    boost::uint64_t seed
-  , boost::uint64_t delay_iterations
+    std::uint64_t seed
+  , std::uint64_t delay_iterations
     )
 {
     boost::random::mt19937_64 prng(seed);
 
     boost::random::uniform_real_distribution<double> v(0, 1.);
-    boost::random::uniform_smallint<boost::uint8_t> s(0, 1);
+    boost::random::uniform_smallint<std::uint8_t> s(0, 1);
 
     double d = 0.;
 
-    for (boost::uint64_t i = 0; i < delay_iterations; ++i)
+    for (std::uint64_t i = 0; i < delay_iterations; ++i)
     {
         double v0 = v(prng);
         double v1 = v(prng);
@@ -81,21 +84,21 @@ double null_function(
 
 ///////////////////////////////////////////////////////////////////////////////
 double null_tree(
-    boost::uint64_t seed
-  , boost::uint64_t children
-  , boost::uint64_t depth
-  , boost::uint64_t max_depth
-  , boost::uint64_t delay_iterations
+    std::uint64_t seed
+  , std::uint64_t children
+  , std::uint64_t depth
+  , std::uint64_t max_depth
+  , std::uint64_t delay_iterations
     );
 
 HPX_PLAIN_ACTION(null_tree, null_tree_action);
 
 double null_tree(
-    boost::uint64_t seed
-  , boost::uint64_t children
-  , boost::uint64_t depth
-  , boost::uint64_t max_depth
-  , boost::uint64_t delay_iterations
+    std::uint64_t seed
+  , std::uint64_t children
+  , std::uint64_t depth
+  , std::uint64_t max_depth
+  , std::uint64_t delay_iterations
     )
 {
     if (depth == max_depth)
@@ -108,9 +111,9 @@ double null_tree(
     std::vector<hpx::future<double> > futures;
     futures.reserve(children);
 
-    boost::uint64_t p = seed + ipow(depth, children);
+    std::uint64_t p = seed + ipow(depth, children);
 
-    for (boost::uint64_t j = 0; j < children; ++j)
+    for (std::uint64_t j = 0; j < children; ++j)
     {
         futures.push_back(hpx::async<null_tree_action>
             (here, j + p, children, depth + 1, max_depth, delay_iterations));
@@ -130,14 +133,14 @@ int hpx_main(
     )
 {
     {
-        boost::uint64_t test_runs = vm["test-runs"].as<boost::uint64_t>();
+        std::uint64_t test_runs = vm["test-runs"].as<std::uint64_t>();
 
-        boost::uint64_t children = vm["children"].as<boost::uint64_t>();
+        std::uint64_t children = vm["children"].as<std::uint64_t>();
 
-        boost::uint64_t max_depth = vm["depth"].as<boost::uint64_t>() + 1;
+        std::uint64_t max_depth = vm["depth"].as<std::uint64_t>() + 1;
 
-        boost::uint64_t delay_iterations
-            = vm["delay-iterations"].as<boost::uint64_t>();
+        std::uint64_t delay_iterations
+            = vm["delay-iterations"].as<std::uint64_t>();
 
         bool verbose = vm.count("verbose") != 0;
 
@@ -146,7 +149,7 @@ int hpx_main(
         double d = 0.;
 
         null_tree_action null_act;
-        for ( boost::uint64_t i = 0
+        for ( std::uint64_t i = 0
             ; (test_runs == 0) || (i < test_runs)
             ; ++i)
         {
@@ -172,22 +175,22 @@ int main(
 
     cmdline.add_options()
         ( "test-runs"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of times to repeat the test (0 == infinite)")
 
         ( "verbose"
         , "print state every iteration")
 
         ( "children"
-        , value<boost::uint64_t>()->default_value(8)
+        , value<std::uint64_t>()->default_value(8)
         , "number of children each node has")
 
         ( "depth"
-        , value<boost::uint64_t>()->default_value(2)
+        , value<std::uint64_t>()->default_value(2)
         , "depth of the tree structure")
 
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of iterations in the delay loop")
         ;
 

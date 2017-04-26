@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,10 +15,20 @@ set(benchmarks
     delay_baseline_threaded
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_timed_task_spawn
+    parent_vs_child_stealing
     print_heterogeneous_payloads
     skynet
     timed_task_spawn
+    wait_all_timings
 )
+
+if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
+  set(benchmarks
+      ${benchmarks}
+      transform_reduce_binary
+     )
+  set(transform_reduce_binary_FLAGS DEPENDENCIES iostreams_component)
+endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks
@@ -63,7 +73,9 @@ endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
 set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
+set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
 set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
@@ -114,7 +126,10 @@ if(HPX_WITH_CXX11_LAMBDAS)
     DEPENDENCIES iostreams_component partitioned_vector_component)
 
   if(HPX_WITH_CUDA)
-    set_source_files_properties( stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ )
+    set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+  endif()
+  if(HPX_WITH_CUDA_CLANG)
+    set_source_files_properties(stream.cpp PROPERTIES COMPILE_FLAGS -xcuda)
   endif()
 endif()
 
@@ -130,7 +145,7 @@ foreach(benchmark ${benchmarks})
                      ${${benchmark}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Local/${benchmark}")
+                     FOLDER "Benchmarks/Local")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.${benchmark})

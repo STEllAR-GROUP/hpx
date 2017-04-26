@@ -13,10 +13,10 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 
-#include <boost/cstdint.hpp>
-
 #include <algorithm>
+#include <cstdint>
 #include <mutex>
+#include <utility>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -32,11 +32,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        counting_semaphore(boost::int64_t value = 0)
+        counting_semaphore(std::int64_t value = 0)
           : value_(value), cond_()
         {}
 
-        void wait(std::unique_lock<mutex_type>& l, boost::int64_t count)
+        void wait(std::unique_lock<mutex_type>& l, std::int64_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             value_ -= count;
         }
 
-        bool try_wait(std::unique_lock<mutex_type>& l, boost::int64_t count = 1)
+        bool try_wait(std::unique_lock<mutex_type>& l, std::int64_t count = 1)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             return false;
         }
 
-        void signal(std::unique_lock<mutex_type> l, boost::int64_t count)
+        void signal(std::unique_lock<mutex_type> l, std::int64_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             // release no more threads than we get resources
             value_ += count;
-            for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)
+            for (std::int64_t i = 0; value_ >= 0 && i < count; ++i)
             {
                 // notify_one() returns false if no more threads are
                 // waiting
@@ -79,17 +79,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
         }
 
-        boost::int64_t signal_all(std::unique_lock<mutex_type> l)
+        std::int64_t signal_all(std::unique_lock<mutex_type> l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
-            boost::int64_t count = static_cast<boost::int64_t>(cond_.size(l));
+            std::int64_t count = static_cast<std::int64_t>(cond_.size(l));
             signal(std::move(l), count);
             return count;
         }
 
     private:
-        boost::int64_t value_;
+        std::int64_t value_;
         local::detail::condition_variable cond_;
     };
 }}}}

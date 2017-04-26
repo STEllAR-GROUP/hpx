@@ -15,11 +15,13 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <set>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -47,60 +49,36 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool background_work()
         {
-            // We accept as many connections as we can ...
-            connection_list connections;
+            // We first try to accept a new connection
+            connection_ptr connection = accept();
+
+            // If we don't have a new connection, try to handle one of the
+            // already accepted ones.
+            if (!connection)
             {
                 std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
                 if(l && !connections_.empty())
                 {
-                    connections.push_back(connections_.front());
+                    connection = std::move(connections_.front());
                     connections_.pop_front();
                 }
             }
 
-            connection_ptr rcv;
-//             do
-//             {
-                rcv = accept();
-                if(rcv && !rcv->receive())
-                {
-                    connections.push_back(rcv);
-                }
-//             } while(rcv);
-            rcv.reset();
-
-            if(!connections.empty())
+            if(connection)
             {
-                receive_messages(std::move(connections));
+                receive_messages(std::move(connection));
                 return true;
             }
 
             return false;
         }
 
-        void receive_messages(
-            connection_list connections
-        )
+        void receive_messages(connection_ptr connection)
         {
-            // We try to handle all receives
-            typename connection_list::iterator end = std::remove_if(
-                connections.begin()
-              , connections.end()
-              , [](connection_ptr & rcv) -> bool
-              {
-                    return rcv->receive();
-              }
-            );
-
-            // If some are still in progress, give them back
-            if(connections.begin() != end)
+            if (!connection->receive())
             {
                 std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.insert(
-                    connections_.end()
-                  , std::make_move_iterator(connections.begin())
-                  , std::make_move_iterator(end)
-                );
+                connections_.push_back(std::move(connection));
             }
         }
 
@@ -172,7 +150,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             int ret = 0;
             ret = MPI_Test(&r, &completed, status);
             HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)// && status->MPI_ERROR != MPI_ERR_PENDING)
+            if(completed)
             {
                 return true;
             }

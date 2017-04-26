@@ -9,6 +9,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -137,7 +139,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         iterator end = v.end(locality_id);
         for (iterator it = v.begin(locality_id); it != end; ++it, ++count)
         {
@@ -156,7 +158,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_iterator end = v.cend(locality_id);
         for (const_iterator it = v.cbegin(locality_id); it != end; ++it, ++count)
         {
@@ -178,7 +180,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         local_segment_iterator seg_end = v.segment_end(locality_id);
         for (local_segment_iterator seg_it = v.segment_begin(locality_id);
              seg_it != seg_end; ++seg_it, ++seg_count)
@@ -197,7 +199,7 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
+        std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
         for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)
@@ -251,10 +253,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         std::string empty(prefix_ + "empty");
 
         hpx::partitioned_vector<T> base;
-        base.register_as_sync(empty);
+        base.register_as(hpx::launch::sync, empty);
 
         hpx::partitioned_vector<T> v;
-        v.connect_to_sync(empty);
+        v.connect_to(hpx::launch::sync, empty);
 
         test_global_iteration(v, 0, T());
         test_segmented_iteration(v, 0, 0);
@@ -273,10 +275,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         std::string size_(prefix_ + "size");
 
         hpx::partitioned_vector<T> base(size);
-        base.register_as_sync(size_);
+        base.register_as(hpx::launch::sync, size_);
 
         hpx::partitioned_vector<T> v;
-        v.connect_to_sync(size_);
+        v.connect_to(hpx::launch::sync, size_);
 
         test_global_iteration(v, size, T());
         test_segmented_iteration(v, size, 1);
@@ -295,10 +297,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         std::string size_value(prefix_ + "size_value");
 
         hpx::partitioned_vector<T> base(size, T(999));
-        base.register_as_sync(size_value);
+        base.register_as(hpx::launch::sync, size_value);
 
         hpx::partitioned_vector<T> v;
-        v.connect_to_sync(size_value);
+        v.connect_to(hpx::launch::sync, size_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, 1);
@@ -322,10 +324,10 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
         std::string policy_(prefix_ + "policy");
 
         hpx::partitioned_vector<T> base(size, policy);
-        base.register_as_sync(policy_);
+        base.register_as(hpx::launch::sync, policy_);
 
         hpx::partitioned_vector<T> v;
-        v.connect_to_sync(policy_);
+        v.connect_to(hpx::launch::sync, policy_);
 
         test_global_iteration(v, size, T(0));
         test_segmented_iteration(v, size, parts);
@@ -342,10 +344,10 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
         std::string policy_value(prefix_ + "policy_value");
 
         hpx::partitioned_vector<T> base(size, T(999), policy);
-        base.register_as_sync(policy_value);
+        base.register_as(hpx::launch::sync, policy_value);
 
         hpx::partitioned_vector<T> v;
-        v.connect_to_sync(policy_value);
+        v.connect_to(hpx::launch::sync, policy_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, parts);

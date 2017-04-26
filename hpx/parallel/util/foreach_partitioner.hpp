@@ -10,11 +10,10 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -23,13 +22,16 @@
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <list>
 #include <memory>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,10 +58,8 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef hpx::util::tuple<
-                        std::size_t, FwdIter, std::size_t
-                    > tuple_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -72,18 +72,18 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
-                            policy, inititems, f1, first, count, 1);
+                            policy, inititems, f1, first, count, 1,
+                            has_variable_chunk_size());
 
-                    workitems.reserve(shape.size());
-
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        hpx::util::bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
-        struct foreach_static_partitioner<parallel_task_execution_policy, Result>
+        struct foreach_static_partitioner<execution::parallel_task_policy, Result>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2>
@@ -125,12 +125,11 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef executor_parameter_traits<parameters_type>
+                    parameters_traits;
+
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
-
-                typedef hpx::util::tuple<
-                        std::size_t, FwdIter, std::size_t
-                    > tuple_type;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
@@ -145,19 +144,18 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<tuple_type> shape =
+                    typedef typename parameters_traits::has_variable_chunk_size
+                        has_variable_chunk_size;
+
+                    auto shapes =
                         get_bulk_iteration_shape_idx(
-                            policy, inititems, f1, first, count, 1);
+                            policy, inititems, f1, first, count, 1,
+                            has_variable_chunk_size());
 
-                    workitems.reserve(shape.size());
-
-                    using hpx::util::bind;
-                    using hpx::util::functional::invoke_fused;
-                    using hpx::util::placeholders::_1;
                     workitems = executor_traits::bulk_async_execute(
                         policy.executor(),
-                        bind(invoke_fused(), std::forward<F1>(f1), _1),
-                        std::move(shape));
+                        partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
+                        std::move(shapes));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
@@ -174,6 +172,7 @@ namespace hpx { namespace parallel { namespace util
                             std::vector<hpx::future<Result> > && r2) mutable
                     ->  FwdIter
                     {
+                        HPX_UNUSED(scoped_param);
                         handle_local_exceptions<ExPolicy>::call(r1, errors);
                         handle_local_exceptions<ExPolicy>::call(r2, errors);
 
@@ -185,9 +184,9 @@ namespace hpx { namespace parallel { namespace util
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_static_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result>
-          : foreach_static_partitioner<parallel_task_execution_policy, Result>
+          : foreach_static_partitioner<execution::parallel_task_policy, Result>
         {};
 
         ///////////////////////////////////////////////////////////////////////
@@ -216,7 +215,7 @@ namespace hpx { namespace parallel { namespace util
         };
 
         template <typename Result>
-        struct foreach_partitioner<parallel_task_execution_policy, Result,
+        struct foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
@@ -232,27 +231,46 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+#if defined(HPX_HAVE_DATAPAR)
+        template <typename Result>
+        struct foreach_partitioner<execution::datapar_task_policy, Result,
+                parallel::traits::static_partitioner_tag>
+        {
+            template <typename ExPolicy, typename FwdIter, typename F1,
+                typename F2>
+            static hpx::future<FwdIter> call(ExPolicy && policy,
+                FwdIter first, std::size_t count, F1 && f1, F2 && f2)
+            {
+                return foreach_static_partitioner<
+                        execution::parallel_task_policy, Result
+                    >::call(
+                        std::forward<ExPolicy>(policy), first, count,
+                        std::forward<F1>(f1), std::forward<F2>(f2));
+            }
+        };
+#endif
+
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::static_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::auto_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
         template <typename Executor, typename Parameters, typename Result>
         struct foreach_partitioner<
-                parallel_task_execution_policy_shim<Executor, Parameters>,
+                execution::parallel_task_policy_shim<Executor, Parameters>,
                 Result, parallel::traits::default_partitioner_tag>
-          : foreach_partitioner<parallel_task_execution_policy, Result,
+          : foreach_partitioner<execution::parallel_task_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 

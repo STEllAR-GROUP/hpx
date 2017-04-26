@@ -13,9 +13,9 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include "boost/type_traits/is_const.hpp"
-#include "boost/ref.hpp"
+#include <functional>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 // ----------------------------------------------------------------------------
@@ -179,14 +179,14 @@ void element_access_test()
     ++hpx::util::get<0>(t);
     HPX_TEST(hpx::util::get<0>(t) == 6);
 
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, hpx::util::tuple<int,
+    HPX_TEST((std::is_const<hpx::util::tuple_element<0, hpx::util::tuple<int,
         float> >::type>::value != true));
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, const hpx::util::tuple<int,
+    HPX_TEST((std::is_const<hpx::util::tuple_element<0, const hpx::util::tuple<int,
         float> >::type>::value));
 
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, hpx::util::tuple<int,
+    HPX_TEST((std::is_const<hpx::util::tuple_element<1, hpx::util::tuple<int,
         float> >::type>::value != true));
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int,
+    HPX_TEST((std::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int,
         float> >::type>::value));
 
     dummy(i); dummy(i2); dummy(j); dummy(e); // avoid warns for unused variables
@@ -258,11 +258,11 @@ void make_tuple_test()
 
     A a = A(); B b;
     const A ca = a;
-    hpx::util::make_tuple(boost::cref(a), b);
-    hpx::util::make_tuple(boost::ref(a), b);
-    hpx::util::make_tuple(boost::ref(a), boost::cref(b));
+    hpx::util::make_tuple(std::cref(a), b);
+    hpx::util::make_tuple(std::ref(a), b);
+    hpx::util::make_tuple(std::ref(a), std::cref(b));
 
-    hpx::util::make_tuple(boost::ref(ca));
+    hpx::util::make_tuple(std::ref(ca));
 
     // the result of make_tuple is assignable:
     HPX_TEST(hpx::util::make_tuple(2, 4, 6) ==

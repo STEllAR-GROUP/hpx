@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 #ifdef HPX_MSVC
 #pragma warning(push)

@@ -11,15 +11,16 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstdint>
 #include <mutex>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 bool root_locality = false;
-boost::int32_t final_result;
+std::int32_t final_result;
 hpx::util::spinlock result_mutex;
 
-void receive_result(boost::int32_t i)
+void receive_result(std::int32_t i)
 {
     std::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
@@ -28,9 +29,9 @@ void receive_result(boost::int32_t i)
 HPX_PLAIN_ACTION(receive_result);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::int32_t> accumulator;
+boost::atomic<std::int32_t> accumulator;
 
-void increment(hpx::id_type const& there, boost::int32_t i)
+void increment(hpx::id_type const& there, std::int32_t i)
 {
     accumulator += i;
     hpx::apply(receive_result_action(), there, accumulator.load());
@@ -38,7 +39,7 @@ void increment(hpx::id_type const& there, boost::int32_t i)
 HPX_PLAIN_ACTION(increment);
 
 void increment_with_future(hpx::id_type const& there,
-    hpx::shared_future<boost::int32_t> fi)
+    hpx::shared_future<std::int32_t> fi)
 {
     accumulator += fi.get();
     hpx::apply(receive_result_action(), there, accumulator.load());
@@ -49,7 +50,7 @@ HPX_PLAIN_ACTION(increment_with_future);
 struct increment_server
   : hpx::components::managed_component_base<increment_server>
 {
-    void call(hpx::id_type const& there, boost::int32_t i) const
+    void call(hpx::id_type const& there, std::int32_t i) const
     {
         accumulator += i;
         hpx::apply(receive_result_action(), there, accumulator.load());
@@ -71,7 +72,7 @@ int hpx_main()
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
     root_locality = true;
-    if (hpx::get_num_localities_sync() > 1)
+    if (hpx::get_num_localities(hpx::launch::sync) > 1)
     {
         std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         there = localities[0];
@@ -89,8 +90,8 @@ int hpx_main()
 
     {
         increment_with_future_action inc;
-        hpx::promise<boost::int32_t> p;
-        hpx::shared_future<boost::int32_t> f = p.get_future();
+        hpx::promise<std::int32_t> p;
+        hpx::shared_future<std::int32_t> f = p.get_future();
 
         using hpx::util::placeholders::_1;
 

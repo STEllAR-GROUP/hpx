@@ -15,9 +15,11 @@
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <hpx/util/storage/tuple.hpp>
@@ -34,7 +36,7 @@ namespace examples { namespace server
             typedef hpx::util::storage::tuple::elem_type elem_type;
             typedef hpx::util::storage::tuple::hash_elem_functor hash_elem_functor;
             typedef hpx::lcos::local::mutex mutex_type;
-            typedef uint64_t index_type;
+            typedef std::uint64_t index_type;
             typedef std::set<index_type> matched_indices_type;
 
             tuples_warehouse() : index_(1) {}

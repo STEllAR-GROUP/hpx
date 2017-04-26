@@ -26,7 +26,9 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <boost/shmem/shmem_named_shared_object.hpp>
 
+#include <cstddef>
 #include <string>
+#include <utility>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 

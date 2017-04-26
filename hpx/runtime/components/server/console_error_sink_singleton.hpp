@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/signals2.hpp>
 
 #include <mutex>

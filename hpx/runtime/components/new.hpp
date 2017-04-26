@@ -17,12 +17,13 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/util/lazy_enable_if.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
+#include <utility>
 #include <vector>
-
-#include <boost/utility/enable_if.hpp>
 
 #if defined(DOXYGEN)
 namespace hpx
@@ -98,14 +99,14 @@ namespace hpx
     ///          where <code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
+    ///          each of the items in this vector is a global address of one
     ///          of the newly created components.
     ///          * If the explicit template argument \a Component
     ///          represents an array of a client side object type (i.e. \a Component[],
     ///          where <code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
+    ///          each of the items in this vector is a client side instance of
     ///          the given type, each representing one of the newly created
     ///          components.
     ///
@@ -184,14 +185,14 @@ namespace hpx
     ///          where <code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
+    ///          each of the items in this vector is a global address of one
     ///          of the newly created components.\n
     ///          * If the explicit template argument \a Component
     ///          represents an array of a client side object type (i.e. \a Component[],
     ///          where <code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
+    ///          each of the items in this vector is a client side instance of
     ///          the given type, each representing one of the newly created
     ///          components.
     ///
@@ -274,7 +275,7 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename ...Ts>
-    inline typename boost::lazy_enable_if_c<
+    inline typename util::lazy_enable_if<
         traits::is_component_or_component_array<Component>::value,
         detail::new_component<Component>
     >::type
@@ -285,7 +286,7 @@ namespace hpx { namespace components
     }
 
     template <typename Component, typename DistPolicy, typename ...Ts>
-    inline typename boost::lazy_enable_if_c<
+    inline typename util::lazy_enable_if<
         traits::is_component_or_component_array<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         detail::new_component<Component>
@@ -350,7 +351,7 @@ namespace hpx { namespace components
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Client, typename ...Ts>
-    inline typename boost::lazy_enable_if_c<
+    inline typename util::lazy_enable_if<
         traits::is_client_or_client_array<Client>::value,
         detail::new_client<Client>
     >::type
@@ -361,7 +362,7 @@ namespace hpx { namespace components
     }
 
     template <typename Client, typename DistPolicy, typename ...Ts>
-    inline typename boost::lazy_enable_if_c<
+    inline typename util::lazy_enable_if<
         traits::is_client_or_client_array<Client>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         detail::new_client<Client>

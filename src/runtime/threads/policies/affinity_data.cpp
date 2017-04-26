@@ -5,7 +5,7 @@
 
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <hpx/util/assert.hpp>
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     }
 
     affinity_data::affinity_data(std::size_t num_threads)
-      : num_threads_(num_threads), pu_offset_(0), pu_step_(1),
+      : num_threads_(num_threads), pu_offset_(std::size_t(-1)), pu_step_(1),
         affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
         no_affinity_()
     {}
@@ -56,8 +56,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t num_system_pus = hardware_concurrency();
 
         // initialize from command line
-        if (data.pu_offset_ != std::size_t(-1))
+        if (data.pu_offset_ == std::size_t(-1))
+        {
+            pu_offset_ = 0;
+        }
+        else
+        {
             pu_offset_ = data.pu_offset_;
+        }
 
         if(num_system_pus > 1)
             pu_step_ = data.pu_step_ % num_system_pus;
@@ -82,12 +88,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         else if (!data.affinity_desc_.empty())
         {
             affinity_masks_.clear();
-            affinity_masks_.resize(num_threads_);
+            affinity_masks_.resize(num_threads_, 0);
+
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
             parse_affinity_options(data.affinity_desc_, affinity_masks_,
-                data.used_cores_, max_cores, pu_nums_);
+                data.used_cores_, max_cores, num_threads_, pu_nums_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {

@@ -13,14 +13,18 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/histogram.hpp>
 #include <hpx/util/pool_timer.hpp>
 
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/preprocessor/stringize.hpp>
-
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -49,11 +53,19 @@ namespace hpx { namespace plugins { namespace parcel
         bool flush(parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering = false);
 
+        void flush_terminate();
+
         // access performance counter data
-        boost::int64_t get_parcels_count(bool reset);
-        boost::int64_t get_messages_count(bool reset);
-        boost::int64_t get_parcels_per_message_count(bool reset);
-        boost::int64_t get_average_time_between_parcels(bool reset);
+        std::int64_t get_parcels_count(bool reset);
+        std::int64_t get_messages_count(bool reset);
+        std::int64_t get_parcels_per_message_count(bool reset);
+        std::int64_t get_average_time_between_parcels(bool reset);
+        std::vector<std::int64_t>
+            get_time_between_parcels_histogram(bool reset);
+        void get_time_between_parcels_histogram_creator(
+            std::int64_t min_boundary, std::int64_t max_boundary,
+            std::int64_t num_buckets,
+            util::function_nonser<std::vector<std::int64_t>(bool)>& result);
 
         // register the given action
         static void register_action(char const* action, error_code& ec);
@@ -62,25 +74,42 @@ namespace hpx { namespace plugins { namespace parcel
         bool timer_flush();
         bool flush_locked(std::unique_lock<mutex_type>& l,
             parcelset::policies::message_handler::flush_mode mode,
-            bool stop_buffering);
+            bool stop_buffering, bool cancel_timer);
+
+        void update_num_messages();
+        void update_interval();
 
     private:
         mutable mutex_type mtx_;
         parcelset::parcelport* pp_;
+        std::size_t num_coalesced_parcels_;
+        std::size_t interval_;
         detail::message_buffer buffer_;
         util::pool_timer timer_;
         bool stopped_;
         bool allow_background_flush_;
+        std::string action_name_;
 
         // performance counter data
-        boost::int64_t num_parcels_;
-        boost::int64_t reset_num_parcels_;
-        boost::int64_t reset_num_parcels_per_message_parcels_;
-        boost::int64_t num_messages_;
-        boost::int64_t reset_num_messages_;
-        boost::int64_t reset_num_parcels_per_message_messages_;
-        boost::int64_t started_at_;
-        boost::int64_t reset_time_num_parcels_;
+        std::int64_t num_parcels_;
+        std::int64_t reset_num_parcels_;
+        std::int64_t reset_num_parcels_per_message_parcels_;
+        std::int64_t num_messages_;
+        std::int64_t reset_num_messages_;
+        std::int64_t reset_num_parcels_per_message_messages_;
+        std::int64_t started_at_;
+        std::int64_t reset_time_num_parcels_;
+        std::int64_t last_parcel_time_;
+
+        typedef boost::accumulators::accumulator_set<
+                double,     // collects percentiles
+                boost::accumulators::features<hpx::util::tag::histogram>
+            > histogram_collector_type;
+
+        std::unique_ptr<histogram_collector_type> time_between_parcels_;
+        std::int64_t histogram_min_boundary_;
+        std::int64_t histogram_max_boundary_;
+        std::int64_t histogram_num_buckets_;
     };
 }}}
 

@@ -14,7 +14,11 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -38,22 +42,22 @@ using hpx::util::unwrapped;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<boost::uint32_t> void_f_count;
-boost::atomic<boost::uint32_t> int_f_count;
+boost::atomic<std::uint32_t> void_f_count;
+boost::atomic<std::uint32_t> int_f_count;
 
 void void_f() {++void_f_count;}
 int int_f() {++int_f_count; return 42; }
 
-boost::atomic<boost::uint32_t> void_f1_count;
-boost::atomic<boost::uint32_t> int_f1_count;
+boost::atomic<std::uint32_t> void_f1_count;
+boost::atomic<std::uint32_t> int_f1_count;
 
 void void_f1(int) {++void_f1_count;}
 int int_f1(int i) {++int_f1_count; return i+42; }
 
-boost::atomic<boost::uint32_t> int_f2_count;
+boost::atomic<std::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
-boost::atomic<boost::uint32_t> int_f_vector_count;
+boost::atomic<std::uint32_t> int_f_vector_count;
 
 int int_f_vector(std::vector<int> const & vf)
 {
@@ -128,8 +132,8 @@ void function_pointers(Executor& exec)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<boost::uint32_t> future_void_f1_count;
-boost::atomic<boost::uint32_t> future_void_f2_count;
+boost::atomic<std::uint32_t> future_void_f1_count;
+boost::atomic<std::uint32_t> future_void_f2_count;
 
 void future_void_f1(future<void> f1)
 {
@@ -150,8 +154,8 @@ void future_void_f2(future<void> f1, future<void> f2)
     ++future_void_f2_count;
 }
 
-boost::atomic<boost::uint32_t> future_int_f1_count;
-boost::atomic<boost::uint32_t> future_int_f2_count;
+boost::atomic<std::uint32_t> future_int_f1_count;
+boost::atomic<std::uint32_t> future_int_f2_count;
 
 int future_int_f1(future<void> f1)
 {
@@ -167,7 +171,7 @@ int future_int_f2(future<int> f1, future<int> f2)
     return f1.get() + f2.get();
 }
 
-boost::atomic<boost::uint32_t> future_int_f_vector_count;
+boost::atomic<std::uint32_t> future_int_f_vector_count;
 
 int future_int_f_vector(std::vector<future<int> >& vf)
 {
@@ -241,20 +245,20 @@ void future_function_pointers(Executor& exec)
     {
         vf.push_back(dataflow(exec, &future_int_f1, make_ready_future()));
     }
-    future<int> f5 = dataflow(exec, &future_int_f_vector, boost::ref(vf));
+    future<int> f5 = dataflow(exec, &future_int_f_vector, std::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::uint32_t> void_f4_count;
-boost::atomic<boost::uint32_t> int_f4_count;
+boost::atomic<std::uint32_t> void_f4_count;
+boost::atomic<std::uint32_t> int_f4_count;
 
 void void_f4(int) { ++void_f4_count; }
 int int_f4(int i) { ++int_f4_count; return i+42; }
 
-boost::atomic<boost::uint32_t> void_f5_count;
-boost::atomic<boost::uint32_t> int_f5_count;
+boost::atomic<std::uint32_t> void_f5_count;
+boost::atomic<std::uint32_t> int_f5_count;
 
 void void_f5(int, hpx::future<int>) { ++void_f5_count; }
 int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }
@@ -341,10 +345,9 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

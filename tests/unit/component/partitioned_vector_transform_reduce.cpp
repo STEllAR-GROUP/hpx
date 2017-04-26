@@ -13,6 +13,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
@@ -40,7 +42,7 @@ T test_transform_reduce(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            multiply(), T(0), std::plus<T>()
+            T(0), std::plus<T>(), multiply()
         );
 }
 
@@ -55,7 +57,7 @@ test_transform_reduce_async(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            multiply(), T(0), std::plus<T>()
+            T(0), std::plus<T>(), multiply()
         );
 }
 
@@ -65,18 +67,20 @@ void transform_reduce_tests(std::size_t num,
     hpx::partitioned_vector<T> const& yvalues)
 {
     HPX_TEST_EQ(
-        test_transform_reduce(hpx::parallel::seq, xvalues, yvalues),
+        test_transform_reduce(hpx::parallel::execution::seq, xvalues, yvalues),
         T(num));
     HPX_TEST_EQ(
-        test_transform_reduce(hpx::parallel::par, xvalues, yvalues),
+        test_transform_reduce(hpx::parallel::execution::par, xvalues, yvalues),
         T(num));
 
     HPX_TEST_EQ(
-        test_transform_reduce_async(hpx::parallel::seq(hpx::parallel::task),
+        test_transform_reduce_async(
+            hpx::parallel::execution::seq(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
         T(num));
     HPX_TEST_EQ(
-        test_transform_reduce_async(hpx::parallel::par(hpx::parallel::task),
+        test_transform_reduce_async(
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
         T(num));
 }

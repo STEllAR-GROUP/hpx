@@ -29,6 +29,8 @@
 #include <memory>                           // std::addressof
 
 #include <mutex>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
@@ -107,9 +109,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \endcode
     ///
     /// \tparam ExPolicy The execution policy an instance of a \a task_block
-    ///         was created with. This defaults to \a parallel_execution_policy.
+    ///         was created with. This defaults to \a parallel_policy.
     ///
-    template <typename ExPolicy = parallel::parallel_execution_policy>
+    template <typename ExPolicy = parallel::execution::parallel_policy>
     class task_block
     {
     private:
@@ -140,9 +142,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         {
             typedef typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
-            typedef std::integral_constant<
-                    bool, hpx::traits::is_future<result_type>::value
-                > is_fut;
+            typedef hpx::traits::is_future<result_type> is_fut;
             wait_for_completion(is_fut());
         }
 
@@ -408,8 +408,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     define_task_block(ExPolicy && policy, F && f)
     {
         static_assert(
-            parallel::is_execution_policy<ExPolicy>::value,
-            "parallel::is_execution_policy<ExPolicy>::value");
+            parallel::execution::is_execution_policy<ExPolicy>::value,
+            "parallel::execution::is_execution_policy<ExPolicy>::value");
 
         typedef typename hpx::util::decay<ExPolicy>::type policy_type;
         task_block<policy_type> trh(std::forward<ExPolicy>(policy));
@@ -429,7 +429,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f. This version uses
-    /// \a parallel_execution_policy for task scheduling.
+    /// \a parallel_policy for task scheduling.
     ///
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
@@ -450,7 +450,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     template <typename F>
     void define_task_block(F && f)
     {
-        define_task_block(parallel::par, std::forward<F>(f));
+        define_task_block(parallel::execution::par, std::forward<F>(f));
     }
 
     /// \cond NOINTERNAL
@@ -464,37 +464,38 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         // perfect forwarding
         std::type_info const& t = policy.type();
 
-        if (t == typeid(sequential_execution_policy))
+        if (t == typeid(execution::sequenced_policy))
         {
             return define_task_block(
-                *policy.get<sequential_execution_policy>(),
+                *policy.get<execution::sequenced_policy>(),
                 std::forward<F>(f));
         }
 
-        if (t == typeid(sequential_task_execution_policy))
+        if (t == typeid(execution::sequenced_task_policy))
         {
-            return define_task_block(parallel::seq, std::forward<F>(f));
-        }
-
-        if (t == typeid(parallel_execution_policy))
-        {
-            return define_task_block(
-                *policy.get<parallel_execution_policy>(),
+            return define_task_block(parallel::execution::seq,
                 std::forward<F>(f));
         }
 
-        if (t == typeid(parallel_task_execution_policy))
+        if (t == typeid(execution::parallel_policy))
         {
-            parallel_task_execution_policy const& task_policy =
-                *policy.get<parallel_task_execution_policy>();
             return define_task_block(
-                par.with(task_policy.parameters()), std::forward<F>(f));
+                *policy.get<execution::parallel_policy>(),
+                std::forward<F>(f));
         }
 
-        if (t == typeid(parallel_vector_execution_policy))
+        if (t == typeid(execution::parallel_task_policy))
+        {
+            execution::parallel_task_policy const& task_policy =
+                *policy.get<execution::parallel_task_policy>();
+            return define_task_block(execution::par.with(
+                task_policy.parameters()), std::forward<F>(f));
+        }
+
+        if (t == typeid(execution::parallel_unsequenced_policy))
         {
             return define_task_block(
-                *policy.get<parallel_vector_execution_policy>(),
+                *policy.get<execution::parallel_unsequenced_policy>(),
                 std::forward<F>(f));
         }
 
@@ -536,8 +537,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     define_task_block_restore_thread(ExPolicy && policy, F && f)
     {
         static_assert(
-            parallel::is_execution_policy<ExPolicy>::value,
-            "parallel::is_execution_policy<ExPolicy>::value");
+            parallel::execution::is_execution_policy<ExPolicy>::value,
+            "parallel::execution::is_execution_policy<ExPolicy>::value");
 
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
@@ -547,7 +548,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f. This version uses
-    /// \a parallel_execution_policy for task scheduling.
+    /// \a parallel_policy for task scheduling.
     ///
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
@@ -571,7 +572,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
-        define_task_block_restore_thread(parallel::par, std::forward<F>(f));
+        define_task_block_restore_thread(parallel::execution::par,
+            std::forward<F>(f));
     }
 }}}
 

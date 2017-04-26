@@ -13,23 +13,29 @@
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
+#include <utility>
+
+namespace hpx
+{
+    /// \cond NOINTERNAL
+    class HPX_EXPORT thread;
+    /// \endcond
+}
 
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
-    class HPX_EXPORT thread_data;
 
     template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl;
-
-    typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
-    typedef util::unique_function_nonser<thread_function_sig>
-        thread_function_type;
 
     class HPX_EXPORT executor;
 
@@ -39,13 +45,18 @@ namespace hpx { namespace threads
     typedef coroutines::detail::coroutine_impl thread_self_impl_type;
 
     typedef void * thread_id_repr_type;
-
     typedef boost::intrusive_ptr<thread_data> thread_id_type;
+
+    typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
+    typedef thread_state_ex_enum thread_arg_type;
+
+    typedef thread_result_type thread_function_sig(thread_arg_type);
+    typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
 
     HPX_API_EXPORT void intrusive_ptr_add_ref(thread_data* p);
     HPX_API_EXPORT void intrusive_ptr_release(thread_data* p);
 
-    HPX_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = 0;
+    HPX_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = nullptr;
     thread_id_type const invalid_thread_id = thread_id_type();
     /// \endcond
 
@@ -88,6 +99,10 @@ namespace hpx { namespace threads
     ///       being defined.
     HPX_API_EXPORT std::size_t get_parent_phase();
 
+    /// The function \a get_self_stacksize returns the stack size of the
+    /// current thread (or zero if the current thread is not a HPX thread).
+    HPX_API_EXPORT std::size_t get_self_stacksize();
+
     /// The function \a get_parent_locality_id returns the id of the locality of
     /// the current thread's parent (or zero if the current thread is not a
     /// HPX thread).
@@ -105,12 +120,17 @@ namespace hpx { namespace threads
     ///       being defined.
     HPX_API_EXPORT std::uint64_t get_self_component_id();
 
-    /// The function \a get_thread_manager returns a reference to the
-    /// current thread manager.
+    /// \cond NOINTERNAL
+    // The function get_thread_manager returns a reference to the
+    // current thread manager.
     HPX_API_EXPORT threadmanager_base& get_thread_manager();
+    /// \endcond
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
+    ///
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
     ///
     /// \note If state == unknown this function will not only return the
     ///       number of currently existing threads, but will add the number
@@ -119,9 +139,36 @@ namespace hpx { namespace threads
     HPX_API_EXPORT std::int64_t get_thread_count(
         thread_state_enum state = unknown);
 
-    /// \copydoc get_thread_count(thread_state_enum state)
+    /// The function \a get_thread_count returns the number of currently
+    /// known threads.
+    ///
+    /// \param priority [in] This specifies the thread-priority for which the
+    ///                 number of threads should be retrieved.
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
+    ///
+    /// \note If state == unknown this function will not only return the
+    ///       number of currently existing threads, but will add the number
+    ///       of registered task descriptions (which have not been
+    ///       converted into threads yet).
     HPX_API_EXPORT std::int64_t get_thread_count(
         thread_priority priority, thread_state_enum state = unknown);
+
+    /// The function \a enumerate_threads will invoke the given function \a f
+    /// for each thread with a matching thread state.
+    ///
+    /// \param f        [in] The function which should be called for each
+    ///                 matching thread. Returning 'false' from this function
+    ///                 will stop the enumeration process.
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 threads should be enumerated.
+    HPX_API_EXPORT bool enumerate_threads(
+        util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state = unknown);
+
+#if defined(HPX_HAVE_APEX)
+    HPX_API_EXPORT void** get_self_apex_data();
+#endif
 }}
 
 #endif

@@ -11,27 +11,25 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/thread_description.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/util/unique_function.hpp>
+#include <hpx/util/steady_clock.hpp>
+#include <hpx/util/thread_description.hpp>
 
-#include <boost/chrono/chrono.hpp>
-
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    /// \cond NOINTERNAL
     class thread_init_data;
-
-    namespace executors
-    {
-        struct HPX_EXPORT current_executor;
-    }
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
@@ -41,7 +39,7 @@ namespace hpx { namespace threads
     ///                   be modified for.
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
@@ -81,10 +79,11 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should
     ///                   be modified for.
-    /// \param at_time
+    /// \param abs_time   [in] Absolute point in time for the new thread to be
+    ///                   run
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
@@ -114,10 +113,11 @@ namespace hpx { namespace threads
     ///
     /// \param id         [in] The thread id of the thread the state should
     ///                   be modified for.
-    /// \param after_duration
+    /// \param rel_time   [in] Time duration after which the new thread should
+    ///                   be run
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
-    /// \param state_ex   [in] The new extended state to be set for the
+    /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
     /// \param priority
     /// \param ec         [in,out] this represents the error status on exit,
@@ -203,11 +203,13 @@ namespace hpx { namespace threads
         thread_id_type const& id, char const* bt = nullptr,
         error_code& ec = throws);
 #else
+#if !defined(DOXYGEN)
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
         thread_id_type const& id, util::backtrace const* bt = nullptr,
         error_code& ec = throws);
+#endif
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -399,6 +401,7 @@ namespace hpx { namespace threads
         thread_id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
     HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
@@ -408,17 +411,16 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::size_t get_thread_data(thread_id_type const& id,
         error_code& ec = throws);
 
     HPX_API_EXPORT std::size_t set_thread_data(thread_id_type const& id,
         std::size_t data, error_code& ec = throws);
-#endif
 
     HPX_API_EXPORT std::size_t& get_continuation_recursion_count();
     HPX_API_EXPORT void reset_continuation_recursion_count();
+    /// \endcond
 
     /// Returns a reference to the executor which was used to create
     /// the given thread.
@@ -436,11 +438,13 @@ namespace hpx { namespace threads
     HPX_API_EXPORT threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec = throws);
 
+    /// \cond NOINTERNAL
     /// Reset internal (round robin) thread distribution scheme
     HPX_API_EXPORT void reset_thread_distribution();
 
     /// Set the new scheduler mode
     HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
+    /// \endcond
 }}
 
 namespace hpx { namespace this_thread
@@ -463,7 +467,56 @@ namespace hpx { namespace this_thread
     ///         \a hpx#invalid_status.
     ///
     HPX_API_EXPORT threads::thread_state_ex_enum suspend(
+        threads::thread_state_enum state, threads::thread_id_type const& id,
+        util::thread_description const& description =
+            util::thread_description("this_thread::suspend"),
+        error_code& ec = throws);
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to the thread state passed as the parameter.
+    ///
+    /// \note Must be called from within a HPX-thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    inline threads::thread_state_ex_enum suspend(
         threads::thread_state_enum state = threads::pending,
+        util::thread_description const& description =
+            util::thread_description("this_thread::suspend"),
+        error_code& ec = throws)
+    {
+        return suspend(state, nullptr, description, ec);
+    }
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to \a suspended and schedules a wakeup for this threads at the given
+    /// time.
+    ///
+    /// \note Must be called from within a HPX-thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
+        util::steady_time_point const& abs_time,
+        threads::thread_id_type const& id,
         util::thread_description const& description =
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws);
@@ -485,11 +538,14 @@ namespace hpx { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
+    inline threads::thread_state_ex_enum suspend(
         util::steady_time_point const& abs_time,
         util::thread_description const& description =
             util::thread_description("this_thread::suspend"),
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        return suspend(abs_time, nullptr, description, ec);
+    }
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
@@ -514,7 +570,34 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(rel_time.from_now(), description, ec);
+        return suspend(rel_time.from_now(), nullptr, description, ec);
+    }
+
+    /// The function \a suspend will return control to the thread manager
+    /// (suspends the current thread). It sets the new state of this thread
+    /// to \a suspended and schedules a wakeup for this threads after the given
+    /// duration.
+    ///
+    /// \note Must be called from within a HPX-thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    inline threads::thread_state_ex_enum suspend(
+        util::steady_duration const& rel_time,
+        threads::thread_id_type const& id,
+        util::thread_description const& description =
+            util::thread_description("this_thread::suspend"),
+        error_code& ec = throws)
+    {
+        return suspend(rel_time.from_now(), id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -539,7 +622,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(boost::chrono::milliseconds(ms), description, ec);
+        return suspend(std::chrono::milliseconds(ms), nullptr, description, ec);
     }
 
     /// Returns a reference to the executor which was used to create the current
@@ -558,6 +641,7 @@ namespace hpx { namespace this_thread
     HPX_EXPORT threads::executors::current_executor
         get_executor(error_code& ec = throws);
 
+    /// \cond NOINTERNAL
     // returns the remaining available stack space
     HPX_EXPORT std::ptrdiff_t get_available_stack_space();
 
@@ -565,7 +649,10 @@ namespace hpx { namespace this_thread
     // requested
     HPX_EXPORT bool has_sufficient_stack_space(
         std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
+    /// \endcond
 }}
+
+/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIXME: the API function below belong into the namespace hpx::threads
@@ -757,18 +844,6 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
-#if !defined(DOXYGEN)
-    HPX_API_EXPORT void register_work_plain(
-        threads::thread_function_type && func, naming::id_type const& target,
-        util::thread_description const& description = util::thread_description(),
-        std::uint64_t /*naming::address_type*/ lva = 0,
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
-        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
     ///        work to be executed.
@@ -840,5 +915,7 @@ namespace hpx { namespace threads
     using applier::register_work;
     using applier::register_work_nullary;
 }}
+
+/// \endcond
 
 #endif /*HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP*/

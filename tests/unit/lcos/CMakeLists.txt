@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,8 @@ set(tests
     async_remote_client
     broadcast
     broadcast_apply
+    channel
+    channel_local
     client_then
     condition_variable
     counting_semaphore
@@ -36,6 +38,7 @@ set(tests
     local_barrier
     local_dataflow
     local_dataflow_executor
+    local_dataflow_std_array
     local_event
     local_mutex
     make_future
@@ -46,11 +49,24 @@ set(tests
     remote_latch
     run_guarded
     shared_future
+    sliding_semaphore
     unwrapped
+    wait_all_std_array
+    wait_any_std_array
     when_all
+    when_all_std_array
     when_any
+    when_any_std_array
     when_some
+    when_some_std_array
    )
+
+if(NOT MSVC12)
+  # MSVC12 can't cope with split_future
+  set(tests ${tests}
+      split_future
+      split_shared_future)
+endif()
 
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)
@@ -84,6 +100,7 @@ set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
+set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_latch_PARAMETERS LOCALITIES 2)

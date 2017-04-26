@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -67,8 +68,12 @@ int check(int fd)
         ssize_t n = read(fd, buf, 1024);
         if (n > 0)
         {
-            out += buf;
-            size_t pos = out.find(counter_name);
+            out += std::string(buf, buf + n);
+            size_t pos = out.find("invalid");
+            if (pos != out.npos)
+                return 0;
+
+            pos = out.find(counter_name);
             if (pos != out.npos)
             { // counter name found
                 out.erase(0, pos);
@@ -77,8 +82,15 @@ int check(int fd)
                 { // this is complete line; extract counter value
                     size_t cpos = out.rfind(',', pos);
                     std::cerr << out.substr(0, pos+1);
-                    cnt.push_back(boost::lexical_cast<double>
-                        (out.substr(cpos+1, pos-cpos-1)));
+                    std::string value = out.substr(cpos+1, pos-cpos-1);
+                    if (value == "invalid")
+                    {
+                        cnt.push_back(-1.0);
+                    }
+                    else
+                    {
+                        cnt.push_back(boost::lexical_cast<double>(value));
+                    }
                     if (cnt.size() == 5) break;
                     out.erase(0, pos+1);
                 }
@@ -87,6 +99,9 @@ int check(int fd)
         else
             throw std::runtime_error("truncated input; didn't get all counter values");
     }
+    // bail out if perf counter isn't available ...
+    if (close_enough(cnt[0], -1.0, 5.0))
+        return 0;
 
     // since printing affects the counts, the relative error bounds need to be
     // increased compared to the "basic_functions" test
@@ -94,6 +109,7 @@ int check(int fd)
         (cnt[1] >= cnt[0]) && close_enough(cnt[0], cnt[1], 5.0) &&
         close_enough(cnt[2], 2.0*cnt[0], 5.0) &&
         close_enough(cnt[3], cnt[0], 5.0);
+
 
     std::cerr << (pass? "PASSED": "FAILED") << ".\n";
 

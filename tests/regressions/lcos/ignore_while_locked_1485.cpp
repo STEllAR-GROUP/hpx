@@ -13,6 +13,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <functional>
 #include <mutex>
 
 struct wait_for_flag
@@ -60,8 +61,8 @@ void test_condition_with_mutex()
     hpx::lcos::local::spinlock local_mutex;
     hpx::lcos::local::condition_variable_any local_cond_var;
 
-    hpx::thread thread(&wait_for_flag::wait, boost::ref(data),
-        boost::ref(local_mutex), boost::ref(local_cond_var), boost::ref(running));
+    hpx::thread thread(&wait_for_flag::wait, std::ref(data),
+        std::ref(local_mutex), std::ref(local_cond_var), std::ref(running));
 
     // wait for the thread to run
     {

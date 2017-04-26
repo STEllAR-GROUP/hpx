@@ -29,7 +29,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
@@ -41,6 +40,7 @@
 #include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
+#include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
@@ -69,7 +69,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     coroutine_impl::~coroutine_impl()
     {
         HPX_ASSERT(!m_fun);   // functor should have been reset by now
-        HPX_ASSERT(!target_);
     }
 #endif
 
@@ -97,17 +96,20 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
                     // if this thread returned 'terminated' we need to reset
                     // the functor and the bound arguments
-                    if (this->m_result_last == terminated)
+                    if (this->m_result_last.first == terminated)
                         this->reset();
                 }
 
                 // return value to other side of the fence
                 this->bind_result(&this->m_result_last);
-            } catch (exit_exception const&) {
+            }
+            catch (exit_exception const&) {
                 status = super_type::ctx_exited_exit;
                 tinfo = boost::current_exception();
                 this->reset();            // reset functor
-            } catch (boost::exception const&) {
+            }
+#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
+            catch (boost::exception const&) {
                 status = super_type::ctx_exited_abnormally;
                 tinfo = boost::current_exception();
                 this->reset();
@@ -120,8 +122,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 tinfo = boost::current_exception();
                 this->reset();
             }
+#endif
 
-            this->do_return(status, tinfo);
+            this->do_return(status, std::move(tinfo));
+
         } while (this->m_state == super_type::ctx_running);
 
         // should not get here, never

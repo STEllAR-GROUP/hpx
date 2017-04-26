@@ -51,9 +51,22 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        operator T() const
+        // Note: The difference of signature allows to define proper
+        //       implicit casts for device code and host code
+
+        HPX_DEVICE operator T&()
+        {
+            return *p_;
+        }
+
+        HPX_HOST operator T() const
         {
             return access_target::read(*target_, p_);
+        }
+
+        T* operator &() const
+        {
+            return p_;
         }
 
         T* device_ptr() const HPX_NOEXCEPT
@@ -90,7 +103,7 @@ namespace hpx { namespace compute { namespace cuda
           , target_(other.target())
         {}
 
-        operator T() const
+        HPX_HOST_DEVICE operator T() const
         {
             return access_target::read(target_, p_);
         }

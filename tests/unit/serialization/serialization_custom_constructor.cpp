@@ -13,6 +13,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -103,7 +104,7 @@ void serialize(Archive& ar, C<T>& c, unsigned)
 }
 
 template<typename T>
-C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
+C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> * /*unused*/)
 {
     C<T> *c = new C<T>(666);
     ar >> *c;

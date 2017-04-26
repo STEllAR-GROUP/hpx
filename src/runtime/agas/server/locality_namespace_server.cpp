@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2015 Hartmut Kaiser
+//  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,162 +14,30 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/scoped_timer.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+
+#include <cstddef>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
-namespace hpx { namespace agas
+namespace hpx { namespace agas { namespace server
 {
-
-naming::gid_type bootstrap_locality_namespace_gid()
-{
-    return naming::gid_type(HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB);
-}
-
-naming::id_type bootstrap_locality_namespace_id()
-{
-    return naming::id_type( HPX_AGAS_LOCALITY_NS_MSB, HPX_AGAS_LOCALITY_NS_LSB
-      , naming::id_type::unmanaged);
-}
-
-namespace server
-{
-
-// TODO: This isn't scalable, we have to update it every time we add a new
-// AGAS request/response type.
-response locality_namespace::service(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{
-    switch (req.get_action_code())
-    {
-        case locality_ns_allocate:
-            {
-                update_time_on_exit update(
-                    counter_data_.allocate_.time_
-                );
-                counter_data_.increment_allocate_count();
-                return allocate(req, ec);
-            }
-        case locality_ns_free:
-            {
-                update_time_on_exit update(
-                    counter_data_.free_.time_
-                );
-                counter_data_.increment_free_count();
-                return free(req, ec);
-            }
-        case locality_ns_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_.localities_.time_
-                );
-                counter_data_.increment_localities_count();
-                return localities(req, ec);
-            }
-        case locality_ns_resolve_locality:
-            {
-                update_time_on_exit update(
-                    counter_data_.resolve_locality_.time_
-                );
-                counter_data_.increment_resolve_locality_count();
-                return resolve_locality(req, ec);
-            }
-        case locality_ns_resolved_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_.resolved_localities_.time_
-                );
-                counter_data_.increment_resolved_localities_count();
-                return resolved_localities(req, ec);
-            }
-        case locality_ns_num_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_.num_localities_.time_
-                );
-                counter_data_.increment_num_localities_count();
-                return get_num_localities(req, ec);
-            }
-        case locality_ns_num_threads:
-            {
-                update_time_on_exit update(
-                    counter_data_.num_threads_.time_
-                );
-                counter_data_.increment_num_threads_count();
-                return get_num_threads(req, ec);
-            }
-        case locality_ns_statistics_counter:
-            return statistics_counter(req, ec);
-
-        case primary_ns_route:
-        case primary_ns_bind_gid:
-        case primary_ns_resolve_gid:
-        case primary_ns_unbind_gid:
-        case primary_ns_increment_credit:
-        case primary_ns_decrement_credit:
-        case primary_ns_allocate:
-        case primary_ns_begin_migration:
-        case primary_ns_end_migration:
-        {
-            LAGAS_(warning) <<
-                "locality_namespace::service, redirecting request to "
-                "primary_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case component_ns_bind_prefix:
-        case component_ns_bind_name:
-        case component_ns_resolve_id:
-        case component_ns_unbind_name:
-        case component_ns_iterate_types:
-        case component_ns_get_component_type_name:
-        case component_ns_num_localities:
-        {
-            LAGAS_(warning) <<
-                "locality_namespace::service, redirecting request to "
-                "component_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case symbol_ns_bind:
-        case symbol_ns_resolve:
-        case symbol_ns_unbind:
-        case symbol_ns_iterate_names:
-        case symbol_ns_on_event:
-        {
-            LAGAS_(warning) <<
-                "locality_namespace::service, redirecting request to "
-                "symbol_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        default:
-        case component_ns_service:
-        case locality_ns_service:
-        case primary_ns_service:
-        case symbol_ns_service:
-        case invalid_request:
-        {
-            HPX_THROWS_IF(ec, bad_action_code
-              , "locality_namespace::service"
-              , boost::str(boost::format(
-                    "invalid action code encountered in request, "
-                    "action_code(%x)")
-                    % boost::uint16_t(req.get_action_code())));
-            return response();
-        }
-    };
-} // }}}
 
 // register all performance counter types exposed by this component
 void locality_namespace::register_counter_types(
@@ -273,14 +142,15 @@ void locality_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
+    agas::register_name(launch::sync, instance_name_,
+        get_unmanaged_id().get_gid(), ec);
 }
 
 void locality_namespace::unregister_server_instance(
     error_code& ec
     )
 {
-    agas::unregister_name_sync(instance_name_, ec);
+    agas::unregister_name(launch::sync, instance_name_, ec);
     this->base_type::finalize();
 }
 
@@ -289,40 +159,23 @@ void locality_namespace::finalize()
     if (!instance_name_.empty())
     {
         error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
+        agas::unregister_name(launch::sync, instance_name_, ec);
     }
 }
 
-// TODO: do/undo semantics (e.g. transactions)
-std::vector<response> locality_namespace::bulk_service(
-    std::vector<request> const& reqs
-  , error_code& ec
-    )
-{
-    std::vector<response> r;
-    r.reserve(reqs.size());
-
-    for (request const& req : reqs)
-    {
-        error_code ign;
-        r.push_back(service(req, ign));
-    }
-
-    return r;
-}
-
-response locality_namespace::allocate(
-    request const& req
-  , error_code& ec
+std::uint32_t locality_namespace::allocate(
+    parcelset::endpoints_type const& endpoints
+  , std::uint64_t count
+  , std::uint32_t num_threads
+  , naming::gid_type suggested_prefix
     )
 { // {{{ allocate implementation
-    using hpx::util::get;
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.allocate_.time_
+    );
+    counter_data_.increment_allocate_count();
 
-    // parameters
-    parcelset::endpoints_type endpoints = req.get_endpoints();
-    boost::uint64_t const count = req.get_count();
-    boost::uint32_t const num_threads = req.get_num_threads();
-    naming::gid_type const suggested_prefix = req.get_suggested_prefix();
+    using hpx::util::get;
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -337,18 +190,17 @@ response locality_namespace::allocate(
     {
         l.unlock();
 
-        HPX_THROWS_IF(ec, internal_server_error
+        HPX_THROW_EXCEPTION(internal_server_error
           , "locality_namespace::allocate"
           , "primary namespace has been exhausted");
-        return response();
     }
 
     // Compute the locality's prefix.
-    boost::uint32_t prefix = naming::invalid_locality_id;
+    std::uint32_t prefix = naming::invalid_locality_id;
 
     // check if the suggested prefix can be used instead of the next
     // free one
-    boost::uint32_t suggested_locality_id =
+    std::uint32_t suggested_locality_id =
         naming::get_locality_id_from_gid(suggested_prefix);
 
     partition_table_type::iterator it = partitions_.end();
@@ -383,13 +235,12 @@ response locality_namespace::allocate(
     {
         l.unlock();
 
-        HPX_THROWS_IF(ec, lock_error
+        HPX_THROW_EXCEPTION(lock_error
           , "locality_namespace::allocate"
           , boost::str(boost::format(
                 "partition table insertion failed due to a locking "
                 "error or memory corruption, endpoint(%1%), "
                 "prefix(%2%)") % endpoints % prefix));
-        return response();
     }
 
 
@@ -401,9 +252,14 @@ response locality_namespace::allocate(
         naming::gid_type id(naming::get_gid_from_locality_id(prefix));
         gva const g(id, components::component_runtime_support, count);
 
-        request req(primary_ns_bind_gid, id, g, id);
-        response resp = primary_->service(req, ec);
-        if (ec) return resp;
+        if(!primary_->bind_gid(g, id, id))
+        {
+            HPX_THROW_EXCEPTION(bad_request
+              , "locality_namespace::allocate"
+              , boost::str(boost::format(
+                    "unable to bind prefix(%1%) to a gid") % prefix));
+        }
+        return prefix;
     }
 
     LAGAS_(info) << (boost::format(
@@ -411,43 +267,42 @@ response locality_namespace::allocate(
         "prefix(%3%)")
         % endpoints % count % prefix);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_allocate, prefix);
+    return prefix;
 } // }}}
 
-response locality_namespace::resolve_locality(
-    request const& req
-  , error_code& ec
-    )
+parcelset::endpoints_type locality_namespace::resolve_locality(
+    naming::gid_type locality)
 { // {{{ resolve_locality implementation
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.resolve_locality_.time_
+    );
+    counter_data_.increment_resolve_locality_count();
 
     using hpx::util::get;
-    boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
+    std::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
     std::lock_guard<mutex_type> l(mutex_);
     partition_table_type::iterator it = partitions_.find(prefix);
 
     if(it != partitions_.end())
     {
-        return response(locality_ns_resolve_locality, get<0>(it->second));
+        return get<0>(it->second);
     }
 
-    return response(locality_ns_resolve_locality, parcelset::endpoints_type(),
-        no_success);
+    return parcelset::endpoints_type();
 } // }}}
 
-response locality_namespace::free(
-    request const& req
-  , error_code& ec
-    )
+void locality_namespace::free(naming::gid_type locality)
 { // {{{ free implementation
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.free_.time_
+    );
+    counter_data_.increment_free_count();
+
     using hpx::util::get;
 
     // parameters
-    naming::gid_type locality = req.get_gid();
-    boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
+    std::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -472,34 +327,25 @@ response locality_namespace::free(
         {
             l.unlock();
 
-            boost::uint32_t locality_id =
-                naming::get_locality_id_from_gid(locality);
-
             // remove primary namespace
             {
                 naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB,
                     HPX_AGAS_PRIMARY_NS_LSB);
-                request req(primary_ns_unbind_gid,
-                    naming::replace_locality_id(service, locality_id), 1);
-                response resp = primary_->service(req, ec);
-                if (ec) return resp;
+                primary_->unbind_gid(
+                    1, naming::replace_locality_id(service, prefix));
             }
 
             // remove symbol namespace
             {
                 naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB,
                     HPX_AGAS_SYMBOL_NS_LSB);
-                request req(primary_ns_unbind_gid,
-                    naming::replace_locality_id(service, locality_id), 1);
-                response resp = primary_->service(req, ec);
-                if (ec) return resp;
+                primary_->unbind_gid(
+                    1, naming::replace_locality_id(service, prefix));
             }
 
             // remove locality itself
             {
-                request req(primary_ns_unbind_gid, locality, 0);
-                response resp = primary_->service(req, ec);
-                if (ec) return resp;
+                primary_->unbind_gid(0, locality);
             }
         }
 
@@ -508,11 +354,6 @@ response locality_namespace::free(
             "locality_namespace::free, ep(%1%)")
             % ep);
         */
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(locality_ns_free);
     }
 
     /*
@@ -521,24 +362,18 @@ response locality_namespace::free(
         "response(no_success)")
         % ep);
     */
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_free
-                       , no_success);
 } // }}}
 
-response locality_namespace::localities(
-    request const& req
-  , error_code& ec
-    )
+std::vector<std::uint32_t> locality_namespace::localities()
 { // {{{ localities implementation
-    using hpx::util::get;
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.localities_.time_
+    );
+    counter_data_.increment_localities_count();
 
     std::lock_guard<mutex_type> l(mutex_);
 
-    std::vector<boost::uint32_t> p;
+    std::vector<std::uint32_t> p;
 
     partition_table_type::const_iterator it = partitions_.begin()
                                        , end = partitions_.end();
@@ -550,74 +385,32 @@ response locality_namespace::localities(
         "locality_namespace::localities, localities(%1%)")
         % p.size());
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_localities, p);
+    return p;
 } // }}}
 
-response locality_namespace::resolved_localities(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ localities implementation
-    using hpx::util::get;
-
-    std::lock_guard<mutex_type> l(mutex_);
-
-    std::map<naming::gid_type, parcelset::endpoints_type> localities;
-
-    partition_table_type::const_iterator it = partitions_.begin()
-                                       , end = partitions_.end();
-
-    for (; it != end; ++it)
-    {
-        localities.insert(
-            std::make_pair(
-                naming::get_gid_from_locality_id(it->first)
-              , get<0>(it->second)
-            )
-        );
-    }
-
-    LAGAS_(info) << (boost::format(
-        "locality_namespace::resolved_localities, localities(%1%)")
-        % localities.size());
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_resolved_localities, localities);
-} // }}}
-
-response locality_namespace::get_num_localities(
-    request const& req
-  , error_code& ec
-    )
+std::uint32_t locality_namespace::get_num_localities()
 { // {{{ get_num_localities implementation
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.num_localities_.time_
+    );
+    counter_data_.increment_num_localities_count();
     std::lock_guard<mutex_type> l(mutex_);
 
-    boost::uint32_t num_localities =
-        static_cast<boost::uint32_t>(partitions_.size());
+    std::uint32_t num_localities =
+        static_cast<std::uint32_t>(partitions_.size());
 
     LAGAS_(info) << (boost::format(
         "locality_namespace::get_num_localities, localities(%1%)")
         % num_localities);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_num_localities, num_localities);
+    return num_localities;
 } // }}}
 
-response locality_namespace::get_num_threads(
-    request const& req
-  , error_code& ec
-    )
+std::vector<std::uint32_t> locality_namespace::get_num_threads()
 { // {{{ get_num_threads implementation
     std::lock_guard<mutex_type> l(mutex_);
 
-    std::vector<boost::uint32_t> num_threads;
+    std::vector<std::uint32_t> num_threads;
 
     partition_table_type::iterator end = partitions_.end();
     for (partition_table_type::iterator it = partitions_.begin();
@@ -631,31 +424,42 @@ response locality_namespace::get_num_threads(
         "locality_namespace::get_num_threads, localities(%1%)")
         % num_threads.size());
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(locality_ns_num_threads, num_threads);
+    return num_threads;
 } // }}}
 
-response locality_namespace::statistics_counter(
-    request const& req
-  , error_code& ec
-    )
+std::uint32_t locality_namespace::get_num_overall_threads()
+{
+    std::lock_guard<mutex_type> l(mutex_);
+
+    std::uint32_t num_threads = 0;
+
+    partition_table_type::iterator end = partitions_.end();
+    for (partition_table_type::iterator it = partitions_.begin();
+         it != end; ++it)
+    {
+        using hpx::util::get;
+        num_threads += get<1>(it->second);
+    }
+
+    LAGAS_(info) << (boost::format(
+        "locality_namespace::get_num_overall_threads, localities(%1%)")
+        % num_threads);
+
+    return num_threads;
+}
+
+naming::gid_type locality_namespace::statistics_counter(std::string name)
 { // {{{ statistics_counter implementation
     LAGAS_(info) << "locality_namespace::statistics_counter";
 
-    std::string name(req.get_statistics_counter_name());
-
     performance_counters::counter_path_elements p;
-    performance_counters::get_counter_path_elements(name, p, ec);
-    if (ec) return response();
+    performance_counters::get_counter_path_elements(name, p);
 
     if (p.objectname_ != "agas")
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "locality_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
     }
 
     namespace_action_code code = invalid_request;
@@ -674,16 +478,15 @@ response locality_namespace::statistics_counter(
 
     if (code == invalid_request || target == detail::counter_target_invalid)
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "locality_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
     }
 
     typedef locality_namespace::counter_data cd;
 
     using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
@@ -703,10 +506,6 @@ response locality_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_localities_count,
                 &counter_data_, _1);
             break;
-        case locality_ns_resolved_localities:
-            get_data_func = util::bind(&cd::get_resolved_localities_count,
-                &counter_data_, _1);
-            break;
         case locality_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_count,
                 &counter_data_, _1);
@@ -719,10 +518,9 @@ response locality_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_overall_count, &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "locality_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
         }
     }
     else {
@@ -743,10 +541,6 @@ response locality_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_localities_time,
                 &counter_data_, _1);
             break;
-        case locality_ns_resolved_localities:
-            get_data_func = util::bind(&cd::get_resolved_localities_time,
-                &counter_data_, _1);
-            break;
         case locality_ns_num_localities:
             get_data_func = util::bind(&cd::get_num_localities_time,
                 &counter_data_, _1);
@@ -758,123 +552,103 @@ response locality_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "locality_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
         }
     }
 
     performance_counters::counter_info info;
-    performance_counters::get_counter_type(name, info, ec);
-    if (ec) return response();
+    performance_counters::get_counter_type(name, info);
 
-    performance_counters::complement_counter_info(info, ec);
-    if (ec) return response();
+    performance_counters::complement_counter_info(info);
 
     using performance_counters::detail::create_raw_counter;
-    naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
-    if (ec) return response();
+    naming::gid_type gid = create_raw_counter(info, get_data_func, hpx::throws);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_statistics_counter, gid);
+    return naming::detail::strip_credits_from_gid(gid);
 }
 
 // access current counter values
-boost::int64_t locality_namespace::counter_data::get_allocate_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_allocate_count(bool reset)
 {
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolve_locality_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_resolve_locality_count(bool reset)
 {
     return util::get_and_reset_value(resolve_locality_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_free_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_free_count(bool reset)
 {
     return util::get_and_reset_value(free_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_localities_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_localities_count(bool reset)
 {
     return util::get_and_reset_value(localities_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_localities_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_localities_count(bool reset)
 {
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_threads_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_threads_count(bool reset)
 {
     return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data
-        ::get_resolved_localities_count(bool reset)
-{
-    return util::get_and_reset_value(resolved_localities_.count_, reset);
-}
-
-boost::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
+std::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
 {
     return util::get_and_reset_value(allocate_.count_, reset) +
         util::get_and_reset_value(resolve_locality_.count_, reset) +
         util::get_and_reset_value(free_.count_, reset) +
         util::get_and_reset_value(localities_.count_, reset) +
         util::get_and_reset_value(num_localities_.count_, reset) +
-        util::get_and_reset_value(num_threads_.count_, reset) +
-        util::get_and_reset_value(resolved_localities_.count_, reset);
+        util::get_and_reset_value(num_threads_.count_, reset);
 }
 
 // access execution time counters
-boost::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
 {
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolve_locality_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_resolve_locality_time(bool reset)
 {
     return util::get_and_reset_value(resolve_locality_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_free_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_free_time(bool reset)
 {
     return util::get_and_reset_value(free_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_localities_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_localities_time(bool reset)
 {
     return util::get_and_reset_value(localities_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_localities_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_localities_time(bool reset)
 {
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_num_threads_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_num_threads_time(bool reset)
 {
     return util::get_and_reset_value(num_threads_.time_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolved_localities_time(bool reset)
-{
-    return util::get_and_reset_value(resolved_localities_.time_, reset);
-}
-
-boost::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
+std::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 {
     return util::get_and_reset_value(allocate_.time_, reset) +
         util::get_and_reset_value(resolve_locality_.time_, reset) +
         util::get_and_reset_value(free_.time_, reset) +
         util::get_and_reset_value(localities_.time_, reset) +
         util::get_and_reset_value(num_localities_.time_, reset) +
-        util::get_and_reset_value(num_threads_.time_, reset) +
-        util::get_and_reset_value(resolved_localities_.time_, reset);
+        util::get_and_reset_value(num_threads_.time_, reset);
 }
 
 // increment counter values
@@ -907,11 +681,5 @@ void locality_namespace::counter_data::increment_num_threads_count()
 {
     ++num_threads_.count_;
 }
-
-void locality_namespace::counter_data::increment_resolved_localities_count()
-{
-    ++resolved_localities_.count_;
-}
-
 }}}
 

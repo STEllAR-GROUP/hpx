@@ -16,6 +16,8 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
 {
@@ -76,7 +78,7 @@ namespace hpx { namespace plugins
         {
             if (isenabled_)
                 return new MessageHandler(action, pp, num_messages, interval);
-            return 0;
+            return nullptr;
         }
 
     protected:

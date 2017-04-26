@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { namespace util
 
         // memory allocation
         pointer allocate(size_type cnt,
-            typename std::allocator<void>::const_pointer = 0)
+            typename std::allocator<void>::const_pointer = nullptr)
         {
             // allocate memory
             pointer p = reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
@@ -89,11 +89,16 @@ namespace hpx { namespace parallel { namespace util
                 pointer end = begin + part_size;
                 first_touch.push_back(
                     hpx::parallel::for_each(
-                        hpx::parallel::par(hpx::parallel::task)
+                        hpx::parallel::execution::par(hpx::parallel::execution::task)
                             .on(executors_[i])
                             .with(hpx::parallel::static_chunk_size()),
                         begin, end,
-                        [this, i](T& val)
+#if defined(HPX_DEBUG)
+                        [this, i]
+#else
+                        []
+#endif
+                        (T& val)
                         {
                             // touch first byte of every object
                             *reinterpret_cast<char*>(&val) = 0;

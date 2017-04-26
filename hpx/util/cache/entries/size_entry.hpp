@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/cache/entries/entry.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace entries
 {

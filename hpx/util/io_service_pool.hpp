@@ -11,14 +11,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/function.hpp>
 
+#include <boost/asio/io_service.hpp>
+
+#include <cstddef>
 #include <memory>
 #include <vector>
-
-#include <boost/asio/io_service.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -97,7 +98,7 @@ namespace hpx { namespace util
     private:
         typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
 // FIXME: Intel compilers don't like this
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
         typedef std::unique_ptr<boost::asio::io_service::work> work_type;
 #else
         typedef boost::asio::io_service::work work_type;
@@ -107,7 +108,7 @@ namespace hpx { namespace util
         {
             return work_type(
 // FIXME: Intel compilers don't like this
-#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC)
                     new boost::asio::io_service::work(io_service)
 #else
                     io_service
@@ -115,11 +116,11 @@ namespace hpx { namespace util
             );
         }
 
-        boost::mutex mtx_;
+        compat::mutex mtx_;
 
         /// The pool of io_services.
         std::vector<io_service_ptr> io_services_;
-        std::vector<boost::thread> threads_;
+        std::vector<compat::thread> threads_;
 
         /// The work that keeps the io_services running.
         std::vector<work_type> work_;

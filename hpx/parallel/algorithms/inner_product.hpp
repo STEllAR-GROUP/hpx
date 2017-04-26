@@ -9,101 +9,18 @@
 #define HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_iterator.hpp>
-#include <hpx/util/zip_iterator.hpp>
 
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
 
-#include <algorithm>
-#include <iterator>
-#include <numeric>
 #include <type_traits>
-#include <vector>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // inner_product
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct inner_product
-          : public detail::algorithm<inner_product<T>, T>
-        {
-            inner_product()
-              : inner_product::algorithm("inner_product")
-            {}
-
-            template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename T_, typename Op1, typename Op2>
-            static T
-            sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
-                T_ && init, Op1 && op1, Op2 && op2)
-            {
-                return std::inner_product(
-                    first1, last1, first2, std::forward<T_>(init),
-                    std::forward<Op1>(op1), std::forward<Op2>(op2));
-            }
-
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename T_, typename Op1, typename Op2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, T
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                 FwdIter2 first2, T_ && init, Op1 && op1, Op2 && op2)
-            {
-                typedef util::detail::algorithm_result<ExPolicy, T> result;
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
-                    difference_type;
-
-                if (first1 == last1)
-                    return result::get(std::forward<T_>(init));
-
-                difference_type count = std::distance(first1, last1);
-
-                using hpx::util::make_zip_iterator;
-                return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count,
-                    [op1, op2](zip_iterator part_begin, std::size_t part_size) ->T
-                    {
-                        using hpx::util::get;
-                        T part_sum = op2(
-                            get<0>(*part_begin), get<1>(*part_begin));
-                        ++part_begin;
-
-                        // VS2015RC bails out when op is captured by ref
-                        util::loop_n(part_begin, part_size - 1,
-                            [=, &part_sum](zip_iterator it)
-                            {
-                                part_sum = op1(
-                                    part_sum, op2(get<0>(*it), get<1>(*it)));
-                            });
-                        return part_sum;
-                    },
-                    [init, op1](std::vector<hpx::future<T> > && results) -> T
-                    {
-                        T ret = init;
-                        for(auto && fut : results)
-                        {
-                            ret = op1(ret, fut.get());
-                        }
-                        return ret;
-                    });
-            }
-        };
-        /// \endcond
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// Returns the result of accumulating init with the inner products of the
     /// pairs formed by the elements of two ranges starting at first1 and
@@ -153,7 +70,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///
-
+    /// \note This function is deprecated and is replaced by the binary version
+    ///       of \a transform_reduce.
+    ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
@@ -162,22 +81,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init)
     {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
-            > is_seq;
-
-        return detail::inner_product<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            std::move(init), std::plus<T>(), std::multiplies<T>());
+        return transform_reduce(
+            std::forward<ExPolicy>(policy), first1, last1, first2,
+            std::move(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,7 +150,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     it.
     ///                     The type \a Ret must be
     ///                     such that it can be implicitly converted to a type
-    ///                     of \tT.
+    ///                     of \a T.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -262,7 +168,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///
-
+    /// \note This function is deprecated and is replaced by the binary version
+    ///       of \a transform_reduce.
+    ///
     template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
         typename Op1, typename Op2>
     inline typename std::enable_if<
@@ -272,23 +180,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, T init, Op1 && op1, Op2 && op2)
     {
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
-            > is_seq;
-
-        return detail::inner_product<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+        return transform_reduce(
+            std::forward<ExPolicy>(policy), first1, last1, first2,
             std::move(init), std::forward<Op1>(op1), std::forward<Op2>(op2));
     }
 }}}
 
+#endif
 #endif

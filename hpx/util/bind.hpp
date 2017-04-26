@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
@@ -20,8 +21,7 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/type_traits/integral_constant.hpp>
-
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -268,16 +268,17 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
-            bound(bound const& other)
+            HPX_HOST_DEVICE bound(bound const& other)
               : _f(other._f)
               , _args(other._args)
             {}
 
-            bound(bound&& other)
+            HPX_HOST_DEVICE bound(bound&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}
@@ -324,6 +325,17 @@ namespace hpx { namespace util
                 return traits::get_function_address<
                         typename std::decay<F>::type
                     >::call(_f);
+            }
+
+            char const* get_function_annotation() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation<
+                        typename std::decay<F>::type
+                    >::call(_f);
+#else
+                return nullptr;
+#endif
             }
 
         private:
@@ -419,6 +431,15 @@ namespace hpx { namespace util
                 return traits::get_function_address<F>::call(_f);
             }
 
+            char const* get_function_annotation() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation<F>::call(_f);
+#else
+                return nullptr;
+#endif
+            }
+
         public: // exposition-only
             F _f;
 #           if !defined(HPX_DISABLE_ASSERTS)
@@ -445,13 +466,13 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_bind_expression<util::detail::bound<T> >
-      : boost::true_type
+      : std::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
     struct is_placeholder<util::detail::placeholder<I> >
-      : boost::integral_constant<int, I>
+      : std::integral_constant<int, I>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -474,6 +495,29 @@ namespace hpx { namespace traits
             return f.get_function_address();
         }
     };
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sig>
+    struct get_function_annotation<util::detail::bound<Sig> >
+    {
+        static char const*
+            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_annotation();
+        }
+    };
+
+    template <typename F>
+    struct get_function_annotation<util::detail::one_shot_wrapper<F> >
+    {
+        static char const*
+            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+        {
+            return f.get_function_annotation();
+        }
+    };
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -10,11 +10,12 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
@@ -32,18 +33,18 @@ void measure_transform_reduce(std::size_t size)
     std::vector<Point> data_representation(size,
         Point{double(std::rand()), double(std::rand())});
 
-    // invode transform_reduce
+    // invoke transform_reduce
     double result =
-        hpx::parallel::transform_reduce(hpx::parallel::par,
-        boost::begin(data_representation),
-        boost::end(data_representation),
-        [](Point r)
-        {
-            return r.x * r.y;
-        },
-        0.0,
-        std::plus<double>()
-    );
+        hpx::parallel::transform_reduce(hpx::parallel::execution::par,
+            boost::begin(data_representation),
+            boost::end(data_representation),
+            0.0,
+            [](Point r)
+            {
+                return r.x * r.y;
+            },
+            std::plus<double>()
+        );
     HPX_UNUSED(result);
 }
 
@@ -52,31 +53,31 @@ void measure_transform_reduce_old(std::size_t size)
     std::vector<Point> data_representation(size,
         Point{double(std::rand()), double(std::rand())});
 
-    //invode old reduce
+    //invoke old reduce
     Point result =
-        hpx::parallel::reduce(hpx::parallel::par,
-        boost::begin(data_representation),
-        boost::end(data_representation),
-        Point{0.0, 0.0},
-        [](Point res, Point curr)
-        {
-            return Point{
-                res.x * res.y + curr.x * curr.y, 1.0};
-        }
-    );
+        hpx::parallel::reduce(hpx::parallel::execution::par,
+            boost::begin(data_representation),
+            boost::end(data_representation),
+            Point{0.0, 0.0},
+            [](Point res, Point curr)
+            {
+                return Point{
+                    res.x * res.y + curr.x * curr.y, 1.0};
+            }
+        );
     HPX_UNUSED(result);
 }
 
-boost::uint64_t average_out_transform_reduce(std::size_t vector_size)
+std::uint64_t average_out_transform_reduce(std::size_t vector_size)
 {
     measure_transform_reduce(vector_size);
-    return boost::uint64_t(1);
+    return std::uint64_t(1);
 }
 
-boost::uint64_t average_out_transform_reduce_old(std::size_t vector_size)
+std::uint64_t average_out_transform_reduce_old(std::size_t vector_size)
 {
     measure_transform_reduce_old(vector_size);
-    return boost::uint64_t(1);
+    return std::uint64_t(1);
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -87,8 +88,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(test_count < 0 || test_count == 0) {
         hpx::cout << "test_count cannot be less than zero...\n" << hpx::flush;
     } else {
-        boost::uint64_t tr_time = average_out_transform_reduce(vector_size);
-        boost::uint64_t tr_old_time = average_out_transform_reduce_old(
+        std::uint64_t tr_time = average_out_transform_reduce(vector_size);
+        std::uint64_t tr_old_time = average_out_transform_reduce_old(
             vector_size);
 
         if(csvoutput) {
@@ -106,9 +107,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
+
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
@@ -127,6 +129,5 @@ int main(int argc, char* argv[])
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);
-
 }
 

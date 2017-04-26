@@ -14,9 +14,9 @@
 
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
-using hpx::parallel::par;
-using hpx::parallel::task;
-using hpx::parallel::parallel_task_execution_policy;
+using hpx::parallel::execution::par;
+using hpx::parallel::execution::task;
+using hpx::parallel::execution::parallel_task_policy;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test1()
@@ -78,7 +78,7 @@ void define_task_block_test2()
     bool task3_flag = false;
 
     hpx::future<void> f = define_task_block(par(task),
-        [&](task_block<parallel_task_execution_policy>& trh)
+        [&](task_block<parallel_task_policy>& trh)
         {
             parent_flag = true;
 
@@ -202,7 +202,7 @@ void define_task_block_exceptions_test1()
 void define_task_block_exceptions_test2()
 {
     hpx::future<void> f = define_task_block(par(task),
-        [](task_block<parallel_task_execution_policy>& trh)
+        [](task_block<parallel_task_policy>& trh)
         {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
@@ -265,7 +265,7 @@ void define_task_block_exceptions_test3()
 void define_task_block_exceptions_test4()
 {
     hpx::future<void> f = define_task_block(par(task),
-        [&](task_block<parallel_task_execution_policy>& trh)
+        [&](task_block<parallel_task_policy>& trh)
         {
             trh.run([&]()
             {
@@ -314,9 +314,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

@@ -11,8 +11,10 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#include <iostream>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 //
 #if defined(HPX_DEBUG)
@@ -88,7 +90,8 @@ void sort_by_key_benchmark()
 
         hpx::util::high_resolution_timer t;
         hpx::parallel::sort_by_key(
-            hpx::parallel::par, keys.begin(), keys.end(), values.begin());
+            hpx::parallel::execution::par,
+            keys.begin(), keys.end(), values.begin());
         double elapsed = t.elapsed();
 
         // after sorting by key, the values should be equal to the original keys
@@ -109,8 +112,8 @@ template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const HelperOp &ho)
 {
-    static_assert(hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
     msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
     std::cout << "\n";
 
@@ -158,8 +161,8 @@ template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
 void test_sort_by_key_async(ExPolicy &&policy, Tkey, Tval, const Op &op,
     const HelperOp &ho)
 {
-    static_assert(hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
     msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), async);
     std::cout << "\n";
 
@@ -214,41 +217,46 @@ void test_sort_by_key1()
     hpx::util::high_resolution_timer t;
     do {
         //
-        test_sort_by_key1(seq, int(), int(), std::equal_to<int>(),
+        test_sort_by_key1(execution::seq, int(), int(), std::equal_to<int>(),
             [](int key) { return key; });
-        test_sort_by_key1(par, int(), int(), std::equal_to<int>(),
+        test_sort_by_key1(execution::par, int(), int(), std::equal_to<int>(),
             [](int key) { return key; });
-        test_sort_by_key1(par_vec, int(), int(), std::equal_to<int>(),
+        test_sort_by_key1(execution::par_unseq, int(), int(), std::equal_to<int>(),
             [](int key) { return key; });
         //
-        test_sort_by_key1(seq, int(), double(), std::equal_to<double>(),
+        test_sort_by_key1(execution::seq, int(), double(), std::equal_to<double>(),
             [](int key) { return key; });
-        test_sort_by_key1(par, int(), double(), std::equal_to<double>(),
+        test_sort_by_key1(execution::par, int(), double(), std::equal_to<double>(),
             [](int key) { return key; });
-        test_sort_by_key1(par_vec, int(), double(), std::equal_to<double>(),
+        test_sort_by_key1(execution::par_unseq, int(), double(),
+            std::equal_to<double>(),
             [](int key) { return key; });
         // custom compare
-        test_sort_by_key1(seq, double(), double(),
+        test_sort_by_key1(execution::seq, double(), double(),
             [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
-        test_sort_by_key1(par, double(), double(),
+        test_sort_by_key1(execution::par, double(), double(),
             [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
-        test_sort_by_key1(par_vec, double(), double(),
+        test_sort_by_key1(execution::par_unseq, double(), double(),
             [](double a, double b) { return std::floor(a) == std::floor(b); }, //-V550
             [](double a) { return std::floor(a); });
     } while (t.elapsed() < seconds);
     //
     hpx::util::high_resolution_timer t2;
     do {
-        test_sort_by_key_async(seq(task), int(), int(), std::equal_to<int>(),
+        test_sort_by_key_async(execution::seq(execution::task), int(), int(),
+            std::equal_to<int>(),
             [](int key) { return key; });
-        test_sort_by_key_async(par(task), int(), int(), std::equal_to<int>(),
+        test_sort_by_key_async(execution::par(execution::task), int(), int(),
+            std::equal_to<int>(),
             [](int key) { return key; });
         //
-        test_sort_by_key_async(seq(task), int(), double(), std::equal_to<double>(),
+        test_sort_by_key_async(execution::seq(execution::task), int(), double(),
+            std::equal_to<double>(),
             [](int key) { return key; });
-        test_sort_by_key_async(par(task), int(), double(), std::equal_to<double>(),
+        test_sort_by_key_async(execution::par(execution::task), int(), double(),
+            std::equal_to<double>(),
             [](int key) { return key; });
     } while (t2.elapsed() < seconds);
 }
@@ -256,7 +264,7 @@ void test_sort_by_key1()
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
 {
-    unsigned int seed = (unsigned int) std::time(0);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -288,9 +296,9 @@ int main(int argc, char *argv[])
         ("benchmark", "run a timing benchmark only");
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

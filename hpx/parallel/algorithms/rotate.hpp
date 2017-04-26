@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -72,8 +73,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::false_type non_seq;
 
-            parallel_task_execution_policy p =
-                parallel_task_execution_policy()
+            auto p =
+                execution::parallel_task_policy()
                     .on(policy.executor())
                     .with(policy.parameters());
 
@@ -155,12 +156,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     algorithm will be applied to.
     ///
     /// The assignments in the parallel \a rotate algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a rotate algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -170,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a rotate algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)> >
     ///           if the execution policy is of type
-    ///           \a parallel_task_execution_policy and
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
     ///           otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
@@ -178,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
@@ -191,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_bidirectional_iterator<FwdIter>::value
             > is_seq;
 
@@ -214,9 +215,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             OutIter dest_first)
         {
             std::pair<FwdIter, OutIter> p1 =
-                util::copy_helper(new_first, last, dest_first);
+                util::copy(new_first, last, dest_first);
             std::pair<FwdIter, OutIter> p2 =
-                util::copy_helper(first, new_first, std::move(p1.second));
+                util::copy(first, new_first, std::move(p1.second));
             return std::make_pair(std::move(p1.first), std::move(p2.second));
         }
 
@@ -227,8 +228,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             typedef std::false_type non_seq;
 
-            parallel_task_execution_policy p =
-                parallel_task_execution_policy()
+            auto p =
+                execution::parallel_task_policy()
                     .on(policy.executor())
                     .with(policy.parameters());
 
@@ -309,19 +310,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param dest_first   Refers to the begin of the destination range.
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a parallel_task_execution_policy and
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to the
@@ -329,8 +330,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename FwdIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
@@ -348,7 +349,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_bidirectional_iterator<FwdIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;

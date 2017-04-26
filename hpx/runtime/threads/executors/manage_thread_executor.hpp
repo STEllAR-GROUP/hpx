@@ -10,7 +10,7 @@
 #include <hpx/error.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
-#include <cstdarg>
+#include <cstddef>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {

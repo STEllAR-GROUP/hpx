@@ -11,6 +11,8 @@
 
 #include <boost/format.hpp>
 
+#include <cstdint>
+
 #include "server/sine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,14 +30,14 @@ namespace performance_counters { namespace sine
 {
     ///////////////////////////////////////////////////////////////////////////
     // This function will be invoked whenever the implicit counter is queried.
-    boost::int64_t immediate_sine(bool reset)
+    std::int64_t immediate_sine(bool reset)
     {
-        static boost::uint64_t started_at =
+        static std::uint64_t started_at =
             hpx::util::high_resolution_clock::now();
 
-        boost::uint64_t up_time =
+        std::uint64_t up_time =
             hpx::util::high_resolution_clock::now() - started_at;
-        return boost::int64_t(std::sin(up_time / 1e10) * 100000.);
+        return std::int64_t(std::sin(up_time / 1e10) * 100000.);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -243,8 +245,15 @@ namespace performance_counters { namespace sine
     ///////////////////////////////////////////////////////////////////////////
     bool get_startup(hpx::startup_function_type& startup_func, bool& pre_startup)
     {
+        // exit silently if this gets loaded outside of the sine_client example
+        if (hpx::get_config_entry("hpx.components.sine.enabled", "0") == "0")
+        {
+            return false;
+        }
+
         // check whether the performance counters need to be enabled
-        if (!need_perf_counters()) {
+        if (!need_perf_counters())
+        {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
                 "performance_counters::sine::get_startup",
                 "the sine component is not enabled on the commandline "

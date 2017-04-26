@@ -19,14 +19,15 @@
 #ifndef HPX_UTIL_INTEGER_ENDIAN_HPP
 #define HPX_UTIL_INTEGER_ENDIAN_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/util/integer/cover_operators.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/detail/endian.hpp>
-#include <boost/type_traits/is_signed.hpp>
 
 #include <climits>
+#include <cstddef>
 #include <iosfwd>
+#include <type_traits>
 
 # if CHAR_BIT != 8
 #   error Platforms with CHAR_BIT != 8 are not supported
@@ -39,7 +40,7 @@ namespace hpx { namespace util
     // Unrolled loops for loading and storing streams of bytes.
 
     template <typename T, std::size_t n_bytes,
-      bool sign=boost::is_signed<T>::value >
+        bool sign = std::is_signed<T>::value>
     struct unrolled_byte_loops
     {
       typedef unrolled_byte_loops<T, n_bytes - 1, sign> next;

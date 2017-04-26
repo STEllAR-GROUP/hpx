@@ -27,10 +27,18 @@ namespace boost
       { "boost/type_traits\\.hpp", "separate type-traits headers" },
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
+      { "boost/utility/enable_if\\.hpp", "type_traits" },
       { "boost/detail/atomic_count\\.hpp", "hpx/util/atomic_count.hpp" },
       { "boost/function\\.hpp", "hpx/util/function.hpp" },
+      { "boost/shared_ptr\\.hpp", "memory" },
+      { "boost/make_shared\\.hpp", "memory" },
+      { "boost/enable_shared_from_this\\.hpp", "memory" },
+      { "boost/bind\\.hpp", "hpx/util/bind.hpp" },
+      { "boost/(chrono/)?chrono\\.hpp", "chrono" },
+      { "boost/(core/)?ref\\.hpp", "functional" },
+      { "boost/cstdint\\.hpp", "cstdint.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
-      { 0, 0 }
+      { nullptr, nullptr }
     };
 
     //  deprecated_include_check constructor  -------------------------------//
@@ -49,7 +57,7 @@ namespace boost
       register_signature( ".ipp" );
 
       for (deprecated_includes const* includes_it = &names[0];
-           includes_it->include_regex != 0;
+           includes_it->include_regex != nullptr;
            ++includes_it)
       {
         std::string rx =
@@ -72,8 +80,17 @@ namespace boost
       const path & full_path,      // example: c:/foo/boost/filesystem/path.hpp
       const string & contents)     // contents of file to be inspected
     {
-      if (contents.find( "hpxinspect:" "nodeprecatedinclude" ) != string::npos)
-        return;
+      std::string::size_type p = contents.find( "hpxinspect:" "nodeprecatedinclude" );
+      if (p != string::npos)
+      {
+        // ignore this directive here (it is handled below) if it is followed
+        // by a ':'
+        if (p == contents.size() - 30 ||
+            (contents.size() > p + 30 && contents[p + 30] != ':'))
+        {
+          return;
+        }
+      }
 
       std::set<std::string> found_includes;
 
@@ -92,6 +109,10 @@ namespace boost
             std::string found_include(m[1].first, m[1].second);
             if (found_includes.find(found_include) == found_includes.end())
             {
+              std::string tag("hpxinspect:" "nodeprecatedinclude:" + found_include);
+              if (contents.find(tag) != string::npos)
+                continue;
+
               // name was found
               found_includes.insert(found_include);
 

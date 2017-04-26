@@ -14,10 +14,11 @@
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/mpl/bool.hpp>
 #include <boost/shared_array.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {
@@ -291,7 +292,7 @@ namespace hpx { namespace traits
     // serialization::serialize_buffer to be streamable
     template <typename T, typename Allocator>
     struct supports_streaming_with_any<serialization::serialize_buffer<T, Allocator> >
-      : boost::mpl::false_
+      : std::false_type
     {};
 }}
 

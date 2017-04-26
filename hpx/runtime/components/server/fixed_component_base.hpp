@@ -20,10 +20,10 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -36,8 +36,8 @@ template <typename Component>
 class fixed_component_base : public traits::detail::fixed_component_tag
 {
 private:
-    typedef typename boost::mpl::if_<
-            boost::is_same<Component, detail::this_type>,
+    typedef typename std::conditional<
+            std::is_same<Component, detail::this_type>::value,
             fixed_component_base, Component
         >::type this_component_type;
 
@@ -56,7 +56,7 @@ public:
     typedef fixed_component<this_component_type> wrapping_type;
 
     /// \brief Construct an empty fixed_component
-    fixed_component_base(boost::uint64_t msb, boost::uint64_t lsb)
+    fixed_component_base(std::uint64_t msb, std::uint64_t lsb)
       : msb_(msb)
       , lsb_(lsb)
     {}
@@ -159,7 +159,7 @@ public:
     }
 #endif
 
-    void set_locality_id(boost::uint32_t locality_id, error_code& ec = throws)
+    void set_locality_id(std::uint32_t locality_id, error_code& ec = throws)
     {
         if (gid_) {
             HPX_THROWS_IF(ec, invalid_status,
@@ -172,18 +172,10 @@ public:
         }
     }
 
-#if defined(HPX_HAVE_SECURITY)
-    static components::security::capability get_required_capabilities(
-        components::security::traits::capability<>::capabilities caps)
-    {
-        return components::default_component_creation_capabilities(caps);
-    }
-#endif
-
     // Pinning functionality
     void pin() {}
     void unpin() {}
-    boost::uint32_t pin_count() const { return 0; }
+    std::uint32_t pin_count() const { return 0; }
 
     void mark_as_migrated()
     {
@@ -195,8 +187,8 @@ public:
 
 private:
     mutable naming::gid_type gid_;
-    boost::uint64_t msb_;
-    boost::uint64_t lsb_;
+    std::uint64_t msb_;
+    std::uint64_t lsb_;
 };
 
 namespace detail
@@ -208,7 +200,7 @@ namespace detail
         static Component* alloc(std::size_t count)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
-            return 0;
+            return nullptr;
         }
         static void free(void* p, std::size_t count)
         {
@@ -232,7 +224,7 @@ class fixed_component : public Component
     static Component* create(std::size_t count)
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
-        return 0;
+        return nullptr;
     }
 
     /// \brief  The function \a destroy is used for destruction and

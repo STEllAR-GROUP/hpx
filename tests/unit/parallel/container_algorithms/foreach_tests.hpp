@@ -11,7 +11,10 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -20,7 +23,7 @@
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each(ExPolicy && policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -79,7 +82,7 @@ void test_for_each_async(ExPolicy && p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_exception(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -147,7 +150,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    BOOST_STATIC_ASSERT(hpx::parallel::execution::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

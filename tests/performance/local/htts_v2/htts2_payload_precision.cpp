@@ -9,7 +9,11 @@
 
 #include "htts2.hpp"
 
-template <typename BaseClock = boost::chrono::steady_clock>
+#include <chrono>
+#include <cstdint>
+#include <iostream>
+
+template <typename BaseClock = std::chrono::steady_clock>
 struct payload_precision_tracker : htts2::clocksource<BaseClock>
 {
     typedef typename htts2::clocksource<BaseClock>::rep rep;
@@ -80,7 +84,7 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
     rep samples_;
 };
 
-template <typename BaseClock = boost::chrono::steady_clock>
+template <typename BaseClock = std::chrono::steady_clock>
 struct payload_precision_driver : htts2::driver
 {
     payload_precision_driver(int argc, char** argv)
@@ -134,7 +138,7 @@ struct payload_precision_driver : htts2::driver
 
         htts2::timer<BaseClock> t;
 
-        for (boost::uint64_t i = 0; i < this->tasks_ /* = m */; ++i)
+        for (std::uint64_t i = 0; i < this->tasks_ /* = m */; ++i)
             p();
 
         // w_M [nanoseconds]

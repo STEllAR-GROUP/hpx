@@ -18,11 +18,14 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -70,24 +73,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 FwdIter prev = first;
                 *dest++ = *first++;
 
-                if (count == 0) {
+                if (count == 0)
+                {
                     return result::get(std::move(dest));
                 }
+
+                auto f1 =
+                    [op, policy](
+                        zip_iterator part_begin, std::size_t part_size
+                    ) mutable
+                    {
+                        HPX_UNUSED(policy);
+
+                        // VS2015RC bails out when op is captured by ref
+                        using hpx::util::get;
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size,
+                            [op](zip_iterator it)
+                            {
+                                get<2>(*it) = hpx::util::invoke(
+                                    op, get<0>(*it), get<1>(*it));
+                            });
+                    };
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, Iter, void>::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, prev, dest), count,
-                    [op](zip_iterator part_begin, std::size_t part_size)
-                    {
-                        // VS2015RC bails out when op is captured by ref
-                        using hpx::util::get;
-                        util::loop_n(part_begin, part_size,
-                            [op](zip_iterator it)
-                            {
-                                get<2>(*it) = op(get<0>(*it), get<1>(*it));
-                            });
-                    },
+                    std::move(f1),
                     [dest, count](std::vector<hpx::future<void> > &&)
                         mutable -> Iter
                     {
@@ -129,19 +142,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the results will be assigned to.
     ///
     /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a adjacent_difference algorithm returns a
     ///           \a hpx::future<OutIter> if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to the
     ///           last element in the output range.
@@ -153,7 +166,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     template <typename ExPolicy, typename InIter, typename OutIter>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
@@ -170,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
@@ -182,7 +195,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     ////////////////////////////////////////////////////////////////////////////
     /// Assigns each value in the range given by result its corresponding
-    /// element in the range [first, last] and the one preceeding it except
+    /// element in the range [first, last] and the one preceding it except
     /// *result, which is assigned *first
     ///
     /// \note   Complexity: Exactly (last - first) - 1 application of the
@@ -227,19 +240,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     type of \a dest.
     ///
     /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a adjacent_difference algorithm returns a
     ///           \a hpx::future<OutIter> if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to the
     ///           last element in the output range.
@@ -248,7 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter,
         typename Op>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
@@ -263,7 +276,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;

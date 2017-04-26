@@ -21,7 +21,7 @@ namespace hpx { namespace traits
             parcelset::parcelhandler*, parcelset::locality const&,
             parcelset::parcel const&)
         {
-            return 0;   // by default actions don't have a message_handler
+            return nullptr;   // by default actions don't have a message_handler
         }
     };
 }}

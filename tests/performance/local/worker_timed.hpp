@@ -10,14 +10,15 @@
 #define HPX_TESTS_PERFORMANCE_WORKER_HPP
 
 #include <hpx/util/high_resolution_clock.hpp>
-#include <boost/cstdint.hpp>
 
-inline void worker_timed(boost::uint64_t delay_ns)
+#include <cstdint>
+
+inline void worker_timed(std::uint64_t delay_ns)
 {
     if (delay_ns == 0)
         return;
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     while (true)
     {

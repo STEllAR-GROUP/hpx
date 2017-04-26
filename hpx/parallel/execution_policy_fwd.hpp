@@ -8,32 +8,35 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#if defined(HPX_HAVE_DATAPAR)
+#include <hpx/parallel/datapar/execution_policy_fwd.hpp>
+#endif
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     // forward declarations, see execution_policy.hpp
-    struct sequential_execution_policy;
+    struct sequenced_policy;
 
     template <typename Executor, typename Parameters>
-    struct sequential_execution_policy_shim;
+    struct sequenced_policy_shim;
 
-    struct sequential_task_execution_policy;
-
-    template <typename Executor, typename Parameters>
-    struct sequential_task_execution_policy_shim;
-
-    struct parallel_execution_policy;
+    struct sequenced_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct parallel_execution_policy_shim;
+    struct sequenced_task_policy_shim;
 
-    struct parallel_task_execution_policy;
+    struct parallel_policy;
 
     template <typename Executor, typename Parameters>
-    struct parallel_task_execution_policy_shim;
+    struct parallel_policy_shim;
 
-    struct parallel_vector_execution_policy;
+    struct parallel_task_policy;
+
+    template <typename Executor, typename Parameters>
+    struct parallel_task_policy_shim;
+
+    struct parallel_unsequenced_policy;
 }}}
 
 #endif

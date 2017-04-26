@@ -9,11 +9,14 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
-
-#include <boost/ref.hpp>
-#include <boost/atomic.hpp>
 
 #include "../algorithms/foreach_tests.hpp"
 
@@ -24,12 +27,16 @@ void chunk_size_test_seq(Parameters && params)
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
-    test_for_each(seq.with(boost::ref(params)), iterator_tag());
-    test_for_each_async(seq(task).with(boost::ref(params)), iterator_tag());
+    test_for_each(execution::seq.with(std::ref(params)), iterator_tag());
+    test_for_each_async(execution::seq(execution::task).with(std::ref(params)),
+        iterator_tag());
 
     sequential_executor seq_exec;
-    test_for_each(seq.on(seq_exec).with(boost::ref(params)), iterator_tag());
-    test_for_each_async(seq(task).on(seq_exec).with(boost::ref(params)), iterator_tag());
+    test_for_each(execution::seq.on(seq_exec).with(std::ref(params)),
+        iterator_tag());
+    test_for_each_async(
+        execution::seq(execution::task).on(seq_exec).with(std::ref(params)),
+        iterator_tag());
 }
 
 template <typename Parameters>
@@ -38,12 +45,16 @@ void chunk_size_test_par(Parameters && params)
     using namespace hpx::parallel;
 
     typedef std::random_access_iterator_tag iterator_tag;
-    test_for_each(par.with(boost::ref(params)), iterator_tag());
-    test_for_each_async(par(task).with(boost::ref(params)), iterator_tag());
+    test_for_each(execution::par.with(std::ref(params)), iterator_tag());
+    test_for_each_async(execution::par(execution::task).with(std::ref(params)),
+        iterator_tag());
 
     parallel_executor par_exec;
-    test_for_each(par.on(par_exec).with(boost::ref(params)), iterator_tag());
-    test_for_each_async(par(task).on(par_exec).with(boost::ref(params)), iterator_tag());
+    test_for_each(execution::par.on(par_exec).with(std::ref(params)),
+        iterator_tag());
+    test_for_each_async(
+        execution::par(execution::task).on(par_exec).with(std::ref(params)),
+        iterator_tag());
 }
 
 struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
@@ -65,7 +76,7 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
     }
 
     std::string name_;
-    boost::uint64_t time_;
+    std::uint64_t time_;
     boost::atomic<std::size_t> count_;
 };
 
@@ -83,7 +94,7 @@ void test_timer_hooks()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = static_cast<unsigned int>(std::time(0));
+    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -108,9 +119,9 @@ int main(int argc, char* argv[])
         ;
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

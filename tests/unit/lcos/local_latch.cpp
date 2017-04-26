@@ -10,6 +10,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <vector>
 
 #define NUM_THREADS std::size_t(100)

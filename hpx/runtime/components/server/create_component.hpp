@@ -18,7 +18,9 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
 #include <sstream>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

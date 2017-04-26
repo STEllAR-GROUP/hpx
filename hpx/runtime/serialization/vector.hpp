@@ -7,6 +7,7 @@
 #define HPX_SERIALIZATION_VECTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
@@ -46,14 +47,13 @@ namespace hpx { namespace serialization
             else
             {
                 // bitwise load ...
-                typedef typename std::vector<T, Allocator>::value_type value_type;
                 typedef typename std::vector<T, Allocator>::size_type size_type;
                 size_type size;
                 ar >> size; //-V128
                 if(size == 0) return;
 
                 v.resize(size);
-                load_binary(ar, &v[0], v.size() * sizeof(value_type));
+                ar >> hpx::serialization::make_array(v.data(), v.size());
             }
         }
     }
@@ -83,7 +83,9 @@ namespace hpx { namespace serialization
     {
         typedef std::integral_constant<bool,
             hpx::traits::is_bitwise_serializable<
-                typename std::vector<T, Allocator>::value_type
+                typename std::remove_const<
+                    typename std::vector<T, Allocator>::value_type
+                >::type
             >::value> use_optimized;
 
         v.clear();
@@ -115,9 +117,8 @@ namespace hpx { namespace serialization
             }
             else
             {
-                // bitwise save ...
-                typedef typename std::vector<T, Allocator>::value_type value_type;
-                save_binary(ar, &v[0], v.size() * sizeof(value_type));
+                // bitwise (zero-copy) save ...
+                ar << hpx::serialization::make_array(v.data(), v.size());
             }
         }
     }
@@ -143,7 +144,9 @@ namespace hpx { namespace serialization
     {
         typedef std::integral_constant<bool,
             hpx::traits::is_bitwise_serializable<
-                typename std::vector<T, Allocator>::value_type
+                typename std::remove_const<
+                    typename std::vector<T, Allocator>::value_type
+                >::type
             >::value> use_optimized;
 
         ar << v.size(); //-V128

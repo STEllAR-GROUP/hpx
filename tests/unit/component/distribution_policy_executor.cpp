@@ -35,9 +35,7 @@ void test_distribution_policy_executor()
         typedef executor_traits<decltype(exec)> executor_traits;
 
         HPX_TEST_EQ(executor_traits::async_execute(exec, call_pfo()).get(), loc);
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
         HPX_TEST_EQ(executor_traits::async_execute(exec, call_action()).get(), loc);
-#endif
     }
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
@@ -46,9 +44,7 @@ void test_distribution_policy_executor()
         typedef executor_traits<decltype(exec)> executor_traits;
 
         HPX_TEST_EQ(executor_traits::execute(exec, call_pfo()), loc);
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
         HPX_TEST_EQ(executor_traits::execute(exec, call_action()), loc);
-#endif
     }
 }
 

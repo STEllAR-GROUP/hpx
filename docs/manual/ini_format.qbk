@@ -9,7 +9,7 @@
 [section:ini_format The __hpx__ INI File Format]
 
 All __hpx__ applications can be configured using a special file format which is
-similar to the well known __ini_file_format__. This is a structured text format
+similar to the well-known __ini_file_format__. This is a structured text format
 allowing to group key/value pairs (properties) into sections. The basic element
 contained in an ini file is the property. Every property has a name and a
 value, delimited by an equals sign (`'='`). The name appears to the left of the

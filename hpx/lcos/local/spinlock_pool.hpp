@@ -16,6 +16,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -71,7 +73,6 @@ namespace hpx { namespace lcos { namespace local
                 HPX_ITT_SYNC_PREPARE(&sp_);
                 sp_.lock();
                 HPX_ITT_SYNC_ACQUIRED(&sp_);
-                util::register_lock(&sp_);
             }
 
             void unlock()
@@ -79,7 +80,6 @@ namespace hpx { namespace lcos { namespace local
                 HPX_ITT_SYNC_RELEASING(&sp_);
                 sp_.unlock();
                 HPX_ITT_SYNC_RELEASED(&sp_);
-                util::unregister_lock(&sp_);
             }
         };
     };

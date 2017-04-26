@@ -18,7 +18,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/assign/std/vector.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
@@ -114,9 +113,7 @@ namespace hpx { namespace util
         if (!need_to_call_pre_initialize)
             return;
 
-        using namespace boost::assign;
-        std::vector<std::string> lines; //-V808
-        lines +=
+        std::vector<std::string> lines = {
             // create an empty application section
             "[application]",
 
@@ -169,11 +166,11 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:1}",
 #else
-            "spinlick_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
+            "spinlock_deadlock_detection = ${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
 #endif
-            "spinlick_deadlock_detection_limit = "
+            "spinlock_deadlock_detection_limit = "
                 "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
 #endif
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
@@ -184,16 +181,33 @@ namespace hpx { namespace util
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
-            "scheduler = local-priority",
+            "scheduler = local-priority-fifo",
             "affinity = pu",
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
-            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+            "max_background_threads = "
+                "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
+
+            "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_IDLE_LOOP_COUNT_MAX) "}",
+            "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
+                BOOST_STRINGIZE(HPX_BUSY_LOOP_COUNT_MAX) "}",
+
+            // arity for collective operations implemented in a tree fashion
+            "[hpx.lcos.collectives]",
+            "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
+            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:-1}",
 
             // connect back to the given latch if specified
             "[hpx.on_startup]",
             "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
+
+#if defined(HPX_HAVE_NETWORKING)
+            // by default, enable networking
+            "[hpx.parcel]",
+            "enable = 1",
+#endif
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -216,11 +230,20 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
 
+            "[hpx.thread_queue]",
+            "min_tasks_to_steal_pending = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}",
+            "min_tasks_to_steal_staged = "
+                "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:10}",
+            "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
+            "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
+            "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
+
             "[hpx.commandline]",
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
 
-            // allow for unknown options to passed through
+            // allow for unknown options to be passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
             // predefine command line aliases
@@ -259,7 +282,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
                 "}",
             "service_mode = hosted",
-            "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
@@ -292,7 +314,7 @@ namespace hpx { namespace util
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
-        ;
+        };
 
         std::vector<std::string> lines_pp =
             hpx::parcelset::parcelhandler::load_runtime_configuration();
@@ -455,7 +477,7 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#ifdef HPX_HAVE_ITTNOTIFY
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -517,7 +539,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#ifdef HPX_HAVE_ITTNOTIFY
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -701,21 +723,6 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
     }
 
-    // Get whether the AGAS server is running as a dedicated runtime.
-    // This decides whether the AGAS actions are executed with normal
-    // priority (if dedicated) or with high priority (non-dedicated)
-    bool runtime_configuration::get_agas_dedicated_server() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
-                return hpx::util::get_entry_as<int>(
-                    *sec, "dedicated_server", 0) != 0;
-            }
-        }
-        return false;
-    }
-
     bool runtime_configuration::get_itt_notify_mode() const
     {
 #if HPX_HAVE_ITTNOTIFY != 0
@@ -824,7 +831,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "spinlick_deadlock_detection_limit", "1000000");
+                    *sec, "spinlock_deadlock_detection_limit", "1000000");
             }
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;

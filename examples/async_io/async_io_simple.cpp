@@ -12,6 +12,9 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/thread_executors.hpp>
 
+#include <functional>
+#include <iostream>
+
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write, int& result)
 {
@@ -33,7 +36,7 @@ int async_io(char const* string_to_write)
 
         // ... and schedule the handler to run on one of its OS-threads.
         scheduler.add(hpx::util::bind(&do_async_io,
-            string_to_write, boost::ref(result)));
+            string_to_write, std::ref(result)));
 
     // Note that the destructor of the scheduler object will wait for
     // the scheduled task to finish executing. This might be

@@ -9,6 +9,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,8 +107,7 @@ template <typename T, typename DistPolicy>
 void fill_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::task;
+    using namespace hpx::parallel::execution;
 
     fill_algo_tests_with_policy<T>(size, policy, seq);
     fill_algo_tests_with_policy<T>(size, policy, par);

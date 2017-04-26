@@ -9,22 +9,24 @@
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT
 
-#include "worker_timed.hpp"
+#include <hpx/compat/thread.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-#include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/lockfree/stack.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
 
-#include <hpx/util/high_resolution_timer.hpp>
+#include <cstdint>
+#include <functional>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "worker_timed.hpp"
 
 char const* benchmark_name = "Serial LIFO Overhead";
 
@@ -35,12 +37,13 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t threads = 1;
-boost::uint64_t blocksize = 10000;
-boost::uint64_t iterations = 2000000;
+std::uint64_t threads = 1;
+std::uint64_t blocksize = 10000;
+std::uint64_t iterations = 2000000;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +139,7 @@ void pop(Lifo& lifo)
 
 template <typename Lifo>
 std::pair<double, double>
-bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
+bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
 {
     ///////////////////////////////////////////////////////////////////////////
     // Push.
@@ -147,14 +150,14 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
     // Start the clock.
     high_resolution_timer t;
 
-    for ( boost::uint64_t block = 0
+    for ( std::uint64_t block = 0
         ; block < (local_iterations / blocksize)
         ; ++block)
     {
         // Restart the clock.
         t.restart();
 
-        for (boost::uint64_t i = 0; i < blocksize; ++i)
+        for (std::uint64_t i = 0; i < blocksize; ++i)
         {
             push(lifo, seed);
         }
@@ -167,7 +170,7 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
         // Restart the clock.
         t.restart();
 
-        for (boost::uint64_t i = 0; i < blocksize; ++i)
+        for (std::uint64_t i = 0; i < blocksize; ++i)
         {
             pop(lifo);
         }
@@ -186,7 +189,7 @@ void perform_iterations(
     )
 {
     {
-        std::vector<boost::uint64_t> lifo;
+        std::vector<std::uint64_t> lifo;
         lifo.reserve(blocksize);
 
         // Warmup.
@@ -196,7 +199,7 @@ void perform_iterations(
     }
 
     {
-        boost::lockfree::stack<boost::uint64_t> lifo(blocksize);
+        boost::lockfree::stack<std::uint64_t> lifo(blocksize);
 
         // Warmup.
         bench_lifo(lifo, blocksize);
@@ -214,23 +217,27 @@ int app_main(
         elapsed_control(threads, std::pair<double, double>(0.0, 0.0));
     std::vector<std::pair<double, double> >
         elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
     boost::barrier b(threads);
 
-    for (boost::uint32_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(
+    for (std::uint32_t i = 0; i != threads; ++i)
+        workers.push_back(compat::thread(
             perform_iterations,
-            boost::ref(b),
-            boost::ref(elapsed_control[i]),
-            boost::ref(elapsed_lockfree[i])
+            std::ref(b),
+            std::ref(elapsed_control[i]),
+            std::ref(elapsed_lockfree[i])
             ));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     std::pair<double, double> total_elapsed_control(0.0, 0.0);
     std::pair<double, double> total_elapsed_lockfree(0.0, 0.0);
 
-    for (boost::uint64_t i = 0; i < elapsed_control.size(); ++i)
+    for (std::uint64_t i = 0; i < elapsed_control.size(); ++i)
     {
         total_elapsed_control.first  += elapsed_control[i].first;
         total_elapsed_control.second += elapsed_control[i].second;
@@ -262,15 +269,15 @@ int main(
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1)
+        , value<std::uint64_t>(&threads)->default_value(1)
         , "number of threads to use")
 
         ( "iterations"
-        , value<boost::uint64_t>(&iterations)->default_value(2000000)
+        , value<std::uint64_t>(&iterations)->default_value(2000000)
         , "number of iterations to perform (most be divisible by block size)")
 
         ( "blocksize"
-        , value<boost::uint64_t>(&blocksize)->default_value(10000)
+        , value<std::uint64_t>(&blocksize)->default_value(10000)
         , "size of each block")
 
         ( "no-header"

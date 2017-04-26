@@ -10,9 +10,10 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/ref.hpp>
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -21,8 +22,8 @@ boost::atomic<int> count(0);
 
 void worker(hpx::lcos::local::counting_semaphore& sem)
 {
-    sem.signal();   // signal main thread
     ++count;
+    sem.signal();   // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,12 +32,12 @@ int hpx_main()
     hpx::lcos::local::counting_semaphore sem;
 
     for (std::size_t i = 0; i != 10; ++i)
-        hpx::apply(&worker, boost::ref(sem));
+        hpx::apply(&worker, std::ref(sem));
 
     // Wait for all threads to finish executing.
     sem.wait(10);
 
-    HPX_TEST(count == 10);
+    HPX_TEST_EQ(count, 10);
 
     return hpx::finalize();
 }
@@ -44,9 +45,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

@@ -29,19 +29,24 @@ void test_for_loop(executor_type& exec,
     target_vector& d_A, target_vector& d_B, target_vector& d_C,
     std::vector<int> const& ref)
 {
+    // FIXME : Lambda function given to for_loop_n() is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used inside for_each()) to get the return
+    //         type
+
     hpx::parallel::for_loop_n(
-        hpx::parallel::par.on(exec),
+        hpx::parallel::execution::par.on(exec),
         d_A.data(), d_A.size(),
         hpx::parallel::induction(d_B.data()),
         hpx::parallel::induction(d_C.data()),
-        [] HPX_DEVICE (int* A, int* B, int* C)
+        [] HPX_HOST_DEVICE (int* A, int* B, int* C)
         {
             *C = *A + 3.0 * *B;
         });
 
     std::vector<int> h_C(d_C.size());
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         d_C.begin(), d_C.end(), h_C.begin());
 
     HPX_TEST_EQ(h_C.size(), ref.size());
@@ -55,7 +60,7 @@ void test_for_loop(executor_type& exec,
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -88,11 +93,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     // copy data to device
     hpx::future<void> f =
         hpx::parallel::copy(
-            hpx::parallel::par(hpx::parallel::task),
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
             h_A.begin(), h_A.end(), d_A.begin());
 
         hpx::parallel::copy(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             h_B.begin(), h_B.end(), d_B.begin());
 
     // synchronize with copy operation to A

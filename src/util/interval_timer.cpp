@@ -12,6 +12,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -20,24 +23,24 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     interval_timer::interval_timer()
-      : microsecs_(0), id_(0)
+      : microsecs_(0), id_(nullptr)
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(),
-        microsecs_(microsecs), id_(0), description_(description),
+        microsecs_(microsecs), id_(nullptr), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false)
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),
-        microsecs_(microsecs), id_(0), description_(description),
+        microsecs_(microsecs), id_(nullptr), description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false)
     {}
@@ -122,12 +125,12 @@ namespace hpx { namespace util { namespace detail
                 error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_boost, ec);
-                id_ = 0;
+                id_ = nullptr;
             }
             return true;
         }
 
-        HPX_ASSERT(id_ == 0);
+        HPX_ASSERT(id_ == nullptr);
         return false;
     }
 
@@ -155,24 +158,24 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
-    boost::int64_t interval_timer::get_interval() const
+    std::int64_t interval_timer::get_interval() const
     {
         std::lock_guard<mutex_type> l(mtx_);
         return microsecs_;
     }
 
-    void interval_timer::slow_down(boost::int64_t max_interval)
+    void interval_timer::slow_down(std::int64_t max_interval)
     {
         std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
     }
-    void interval_timer::speed_up(boost::int64_t min_interval)
+    void interval_timer::speed_up(std::int64_t min_interval)
     {
         std::lock_guard<mutex_type> l(mtx_);
         microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
     }
 
-    threads::thread_state_enum interval_timer::evaluate(
+    threads::thread_result_type interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
         try {
@@ -181,13 +184,17 @@ namespace hpx { namespace util { namespace detail
             if (is_stopped_ || is_terminated_ ||
                 statex == threads::wait_abort || 0 == microsecs_)
             {
-                return threads::terminated;        // object has been finalized, exit
+                // object has been finalized, exit
+                return threads::thread_result_type(threads::terminated, nullptr);
             }
 
-            if (id_ != 0 && id_ != threads::get_self_id())
-                return threads::terminated;        // obsolete timer thread
+            if (id_ != nullptr && id_ != threads::get_self_id())
+            {
+                // obsolete timer thread
+                return threads::thread_result_type(threads::terminated, nullptr);
+            }
 
-            id_ = 0;
+            id_ = nullptr;
             is_started_ = false;
 
             bool result = false;
@@ -198,7 +205,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // some other thread might already have started the timer
-            if (0 == id_ && result) {
+            if (nullptr == id_ && result) {
                 HPX_ASSERT(!is_started_);
                 schedule_thread(l);        // wait and repeat
             }
@@ -211,7 +218,9 @@ namespace hpx { namespace util { namespace detail
             if (e.get_error() != yield_aborted)
                 throw;
         }
-        return threads::terminated;   // do not re-schedule this thread
+
+        // do not re-schedule this thread
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // schedule a high priority task after a given time interval
@@ -247,7 +256,7 @@ namespace hpx { namespace util { namespace detail
 
         // schedule this thread to be run after the given amount of seconds
         threads::set_thread_state(id,
-            boost::chrono::microseconds(microsecs_),
+            std::chrono::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_boost, ec);
 
@@ -272,7 +281,7 @@ namespace hpx { namespace util
     interval_timer::interval_timer() {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, microsecs, description, pre_shutdown))
@@ -280,7 +289,7 @@ namespace hpx { namespace util
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::int64_t microsecs, std::string const& description,
+            std::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
             f, on_term, microsecs, description, pre_shutdown))
@@ -307,17 +316,17 @@ namespace hpx { namespace util
         timer_->terminate();
     }
 
-    boost::int64_t interval_timer::get_interval() const
+    std::int64_t interval_timer::get_interval() const
     {
         return timer_->get_interval();
     }
 
-    void interval_timer::slow_down(boost::int64_t max_interval)
+    void interval_timer::slow_down(std::int64_t max_interval)
     {
         return timer_->slow_down(max_interval);
     }
 
-    void interval_timer::speed_up(boost::int64_t min_interval)
+    void interval_timer::speed_up(std::int64_t min_interval)
     {
         return timer_->speed_up(min_interval);
     }

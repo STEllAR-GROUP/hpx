@@ -45,8 +45,13 @@ namespace hpx { namespace threads
         if (0 == --p->count_)
         {
             thread_data::pool_type* pool = p->get_pool();
-            p->~thread_data();
-            pool->deallocate(p);
+            if (pool == nullptr)
+                delete p;
+            else
+            {
+                p->~thread_data();
+                pool->deallocate(p);
+            }
         }
     }
 
@@ -152,7 +157,7 @@ namespace hpx { namespace threads
         {
             HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
                 "null thread id encountered (is this executed on a HPX-thread?)");
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -164,12 +169,18 @@ namespace hpx { namespace threads
     thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();
-        if (0 == self)
+        if (nullptr == self)
             return threads::invalid_thread_id;
 
         return thread_id_type(
                 reinterpret_cast<thread_data*>(self->get_thread_id())
             );
+    }
+
+    std::size_t get_self_stacksize()
+    {
+        thread_id_type id = get_self_id();
+        return id ? id->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -183,7 +194,7 @@ namespace hpx { namespace threads
         return 0;
     }
 
-    boost::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id()
     {
         return naming::invalid_locality_id;
     }
@@ -191,7 +202,7 @@ namespace hpx { namespace threads
     thread_id_repr_type get_parent_id()
     {
         thread_self* self = get_self_ptr();
-        if (0 == self)
+        if (nullptr == self)
             return threads::invalid_thread_id_repr;
         return get_self_id()->get_parent_thread_id();
     }
@@ -199,15 +210,15 @@ namespace hpx { namespace threads
     std::size_t get_parent_phase()
     {
         thread_self* self = get_self_ptr();
-        if (0 == self)
+        if (nullptr == self)
             return 0;
         return get_self_id()->get_parent_thread_phase();
     }
 
-    boost::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id()
     {
         thread_self* self = get_self_ptr();
-        if (0 == self)
+        if (nullptr == self)
             return naming::invalid_locality_id;
         return get_self_id()->get_parent_locality_id();
     }
@@ -219,9 +230,19 @@ namespace hpx { namespace threads
         return 0;
 #else
         thread_self* self = get_self_ptr();
-        if (0 == self)
+        if (nullptr == self)
             return 0;
         return get_self_id()->get_component_id();
 #endif
     }
+
+#if defined(HPX_HAVE_APEX)
+    void** get_self_apex_data()
+    {
+        thread_self* self = get_self_ptr();
+        if (nullptr == self)
+            return nullptr;
+        return self->get_apex_data();
+    }
+#endif
 }}

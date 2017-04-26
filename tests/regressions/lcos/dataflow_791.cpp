@@ -15,8 +15,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign.hpp>
-
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -57,14 +56,14 @@ vector<double> L;
 vector<double> U;
 int size = 200;
 
-boost::uint64_t get_tick_count()
+std::uint64_t get_tick_count()
 {
     return hpx::util::high_resolution_clock::now() / 1000;
 }
 
 int hpx_main (int argc, char *argv[])
 {
-    boost::uint64_t t1, t2;
+    std::uint64_t t1, t2;
     vector<double> originalA;
     int numBlocks = 20;
 
@@ -104,10 +103,9 @@ int hpx_main (int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);

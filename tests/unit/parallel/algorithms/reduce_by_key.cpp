@@ -11,8 +11,10 @@
 //
 #include <boost/random/uniform_int_distribution.hpp>
 //
+#include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
+# include <cstddef>
 # include <string>
 # include <iostream>
 #endif
@@ -21,7 +23,7 @@
 //
 #include "sort_tests.hpp"
 //
-//#define EXTRA_DEBUG
+#define EXTRA_DEBUG
 //
 namespace debug {
     template<typename T>
@@ -64,8 +66,8 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
     const HelperOp &ho)
     {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
     msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
     std::cout << "\n";
 
@@ -134,14 +136,25 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
         }
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,8 +163,8 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
     const Op &op, const HelperOp &ho)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
     msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), sync);
     std::cout << "\n";
 
@@ -223,14 +236,25 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
         }
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,8 +263,8 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     const HelperOp &ho)
     {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
     msg(typeid(ExPolicy).name(), typeid(Tval).name(), typeid(Op).name(), async);
     std::cout << "\n";
 
@@ -304,18 +328,30 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
 
     std::cout << "Async time " << async_seconds << " Sync time " << sync_seconds << "\n";
     bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    HPX_TEST(is_equal);
     if (is_equal) {
         //std::cout << "Test Passed\n";
     }
     else {
-        debug::output("keys     ", o_keys);
-        debug::output("values   ", o_values);
-        debug::output("key range", keys.begin(), result.first);
-        debug::output("val range", values.begin(), result.second);
-        debug::output("expected ", check_values);
-        throw std::string("Problem");
+//         debug::output("keys     ", o_keys);
+//         debug::output("values   ", o_values);
+//         debug::output("key range", keys.begin(), result.first);
+//         debug::output("val range", values.begin(), result.second);
+//         debug::output("expected ", check_values);
+//         throw std::string("Problem");
+#if defined(EXTRA_DEBUG)
+        for (std::size_t i = 0; i != check_values.size(); ++i)
+        {
+            if (values[i] != check_values[i])
+            {
+                std::cout
+                    << i << ": "
+                    << values[i] << " != " << check_values[i]
+                    << "\n";
+            }
+        }
+#endif
     }
-    HPX_TEST(is_equal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -325,31 +361,37 @@ void test_reduce_by_key1()
     //
     hpx::util::high_resolution_timer t;
     do {
-        test_reduce_by_key1(seq, int(), int(), false, std::equal_to<int>(),
+        test_reduce_by_key1(execution::seq, int(), int(), false,
+            std::equal_to<int>(),
             [](int key) {return key;});
-        test_reduce_by_key1(par, int(), int(), false, std::equal_to<int>(),
+        test_reduce_by_key1(execution::par, int(), int(), false,
+            std::equal_to<int>(),
             [](int key) {return key;});
-        test_reduce_by_key1(par_vec, int(), int(), false, std::equal_to<int>(),
+        test_reduce_by_key1(execution::par_unseq, int(), int(), false,
+            std::equal_to<int>(),
             [](int key) {return key;});
         //
         // default comparison operator (std::equal_to)
-        test_reduce_by_key1(seq, int(), double(), false, std::equal_to<double>(),
+        test_reduce_by_key1(execution::seq, int(), double(), false,
+            std::equal_to<double>(),
             [](int key) {return key;});
-        test_reduce_by_key1(par, int(), double(), false, std::equal_to<double>(),
+        test_reduce_by_key1(execution::par, int(), double(), false,
+            std::equal_to<double>(),
             [](int key) {return key;});
-        test_reduce_by_key1(par_vec, int(), double(), false, std::equal_to<double>(),
+        test_reduce_by_key1(execution::par_unseq, int(), double(), false,
+            std::equal_to<double>(),
             [](int key) {return key;});
         //
         //
-        test_reduce_by_key1(seq, double(), double(), false,
+        test_reduce_by_key1(execution::seq, double(), double(), false,
             [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
-        test_reduce_by_key1(par, double(), double(), false,
+        test_reduce_by_key1(execution::par, double(), double(), false,
             [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
-        test_reduce_by_key1(par_vec, double(), double(), false,
+        test_reduce_by_key1(execution::par_unseq, double(), double(), false,
             [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
@@ -357,14 +399,16 @@ void test_reduce_by_key1()
     //
     hpx::util::high_resolution_timer t3;
     do {
-        test_reduce_by_key_const(seq, int(), int(), false, std::equal_to<int>(),
+        test_reduce_by_key_const(execution::seq, int(), int(), false,
+            std::equal_to<int>(),
             [](int key) {return key;});
         //
         // default comparison operator (std::equal_to)
-        test_reduce_by_key_const(seq, int(), double(), false, std::equal_to<double>(),
+        test_reduce_by_key_const(execution::seq, int(), double(), false,
+            std::equal_to<double>(),
             [](int key) {return key;});
         //
-        test_reduce_by_key_const(seq, double(), double(), false,
+        test_reduce_by_key_const(execution::seq, double(), double(), false,
             [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
             [](double a) {return std::floor(a);}
             );
@@ -372,19 +416,23 @@ void test_reduce_by_key1()
     //
     hpx::util::high_resolution_timer t2;
     do {
-        test_reduce_by_key_async(seq(task), int(), int(), std::equal_to<int>(),
+        test_reduce_by_key_async(execution::seq(execution::task), int(), int(),
+            std::equal_to<int>(),
             [](int key) {return key;});
-        test_reduce_by_key_async(par(task), int(), int(), std::equal_to<int>(),
+        test_reduce_by_key_async(execution::par(execution::task), int(), int(),
+            std::equal_to<int>(),
             [](int key) {return key;});
         //
-        test_reduce_by_key_async(seq(task), int(), double(), std::equal_to<double>(),
+        test_reduce_by_key_async(execution::seq(execution::task), int(), double(),
+            std::equal_to<double>(),
             [](int key) {return key;});
-        test_reduce_by_key_async(par(task), int(), double(), std::equal_to<double>(),
+        test_reduce_by_key_async(execution::par(execution::task), int(), double(),
+            std::equal_to<double>(),
             [](int key) {return key;});
     } while (t2.elapsed() < 2);
 
     // one last test with timing output enabled
-    test_reduce_by_key1(par, double(), double(), true,
+    test_reduce_by_key1(execution::par, double(), double(), true,
         [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
         [](double a) {return std::floor(a);}
         );
@@ -393,7 +441,7 @@ void test_reduce_by_key1()
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(0);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -419,9 +467,9 @@ int main(int argc, char* argv[])
         ;
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

@@ -12,6 +12,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 
+#include <cstdint>
+#include <utility>
+
 namespace hpx { namespace threads { namespace coroutines
 {
     namespace detail { namespace generic_context
@@ -61,11 +64,11 @@ namespace hpx { namespace threads { namespace coroutines
             static counter_type counter(0);
             return counter;
         }
-        boost::uint64_t fcontext_context_impl::get_stack_unbind_count(bool reset)
+        std::uint64_t fcontext_context_impl::get_stack_unbind_count(bool reset)
         {
             return util::get_and_reset_value(get_stack_unbind_counter(), reset);
         }
-        boost::uint64_t fcontext_context_impl::increment_stack_unbind_count()
+        std::uint64_t fcontext_context_impl::increment_stack_unbind_count()
         {
             return ++get_stack_unbind_counter();
         }
@@ -76,11 +79,11 @@ namespace hpx { namespace threads { namespace coroutines
             static counter_type counter(0);
             return counter;
         }
-        boost::uint64_t fcontext_context_impl::get_stack_recycle_count(bool reset)
+        std::uint64_t fcontext_context_impl::get_stack_recycle_count(bool reset)
         {
             return util::get_and_reset_value(get_stack_recycle_counter(), reset);
         }
-        boost::uint64_t fcontext_context_impl::increment_stack_recycle_count()
+        std::uint64_t fcontext_context_impl::increment_stack_recycle_count()
         {
             return ++get_stack_recycle_counter();
         }

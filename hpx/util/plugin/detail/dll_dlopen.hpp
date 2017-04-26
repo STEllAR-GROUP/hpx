@@ -4,10 +4,14 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
+// hpxinspect:nodeprecatedname:boost::shared_ptr
+
 #ifndef HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
@@ -16,16 +20,14 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
 
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
@@ -116,7 +118,7 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (nullptr != h_)
                 {
-                    std::lock_guard<boost::recursive_mutex> lock(
+                    std::lock_guard<compat::recursive_mutex> lock(
                         dll::mutex_instance());
 
                     dll::deinit_library(h_);
@@ -210,11 +212,11 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
+            std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
 
             static_assert(
-                boost::is_pointer<SymbolType>::value,
-                "boost::is_pointer<SymbolType>::value");
+                std::is_pointer<SymbolType>::value,
+                "std::is_pointer<SymbolType>::value");
 
             SymbolType address = very_detail::nasty_cast<SymbolType>(
                 MyGetProcAddress(dll_handle, symbol_name.c_str()));
@@ -279,7 +281,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
+                std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary(
@@ -365,7 +367,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (nullptr != dll_handle)
             {
-                std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
+                std::lock_guard<compat::recursive_mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -374,9 +376,9 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         // protect access to dl... functions
-        static boost::recursive_mutex &mutex_instance()
+        static compat::recursive_mutex &mutex_instance()
         {
-            static boost::recursive_mutex mutex;
+            static compat::recursive_mutex mutex;
             return mutex;
         }
 

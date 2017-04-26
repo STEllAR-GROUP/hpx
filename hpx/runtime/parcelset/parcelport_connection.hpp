@@ -9,7 +9,9 @@
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
+#include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace hpx { namespace parcelset {
 
@@ -17,13 +19,17 @@ namespace hpx { namespace parcelset {
     template <typename ConnectionHandler>
     class parcelport_impl;
 
-    boost::uint64_t get_max_inbound_size(parcelport&);
+    std::int64_t HPX_EXPORT get_max_inbound_size(parcelport&);
 
     template <typename Connection, typename BufferType,
         typename ChunkType = serialization::serialization_chunk>
     struct parcelport_connection
       : std::enable_shared_from_this<Connection>
     {
+          ////////////////////////////////////////////////////////////////////////
+          typedef BufferType buffer_type;
+          typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
+
     private:
         HPX_NON_COPYABLE(parcelport_connection);
 
@@ -44,35 +50,7 @@ namespace hpx { namespace parcelset {
         };
 #endif
 
-#if defined(HPX_HAVE_SECURITY) && defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-        parcelport_connection()
-          : first_message_(true)
-          , state_(state_initialized)
-        {}
-
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
-          : first_message_(true)
-          , state_(state_initialized)
-          , buffer_(alloc)
-        {}
-        bool first_message_;
-        state state_;
-#endif
-
-#if defined(HPX_HAVE_SECURITY) && !defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-        parcelport_connection()
-          : first_message_(true)
-        {}
-        bool first_message_;
-
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
-          : first_message_(true)
-          , buffer_(alloc)
-        {}
-        bool first_message_;
-#endif
-
-#if !defined(HPX_HAVE_SECURITY) && defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         parcelport_connection()
           : state_(state_initialized)
         {}
@@ -82,15 +60,22 @@ namespace hpx { namespace parcelset {
           , buffer_(alloc)
         {}
         state state_;
-#endif
-
-#if !defined(HPX_HAVE_SECURITY) && !defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+#else
         parcelport_connection()
         {}
 
         parcelport_connection(typename BufferType::allocator_type const & alloc)
           : buffer_(alloc)
         {}
+
+        parcelport_connection(typename BufferType::allocator_type * alloc)
+          : buffer_(std::move(buffer_type(alloc)),alloc)
+        {}
+
+        parcelport_connection(parcel_buffer_type && buffer)
+          : buffer_(std::move(buffer))
+        {}
+
 #endif
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -101,10 +86,6 @@ namespace hpx { namespace parcelset {
 #endif
 
         virtual ~parcelport_connection() {}
-
-        ////////////////////////////////////////////////////////////////////////
-        typedef BufferType buffer_type;
-        typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
         /// buffer for data
         parcel_buffer_type buffer_;

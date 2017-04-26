@@ -12,6 +12,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -65,7 +67,7 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             futs.push_back(
-                hpx::async(&local_event_test, boost::ref(e), boost::ref(c))
+                hpx::async(&local_event_test, std::ref(e), std::ref(c))
             );
         }
 
@@ -100,10 +102,9 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

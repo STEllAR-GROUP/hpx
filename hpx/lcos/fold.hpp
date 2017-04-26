@@ -182,6 +182,8 @@ namespace hpx { namespace lcos
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace lcos

@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <numeric>
 #include <string>
@@ -122,8 +123,9 @@ int main(int argc, char* argv[])
 {
     // By default this test should run on one core (the executors create more
     // threads)
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=1");
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

@@ -13,18 +13,20 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t threshold = 2;
+std::uint64_t threshold = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+HPX_NOINLINE std::uint64_t fibonacci_serial(std::uint64_t n)
 {
     if (n < 2)
         return n;
@@ -33,37 +35,37 @@ HPX_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// hpx::future<boost::uint64_t> fibonacci(boost::uint64_t) resumable
+// hpx::future<std::uint64_t> fibonacci(std::uint64_t) resumable
 // {
 //     if (n < 2) return hpx::make_ready_future(n);
 //     if (n < threshold) return hpx::make_ready_future(fibonacci_serial(n));
 //
-//     hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1);
-//     hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
+//     hpx::future<std::uint64_t> lhs = hpx::async(&fibonacci, n-1);
+//     hpx::future<std::uint64_t> rhs = fibonacci(n-2);
 //
 //     return await lhs + await rhs;
 // }
 //
 
-hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n);
+hpx::future<std::uint64_t> fibonacci(std::uint64_t n);
 
 struct _fibonacci_frame
 {
     int state_;
-    hpx::future<boost::uint64_t> result_;
-    hpx::lcos::local::promise<boost::uint64_t> result_promise_;
+    hpx::future<std::uint64_t> result_;
+    hpx::lcos::local::promise<std::uint64_t> result_promise_;
 
-    _fibonacci_frame(boost::uint64_t n)
+    _fibonacci_frame(std::uint64_t n)
       : state_(0),
         n_(n), lhs_result_(0), rhs_result_(0)
     {}
 
     // local variables
-    boost::uint64_t n_;
-    hpx::future<boost::uint64_t> lhs_;
-    hpx::future<boost::uint64_t> rhs_;
-    boost::uint64_t lhs_result_;
-    boost::uint64_t rhs_result_;
+    std::uint64_t n_;
+    hpx::future<std::uint64_t> lhs_;
+    hpx::future<std::uint64_t> rhs_;
+    std::uint64_t lhs_result_;
+    std::uint64_t rhs_result_;
 };
 
 void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
@@ -101,10 +103,10 @@ void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
         return;
     }
 
-    // hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1);
+    // hpx::future<std::uint64_t> lhs = hpx::async(&fibonacci, n-1);
     frame->lhs_ = hpx::async(&fibonacci, frame->n_-1);
 
-    // hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
+    // hpx::future<std::uint64_t> rhs = fibonacci(n-2);
     frame->rhs_ = fibonacci(frame->n_-2);
 
     if (!frame->lhs_.is_ready())
@@ -139,7 +141,7 @@ L2:
     return;
 }
 
-hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
+hpx::future<std::uint64_t> fibonacci(std::uint64_t n)
 {
     std::shared_ptr<_fibonacci_frame> frame =
         std::make_shared<_fibonacci_frame>(n);
@@ -153,9 +155,9 @@ hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
-    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::uint64_t n = vm["n-value"].as<std::uint64_t>();
     std::string test = vm["test"].as<std::string>();
-    boost::uint64_t max_runs = vm["n-runs"].as<boost::uint64_t>();
+    std::uint64_t max_runs = vm["n-runs"].as<std::uint64_t>();
 
     if (max_runs == 0) {
         std::cerr << "fibonacci_await: wrong command line argument value for "
@@ -172,12 +174,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     bool executed_one = false;
-    boost::uint64_t r = 0;
+    std::uint64_t r = 0;
 
     if (test == "all" || test == "0")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -186,7 +188,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
@@ -197,7 +199,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (test == "all" || test == "1")
     {
         // Keep track of the time required to execute.
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
@@ -207,7 +209,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
-        boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
+        std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_await(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
@@ -234,9 +236,9 @@ int main(int argc, char* argv[])
 
     using boost::program_options::value;
     desc_commandline.add_options()
-        ( "n-value", value<boost::uint64_t>()->default_value(10),
+        ( "n-value", value<std::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")
-        ( "n-runs", value<boost::uint64_t>()->default_value(1),
+        ( "n-runs", value<std::uint64_t>()->default_value(1),
           "number of runs to perform")
         ( "threshold", value<unsigned int>()->default_value(2),
           "threshold for switching to serial code")

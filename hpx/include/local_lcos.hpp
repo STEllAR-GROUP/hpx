@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,13 +10,16 @@
 #include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/barrier.hpp>
+#include <hpx/lcos/local/channel.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/lcos/local/sliding_semaphore.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/and_gate.hpp>

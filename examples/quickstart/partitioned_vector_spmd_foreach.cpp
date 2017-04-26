@@ -19,8 +19,10 @@
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 
-#include <ctime>
+#include <cstddef>
 #include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -114,7 +116,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -159,7 +161,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
         hpx::parallel::generate(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             view.begin(), view.end(),
             [&]()
             {
@@ -168,7 +170,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // square all numbers in the array
         hpx::parallel::for_each(
-            hpx::parallel::par,
+            hpx::parallel::execution::par,
             view.begin(), view.end(),
             [](int& val)
             {
@@ -202,8 +204,9 @@ int main(int argc, char* argv[])
         ;
 
     // run hpx_main on all localities
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv, cfg);

@@ -66,7 +66,7 @@ Additionally, if you wish to require __hpx__ for your project, replace the
 
 You can check if __hpx__ was successfully found with the `HPX_FOUND` CMake variable.
 
-The simplst way to add the __hpx__ component is to use the `add_hpx_component`
+The simplest way to add the __hpx__ component is to use the `add_hpx_component`
 macro and add it to the `CMakeLists.txt` file:
 
 ``
@@ -108,7 +108,7 @@ After adding the component, the way you add the executable is as follows:
     add_hpx_executable(hello_world
         ESSENTIAL
         SOURCES hello_world_client.cpp
-        COMPONENT_DEPENDENCIES hello_world_component)
+        COMPONENT_DEPENDENCIES hello_world)
 ``
 
 When you configure your application, all you need to do is set the

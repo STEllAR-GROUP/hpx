@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,9 +9,16 @@
 #define HPX_THREADMANAGER_SCHEDULING_STATIC_PRIOTITY_QUEUE_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -28,12 +35,11 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     /// This scheduler does not do any work stealing.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class static_priority_queue_scheduler
+    template <typename Mutex = compat::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT static_priority_queue_scheduler
         : public local_priority_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
           >
@@ -58,8 +64,8 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+        bool get_next_thread(std::size_t num_thread, bool running,
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = this->queues_.size();
 
@@ -101,7 +107,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count)
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 
@@ -158,5 +164,6 @@ namespace hpx { namespace threads { namespace policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif
 

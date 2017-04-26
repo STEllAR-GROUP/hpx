@@ -10,7 +10,11 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <cstddef>
+#include <functional>
+#include <iostream>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace jacobi_smp {
@@ -100,10 +104,10 @@ namespace jacobi_smp {
                         hpx::util::bind(
                             jacobi_kernel_wrap
                           , block_ranges[block]
-                          , boost::cref(A)
-                          , boost::ref(*dst)
-                          , boost::cref(*src)
-                          , boost::cref(b)
+                          , std::cref(A)
+                          , std::ref(*dst)
+                          , std::cref(*src)
+                          , std::cref(b)
                         )
                     );
             }

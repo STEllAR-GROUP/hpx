@@ -7,9 +7,12 @@
 #define HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/exception_ptr.hpp>
+
+#include <cstddef>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -21,11 +21,13 @@
 #include <cuda_runtime.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <limits>
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace compute { namespace cuda
 {
@@ -58,15 +60,19 @@ namespace hpx { namespace compute { namespace cuda
         typedef cuda::target target_type;
 
         allocator()
-          : target_(&cuda::get_default_target())
+          : target_(cuda::get_default_target())
         {}
 
-        allocator(target_type& tgt)
-          : target_(&tgt)
+        allocator(target_type const& tgt)
+          : target_(tgt)
+        {}
+
+        allocator(target_type && tgt)
+          : target_(std::move(tgt))
         {}
 
         template <typename U>
-        allocator(allocator<U>& alloc)
+        allocator(allocator<U> const& alloc)
           : target_(alloc.target_)
         {}
 
@@ -77,7 +83,7 @@ namespace hpx { namespace compute { namespace cuda
 #if defined(__CUDA_ARCH__)
             return &x;
 #else
-            return pointer(x.device_ptr(), *target_);
+            return pointer(x.device_ptr(), target_);
 #endif
         }
 
@@ -86,7 +92,7 @@ namespace hpx { namespace compute { namespace cuda
 #if defined(__CUDA_ARCH__)
             return &x;
 #else
-            return pointer(x.device_ptr(), *target_);
+            return pointer(x.device_ptr(), target_);
 #endif
         }
 
@@ -95,17 +101,18 @@ namespace hpx { namespace compute { namespace cuda
         // called. The pointer hint may be used to provide locality of
         // reference: the allocator, if supported by the implementation, will
         // attempt to allocate the new memory block as close as possible to hint.
-        pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
+        pointer allocate(size_type n,
+            std::allocator<void>::const_pointer hint = nullptr)
         {
 #if defined(__CUDA_ARCH__)
             pointer result;
 #else
             value_type *p = nullptr;
-            detail::scoped_active_target active(*target_);
+            detail::scoped_active_target active(target_);
 
             cudaError_t error = cudaMalloc(&p, n*sizeof(T));
 
-            pointer result(p, *target_);
+            pointer result(p, target_);
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
@@ -124,7 +131,7 @@ namespace hpx { namespace compute { namespace cuda
         void deallocate(pointer p, size_type n)
         {
 #if !defined(__CUDA_ARCH__)
-            detail::scoped_active_target active(*target_);
+            detail::scoped_active_target active(target_);
 
             cudaError_t error = cudaFree(p.device_ptr());
             if (error != cudaSuccess)
@@ -142,7 +149,7 @@ namespace hpx { namespace compute { namespace cuda
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
         size_type max_size() const HPX_NOEXCEPT
         {
-            detail::scoped_active_target active(*target_);
+            detail::scoped_active_target active(target_);
             std::size_t free = 0;
             std::size_t total = 0;
             cudaError_t error = cudaMemGetInfo(&free, &total);
@@ -160,79 +167,81 @@ namespace hpx { namespace compute { namespace cuda
     public:
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
-        template <typename U, typename ... Args>
-        void bulk_construct(U* p, std::size_t count, Args &&... args)
+        template <typename ... Args>
+        void bulk_construct(pointer p, std::size_t count, Args &&... args)
         {
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
 
             detail::launch(
-                *target_, num_blocks, threads_per_block,
-                [] __device__ (U* p, std::size_t count, Args const&... args)
+                target_, num_blocks, threads_per_block,
+                [] HPX_DEVICE (T* p, std::size_t count, Args const&... args)
                 {
-                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                    std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
-                        ::new (p + idx) U (std::forward<Args>(args)...);
+                        ::new (p + idx) T (std::forward<Args>(args)...);
                     }
                 },
-                p, count, std::forward<Args>(args)...);
-            target_->synchronize();
+                p.device_ptr(), count, std::forward<Args>(args)...);
+            target_.synchronize();
         }
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <typename U, typename ... Args>
-        void construct(U* p, Args &&... args)
+        template <typename ... Args>
+        void construct(pointer p, Args &&... args)
         {
             detail::launch(
-                *target_, 1, 1,
-                [] __device__ (U* p, Args const&... args)
+                target_, 1, 1,
+                [] HPX_DEVICE (T* p, Args const&... args)
                 {
-                    ::new (p) U (std::forward<Args>(args)...);
+                    ::new (p) T (std::forward<Args>(args)...);
                 },
-                p, std::forward<Args>(args)...);
-            target_->synchronize();
+                p.device_ptr(), std::forward<Args>(args)...);
+            target_.synchronize();
         }
 
         // Calls the destructor of count objects pointed to by p
-        template <typename U>
-        void bulk_destroy(U* p, std::size_t count)
+        void bulk_destroy(pointer p, std::size_t count)
         {
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
 
             detail::launch(
-                *target_, num_blocks, threads_per_block,
-                [] __device__ (U* p, std::size_t count)
+                target_, num_blocks, threads_per_block,
+                [] HPX_DEVICE (T* p, std::size_t count)
                 {
-                    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                    std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
-                        (p + idx)->~U();
+                        (p + idx)->~T();
                     }
                 },
-                p, count);
-            target_->synchronize();
+                p.device_ptr(), count);
+            target_.synchronize();
         }
 
         // Calls the destructor of the object pointed to by p
-        template <typename U>
-        void destroy(U* p)
+        void destroy(pointer p)
         {
             bulk_destroy(p, 1);
         }
 
         // Access the underlying target (device)
-        target_type& target() const HPX_NOEXCEPT
+        target_type& target() HPX_NOEXCEPT
         {
-            return *target_;
+            return target_;
+        }
+        target_type const& target() const HPX_NOEXCEPT
+        {
+            return target_;
         }
 
     private:
-        target_type* target_;
+        target_type target_;
     };
 }}}
 

@@ -9,8 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/make_continuation.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/applier/apply_continue_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
+
+#include <utility>
 
 namespace hpx
 {

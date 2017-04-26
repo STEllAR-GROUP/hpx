@@ -5,7 +5,11 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
+#endif
 
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -15,6 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <string>
 
@@ -292,3 +297,4 @@ namespace hpx { namespace util
     }
 }}
 
+#endif

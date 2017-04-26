@@ -8,9 +8,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-#include <boost/assign/std/vector.hpp>
-#include <boost/chrono.hpp>
-
+#include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -25,13 +24,13 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
-using hpx::agas::register_name_sync;
-using hpx::agas::unregister_name_sync;
+using hpx::agas::register_name;
+using hpx::agas::unregister_name;
 using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
@@ -50,7 +49,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
+    std::uint64_t const delay = vm["delay"].as<std::uint64_t>();
 
     {
         /// AGAS reference-counting test 7 (from #126):
@@ -71,7 +70,7 @@ void hpx_test_main(
              << flush;
 
         // Associate a symbolic name with the object.
-        HPX_TEST_EQ(true, register_name_sync(name, monitor.get_id()));
+        HPX_TEST_EQ(true, register_name(hpx::launch::sync, name, monitor.get_id()));
 
         hpx::naming::gid_type gid;
 
@@ -93,7 +92,7 @@ void hpx_test_main(
 
         // Remove the symbolic name. This should return the final credits
         // to AGAS.
-        HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
+        HPX_TEST_EQ(gid, unregister_name(hpx::launch::sync, name).get_gid());
 
         // Flush pending reference counting operations.
         garbage_collect();
@@ -138,15 +137,15 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(500)
+        , value<std::uint64_t>()->default_value(500)
         , "number of milliseconds to wait for object destruction")
         ;
 
     // We need to explicitly enable the test components used by this test.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.components.simple_refcnt_checker.enabled! = 1";
-    cfg += "hpx.components.managed_refcnt_checker.enabled! = 1";
+    std::vector<std::string> const cfg = {
+        "hpx.components.simple_refcnt_checker.enabled! = 1",
+        "hpx.components.managed_refcnt_checker.enabled! = 1"
+    };
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv, cfg);

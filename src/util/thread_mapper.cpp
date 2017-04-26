@@ -5,11 +5,11 @@
 
 #include <hpx/util/thread_mapper.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -58,11 +58,11 @@ namespace hpx { namespace util
             thread_info_[i].cleanup_(i); //-V108
     }
 
-    boost::uint32_t thread_mapper::register_thread(char const *l, error_code& ec)
+    std::uint32_t thread_mapper::register_thread(char const *l, error_code& ec)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        boost::thread::id id = boost::this_thread::get_id();
+        compat::thread::id id = compat::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         if (it != thread_map_.end())
         {
@@ -81,7 +81,7 @@ namespace hpx { namespace util
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::thread_mapper::register_thread",
                 "attempted to register thread with a duplicate label");
-            return boost::uint32_t(-1);
+            return std::uint32_t(-1);
         }
 
         label_map_.left.insert(label_map_type::left_value_type(l, tix));
@@ -96,7 +96,7 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        boost::thread::id id = boost::this_thread::get_id();
+        compat::thread::id id = compat::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         return (it == thread_map_.end()) ? false : unmap_thread(it);
     }

@@ -9,11 +9,15 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+#include <functional>
+#include <iostream>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -54,18 +58,18 @@ inline bool compare_real(T x, T y, T epsilon)
 }
 
 double null_function(
-    boost::uint64_t seed
-  , boost::uint64_t delay_iterations
+    std::uint64_t seed
+  , std::uint64_t delay_iterations
     )
 {
     boost::random::mt19937_64 prng(seed);
 
     boost::random::uniform_real_distribution<double> v(0, 1.);
-    boost::random::uniform_smallint<boost::uint8_t> s(0, 1);
+    boost::random::uniform_smallint<std::uint8_t> s(0, 1);
 
     double d = 0.;
 
-    for (boost::uint64_t i = 0; i < delay_iterations; ++i)
+    for (std::uint64_t i = 0; i < delay_iterations; ++i)
     {
         double v0 = v(prng);
         double v1 = v(prng);
@@ -81,19 +85,19 @@ double null_function(
 
 ///////////////////////////////////////////////////////////////////////////////
 double null_tree(
-    boost::uint64_t seed
-  , boost::uint64_t depth
-  , boost::uint64_t max_depth
-  , boost::uint64_t children
-  , boost::uint64_t delay_iterations
-  , boost::uint32_t num_localities
+    std::uint64_t seed
+  , std::uint64_t depth
+  , std::uint64_t max_depth
+  , std::uint64_t children
+  , std::uint64_t delay_iterations
+  , std::uint32_t num_localities
     );
 
 HPX_PLAIN_ACTION(null_tree, null_tree_action);
 
 void null_callback(
     std::vector<double>& dd
-  , boost::uint64_t j
+  , std::uint64_t j
   , hpx::future<double> f
     )
 {
@@ -101,12 +105,12 @@ void null_callback(
 }
 
 double null_tree(
-    boost::uint64_t seed
-  , boost::uint64_t depth
-  , boost::uint64_t max_depth
-  , boost::uint64_t children
-  , boost::uint64_t delay_iterations
-  , boost::uint32_t num_localities
+    std::uint64_t seed
+  , std::uint64_t depth
+  , std::uint64_t max_depth
+  , std::uint64_t children
+  , std::uint64_t delay_iterations
+  , std::uint32_t num_localities
     )
 {
     if (depth == max_depth)
@@ -118,9 +122,9 @@ double null_tree(
     std::vector<hpx::future<void> > futures;
     futures.reserve(children);
 
-    boost::uint64_t p = seed + ipow(depth, children);
+    std::uint64_t p = seed + ipow(depth, children);
 
-    for (boost::uint64_t j = 0; j < children; ++j)
+    for (std::uint64_t j = 0; j < children; ++j)
     {
         hpx::id_type const target
             = hpx::naming::get_id_from_locality_id((j + p) % num_localities);
@@ -134,7 +138,7 @@ double null_tree(
                                         );
 
         futures.push_back(f.then
-            (hpx::util::bind(&null_callback, boost::ref(dd), j,
+            (hpx::util::bind(&null_callback, std::ref(dd), j,
                 hpx::util::placeholders::_1)));
     }
 
@@ -144,7 +148,7 @@ double null_tree(
 
     double d = 0.;
 
-    for (boost::uint64_t j = 0; j < children; ++j)
+    for (std::uint64_t j = 0; j < children; ++j)
         d += dd[j];
 
     return d;
@@ -155,24 +159,25 @@ int hpx_main(
     )
 {
     {
-        boost::uint64_t test_runs = vm["test-runs"].as<boost::uint64_t>();
+        std::uint64_t test_runs = vm["test-runs"].as<std::uint64_t>();
 
-        boost::uint64_t children = vm["children"].as<boost::uint64_t>();
+        std::uint64_t children = vm["children"].as<std::uint64_t>();
 
-        boost::uint64_t max_depth = vm["depth"].as<boost::uint64_t>() + 1;
+        std::uint64_t max_depth = vm["depth"].as<std::uint64_t>() + 1;
 
-        boost::uint64_t delay_iterations
-            = vm["delay-iterations"].as<boost::uint64_t>();
+        std::uint64_t delay_iterations
+            = vm["delay-iterations"].as<std::uint64_t>();
 
         bool verbose = vm.count("verbose") != 0;
 
-        boost::uint32_t num_localities = hpx::get_num_localities_sync();
+        std::uint32_t num_localities =
+            hpx::get_num_localities(hpx::launch::sync);
 
         hpx::id_type const here = hpx::find_here();
 
         double d = 0.;
 
-        for ( boost::uint64_t i = 0
+        for ( std::uint64_t i = 0
             ; (test_runs == 0) || (i < test_runs)
             ; ++i)
         {
@@ -213,22 +218,22 @@ int main(
 
     cmdline.add_options()
         ( "test-runs"
-        , value<boost::uint64_t>()->default_value(10)
+        , value<std::uint64_t>()->default_value(10)
         , "number of times to repeat the test (0 == infinite)")
 
         ( "verbose"
         , "print state every iteration")
 
         ( "children"
-        , value<boost::uint64_t>()->default_value(8)
+        , value<std::uint64_t>()->default_value(8)
         , "number of children each node has")
 
         ( "depth"
-        , value<boost::uint64_t>()->default_value(3)
+        , value<std::uint64_t>()->default_value(3)
         , "depth of the tree structure")
 
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of iterations in the delay loop")
         ;
 

@@ -15,7 +15,9 @@
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx
@@ -127,17 +129,6 @@ namespace hpx
         struct is_distribution_policy<container_distribution_policy>
           : std::true_type
         {};
-
-        // By default the number of partitions is the same as the number of
-        // localities represented by the given distribution policy
-        template <typename Policy, typename Enable = void>
-        struct num_container_partitions
-        {
-            static std::size_t call(Policy const& policy)
-            {
-                return policy.get_num_localities();
-            }
-        };
 
         template <>
         struct num_container_partitions<container_distribution_policy>

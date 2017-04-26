@@ -10,11 +10,14 @@
 
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
+#include <utility>
+
 namespace hpx { namespace components {
     template <typename Component>
     class component
       : public simple_component<Component>
     {
+    public:
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance
         template <typename ...Ts>

@@ -15,22 +15,48 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
+#include <boost/lockfree/detail/prefix.hpp>
 
 #include <cstddef> // for std::size_t
+#include <cstdint>
+
+#ifdef _MSC_VER
+#if defined(_M_IX86)
+    #define HPX_LOCKFREE_DCAS_ALIGNMENT
+#elif defined(_M_X64) || defined(_M_IA64)
+    #define HPX_LOCKFREE_DCAS_ALIGNMENT __declspec(align(16))
+#endif
+
+#endif /* _MSC_VER */
+
+#ifdef __GNUC__
+#if defined(__i386__) || defined(__ppc__)
+    #define HPX_LOCKFREE_DCAS_ALIGNMENT
+#elif defined(__x86_64__)
+    #define HPX_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
+#elif defined(__alpha__)
+    // LATER: alpha may benefit from pointer compression.
+    //  but what is the maximum size of the address space?
+    #define HPX_LOCKFREE_DCAS_ALIGNMENT
+#endif
+#endif /* __GNUC__ */
+
+#if !defined(HPX_LOCKFREE_DCAS_ALIGNMENT)
+#define HPX_LOCKFREE_DCAS_ALIGNMENT
+#endif
 
 namespace boost { namespace lockfree
 {
 
 #if defined(BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS)
 template <class Left, class Right>
-struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
+struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
     typedef __uint128_t compressed_ptr_pair_t;
-    typedef boost::uint64_t compressed_ptr_t;
-    typedef boost::uint16_t tag_t;
+    typedef std::uint64_t compressed_ptr_t;
+    typedef std::uint16_t tag_t;
 
-    union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
+    union HPX_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {
         compressed_ptr_pair_t value;
         compressed_ptr_t ptrs[2];
@@ -200,10 +226,10 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     compressed_ptr_pair_t pair_;
 };
 #else
-struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
+struct HPX_LOCKFREE_DCAS_ALIGNMENT uint128_type
 {
-    boost::uint64_t left;
-    boost::uint64_t right;
+    std::uint64_t left;
+    std::uint64_t right;
 
     bool operator==(volatile uint128_type const& rhs) const
     { return (left == rhs.left) && (right == rhs.right); }
@@ -213,13 +239,13 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
 };
 
 template <class Left, class Right>
-struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
+struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 {
     typedef uint128_type compressed_ptr_pair_t;
-    typedef boost::uint64_t compressed_ptr_t;
-    typedef boost::uint16_t tag_t;
+    typedef std::uint64_t compressed_ptr_t;
+    typedef std::uint16_t tag_t;
 
-    union BOOST_LOCKFREE_DCAS_ALIGNMENT cast_unit
+    union HPX_LOCKFREE_DCAS_ALIGNMENT cast_unit
     {
         compressed_ptr_pair_t value;
         tag_t tags[8];

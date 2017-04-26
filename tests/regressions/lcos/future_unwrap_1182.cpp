@@ -8,6 +8,7 @@
 #include <hpx/hpx_main.hpp>
 
 #include <iostream>
+#include <utility>
 
 using namespace hpx;
 

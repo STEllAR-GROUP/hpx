@@ -13,16 +13,18 @@
 #include <hpx/async.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/util/register_locks.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <cstdint>
 #include <ios>
 #include <iostream>
 #include <iterator>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -126,9 +128,20 @@ namespace hpx { namespace iostreams
         template <typename Tag>
         hpx::future<naming::id_type> create_ostream(Tag tag)
         {
-            return create_ostream(get_outstream_name(tag), detail::get_outstream(tag));
+            return create_ostream(get_outstream_name(tag),
+                detail::get_outstream(tag));
         }
 
+//         ///////////////////////////////////////////////////////////////////////
+//         void release_ostream(char const* name, naming::id_type const& id);
+//
+//         template <typename Tag>
+//         void release_ostream(Tag tag, naming::id_type const& id)
+//         {
+//             release_ostream(get_outstream_name(tag), id);
+//         }
+
+        ///////////////////////////////////////////////////////////////////////
         void register_ostreams();
         void unregister_ostreams();
     }
@@ -149,13 +162,13 @@ namespace hpx { namespace iostreams
 
         typedef typename stream_base_type::traits_type stream_traits_type;
         typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
-        typedef lcos::local::recursive_mutex mutex_type;
+        typedef detail::buffer::mutex_type mutex_type;
 
         HPX_MOVABLE_ONLY(ostream);
 
     private:
-        mutex_type mtx_;
-        boost::atomic<boost::uint64_t> generational_count_;
+        using detail::buffer::mtx_;
+        boost::atomic<std::uint64_t> generational_count_;
 
         // Performs a lazy streaming operation.
         template <typename T>
@@ -175,10 +188,10 @@ namespace hpx { namespace iostreams
 
             // If the buffer isn't empty, send it asynchronously to the
             // destination.
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
@@ -201,10 +214,10 @@ namespace hpx { namespace iostreams
             *static_cast<stream_base_type*>(this) << subject;
 
             // If the buffer isn't empty, send it to the destination.
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
@@ -215,7 +228,10 @@ namespace hpx { namespace iostreams
                 hpx::async<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next).get();
             }
-
+            else
+            {
+                l.unlock();     // must unlock in any case
+            }
             return *this;
         } // }}}
 
@@ -225,13 +241,19 @@ namespace hpx { namespace iostreams
         bool flush()
         {
             std::unique_lock<mutex_type> l(mtx_);
-            if (!this->detail::buffer::empty())
+            if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
-                buffer next = this->detail::buffer::init();
+                buffer next = this->detail::buffer::init_locked();
 
                 // Unlock the mutex before we cleanup.
                 l.unlock();
+
+                // since mtx_ is recursive and apply will do an AGAS lookup,
+                // we need to ignore the lock here in case we are called
+                // recursively
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type> >
+                    il(&l);
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
@@ -254,13 +276,17 @@ namespace hpx { namespace iostreams
         }
 
         // reset this object during runtime system shutdown
-        void uninitialize()
+        template <typename Tag>
+        void uninitialize(Tag tag)
         {
             std::unique_lock<mutex_type> l(mtx_, std::try_to_lock);
             if (l)
             {
-                streaming_operator_sync(hpx::async_flush, l);   // unlocks l
+                streaming_operator_sync(hpx::async_flush, l);   // unlocks
             }
+
+            // FIXME: find a later spot to invoke this
+//             detail::release_ostream(tag, this->get_id());
             this->base_type::free();
         }
 
@@ -311,7 +337,8 @@ namespace hpx { namespace iostreams
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
+            util::ignore_while_checking<std::unique_lock<mutex_type> > ignore(&l);
             return streaming_operator_lazy(manip_fun);
         }
     };

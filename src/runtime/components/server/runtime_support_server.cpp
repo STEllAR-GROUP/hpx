@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
@@ -39,7 +39,9 @@
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
+#include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
+#include <hpx/lcos/detail/barrier_node.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif
@@ -48,6 +50,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -61,6 +64,9 @@
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -323,39 +329,6 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<util::one_size_heap_list_base>
-        runtime_support::get_promise_heap(components::component_type type)
-    {
-        // locate the factory for the requested component type
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-
-        component_map_type::iterator it = components_.find(type);
-        if (it == components_.end())
-        {
-            // we don't know anything about this promise type yet
-            std::shared_ptr<components::base_lco_factory> factory(
-                new components::base_lco_factory(type));
-
-            component_factory_type data(factory);
-            std::pair<component_map_type::iterator, bool> p =
-                components_.insert(component_map_type::value_type(type, data));
-            if (!p.second)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(out_of_memory,
-                    "runtime_support::get_promise_heap",
-                    "could not create base_lco_factor for type " +
-                        components::get_component_type_name(type));
-            }
-
-            it = p.first;
-        }
-
-        return std::static_pointer_cast<components::base_lco_factory>(
-            (*it).second.first)->get_heap();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
     // FIXME: error code?
     naming::gid_type runtime_support::create_memory_block(
@@ -384,7 +357,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        agas::gva const& g, naming::gid_type const& gid, boost::uint64_t count)
+        agas::gva const& g, naming::gid_type const& gid, std::uint64_t count)
     {
         // Special case: component_memory_block.
         if (g.type == components::component_memory_block) {
@@ -421,7 +394,7 @@ namespace hpx { namespace components { namespace server
         else if (naming::refers_to_virtual_memory(gid))
         {
             // simply delete the memory
-            delete [] reinterpret_cast<boost::uint8_t*>(gid.get_lsb());
+            delete [] reinterpret_cast<std::uint8_t*>(gid.get_lsb());
             return;
         }
 
@@ -551,10 +524,11 @@ typedef
     hpx::lcos::detail::make_broadcast_action<call_shutdown_functions_action>::type
     call_shutdown_functions_broadcast_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
-        call_shutdown_functions_action)
 HPX_ACTION_USES_MEDIUM_STACK(
     call_shutdown_functions_broadcast_action)
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
+        call_shutdown_functions_action)
 HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
         call_shutdown_functions_action,
         hpx::actions::broadcast_call_shutdown_functions_action_id)
@@ -612,12 +586,11 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        while (tm.get_thread_count() > 1)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::size_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
-            // FIXME: this sleep_for is causing very long shutdown times.
-            // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
-            this_thread::yield();
+            util::detail::yield_k(k, "runtime_support::dijkstra_termination");
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -642,10 +615,25 @@ namespace hpx { namespace components { namespace server
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
-        boost::uint32_t num_localities =
-            static_cast<boost::uint32_t>(locality_ids.size());
+        std::uint32_t num_localities =
+            static_cast<std::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
+
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
+            {
+                util::detail::yield_k(k,
+                    "runtime_support::dijkstra_termination_detection");
+            }
+
             return 0;
+        }
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -685,9 +673,9 @@ namespace hpx { namespace components { namespace server
     }
 #else
     void runtime_support::send_dijkstra_termination_token(
-        boost::uint32_t target_locality_id,
-        boost::uint32_t initiating_locality_id,
-        boost::uint32_t num_localities, bool dijkstra_token)
+        std::uint32_t target_locality_id,
+        std::uint32_t initiating_locality_id,
+        std::uint32_t num_localities, bool dijkstra_token)
     {
         // First wait for this locality to become passive. We do this by
         // periodically checking the number of still running threads.
@@ -697,12 +685,12 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        while (tm.get_thread_count() > 1)
+        for (std::size_t k = 0;
+            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+            ++k)
         {
-            // FIXME: this sleep_for is causing very long shutdown times.
-            // By commenting it, #1263 gets solved.
-            //this_thread::sleep_for(boost::posix_time::millisec(100));
-            this_thread::yield();
+            util::detail::yield_k(k,
+                "runtime_support::send_dijkstra_termination_token");
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -728,15 +716,17 @@ namespace hpx { namespace components { namespace server
 
     // invoked during termination detection
     void runtime_support::dijkstra_termination(
-        boost::uint32_t initiating_locality_id, boost::uint32_t num_localities,
+        std::uint32_t initiating_locality_id, std::uint32_t num_localities,
         bool dijkstra_token)
     {
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
+        parcelset::parcelhandler& ph = appl.get_parcel_handler();
 
         agas_client.start_shutdown();
+        ph.flush_parcels();
 
-        boost::uint32_t locality_id = get_locality_id();
+        std::uint32_t locality_id = get_locality_id();
 
         if (initiating_locality_id == locality_id)
         {
@@ -762,17 +752,32 @@ namespace hpx { namespace components { namespace server
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
-        boost::uint32_t num_localities =
-            static_cast<boost::uint32_t>(locality_ids.size());
+        std::uint32_t num_localities =
+            static_cast<std::uint32_t>(locality_ids.size());
         if (num_localities == 1)
-            return 0;
+        {
+            // While no real distributed termination detection has to be
+            // performed, we should still wait for the thread-queues to drain.
+            applier::applier& appl = hpx::applier::get_applier();
+            threads::threadmanager_base& tm = appl.get_thread_manager();
 
-        boost::uint32_t initiating_locality_id = get_locality_id();
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
+            {
+                util::detail::yield_k(k,
+                    "runtime_support::dijkstra_termination_detection");
+            }
+
+            return 0;
+        }
+
+        std::uint32_t initiating_locality_id = get_locality_id();
 
         // send token to previous node
-        boost::uint32_t target_id = initiating_locality_id;
+        std::uint32_t target_id = initiating_locality_id;
         if (0 == target_id)
-            target_id = static_cast<boost::uint32_t>(num_localities);
+            target_id = static_cast<std::uint32_t>(num_localities);
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -815,7 +820,7 @@ namespace hpx { namespace components { namespace server
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_support::shutdown_all",
-                "shutdown_all shut be invoked on the troot locality only");
+                "shutdown_all should be invoked on the root locality only");
             return;
         }
 
@@ -859,11 +864,11 @@ namespace hpx { namespace components { namespace server
                       "passed second termination detection (count: "
                    << count << ").";
 
-        // Shut down all localities except the the local one, we can't use
+        // Shut down all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
-        boost::uint32_t locality_id = get_locality_id();
+        std::uint32_t locality_id = get_locality_id();
         std::vector<lcos::future<void> > lazy_actions;
 
         for (naming::id_type const& id : locality_ids)
@@ -896,11 +901,11 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
-        // Terminate all localities except the the local one, we can't use
+        // Terminate all localities except the local one, we can't use
         // broadcast here as we have to handle the back parcel in a special
         // way.
         {
-            boost::uint32_t locality_id = get_locality_id();
+            std::uint32_t locality_id = get_locality_id();
             std::vector<lcos::future<void> > lazy_actions;
 
             for (naming::gid_type gid : locality_ids)
@@ -931,8 +936,8 @@ namespace hpx { namespace components { namespace server
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
     void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr, boost::uint64_t count,
-        boost::uint64_t offset)
+        naming::address const& addr, std::uint64_t count,
+        std::uint64_t offset)
     {
         naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
     }
@@ -992,7 +997,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::int32_t runtime_support::get_instance_count(components::component_type type)
+    std::int32_t runtime_support::get_instance_count(components::component_type type)
     {
         std::unique_lock<component_map_mutex_type> l(cm_mtx_);
 
@@ -1008,7 +1013,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_instance_count",
                 strm.str());
-            return boost::int32_t(-1);
+            return std::int32_t(-1);
         }
 
         // ask for the factory's capabilities
@@ -1021,7 +1026,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0) return;
+        if (rt == nullptr) return;
 
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
@@ -1030,7 +1035,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         stopped_ = false;
         terminated_ = false;
         shutdown_all_invoked_.store(false);
@@ -1038,7 +1043,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         while (!stopped_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -1054,12 +1059,12 @@ namespace hpx { namespace components { namespace server
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        HPX_ASSERT(0 != self);    // needs to be executed by a HPX thread
+        HPX_ASSERT(nullptr != self);    // needs to be executed by a HPX thread
 
         // give the scheduler some time to work on remaining tasks
         {
             util::unlock_guard<Lock> ul(l);
-            self->yield(threads::pending);
+            self->yield(threads::thread_result_type(threads::pending, nullptr));
         }
 
         // get rid of all terminated threads
@@ -1069,7 +1074,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         if (!stopped_) {
             // push pending logs
             components::cleanup_logging();
@@ -1087,7 +1092,9 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            while (tm.get_thread_count() > 1)
+            for (std::size_t k = 0;
+                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                ++k)
             {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
@@ -1099,6 +1106,7 @@ namespace hpx { namespace components { namespace server
                     timed_out = true;
                     break;
                 }
+                util::detail::yield_k(k, "runtime_support::stop");
             }
 
             // If it took longer than expected, kill all suspended threads as
@@ -1106,7 +1114,10 @@ namespace hpx { namespace components { namespace server
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
                 start_time = t.elapsed();
-                while (tm.get_thread_count() > 1)
+
+                for (std::size_t k = 0;
+                    tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                    ++k)
                 {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
@@ -1120,12 +1131,12 @@ namespace hpx { namespace components { namespace server
                         // we waited long enough
                         break;
                     }
+                    util::detail::yield_k(k, "runtime_support::stop");
                 }
             }
 
             // Drop the locality from the partition table.
             naming::gid_type here = agas_client.get_local_locality();
-            agas_client.unregister_locality(here, ec);
 
             // unregister fixed components
             agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
@@ -1133,6 +1144,11 @@ namespace hpx { namespace components { namespace server
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
+
+            agas_client.unregister_locality(here, ec);
+
+            if (remove_from_remote_caches)
+                remove_here_from_console_connection_cache();
 
             if (respond_to) {
                 // respond synchronously
@@ -1158,7 +1174,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         if (!stopped_) {
             stopped_ = true;
             wait_condition_.notify_all();
@@ -1169,7 +1185,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<compat::mutex> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination
@@ -1233,7 +1249,7 @@ namespace hpx { namespace components { namespace server
                 std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
                     std::size_t(-1), mode,
-                    get_runtime_mode_from_name(runtime_mode), 0,
+                    get_runtime_mode_from_name(runtime_mode), nullptr,
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
@@ -1243,7 +1259,7 @@ namespace hpx { namespace components { namespace server
                 if (!still_unknown_commandline.empty())
                 {
                     util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != 0);
+                    HPX_ASSERT(s != nullptr);
                     s->add_entry("unknown_cmd_line_option",
                         still_unknown_commandline);
                 }
@@ -1342,6 +1358,7 @@ namespace hpx { namespace components { namespace server
                     rt.report_error(boost::current_exception());
                 }
             }
+            lcos::barrier::get_global_barrier().detach();
         }
     }
 
@@ -1388,7 +1405,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::remove_here_from_connection_cache()
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == 0)
+        if (rt == nullptr)
             return;
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
@@ -1402,12 +1419,36 @@ namespace hpx { namespace components { namespace server
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
+            // console is handled separately
+            if (naming::get_locality_id_from_id(id) == 0)
+                continue;
+
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+    }
+
+    void runtime_support::remove_here_from_console_connection_cache()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+            return;
+
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
+        action_type act;
+        indirect_packaged_task ipt;
+        future<void> callback = ipt.get_future();
+
+        // handle console separately
+        id_type id = naming::get_id_from_locality_id(0);
+        apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
+
+        callback.wait();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1502,7 +1543,7 @@ namespace hpx { namespace components { namespace server
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
             }
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1514,14 +1555,14 @@ namespace hpx { namespace components { namespace server
 
         parcelset::policies::message_handler* mh = factory->create(action,
             pp, num_messages, interval);
-        if (0 == mh) {
+        if (nullptr == mh) {
             std::ostringstream strm;
             strm << "couldn't create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
@@ -1550,7 +1591,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         l.unlock();
@@ -1561,21 +1602,21 @@ namespace hpx { namespace components { namespace server
                 (*it).second.first));
 
         serialization::binary_filter* bf = factory->create(compress, next_filter);
-        if (0 == bf) {
+        if (nullptr == bf) {
             std::ostringstream strm;
-            strm << "couldn't to create binary filter plugin of type: "
+            strm << "couldn't create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 strm.str());
-            return 0;
+            return nullptr;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
         // log result if requested
-        LRT_(info) << "successfully binary filter handler plugin of type: "
+        LRT_(info) << "successfully created binary filter handler plugin of type: "
                     << binary_filter_type;
         return bf;
     }
@@ -1602,7 +1643,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 util::plugin::get_plugins_list_type f;
@@ -2084,7 +2125,7 @@ namespace hpx { namespace components { namespace server
                 component_ini = ini.get_section(component_section);
 
             error_code ec(lightweight);
-            if (0 == component_ini ||
+            if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
                 // get the factory
@@ -2305,7 +2346,7 @@ namespace hpx { namespace components { namespace server
                 plugin_ini = ini.get_section(plugin_section);
 
             error_code ec(lightweight);
-            if (0 == plugin_ini ||
+            if (nullptr == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
                 // get the factory
@@ -2402,51 +2443,6 @@ namespace hpx { namespace components { namespace server
 
         modules_.insert(std::make_pair(HPX_MANGLE_STRING(plugin), d));
         return true;    // plugin got loaded
-    }
-#endif
-
-#if defined(HPX_HAVE_SECURITY)
-    components::security::capability
-        runtime_support::get_factory_capabilities(components::component_type type)
-    {
-        components::security::capability caps;
-
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end()) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (component type not found in map)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        if (!(*it).second.first) {
-            std::ostringstream strm;
-            strm << "attempt to extract capabilities for component instance of "
-                << "invalid/unknown type: "
-                << components::get_component_type_name(type)
-                << " (map entry is nullptr)";
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_factory_capabilities",
-                strm.str());
-            return caps;
-        }
-
-        std::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_guard<std::unique_lock<component_map_mutex_type> > ul(l);
-            caps = factory->get_required_capabilities();
-        }
-        return caps;
     }
 #endif
 }}}

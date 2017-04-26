@@ -3,19 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/config.hpp>
 
+#include <hpx/compat/thread.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+
 #include <boost/config.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
-#include <hpx/util/high_resolution_timer.hpp>
+#include <cstdint>
+#include <functional>
+#include <iostream>
+#include <vector>
 
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
@@ -42,6 +44,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +54,7 @@ static HPX_NATIVE_TLS double* global_scratch;
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
     boost::barrier& b
-  , boost::uint64_t updates
+  , std::uint64_t updates
     )
 {
     b.wait();
@@ -78,18 +81,18 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    boost::uint32_t threads, updates;
+    std::uint32_t threads, updates;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint32_t>(&threads)->default_value(1),
+        , value<std::uint32_t>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
-        , value<boost::uint32_t>(&updates)->default_value(1 << 22)
+        , value<std::uint32_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"
@@ -111,16 +114,20 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
 
     boost::barrier b(threads);
 
     high_resolution_timer t;
 
-    for (boost::uint32_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
+    for (std::uint32_t i = 0; i != threads; ++i)
+        workers.push_back(compat::thread(worker, std::ref(b), updates));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     const double duration = t.elapsed();
 

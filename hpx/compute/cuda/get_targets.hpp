@@ -10,39 +10,19 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/exception.hpp>
+#if defined(HPX_HAVE_CUDA)
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 
-#include <cuda_runtime.h>
-
-#include <string>
 #include <vector>
 
 namespace hpx { namespace compute { namespace cuda
 {
-    std::vector<target> get_targets()
-    {
-        int device_count = 0;
-        cudaError_t error = cudaGetDeviceCount(&device_count);
-        if (error != cudaSuccess)
-        {
-            HPX_THROW_EXCEPTION(kernel_error,
-                "cuda::get_targets()",
-                std::string("cudaGetDeviceCount failed: ") +
-                    cudaGetErrorString(error));
-        }
+    struct HPX_EXPORT target;
 
-        std::vector<target> targets;
-        targets.reserve(device_count);
-
-        for(int i = 0; i < device_count; ++i)
-        {
-            targets.emplace_back(target(i));
-        }
-
-        return targets;
-    }
+    HPX_EXPORT std::vector<target> get_local_targets();
+    HPX_EXPORT hpx::future<std::vector<target> >
+        get_targets(hpx::id_type const& locality);
 }}}
 
 #endif

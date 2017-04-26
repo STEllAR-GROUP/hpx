@@ -30,16 +30,39 @@ namespace boost
       { "(\\bboost\\s*::\\s*noncopyable\\b)", "HPX_NON_COPYABLE" },
       { "(\\bboost\\s*::\\s*result_of\\b)", "std::result_of" },
       { "(\\bboost\\s*::\\s*decay\\b)", "std::decay" },
-//       { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*enable_if\\b)", "std::enable_if" },
+      { "(\\bboost\\s*::\\s*disable_if\\b)", "std::enable_if" },
+      { "(\\bboost\\s*::\\s*enable_if_c\\b)", "std::enable_if" },
+      { "(\\bboost\\s*::\\s*disable_if_c\\b)", "std::enable_if" },
+      { "(\\bboost\\s*::\\s*lazy_enable_if\\b)", "hpx::util::lazy_enable_if" },
+      { "(\\bboost\\s*::\\s*lazy_disable_if\\b)", "hpx::util::lazy_enable_if" },
+      { "(\\bboost\\s*::\\s*lazy_enable_if_c\\b)", "hpx::util::lazy_enable_if" },
+      { "(\\bboost\\s*::\\s*lazy_disable_if_c\\b)", "hpx::util::lazy_enable_if" },
+      { "(\\bboost\\s*::\\s*mpl\\b)", "no specific replacement" },
+      { "(\\bboost\\s*::\\s*(is_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(add_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(remove_[^\\s]*?\\b))", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(((false)|(true))_type\\b))", "std::\\2" },
       { "(\\bboost\\s*::\\s*lock_guard\\b)", "std::lock_guard" },
       { "(\\bboost\\s*::\\s*unordered_map\\b)", "std::unordered_map" },
       { "(\\bboost\\s*::\\s*unordered_multimap\\b)", "std::unordered_multimap" },
       { "(\\bboost\\s*::\\s*unordered_set\\b)", "std::unordered_set" },
       { "(\\bboost\\s*::\\s*unordered_multiset\\b)", "std::unordered_multiset" },
-      { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)", "hpx::util::atomic_count" },
+      { "(\\bboost\\s*::\\s*detail\\s*::\\s*atomic_count\\b)",
+        "hpx::util::atomic_count" },
       { "(\\bboost\\s*::\\s*function\\b)", "hpx::util::function_nonser" },
+      { "(\\bboost\\s*::\\s*shared_ptr\\b)", "std::shared_ptr" },
+      { "(\\bboost\\s*::\\s*make_shared\\b)", "std::make_shared" },
+      { "(\\bboost\\s*::\\s*enable_shared_from_this\\b)",
+        "std::enable_shared_from_this" },
+      { "(\\bboost\\s*::\\s*bind\\b)", "hpx::util::bind" },
+      { "(\\bboost\\s*::\\s*unique_lock\\b)", "std::unique_lock" },
+      { "(\\bboost\\s*::\\s*chrono\\b)", "std::chrono" },
+      { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },
+      { "(\\bboost\\s*::\\s*(c?ref)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2" },
       { "(\\bNULL\\b)", "nullptr" },
-      { 0, 0 }
+      { nullptr, nullptr }
     };
 
     //  deprecated_name_check constructor  --------------------------------- //
@@ -58,7 +81,7 @@ namespace boost
       register_signature( ".ipp" );
 
       for (deprecated_names const* names_it = &names[0];
-           names_it->name_regex != 0;
+           names_it->name_regex != nullptr;
            ++names_it)
       {
         std::string rx(names_it->name_regex);
@@ -82,8 +105,17 @@ namespace boost
       const path & full_path,      // example: c:/foo/boost/filesystem/path.hpp
       const string & contents)     // contents of file to be inspected
     {
-      if (contents.find( "hpxinspect:" "nodeprecatedname" ) != string::npos)
-        return;
+      std::string::size_type p = contents.find( "hpxinspect:" "nodeprecatedname" );
+      if (p != string::npos)
+      {
+        // ignore this directive here (it is handled below) if it is followed
+        // by a ':'
+        if (p == contents.size() - 27 ||
+            (contents.size() > p + 27 && contents[p + 27] != ':'))
+        {
+          return;
+        }
+      }
 
       std::set<std::string> found_names;
 
@@ -98,8 +130,13 @@ namespace boost
           {
             // avoid errors to be reported twice
             std::string found_name(m[1].first, m[1].second);
+
             if (found_names.find(found_name) == found_names.end())
             {
+              std::string tag("hpxinspect:" "nodeprecatedname:" + found_name);
+              if (contents.find(tag) != string::npos)
+                continue;
+
               // name was found
               found_names.insert(found_name);
 

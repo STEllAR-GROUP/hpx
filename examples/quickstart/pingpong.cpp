@@ -11,7 +11,10 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <memory>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////

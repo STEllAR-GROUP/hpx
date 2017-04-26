@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -20,14 +20,16 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
 
+#include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <memory>
+#include <utility>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -67,6 +69,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         switch_status (thread_data* t, thread_state prev_state)
           : thread_(t), prev_state_(prev_state),
+            next_thread_id_(nullptr),
             need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
 
@@ -80,10 +83,12 @@ namespace hpx { namespace threads { namespace detail
 
         // allow to change the state the thread will be switched to after
         // execution
-        thread_state operator=(thread_state_enum new_state)
+        thread_state operator=(thread_result_type && new_state)
         {
-            return prev_state_ = thread_state(new_state,
+            prev_state_ = thread_state(new_state.first,
                 prev_state_.state_ex(), prev_state_.tag() + 1);
+            next_thread_id_ = std::move(new_state.second);
+            return prev_state_;
         }
 
         // Get the state this thread was in before execution (usually pending),
@@ -111,10 +116,17 @@ namespace hpx { namespace threads { namespace detail
         // disable default handling in destructor
         void disable_restore() { need_restore_state_ = false; }
 
+        thread_data* get_next_thread() const
+        {
+            // we know that the thread-id is just the pointer to the thread_data
+            return reinterpret_cast<thread_data*>(next_thread_id_.get());
+        }
+
     private:
         thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
+        thread_id_type next_thread_id_;
         bool need_restore_state_;
     };
 
@@ -197,21 +209,45 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    struct is_active_wrapper
+    {
+        is_active_wrapper(std::uint8_t& is_active)
+          : is_active_(is_active)
+        {
+            is_active = 1;
+        }
+        ~is_active_wrapper()
+        {
+            is_active_ = 0;
+        }
+
+        std::uint8_t& is_active_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     struct scheduling_counters
     {
         scheduling_counters(std::int64_t& executed_threads,
                 std::int64_t& executed_thread_phases,
-                std::uint64_t& tfunc_time, std::uint64_t& exec_time)
+                std::uint64_t& tfunc_time, std::uint64_t& exec_time,
+                std::int64_t& idle_loop_count, std::int64_t& busy_loop_count,
+                std::uint8_t& is_active)
           : executed_threads_(executed_threads),
             executed_thread_phases_(executed_thread_phases),
             tfunc_time_(tfunc_time),
-            exec_time_(exec_time)
+            exec_time_(exec_time),
+            idle_loop_count_(idle_loop_count),
+            busy_loop_count_(busy_loop_count),
+            is_active_(is_active)
         {}
 
         std::int64_t& executed_threads_;
         std::int64_t& executed_thread_phases_;
         std::uint64_t& tfunc_time_;
         std::uint64_t& exec_time_;
+        std::int64_t& idle_loop_count_;
+        std::int64_t& busy_loop_count_;
+        std::uint8_t& is_active_;
     };
 
     struct scheduling_callbacks
@@ -227,32 +263,178 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t max_background_threads =
                     hpx::util::safe_lexical_cast<std::size_t>(
                         hpx::get_config_entry("hpx.max_background_threads",
-                            (std::numeric_limits<std::size_t>::max)())))
+                            (std::numeric_limits<std::size_t>::max)())),
+                std::size_t max_idle_loop_count =
+                    hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::get_config_entry("hpx.max_idle_loop_count",
+                            HPX_IDLE_LOOP_COUNT_MAX)),
+                std::size_t max_busy_loop_count =
+                    hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::get_config_entry("hpx.max_busy_loop_count",
+                            HPX_BUSY_LOOP_COUNT_MAX)))
           : outer_(std::move(outer)),
             inner_(std::move(inner)),
             background_(std::move(background)),
-            max_background_threads_(max_background_threads)
+            max_background_threads_(max_background_threads),
+            max_idle_loop_count_(max_idle_loop_count),
+            max_busy_loop_count_(max_busy_loop_count)
         {}
 
         callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
-        std::size_t max_background_threads_;
+        std::size_t const max_background_threads_;
+        std::int64_t const max_idle_loop_count_;
+        std::int64_t const max_busy_loop_count_;
     };
 
     template <typename SchedulingPolicy>
+    thread_id_type create_background_thread(SchedulingPolicy& scheduler,
+        scheduling_callbacks& callbacks, std::shared_ptr<bool>& background_running,
+        std::size_t num_thread, std::int64_t& idle_loop_count)
+    {
+        thread_id_type background_thread;
+        background_running.reset(new bool(true));
+        thread_init_data background_init(
+            [&, background_running](thread_state_ex_enum) -> thread_result_type
+            {
+                while(*background_running)
+                {
+                    if (callbacks.background_())
+                    {
+                        // we only update the idle_loop_count if
+                        // background_running is true. If it was false, this task
+                        // was given back to the scheduler.
+                        if (*background_running)
+                            idle_loop_count = 0;
+                    }
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "background_work");
+                }
+                return thread_result_type(terminated, nullptr);
+            },
+            hpx::util::thread_description("background_work"),
+            0,
+            thread_priority_critical,
+            num_thread,
+            std::size_t(-1),
+            &scheduler);
+
+        // Create in suspended to prevent the thread from being scheduled
+        // directly...
+        scheduler.SchedulingPolicy::create_thread(background_init,
+            &background_thread, suspended, true, hpx::throws, num_thread);
+        HPX_ASSERT(background_thread);
+        // We can now set the state to pending
+        background_thread->set_state(pending);
+        return background_thread;
+    }
+
+    // This function tries to invoke the background work thread. It returns
+    // false when we need to give the background thread back to scheduler
+    // and create a new one that is supposed to be executed inside the
+    // scheduling_loop, true otherwise
+    template <typename SchedulingPolicy>
+    bool call_background_thread(thread_id_type& background_thread,
+        thread_data*& next_thrd, SchedulingPolicy& scheduler, std::size_t num_thread,
+        bool running)
+    {
+        if (HPX_UNLIKELY(background_thread))
+        {
+            thread_state state = background_thread->get_state();
+            thread_state_enum state_val = state.state();
+
+            if (HPX_LIKELY(pending == state_val))
+            {
+                {
+                    // tries to set state to active (only if state is still
+                    // the same as 'state')
+                    detail::switch_status thrd_stat (background_thread.get(), state);
+                    if (HPX_LIKELY(thrd_stat.is_valid() &&
+                            thrd_stat.get_previous() == pending))
+                    {
+#if defined(HPX_HAVE_APEX)
+                        // get the APEX data pointer, in case we are resuming the
+                        // thread and have to restore any leaf timers from
+                        // direct actions, etc.
+
+                        // the address of tmp_data is getting stored
+                        // by APEX during this call
+                        util::apex_wrapper apex_profiler(
+                            background_thread->get_description(),
+                            background_thread->get_apex_data());
+
+                        thrd_stat = (*background_thread)();
+
+                        if (thrd_stat.get_previous() == terminated)
+                        {
+                            apex_profiler.stop();
+                        }
+                        else
+                        {
+                            apex_profiler.yield();
+                        }
+#else
+                        thrd_stat = (*background_thread)();
+#endif
+                        thread_data *next = thrd_stat.get_next_thread();
+                        if (next != nullptr && next != background_thread.get())
+                        {
+                            if (next_thrd == nullptr)
+                            {
+                                next_thrd = next;
+                            }
+                            else
+                            {
+                                scheduler.SchedulingPolicy::schedule_thread(
+                                    next, num_thread);
+                            }
+                        }
+                    }
+                    thrd_stat.store_state(state);
+                    state_val = state.state();
+
+                    if (HPX_LIKELY(state_val == pending_boost))
+                    {
+                        background_thread->set_state(pending);
+                    }
+                    else if(terminated == state_val)
+                    {
+                        std::int64_t busy_count = 0;
+                        scheduler.SchedulingPolicy::destroy_thread(
+                            background_thread.get(), busy_count);
+                        background_thread.reset();
+                    }
+                    else if(suspended == state_val)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            // This should never be reached ... we should only deal with pending
+            // here.
+            HPX_ASSERT(false);
+        }
+        return true;
+    }
+
+    template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        scheduling_counters& counters, scheduling_callbacks& callbacks)
+        scheduling_counters& counters, scheduling_callbacks& params)
     {
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain(get_thread_name().data());
-//         util::itt::id threadid(domain, this);
-        util::itt::frame_context fctx(domain);
+        util::itt::domain domain = hpx::get_thread_itt_domain();
+        util::itt::id threadid(domain, &scheduler);
+        util::itt::string_handle task_id("task_id");
+        util::itt::string_handle task_phase("task_phase");
 
-        boost::int64_t idle_loop_count = 0;
-        boost::int64_t busy_loop_count = 0;
+//         util::itt::frame_context fctx(domain);
+
+        std::int64_t& idle_loop_count = counters.idle_loop_count_;
+        std::int64_t& busy_loop_count = counters.busy_loop_count_;
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
@@ -261,13 +443,29 @@ namespace hpx { namespace threads { namespace detail
 
         // spin for some time after queues have become empty
         bool may_exit = false;
+        thread_data* thrd = nullptr;
+        thread_data* next_thrd = nullptr;
+
+        std::shared_ptr<bool> background_running = nullptr;
+        thread_id_type background_thread = nullptr;
+
+        if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+            num_thread < params.max_background_threads_ &&
+            !params.background_.empty())
+        {
+            background_thread = create_background_thread(scheduler, params,
+                background_running, num_thread, idle_loop_count);
+        }
 
         while (true) {
             // Get the next HPX thread from the queue
-            thread_data* thrd = nullptr;
+            thrd = next_thrd;
+            bool running = this_state.load(
+                boost::memory_order_relaxed) < state_stopping;
 
-            if (scheduler.SchedulingPolicy::get_next_thread(
-                    num_thread, idle_loop_count, thrd))
+            if (HPX_LIKELY(thrd ||
+                    scheduler.SchedulingPolicy::get_next_thread(
+                        num_thread, running, idle_loop_count, thrd)))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -284,7 +482,8 @@ namespace hpx { namespace threads { namespace detail
 
                 detail::write_old_state_log(num_thread, thrd, state_val);
 
-                if (pending == state_val) {
+                if (HPX_LIKELY(pending == state_val))
+                {
                     // switch the state of the thread to active and back to
                     // what the thread reports as its return value
 
@@ -292,25 +491,36 @@ namespace hpx { namespace threads { namespace detail
                         // tries to set state to active (only if state is still
                         // the same as 'state')
                         detail::switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending)
+                        if (HPX_LIKELY(thrd_stat.is_valid() &&
+                                thrd_stat.get_previous() == pending))
                         {
                             tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-#ifdef HPX_HAVE_ITTNOTIFY
+                                is_active_wrapper utilization(counters.is_active_);
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
-                                util::itt::undo_frame_context undoframe(fctx);
+//                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
+                                task.add_metadata(task_id, thrd);
+                                task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 exec_time_wrapper exec_time_collector(idle_rate);
 
 #if defined(HPX_HAVE_APEX)
+                                // get the APEX data pointer, in case we are resuming the
+                                // thread and have to restore any leaf timers from
+                                // direct actions, etc.
+
+                                // the address of tmp_data is getting stored
+                                // by APEX during this call
                                 util::apex_wrapper apex_profiler(
-                                    thrd->get_description());
+                                    thrd->get_description(),
+                                    thrd->get_apex_data());
 
                                 thrd_stat = (*thrd)();
 
@@ -342,7 +552,7 @@ namespace hpx { namespace threads { namespace detail
                         }
 
                         // store and retrieve the new state in the thread
-                        if (!thrd_stat.store_state(state)) {
+                        if (HPX_UNLIKELY(!thrd_stat.store_state(state))) {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
@@ -355,6 +565,10 @@ namespace hpx { namespace threads { namespace detail
 
                         // any exception thrown from the thread will reset its
                         // state at this point
+
+                        // handle next thread id if given (switch directly to
+                        // this thread)
+                        next_thrd = thrd_stat.get_next_thread();
                     }
 
                     //detail::write_new_state_log_debug(num_thread, thrd,
@@ -363,10 +577,13 @@ namespace hpx { namespace threads { namespace detail
                     // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
-                    if (state_val == pending) {
-                        // schedule other work
-                        scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                            is_running_state(this_state.load()), idle_loop_count);
+                    if (HPX_UNLIKELY(state_val == pending))
+                    {
+                        if (HPX_LIKELY(next_thrd == nullptr)) {
+                            // schedule other work
+                            scheduler.SchedulingPolicy::wait_or_add_new(
+                                num_thread, running, idle_loop_count);
+                        }
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -374,8 +591,45 @@ namespace hpx { namespace threads { namespace detail
                             num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
+                    else if (HPX_UNLIKELY(state_val == pending_boost))
+                    {
+                        thrd->set_state(pending);
+
+                        if (HPX_LIKELY(next_thrd == nullptr))
+                        {
+                            // reschedule this thread right away if the
+                            // background work will be triggered
+                            if (HPX_UNLIKELY(
+                                busy_loop_count > params.max_busy_loop_count_))
+                            {
+                                next_thrd = thrd;
+                            }
+                            else
+                            {
+                                // schedule other work
+                                scheduler.SchedulingPolicy::wait_or_add_new(
+                                    num_thread, running, idle_loop_count);
+
+                                // schedule this thread again immediately with
+                                // boosted priority
+                                scheduler.SchedulingPolicy::schedule_thread(
+                                    thrd, num_thread, thread_priority_boost);
+                                scheduler.SchedulingPolicy::do_some_work(
+                                    num_thread);
+                            }
+                        }
+                        else if (HPX_LIKELY(next_thrd != thrd))
+                        {
+                            // schedule this thread again immediately with
+                            // boosted priority
+                            scheduler.SchedulingPolicy::schedule_thread(
+                                thrd, num_thread, thread_priority_boost);
+                            scheduler.SchedulingPolicy::do_some_work(
+                                num_thread);
+                        }
+                    }
                 }
-                else if (active == state_val) {
+                else if (HPX_UNLIKELY(active == state_val)) {
                     LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
                         "thread(" << thrd->get_thread_id().get() << "), "
                         "description(" << thrd->get_description() << "), "
@@ -395,7 +649,7 @@ namespace hpx { namespace threads { namespace detail
                 // or terminated, this will delete the HPX thread as all
                 // references go out of scope.
                 // REVIEW: what has to be done with depleted HPX threads?
-                if (state_val == depleted || state_val == terminated)
+                if (HPX_LIKELY(state_val == depleted || state_val == terminated))
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                     ++counters.executed_threads_;
@@ -408,8 +662,8 @@ namespace hpx { namespace threads { namespace detail
             else {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        is_running_state(this_state.load()), idle_loop_count))
+                if (scheduler.SchedulingPolicy::wait_or_add_new(
+                        num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
@@ -428,47 +682,66 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
 
-                // do background work in parcel layer and in agas
-                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                // let our background threads terminate
+                if (background_running)
                 {
-                    if (callbacks.background_())
-                        idle_loop_count = 0;
+                    *background_running = running;
+                }
+                // do background work in parcel layer and in agas
+                if (!call_background_thread(background_thread, next_thrd, scheduler,
+                    num_thread, running))
+                {
+                    // Let the current background thread terminate as soon as
+                    // possible. No need to reschedule, as another LCO will
+                    // set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
+                    *background_running = false;
+                    // Create a new one which will replace the current such we
+                    // avoid deadlock situations, if all background threads are
+                    // blocked.
+                    background_thread = create_background_thread(scheduler, params,
+                        background_running, num_thread, idle_loop_count);
                 }
 
                 // call back into invoking context
-                if (!callbacks.inner_.empty())
-                    callbacks.inner_();
+                if (!params.inner_.empty())
+                    params.inner_();
             }
 
             // something went badly wrong, give up
-            if (this_state.load() == state_terminating)
+            if (HPX_UNLIKELY(this_state.load() == state_terminating))
                 break;
 
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
+            if (busy_loop_count > params.max_busy_loop_count_)
             {
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
-                    num_thread < callbacks.max_background_threads_ &&
-                    !callbacks.background_.empty())
+                if (!call_background_thread(background_thread, next_thrd, scheduler,
+                    num_thread, running))
                 {
-                    if (callbacks.background_())
-                        idle_loop_count = 0;
+                    // Let the current background thread terminate as soon as
+                    // possible. No need to reschedule, as another LCO will
+                    // set it to pending and schedule it back eventually
+                    HPX_ASSERT(background_thread);
+                    *background_running = false;
+                    // Create a new one which will replace the current such we
+                    // avoid deadlock situations, if all background threads are
+                    // blocked.
+                    background_thread = create_background_thread(scheduler, params,
+                        background_running, num_thread, idle_loop_count);
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
-                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
                 // clean up terminated threads
-                if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
 
                 // call back into invoking context
-                if (!callbacks.outer_.empty())
-                    callbacks.outer_();
+                if (!params.outer_.empty())
+                    params.outer_();
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)

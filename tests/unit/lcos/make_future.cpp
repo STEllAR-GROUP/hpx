@@ -8,6 +8,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_make_future()

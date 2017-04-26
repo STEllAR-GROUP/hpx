@@ -23,7 +23,7 @@ if(HPX_WITH_EXAMPLES_QT4)
         ${qt_FLAGS}
         FOLDER "Examples/Qt")
 
-    target_link_libraries(qt_exe ${QT_LIBRARIES})
+    target_link_libraries(qt_exe ${HPX_TLL_PUBLIC} ${QT_LIBRARIES})
 
     # add a custom target for this example
     add_hpx_pseudo_target(examples.qt.qt)

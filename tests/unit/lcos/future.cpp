@@ -1,4 +1,4 @@
-//  Copyright (C) 2012 Hartmut Kaiser
+//  Copyright (C) 2012-2017 Hartmut Kaiser
 //  (C) Copyright 2008-10 Anthony Williams
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -11,8 +11,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
+#include <chrono>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -414,7 +414,7 @@ void test_wait_callback()
     hpx::lcos::future<int> fi = pi.get_future();
 
     hpx::lcos::future<void> ft = fi.then(&wait_callback);
-    hpx::thread t(&promise_set_value, boost::ref(pi));
+    hpx::thread t(&promise_set_value, std::ref(pi));
 
     ft.wait();
 
@@ -440,21 +440,21 @@ void test_wait_callback_with_timed_wait()
     hpx::lcos::future<int> fi = pi.get_future();
 
     hpx::lcos::future<void> fv =
-        fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
+        fi.then(hpx::util::bind(&do_nothing_callback, std::ref(pi)));
 
-    int state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    int state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
     pi.set_value(42);
 
-    state = int(fv.wait_for(boost::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(10)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::ready));
 
     HPX_TEST_EQ(callback_called, 1U);
@@ -534,6 +534,15 @@ void test_destroying_a_packaged_task_stores_broken_task()
     }
 }
 
+void test_assign_to_void()
+{
+    hpx::lcos::future<void> f1 = hpx::lcos::make_ready_future(42);
+    f1.get();
+
+    hpx::lcos::shared_future<void> f2 = hpx::lcos::make_ready_future(42).share();
+    f2.get();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -565,6 +574,7 @@ int hpx_main(variables_map&)
         test_packaged_task_can_be_moved();
         test_destroying_a_promise_stores_broken_promise();
         test_destroying_a_packaged_task_stores_broken_task();
+        test_assign_to_void();
     }
 
     hpx::finalize();
@@ -578,10 +588,9 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

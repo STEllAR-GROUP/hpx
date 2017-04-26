@@ -9,6 +9,9 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 inline bool close_enough(double m, double ex, double perc)
 {
@@ -20,7 +23,7 @@ int hpx_main(boost::program_options::variables_map&)
 {
     const size_t n = 1000000;
 
-    boost::uint32_t const prefix = hpx::get_locality_id();
+    std::uint32_t const prefix = hpx::get_locality_id();
     // use floating point instructions here to avoid measuring runtime side effects
     boost::format cnt_name("/papi{locality#%d/worker-thread#0}/PAPI_FP_INS");
 
@@ -31,32 +34,32 @@ int hpx_main(boost::program_options::variables_map&)
 
     id_type id = get_counter(boost::str(cnt_name % prefix));
 
-    performance_counter::start(id);
+    performance_counter::start(hpx::launch::sync, id);
 
     // perform n ops, active counter
     volatile size_t i;
     volatile double a = 0.0, b = 0.0, c = 0.0;
     for (i = 0; i < n; i++) a=b+c;
 
-    counter_value value1 = performance_counter::get_value(id);
+    counter_value value1 = performance_counter::get_value(hpx::launch::sync, id);
     // stop the counter w/o resetting
-    performance_counter::stop(id);
+    performance_counter::stop(hpx::launch::sync,id);
 
     // perform n ops (should be uncounted)
     for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
-    counter_value value2 = performance_counter::get_value(id, true);
-    performance_counter::start(id);
+    counter_value value2 = performance_counter::get_value(hpx::launch::sync, id, true);
+    performance_counter::start(hpx::launch::sync, id);
 
     // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;
-    counter_value value3 = performance_counter::get_value(id);
+    counter_value value3 = performance_counter::get_value(hpx::launch::sync, id);
     // reset counter using reset-only interface
-    performance_counter::reset(id);
+    performance_counter::reset(hpx::launch::sync, id);
 
     // perform n ops, counted from 0 (or close to it)
     for (i = 0; i < n; i++) a=b+c;
-    counter_value value4 = performance_counter::get_value(id);
+    counter_value value4 = performance_counter::get_value(hpx::launch::sync, id);
 
     bool pass = status_is_valid(value1.status_) &&
                 status_is_valid(value2.status_) &&
@@ -64,10 +67,10 @@ int hpx_main(boost::program_options::variables_map&)
                 status_is_valid(value4.status_);
     if (pass)
     {
-        boost::uint64_t cnt1 = value1.get_value<boost::uint64_t>();
-        boost::uint64_t cnt2 = value2.get_value<boost::uint64_t>();
-        boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
-        boost::uint64_t cnt4 = value4.get_value<boost::uint64_t>();
+        std::uint64_t cnt1 = value1.get_value<std::uint64_t>();
+        std::uint64_t cnt2 = value2.get_value<std::uint64_t>();
+        std::uint64_t cnt3 = value3.get_value<std::uint64_t>();
+        std::uint64_t cnt4 = value4.get_value<std::uint64_t>();
 
         std::cout << n << " counted fp instructions, result: " << cnt1 << std::endl
                   << n << " uncounted fp instructions, result: "

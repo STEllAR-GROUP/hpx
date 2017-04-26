@@ -11,10 +11,11 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
@@ -36,7 +37,7 @@ void measure_sequential_foreach(std::size_t size)
         std::rand());
 
     // invoke sequential for_each
-    hpx::parallel::for_each(hpx::parallel::seq,
+    hpx::parallel::for_each(hpx::parallel::execution::seq,
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -55,7 +56,7 @@ void measure_parallel_foreach(std::size_t size)
     hpx::parallel::static_chunk_size cs(chunk_size);
 
     // invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::par.with(cs),
+    hpx::parallel::for_each(hpx::parallel::execution::par.with(cs),
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -77,7 +78,7 @@ hpx::future<void> measure_task_foreach(std::size_t size)
     // invoke parallel for_each
     return
         hpx::parallel::for_each(
-            hpx::parallel::par(hpx::parallel::task).with(cs),
+            hpx::parallel::execution::par(hpx::parallel::execution::task).with(cs),
             boost::begin(*data_representation),
             boost::end(*data_representation),
             [](std::size_t) {
@@ -88,9 +89,9 @@ hpx::future<void> measure_task_foreach(std::size_t size)
         );
 }
 
-boost::uint64_t average_out_parallel(std::size_t vector_size)
+std::uint64_t average_out_parallel(std::size_t vector_size)
 {
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
@@ -99,11 +100,11 @@ boost::uint64_t average_out_parallel(std::size_t vector_size)
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-boost::uint64_t average_out_task(std::size_t vector_size)
+std::uint64_t average_out_task(std::size_t vector_size)
 {
     if (num_overlapping_loops <= 0)
     {
-        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+        std::uint64_t start = hpx::util::high_resolution_clock::now();
 
         for(auto i = 0; i < test_count; i++)
             measure_task_foreach(vector_size).wait();
@@ -114,7 +115,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
     std::vector<hpx::shared_future<void> > tests;
     tests.resize(num_overlapping_loops);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     for(auto i = 0; i < test_count; i++)
     {
@@ -128,9 +129,9 @@ boost::uint64_t average_out_task(std::size_t vector_size)
     return (hpx::util::high_resolution_clock::now() - start) / test_count;
 }
 
-boost::uint64_t average_out_sequential(std::size_t vector_size)
+std::uint64_t average_out_sequential(std::size_t vector_size)
 {
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for(auto i = 0; i < test_count; i++)
@@ -158,9 +159,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     } else {
 
         //results
-        boost::uint64_t par_time = average_out_parallel(vector_size);
-        boost::uint64_t task_time = average_out_task(vector_size);
-        boost::uint64_t seq_time = average_out_sequential(vector_size);
+        std::uint64_t par_time = average_out_parallel(vector_size);
+        std::uint64_t task_time = average_out_task(vector_size);
+        std::uint64_t seq_time = average_out_sequential(vector_size);
 
         if(csvoutput) {
             hpx::cout << "," << seq_time/1e9
@@ -203,9 +204,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     //initialize program
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
+
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 

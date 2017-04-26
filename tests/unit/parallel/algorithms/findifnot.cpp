@@ -10,6 +10,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -20,8 +22,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_find_if_not(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -71,20 +73,20 @@ template <typename IteratorTag>
 void test_find_if_not()
 {
     using namespace hpx::parallel;
-    test_find_if_not(seq, IteratorTag());
-    test_find_if_not(par, IteratorTag());
-    test_find_if_not(par_vec, IteratorTag());
+    test_find_if_not(execution::seq, IteratorTag());
+    test_find_if_not(execution::par, IteratorTag());
+    test_find_if_not(execution::par_unseq, IteratorTag());
 
-    test_find_if_not_async(seq(task), IteratorTag());
-    test_find_if_not_async(par(task), IteratorTag());
+    test_find_if_not_async(execution::seq(execution::task), IteratorTag());
+    test_find_if_not_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if_not(execution_policy(seq), IteratorTag());
-    test_find_if_not(execution_policy(par), IteratorTag());
-    test_find_if_not(execution_policy(par_vec), IteratorTag());
+    test_find_if_not(execution_policy(execution::seq), IteratorTag());
+    test_find_if_not(execution_policy(execution::par), IteratorTag());
+    test_find_if_not(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_find_if_not(execution_policy(seq(task)), IteratorTag());
-    test_find_if_not(execution_policy(par(task)), IteratorTag());
+    test_find_if_not(execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_find_if_not(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -97,7 +99,7 @@ void find_if_not_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -121,9 +123,9 @@ int main(int argc, char* argv[])
         ;
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

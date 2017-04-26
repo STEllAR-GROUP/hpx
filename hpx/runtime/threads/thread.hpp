@@ -8,12 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util_fwd.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -26,7 +27,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT thread
+    class thread
     {
         typedef lcos::local::spinlock mutex_type;
         void terminate(const char* function, const char* reason) const;
@@ -91,10 +92,8 @@ namespace hpx
 
         lcos::future<void> get_future(error_code& ec = throws);
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const;
         std::size_t set_thread_data(std::size_t);
-#endif
 
     private:
         bool joinable_locked() const HPX_NOEXCEPT
@@ -106,7 +105,7 @@ namespace hpx
             id_ = threads::invalid_thread_id;
         }
         void start_thread(util::unique_function_nonser<void()>&& func);
-        static threads::thread_state_enum thread_function_nullary(
+        static threads::thread_result_type thread_function_nullary(
             util::unique_function_nonser<void()> const& func);
 
         mutable mutex_type mtx_;
@@ -139,7 +138,14 @@ namespace hpx
 
     public:
         id() HPX_NOEXCEPT : id_(threads::invalid_thread_id) {}
-        explicit id(threads::thread_id_type i) HPX_NOEXCEPT : id_(i) {}
+        explicit id(threads::thread_id_type const& i) HPX_NOEXCEPT
+          : id_(i)
+        {}
+        explicit id(threads::thread_id_type && i) HPX_NOEXCEPT
+          : id_(std::move(i))
+        {}
+
+        threads::thread_id_type const& native_handle() const { return id_; }
     };
 
     inline bool operator== (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
@@ -189,6 +195,7 @@ namespace hpx
         HPX_API_EXPORT thread::id get_id() HPX_NOEXCEPT;
 
         HPX_API_EXPORT void yield() HPX_NOEXCEPT;
+        HPX_API_EXPORT void yield_to(thread::id) HPX_NOEXCEPT;
 
         // extensions
         HPX_API_EXPORT threads::thread_priority get_priority();

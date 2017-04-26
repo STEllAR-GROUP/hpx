@@ -12,6 +12,8 @@
 
 #include <hpx/include/naming.hpp>
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 namespace jacobi

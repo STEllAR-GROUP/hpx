@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -78,15 +79,6 @@ namespace hpx { namespace components { namespace server
 
         destroy<Component>(gid, addr, ec);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void destroy_base_lco(naming::gid_type const& gid,
-        util::one_size_heap_list_base* heap, components::component_type type,
-        error_code& ec = throws);
-
-    HPX_EXPORT void destroy_base_lco(naming::gid_type const& gid,
-        naming::address const& addr, util::one_size_heap_list_base* heap,
-        components::component_type type, error_code& ec = throws);
 }}}
 
 #endif

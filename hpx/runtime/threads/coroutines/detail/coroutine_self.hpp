@@ -67,19 +67,21 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     public:
         friend struct detail::coroutine_accessor;
 
-        typedef thread_state_enum result_type;
-        typedef thread_state_ex_enum arg_type;
-
         typedef coroutine_impl impl_type;
         typedef impl_type* impl_ptr; // Note, no reference counting here.
         typedef impl_type::thread_id_repr_type thread_id_repr_type;
+
+        typedef impl_type::result_type result_type;
+        typedef impl_type::arg_type arg_type;
 
         typedef util::function_nonser<arg_type(result_type)>
             yield_decorator_type;
 
         arg_type yield(result_type arg = result_type())
         {
-            return !yield_decorator_.empty() ? yield_decorator_(arg) : yield_impl(arg);
+            return !yield_decorator_.empty() ?
+                yield_decorator_(std::move(arg)) :
+                yield_impl(std::move(arg));
         }
 
         arg_type yield_impl(result_type arg)
@@ -124,7 +126,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return tmp;
         }
 
-        HPX_ATTRIBUTE_NORETURN void exit() {
+        HPX_ATTRIBUTE_NORETURN void exit()
+        {
             m_pimpl->exit_self();
             std::terminate(); // FIXME: replace with hpx::terminate();
         }
@@ -165,7 +168,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
           : m_pimpl(pimpl), next_self_(next_self)
         {}
 
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
             HPX_ASSERT(m_pimpl);
@@ -177,6 +179,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_pimpl->set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data()
         {
             HPX_ASSERT(m_pimpl);
@@ -201,6 +204,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT coroutine_self* get_self();
         static HPX_EXPORT void init_self();
         static HPX_EXPORT void reset_self();
+
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            HPX_ASSERT(m_pimpl);
+            return m_pimpl->get_apex_data();
+        }
+#endif
 
     private:
         yield_decorator_type yield_decorator_;

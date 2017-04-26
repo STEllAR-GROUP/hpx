@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,15 +9,19 @@
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
+#include <hpx/util/function.hpp>
 
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
+#include <utility>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(HPX_MSVC)
@@ -36,17 +40,25 @@ namespace hpx { namespace util
     class HPX_EXPORT section
     {
     public:
-        typedef std::map<std::string, std::string> entry_map;
+        typedef util::function_nonser<
+                void(std::string const&, std::string const&)
+            > entry_changed_func;
+        typedef std::pair<std::string, entry_changed_func> entry_type;
+        typedef std::map<std::string, entry_type> entry_map;
         typedef std::map<std::string, section> section_map;
 
     private:
         section *this_() { return this; }
+
+        typedef lcos::local::spinlock mutex_type;
 
         section* root_;
         entry_map entries_;
         section_map sections_;
         std::string name_;
         std::string parent_name_;
+
+        mutable mutex_type mtx_;
 
     private:
         friend class hpx::serialization::access;
@@ -65,6 +77,36 @@ namespace hpx { namespace util
             int lnum = 0, std::string const& line = "");
 
         section& clone_from(section const& rhs, section* root = nullptr);
+
+    private:
+        void add_section(std::lock_guard<mutex_type>& l,
+            std::string const& sec_name, section& sec, section* root = nullptr);
+        bool has_section(std::lock_guard<mutex_type>& l,
+            std::string const& sec_name) const;
+
+        section* get_section (std::lock_guard<mutex_type>& l,
+            std::string const& sec_name);
+        section const* get_section (std::lock_guard<mutex_type>& l,
+            std::string const& sec_name) const;
+
+        ///////////////////////////////////////////////////////////////////////////
+        section* add_section_if_new(std::lock_guard<lcos::local::spinlock>& l,
+            std::string const& sec_name);
+
+        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+            std::string const& key, std::string val);
+        void add_entry(std::lock_guard<mutex_type>& l, std::string const& fullkey,
+            std::string const& key, entry_type const& val);
+
+        bool has_entry(std::lock_guard<mutex_type>& l,
+            std::string const& key) const;
+        std::string get_entry(std::lock_guard<mutex_type>& l,
+            std::string const& key) const;
+        std::string get_entry(std::lock_guard<mutex_type>& l,
+            std::string const& key, std::string const& dflt) const;
+
+        void add_notification_callback(std::lock_guard<mutex_type>& l,
+            std::string const& key, entry_changed_func const& callback);
 
     public:
         section();
@@ -93,42 +135,116 @@ namespace hpx { namespace util
         void dump(int ind = 0, std::ostream& strm = std::cout) const;
 
         void add_section(std::string const& sec_name, section& sec,
-            section* root = nullptr);
-        bool has_section(std::string const& sec_name) const;
+            section* root = nullptr)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_section(l, sec_name, sec, root);
+        }
 
-        section* get_section (std::string const& sec_name);
-        section const* get_section (std::string const& sec_name) const;
+        section* add_section_if_new(std::string const& sec_name)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return add_section_if_new(l, sec_name);
+        }
 
-        section_map const& get_sections() const
-            { return sections_; }
+        bool has_section(std::string const& sec_name) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return has_section(l, sec_name);
+        }
 
-        void add_entry(std::string const& key, std::string val);
-        bool has_entry(std::string const& key) const;
-        std::string get_entry(std::string const& key) const;
-        std::string get_entry(std::string const& key, std::string const& dflt) const;
+        section* get_section (std::string const& sec_name)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return get_section(l, sec_name);
+        }
+
+        section const* get_section (std::string const& sec_name) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return get_section(l, sec_name);
+        }
+
+        section_map const& get_sections() const { return sections_; }
+
+        void add_entry(std::string const& key, entry_type const& val)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_entry(l, key, key, val);
+        }
+
+        void add_entry(std::string const& key, std::string const& val)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_entry(l, key, key, val);
+        }
+
+        bool has_entry(std::string const& key) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return has_entry(l, key);
+        }
+
+        std::string get_entry(std::string const& key) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return get_entry(l, key);
+        }
+
+        std::string get_entry(std::string const& key, std::string const& dflt) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return get_entry(l, key, dflt);
+        }
+
         template <typename T>
         std::string get_entry(std::string const& key, T dflt) const
         {
-            return get_entry(key, boost::lexical_cast<std::string>(dflt));
+            std::lock_guard<mutex_type> l(mtx_);
+            return get_entry(l, key, boost::lexical_cast<std::string>(dflt));
         }
 
-        entry_map const& get_entries() const
-            { return entries_; }
-        std::string expand(std::string in) const;
+        void add_notification_callback(std::string const& key,
+            entry_changed_func const& callback)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_notification_callback(l, key, callback);
+        }
 
-        void expand(std::string&, std::string::size_type) const;
-        void expand_bracket(std::string&, std::string::size_type) const;
-        void expand_brace(std::string&, std::string::size_type) const;
+        entry_map const& get_entries() const { return entries_; }
 
-        std::string expand_only(std::string in,
+    private:
+        std::string expand(std::lock_guard<mutex_type>& l, std::string in) const;
+
+        void expand(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type) const;
+        void expand_bracket(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type) const;
+        void expand_brace(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type) const;
+
+        std::string expand_only(std::lock_guard<mutex_type>& l, std::string in,
             std::string const& expand_this) const;
 
-        void expand_only(std::string&, std::string::size_type,
-            std::string const& expand_this) const;
-        void expand_bracket_only(std::string&, std::string::size_type,
-            std::string const& expand_this) const;
-        void expand_brace_only(std::string&, std::string::size_type,
-            std::string const& expand_this) const;
+        void expand_only(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type, std::string const& expand_this) const;
+        void expand_bracket_only(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type, std::string const& expand_this) const;
+        void expand_brace_only(std::lock_guard<mutex_type>& l, std::string&,
+            std::string::size_type, std::string const& expand_this) const;
+
+    public:
+        std::string expand(std::string const& str) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return expand(l, str);
+        }
+
+        void expand(std::string& str, std::string::size_type len) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            expand(l, str, len);
+        }
 
         void set_root(section* r, bool recursive = false)
         {

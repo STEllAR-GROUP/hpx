@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/traits/plugin_config_data.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -35,8 +37,10 @@
 #include <boost/archive/basic_archive.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -56,8 +60,9 @@ namespace hpx { namespace parcelset
     struct connection_handler_traits<policies::mpi::parcelport>
     {
         typedef policies::mpi::sender_connection connection_type;
-        typedef boost::mpl::true_  send_early_parcel;
-        typedef boost::mpl::true_ do_background_work;
+        typedef std::true_type  send_early_parcel;
+        typedef std::true_type  do_background_work;
+        typedef std::false_type send_immediate_parcels;
 
         static const char * type()
         {
@@ -160,8 +165,7 @@ namespace hpx { namespace parcelset
                 parcelset::locality const& l, error_code& ec)
             {
                 int dest_rank = l.get<locality>().rank();
-                return sender_.create_connection(
-                    dest_rank, parcels_sent_);
+                return sender_.create_connection(dest_rank, this);
             }
 
             parcelset::locality agas_locality(
@@ -284,3 +288,5 @@ namespace hpx { namespace traits
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::mpi::parcelport,
     mpi);
+
+#endif

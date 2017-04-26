@@ -125,6 +125,17 @@ macro(add_hpx_library name)
     endif()
   endif()
 
+  # Manage files with .cu extension in case When Cuda Clang is used
+  if(HPX_WITH_CUDA_CLANG)
+    foreach(source ${${name}_SOURCES})
+      get_filename_component(extension ${source} EXT)
+      if(${extension} STREQUAL ".cu")
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
+          LANGUAGE CXX)
+      endif()
+    endforeach()
+  endif()
+
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     cuda_add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})

@@ -7,15 +7,18 @@
 // (see: https://channel9.msdn.com/Shows/C9-GoingNative/GoingNative-40-Updated-STL-in-VS-2015-feat-STL)
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono.hpp>
 #include <boost/random.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <chrono>
+#include <cstdint>
 #include <ctime>
 #include <mutex>
 #include <vector>
@@ -24,7 +27,7 @@ int const writers = 3;
 int const readers = 3;
 int const cycles = 10;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 int main()
 {
@@ -38,7 +41,7 @@ int main()
             [&ready, &stm, i]
             {
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(0)));
+                    static_cast<std::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
@@ -64,8 +67,9 @@ int main()
         threads.emplace_back(
             [&ready, &stm, k, i]
             {
+                HPX_UNUSED(k);
                 boost::random::mt19937 urng(
-                    static_cast<boost::uint32_t>(std::time(0)));
+                    static_cast<std::uint32_t>(std::time(nullptr)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }

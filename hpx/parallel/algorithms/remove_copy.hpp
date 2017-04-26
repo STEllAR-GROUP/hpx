@@ -20,10 +20,12 @@
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -80,6 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first, last, dest,
                     [val, proj](T const& a)
                     {
+                        HPX_UNUSED(proj);
                         return !(a == val);
                     },
                     std::forward<Proj>(proj));
@@ -131,20 +134,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a remove_copy algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a remove_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a remove_copy algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
@@ -156,12 +159,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename T,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T>,
+            ExPolicy, std::equal_to<T>,
                 traits::projected<Proj, InIter>,
                 traits::projected<Proj, T const*>
         >::value)>
@@ -180,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
@@ -315,20 +318,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a remove_copy_if algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a remove_copy_if algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a remove_copy_if algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
@@ -340,11 +343,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
-            F, traits::projected<Proj, InIter>
+            ExPolicy, F, traits::projected<Proj, InIter>
         >::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
@@ -362,7 +365,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;

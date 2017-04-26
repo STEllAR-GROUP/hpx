@@ -10,8 +10,10 @@
 #include <hpx/util/cache/statistics/no_statistics.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <list>
 #include <map>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache

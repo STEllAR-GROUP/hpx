@@ -16,6 +16,7 @@
 
 #include <boost/iostreams/filter/zlib.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 

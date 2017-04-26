@@ -9,10 +9,9 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/throw_exception.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/traits/action_capability_provider.hpp>
-#endif
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -26,6 +25,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
@@ -37,17 +37,18 @@
 #include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <set>
+#include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -66,7 +67,6 @@ namespace hpx { namespace components { namespace server
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
         typedef lcos::local::spinlock plugin_map_mutex_type;
-        typedef boost::mutex mutex_type;
 
         struct component_factory
         {
@@ -185,7 +185,7 @@ namespace hpx { namespace components { namespace server
         /// \param count [in] This GID is a count of the number of components
         ///                   to destroy. It does not represent a global address.
         void free_component(agas::gva const&, naming::gid_type const& gid,
-            boost::uint64_t count);
+            std::uint64_t count);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
@@ -210,7 +210,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Update the given name mapping into the AGAS cache of this
         ///        locality.
         void update_agas_cache_entry(naming::gid_type const&,
-            naming::address const&, boost::uint64_t, boost::uint64_t);
+            naming::address const&, std::uint64_t, std::uint64_t);
 
         /// \brief Load all components on this locality.
         int load_components();
@@ -227,7 +227,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Return the current instance count for the given component
         ///        type
-        boost::int32_t get_instance_count(components::component_type);
+        std::int32_t get_instance_count(components::component_type);
 
         /// \brief Remove the given locality from our connection cache
         void remove_from_connection_cache(naming::gid_type const& gid,
@@ -237,8 +237,8 @@ namespace hpx { namespace components { namespace server
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         bool dijkstra_termination();
 #else
-        void dijkstra_termination(boost::uint32_t initiating_locality_id,
-            boost::uint32_t num_localities, bool dijkstra_token);
+        void dijkstra_termination(std::uint32_t initiating_locality_id,
+            std::uint32_t num_localities, bool dijkstra_token);
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, free_component,
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, free_component,
             free_component_action);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
@@ -326,6 +326,7 @@ namespace hpx { namespace components { namespace server
         bool keep_factory_alive(component_type t);
 
         void remove_here_from_connection_cache();
+        void remove_here_from_console_connection_cache();
 
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,
@@ -340,15 +341,6 @@ namespace hpx { namespace components { namespace server
 
         // notify of message being sent
         void dijkstra_make_black();
-
-#if defined(HPX_HAVE_SECURITY)
-        components::security::capability get_factory_capabilities(
-            components::component_type type);
-#endif
-
-        ///////////////////////////////////////////////////////////////////////
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -420,15 +412,15 @@ namespace hpx { namespace components { namespace server
 
 #if !defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         void send_dijkstra_termination_token(
-            boost::uint32_t target_locality_id,
-            boost::uint32_t initiating_locality_id,
-            boost::uint32_t num_localities, bool dijkstra_token);
+            std::uint32_t target_locality_id,
+            std::uint32_t initiating_locality_id,
+            std::uint32_t num_localities, bool dijkstra_token);
 #endif
 
     private:
-        mutex_type mtx_;
-        boost::condition_variable wait_condition_;
-        boost::condition_variable stop_condition_;
+        compat::mutex mtx_;
+        compat::condition_variable wait_condition_;
+        compat::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
@@ -455,6 +447,21 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Functions wrapped by creat_component actions below
+#if defined(__NVCC__)
+    template <typename Component>
+    naming::gid_type runtime_support::create_component()
+    {
+        HPX_ASSERT(false);
+        return naming::gid_type();
+    }
+
+    template <typename Component, typename T, typename ...Ts>
+    naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    {
+        HPX_ASSERT(false);
+        return naming::gid_type();
+    }
+#else
     template <typename Component>
     naming::gid_type runtime_support::create_component()
     {
@@ -470,6 +477,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -482,6 +491,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -515,6 +526,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -527,6 +540,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -552,6 +567,7 @@ namespace hpx { namespace components { namespace server
 
         return id;
     }
+#endif
 
     template <typename Component>
     std::vector<naming::gid_type>
@@ -569,6 +585,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -581,6 +599,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -607,7 +627,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component, typename T, typename ...Ts>
     std::vector<naming::gid_type>
-    runtime_support::bulk_create_component(std::size_t count, T v, Ts... vs)
+    runtime_support::bulk_create_component(std::size_t count, T v, Ts ... vs)
     {
         components::component_type const type =
             components::get_component_type<
@@ -621,6 +641,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -633,6 +655,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -652,9 +676,11 @@ namespace hpx { namespace components { namespace server
                 // Note, T and Ts can't be (non-const) references, and parameters
                 // should be moved to allow for move-only constructor argument
                 // types.
-                ids.push_back(factory->create_with_args(
-                    detail::construct_function<wrapping_type>(
-                        std::move(v), std::move(vs)...)));
+                ids.push_back(
+                    factory->create_with_args(
+                        detail::construct_function<wrapping_type>(v, vs...)
+                    )
+                );
             }
         }
         LRT_(info) << "successfully created " << count //-V128
@@ -680,6 +706,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (component type not found in map)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
@@ -692,6 +720,8 @@ namespace hpx { namespace components { namespace server
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
                 << " (map entry is nullptr)";
+
+            l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
@@ -808,6 +838,21 @@ namespace hpx { namespace components { namespace server
 
 #include <hpx/config/warnings_suffix.hpp>
 
+HPX_ACTION_USES_LARGE_STACK(
+    hpx::components::server::runtime_support::load_components_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::call_startup_functions_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::call_shutdown_functions_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::shutdown_all_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::create_performance_counter_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::dijkstra_termination_action)
+
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::bulk_create_components_action,
     bulk_create_components_action)
@@ -817,31 +862,21 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::load_components_action,
     load_components_action)
-HPX_ACTION_USES_LARGE_STACK(
-    hpx::components::server::runtime_support::load_components_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_startup_functions_action,
     call_startup_functions_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::call_startup_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
     call_shutdown_functions_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::call_shutdown_functions_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::free_component_action,
     free_component_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_action,
     shutdown_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::shutdown_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::shutdown_all_action,
     shutdown_all_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::shutdown_all_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::terminate_action,
     terminate_action)
@@ -860,8 +895,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::create_performance_counter_action,
     create_performance_counter_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::create_performance_counter_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::get_instance_count_action,
     get_instance_count_action)
@@ -871,8 +904,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::dijkstra_termination_action,
     dijkstra_termination_action)
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::components::server::runtime_support::dijkstra_termination_action)
 
 namespace hpx { namespace components { namespace server
 {
@@ -974,49 +1005,10 @@ namespace hpx { namespace traits
         }
     };
 
-#if defined(HPX_HAVE_SECURITY)
-    ///////////////////////////////////////////////////////////////////////////
-    // Actions used to create components with constructors of various arities.
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_action<Component, Ts...> >
-    {
-        // return the required capabilities to invoke the given action
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_direct_action<Component, Ts...> >
-    {
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-#endif
-
     // runtime_support is a (hand-rolled) component
     template <>
     struct is_component<components::server::runtime_support>
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

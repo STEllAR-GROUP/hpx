@@ -19,26 +19,19 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/capability.hpp>
-#include <hpx/components/security/certificate.hpp>
-#include <hpx/components/security/signed_type.hpp>
-#endif
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <memory>
+#include <sstream>
 #include <utility>
 #include <vector>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
-    void dijkstra_make_black();     // forward declaration only
-}}
 
 namespace hpx { namespace applier
 {
     ///////////////////////////////////////////////////////////////////////////
-    static inline threads::thread_state_enum thread_function(
+    static inline threads::thread_result_type thread_function(
         util::unique_function_nonser<void(threads::thread_state_ex_enum)> func)
     {
         // execute the actual thread function
@@ -49,10 +42,10 @@ namespace hpx { namespace applier
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
-    static inline threads::thread_state_enum thread_function_nullary(
+    static inline threads::thread_result_type thread_function_nullary(
         util::unique_function_nonser<void()> func)
     {
         // execute the actual thread function
@@ -63,7 +56,7 @@ namespace hpx { namespace applier
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,32 +237,6 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        threads::thread_function_type && func, naming::id_type const& target,
-        util::thread_description const& desc, naming::address::address_type lva,
-        threads::thread_state_enum state, threads::thread_priority priority,
-        std::size_t os_thread, threads::thread_stacksize stacksize,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (nullptr == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_work_plain",
-                "global applier object is not accessible");
-            return;
-        }
-
-        util::thread_description d =
-            desc ? desc : util::thread_description(func, "register_work_plain");
-
-        threads::thread_init_data data(std::move(func),
-            d, lva, priority, os_thread, threads::get_stack_size(stacksize),
-            target);
-
-        app->get_thread_manager().register_work(data, state, ec);
-    }
-
-    void register_work_plain(
         threads::thread_init_data& data, threads::thread_state_enum state,
         error_code& ec)
     {
@@ -290,12 +257,9 @@ namespace hpx { namespace applier
 
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm)
       : parcel_handler_(ph), thread_manager_(tm)
-#if defined(HPX_HAVE_SECURITY)
-      , verify_capabilities_(false)
-#endif
     {}
 
-    void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
+    void applier::initialize(std::uint64_t rts, std::uint64_t mem)
     {
         naming::resolver_client & agas_client = get_agas_client();
         runtime_support_id_ = naming::id_type(
@@ -326,7 +290,7 @@ namespace hpx { namespace applier
         return hpx::naming::get_agas_client().get_local_locality(ec);
     }
 
-    boost::uint32_t applier::get_locality_id(error_code& ec) const
+    std::uint32_t applier::get_locality_id(error_code& ec) const
     {
         return naming::get_locality_id_from_gid(get_raw_locality(ec));
     }
@@ -395,183 +359,6 @@ namespace hpx { namespace applier
         applier::applier_.reset();
     }
 
-    namespace detail
-    {
-        // The original parcel-sent handler is wrapped to keep the parcel alive
-        // until after the data has been reliably sent (which is needed for zero
-        // copy serialization).
-        void parcel_sent_handler(parcelset::parcelhandler& ph,
-            boost::system::error_code const& ec,
-            parcelset::parcel const& p)
-        {
-            // invoke the original handler
-            ph.invoke_write_handler(ec, p);
-
-            // inform termination detection of a sent message
-            if (!p.does_termination_detection())
-                hpx::detail::dijkstra_make_black();
-        }
-    }
-
-    // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
-    {
-        // fetch the set of destinations
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        std::size_t const size = 1ul;
-#else
-        std::size_t const size = p.size();
-#endif
-        naming::id_type const* ids = p.destinations();
-        naming::address const* addrs = p.addrs();
-
-        // decode the action-type in the parcel
-        std::unique_ptr<actions::continuation> cont = p.get_continuation();
-        actions::base_action * act = p.get_action();
-
-#if defined(HPX_HAVE_SECURITY)
-        // we look up the certificate of the originating locality, no matter
-        // whether this parcel was routed through another locality or not
-        boost::uint32_t locality_id =
-            naming::get_locality_id_from_gid(p.get_parcel_id());
-        error_code ec(lightweight);
-        components::security::signed_certificate const& cert =
-            get_locality_certificate(locality_id, ec);
-
-        if (verify_capabilities_ && ec) {
-            // we should have received the sender's certificate by now
-            HPX_THROW_EXCEPTION(security_error,
-                "applier::schedule_action",
-                boost::str(boost::format("couldn't extract sender's "
-                    "certificate (sender locality id: %1%)") % locality_id));
-            return;
-        }
-
-        components::security::capability caps_sender;
-        if (verify_capabilities_)
-            caps_sender = cert.get_type().get_capability();
-#endif
-        int comptype = act->get_component_type();
-        naming::gid_type dest = p.destination_locality();
-
-        // if the parcel carries a continuation it should be directed to a
-        // single destination
-        HPX_ASSERT(!cont || size == 1);
-
-        naming::resolver_client& client = hpx::naming::get_agas_client();
-
-        // schedule a thread for each of the destinations
-        for (std::size_t i = 0; i != size; ++i)
-        {
-            naming::address const& addr = addrs[i];
-
-            // make sure this parcel destination matches the proper locality
-            HPX_ASSERT(dest == addr.locality_);
-
-            // decode the local virtual address of the parcel
-            naming::address::address_type lva = addr.address_;
-
-            // by convention, a zero address references either the local
-            // runtime support component or one of the AGAS components
-            if (0 == lva)
-            {
-                switch(comptype)
-                {
-                case components::component_runtime_support:
-                    lva = get_runtime_support_raw_gid().get_lsb();
-                    break;
-
-                case components::component_agas_primary_namespace:
-                    lva = get_agas_client().get_primary_ns_lva();
-                    break;
-
-                case components::component_agas_symbol_namespace:
-                    lva = get_agas_client().get_symbol_ns_lva();
-                    break;
-
-                case components::component_plain_function:
-                    break;
-
-                default:
-                    HPX_ASSERT(false);
-                }
-            }
-            else if (comptype == components::component_memory)
-            {
-                HPX_ASSERT(naming::refers_to_virtual_memory(ids[i].get_gid()));
-                lva = get_memory_raw_gid().get_lsb();
-            }
-
-            // make sure the target has not been migrated away
-            auto r = act->was_object_migrated(ids[i], lva);
-            if (r.first)
-            {
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-                // it's unclear at this point what could be done if there is
-                // more than one destination
-                HPX_ASSERT(size == 1);
-#endif
-                // set continuation in outgoing parcel
-                if (cont)
-                    p.set_continuation(std::move(cont));
-
-                // route parcel to new locality of target
-                client.route(
-                    std::move(p),
-                    util::bind(&detail::parcel_sent_handler,
-                        boost::ref(parcel_handler_),
-                        util::placeholders::_1, util::placeholders::_2),
-                    threads::thread_priority_normal);
-                break;
-            }
-
-#if defined(HPX_HAVE_SECURITY)
-            if (verify_capabilities_) {
-                components::security::capability caps_action =
-                    act->get_required_capabilities(lva);
-
-                if (caps_action.verify(caps_sender) == false) {
-                    HPX_THROW_EXCEPTION(security_error,
-                        "applier::schedule_action",
-                        boost::str(boost::format("sender has insufficient capabilities "
-                            "to execute the action (%1%, sender: %2%, action %3%)") %
-                            act->get_action_name() % caps_sender % caps_action));
-                    return;
-                }
-            }
-#endif
-            // make sure the component_type of the action matches the
-            // component type in the destination address
-            if (HPX_UNLIKELY(!components::types_are_compatible(
-                addr.type_, comptype)))
-            {
-                std::ostringstream strm;
-                strm << " types are not compatible: destination_type("
-                      << addr.type_ << ") action_type(" << comptype
-                      << ") parcel ("  << p << ")";
-                HPX_THROW_EXCEPTION(bad_component_type,
-                    "applier::schedule_action",
-                    strm.str());
-            }
-
-            // dispatch action, register work item either with or without
-            // continuation support
-            if (!cont) {
-                // No continuation is to be executed, register the plain
-                // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending, num_thread);
-            }
-            else {
-                // This parcel carries a continuation, register a wrapper
-                // which first executes the original thread function as
-                // required by the action and triggers the continuations
-                // afterwards.
-                act->schedule_thread(std::move(cont), ids[i], lva,
-                    threads::pending, num_thread);
-            }
-        }
-    }
-
     applier& get_applier()
     {
         // should have been initialized
@@ -586,7 +373,7 @@ namespace hpx { namespace applier
     }
 
     // The function \a get_locality_id returns the id of this locality
-    boost::uint32_t get_locality_id(error_code& ec) //-V659
+    std::uint32_t get_locality_id(error_code& ec) //-V659
     {
         applier** appl = applier::applier_.get();
         return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;

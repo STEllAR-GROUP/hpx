@@ -14,6 +14,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <functional>
 #include <string>
 #include <utility>
 
@@ -93,7 +94,7 @@ static void
     HPX_TEST(global_int == 5);
 
     // clear
-    void (*fpv1)() = 0;
+    void (*fpv1)() = 0; // NOLINT
     v1 = fpv1;
     HPX_TEST(v1.empty());
 
@@ -492,7 +493,7 @@ static void
     HPX_TEST(global_int == 2);
 
     // Test construction from 0
-    void (*fpv9)() = 0;
+    void (*fpv9)() = 0; // NOLINT
     func_void_type v9(fpv9);
     HPX_TEST(v9.empty());
 
@@ -633,7 +634,7 @@ static void
 {
     add_with_throw_on_copy atc;
     try {
-        hpx::util::function_nonser<int (int, int)> f(boost::ref(atc));
+        hpx::util::function_nonser<int (int, int)> f(std::ref(atc));
         HPX_TEST(f(1, 3) == 4);
     }
     catch(std::runtime_error const& /*e*/) {
@@ -646,7 +647,7 @@ static void dummy() {}
 static void test_empty_ref()
 {
     hpx::util::function_nonser<void()> f1;
-    hpx::util::function_nonser<void()> f2(boost::ref(f1));
+    hpx::util::function_nonser<void()> f2(std::ref(f1));
 
     try {
         f2();

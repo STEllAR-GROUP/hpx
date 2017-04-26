@@ -20,6 +20,8 @@
 
 #include <boost/format.hpp>
 
+#include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace hpx
@@ -81,7 +83,7 @@ namespace hpx
 
     template <typename Action, typename DistPolicy, typename Callback,
         typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
     apply_p_cb(DistPolicy const& policy, threads::thread_priority priority,
@@ -93,7 +95,7 @@ namespace hpx
 
     template <typename Action, typename DistPolicy, typename Callback,
         typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
     apply_cb(DistPolicy const& policy, Callback && cb, Ts&&... vs)
@@ -104,7 +106,7 @@ namespace hpx
 
     template <typename Component, typename Signature, typename Derived,
         typename DistPolicy, typename Callback, typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
     apply_cb(
@@ -214,7 +216,7 @@ namespace hpx
     template <typename Action, typename Continuation, typename DistPolicy,
         typename Callback,
         typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_continuation<Continuation>::value &&
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
@@ -228,7 +230,7 @@ namespace hpx
     template <typename Action, typename Continuation, typename DistPolicy,
         typename Callback,
         typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_continuation<Continuation>::value &&
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
@@ -243,7 +245,7 @@ namespace hpx
     template <typename Component, typename Continuation, typename Signature,
         typename Derived,
         typename DistPolicy, typename Callback, typename ...Ts>
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
     apply_cb(Continuation && c,

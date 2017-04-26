@@ -9,9 +9,12 @@
 #include <hpx/util/assert.hpp>
 
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "partition3d.hpp"
@@ -165,7 +168,7 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<double> partition3d::interpolate(double ye, double temp,
-        double rho, boost::uint32_t eosvalues)
+        double rho, std::uint32_t eosvalues)
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -233,14 +236,14 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        inline int numberof_setbits(boost::uint32_t i)
+        inline int numberof_setbits(std::uint32_t i)
         {
             i = i - ((i >> 1) & 0x55555555);
             i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
             return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
         }
 
-        inline bool more_than_one_value_requested(boost::uint32_t i)
+        inline bool more_than_one_value_requested(std::uint32_t i)
         {
             return numberof_setbits(i) > 1;
         }
@@ -248,7 +251,7 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     double partition3d::interpolate_one(double ye, double temp,
-        double rho, boost::uint32_t eosvalue)
+        double rho, std::uint32_t eosvalue)
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -329,13 +332,13 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     inline double partition3d::interpolate_one(sheneos_coord const& c,
-        boost::uint32_t eosvalue)
+        std::uint32_t eosvalue)
     {
         return interpolate_one(c.ye_, c.temp_, c.rho_, eosvalue);
     }
 
     inline std::vector<double> partition3d::interpolate(
-        sheneos_coord const& c, boost::uint32_t eosvalues)
+        sheneos_coord const& c, std::uint32_t eosvalues)
     {
         return interpolate(c.ye_, c.temp_, c.rho_, eosvalues);
     }
@@ -343,7 +346,7 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     std::vector<double>
     partition3d::interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-        boost::uint32_t eosvalue)
+        std::uint32_t eosvalue)
     {
         std::vector<double> result;
         result.reserve(coords.size());
@@ -362,7 +365,7 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::vector<double> >
     partition3d::interpolate_bulk(std::vector<sheneos_coord> const& coords,
-        boost::uint32_t eosvalues)
+        std::uint32_t eosvalues)
     {
         std::vector<std::vector<double> > result;
         result.reserve(coords.size());

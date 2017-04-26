@@ -8,19 +8,23 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <chrono>
+#include <cstdint>
+#include <iostream>
 #include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
@@ -48,19 +52,19 @@ using hpx::find_here;
 namespace detail
 {
     template <typename T1>
-    boost::uint64_t wait(
+    std::uint64_t wait(
         std::vector<future<T1> > const& lazy_values
-      , boost::int32_t suspend_for = 10
+      , std::int32_t suspend_for = 10
         )
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
-        boost::uint64_t handled_count = 0;
+        std::uint64_t handled_count = 0;
 
         while (handled_count < lazy_values.size())
         {
             bool suspended = false;
 
-            for (boost::uint64_t i = 0; i < lazy_values.size(); ++i)
+            for (std::uint64_t i = 0; i < lazy_values.size(); ++i)
             {
                 // loop over all lazy_values, executing the next as soon as its
                 // value gets available
@@ -87,7 +91,7 @@ namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 void change_thread_state(
-    boost::uint64_t thread
+    std::uint64_t thread
     )
 {
 //    std::cout << "waking up thread (wait_signaled)\n";
@@ -102,20 +106,20 @@ HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
-    boost::uint64_t count
-  , boost::uint64_t grain_size
+    std::uint64_t count
+  , std::uint64_t grain_size
   , id_type const& prefix
-  , boost::uint64_t thread
+  , std::uint64_t thread
     );
 
 HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
-    boost::uint64_t count
-  , boost::uint64_t grain_size
+    std::uint64_t count
+  , std::uint64_t grain_size
   , id_type const& prefix
-  , boost::uint64_t thread
+  , std::uint64_t thread
     )
 {
     HPX_ASSERT(grain_size);
@@ -123,10 +127,10 @@ void tree_boot(
 
     std::vector<future<void> > promises;
 
-    boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
+    std::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
-    boost::uint64_t child_count = 0;
-    boost::uint64_t children = 0;
+    std::uint64_t child_count = 0;
+    std::uint64_t children = 0;
 
     if (count > grain_size)
     {
@@ -144,13 +148,13 @@ void tree_boot(
     else
         promises.reserve(count);
 
-    for (boost::uint64_t i = 0; i < children; ++i)
+    for (std::uint64_t i = 0; i < children; ++i)
     {
         promises.push_back(async<tree_boot_action>
             (prefix, child_count, grain_size, prefix, thread));
     }
 
-    for (boost::uint64_t i = 0; i < actors; ++i)
+    for (std::uint64_t i = 0; i < actors; ++i)
         promises.push_back(async<change_thread_state_action>(prefix, thread));
 
     detail::wait(promises);
@@ -158,10 +162,10 @@ void tree_boot(
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_dummy_thread(
-    boost::uint64_t futures
+    std::uint64_t futures
     )
 {
-    boost::uint64_t woken = 0
+    std::uint64_t woken = 0
                   , signaled = 0
                   , timed_out = 0;
 
@@ -194,8 +198,8 @@ void test_dummy_thread(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    boost::uint64_t const futures = vm["futures"].as<boost::uint64_t>();
-    boost::uint64_t const grain_size = vm["grain-size"].as<boost::uint64_t>();
+    std::uint64_t const futures = vm["futures"].as<std::uint64_t>();
+    std::uint64_t const grain_size = vm["grain-size"].as<std::uint64_t>();
 
     {
         id_type const prefix = find_here();
@@ -204,7 +208,7 @@ int hpx_main(variables_map& vm)
             (hpx::util::bind(&test_dummy_thread, futures));
 
         tree_boot(futures, grain_size, prefix,
-            reinterpret_cast<boost::uint64_t>(thread.get()));
+            reinterpret_cast<std::uint64_t>(thread.get()));
 
         set_thread_state(thread, pending, wait_terminate);
     }
@@ -222,11 +226,11 @@ int main(int argc, char* argv[])
 
     cmdline.add_options()
         ( "futures"
-        , value<boost::uint64_t>()->default_value(64)
+        , value<std::uint64_t>()->default_value(64)
         , "number of futures to invoke")
 
         ( "grain-size"
-        , value<boost::uint64_t>()->default_value(4)
+        , value<std::uint64_t>()->default_value(4)
         , "grain size of the future tree")
     ;
 

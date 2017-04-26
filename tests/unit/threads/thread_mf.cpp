@@ -10,7 +10,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
+#include <functional>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -68,75 +68,75 @@ int hpx_main(variables_map& /*vm*/)
 
         // 0
         hpx::thread(&X::f0, &x).join();
-        hpx::thread(&X::f0, boost::ref(x)).join();
+        hpx::thread(&X::f0, std::ref(x)).join();
 
         hpx::thread(&X::g0, &x).join();
         hpx::thread(&X::g0, x).join();
-        hpx::thread(&X::g0, boost::ref(x)).join();
+        hpx::thread(&X::g0, std::ref(x)).join();
 
         // 1
         hpx::thread(&X::f1, &x, 1).join();
-        hpx::thread(&X::f1, boost::ref(x), 1).join();
+        hpx::thread(&X::f1, std::ref(x), 1).join();
 
         hpx::thread(&X::g1, &x, 1).join();
         hpx::thread(&X::g1, x, 1).join();
-        hpx::thread(&X::g1, boost::ref(x), 1).join();
+        hpx::thread(&X::g1, std::ref(x), 1).join();
 
         // 2
         hpx::thread(&X::f2, &x, 1, 2).join();
-        hpx::thread(&X::f2, boost::ref(x), 1, 2).join();
+        hpx::thread(&X::f2, std::ref(x), 1, 2).join();
 
         hpx::thread(&X::g2, &x, 1, 2).join();
         hpx::thread(&X::g2, x, 1, 2).join();
-        hpx::thread(&X::g2, boost::ref(x), 1, 2).join();
+        hpx::thread(&X::g2, std::ref(x), 1, 2).join();
 
         // 3
         hpx::thread(&X::f3, &x, 1, 2, 3).join();
-        hpx::thread(&X::f3, boost::ref(x), 1, 2, 3).join();
+        hpx::thread(&X::f3, std::ref(x), 1, 2, 3).join();
 
         hpx::thread(&X::g3, &x, 1, 2, 3).join();
         hpx::thread(&X::g3, x, 1, 2, 3).join();
-        hpx::thread(&X::g3, boost::ref(x), 1, 2, 3).join();
+        hpx::thread(&X::g3, std::ref(x), 1, 2, 3).join();
 
         // 4
         hpx::thread(&X::f4, &x, 1, 2, 3, 4).join();
-        hpx::thread(&X::f4, boost::ref(x), 1, 2, 3, 4).join();
+        hpx::thread(&X::f4, std::ref(x), 1, 2, 3, 4).join();
 
         hpx::thread(&X::g4, &x, 1, 2, 3, 4).join();
         hpx::thread(&X::g4, x, 1, 2, 3, 4).join();
-        hpx::thread(&X::g4, boost::ref(x), 1, 2, 3, 4).join();
+        hpx::thread(&X::g4, std::ref(x), 1, 2, 3, 4).join();
 
         // 5
         hpx::thread(&X::f5, &x, 1, 2, 3, 4, 5).join();
-        hpx::thread(&X::f5, boost::ref(x), 1, 2, 3, 4, 5).join();
+        hpx::thread(&X::f5, std::ref(x), 1, 2, 3, 4, 5).join();
 
         hpx::thread(&X::g5, &x, 1, 2, 3, 4, 5).join();
         hpx::thread(&X::g5, x, 1, 2, 3, 4, 5).join();
-        hpx::thread(&X::g5, boost::ref(x), 1, 2, 3, 4, 5).join();
+        hpx::thread(&X::g5, std::ref(x), 1, 2, 3, 4, 5).join();
 
         // 6
         hpx::thread(&X::f6, &x, 1, 2, 3, 4, 5, 6).join();
-        hpx::thread(&X::f6, boost::ref(x), 1, 2, 3, 4, 5, 6).join();
+        hpx::thread(&X::f6, std::ref(x), 1, 2, 3, 4, 5, 6).join();
 
         hpx::thread(&X::g6, &x, 1, 2, 3, 4, 5, 6).join();
         hpx::thread(&X::g6, x, 1, 2, 3, 4, 5, 6).join();
-        hpx::thread(&X::g6, boost::ref(x), 1, 2, 3, 4, 5, 6).join();
+        hpx::thread(&X::g6, std::ref(x), 1, 2, 3, 4, 5, 6).join();
 
         // 7
         hpx::thread(&X::f7, &x, 1, 2, 3, 4, 5, 6, 7).join();
-        hpx::thread(&X::f7, boost::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
+        hpx::thread(&X::f7, std::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
 
         hpx::thread(&X::g7, &x, 1, 2, 3, 4, 5, 6, 7).join();
         hpx::thread(&X::g7, x, 1, 2, 3, 4, 5, 6, 7).join();
-        hpx::thread(&X::g7, boost::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
+        hpx::thread(&X::g7, std::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
 
         // 8
         hpx::thread(&X::f8, &x, 1, 2, 3, 4, 5, 6, 7, 8).join();
-        hpx::thread(&X::f8, boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
+        hpx::thread(&X::f8, std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
 
         hpx::thread(&X::g8, &x, 1, 2, 3, 4, 5, 6, 7, 8).join();
         hpx::thread(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8).join();
-        hpx::thread(&X::g8, boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
+        hpx::thread(&X::g8, std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
 
         HPX_TEST_EQ(x.hash, 23558);
     }

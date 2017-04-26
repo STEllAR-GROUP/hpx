@@ -44,7 +44,6 @@ set(all_documentation_dependencies
 
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
-    "${PROJECT_SOURCE_DIR}/hpx/hpx_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
@@ -53,7 +52,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
@@ -76,7 +74,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inner_product.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
@@ -101,6 +98,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_inclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce_binary.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
@@ -126,10 +124,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/agas_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/components_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_localities.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_colocation_id.hpp"
@@ -141,8 +137,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_thread_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_worker_thread_num.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/naming_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/parcelset_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/report_error.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/runtime_mode.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/shutdown_function.hpp"
@@ -161,11 +156,13 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/barrier.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/gather.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/split_future.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_any.hpp"
@@ -333,9 +330,9 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=479
-                boost.image.h=104
-                boost.image.alt="HPX - High Performance ParalleX"
+                boost.image.w=531
+                boost.image.h=105
+                boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index

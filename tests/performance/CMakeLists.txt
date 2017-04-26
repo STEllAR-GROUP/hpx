@@ -6,6 +6,7 @@
 set(subdirs
     local
     network
+    compute
    )
 
 foreach(subdir ${subdirs})

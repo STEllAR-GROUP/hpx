@@ -6,7 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "is_sorted_tests.hpp"
@@ -43,18 +45,18 @@ void sorted_executors_test()
     {
         parallel_executor exec;
 
-        test_executors(par.on(exec));
-        test_executors_async(par(task).on(exec));
+        test_executors(execution::par.on(exec));
+        test_executors_async(execution::par(execution::task).on(exec));
     }
 
     {
         sequential_executor exec;
 
-        test_executors(seq.on(exec));
-        test_executors_async(seq(task).on(exec));
+        test_executors(execution::seq.on(exec));
+        test_executors_async(execution::seq(execution::task).on(exec));
 
-        test_executors(par.on(exec));
-        test_executors_async(par(task).on(exec));
+        test_executors(execution::par.on(exec));
+        test_executors_async(execution::par(execution::task).on(exec));
     }
 }
 
@@ -71,9 +73,9 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
         "HPX main exited with non-zero status");

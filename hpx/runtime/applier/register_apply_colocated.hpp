@@ -7,9 +7,10 @@
 #define HPX_RUNTIME_APPLIER_REGISTER_APPLY_COLOCATED_MAR_09_2014_1214PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -36,8 +37,10 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
+
+/*
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
-        void (hpx::naming::id_type, hpx::agas::response)                      \
+        void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::apply_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
                 Action                                                        \
@@ -48,11 +51,14 @@ namespace hpx { namespace detail
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
+    */
 /**/
 
 #define HPX_REGISTER_APPLY_COLOCATED(action, name)                            \
+
+/*
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
-        void (hpx::naming::id_type, hpx::agas::response)                      \
+        void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::apply_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
                 action                                                        \
@@ -63,6 +69,7 @@ namespace hpx { namespace detail
         >)                                                                    \
       , name                                                                  \
     );                                                                        \
+    */
 /**/
 
 #endif

@@ -8,11 +8,10 @@ set(tests
     any_serialization
     boost_any
     bind_action
+    config_entry
     function
     parse_slurm_nodelist
-    stencil3_iterator
     tagged
-    transform_iterator
     tuple
    )
 
@@ -26,6 +25,7 @@ set(subdirs
     bind
     cache
     function
+    iterator
     mem_fn
    )
 

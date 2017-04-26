@@ -10,6 +10,6 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    fixture global_fixture = fixture(std::cerr);
+    fixture global_fixture{std::cerr};
 }}}
 

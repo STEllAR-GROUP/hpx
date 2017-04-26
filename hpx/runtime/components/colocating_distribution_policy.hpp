@@ -19,6 +19,7 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -27,7 +28,9 @@
 #include <hpx/traits/promise_local_result.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components
@@ -135,11 +138,7 @@ namespace hpx { namespace components
                     -> std::vector<bulk_locality_result>
                 {
                     std::vector<bulk_locality_result> result;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     result.emplace_back(id, f.get());
-#else
-                    result.push_back(std::make_pair(id, f.get()));
-#endif
                     return result;
                 });
         }

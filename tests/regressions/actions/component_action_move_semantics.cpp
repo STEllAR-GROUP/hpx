@@ -9,9 +9,9 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
+#include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <tests/regressions/actions/components/action_move_semantics.hpp>
@@ -171,7 +171,7 @@ void test_actions()
                     action_move_semantics::return_test_non_movable_action,
                 non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }
@@ -237,14 +237,14 @@ void test_direct_actions()
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
 
             HPX_TEST_EQ((
                 move_object<
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 3u); // transfer_action + bind + function
+            ), 1u); // transfer_action
         }
 
         // test movable_object()
@@ -281,7 +281,7 @@ void test_direct_actions()
                     action_move_semantics::return_test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 4u, 8u); // transfer_action + bind + function + ?call +
+            ), 3u, 8u); // transfer_action + function + ?call +
                     // set_value + ?return
         }
     }
@@ -305,9 +305,9 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // we need to explicitly enable the test components used by this test
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.components.action_move_semantics.enabled! = 1";
+    std::vector<std::string> const cfg = {
+        "hpx.components.action_move_semantics.enabled! = 1"
+    };
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv, cfg);

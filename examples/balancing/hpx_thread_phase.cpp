@@ -10,11 +10,14 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/chrono/duration.hpp>
 #include <boost/lockfree/queue.hpp>
 
+#include <chrono>
+#include <cstddef>
+#include <functional>
 #include <iostream>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 using boost::lockfree::queue;
@@ -23,7 +26,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;
@@ -119,10 +122,10 @@ int hpx_main(variables_map& vm)
             const std::size_t index = j % mutex_count;
 
             register_thread(hpx::util::bind
-                (&lock_and_wait, boost::ref(m[index])
-                               , boost::ref(b0)
-                               , boost::ref(b1)
-                               , boost::ref(hpxthreads[j])
+                (&lock_and_wait, std::ref(m[index])
+                               , std::ref(b0)
+                               , std::ref(b1)
+                               , std::ref(hpxthreads[j])
                                , wait)
               , "lock_and_wait");
         }

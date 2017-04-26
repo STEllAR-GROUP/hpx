@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,11 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -16,13 +20,16 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -44,12 +51,11 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex
-            , typename PendingQueuing
-            , typename StagedQueuing
-            , typename TerminatedQueuing
-             >
-    class local_queue_scheduler : public scheduler_base
+    template <typename Mutex = compat::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class HPX_EXPORT local_queue_scheduler : public scheduler_base
     {
     protected:
         // The maximum number of active threads this thread manager should
@@ -61,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
-        typedef boost::mpl::false_ has_periodic_maintenance;
+        typedef std::false_type has_periodic_maintenance;
 
         typedef thread_queue<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
@@ -151,9 +157,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        boost::uint64_t get_creation_time(bool reset)
+        std::uint64_t get_creation_time(bool reset)
         {
-            boost::uint64_t time = 0;
+            std::uint64_t time = 0;
 
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 time += queues_[i]->get_creation_time(reset);
@@ -161,9 +167,9 @@ namespace hpx { namespace threads { namespace policies
             return time;
         }
 
-        boost::uint64_t get_cleanup_time(bool reset)
+        std::uint64_t get_cleanup_time(bool reset)
         {
-            boost::uint64_t time = 0;
+            std::uint64_t time = 0;
 
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 time += queues_[i]->get_cleanup_time(reset);
@@ -173,9 +179,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        boost::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_pending_misses = 0;
+            std::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -190,9 +196,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        boost::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_pending_accesses = 0;
+            std::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -207,9 +213,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        boost::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -222,9 +228,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -236,9 +242,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -250,9 +256,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            boost::int64_t num_stolen_threads = 0;
+            std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -313,8 +319,8 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = queues_.size();
 
@@ -362,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -391,7 +397,7 @@ namespace hpx { namespace threads { namespace policies
                             continue;
 
                         thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd))
+                        if (q->get_next_thread(thrd, running))
                         {
                             q->increment_num_stolen_from_pending();
                             queues_[num_thread]->increment_num_stolen_to_pending();
@@ -412,7 +418,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     thread_queue_type* q = queues_[idx];
-                    if (q->get_next_thread(thrd))
+                    if (q->get_next_thread(thrd, running))
                     {
                         q->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();
@@ -447,7 +453,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
             {
@@ -463,10 +469,10 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
+        std::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
             // Return queue length of one specific queue.
-            boost::int64_t count = 0;
+            std::int64_t count = 0;
             if (std::size_t(-1) != num_thread) {
                 HPX_ASSERT(num_thread < queues_.size());
 
@@ -481,12 +487,12 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current thread count of the queues.
-        boost::int64_t get_thread_count(thread_state_enum state = unknown,
+        std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false) const
         {
             // Return thread count of one specific queue.
-            boost::int64_t count = 0;
+            std::int64_t count = 0;
             if (std::size_t(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < queues_.size());
@@ -536,15 +542,29 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // Enumerate matching threads from all queues
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+            {
+                result = result && queues_[i]->enumerate_threads(f, state);
+            }
+            return result;
+        }
+
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
-        boost::int64_t get_average_thread_wait_time(
+        std::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
             // Return average thread wait time of one specific queue.
-            boost::uint64_t wait_time = 0;
-            boost::uint64_t count = 0;
+            std::uint64_t wait_time = 0;
+            std::uint64_t count = 0;
             if (std::size_t(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < queues_.size());
@@ -564,12 +584,12 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average task wait time of the queues.
-        boost::int64_t get_average_task_wait_time(
+        std::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
         {
             // Return average task wait time of one specific queue.
-            boost::uint64_t wait_time = 0;
-            boost::uint64_t count = 0;
+            std::uint64_t wait_time = 0;
+            std::uint64_t count = 0;
             if (std::size_t(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < queues_.size());
@@ -593,7 +613,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count)
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
@@ -719,7 +739,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {
-            if (0 == queues_[num_thread])
+            if (nullptr == queues_[num_thread])
             {
                 queues_[num_thread] =
                     new thread_queue_type(max_queue_thread_count_);
@@ -795,5 +815,6 @@ namespace hpx { namespace threads { namespace policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif
 

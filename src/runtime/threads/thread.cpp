@@ -16,8 +16,8 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -108,7 +108,7 @@ namespace hpx
         threads::run_thread_exit_callbacks(id);
     }
 
-    threads::thread_state_enum thread::thread_function_nullary(
+    threads::thread_result_type thread::thread_function_nullary(
         util::unique_function_nonser<void()> const& func)
     {
         try {
@@ -137,7 +137,8 @@ namespace hpx
 
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();
-        return threads::terminated;
+
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     thread::id thread::get_id() const HPX_NOEXCEPT
@@ -221,7 +222,6 @@ namespace hpx
         threads::interrupt_thread(id.id_, flag);
     }
 
-#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     std::size_t thread::get_thread_data() const
     {
         return threads::get_thread_data(native_handle());
@@ -230,7 +230,6 @@ namespace hpx
     {
         return threads::set_thread_data(native_handle(), data);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -319,6 +318,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
+        void yield_to(thread::id id) HPX_NOEXCEPT
+        {
+            this_thread::suspend(threads::pending, id.native_handle(),
+                "this_thread::yield_to");
+        }
+
         void yield() HPX_NOEXCEPT
         {
             this_thread::suspend(threads::pending, "this_thread::yield");
@@ -364,6 +369,16 @@ namespace hpx
         void sleep_until(util::steady_time_point const& abs_time)
         {
             this_thread::suspend(abs_time, "this_thread::sleep_until");
+        }
+
+        std::size_t get_thread_data()
+        {
+            return threads::get_thread_data(threads::get_self_id());
+        }
+
+        std::size_t set_thread_data(std::size_t data)
+        {
+            return threads::set_thread_data(threads::get_self_id(), data);
         }
 
         ///////////////////////////////////////////////////////////////////////

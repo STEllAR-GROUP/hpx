@@ -27,9 +27,9 @@
 #include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/ref.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -219,7 +219,7 @@ namespace hpx { namespace naming
                 HPX_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
             }
-            return 0;
+            return nullptr;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -228,6 +228,11 @@ namespace hpx { namespace naming
         {
             // unmanaged gids do not require any special handling
             if (unmanaged == type_)
+            {
+                return;
+            }
+
+            if (ar.has_gid(*this))
             {
                 return;
             }
@@ -350,9 +355,9 @@ namespace hpx { namespace naming
 
                     naming::gid_type new_gid = gid;     // strips lock-bit
                     HPX_ASSERT(new_gid != invalid_gid);
-                    return agas::incref_async(new_gid, new_credit)
+                    return agas::incref(new_gid, new_credit)
                         .then(
-                            hpx::util::bind(postprocess_incref, boost::ref(gid))
+                            hpx::util::bind(postprocess_incref, std::ref(gid))
                         );
                 }
 
@@ -443,7 +448,7 @@ namespace hpx { namespace naming
             {
                 hpx::util::scoped_unlock<std::unique_lock<gid_type::mutex_type> >
                     ul(l);
-                 result = agas::incref(unlocked_gid, added_credit);
+                 result = agas::incref(launch::sync, unlocked_gid, added_credit);
             }
 
             return result;
@@ -498,43 +503,37 @@ namespace hpx { namespace naming
         // serialization
         void id_type_impl::save(serialization::output_archive& ar, unsigned) const
         {
-            if(ar.is_future_awaiting())
+            // Avoid performing side effects if the archive is not saving the
+            // data.
+            if(ar.is_preprocessing())
             {
                 preprocess_gid(ar);
+                gid_serialization_data data { *this, type_ };
+                ar << data;
                 return;
             }
 
-            // Avoid performing side effects if the archive is not saving the
-            // data.
-            if (ar.is_saving())
+            id_type_management type = type_;
+
+            gid_type new_gid;
+            if (unmanaged == type_)
             {
-                id_type_management type = type_;
-
-                gid_type new_gid;
-                if (unmanaged == type_)
-                {
-                    new_gid = *this;
-                }
-                else if(managed_move_credit == type_)
-                {
-                    // all credits will be moved to the returned gid
-                    new_gid = move_gid(const_cast<id_type_impl&>(*this));
-                    type = managed;
-                }
-                else
-                {
-                    new_gid = ar.get_new_gid(*this);
-                    HPX_ASSERT(new_gid != invalid_gid);
-                }
-
-                gid_serialization_data data { new_gid, type };
-                ar << data;
+                new_gid = *this;
+            }
+            else if(managed_move_credit == type_)
+            {
+                // all credits will be moved to the returned gid
+                new_gid = move_gid(const_cast<id_type_impl&>(*this));
+                type = managed;
             }
             else
             {
-                gid_serialization_data data { *this, type_ };
-                ar << data;
+                new_gid = ar.get_new_gid(*this);
+                HPX_ASSERT(new_gid != invalid_gid);
             }
+
+            gid_serialization_data data { new_gid, type };
+            ar << data;
         }
 
         void id_type_impl::load(serialization::input_archive& ar, unsigned)
@@ -719,9 +718,10 @@ namespace hpx { namespace naming
 
 namespace hpx
 {
-    naming::id_type get_colocation_id_sync(naming::id_type const& id, error_code& ec)
+    naming::id_type get_colocation_id(launch::sync_policy,
+        naming::id_type const& id, error_code& ec)
     {
-        return agas::get_colocation_id_sync(id, ec);
+        return agas::get_colocation_id(launch::sync, id, ec);
     }
 
     lcos::future<naming::id_type> get_colocation_id(naming::id_type const& id)

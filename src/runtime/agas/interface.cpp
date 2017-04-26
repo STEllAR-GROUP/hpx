@@ -8,12 +8,13 @@
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -28,8 +29,9 @@ bool is_console()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool register_name_sync(
-    std::string const& name
+bool register_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::gid_type const& gid
   , error_code& ec
     )
@@ -38,8 +40,9 @@ bool register_name_sync(
     return agas_.register_name(name, gid);
 }
 
-bool register_name_sync(
-    std::string const& name
+bool register_name(
+    launch::sync_policy
+  , std::string const& name
   , naming::id_type const& id
   , error_code& ec
     )
@@ -57,30 +60,9 @@ lcos::future<bool> register_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool unregister_name_sync(
-    std::string const& name
-  , naming::id_type& gid
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-
-    naming::gid_type raw_gid;
-
-    if (agas_.unregister_name(name, raw_gid, ec) && !ec)
-    {
-        gid = naming::id_type(raw_gid,
-            naming::detail::has_credits(raw_gid) ?
-                naming::id_type::managed :
-                naming::id_type::unmanaged);
-        return true;
-    }
-
-    return false;
-}
-
-naming::id_type unregister_name_sync(
-    std::string const& name
+naming::id_type unregister_name(
+    launch::sync_policy
+  , std::string const& name
   , error_code& ec
     )
 {
@@ -97,39 +79,6 @@ lcos::future<naming::id_type> unregister_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool resolve_name_sync(
-    std::string const& name
-  , naming::gid_type& gid
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.resolve_name(name, gid, ec);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-bool resolve_name_sync(
-    std::string const& name
-  , naming::id_type& gid
-  , error_code& ec
-    )
-{
-    naming::resolver_client& agas_ = naming::get_agas_client();
-
-    naming::gid_type raw_gid;
-
-    if (agas_.resolve_name(name, raw_gid, ec) && !ec)
-    {
-        gid = naming::id_type(raw_gid,
-            naming::detail::has_credits(raw_gid) ?
-                naming::id_type::managed :
-                naming::id_type::unmanaged);
-        return true;
-    }
-
-    return false;
-}
-
 lcos::future<naming::id_type> resolve_name(
     std::string const& name
     )
@@ -138,8 +87,9 @@ lcos::future<naming::id_type> resolve_name(
     return agas_.resolve_name_async(name);
 }
 
-naming::id_type resolve_name_sync(
-    std::string const& name
+naming::id_type resolve_name(
+    launch::sync_policy
+  , std::string const& name
   , error_code& ec
     )
 {
@@ -165,7 +115,7 @@ naming::id_type resolve_name_sync(
 //     return agas_.get_localities(type, ec);
 // }
 
-lcos::future<boost::uint32_t> get_num_localities(
+lcos::future<std::uint32_t> get_num_localities(
     components::component_type type
     )
 {
@@ -173,8 +123,9 @@ lcos::future<boost::uint32_t> get_num_localities(
     return agas_.get_num_localities_async();
 }
 
-boost::uint32_t get_num_localities_sync(
-    components::component_type type
+std::uint32_t get_num_localities(
+    launch::sync_policy
+  , components::component_type type
   , error_code& ec
     )
 {
@@ -182,28 +133,30 @@ boost::uint32_t get_num_localities_sync(
     return agas_.get_num_localities(type, ec);
 }
 
-lcos::future<std::vector<boost::uint32_t> > get_num_threads()
+lcos::future<std::vector<std::uint32_t> > get_num_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
 }
 
-std::vector<boost::uint32_t> get_num_threads_sync(
-    error_code& ec
+std::vector<std::uint32_t> get_num_threads(
+    launch::sync_policy
+  , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads(ec);
 }
 
-lcos::future<boost::uint32_t> get_num_overall_threads()
+lcos::future<std::uint32_t> get_num_overall_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
 }
 
-boost::uint32_t get_num_overall_threads_sync(
-    error_code& ec
+std::uint32_t get_num_overall_threads(
+    launch::sync_policy
+  , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
@@ -285,8 +238,9 @@ hpx::future<naming::address> resolve(
     return agas_.resolve_async(id);
 }
 
-naming::address resolve_sync(
-    naming::id_type const& id
+naming::address resolve(
+    launch::sync_policy
+  , naming::id_type const& id
   , error_code& ec
     )
 {
@@ -297,17 +251,18 @@ naming::address resolve_sync(
 hpx::future<bool> bind(
     naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.bind_async(gid, addr, locality_id);
 }
 
-bool bind_sync(
-    naming::gid_type const& gid
+bool bind(
+    launch::sync_policy
+  , naming::gid_type const& gid
   , naming::address const& addr
-  , boost::uint32_t locality_id
+  , std::uint32_t locality_id
   , error_code& ec
     )
 {
@@ -325,8 +280,9 @@ hpx::future<bool> bind(
     return agas_.bind_async(gid, addr, locality_);
 }
 
-bool bind_sync(
-    naming::gid_type const& gid
+bool bind(
+    launch::sync_policy
+  , naming::gid_type const& gid
   , naming::address const& addr
   , naming::gid_type const& locality_
   , error_code& ec
@@ -338,16 +294,17 @@ bool bind_sync(
 
 hpx::future<naming::address> unbind(
     naming::gid_type const& id
-  , boost::uint64_t count
+  , std::uint64_t count
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.unbind_range_async(id);
 }
 
-naming::address unbind_sync(
-    naming::gid_type const& id
-  , boost::uint64_t count
+naming::address unbind(
+    launch::sync_policy
+  , naming::gid_type const& id
+  , std::uint64_t count
   , error_code& ec
     )
 {
@@ -409,6 +366,10 @@ naming::id_type get_console_locality(
     error_code& ec
     )
 {
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
+        return naming::invalid_id;
+
     naming::gid_type console;
     naming::get_agas_client().get_console_locality(console, ec);
     if (ec) return naming::invalid_id;
@@ -416,9 +377,10 @@ naming::id_type get_console_locality(
     return naming::id_type(console, naming::id_type::unmanaged);
 }
 
-boost::uint32_t get_locality_id(error_code& ec)
+std::uint32_t get_locality_id(error_code& ec)
 {
-    if (get_runtime_ptr() == 0)
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
         return naming::invalid_locality_id;
 
     naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
@@ -431,7 +393,8 @@ naming::gid_type get_next_id(
   , error_code& ec
     )
 {
-    if (get_runtime_ptr() == 0)
+    runtime* rt = get_runtime_ptr();
+    if (rt == nullptr || rt->get_state() == state_invalid)
     {
         HPX_THROWS_IF(ec, invalid_status,
             "get_next_id", "the runtime system has not been started yet.");
@@ -449,7 +412,7 @@ naming::gid_type get_next_id(
 ///////////////////////////////////////////////////////////////////////////////
 void decref(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , error_code& ec
   )
 {
@@ -458,9 +421,9 @@ void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::int64_t> incref_async(
+hpx::future<std::int64_t> incref(
     naming::gid_type const& gid
-  , boost::int64_t credits
+  , std::int64_t credits
   , naming::id_type const& keep_alive_
   )
 {
@@ -475,9 +438,10 @@ hpx::future<boost::int64_t> incref_async(
     return resolver.incref_async(gid, credits, keep_alive);
 }
 
-boost::int64_t incref(
-    naming::gid_type const& gid
-  , boost::int64_t credits
+std::int64_t incref(
+    launch::sync_policy
+  , naming::gid_type const& gid
+  , std::int64_t credits
   , naming::id_type const& keep_alive_
   , error_code& ec
   )
@@ -501,8 +465,9 @@ hpx::future<naming::id_type> get_colocation_id(
     return resolver.get_colocation_id_async(id);
 }
 
-naming::id_type get_colocation_id_sync(
-    naming::id_type const& id
+naming::id_type get_colocation_id(
+    launch::sync_policy
+  , naming::id_type const& id
   , error_code& ec)
 {
     return get_colocation_id(id).get(ec);
@@ -510,11 +475,10 @@ naming::id_type get_colocation_id_sync(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<hpx::id_type> on_symbol_namespace_event(
-    std::string const& name, agas::namespace_action_code evt,
-    bool call_for_past_events)
+    std::string const& name, bool call_for_past_events)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.on_symbol_namespace_event(name, evt, call_for_past_events);
+    return resolver.on_symbol_namespace_event(name, call_for_past_events);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

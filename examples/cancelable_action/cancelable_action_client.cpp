@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/threads.hpp>
 
 #include "cancelable_action/cancelable_action.hpp"
 
@@ -11,7 +12,7 @@
 void interrupt_do_it(examples::cancelable_action ca)
 {
     // wait for one second before interrupting the (possibly remote) operation
-    hpx::this_thread::sleep_for(boost::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
     ca.cancel_it();
 }
 

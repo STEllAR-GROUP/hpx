@@ -11,19 +11,22 @@
 
 #include <boost/atomic.hpp>
 
+#include <chrono>
+#include <cstdint>
+#include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<boost::int32_t> accumulator;
+boost::atomic<std::int32_t> accumulator;
 hpx::lcos::local::condition_variable_any result_cv;
 
-void increment(boost::int32_t i)
+void increment(std::int32_t i)
 {
     accumulator += i;
     result_cv.notify_one();
 }
 
-void increment_with_future(hpx::shared_future<boost::int32_t> fi)
+void increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     accumulator += fi.get();
     result_cv.notify_one();
@@ -32,7 +35,7 @@ void increment_with_future(hpx::shared_future<boost::int32_t> fi)
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_function_object
 {
-    void operator()(boost::int32_t i) const
+    void operator()(std::int32_t i) const
     {
         accumulator += i;
     }
@@ -41,14 +44,14 @@ struct increment_function_object
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_type
 {
-    void call(boost::int32_t i) const
+    void call(std::int32_t i) const
     {
         accumulator += i;
     }
 };
 
 #if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
-auto increment_lambda = [](boost::int32_t i){ accumulator += i; };
+auto increment_lambda = [](std::int32_t i){ accumulator += i; };
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,8 +66,8 @@ int hpx_main()
     }
 
     {
-        hpx::promise<boost::int32_t> p;
-        hpx::shared_future<boost::int32_t> f = p.get_future();
+        hpx::promise<std::int32_t> p;
+        hpx::shared_future<std::int32_t> f = p.get_future();
 
         using hpx::util::placeholders::_1;
 
@@ -119,13 +122,13 @@ int hpx_main()
     hpx::lcos::local::no_mutex result_mutex;
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
 #   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
-    result_cv.wait_for(l, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
+    result_cv.wait_for(l, std::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 #   else
-    result_cv.wait_for(l, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 15));
+    result_cv.wait_for(l, std::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 15));
 
     HPX_TEST_EQ(accumulator.load(), 15);
 #   endif

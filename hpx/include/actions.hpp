@@ -11,6 +11,8 @@
 #include <hpx/runtime/actions/action_invoke_no_more_than.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/lambda_to_action.hpp>
+#include <hpx/runtime/actions/make_continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 

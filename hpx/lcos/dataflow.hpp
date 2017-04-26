@@ -1,7 +1,10 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// hpxinspect:nodeprecatedinclude:boost/ref.hpp
+// hpxinspect:nodeprecatedname:boost::reference_wrapper
 
 #ifndef HPX_LCOS_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_HPP
@@ -9,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
@@ -20,20 +24,24 @@
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
+
+#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -77,6 +85,15 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
+            traits::is_future_or_future_range<Future>::value
+        >::type operator()(std::reference_wrapper<Future>& future) const
+        {
+            future.get() = Future();
+        }
+
+        template <typename Future>
+        HPX_FORCEINLINE
+        typename std::enable_if<
             !traits::is_future_or_future_range<Future>::value
         >::type operator()(Future& future) const
         {}
@@ -109,6 +126,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef
             typename detail::dataflow_return<Func, Futures>::type
             result_type;
+        typedef hpx::lcos::detail::future_data<result_type> base_type;
 
         typedef hpx::lcos::future<result_type> type;
 
@@ -138,12 +156,27 @@ namespace hpx { namespace lcos { namespace detail
         dataflow_frame(dataflow_frame const&);
 
     public:
+        typedef typename base_type::init_no_addref init_no_addref;
+
         template <typename FFunc, typename FFutures>
         dataflow_frame(
             Policy policy
           , FFunc && func
           , FFutures && futures)
               : policy_(std::move(policy))
+              , func_(std::forward<FFunc>(func))
+              , futures_(std::forward<FFutures>(futures))
+              , done_(false)
+        {}
+
+        template <typename FFunc, typename FFutures>
+        dataflow_frame(
+            Policy policy
+          , FFunc && func
+          , FFutures && futures
+          , init_no_addref no_addref)
+              : base_type(no_addref)
+              , policy_(std::move(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
@@ -156,8 +189,7 @@ namespace hpx { namespace lcos { namespace detail
         void execute(util::detail::pack_c<std::size_t, Is...>, std::false_type)
         {
             try {
-                result_type res =
-                    util::invoke_fused(func_, std::move(futures_));
+                result_type res = util::invoke_fused(func_, std::move(futures_));
 
                 // reset futures
                 reset_dataflow_future reset;
@@ -194,48 +226,91 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        HPX_FORCEINLINE
-        void finalize(launch policy)
+        HPX_FORCEINLINE void done()
         {
-            if (policy == hpx::launch::sync)
-            {
-                execute(indices_type(), is_void());
-                return;
-            }
+            hpx::util::annotate_function annotate(func_);
+            (void)annotate;     // suppress warning about unused variable
+            execute(indices_type(), is_void());
+        }
 
-            util::thread_description desc(func_, "dataflow_frame::finalize");
-
+        ///////////////////////////////////////////////////////////////////////
+        void finalize(hpx::detail::async_policy policy)
+        {
             // schedule the final function invocation with high priority
-            execute_function_type f = &dataflow_frame::execute;
+            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            // simply schedule new thread
             threads::register_thread_nullary(
-                util::deferred_call(
-                    f, std::move(this_), indices_type(), is_void())
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
               , desc
               , threads::pending
               , true
-              , threads::thread_priority_boost);
+              , policy.priority()
+              , std::size_t(-1)
+              , threads::thread_stacksize_current);
+        }
+
+        HPX_FORCEINLINE
+        void finalize(hpx::detail::sync_policy)
+        {
+            done();
+        }
+
+        void finalize(hpx::detail::fork_policy policy)
+        {
+            // schedule the final function invocation with high priority
+            util::thread_description desc(func_, "dataflow_frame::finalize");
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            threads::thread_id_type tid = threads::register_thread_nullary(
+                util::deferred_call(&dataflow_frame::done, std::move(this_))
+              , desc
+              , threads::pending_do_not_schedule
+              , true
+              , policy.priority()
+              , get_worker_thread_num()
+              , threads::thread_stacksize_current);
+
+            if (tid)
+            {
+                // make sure this thread is executed last
+                hpx::this_thread::yield_to(thread::id(std::move(tid)));
+            }
+        }
+
+        void finalize(launch policy)
+        {
+            if (policy == launch::sync)
+            {
+                finalize(launch::sync);
+            }
+            else if (policy == launch::fork)
+            {
+                finalize(launch::fork);
+            }
+            else
+            {
+                finalize(launch::async);
+            }
         }
 
         HPX_FORCEINLINE
         void finalize(threads::executor& sched)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(sched, f, std::move(this_), indices_type(), is_void());
+            hpx::apply(sched, &dataflow_frame::done, std::move(this_));
         }
 
         // handle executors through their executor_traits
         template <typename Executor>
         HPX_FORCEINLINE
-        void finalize(Executor& exec)
+        typename std::enable_if<traits::is_executor<Executor>::value>::type
+        finalize(Executor& exec)
         {
-            execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-
             parallel::executor_traits<Executor>::apply_execute(exec,
-                f, std::move(this_), indices_type(), is_void());
+                &dataflow_frame::done, std::move(this_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -262,7 +337,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::false_, boost::mpl::false_)
+        void await_next(std::false_type, std::false_type)
         {
             do_await<I + 1>(is_end<I + 1>());
         }
@@ -293,12 +368,13 @@ namespace hpx { namespace lcos { namespace detail
                     typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data
-                    = traits::detail::get_shared_state(*next);
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(*next);
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
                     next_future_data->execute_deferred();
 
@@ -325,7 +401,7 @@ namespace hpx { namespace lcos { namespace detail
         // Current element is a range (vector) of futures
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::false_, boost::mpl::true_)
+        void await_next(std::false_type, std::true_type)
         {
             typedef
                 typename util::tuple_element<I, Futures>::type
@@ -333,15 +409,15 @@ namespace hpx { namespace lcos { namespace detail
             future_type & f_ = util::get<I>(futures_);
 
             await_range<I>(
-                boost::begin(boost::unwrap_ref(f_))
-              , boost::end(boost::unwrap_ref(f_))
+                boost::begin(util::unwrap_ref(f_))
+              , boost::end(util::unwrap_ref(f_))
             );
         }
 
         // Current element is a simple future
         template <std::size_t I>
         HPX_FORCEINLINE
-        void await_next(boost::mpl::true_, boost::mpl::false_)
+        void await_next(std::true_type, std::false_type)
         {
             typedef
                 typename util::tuple_element<I, Futures>::type
@@ -352,12 +428,13 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::future_traits<future_type>::type
                 future_result_type;
 
-            boost::intrusive_ptr<
-                lcos::detail::future_data<future_result_type>
-            > next_future_data
-                = traits::detail::get_shared_state(f_);
+            typename traits::detail::shared_state_ptr<
+                    future_result_type
+                >::type next_future_data =
+                    traits::detail::get_shared_state(f_);
 
-            if(!next_future_data->is_ready())
+            if (next_future_data.get() != nullptr &&
+                !next_future_data->is_ready())
             {
                 next_future_data->execute_deferred();
 
@@ -365,7 +442,7 @@ namespace hpx { namespace lcos { namespace detail
                 if (!next_future_data->is_ready())
                 {
                     void (dataflow_frame::*f)(
-                            boost::mpl::true_, boost::mpl::false_
+                            std::true_type, std::false_type
                         ) = &dataflow_frame::await_next_respawn<I>;
 
                     boost::intrusive_ptr<dataflow_frame> this_(this);
@@ -373,8 +450,8 @@ namespace hpx { namespace lcos { namespace detail
                         util::deferred_call(
                             f
                           , std::move(this_)
-                          , boost::mpl::true_()
-                          , boost::mpl::false_()
+                          , std::true_type()
+                          , std::false_type()
                         )
                     );
                     return;
@@ -393,13 +470,15 @@ namespace hpx { namespace lcos { namespace detail
                 typename util::tuple_element<I, Futures>::type
                 future_type;
 
-            typedef typename traits::is_future<
-                future_type
-            >::type is_future;
+            typedef util::detail::any_of<
+                    traits::is_future<future_type>,
+                    traits::is_ref_wrapped_future<future_type>
+                > is_future;
 
-            typedef typename traits::is_future_range<
-                future_type
-            >::type is_range;
+            typedef util::detail::any_of<
+                    traits::is_future_range<future_type>,
+                    traits::is_ref_wrapped_future_range<future_type>
+                > is_range;
 
             await_next<I>(is_future(), is_range());
         }
@@ -428,25 +507,28 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<Action,
         typename std::enable_if<traits::is_action<Action>::value>::type>
     {
-        template <
+        template <typename Policy,
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
         HPX_FORCEINLINE static
-        typename dataflow_frame<
-            launch
-          , Derived
-          , util::tuple<
-                hpx::id_type
-              , typename traits::acquire_future<Ts>::type...
-            >
+        typename std::enable_if<
+            traits::is_launch_policy<Policy>::value,
+            typename dataflow_frame<
+                Policy
+              , Derived
+              , util::tuple<
+                    hpx::id_type
+                  , typename traits::acquire_future<Ts>::type...
+                >
+            >::type
         >::type
-        call(launch launch_policy,
+        call(Policy launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
             typedef
                 dataflow_frame<
-                    launch
+                    Policy
                   , Derived
                   , util::tuple<
                         hpx::id_type
@@ -454,15 +536,17 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
+            typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    launch::async
+                    launch_policy
                   , Derived()
                   , util::forward_as_tuple(
                         id
                       , traits::acquire_future_disp()(std::forward<Ts>(ts))...
                     )
-                ));
+                  , init_no_addref()
+                ), false);
             p->do_await();
 
             using traits::future_access;
@@ -474,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            launch
+            hpx::detail::async_policy
           , Derived
           , util::tuple<
                 hpx::id_type
@@ -484,7 +568,7 @@ namespace hpx { namespace lcos { namespace detail
         call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
-            return call(launch::all, act, id, std::forward<Ts>(ts)...);
+            return call(launch::async, act, id, std::forward<Ts>(ts)...);
         }
     };
 
@@ -500,8 +584,7 @@ namespace hpx { namespace lcos { namespace detail
                     Action
                 >::remote_result_type
             >::type>
-        call(launch launch_policy,
-            naming::id_type const& id, Ts &&... ts)
+        call(Policy launch_policy, naming::id_type const& id, Ts &&... ts)
         {
             return dataflow_dispatch<Action>::call(launch_policy, Action(), id,
                 std::forward<Ts>(ts)...);
@@ -519,8 +602,7 @@ namespace hpx { namespace lcos { namespace detail
 //                 >::type
 //             >
 //         >::type
-//         call(launch launch_policy,
-//             DistPolicy const& policy, Ts&&... ts)
+//         call(Policy launch_policy, DistPolicy const& policy, Ts&&... ts)
 //         {
 //             return policy.template async<Action>(launch_policy,
 //                 std::forward<Ts>(ts)...);
@@ -542,8 +624,8 @@ namespace hpx { namespace lcos { namespace detail
         call(naming::id_type const& id, Ts&&... ts)
         {
             return dataflow_action_dispatch<
-                    Action, launch
-                >::call(launch::all, id, std::forward<Ts>(ts)...);
+                    Action, hpx::detail::async_policy
+                >::call(launch::async, id, std::forward<Ts>(ts)...);
         }
     };
 
@@ -565,8 +647,8 @@ namespace hpx { namespace lcos { namespace detail
 //         call(DistPolicy const& policy, Ts&&... ts)
 //         {
 //             return dataflow_action_dispatch<
-//                     Action, launch
-//                 >::call(launch::all, policy, std::forward<Ts>(ts)...);
+//                     Action, hpx::detail::async_policy
+//                 >::call(launch::async, policy, std::forward<Ts>(ts)...);
 //         }
 //     };
 
@@ -581,26 +663,32 @@ namespace hpx { namespace lcos { namespace detail
                 >::remote_result_type
             >::type result_type;
 
-        template <typename ...Ts>
+        template <typename Policy, typename ...Ts>
         HPX_FORCEINLINE static
         lcos::future<result_type>
-        call(launch launch_policy,
+        call(Policy launch_policy,
             Action const&, naming::id_type const& id, Ts &&... ts)
         {
+            static_assert(traits::is_launch_policy<Policy>::value,
+                "Policy must be a valid launch policy");
+
             return dataflow_action_dispatch<
                     Action, launch
                 >::call(launch_policy, id, std::forward<Ts>(ts)...);
         }
 
-//         template <typename DistPolicy, typename ...Ts>
+//         template <typename Policy, typename DistPolicy, typename ...Ts>
 //         HPX_FORCEINLINE static
 //         typename std::enable_if<
 //             traits::is_distribution_policy<DistPolicy>::value,
 //             lcos::future<result_type>
 //         >::type
-//         call(launch launch_policy,
-//             Action const&, DistPolicy const& policy, Ts&&... ts)
+//         call(Policy launch_policy, Action const&, DistPolicy const& policy,
+//             Ts&&... ts)
 //         {
+//             static_assert(traits::is_launch_policy<Policy>::value,
+//                 "Policy must be a valid launch policy");
+//
 //             return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
 //         }
     };

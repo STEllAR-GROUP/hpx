@@ -19,11 +19,14 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -86,15 +89,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    [pred, tok](Iter part_begin,
-                        std::size_t part_count) mutable -> bool
+                auto f1 =
+                    [pred, tok, policy](
+                        Iter part_begin, std::size_t part_count
+                    ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         bool fst_bool = pred(*part_begin);
                         if (part_count == 1)
                             return fst_bool;
-                        util::loop_n(++part_begin, --part_count, tok,
+
+                        util::loop_n<ExPolicy>(
+                            ++part_begin, --part_count, tok,
                             [&fst_bool, &pred, &tok](Iter const& a) {
                                 if (fst_bool != pred(*a))
                                 {
@@ -104,8 +111,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel();
                                 }
                             });
+
                         return fst_bool;
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, bool>::call(
+                    std::forward<ExPolicy>(policy), first, count,
+                    std::move(f1),
                     [tok](std::vector<hpx::future<bool> > && results) -> bool
                     {
                         if (tok.was_cancelled()) return false;
@@ -148,12 +160,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     implicitly converted to Type.
     ///
     /// The predicate operations in the parallel \a is_partitioned algorithm invoked
-    /// with an execution policy object of type \a sequential_execution_policy
+    /// with an execution policy object of type \a sequenced_policy
     /// executes in sequential order in the calling thread.
     ///
     /// The comparison operations in the parallel \a is_partitioned algorithm invoked
-    /// with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
@@ -163,12 +175,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a is_partitioned algorithm returns true if each element
     ///           in the sequence for which pred returns true precedes those for
     ///           which pred returns false. Otherwise is_partitioned returns
-    ///           false. If the range [first, last) containes less than two
+    ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
     template <typename ExPolicy, typename InIter, typename Pred>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_partitioned(ExPolicy && policy, InIter first, InIter last, Pred && pred)
@@ -178,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 

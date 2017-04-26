@@ -11,11 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/traits/vector_pack_count_bits.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -23,8 +25,11 @@
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -34,6 +39,65 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+        template <typename ExPolicy, typename Op>
+        struct count_iteration
+        {
+            typedef typename hpx::util::decay<ExPolicy>::type execution_policy_type;
+            typedef typename hpx::util::decay<Op>::type op_type;
+
+            op_type op_;
+
+            template <typename Op_,
+                typename U = typename std::enable_if<
+                   !std::is_same<
+                        typename hpx::util::decay<Op_>::type, count_iteration
+                    >::value
+                >::type>
+            HPX_HOST_DEVICE count_iteration(Op_ && op)
+              : op_(std::forward<Op_>(op))
+            {}
+
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
+            count_iteration(count_iteration const&) = default;
+            count_iteration(count_iteration&&) = default;
+#else
+            HPX_HOST_DEVICE count_iteration(count_iteration const& rhs)
+              : op_(rhs.op_)
+            {}
+
+            HPX_HOST_DEVICE count_iteration(count_iteration && rhs)
+              : op_(std::move(rhs.op_))
+            {}
+#endif
+
+            HPX_DELETE_COPY_ASSIGN(count_iteration);
+            HPX_DELETE_MOVE_ASSIGN(count_iteration);
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::iterator_traits<Iter>::difference_type
+            operator()(Iter part_begin, std::size_t part_size)
+            {
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                util::loop_n<execution_policy_type>(
+                    part_begin, part_size,
+                    hpx::util::bind(*this, _1, std::ref(ret))
+                );
+                return ret;
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(Iter curr,
+                typename std::iterator_traits<Iter>::difference_type& ret)
+            {
+                ret += traits::count_bits(hpx::util::invoke(op_, *curr));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Value>
         struct count
           : public detail::algorithm<count<Value>, Value>
@@ -46,9 +110,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static difference_type
-            sequential(ExPolicy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy && policy, Iter first, Iter last, T const& value)
             {
-                return std::count(first, last, value);
+                auto f1 =
+                    count_iteration<ExPolicy, detail::compare_to<T> >(
+                        detail::compare_to<T>(value));
+
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+
+                util::loop(
+                    policy, first, last,
+                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+
+                return ret;
             }
 
             template <typename ExPolicy, typename Iter, typename T>
@@ -65,20 +140,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         >::get(0);
                 }
 
+                auto f1 =
+                    count_iteration<ExPolicy, detail::compare_to<T> >(
+                        detail::compare_to<T>(value));
+
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [value](Iter part_begin, std::size_t part_size) -> difference_type
-                    {
-                        difference_type ret = 0;
-                        util::loop_n(part_begin, part_size,
-                            [&value, &ret](Iter const& curr)
-                            {
-                                if (value == *curr)
-                                    ++ret;
-                            });
-                        return ret;
-                    },
+                    std::move(f1),
                     hpx::util::unwrapped(
                         [](std::vector<difference_type>&& results)
                         {
@@ -97,7 +166,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -143,20 +214,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param value        The value to search for.
     ///
     /// The comparisons in the parallel \a count algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// \note The comparisons in the parallel \a count algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
+    ///       an execution policy object of type \a parallel_policy or
+    ///       \a parallel_task_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count algorithm returns a
     ///           \a hpx::future<difference_type> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
@@ -164,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
@@ -199,9 +270,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename Pred>
             static difference_type
-            sequential(ExPolicy, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy && policy, Iter first, Iter last, Pred && op)
             {
-                return std::count_if(first, last, std::forward<Pred>(op));
+                auto f1 = count_iteration<ExPolicy, Pred>(op);
+
+                using hpx::util::placeholders::_1;
+                typename std::iterator_traits<Iter>::difference_type ret = 0;
+
+                util::loop(
+                    policy, first, last,
+                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+
+                return ret;
             }
 
             template <typename ExPolicy, typename Iter, typename Pred>
@@ -217,23 +297,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         >::get(0);
                 }
 
+                auto f1 = count_iteration<ExPolicy, Pred>(op);
+
                 return util::partitioner<ExPolicy, difference_type>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [op](Iter part_begin, std::size_t part_size)
-                    ->  difference_type
-                    {
-                        difference_type ret = 0;
-
-                        // MSVC bails out if 'op' is captured by reference
-                        util::loop_n(part_begin, part_size,
-                            [op, &ret](Iter const& curr)
-                            {
-                                if (hpx::util::invoke(op, *curr))
-                                    ++ret;
-                            });
-                        return ret;
-                    },
+                    std::move(f1),
                     hpx::util::unwrapped(
                         [](std::vector<difference_type> && results)
                         {
@@ -252,7 +321,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequential_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
@@ -316,19 +387,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     implicitly converted to Type.
     ///
     /// \note The assignments in the parallel \a count_if algorithm invoked with
-    ///       an execution policy object of type \a sequential_execution_policy
+    ///       an execution policy object of type \a sequenced_policy
     ///       execute in sequential order in the calling thread.
     /// \note The assignments in the parallel \a count_if algorithm invoked with
-    ///       an execution policy object of type \a parallel_execution_policy or
-    ///       \a parallel_task_execution_policy are permitted to execute in an unordered
+    ///       an execution policy object of type \a parallel_policy or
+    ///       \a parallel_task_policy are permitted to execute in an unordered
     ///       fashion in unspecified threads, and indeterminately sequenced
     ///       within each thread.
     ///
     /// \returns  The \a count_if algorithm returns
     ///           \a hpx::future<difference_type> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a std::iterator_traits<InIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
@@ -336,7 +407,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename F>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type

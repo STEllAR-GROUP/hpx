@@ -18,10 +18,7 @@
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/capability.hpp>
-#endif
-
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,16 +116,6 @@ namespace hpx { namespace components
         /// \return Returns the number of instances of the managed object type
         ///         which are currently alive.
         virtual long instance_count() const = 0;
-
-#if defined(HPX_HAVE_SECURITY)
-        /// \brief Return the required capabilities necessary to create an
-        ///        instance of a component using this factory instance.
-        ///
-        /// \return Returns required capabilities necessary to create a new
-        ///         instance of a component using this factory instance.
-        virtual components::security::capability
-            get_required_capabilities() const = 0;
-#endif
     };
 }}
 

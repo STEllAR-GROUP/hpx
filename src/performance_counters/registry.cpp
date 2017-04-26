@@ -9,6 +9,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
+#include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
@@ -20,7 +21,10 @@
 #include <boost/regex.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
 
+#include <cstdint>
+#include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,7 +218,7 @@ namespace hpx { namespace performance_counters
             {
                 using hpx::util::placeholders::_1;
                 discover_counter = hpx::util::bind(&expand_counter_info, _1,
-                    discover_counter, boost::ref(ec));
+                    discover_counter, std::ref(ec));
             }
 
             counter_info info = (*it).second.info_;
@@ -235,7 +239,7 @@ namespace hpx { namespace performance_counters
             {
                 using hpx::util::placeholders::_1;
                 discover_counter = hpx::util::bind(&expand_counter_info, _1,
-                    discover_counter, boost::ref(ec));
+                    discover_counter, std::ref(ec));
             }
 
             // split name
@@ -303,7 +307,7 @@ namespace hpx { namespace performance_counters
         {
             using hpx::util::placeholders::_1;
             discover_counter_ = hpx::util::bind(&expand_counter_info, _1,
-                std::move(discover_counter), boost::ref(ec));
+                std::move(discover_counter), std::ref(ec));
         }
         else
         {
@@ -433,41 +437,48 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::int64_t wrap_counter(boost::int64_t* p, bool reset)
+    std::int64_t wrap_counter(std::int64_t* p, bool reset)
     {
-        boost::int64_t result = *p;
+        std::int64_t result = *p;
         *p = 0;
         return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::create_raw_counter_value(counter_info const& info,
-        boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
+        std::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
         using util::placeholders::_1;
-        hpx::util::function_nonser<boost::int64_t(bool)> func(
+        hpx::util::function_nonser<std::int64_t(bool)> func(
             util::bind(wrap_counter, countervalue, _1));
         return create_raw_counter(info, func, id, ec);
     }
 
-    static boost::int64_t
-    wrap_raw_counter(hpx::util::function_nonser<boost::int64_t()> const& f, bool)
+    static std::int64_t
+    wrap_raw_counter(hpx::util::function_nonser<std::int64_t()> const& f, bool)
+    {
+        return f();
+    }
+
+    static std::vector<std::int64_t>
+    wrap_raw_values_counter(
+        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<boost::int64_t()> const& f, naming::gid_type& id,
+        hpx::util::function_nonser<std::int64_t()> const& f, naming::gid_type& id,
         error_code& ec)
     {
         using util::placeholders::_1;
-        hpx::util::function_nonser<boost::int64_t(bool)> func(
+        hpx::util::function_nonser<std::int64_t(bool)> func(
             util::bind(&wrap_raw_counter, f, _1));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<boost::int64_t(bool)> const& f, naming::gid_type& id,
+        hpx::util::function_nonser<std::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name
@@ -498,6 +509,74 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             typedef components::component<server::raw_counter> counter_t;
+            id = components::server::construct<counter_t>(complemented_info, f);
+
+            std::string name(complemented_info.fullname_);
+            ensure_counter_prefix(name);      // pre-pend prefix, if necessary
+        }
+        catch (hpx::exception const& e) {
+            id = naming::invalid_gid;        // reset result
+            if (&ec == &throws)
+                throw;
+            ec = make_error_code(e.get_error(), e.what());
+            LPCS_(warning) << (
+                boost::format("failed to create raw counter %s (%s)") %
+                    complemented_info.fullname_ % e.what());
+            return status_invalid_data;
+        }
+
+        LPCS_(info) << (boost::format("raw counter %s created at %s")
+            % complemented_info.fullname_ % id);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return status_valid_data;
+    }
+
+    counter_status registry::create_raw_counter(counter_info const& info,
+        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
+        naming::gid_type& id, error_code& ec)
+    {
+        using util::placeholders::_1;
+        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> func(
+            util::bind(&wrap_raw_values_counter, f, _1));
+        return create_raw_counter(info, func, id, ec);
+    }
+
+    counter_status registry::create_raw_counter(counter_info const& info,
+        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
+        naming::gid_type& id, error_code& ec)
+    {
+        // create canonical type name
+        std::string type_name;
+        counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
+        if (!status_is_valid(status)) return status;
+
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        if (it == countertypes_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
+                boost::str(boost::format("unknown counter type %s") % type_name));
+            return status_counter_type_unknown;
+        }
+
+        // make sure the counter type requested is supported
+        if (counter_histogram != (*it).second.info_.type_ ||
+            counter_histogram != info.type_)
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
+                "invalid counter type requested (only counter_histogram "
+                "is supported)");
+            return status_counter_type_unknown;
+        }
+
+        // make sure parent instance name is set properly
+        counter_info complemented_info = info;
+        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        if (ec) return status_invalid_data;
+
+        // create the counter as requested
+        try {
+            typedef components::component<server::raw_values_counter> counter_t;
             id = components::server::construct<counter_t>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
@@ -588,7 +667,7 @@ namespace hpx { namespace performance_counters
     ///        (milliseconds).
     counter_status registry::create_statistics_counter(
         counter_info const& info, std::string const& base_counter_name,
-        std::vector<boost::int64_t> const& parameters,
+        std::vector<std::int64_t> const& parameters,
         naming::gid_type& gid, error_code& ec)
     {
         // create canonical type name
@@ -626,7 +705,7 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             // extract parameters
-            boost::uint64_t sample_interval = 1000;   // default sampling interval
+            std::uint64_t sample_interval = 1000;   // default sampling interval
             if (!parameters.empty())
                 sample_interval = parameters[0];
 
@@ -653,7 +732,7 @@ namespace hpx { namespace performance_counters
                         boost::accumulators::tag::rolling_mean>
                 > counter_t;
 
-                boost::uint64_t window_size = 10;   // default rolling window size
+                std::uint64_t window_size = 10;   // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
@@ -835,7 +914,7 @@ namespace hpx { namespace performance_counters
         // register the canonical name with AGAS
         std::string name(complemented_info.fullname_);
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
-        agas::register_name_sync(name, id, ec);
+        agas::register_name(launch::sync, name, id, ec);
         if (ec) return status_invalid_data;
 
         if (&ec != &throws)
@@ -860,7 +939,7 @@ namespace hpx { namespace performance_counters
 
         // unregister this counter from AGAS
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
-        agas::unregister_name_sync(name, ec);
+        agas::unregister_name(launch::sync, name, ec);
         if (ec) {
             LPCS_(warning) << ( boost::format("failed to remove counter %s")
                 % complemented_info.fullname_);

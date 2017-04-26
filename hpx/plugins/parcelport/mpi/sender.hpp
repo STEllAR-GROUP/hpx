@@ -17,10 +17,12 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -44,12 +46,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             get_next_free_tag();
         }
 
-        connection_ptr create_connection(int dest,
-            performance_counters::parcels::gatherer & parcels_sent)
+        connection_ptr create_connection(int dest, parcelset::parcelport* pp)
         {
-            return
-                std::make_shared<connection_type>(
-                    this, dest, parcels_sent);
+            return std::make_shared<connection_type>(this, dest, pp);
         }
 
         void add(connection_ptr const & ptr)
@@ -64,52 +63,38 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         void send_messages(
-            connection_list connections
+            connection_ptr connection
         )
         {
-            // We try to handle all sends
-            connection_list::iterator end = std::remove_if(
-                connections.begin()
-              , connections.end()
-              , [](connection_ptr sender) -> bool
-              {
-                    if(sender->send())
-                    {
-                        error_code ec;
-                        sender->postprocess_handler_(ec, sender->destination(), sender);
-                        return true;
-                    }
-                    return false;
-              }
-            );
-
-            // If some are still in progress, give them back
-            if(connections.begin() != end)
+            // Check if sending has been completed....
+            if (connection->send())
+            {
+                error_code ec;
+                connection->postprocess_handler_(
+                    ec, connection->destination(), connection);
+            }
+            else
             {
                 std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.insert(
-                    connections_.end()
-                  , std::make_move_iterator(connections.begin())
-                  , std::make_move_iterator(end)
-                );
+                connections_.push_back(std::move(connection));
             }
         }
 
         bool background_work()
         {
-            connection_list connections;
+            connection_ptr connection;
             {
                 std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
                 if(l && !connections_.empty())
                 {
-                    connections.push_back(connections_.front());
+                    connection = std::move(connections_.front());
                     connections_.pop_front();
                 }
             }
             bool has_work = false;
-            if(!connections.empty())
+            if(connection)
             {
-                send_messages(std::move(connections));
+                send_messages(std::move(connection));
                 has_work = true;
             }
             next_free_tag();

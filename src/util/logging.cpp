@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -26,10 +27,10 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -145,11 +146,21 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            std::stringstream out;
-            out << std::hex << std::setw(sizeof(std::size_t)*2)
-                << std::setfill('0')
-                << hpx::get_worker_thread_num();
-            str.prepend_string(out.str());
+            error_code ec(lightweight);
+            std::size_t thread_num = hpx::get_worker_thread_num(ec);
+
+            if (std::size_t(-1) != thread_num)
+            {
+                std::stringstream out;
+                out << std::hex << std::setw(sizeof(std::size_t)*2)
+                    << std::setfill('0')
+                    << thread_num;
+                str.prepend_string(out.str());
+            }
+            else
+            {
+                str.prepend_string(std::string(sizeof(std::size_t)*2, '-'));
+            }
         }
     };
 
@@ -165,22 +176,17 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            boost::uint32_t locality_id = naming::invalid_locality_id;
-            applier::applier* appl = applier::get_applier_ptr();
-            if (appl) {
-                error_code ec(lightweight);
-                locality_id = appl->get_locality_id(ec);
-            }
+            std::uint32_t locality_id = hpx::get_locality_id();
 
             if (naming::invalid_locality_id != locality_id) {
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
                     << std::setfill('0') << locality_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
             }
         }
     };
@@ -195,7 +201,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 threads::thread_id_type id = threads::get_self_id();
                 if (id != threads::invalid_thread_id) {
@@ -223,12 +229,12 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (0 != self) {
+            if (nullptr != self) {
                 // called from inside a HPX thread
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
                     std::stringstream out;
-                    out << std::hex << std::setw(sizeof(boost::uint32_t))
+                    out << std::hex << std::setw(sizeof(std::uint32_t))
                         << std::setfill('0') << self->get_thread_phase();
                     str.prepend_string(out.str());
                     return;
@@ -236,7 +242,7 @@ namespace hpx { namespace util
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
+            str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
         }
     };
 
@@ -249,17 +255,17 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            boost::uint32_t parent_locality_id = threads::get_parent_locality_id();
+            std::uint32_t parent_locality_id = threads::get_parent_locality_id();
             if (naming::invalid_locality_id != parent_locality_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
                     << std::setfill('0') << parent_locality_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
             }
         }
     };
@@ -274,7 +280,7 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_id_repr_type parent_id = threads::get_parent_id();
-            if (0 != parent_id && threads::invalid_thread_id != parent_id) {
+            if (nullptr != parent_id && threads::invalid_thread_id != parent_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(void*)*2)
@@ -302,13 +308,13 @@ namespace hpx { namespace util
             if (0 != parent_phase) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t))
+                out << std::hex << std::setw(sizeof(std::uint32_t))
                     << std::setfill('0') << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
+                str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
             }
         }
     };
@@ -322,18 +328,18 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            boost::uint64_t component_id = threads::get_self_component_id();
+            std::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint64_t)*2)
+                out << std::hex << std::setw(sizeof(std::uint64_t)*2)
                     << std::setfill('0')
                     << component_id;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(boost::uint64_t)*2, '-'));
+                str.prepend_string(std::string(sizeof(std::uint64_t)*2, '-'));
             }
         }
     };
@@ -1062,16 +1068,15 @@ namespace hpx { namespace util { namespace detail
         try {
             // add default logging configuration as defaults to the ini data
             // this will be overwritten by related entries in the read hpx.ini
-            using namespace boost::assign;
-            prefill_ +=
+            prefill_ = {
                 // general logging
                 "[hpx.logging]",
                 "level = ${HPX_LOGLEVEL:0}",
                 "destination = ${HPX_LOGDESTINATION:console}",
                 "format = ${HPX_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%]|\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%]|\\n}",
 
                 // general console logging
                 "[hpx.logging.console]",
@@ -1079,8 +1084,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_LOGDESTINATION:\
-                    file(hpx.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_LOGDESTINATION:"
+                    "file(hpx.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
@@ -1090,8 +1095,8 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_TIMING_LOGDESTINATION:console}",
                 "format = ${HPX_TIMING_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [TIM] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
                 "[hpx.logging.console.timing]",
@@ -1099,8 +1104,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
 #else
-                "destination = \
-            ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
+                    "file(hpx.timing.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
@@ -1108,12 +1113,12 @@ namespace hpx { namespace util { namespace detail
                 "[hpx.logging.agas]",
                 "level = ${HPX_AGAS_LOGLEVEL:-1}",
 //                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
-                "destination = \
-                ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "destination = ${HPX_AGAS_LOGDESTINATION:"
+                    "file(hpx.agas.$[system.pid].log)}",
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%][AGAS] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
                 "[hpx.logging.console.agas]",
@@ -1121,20 +1126,20 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file\
-                    (hpx.agas.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
+                    "file(hpx.agas.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to the parcel transport
                 "[hpx.logging.parcel]",
                 "level = ${HPX_PARCEL_LOGLEVEL:-1}",
-                "destination = ${HPX_PARCEL_LOGDESTINATION:file\
-                (hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_PARCEL_LOGDESTINATION:"
+                    "file(hpx.parcel.$[system.pid].log)}",
                 "format = ${HPX_PARCEL_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%][  PT] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
 
                 // console logging related to the parcel transport
                 "[hpx.logging.console.parcel]",
@@ -1142,8 +1147,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:file\
-                    (hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
+                    "file(hpx.parcel.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
 
@@ -1153,8 +1158,8 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_APP_LOGDESTINATION:console}",
                 "format = ${HPX_APP_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [APP] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
                 "[hpx.logging.console.application]",
@@ -1162,8 +1167,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file\
-                    (hpx.application.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
+                    "file(hpx.application.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
 
@@ -1173,19 +1178,19 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_DEB_LOGDESTINATION:console}",
                 "format = ${HPX_DEB_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [DEB] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
 
                 "[hpx.logging.console.debuglog]",
                 "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:file\
-                    (hpx.debuglog.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
+                    "file(hpx.debuglog.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
-            ;
+            };
         }
         catch (std::exception const&) {
             // just in case something goes wrong
@@ -1204,8 +1209,7 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    init_logging::init_logging(runtime_configuration& ini, bool isconsole,
-        naming::resolver_client& agas_client)
+    void init_logging(runtime_configuration& ini, bool isconsole)
     {
         // initialize normal logs
         init_agas_log(ini, isconsole);
@@ -1230,6 +1234,7 @@ namespace hpx { namespace util { namespace detail
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/init_logging.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <iostream>
 #include <string>
@@ -1237,24 +1242,21 @@ namespace hpx { namespace util { namespace detail
 
 namespace hpx { namespace util { namespace detail
 {
-    dummy_log_impl dummy_log = dummy_log_impl();
-
     std::vector<std::string> get_logging_data()
     {
         static std::vector<std::string> dummy_data;
         return dummy_data;
     }
 
-    init_logging::init_logging(runtime_configuration& ini, bool,
-        naming::resolver_client&)
+    void init_logging(runtime_configuration& ini, bool)
     {
         // warn if logging is requested
 
-        if (ini.get_entry("hpx.logging.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.timing.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.agas.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.debuglog.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.application.level", "0") != "0")
+        if (util::get_entry_as<int>(ini, "hpx.logging.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.timing.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.agas.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.debuglog.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.application.level", -1) > 0)
         {
             std::cerr << "hpx::init_logging: warning: logging is requested even "
                          "while it was disabled at compile time. If you "

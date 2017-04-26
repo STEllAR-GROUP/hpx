@@ -9,12 +9,12 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <map>
+#include <type_traits>
 
 namespace hpx { namespace serialization
 {
@@ -45,9 +45,9 @@ namespace hpx { namespace serialization
     template <typename Archive>
     struct HPX_EXPORT basic_archive
     {
-        static const boost::uint64_t npos = boost::uint64_t(-1);
+        static const std::uint64_t npos = std::uint64_t(-1);
 
-        basic_archive(boost::uint32_t flags)
+        basic_archive(std::uint32_t flags)
           : flags_(flags)
           , size_(0)
         {}
@@ -58,7 +58,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void invoke(T & t)
         {
-            static_assert(!boost::is_pointer<T>::value,
+            static_assert(!std::is_pointer<T>::value,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
 
@@ -93,7 +93,7 @@ namespace hpx { namespace serialization
                 true : false;
         }
 
-        boost::uint32_t flags() const
+        std::uint32_t flags() const
         {
             return flags_;
         }
@@ -101,7 +101,7 @@ namespace hpx { namespace serialization
         // Archives can be used to do 'fake' serialization, in which case no
         // data is being stored/restored and no side effects should be
         // performed during serialization/de-serialization.
-        bool is_saving() const
+        bool is_preprocessing() const
         {
             return false;
         }
@@ -121,8 +121,13 @@ namespace hpx { namespace serialization
             static_cast<Archive*>(this)->load_binary(address, count);
         }
 
+        void reset()
+        {
+            size_ = 0;
+        }
+
     protected:
-        boost::uint32_t flags_;
+        std::uint32_t flags_;
         std::size_t size_;
     };
 

@@ -11,6 +11,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -61,7 +63,7 @@ namespace sheneos
         /// the proper partition for the actual interpolation.
         hpx::lcos::future<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
+            std::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate_async(
                 get_id(ye, temp, rho), ye, temp, rho, eosvalues);
@@ -71,7 +73,7 @@ namespace sheneos
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation.
         std::vector<double> interpolate(double ye, double temp, double rho,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
+            std::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate(
                 get_id(ye, temp, rho), ye, temp, rho, eosvalues);
@@ -82,7 +84,7 @@ namespace sheneos
         /// the proper partition for the actual interpolation.
         hpx::lcos::future<double>
         interpolate_one_async(double ye, double temp, double rho,
-            boost::uint32_t eosvalue)  const
+            std::uint32_t eosvalue)  const
         {
             return stubs::partition3d::interpolate_one_async(
                 get_id(ye, temp, rho), ye, temp, rho, eosvalue);
@@ -92,7 +94,7 @@ namespace sheneos
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation.
         double interpolate_one(double ye, double temp, double rho,
-            boost::uint32_t eosvalue)  const
+            std::uint32_t eosvalue)  const
         {
             return stubs::partition3d::interpolate_one(
                 get_id(ye, temp, rho), ye, temp, rho, eosvalue);
@@ -104,7 +106,7 @@ namespace sheneos
         /// operations.
         hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue) const;
+            std::uint32_t eosvalue) const;
 
         /// Synchronously interpolate the function value for all the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
@@ -112,7 +114,7 @@ namespace sheneos
         /// operations.
         std::vector<double>
         interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalue) const
+            std::uint32_t eosvalue) const
         {
             return interpolate_one_bulk_async(coords, eosvalue).get();
         }
@@ -123,7 +125,7 @@ namespace sheneos
         /// operations.
         hpx::lcos::future<std::vector<std::vector<double> > >
         interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values) const;
+            std::uint32_t eosvalues = server::partition3d::small_api_values) const;
 
         /// Synchronously interpolate the function values for all the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
@@ -131,7 +133,7 @@ namespace sheneos
         /// operations.
         std::vector<std::vector<double> >
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values) const
+            std::uint32_t eosvalues = server::partition3d::small_api_values) const
         {
             return interpolate_bulk_async(coords, eosvalues).get();
         }

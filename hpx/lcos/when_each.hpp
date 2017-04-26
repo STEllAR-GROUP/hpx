@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -13,7 +13,7 @@
 #if defined(DOXYGEN)
 namespace hpx
 {
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -40,7 +40,7 @@ namespace hpx
     template <typename F, typename Future>
     future<void> when_each(F&& f, std::vector<Future>&& futures);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -69,7 +69,7 @@ namespace hpx
     template <typename F, typename Iterator>
     future<Iterator> when_each(F&& f, Iterator begin, Iterator end);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -95,7 +95,7 @@ namespace hpx
     template <typename F, typename... Ts>
     future<void> when_each(F&& f, Ts&&... futures);
 
-    /// The function \a when_each is a operator allowing to join on the results
+    /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
     /// having finished executing. It also calls the supplied callback
@@ -140,11 +140,10 @@ namespace hpx
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/ref.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -164,14 +163,14 @@ namespace hpx { namespace lcos
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::true_type)
+                std::true_type)
             {
                 f(index, std::move(future));
             }
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
-                boost::false_type)
+                std::false_type)
             {
                 f(std::move(future));
             }
@@ -227,12 +226,13 @@ namespace hpx { namespace lcos
 
                 for(/**/; next != end; ++next)
                 {
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data =
-                        traits::detail::get_shared_state(*next);
+                    typename traits::detail::shared_state_ptr<
+                            future_result_type
+                        >::type next_future_data =
+                            traits::detail::get_shared_state(*next);
 
-                    if (!next_future_data->is_ready())
+                    if (next_future_data.get() != nullptr &&
+                        !next_future_data->is_ready())
                     {
                         next_future_data->execute_deferred();
 
@@ -270,17 +270,17 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::false_, boost::mpl::true_)
+            void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(boost::unwrap_ref(util::get<I>(t_))),
-                    boost::end(boost::unwrap_ref(util::get<I>(t_))));
+                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
+                    boost::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
             template <std::size_t I>
             HPX_FORCEINLINE
-            void await_next(boost::mpl::true_, boost::mpl::false_)
+            void await_next(std::true_type, std::false_type)
             {
                 typedef typename util::decay_unwrap<
                     typename util::tuple_element<I, Tuple>::type
@@ -289,17 +289,15 @@ namespace hpx { namespace lcos
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                using boost::mpl::false_;
-                using boost::mpl::true_;
-
                 future_type& fut = util::get<I>(t_);
 
-                boost::intrusive_ptr<
-                    lcos::detail::future_data<future_result_type>
-                > next_future_data =
-                    traits::detail::get_shared_state(fut);
+                typename traits::detail::shared_state_ptr<
+                        future_result_type
+                    >::type next_future_data =
+                        traits::detail::get_shared_state(fut);
 
-                if (!next_future_data->is_ready())
+                if (next_future_data.get() != nullptr &&
+                    !next_future_data->is_ready())
                 {
 
                     next_future_data->execute_deferred();
@@ -310,12 +308,12 @@ namespace hpx { namespace lcos
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
-                        void (when_each_frame::*f)(true_, false_) =
+                        void (when_each_frame::*f)(std::true_type, std::false_type) =
                             &when_each_frame::await_next<I>;
 
                         boost::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), true_(), false_()));
+                            f, std::move(this_), std::true_type(), std::false_type()));
                         return;
                     }
                 }
@@ -343,8 +341,15 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef typename traits::is_future<future_type>::type is_future;
-                typedef typename traits::is_future_range<future_type>::type is_range;
+                typedef util::detail::any_of<
+                        traits::is_future<future_type>,
+                        traits::is_ref_wrapped_future<future_type>
+                    > is_future;
+
+                typedef util::detail::any_of<
+                        traits::is_future_range<future_type>,
+                        traits::is_ref_wrapped_future_range<future_type>
+                    > is_range;
 
                 await_next<I>(is_future(), is_range());
             }

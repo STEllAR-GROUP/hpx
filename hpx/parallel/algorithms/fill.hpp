@@ -21,10 +21,11 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -32,6 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // fill
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct fill_iteration
         {
@@ -58,7 +60,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        /// \cond NOINTERNAL
         struct fill : public detail::algorithm<fill>
         {
             fill()
@@ -105,8 +106,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
 
             typedef std::integral_constant<bool,
-                parallel::is_sequential_execution_policy<ExPolicy>::value ||
-                !hpx::traits::is_forward_iterator<InIter>::value
+                parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                >::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
             return detail::fill().call(
@@ -147,25 +150,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param value        The value to be assigned.
     ///
     /// The comparisons in the parallel \a fill algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparisons in the parallel \a fill algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a fill algorithm returns a \a hpx::future<void> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename InIter, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
@@ -249,25 +252,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param value        The value to be assigned.
     ///
     /// The comparisons in the parallel \a fill_n algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The comparisons in the parallel \a fill_n algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a fill_n algorithm returns a \a hpx::future<void> if the
     ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
     template <typename ExPolicy, typename OutIter, typename Size, typename T>
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     fill_n(ExPolicy && policy, OutIter first, Size count, T value)
@@ -285,7 +288,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 

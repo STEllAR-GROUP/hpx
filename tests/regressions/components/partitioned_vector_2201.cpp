@@ -11,6 +11,8 @@
 
 #include <boost/random.hpp>
 
+#include <cstddef>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(int);
@@ -49,7 +51,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // initialize data
         // segmented version of algorithm used
         using namespace  hpx::parallel;
-        generate(par, v.begin(), v.end(), random_fill());
+        generate(execution::par, v.begin(), v.end(), random_fill());
 
         return hpx::finalize();
     }

@@ -11,9 +11,14 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/shared_array.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <utility>
 #include <vector>
 
 #include "print_time_results.hpp"
@@ -264,6 +269,8 @@ struct stepper
             unwrapped(
                 [middle](partition_data const& m) -> partition_data
                 {
+                    HPX_UNUSED(middle);
+
                     // All local operations are performed once the middle data of
                     // the previous time step becomes available.
                     std::size_t size = m.size();
@@ -281,6 +288,9 @@ struct stepper
                 [left, middle, right](partition_data next, partition_data const& l,
                     partition_data const& m, partition_data const& r) -> partition
                 {
+                    HPX_UNUSED(left);
+                    HPX_UNUSED(right);
+
                     // Calculate the missing boundary elements once the
                     // corresponding data has become available.
                     std::size_t size = m.size();
@@ -357,9 +367,9 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
+    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::size_t nl = localities.size();                    // Number of localities
@@ -378,14 +388,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    std::uint64_t t = hpx::util::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     stepper::space solution = step.do_work(np, nx, nt);
     for (std::size_t i = 0; i != np; ++i)
         solution[i].get_data(partition_server::middle_partition).wait();
 
-    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+    std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     // Print the final solution
     if (vm.count("results"))
@@ -397,8 +407,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                       << std::endl;
         }
     }
-    boost::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
-    hpx::future<boost::uint32_t> locs = hpx::get_num_localities();
+    std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
+    hpx::future<std::uint32_t> locs = hpx::get_num_localities();
     print_time_results(locs.get(),num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
@@ -411,11 +421,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline;
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<std::uint64_t>()->default_value(10),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<std::uint64_t>()->default_value(45),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(10),
+        ("np", value<std::uint64_t>()->default_value(10),
          "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")

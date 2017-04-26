@@ -21,7 +21,7 @@ namespace hpx
         /// List of indices of futures which became ready
         std::vector<std::size_t> indices;
 
-        ///< The sequence of futures as passed to \a hpx::when_some
+        /// The sequence of futures as passed to \a hpx::when_some
         Sequence futures;
     };
 
@@ -319,19 +319,22 @@ namespace hpx { namespace lcos
             {
                 std::size_t counter =
                     when_.count_.load(boost::memory_order_seq_cst);
-                if (counter < when_.needed_count_) {
-                    if (!future.is_ready()) {
-                        // handle future only if not enough futures are ready
-                        // yet also, do not touch any futures which are already
-                        // ready
+                if (counter < when_.needed_count_)
+                {
+                    // handle future only if not enough futures are ready
+                    // yet also, do not touch any futures which are already
+                    // ready
 
-                        typedef
-                            typename traits::detail::shared_state_ptr_for<Future>::type
-                            shared_state_ptr;
+                    typedef
+                        typename traits::detail::shared_state_ptr_for<Future>::type
+                        shared_state_ptr;
 
-                        shared_state_ptr const& shared_state =
-                            traits::detail::get_shared_state(future);
+                    shared_state_ptr const& shared_state =
+                        traits::detail::get_shared_state(future);
 
+                    if (shared_state.get() != nullptr &&
+                        !shared_state->is_ready())
+                    {
                         shared_state->execute_deferred();
 
                         // execute_deferred might have made the future ready

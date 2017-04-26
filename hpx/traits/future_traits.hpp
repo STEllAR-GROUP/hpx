@@ -6,13 +6,6 @@
 #if !defined(HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM)
 #define HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM
 
-#include <hpx/config.hpp>
-
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/type_traits/add_lvalue_reference.hpp>
-#include <boost/type_traits/is_void.hpp>
-
 namespace hpx { namespace lcos
 {
     template <typename R> class future;
@@ -60,11 +53,14 @@ namespace hpx { namespace traits
     struct future_traits<lcos::shared_future<R> >
     {
         typedef R type;
-        typedef typename boost::mpl::eval_if<
-            boost::is_void<R>
-          , boost::mpl::identity<R>
-          , boost::add_lvalue_reference<R const>
-        >::type result_type;
+        typedef R const& result_type;
+    };
+
+    template <>
+    struct future_traits<lcos::shared_future<void> >
+    {
+        typedef void type;
+        typedef void result_type;
     };
 }}
 

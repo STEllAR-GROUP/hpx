@@ -16,8 +16,9 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/cstdint.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <stdexcept>
 #include <vector>
@@ -48,7 +49,7 @@ using hpx::flush;
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
 double global_init[N] = {0};
-boost::uint64_t num_iterations = 0;
+std::uint64_t num_iterations = 0;
 
 std::size_t k1 = 0;
 std::size_t k2 = 0;
@@ -60,7 +61,7 @@ namespace test
         HPX_NON_COPYABLE(local_spinlock);
 
     private:
-        boost::uint64_t v_;
+        std::uint64_t v_;
 
         ///////////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
@@ -92,7 +93,7 @@ namespace test
                 rqtp.tv_sec = 0;
                 rqtp.tv_nsec = 1000;
 
-                nanosleep( &rqtp, 0 );
+                nanosleep( &rqtp, nullptr );
 #endif
             }
         }
@@ -126,10 +127,10 @@ namespace test
             HPX_ITT_SYNC_PREPARE(this);
 
 #if !defined( BOOST_SP_HAS_SYNC )
-            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            BOOST_COMPILER_FENCE
+            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            HPX_COMPILER_FENCE
 #else
-            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
 
             if (r == 0) {
@@ -147,8 +148,8 @@ namespace test
             HPX_ITT_SYNC_RELEASING(this);
 
 #if !defined( BOOST_SP_HAS_SYNC )
-            BOOST_COMPILER_FENCE
-            *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+            HPX_COMPILER_FENCE
+            *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif
@@ -189,9 +190,9 @@ int hpx_main(
     )
 {
     {
-        num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
+        num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const boost::uint64_t count = vm["futures"].as<boost::uint64_t>();
+        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
 
         k1 = vm["k1"].as<std::size_t>();
         k2 = vm["k2"].as<std::size_t>();
@@ -215,7 +216,7 @@ int hpx_main(
             //for(; k2 < 2056; k2 = k2 * 2)
             {
                 high_resolution_timer walltime;
-                for (boost::uint64_t i = 0; i < count; ++i)
+                for (std::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
                 wait_each(hpx::util::unwrapped(
@@ -261,11 +262,11 @@ int main(
 
     cmdline.add_options()
         ( "futures"
-        , value<boost::uint64_t>()->default_value(500000)
+        , value<std::uint64_t>()->default_value(500000)
         , "number of futures to invoke")
 
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<std::uint64_t>()->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "k1"

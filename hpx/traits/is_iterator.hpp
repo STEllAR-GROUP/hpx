@@ -10,6 +10,7 @@
 
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace traits
 {
@@ -22,7 +23,7 @@ namespace hpx { namespace traits
         template <typename T>
         struct is_iterator
         {
-#if defined(HPX_MSVC) && defined(__NVCC__)
+#if defined(HPX_MSVC) && defined(__CUDACC__)
             template <typename U>
             static typename U::iterator_category * test(U); // iterator
 
@@ -103,6 +104,19 @@ namespace hpx { namespace traits
     struct is_random_access_iterator
       : detail::has_category<
             typename std::decay<Iter>::type, std::random_access_iterator_tag>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_iterator;
+
+    template <typename Iterator, typename Enable = void>
+    struct is_segmented_local_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename Enable = void>
+    struct is_zip_iterator
+      : std::false_type
     {};
 }}
 

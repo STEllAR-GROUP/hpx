@@ -13,9 +13,11 @@
 
 #include <boost/asio/ip/tcp.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(HPX_MSVC)

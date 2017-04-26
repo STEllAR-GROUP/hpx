@@ -14,6 +14,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parcelset
@@ -31,21 +32,28 @@ namespace hpx { namespace parcelset
         explicit parcel_buffer(allocator_type allocator = allocator_type())
           : data_(allocator)
           , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0)
+          , size_(0), data_size_(0), header_size_(0)
         {}
 
         explicit parcel_buffer(BufferType const & data,
                 allocator_type allocator = allocator_type())
           : data_(data, allocator)
           , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0)
+          , size_(0), data_size_(0), header_size_(0)
         {}
 
         explicit parcel_buffer(BufferType && data,
             allocator_type allocator = allocator_type())
           : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0)
+          , size_(0), data_size_(0), header_size_(0)
+        {}
+
+        explicit parcel_buffer(BufferType && data,
+            allocator_type *allocator)
+          : data_(std::move(data))
+          , num_chunks_(count_chunks_type(0, 0))
+          , size_(0), data_size_(0), header_size_(0)
         {}
 
         parcel_buffer(parcel_buffer && other)
@@ -55,6 +63,7 @@ namespace hpx { namespace parcelset
           , num_chunks_(other.num_chunks_)
           , size_(other.size_)
           , data_size_(other.data_size_)
+          , header_size_(other.header_size_)
           , data_point_(other.data_point_)
         {
         }
@@ -67,6 +76,7 @@ namespace hpx { namespace parcelset
             num_chunks_ = other.num_chunks_;
             size_ = other.size_;
             data_size_ = other.data_size_;
+            header_size_ = other.header_size_;
             data_point_ = other.data_point_;
 
             return *this;
@@ -80,6 +90,7 @@ namespace hpx { namespace parcelset
             num_chunks_ = count_chunks_type(0, 0);
             size_ = 0;
             data_size_ = 0;
+            header_size_ = 0;
             data_point_ = performance_counters::parcels::data_point();
         }
 
@@ -96,6 +107,7 @@ namespace hpx { namespace parcelset
 
         util::integer::ulittle64_t size_;
         util::integer::ulittle64_t data_size_;
+        util::integer::ulittle64_t header_size_;
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;

@@ -35,10 +35,10 @@ macro(add_hpx_test category name)
 
   set(args)
 
-  foreach(arg ${${name}_ARGS})
-    set(args ${args} "'${arg}'")
+  foreach(arg ${${name}_UNPARSED_ARGUMENTS})
+    set(args ${args} "${arg}")
   endforeach()
-  set(args ${args} "-v" "--" ${args})
+  set(args "-v" "--" ${args})
 
   set(cmd "${PYTHON_EXECUTABLE}"
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
@@ -52,11 +52,11 @@ macro(add_hpx_test category name)
       NAME "${category}.${name}"
       COMMAND ${cmd} ${args})
     else()
-      if(HPX_WITH_PARCELPORT_IBVERBS)
+      if(HPX_WITH_PARCELPORT_VERBS)
         set(_add_test FALSE)
         if(DEFINED ${name}_PARCELPORTS)
           set(PP_FOUND -1)
-          list(FIND ${name}_PARCELPORTS "ibverbs" PP_FOUND)
+          list(FIND ${name}_PARCELPORTS "verbs" PP_FOUND)
           if(NOT PP_FOUND EQUAL -1)
             set(_add_test TRUE)
           endif()
@@ -65,8 +65,8 @@ macro(add_hpx_test category name)
         endif()
         if(_add_test)
           add_test(
-            NAME "${category}.distributed.ibverbs.${name}"
-            COMMAND ${cmd} "-p" "ibverbs" ${args})
+            NAME "${category}.distributed.verbs.${name}"
+            COMMAND ${cmd} "-p" "verbs" ${args})
         endif()
       endif()
       if(HPX_WITH_PARCELPORT_IPC)

@@ -9,11 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <boost/exception_ptr.hpp>
+
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -32,16 +36,11 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data);
+            HPX_NON_COPYABLE(entry_data);
 
         public:
             entry_data()
-              : can_be_deleted_(false)
-            {}
-
-            entry_data(entry_data && rhs)
-              : promise_(std::move(rhs.promise_)),
-                can_be_deleted_(rhs.can_be_deleted_)
+              : can_be_deleted_(false), value_set_(false)
             {}
 
             hpx::future<T> get_future()
@@ -52,11 +51,24 @@ namespace hpx { namespace lcos { namespace local
             template <typename Val>
             void set_value(Val && val)
             {
+                value_set_ = true;
                 promise_.set_value(std::forward<Val>(val));
+            }
+
+            bool cancel(boost::exception_ptr const& e)
+            {
+                HPX_ASSERT(can_be_deleted_);
+                if (!value_set_)
+                {
+                    promise_.set_exception(e);
+                    return true;
+                }
+                return false;
             }
 
             buffer_promise_type promise_;
             bool can_be_deleted_;
+            bool value_set_;
         };
 
         typedef std::map<std::size_t, std::shared_ptr<entry_data> >
@@ -122,7 +134,37 @@ namespace hpx { namespace lcos { namespace local
             return it->second->get_future();
         }
 
-        void store_received(std::size_t step, T && val)
+        bool try_receive(std::size_t step, hpx::future<T>* f = nullptr)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator it = buffer_map_.find(step);
+            if (it == buffer_map_.end())
+                return false;
+
+            // if the value was already set we delete the entry after
+            // retrieving the future
+            if (it->second->can_be_deleted_)
+            {
+                if (f != nullptr)
+                {
+                    erase_on_exit t(buffer_map_, it);
+                    *f = it->second->get_future();
+                }
+                return true;
+            }
+
+            // otherwise mark the entry as to be deleted once the value was set
+            if (f != nullptr)
+            {
+                it->second->can_be_deleted_ = true;
+                *f = it->second->get_future();
+            }
+            return true;
+        }
+
+        template <typename Lock = hpx::lcos::local::no_mutex>
+        void store_received(std::size_t step, T && val, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
 
@@ -148,8 +190,31 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
+            if (lock)
+                lock->unlock();
+
             // set value in promise, but only after the lock went out of scope
             entry->set_value(std::move(val));
+        }
+
+        bool empty() const
+        {
+            return buffer_map_.empty();
+        }
+
+        void cancel_waiting(boost::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator end = buffer_map_.end();
+            for (iterator it = buffer_map_.begin(); it != end; /**/)
+            {
+                iterator to_delete = it++;
+                if (to_delete->second->cancel(e))
+                {
+                    buffer_map_.erase(to_delete);
+                }
+            }
         }
 
     protected:
@@ -188,16 +253,11 @@ namespace hpx { namespace lcos { namespace local
         struct entry_data
         {
         private:
-            HPX_MOVABLE_ONLY(entry_data);
+            HPX_NON_COPYABLE(entry_data);
 
         public:
             entry_data()
-              : can_be_deleted_(false)
-            {}
-
-            entry_data(entry_data && rhs)
-              : promise_(std::move(rhs.promise_)),
-                can_be_deleted_(rhs.can_be_deleted_)
+              : can_be_deleted_(false), value_set_(false)
             {}
 
             hpx::future<void> get_future()
@@ -207,11 +267,24 @@ namespace hpx { namespace lcos { namespace local
 
             void set_value()
             {
+                value_set_ = true;
                 promise_.set_value();
+            }
+
+            bool cancel(boost::exception_ptr const& e)
+            {
+                HPX_ASSERT(can_be_deleted_);
+                if (!value_set_)
+                {
+                    promise_.set_exception(e);
+                    return true;
+                }
+                return false;
             }
 
             buffer_promise_type promise_;
             bool can_be_deleted_;
+            bool value_set_;
         };
 
         typedef std::map<std::size_t, std::shared_ptr<entry_data> >
@@ -277,7 +350,37 @@ namespace hpx { namespace lcos { namespace local
             return it->second->get_future();
         }
 
-        void store_received(std::size_t step)
+        bool try_receive(std::size_t step, hpx::future<void>* f = nullptr)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator it = buffer_map_.find(step);
+            if (it == buffer_map_.end())
+                return false;
+
+            // if the value was already set we delete the entry after
+            // retrieving the future
+            if (it->second->can_be_deleted_)
+            {
+                if (f != nullptr)
+                {
+                    erase_on_exit t(buffer_map_, it);
+                    *f = it->second->get_future();
+                }
+                return true;
+            }
+
+            // otherwise mark the entry as to be deleted once the value was set
+            if (f != nullptr)
+            {
+                it->second->can_be_deleted_ = true;
+                *f = it->second->get_future();
+            }
+            return true;
+        }
+
+        template <typename Lock = hpx::lcos::local::no_mutex>
+        void store_received(std::size_t step, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
 
@@ -303,8 +406,31 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
+            if (lock)
+                lock->unlock();
+
             // set value in promise, but only after the lock went out of scope
             entry->set_value();
+        }
+
+        bool empty() const
+        {
+            return buffer_map_.empty();
+        }
+
+        void cancel_waiting(boost::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+
+            iterator end = buffer_map_.end();
+            for (iterator it = buffer_map_.begin(); it != end; /**/)
+            {
+                iterator to_delete = it++;
+                if (to_delete->second->cancel(e))
+                {
+                    buffer_map_.erase(to_delete);
+                }
+            }
         }
 
     protected:

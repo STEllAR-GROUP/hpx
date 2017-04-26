@@ -23,9 +23,11 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <set>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -43,8 +45,9 @@ namespace hpx { namespace parcelset
     struct connection_handler_traits<policies::tcp::connection_handler>
     {
         typedef policies::tcp::sender connection_type;
-        typedef boost::mpl::true_  send_early_parcel;
-        typedef boost::mpl::false_ do_background_work;
+        typedef std::true_type  send_early_parcel;
+        typedef std::false_type do_background_work;
+        typedef std::false_type send_immediate_parcels;
 
         static const char * type()
         {

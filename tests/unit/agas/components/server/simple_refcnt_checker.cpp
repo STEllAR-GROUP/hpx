@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -18,7 +19,7 @@ namespace hpx { namespace test { namespace server
 
 simple_refcnt_checker::~simple_refcnt_checker()
 {
-    const boost::uint32_t prefix_ = get_locality_id();
+    const std::uint32_t prefix_ = get_locality_id();
     const naming::gid_type this_ = get_base_gid();
 
     std::ostringstream strm;

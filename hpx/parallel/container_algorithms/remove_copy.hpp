@@ -24,6 +24,7 @@
 #include <boost/range/functions.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -68,20 +69,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a remove_copy algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a remove_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a remove_copy algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
@@ -93,12 +94,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename Rng, typename OutIter, typename T,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            std::equal_to<T>,
+            ExPolicy, std::equal_to<T>,
                 traits::projected_range<Proj, Rng>,
                 traits::projected<Proj, T const*>
         >::value)>
@@ -136,9 +137,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -152,10 +153,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -177,20 +176,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     \a is invoked.
     ///
     /// The assignments in the parallel \a remove_copy_if algorithm invoked with
-    /// an execution policy object of type \a sequential_execution_policy
+    /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The assignments in the parallel \a remove_copy_if algorithm invoked with
-    /// an execution policy object of type \a parallel_execution_policy or
-    /// \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a remove_copy_if algorithm returns a
     ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
@@ -202,12 +201,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
-            F, traits::projected_range<Proj, Rng>
+            ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,

@@ -60,7 +60,8 @@ namespace hpx { namespace traits
 #  pragma clang diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+    (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
 #  endif
@@ -69,7 +70,8 @@ namespace hpx { namespace traits
 
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+    (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
@@ -91,7 +93,8 @@ namespace hpx { namespace traits
 #  pragma clang diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+    (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #  if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #    pragma GCC diagnostic push
 #  endif
@@ -100,7 +103,8 @@ namespace hpx { namespace traits
 
             return reinterpret_cast<std::size_t>(*reinterpret_cast<void**>(&f));
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER) &&  \
+    (!defined(__NVCC__) || (__CUDACC_VER_MAJOR__ >= 8))
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif

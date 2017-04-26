@@ -8,6 +8,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
+#include <hpx/compat/thread.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -21,8 +24,12 @@
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
+#include <sstream>
 #include <string>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
@@ -36,7 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 return parcelset::locality(
                     locality(
                         sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-                      , hpx::util::get_entry_as<boost::uint16_t>(
+                      , hpx::util::get_entry_as<std::uint16_t>(
                             *sec, "port", HPX_INITIAL_IP_PORT)
                     )
                 );
@@ -144,8 +151,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
-        std::shared_ptr<sender> sender_connection(new sender(
-            io_service, l, this->parcels_sent_));
+        std::shared_ptr<sender> sender_connection(new sender(io_service, l, this));
 
         // Connect to the target locality, retry if needed
         boost::system::error_code error = boost::asio::error::try_again;
@@ -177,9 +183,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         "connection_handler(tcp)::create_connection");
                 }
                 else {
-                    boost::this_thread::sleep(boost::get_system_time() +
-                        boost::posix_time::milliseconds(
-                            HPX_NETWORK_RETRIES_SLEEP));
+                    compat::this_thread::sleep_for(
+                        std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }
             catch (boost::system::system_error const& e) {
@@ -223,8 +228,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         HPX_ASSERT(l == sender_connection->destination());
 
         std::string connection_addr = s.remote_endpoint().address().to_string();
-        boost::uint16_t connection_port = s.remote_endpoint().port();
-        HPX_ASSERT(l.get<locality>().address() == connection_addr);
+        std::uint16_t connection_port = s.remote_endpoint().port();
+        HPX_ASSERT(hpx::util::cleanup_ip_address(l.get<locality>().address())
+            == hpx::util::cleanup_ip_address(connection_addr));
         HPX_ASSERT(l.get<locality>().port() == connection_port);
 #endif
 
@@ -245,7 +251,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     parcelset::locality(
                         locality(
                             sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
-                          , hpx::util::get_entry_as<boost::uint16_t>(
+                          , hpx::util::get_entry_as<std::uint16_t>(
                                 *sec, "port", HPX_INITIAL_IP_PORT)
                         )
                     );
@@ -331,3 +337,5 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
     }
 }}}}
+
+#endif

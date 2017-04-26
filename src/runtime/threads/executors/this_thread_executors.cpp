@@ -23,13 +23,13 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/chrono/chrono.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -55,7 +55,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_num_(std::size_t(-1)),
         parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
-        self_(0)
+        self_(nullptr)
     {
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     template <typename Scheduler>
-    threads::thread_state_enum
+    threads::thread_result_type
     this_thread_executor<Scheduler>::thread_function_nullary(
         closure_type func)
     {
@@ -112,7 +112,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // held.
         util::force_error_on_lock();
 
-        return threads::terminated;
+        return threads::thread_result_type(threads::terminated, nullptr);
     }
 
     // Schedule the specified function for execution in this executor.
@@ -159,7 +159,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_at(
-        boost::chrono::steady_clock::time_point const& abs_time,
+        util::steady_clock::time_point const& abs_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
@@ -203,11 +203,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_after(
-        boost::chrono::steady_clock::duration const& rel_time,
+        util::steady_clock::duration const& rel_time,
         closure_type && f, util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(boost::chrono::steady_clock::now() + rel_time,
+        return add_at(util::steady_clock::now() + rel_time,
             std::move(f), desc, stacksize, ec);
     }
 
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
         ~on_self_reset()
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
     };
 
@@ -284,7 +284,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
           : shutdown_sem_(shutdown_sem),
             self_(self)
         {
-            threads::detail::set_self_ptr(0);
+            threads::detail::set_self_ptr(nullptr);
         }
 
         ~this_thread_on_run_exit()
@@ -330,10 +330,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
             std::uint64_t overall_times = 0, thread_times = 0;
+            std::int64_t idle_loop_count = 0, busy_loop_count = 0;
+            std::uint8_t task_active = 0;
 
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
-                overall_times, thread_times);
+                overall_times, thread_times, idle_loop_count, busy_loop_count,
+                task_active);
 
             threads::detail::scheduling_callbacks callbacks(
                 threads::detail::scheduling_callbacks::callback_type(),

@@ -11,11 +11,10 @@
 #define HPX_RUNTIME_THREADS_TOPOLOGY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -24,6 +23,7 @@
 #if defined(HPX_HAVE_HWLOC)
 #include <hpx/error_code.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #endif
@@ -33,11 +33,6 @@ namespace hpx { namespace threads
     struct HPX_EXPORT topology
     {
         virtual ~topology() {}
-
-        virtual std::size_t get_pu_number(
-            std::size_t num_thread
-          , error_code& ec = throws
-            ) const = 0;
 
         /// \brief Return the NUMA node number of the processing unit the
         ///        given thread is running on.
@@ -90,6 +85,15 @@ namespace hpx { namespace threads
             bool numa_sensitive, error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
+        ///        processing unit associated with the given NUMA node.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual mask_type get_numa_node_affinity_mask_from_numa_node(
+            std::size_t num_node) const = 0;
+
+        /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
         ///        the core it is running on.
         ///
@@ -118,7 +122,7 @@ namespace hpx { namespace threads
         ///
         /// \note  Use this function on systems where the affinity must be
         ///        set from outside the thread itself.
-        virtual void set_thread_affinity_mask(boost::thread& t,
+        virtual void set_thread_affinity_mask(compat::thread& t,
             mask_cref_type mask, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
@@ -183,7 +187,7 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
-        virtual mask_type get_cpubind_mask(boost::thread & handle,
+        virtual mask_type get_cpubind_mask(compat::thread & handle,
             error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;
@@ -205,16 +209,17 @@ namespace hpx { namespace threads
         std::vector<mask_type>& affinities,
         std::size_t used_cores,
         std::size_t max_cores,
+        std::size_t num_threads,
         std::vector<std::size_t>& num_pus,
         error_code& ec = throws);
 
     // backwards compatibility helper
     inline void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities,
-        error_code& ec = throws)
+        std::vector<mask_type>& affinities, error_code& ec = throws)
     {
         std::vector<std::size_t> num_pus;
-        parse_affinity_options(spec, affinities, 1, 1, num_pus, ec);
+        parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
+            num_pus, ec);
     }
 #endif
 

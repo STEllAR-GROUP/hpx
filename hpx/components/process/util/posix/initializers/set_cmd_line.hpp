@@ -20,6 +20,7 @@
 #include <boost/shared_array.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -57,7 +58,7 @@ private:
         std::size_t i = 0;
         for (std::string const& s : args_)
             cmd_line_[i++] = const_cast<char*>(s.c_str());
-        cmd_line_[i] = 0;
+        cmd_line_[i] = nullptr;
     }
 
     friend class hpx::serialization::access;

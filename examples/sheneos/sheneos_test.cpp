@@ -12,8 +12,11 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -105,8 +108,9 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     hpx::wait_all(tests);
 }
 
-HPX_PLAIN_ACTION(test_sheneos, test_action);
+HPX_DECLARE_ACTION(test_sheneos, test_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_action);
+HPX_PLAIN_ACTION(test_sheneos, test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -199,8 +203,9 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<double> results = hpx::util::unwrapped(bulk_one_tests);
 }
 
-HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
+HPX_DECLARE_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function for interpolate_bulk. It will be invoked on all
@@ -293,8 +298,9 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<std::vector<double> > results = hpx::util::unwrapped(bulk_tests);
 }
 
-HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
+HPX_DECLARE_ACTION(test_sheneos_bulk, test_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_task(std::size_t i, hpx::util::high_resolution_timer& t)
@@ -324,7 +330,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::size_t seed = vm["seed"].as<std::size_t>();
     if (!seed)
-        seed = std::size_t(std::time(0));
+        seed = std::size_t(std::time(nullptr));
 
     std::cout << "Seed: " << seed << std::endl;
 
@@ -365,7 +371,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 //         using hpx::util::placeholders::_1;
 //         hpx::lcos::wait(tests,
-//             hpx::util::bind(wait_for_task, _1, boost::ref(t)));
+//             hpx::util::bind(wait_for_task, _1, std::ref(t)));
 //
 //         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
 //
@@ -384,7 +390,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 //         using hpx::util::placeholders::_1;
 //         hpx::lcos::wait(bulk_one_tests,
-//             hpx::util::bind(wait_for_bulk_one_task, _1, boost::ref(t)));
+//             hpx::util::bind(wait_for_bulk_one_task, _1, std::ref(t)));
 //
 //         std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
 //             << std::endl;

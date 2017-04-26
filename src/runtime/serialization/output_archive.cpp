@@ -14,23 +14,27 @@ namespace hpx { namespace serialization
         naming::gid_type const & gid,
         naming::gid_type const & split_gid)
     {
-        HPX_ASSERT(is_future_awaiting());
+        HPX_ASSERT(is_preprocessing());
         buffer_->add_gid(gid, split_gid);
+    }
+
+    bool output_archive::has_gid(naming::gid_type const & gid)
+    {
+        HPX_ASSERT(is_preprocessing());
+        return buffer_->has_gid(gid);
     }
 
     naming::gid_type output_archive::get_new_gid(naming::gid_type const & gid)
     {
-        if(!new_gids_) return naming::gid_type();
+        if(!split_gids_) return naming::gid_type();
 
-        new_gids_map::iterator it = new_gids_->find(gid);
-
-        std::list<naming::gid_type>& gids = it->second;
-
-        HPX_ASSERT(it != new_gids_->end() && !gids.empty());
-
-        naming::gid_type new_gid = gids.front();
-        gids.pop_front();
-
+        split_gids_type::iterator it = split_gids_->find(&gid);
+        HPX_ASSERT(it != split_gids_->end());
+        HPX_ASSERT(it->second != naming::invalid_gid);
+        naming::gid_type new_gid = it->second;
+#if defined(HPX_DEBUG)
+        it->second = naming::invalid_gid;
+#endif
         return new_gid;
     }
 

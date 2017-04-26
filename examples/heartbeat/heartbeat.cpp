@@ -15,9 +15,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
+#include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -34,7 +35,7 @@ void stop_monitor(std::shared_ptr<hpx::promise<void> > p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int monitor(double runfor, std::string const& name, boost::uint64_t pause)
+int monitor(double runfor, std::string const& name, std::uint64_t pause)
 {
 #if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_shutdown_function(&uninstall_windows_counters);
@@ -50,7 +51,7 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
         return 1;
     }
 
-    boost::uint32_t const locality_id = hpx::get_locality_id();
+    std::uint32_t const locality_id = hpx::get_locality_id();
     if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
     {
         std::cout << (boost::format(
@@ -66,7 +67,7 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
     hpx::register_shutdown_function(
         hpx::util::bind(&stop_monitor, stop_flag));
 
-    boost::int64_t zero_time = 0;
+    std::int64_t zero_time = 0;
 
     hpx::util::high_resolution_timer t;
     while (runfor < 0 || t.elapsed() < runfor)
@@ -77,7 +78,8 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
 
         // Query the performance counter.
         using namespace hpx::performance_counters;
-        counter_value value = stubs::performance_counter::get_value(id);
+        counter_value value =
+            stubs::performance_counter::get_value(hpx::launch::sync, id);
 
         if (status_is_valid(value.status_))
         {
@@ -108,7 +110,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "starting monitor" << std::endl;
 
     std::string const name = vm["name"].as<std::string>();
-    boost::uint64_t const pause = vm["pause"].as<boost::uint64_t>();
+    std::uint64_t const pause = vm["pause"].as<std::uint64_t>();
     double const runfor = vm["runfor"].as<double>();
 
     return monitor(runfor, name, pause);
@@ -127,7 +129,7 @@ int main(int argc, char* argv[])
               "/threadqueue{locality#0/total}/length")
         , "symbolic name of the performance counter")
 
-        ( "pause", value<boost::uint64_t>()->default_value(500)
+        ( "pause", value<std::uint64_t>()->default_value(500)
         , "milliseconds between each performance counter query")
 
         ( "runfor", value<double>()->default_value(-1)
@@ -140,8 +142,9 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, enforce connect mode as we connect to an existing
     // application.
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
 
     hpx::util::function_nonser<void()> const empty;
     return hpx::init(desc_commandline, argc, argv, cfg, empty,

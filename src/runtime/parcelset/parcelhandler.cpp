@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -18,7 +18,7 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
@@ -32,6 +32,9 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/util/apex.hpp>
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -43,10 +46,13 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,18 +110,25 @@ namespace hpx { namespace parcelset
         count_routed_(0),
         write_handler_(&default_write_handler)
     {
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+        LPROGRESS_;
+
+#if defined(HPX_HAVE_NETWORKING)
+        if (cfg.get_entry("hpx.parcel.enable", "1") != "0")
         {
-            std::shared_ptr<parcelport> pp;
-            pp.reset(
-                factory->create(
-                    cfg
-                  , on_start_thread
-                  , on_stop_thread
-                )
-            );
-            attach_parcelport(pp);
+            for (plugins::parcelport_factory_base* factory :
+                    get_parcelport_factories())
+            {
+                std::shared_ptr<parcelport> pp(
+                    factory->create(
+                        cfg
+                      , on_start_thread
+                      , on_stop_thread
+                    )
+                );
+                attach_parcelport(pp);
+            }
         }
+#endif
     }
 
     std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
@@ -143,12 +156,12 @@ namespace hpx { namespace parcelset
 
         for (pports_type::value_type& pp : pports_)
         {
+            pp.second->set_applier(applier);
             if(pp.second != get_bootstrap_parcelport())
             {
                 if(pp.first > 0)
                     pp.second->run(false);
             }
-            pp.second->set_applier(applier);
         }
     }
 
@@ -189,6 +202,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
         using util::placeholders::_1;
+#if defined(HPX_HAVE_NETWORKING)
 
         if(!pp) return;
 
@@ -206,6 +220,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(pp->type() == pp->here().type());
         if(priority > 0)
             endpoints_[pp->type()] = pp->here();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -235,6 +250,7 @@ namespace hpx { namespace parcelset
     {
         bool did_some_work = false;
 
+#if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
         if(0 == num_thread)
         {
@@ -270,8 +286,20 @@ namespace hpx { namespace parcelset
                     did_some_work;
             }
         }
-
+#endif
         return did_some_work;
+    }
+
+    void parcelhandler::flush_parcels()
+    {
+        // now flush all parcel ports to be shut down
+        for (pports_type::value_type& pp : pports_)
+        {
+            if(pp.first > 0)
+            {
+                pp.second->flush_parcels();
+            }
+        }
     }
 
     void parcelhandler::stop(bool blocking)
@@ -339,10 +367,22 @@ namespace hpx { namespace parcelset
             }
         }
 
+        std::ostringstream strm;
+        strm << "target locality: " << dest_gid << "\n";
+        strm << "available destination endpoints:\n" << dest_endpoints << "\n";
+        strm << "available partcelports:\n";
+        for (auto const& pp : pports_)
+        {
+            list_parcelport(strm, pp.second->type(), pp.second->priority(),
+                pp.second == get_bootstrap_parcelport());
+            strm << "\t [" << pp.second->here() << "]\n";
+        }
+
         HPX_THROW_EXCEPTION(network_error,
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
-            "No valid parcelport configured.");
+            "No valid parcelport configured. Detailed information:\n" +
+            strm.str());
         return std::pair<std::shared_ptr<parcelport>, locality>();
     }
 
@@ -379,15 +419,27 @@ namespace hpx { namespace parcelset
 
             // invoke the original handler
             f(ec, p);
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static util::itt::event parcel_send("send_parcel");
+            util::itt::event_tick(parcel_send);
+#endif
+
+#if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
+            // tell APEX about the sent parcel
+            apex::send(p.parcel_id().get_lsb(), p.size(),
+                p.destination_locality_id());
+#endif
         }
     }
 
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
-        naming::id_type const* ids = p.destinations();
-        naming::address* addrs = p.addrs();
+        naming::gid_type const& gid = p.destination();
+        naming::address& addr = p.addr();
 
         // During bootstrap this is handled separately (see
         // addressing_service::resolve_locality.
@@ -397,7 +449,7 @@ namespace hpx { namespace parcelset
             hpx::threads::threadmanager_is(hpx::state::state_running))
         {
 //             naming::gid_type locality =
-//                 naming::get_locality_from_gid(ids[0].get_gid());
+//                 naming::get_locality_from_gid(id.get_gid());
 //             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
@@ -420,32 +472,17 @@ namespace hpx { namespace parcelset
 
         bool resolved_locally = true;
 
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        if (!addrs[0])
+        if (!addr)
         {
-            resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
-        }
-#else
-        std::size_t size = p.size();
-
-        if (0 == size) {
-            HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
-                "no destination address given");
-            return;
+            resolved_locally = resolver_->resolve_local(gid, addr);
         }
 
-        if (1 == size) {
-            if (!addrs[0])
-                resolved_locally = resolver_->resolve_local(ids[0], addrs[0]);
-        }
-        else {
-            boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_->resolve_local(ids, addrs, size, locals);
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        if (!p.parcel_id())
+        {
+            p.parcel_id() = parcelset::parcel::generate_unique_id();
         }
 #endif
-
-        if (!p.parcel_id())
-            p.parcel_id() = parcel::generate_unique_id();
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -459,7 +496,7 @@ namespace hpx { namespace parcelset
             // dispatch to the message handler which is associated with the
             // encapsulated action
             typedef std::pair<std::shared_ptr<parcelport>, locality> destination_pair;
-            destination_pair dest = find_appropriate_destination(addrs[0].locality_);
+            destination_pair dest = find_appropriate_destination(addr.locality_);
 
             if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
             {
@@ -481,11 +518,18 @@ namespace hpx { namespace parcelset
         ++count_routed_;
 
         resolver_->route(std::move(p), std::move(wrapped_f));
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcel");
+#endif
     }
 
     void parcelhandler::put_parcels(std::vector<parcel> parcels,
         std::vector<write_handler_type> handlers)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
         if (parcels.size() != handlers.size())
@@ -501,7 +545,7 @@ namespace hpx { namespace parcelset
             hpx::threads::threadmanager_is(hpx::state::state_running))
         {
 //             naming::gid_type locality = naming::get_locality_from_gid(
-//                 (*parcels[0].destinations()).get_gid());
+//                 parcels[0].destination());
 //             if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
@@ -555,16 +599,20 @@ namespace hpx { namespace parcelset
 
             // properly initialize parcel
             init_parcel(p);
+#if defined(HPX_HAVE_PARCEL_PROFILING)
             if (!p.parcel_id())
-                p.parcel_id() = parcel::generate_unique_id();
+            {
+                p.parcel_id() = parcelset::parcel::generate_unique_id();
+            }
+#endif
 
             bool resolved_locally = true;
-            naming::address* addrs = p.addrs();
+            naming::address& addr = p.addr();
 
-            if (!addrs[0])
+            if (!addr)
             {
                 resolved_locally = resolver_->resolve_local(
-                    p.destinations()[0], addrs[0]);
+                    p.destination(), addr);
             }
 
             using util::placeholders::_1;
@@ -579,7 +627,7 @@ namespace hpx { namespace parcelset
                 // dispatch to the message handler which is associated with the
                 // encapsulated action
                 destination_pair dest = find_appropriate_destination(
-                    addrs[0].locality_);
+                    addr.locality_);
 
                 if (load_message_handlers_)
                 {
@@ -627,11 +675,17 @@ namespace hpx { namespace parcelset
             resolver_->route(std::move(nonresolved_parcels[i]),
                 std::move(nonresolved_handlers[i]));
         }
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcels");
+#endif
     }
 
-    boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
+    std::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
-        boost::int64_t parcel_count = 0;
+        std::int64_t parcel_count = 0;
         for (pports_type::value_type const& pp : pports_)
         {
             parcel_count += pp.second->get_pending_parcels_count(reset);
@@ -644,6 +698,7 @@ namespace hpx { namespace parcelset
     void default_write_handler(boost::system::error_code const& ec,
         parcel const& p)
     {
+#if defined(HPX_HAVE_NETWORKING)
         if (ec) {
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
@@ -666,6 +721,7 @@ namespace hpx { namespace parcelset
 
             hpx::report_error(exception);
         }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -674,6 +730,7 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
@@ -682,14 +739,17 @@ namespace hpx { namespace parcelset
             std::shared_ptr<policies::message_handler> p;
 
             {
-                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                // Just ignore the handlers_mtx_ while checking. We need to hold
+                // the lock here to avoid multiple registrations that happens
+                // right now in the parcel coalescing plugin
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }
 
             it = handlers_.find(key);
             if (it != handlers_.end()) {
-                // if some other thread has created the entry in the mean time
+                // if some other thread has created the entry in the meantime
                 l.unlock();
                 if (&ec != &throws) {
                     if ((*it).second.get())
@@ -712,9 +772,9 @@ namespace hpx { namespace parcelset
                     HPX_THROWS_IF(ec, internal_server_error,
                         "parcelhandler::get_message_handler",
                         "could not store empty message handler");
-                    return 0;
+                    return nullptr;
                 }
-                return 0;           // no message handler available
+                return nullptr;           // no message handler available
             }
 
             std::pair<message_handler_map::iterator, bool> r =
@@ -725,7 +785,7 @@ namespace hpx { namespace parcelset
                 HPX_THROWS_IF(ec, internal_server_error,
                     "parcelhandler::get_message_handler",
                     "could not store newly created message handler");
-                return 0;
+                return nullptr;
             }
             it = r.first;
         }
@@ -741,13 +801,20 @@ namespace hpx { namespace parcelset
                     "parcelhandler::get_message_handler",
                     "couldn't find an appropriate message handler");
             }
-            return 0;           // no message handler available
+            return nullptr;           // no message handler available
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return (*it).second.get();
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::get_message_handler");
+        return nullptr;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -769,7 +836,7 @@ namespace hpx { namespace parcelset
     // Performance counter data
 
     // number of parcels sent
-    boost::int64_t parcelhandler::get_parcel_send_count(
+    std::int64_t parcelhandler::get_parcel_send_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -778,13 +845,13 @@ namespace hpx { namespace parcelset
     }
 
     // number of parcels routed
-    boost::int64_t parcelhandler::get_parcel_routed_count(bool reset)
+    std::int64_t parcelhandler::get_parcel_routed_count(bool reset)
     {
         return util::get_and_reset_value(count_routed_, reset);
     }
 
     // number of messages sent
-    boost::int64_t parcelhandler::get_message_send_count(
+    std::int64_t parcelhandler::get_message_send_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -793,7 +860,7 @@ namespace hpx { namespace parcelset
     }
 
     // number of parcels received
-    boost::int64_t parcelhandler::get_parcel_receive_count(
+    std::int64_t parcelhandler::get_parcel_receive_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -802,7 +869,7 @@ namespace hpx { namespace parcelset
     }
 
     // number of messages received
-    boost::int64_t parcelhandler::get_message_receive_count(
+    std::int64_t parcelhandler::get_message_receive_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -812,7 +879,7 @@ namespace hpx { namespace parcelset
 
     // the total time it took for all sends, from async_write to the
     // completion handler (nanoseconds)
-    boost::int64_t parcelhandler::get_sending_time(
+    std::int64_t parcelhandler::get_sending_time(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -822,7 +889,7 @@ namespace hpx { namespace parcelset
 
     // the total time it took for all receives, from async_read to the
     // completion handler (nanoseconds)
-    boost::int64_t parcelhandler::get_receiving_time(
+    std::int64_t parcelhandler::get_receiving_time(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -832,7 +899,7 @@ namespace hpx { namespace parcelset
 
     // the total time it took for all sender-side serialization operations
     // (nanoseconds)
-    boost::int64_t parcelhandler::get_sending_serialization_time(
+    std::int64_t parcelhandler::get_sending_serialization_time(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -842,7 +909,7 @@ namespace hpx { namespace parcelset
 
     // the total time it took for all receiver-side serialization
     // operations (nanoseconds)
-    boost::int64_t parcelhandler::get_receiving_serialization_time(
+    std::int64_t parcelhandler::get_receiving_serialization_time(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -850,30 +917,8 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_receiving_serialization_time(reset) : 0;
     }
 
-#if defined(HPX_HAVE_SECURITY)
-    // the total time it took for all sender-side security operations
-    // (nanoseconds)
-    boost::int64_t parcelhandler::get_sending_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_sending_security_time(reset) : 0;
-    }
-
-    // the total time it took for all receiver-side security
-    // operations (nanoseconds)
-    boost::int64_t parcelhandler::get_receiving_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_receiving_security_time(reset) : 0;
-    }
-#endif
-
     // total data sent (bytes)
-    boost::int64_t parcelhandler::get_data_sent(std::string const& pp_type,
+    std::int64_t parcelhandler::get_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -882,7 +927,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) sent (bytes)
-    boost::int64_t parcelhandler::get_raw_data_sent(std::string const& pp_type,
+    std::int64_t parcelhandler::get_raw_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -891,7 +936,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data received (bytes)
-    boost::int64_t parcelhandler::get_data_received(std::string const& pp_type,
+    std::int64_t parcelhandler::get_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -900,7 +945,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) received (bytes)
-    boost::int64_t parcelhandler::get_raw_data_received(std::string const& pp_type,
+    std::int64_t parcelhandler::get_raw_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -908,14 +953,14 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_raw_data_received(reset) : 0;
     }
 
-    boost::int64_t parcelhandler::get_buffer_allocate_time_sent(
+    std::int64_t parcelhandler::get_buffer_allocate_time_sent(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
     }
-    boost::int64_t parcelhandler::get_buffer_allocate_time_received(
+    std::int64_t parcelhandler::get_buffer_allocate_time_received(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -924,7 +969,7 @@ namespace hpx { namespace parcelset
     }
 
     // connection stack statistics
-    boost::int64_t parcelhandler::get_connection_cache_statistics(
+    std::int64_t parcelhandler::get_connection_cache_statistics(
         std::string const& pp_type,
         parcelport::connection_cache_statistics_type stat_type, bool reset) const
     {
@@ -933,6 +978,65 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_connection_cache_statistics(stat_type, reset) : 0;
     }
 
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+    // same as above, just separated data for each action
+    // number of parcels sent
+    std::int64_t parcelhandler::get_action_parcel_send_count(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_parcel_send_count(action, reset) : 0;
+    }
+
+    // number of parcels received
+    std::int64_t parcelhandler::get_action_parcel_receive_count(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_parcel_receive_count(action, reset) : 0;
+    }
+
+    // the total time it took for all sender-side serialization operations
+    // (nanoseconds)
+    std::int64_t parcelhandler::get_action_sending_serialization_time(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_sending_serialization_time(action, reset) : 0;
+    }
+
+    // the total time it took for all receiver-side serialization
+    // operations (nanoseconds)
+    std::int64_t parcelhandler::get_action_receiving_serialization_time(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_receiving_serialization_time(action, reset) : 0;
+    }
+
+    // total data sent (bytes)
+    std::int64_t parcelhandler::get_action_data_sent(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_data_sent(action, reset) : 0;
+    }
+
+    // total data received (bytes)
+    std::int64_t parcelhandler::get_action_data_received(
+        std::string const& pp_type, std::string const& action, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_action_data_received(action, reset) : 0;
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::register_counter_types()
     {
@@ -940,24 +1044,26 @@ namespace hpx { namespace parcelset
         for (pports_type::value_type const & pp : pports_)
         {
             register_counter_types(pp.second->type());
+            register_connection_cache_counter_types(pp.second->type());
         }
 
         using util::placeholders::_1;
         using util::placeholders::_2;
 
         // register common counters
-        util::function_nonser<boost::int64_t(bool)> incoming_queue_length(
+        util::function_nonser<std::int64_t(bool)> incoming_queue_length(
             util::bind(&parcelhandler::get_incoming_queue_length, this, _1));
-        util::function_nonser<boost::int64_t(bool)> outgoing_queue_length(
+        util::function_nonser<std::int64_t(bool)> outgoing_queue_length(
             util::bind(&parcelhandler::get_outgoing_queue_length, this, _1));
-        util::function_nonser<boost::int64_t(bool)> outgoing_routed_count(
+        util::function_nonser<std::int64_t(bool)> outgoing_routed_count(
             util::bind(&parcelhandler::get_parcel_routed_count, this, _1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
             { "/parcelqueue/length/receive",
               performance_counters::counter_raw,
-              "returns the number current length of the queue of incoming parcels",
+              "returns the number current length of the queue of incoming "
+                  "parcels",
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, incoming_queue_length, _2),
@@ -966,7 +1072,8 @@ namespace hpx { namespace parcelset
             },
             { "/parcelqueue/length/send",
               performance_counters::counter_raw,
-              "returns the number current length of the queue of outgoing parcels",
+              "returns the number current length of the queue of outgoing "
+                  "parcels",
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, outgoing_queue_length, _2),
@@ -990,331 +1097,431 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
         using util::placeholders::_1;
         using util::placeholders::_2;
 
-        util::function_nonser<boost::int64_t(bool)> num_parcel_sends(
-            util::bind(&parcelhandler::get_parcel_send_count, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> num_parcel_receives(
-            util::bind(&parcelhandler::get_parcel_receive_count, this, pp_type, _1));
-
-        util::function_nonser<boost::int64_t(bool)> num_message_sends(
-            util::bind(&parcelhandler::get_message_send_count, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> num_message_receives(
-            util::bind(&parcelhandler::get_message_receive_count, this, pp_type, _1));
-
-        util::function_nonser<boost::int64_t(bool)> sending_time(
-            util::bind(&parcelhandler::get_sending_time, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> receiving_time(
-            util::bind(&parcelhandler::get_receiving_time, this, pp_type, _1));
-
-        util::function_nonser<boost::int64_t(bool)> sending_serialization_time(
-            util::bind(&parcelhandler::get_sending_serialization_time,
-                this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> receiving_serialization_time(
-            util::bind(&parcelhandler::get_receiving_serialization_time,
-                this, pp_type, _1));
-
-#if defined(HPX_HAVE_SECURITY)
-        util::function_nonser<boost::int64_t(bool)> sending_security_time(
-            util::bind(&parcelhandler::get_sending_security_time, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> receiving_security_time(
-            util::bind(&parcelhandler::get_receiving_security_time, this, pp_type, _1));
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            num_parcel_sends(util::bind(
+                &parcelhandler::get_action_parcel_send_count, this,
+                pp_type, _1, _2
+            ));
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            num_parcel_receives(util::bind(
+                &parcelhandler::get_action_parcel_receive_count, this,
+                pp_type, _1, _2
+            ));
+#else
+        util::function_nonser<std::int64_t(bool)>
+            num_parcel_sends(util::bind(
+                &parcelhandler::get_parcel_send_count, this,
+                pp_type, _1
+            ));
+        util::function_nonser<std::int64_t(bool)>
+            num_parcel_receives(util::bind(
+                &parcelhandler::get_parcel_receive_count, this,
+                pp_type, _1
+            ));
 #endif
-        util::function_nonser<boost::int64_t(bool)> data_sent(
-            util::bind(&parcelhandler::get_data_sent, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> data_received(
-            util::bind(&parcelhandler::get_data_received, this, pp_type, _1));
 
-        util::function_nonser<boost::int64_t(bool)> data_raw_sent(
-            util::bind(&parcelhandler::get_raw_data_sent, this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> data_raw_received(
-            util::bind(&parcelhandler::get_raw_data_received, this, pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> num_message_sends(
+            util::bind(&parcelhandler::get_message_send_count, this,
+                pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> num_message_receives(
+            util::bind(&parcelhandler::get_message_receive_count, this,
+                pp_type, _1));
 
-        util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_sent(
-            util::bind(&parcelhandler::get_buffer_allocate_time_sent,
-                this, pp_type, _1));
-        util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_received(
-            util::bind(&parcelhandler::get_buffer_allocate_time_received,
-                this, pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> sending_time(
+            util::bind(&parcelhandler::get_sending_time, this,
+                pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> receiving_time(
+            util::bind(&parcelhandler::get_receiving_time, this,
+                pp_type, _1));
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            sending_serialization_time(util::bind(
+                &parcelhandler::get_action_sending_serialization_time, this,
+                pp_type, _1, _2
+            ));
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            receiving_serialization_time(util::bind(
+                &parcelhandler::get_action_receiving_serialization_time, this,
+                pp_type, _1, _2
+            ));
+#else
+        util::function_nonser<std::int64_t(bool)>
+            sending_serialization_time(util::bind(
+                &parcelhandler::get_sending_serialization_time, this,
+                pp_type, _1
+            ));
+        util::function_nonser<std::int64_t(bool)>
+            receiving_serialization_time(util::bind(
+                &parcelhandler::get_receiving_serialization_time, this,
+                pp_type, _1
+            ));
+#endif
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            data_sent(util::bind(
+                &parcelhandler::get_action_data_sent, this,
+                pp_type, _1, _2
+            ));
+        util::function_nonser<std::int64_t(std::string const&, bool)>
+            data_received(util::bind(
+                &parcelhandler::get_action_data_received, this,
+                pp_type, _1, _2
+            ));
+#else
+        util::function_nonser<std::int64_t(bool)>
+            data_sent(util::bind(
+                &parcelhandler::get_data_sent, this, pp_type, _1
+            ));
+        util::function_nonser<std::int64_t(bool)>
+            data_received(util::bind(
+                &parcelhandler::get_data_received, this, pp_type, _1
+            ));
+#endif
+
+        util::function_nonser<std::int64_t(bool)> data_raw_sent(
+            util::bind(&parcelhandler::get_raw_data_sent, this,
+                pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> data_raw_received(
+            util::bind(&parcelhandler::get_raw_data_received, this,
+                pp_type, _1));
+
+        util::function_nonser<std::int64_t(bool)> buffer_allocate_time_sent(
+            util::bind(&parcelhandler::get_buffer_allocate_time_sent, this,
+                pp_type, _1));
+        util::function_nonser<std::int64_t(bool)> buffer_allocate_time_received(
+            util::bind(&parcelhandler::get_buffer_allocate_time_received, this,
+                pp_type, _1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
             { boost::str(boost::format("/parcels/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of \
-                     parcels sent using the %s "
+              boost::str(boost::format(
+                  "returns the number of parcels sent using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, num_parcel_sends, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(num_parcel_sends), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(num_parcel_sends), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               ""
             },
             { boost::str(boost::format("/parcels/count/%s/received") % pp_type),
                performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of \
-                     parcels received using the %s "
+              boost::str(boost::format(
+                  "returns the number of parcels received using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, num_parcel_receives, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(num_parcel_receives), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(num_parcel_receives), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               ""
             },
             { boost::str(boost::format("/messages/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of messages sent using \
-                     the %s "
+              boost::str(boost::format(
+                  "returns the number of messages sent using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, num_message_sends, _2),
+                  _1, std::move(num_message_sends), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
             { boost::str(boost::format("/messages/count/%s/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of messages received using \
-                   the %s "
+              boost::str(boost::format(
+                  "returns the number of messages received using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, num_message_receives, _2),
+                  _1, std::move(num_message_receives), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
 
             { boost::str(boost::format("/data/time/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time between the start of "
-                  "each asynchronous write and the invocation of the write callback "
+              boost::str(boost::format(
+                  "returns the total time between the start of each "
+                  "asynchronous write and the invocation of the write callback "
                   "using the %s connection type for the referenced locality") %
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, sending_time, _2),
+                  _1, std::move(sending_time), _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
             { boost::str(boost::format("/data/time/%s/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time between the start of "
-                  "each asynchronous read and the invocation of the read callback "
+              boost::str(boost::format(
+                  "returns the total time between the start of each "
+                  "asynchronous read and the invocation of the read callback "
                   "using the %s connection type for the referenced locality") %
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, receiving_time, _2),
+                  _1, std::move(receiving_time), _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
             { boost::str(boost::format("/serialize/time/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time required to serialize "
-                  "all sent parcels using the %s connection type for the referenced "
+              boost::str(boost::format(
+                  "returns the total time required to serialize all sent "
+                  "parcels using the %s connection type for the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, sending_serialization_time, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(sending_serialization_time), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(sending_serialization_time), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               "ns"
             },
             { boost::str(boost::format("/serialize/time/%s/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time required to de-serialize "
-                  "all received parcels using the %s connection type for the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the total time required to de-serialize all "
+                  "received parcels using the %s connection type for the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, receiving_serialization_time, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(receiving_serialization_time), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(receiving_serialization_time), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               "ns"
             },
 
-#if defined(HPX_HAVE_SECURITY)
-            { boost::str(boost::format("/security/time/%s/sent") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time required to perform "
-                  "tasks related to security in the parcel layer for all sent parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, sending_security_time, _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-            { boost::str(boost::format("/security/time/%s/received") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format("returns the total time required to perform "
-                  "tasks related to security in the parcel layer for \
-                     all received parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, receiving_security_time, _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-#endif
             { boost::str(boost::format("/data/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of (uncompressed) parcel "
-                  "argument data sent using the %s connection type by the referenced "
+              boost::str(boost::format(
+                  "returns the amount of (uncompressed) parcel argument data "
+                  "sent using the %s connection type by the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_raw_sent, _2),
+                  _1, std::move(data_raw_sent), _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
             { boost::str(boost::format("/data/count/%s/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of (uncompressed) parcel "
-                  "argument data received using the \
-                     %s connection type by the referenced "
+              boost::str(boost::format(
+                  "returns the amount of (uncompressed) parcel argument data "
+                  "received using the %s connection type by the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_raw_received, _2),
+                  _1, std::move(data_raw_received), _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { boost::str(boost::format("/serialize/count/%s/sent") % pp_type),
+            { boost::str(boost::format(
+                  "/serialize/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of parcel data (including "
-                  "headers, possibly compressed) sent using the %s connection type "
+              boost::str(boost::format(
+                  "returns the amount of parcel data (including headers, "
+                  "possibly compressed) sent using the %s connection type "
                   "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_sent, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(data_sent), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(data_sent), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               "bytes"
             },
-            { boost::str(boost::format("/serialize/count/%s/received") % pp_type),
+            { boost::str(boost::format(
+                  "/serialize/count/%s/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the amount of parcel data (including "
-                  "headers, possibly compressed) received using the %s connection type "
+              boost::str(boost::format(
+                  "returns the amount of parcel data (including headers, "
+                  "possibly compressed) received using the %s connection type "
                   "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, data_received, _2),
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+              util::bind(
+                  &performance_counters::per_action_data_counter_creator,
+                  _1, std::move(data_received), _2),
+              &performance_counters::per_action_data_counter_discoverer,
+#else
+              util::bind(
+                  &performance_counters::locality_raw_counter_creator,
+                  _1, std::move(data_received), _2),
               &performance_counters::locality_counter_discoverer,
+#endif
               "bytes"
             },
-            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/received")
-                % pp_type),
+            { boost::str(boost::format(
+                "/parcels/time/%s/buffer_allocate/received") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the "
-                "buffers for serializing using the %s connection type") % pp_type),
+              boost::str(boost::format(
+                  "returns the time needed to allocate the buffers for "
+                  "serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, buffer_allocate_time_received, _2),
+                  _1, std::move(buffer_allocate_time_received), _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/sent")
-                % pp_type),
+            { boost::str(boost::format(
+                "/parcels/time/%s/buffer_allocate/sent") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the time needed to allocate the "
-                "buffers for serializing using the %s connection type") % pp_type),
+              boost::str(boost::format(
+                  "returns the time needed to allocate the buffers for "
+                  "serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, buffer_allocate_time_sent, _2),
+                  _1, std::move(buffer_allocate_time_sent), _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+#endif
+    }
 
-        // register connection specific performance counters related to connection
-        // caches
-        util::function_nonser<boost::int64_t(bool)> cache_insertions(
+    // register connection specific performance counters related to connection
+    // caches
+    void parcelhandler::register_connection_cache_counter_types(
+        std::string const& pp_type)
+    {
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
+#if defined(HPX_HAVE_NETWORKING)
+        util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions, _1));
-        util::function_nonser<boost::int64_t(bool)> cache_evictions(
+        util::function_nonser<std::int64_t(bool)> cache_evictions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_evictions, _1));
-        util::function_nonser<boost::int64_t(bool)> cache_hits(
+        util::function_nonser<std::int64_t(bool)> cache_hits(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_hits, _1));
-        util::function_nonser<boost::int64_t(bool)> cache_misses(
+        util::function_nonser<std::int64_t(bool)> cache_misses(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_misses, _1));
-        util::function_nonser<boost::int64_t(bool)> cache_reclaims(
+        util::function_nonser<std::int64_t(bool)> cache_reclaims(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_reclaims, _1));
 
-        performance_counters::generic_counter_type_data const connection_cache_types[] =
+        performance_counters::generic_counter_type_data const
+            connection_cache_types[] =
         {
-            { boost::str(boost::format("/parcelport/count/%s/cache-insertions")
-             % pp_type),
+            { boost::str(boost::format(
+                  "/parcelport/count/%s/cache-insertions") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of \
-                   cache insertions while accessing "
-                  "the connection cache for the %s connection type on the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the number of cache insertions while accessing the "
+                  "connection cache for the %s connection type on the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, cache_insertions, _2),
+                  _1, std::move(cache_insertions), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-evictions")
-                % pp_type),
+            { boost::str(boost::format(
+                  "/parcelport/count/%s/cache-evictions") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of \
-                   cache evictions while accessing "
-                  "the connection cache for the %s connection type on the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the number of cache evictions while accessing the "
+                  "connection cache for the %s connection type on the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, cache_evictions, _2),
+                  _1, std::move(cache_evictions), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-hits") % pp_type),
+            { boost::str(boost::format(
+                  "/parcelport/count/%s/cache-hits") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of \
-                   cache hits while accessing "
-                  "the connection cache for the %s connection type on the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the number of cache hits while accessing the "
+                  "connection cache for the %s connection type on the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, cache_hits, _2),
+                  _1, std::move(cache_hits), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-misses") % pp_type),
+            { boost::str(boost::format(
+                  "/parcelport/count/%s/cache-misses") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of cache misses while \
-                   accessing "
-                  "the connection cache for the %s connection type on the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the number of cache misses while accessing the "
+                  "connection cache for the %s connection type on the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, cache_misses, _2),
+                  _1, std::move(cache_misses), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { boost::str(boost::format("/parcelport/count/%s/cache-reclaims") % pp_type),
+            { boost::str(boost::format(
+                  "/parcelport/count/%s/cache-reclaims") % pp_type),
               performance_counters::counter_raw,
-              boost::str(boost::format("returns the number of cache reclaims \
-                  while accessing "
-                  "the connection cache for the %s connection type on the referenced "
-                  "locality") % pp_type),
+              boost::str(boost::format(
+                  "returns the number of cache reclaims while accessing the "
+                  "connection cache for the %s connection type on the "
+                  "referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
               util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, cache_reclaims, _2),
+                  _1, std::move(cache_reclaims), _2),
               &performance_counters::locality_counter_discoverer,
               ""
             }
         };
         performance_counters::install_counter_types(connection_cache_types,
             sizeof(connection_cache_types)/sizeof(connection_cache_types[0]));
+#endif
     }
 
     std::vector<plugins::parcelport_factory_base *> &
@@ -1325,21 +1532,23 @@ namespace hpx { namespace parcelset
         {
             init_static_parcelport_factories(factories);
         }
-
         return factories;
     }
 
-    void parcelhandler::add_parcelport_factory(plugins::parcelport_factory_base *factory)
+    void parcelhandler::add_parcelport_factory(
+        plugins::parcelport_factory_base *factory)
     {
         auto & factories = get_parcelport_factories();
-        if(std::find(factories.begin(), factories.end(), factory) != factories.end())
+        if (std::find(factories.begin(), factories.end(), factory) !=
+            factories.end())
         {
             return;
         }
         factories.push_back(factory);
     }
 
-    void parcelhandler::init(int *argc, char ***argv, util::command_line_handling &cfg)
+    void parcelhandler::init(int *argc, char ***argv,
+        util::command_line_handling &cfg)
     {
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
@@ -1349,9 +1558,10 @@ namespace hpx { namespace parcelset
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
     {
-        /// TODO: properly hide this in plugins ...
+        // TODO: properly hide this in plugins ...
         std::vector<std::string> ini_defs;
 
+#if defined(HPX_HAVE_NETWORKING)
         using namespace boost::assign;
         ini_defs +=
             "[hpx.parcel]",
@@ -1361,7 +1571,8 @@ namespace hpx { namespace parcelset
             "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
             "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
-            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
+            "max_connections_per_locality = "
+                "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
@@ -1384,10 +1595,11 @@ namespace hpx { namespace parcelset
 #endif
             ;
 
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+        for (plugins::parcelport_factory_base* f : get_parcelport_factories())
         {
-            factory->get_plugin_info(ini_defs);
+            f->get_plugin_info(ini_defs);
         }
+#endif
 
         return ini_defs;
     }

@@ -11,13 +11,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
-#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
@@ -25,15 +22,18 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/report_error.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace hpx
@@ -54,11 +54,6 @@ namespace hpx
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
     HPX_API_EXPORT std::size_t get_runtime_instance_number();
-
-    HPX_API_EXPORT void report_error(std::size_t num_thread
-      , boost::exception_ptr const& e);
-
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
     HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
@@ -146,7 +141,7 @@ namespace hpx
     /// This function returns the system uptime measured in nanoseconds for the
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
-    HPX_API_EXPORT boost::uint64_t get_system_uptime();
+    HPX_API_EXPORT std::uint64_t get_system_uptime();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the
@@ -227,6 +222,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
     ///
+    /// \param binary_filter_type [in] The type of the binary filter to create
+    /// \param compress     [in] The created filter should support compression
+    /// \param next_filter  [in] Use this as the filter to dispatch the
+    ///                     invocation into.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
@@ -239,48 +238,6 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
-
-#if defined(HPX_HAVE_SODIUM)
-    namespace components { namespace security
-    {
-        class certificate;
-        class certificate_signing_request;
-        class parcel_suffix;
-        class hash;
-
-        template <typename T> class signed_type;
-        typedef signed_type<certificate> signed_certificate;
-        typedef signed_type<certificate_signing_request>
-            signed_certificate_signing_request;
-        typedef signed_type<parcel_suffix> signed_parcel_suffix;
-    }}
-
-#if defined(HPX_HAVE_SECURITY)
-    /// \brief Return the certificate for this locality
-    ///
-    /// \returns This function returns the signed certificate for this locality.
-    HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(error_code& ec = throws);
-
-    /// \brief Return the certificate for the given locality
-    ///
-    /// \param id The id representing the locality for which to retrieve
-    ///           the signed certificate.
-    ///
-    /// \returns This function returns the signed certificate for the locality
-    ///          identified by the parameter \a id.
-    HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
-
-    /// \brief Add the given certificate to the certificate store of this locality.
-    ///
-    /// \param cert The certificate to add to the certificate store of this
-    ///             locality
-    HPX_API_EXPORT void add_locality_certificate(
-        components::security::signed_certificate const& cert,
-        error_code& ec = throws);
-#endif
-#endif
 }
 
 #endif

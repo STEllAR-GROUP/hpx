@@ -5,12 +5,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/assert.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions

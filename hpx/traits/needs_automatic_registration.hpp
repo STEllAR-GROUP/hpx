@@ -7,7 +7,7 @@
 #ifndef HPX_TRAITS_NEEDS_AUTOMATIC_REGISTRATION_HPP
 #define HPX_TRAITS_NEEDS_AUTOMATIC_REGISTRATION_HPP
 
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -15,7 +15,7 @@ namespace hpx { namespace traits
     // required to automatically register to the action factory
     template <typename T, typename Enable = void>
     struct needs_automatic_registration
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

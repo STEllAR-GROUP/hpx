@@ -26,6 +26,13 @@ if(HPX_WITH_PARCELPORT_MPI)
   endif()
 endif()
 
+# If we compile with PAPI performance counters, we need to additionally
+# add the PAPI include path here
+if(HPX_WITH_PAPI)
+  find_package(PAPI)
+  include_directories(${PAPI_INCLUDE_DIR})
+endif()
+
 # make sure #including 'hpx/config/autolink.hpp' does not cause errors
 hpx_add_compile_flag(-DHPX_AUTOLINK_LIB_NAME=hpx)
 

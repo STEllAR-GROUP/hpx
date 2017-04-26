@@ -69,6 +69,29 @@ evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
 set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
 parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
 
+# hpx/runtime/threads/thread_data_fwd.hpp
+get_self                              "" "hpx\.threads\.get_self.*"
+get_self_ptr                          "" "hpx\.threads\.get_self_ptr.*"
+get_ctx_ptr                           "" "hpx\.threads\.get_ctx_ptr.*"
+get_self_ptr_checked                  "" "hpx\.threads\.get_self_ptr_checked.*"
+get_self_id                           "" "hpx\.threads\.get_self_id.*"
+get_parent_id                         "" "hpx\.threads\.get_parent_id.*"
+get_parent_phase                      "" "hpx\.threads\.get_parent_phase.*"
+get_parent_locality_id                "" "hpx\.threads\.get_parent_locality_id.*"
+get_self_component_id                 "" "hpx\.threads\.get_self_component_id.*"
+get_thread_count                      "" "hpx\.threads\.get_thread_count.*"
+enumerate_threads                     "" "hpx\.threads\.enumerate_threads.*"
+
+# hpx/runtime/threads/thread_enums.hpp
+thread_state_enum                     "" "hpx\.threads\.thread_state_enum.*"
+thread_priority                       "" "hpx\.threads\.thread_priority.*"
+thread_state_ex_enum                  "" "hpx\.threads\.thread_state_ex_enum.*"
+thread_stacksize                      "" "hpx\.threads\.thread_stacksize.*"
+get_thread_state_name                 "" "hpx\.threads\.get_thread_state_name.*"
+get_thread_priority_name              "" "hpx\.threads\.get_thread_priority_name.*"
+get_thread_state_ex_name              "" "hpx\.threads\.get_thread_state_ex_name.*"
+get_stack_size_name                   "" "hpx\.threads\.get_stack_size_name.*"
+
 # hpx/components/component_storage/migrate_from_storage.hpp
 migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"
 
@@ -429,6 +452,9 @@ unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanage
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.runtime\.get_ptr.*"
 
+# hpx/lcos/barrier.hpp
+barrier                               "" "header\.hpx\.lcos\.barrier.*"
+
 # hpx/lcos/broadcast.hpp
 broadcast                             "" "header\.hpx\.lcos\.broadcast.*"
 broadcast_with_index                  "" "header\.hpx\.lcos\.broadcast.*"
@@ -448,6 +474,9 @@ fold                                  "" "header\.hpx\.lcos\.fold.*"
 fold_with_index                       "" "header\.hpx\.lcos\.fold.*"
 inverse_fold                          "" "header\.hpx\.lcos\.fold.*"
 inverse_fold_with_index               "" "header\.hpx\.lcos\.fold.*"
+
+# hpx/lcos/split_future.hpp
+split_future                          "" "header\.hpx\.lcos\.split_future.*"
 
 # hpx/lcos/wait_all.hpp
 wait_all                              "" "header\.hpx\.lcos\.wait_all.*"

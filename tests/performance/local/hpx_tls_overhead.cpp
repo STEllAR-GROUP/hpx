@@ -3,18 +3,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/config.hpp>
 
-#include <boost/config.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/program_options.hpp>
-
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+
+#include <boost/config.hpp>
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -23,8 +24,8 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
-
 using hpx::util::thread_specific_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,7 +35,7 @@ static thread_specific_ptr<double, tag> global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    boost::uint64_t updates
+    std::uint64_t updates
     )
 {
     global_scratch.reset(new double);
@@ -57,18 +58,18 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    boost::uint64_t threads, updates;
+    std::uint64_t threads, updates;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1),
+        , value<std::uint64_t>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
-        , value<boost::uint64_t>(&updates)->default_value(1 << 22)
+        , value<std::uint64_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"
@@ -90,14 +91,18 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
 
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, updates));
+    for (std::uint64_t i = 0; i != threads; ++i)
+        workers.push_back(compat::thread(worker, updates));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     const double duration = t.elapsed();
 

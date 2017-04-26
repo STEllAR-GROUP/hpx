@@ -10,6 +10,7 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -18,14 +19,14 @@ namespace test
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct decorated_iterator
-      : boost::iterator_adaptor<
+      : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
     {
     private:
-        typedef boost::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>,
-            BaseIterator, boost::use_default, IteratorTag>
+            BaseIterator, void, IteratorTag>
         base_type;
 
     public:
@@ -41,7 +42,7 @@ namespace test
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         typename base_type::reference dereference() const
         {
@@ -96,12 +97,12 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exted with non-zero status");
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

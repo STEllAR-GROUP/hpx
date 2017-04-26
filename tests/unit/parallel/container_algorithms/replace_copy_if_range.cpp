@@ -10,6 +10,8 @@
 
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -33,8 +35,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -103,20 +105,22 @@ template <typename IteratorTag>
 void test_replace_copy_if()
 {
     using namespace hpx::parallel;
-    test_replace_copy_if(seq, IteratorTag());
-    test_replace_copy_if(par, IteratorTag());
-    test_replace_copy_if(par_vec, IteratorTag());
+    test_replace_copy_if(execution::seq, IteratorTag());
+    test_replace_copy_if(execution::par, IteratorTag());
+    test_replace_copy_if(execution::par_unseq, IteratorTag());
 
-    test_replace_copy_if_async(seq(task), IteratorTag());
-    test_replace_copy_if_async(par(task), IteratorTag());
+    test_replace_copy_if_async(execution::seq(execution::task), IteratorTag());
+    test_replace_copy_if_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_copy_if(execution_policy(seq), IteratorTag());
-    test_replace_copy_if(execution_policy(par), IteratorTag());
-    test_replace_copy_if(execution_policy(par_vec), IteratorTag());
+    test_replace_copy_if(execution_policy(execution::seq), IteratorTag());
+    test_replace_copy_if(execution_policy(execution::par), IteratorTag());
+    test_replace_copy_if(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_replace_copy_if(execution_policy(seq(task)), IteratorTag());
-    test_replace_copy_if(execution_policy(par(task)), IteratorTag());
+    test_replace_copy_if(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_replace_copy_if(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -132,8 +136,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -212,18 +216,24 @@ void test_replace_copy_if_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_replace_copy_if_exception(seq, IteratorTag());
-    test_replace_copy_if_exception(par, IteratorTag());
+    test_replace_copy_if_exception(execution::seq, IteratorTag());
+    test_replace_copy_if_exception(execution::par, IteratorTag());
 
-    test_replace_copy_if_exception_async(seq(task), IteratorTag());
-    test_replace_copy_if_exception_async(par(task), IteratorTag());
+    test_replace_copy_if_exception_async(execution::seq(execution::task),
+        IteratorTag());
+    test_replace_copy_if_exception_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_copy_if_exception(execution_policy(seq), IteratorTag());
-    test_replace_copy_if_exception(execution_policy(par), IteratorTag());
+    test_replace_copy_if_exception(execution_policy(execution::seq),
+        IteratorTag());
+    test_replace_copy_if_exception(execution_policy(execution::par),
+        IteratorTag());
 
-    test_replace_copy_if_exception(execution_policy(seq(task)), IteratorTag());
-    test_replace_copy_if_exception(execution_policy(par(task)), IteratorTag());
+    test_replace_copy_if_exception(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_replace_copy_if_exception(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -239,8 +249,8 @@ template <typename ExPolicy, typename IteratorTag>
 void test_replace_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
-        hpx::parallel::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::is_execution_policy<ExPolicy>::value");
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -317,18 +327,24 @@ void test_replace_copy_if_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_replace_copy_if_bad_alloc(seq, IteratorTag());
-    test_replace_copy_if_bad_alloc(par, IteratorTag());
+    test_replace_copy_if_bad_alloc(execution::seq, IteratorTag());
+    test_replace_copy_if_bad_alloc(execution::par, IteratorTag());
 
-    test_replace_copy_if_bad_alloc_async(seq(task), IteratorTag());
-    test_replace_copy_if_bad_alloc_async(par(task), IteratorTag());
+    test_replace_copy_if_bad_alloc_async(execution::seq(execution::task),
+        IteratorTag());
+    test_replace_copy_if_bad_alloc_async(execution::par(execution::task),
+        IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_copy_if_bad_alloc(execution_policy(seq), IteratorTag());
-    test_replace_copy_if_bad_alloc(execution_policy(par), IteratorTag());
+    test_replace_copy_if_bad_alloc(execution_policy(execution::seq),
+        IteratorTag());
+    test_replace_copy_if_bad_alloc(execution_policy(execution::par),
+        IteratorTag());
 
-    test_replace_copy_if_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_replace_copy_if_bad_alloc(execution_policy(par(task)), IteratorTag());
+    test_replace_copy_if_bad_alloc(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_replace_copy_if_bad_alloc(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
@@ -341,7 +357,7 @@ void replace_copy_if_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -366,9 +382,9 @@ int main(int argc, char* argv[])
         "the random number generator seed to use for this run")
         ;
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

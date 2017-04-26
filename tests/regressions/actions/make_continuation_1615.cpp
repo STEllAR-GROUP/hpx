@@ -11,15 +11,17 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstdint>
 #include <string>
+#include <utility>
 
-boost::int32_t times2(boost::int32_t i)
+std::int32_t times2(std::int32_t i)
 {
     return i * 2;
 }
 HPX_PLAIN_ACTION(times2);           // defines times2_action
 
-std::string to_string(boost::int32_t i)
+std::string to_string(std::int32_t i)
 {
     return std::to_string(i);
 }
@@ -27,11 +29,36 @@ HPX_PLAIN_ACTION(to_string);    // defines to_string_action
 
 int hpx_main(int argc, char* argv[])
 {
-    std::string result = hpx::async_continue(
-        times2_action(), hpx::make_continuation(to_string_action()),
-        hpx::find_here(), 42).get();
+    {
+        std::string result = hpx::async_continue(
+            times2_action(), hpx::make_continuation(to_string_action()),
+            hpx::find_here(), 42).get();
 
-    HPX_TEST_EQ(result, std::string("84"));
+        HPX_TEST_EQ(result, std::string("84"));
+    }
+
+    // Same test with lambdas
+    {
+        auto t2 =
+            hpx::actions::lambda_to_action(
+            [](std::int32_t i) -> std::int32_t
+            {
+                return i * 2;
+            });
+
+        auto ts =
+            hpx::actions::lambda_to_action(
+            [](std::int32_t i) -> std::string
+            {
+                return std::to_string(i);
+            });
+
+        std::string result = hpx::async_continue(
+            std::move(t2), hpx::make_continuation(std::move(ts)),
+            hpx::find_here(), 42).get();
+
+        HPX_TEST_EQ(result, std::string("84"));
+    }
 
     return hpx::finalize();
 }

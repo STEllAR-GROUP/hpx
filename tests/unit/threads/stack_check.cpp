@@ -8,10 +8,11 @@
 #include <hpx/util/lightweight_test.hpp>
 //
 #include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
-#include <iostream>
 #include <algorithm>
+#include <cstddef>
 #include <string>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <stack>
@@ -84,9 +85,9 @@ int main(int argc, char *argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

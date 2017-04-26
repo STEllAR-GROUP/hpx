@@ -8,8 +8,7 @@
 
 #include <hpx/util/function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -47,7 +46,7 @@ namespace hpx { namespace util
             transform_ = f;
         }
 
-        std::string map(std::string host_name, boost::uint16_t port) const;
+        std::string map(std::string host_name, std::uint16_t port) const;
 
       private:
         transform_function_type transform_;

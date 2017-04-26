@@ -7,6 +7,8 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -15,14 +17,13 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -52,8 +53,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t init(std::size_t num_threads,
             policies::init_affinity_data const& data);
 
-        bool run(std::unique_lock<boost::mutex>& l, std::size_t num_threads);
-        void stop(std::unique_lock<boost::mutex>& l, bool blocking = true);
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+        void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
 
@@ -62,7 +63,7 @@ namespace hpx { namespace threads { namespace detail
         {
             return threads_.size();
         }
-        boost::thread& get_os_thread_handle(std::size_t num_thread);
+        compat::thread& get_os_thread_handle(std::size_t num_thread);
 
         void create_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state, bool run_now, error_code& ec);
@@ -132,6 +133,16 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread, bool reset) const;
 
+        std::int64_t get_scheduler_utilization() const;
+
+        std::int64_t get_idle_loop_count(std::size_t num) const;
+        std::int64_t get_busy_loop_count(std::size_t num) const;
+
+        ///////////////////////////////////////////////////////////////////////
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const;
+
         void reset_thread_distribution();
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode);
@@ -160,7 +171,7 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         // this thread manager has exactly as many OS-threads as requested
-        std::vector<boost::thread> threads_;
+        std::vector<compat::thread> threads_;
 
         // refer to used scheduler
         Scheduler& sched_;
@@ -221,6 +232,10 @@ namespace hpx { namespace threads { namespace detail
         // tfunc_impl timers
         std::vector<std::uint64_t> exec_times_, tfunc_times_;
         std::vector<std::uint64_t> reset_tfunc_times_;
+
+        std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
+
+        std::vector<std::uint8_t> tasks_active_;
 
         // Stores the mask identifying all processing units used by this
         // thread manager.

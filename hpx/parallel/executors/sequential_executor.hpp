@@ -18,6 +18,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -32,9 +33,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     struct sequential_executor : executor_tag
     {
-#if defined(DOXYGEN)
+#if !defined(DOXYGEN)
         /// Create a new sequential executor
-        sequential_executor() {}
+        HPX_CONSTEXPR sequential_executor() {}
 #endif
 
         /// \cond NOINTERNAL
@@ -113,6 +114,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         std::size_t processing_units_count()
         {
             return 1;
+        }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
         }
         /// \endcond
     };

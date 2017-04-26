@@ -10,6 +10,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -60,7 +62,7 @@ int hpx_main(variables_map& vm)
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work(hpx::util::bind
-                (&suspend_test, boost::ref(b), iterations));
+                (&suspend_test, std::ref(b), iterations));
 
         b.wait(); // Wait for all hpx-threads to enter the barrier.
     }
@@ -84,10 +86,9 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

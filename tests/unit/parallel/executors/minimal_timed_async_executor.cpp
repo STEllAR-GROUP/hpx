@@ -8,16 +8,18 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
+#include <functional>
 #include <string>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
-#include <boost/range/functions.hpp>
-#include <boost/chrono.hpp>
-
-using namespace boost::chrono;
+using namespace std::chrono;
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id sync_test(int passed_through)
@@ -46,11 +48,11 @@ void test_timed_apply(Executor& exec)
 
         using hpx::util::placeholders::_1;
         traits::apply_execute_after(exec, milliseconds(10),
-            hpx::util::bind(&apply_test, boost::ref(l), boost::ref(id), _1), 42
+            hpx::util::bind(&apply_test, std::ref(l), std::ref(id), _1), 42
         );
 
         traits::apply_execute_after(exec, milliseconds(10),
-            &apply_test, boost::ref(l), boost::ref(id), 42);
+            &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 
@@ -64,10 +66,10 @@ void test_timed_apply(Executor& exec)
         typedef hpx::parallel::timed_executor_traits<Executor> traits;
         traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
             hpx::util::deferred_call(
-                &apply_test, boost::ref(l), boost::ref(id), 42));
+                &apply_test, std::ref(l), std::ref(id), 42));
 
         traits::apply_execute_at(exec, steady_clock::now() + milliseconds(10),
-            &apply_test, boost::ref(l), boost::ref(id), 42);
+            &apply_test, std::ref(l), std::ref(id), 42);
 
         l.count_down_and_wait();
 
@@ -182,9 +184,9 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency()));
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,

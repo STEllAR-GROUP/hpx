@@ -8,6 +8,7 @@
 #if !defined(HPX_F646702C_6556_48FA_BF9D_3E7959983122)
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/current_function.hpp>
@@ -43,14 +44,19 @@ struct fixture
     std::ostream& stream_;
     std::size_t sanity_failures_;
     std::size_t test_failures_;
+#if defined(HPX_HAVE_CXX11_NSDMI)
+    mutex_type mutex_ = BOOST_DETAIL_SPINLOCK_INIT;
+#else
     mutex_type mutex_;
+#endif
 
   public:
     fixture(std::ostream& stream):
       stream_(stream), sanity_failures_(0), test_failures_(0)
+#if !defined(HPX_HAVE_CXX11_NSDMI)
+    , mutex_(BOOST_DETAIL_SPINLOCK_INIT)
+#endif
     {
-        mutex_type l = BOOST_DETAIL_SPINLOCK_INIT;
-        mutex_ = l;
     }
 
     void increment(counter_type c)

@@ -23,11 +23,13 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#if defined(__NVCC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
 #include <type_traits>
 #endif
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -83,6 +85,7 @@ namespace hpx { namespace actions
 
 namespace hpx { namespace traits
 {
+    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline components::component_type
     component_type_database<hpx::actions::detail::plain_function>::get()
@@ -90,7 +93,6 @@ namespace hpx { namespace traits
         return hpx::components::component_plain_function;
     }
 
-    /// \cond NOINTERNAL
     template <> HPX_ALWAYS_EXPORT
     inline void
     component_type_database<hpx::actions::detail::plain_function>::set(
@@ -120,9 +122,9 @@ namespace hpx { namespace traits
 ///       }
 /// \endcode
 ///
-/// \note Usually this macro will not be used in user code unless the intend is
+/// \note Usually this macro will not be used in user code unless the intent is
 /// to avoid defining the action_type in global namespace. Normally, the use of
-/// the macro \a HPX_PLAIN_ACTION is recommend.
+/// the macro \a HPX_PLAIN_ACTION is recommended.
 ///
 /// \note The macro \a HPX_DEFINE_PLAIN_ACTION can be used with 1 or 2
 /// arguments. The second argument is optional. The default value for the
@@ -157,7 +159,7 @@ namespace hpx { namespace traits
     HPX_DEFINE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))              \
     /**/
 
-#if defined(__NVCC__)
+#if defined(__NVCC__) || defined(__CUDACC__)
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
     struct name : hpx::actions::make_action<                                  \
         typename std::add_pointer<                                            \
@@ -187,29 +189,8 @@ namespace hpx { namespace traits
 /// \brief Declares a plain action type
 ///
 #define HPX_DECLARE_PLAIN_ACTION(...)                                         \
-    HPX_DECLARE_PLAIN_ACTION_(__VA_ARGS__)                                    \
+    HPX_DECLARE_ACTION(__VA_ARGS__)                                           \
     /**/
-
-/// \cond NOINTERNAL
-
-#define HPX_DECLARE_PLAIN_DIRECT_ACTION(...)                                  \
-    HPX_DECLARE_PLAIN_ACTION(__VA_ARGS__)                                     \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_(...)                                        \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_1(func)                                      \
-    HPX_DECLARE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))             \
-    /**/
-
-#define HPX_DECLARE_PLAIN_ACTION_2(func, name) struct name;                   \
-    /**/
-
-/// \endcond
 
 /// \def HPX_PLAIN_ACTION(func, name)
 ///

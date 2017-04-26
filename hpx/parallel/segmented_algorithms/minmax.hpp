@@ -23,6 +23,7 @@
 #include <iterator>
 #include <list>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -108,7 +109,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             return Algo::sequential_minmax_element_ind(
-                positions.begin(), positions.size(), f, proj);
+                policy, positions.begin(), positions.size(), f, proj);
         }
 
         // parallel remote implementation
@@ -218,7 +219,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::vector<SegIter> res =
                             hpx::util::unwrapped(std::move(r));
                         return Algo::sequential_minmax_element_ind(
-                            res.begin(), res.size(), f, proj);
+                            policy, res.begin(), res.size(), f, proj);
                     },
                     std::move(segments)));
         }
@@ -230,7 +231,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         min_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -254,7 +257,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         max_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             SegIter result = first;
             if (first == last || ++first == last)
@@ -382,8 +387,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 }
             }
 
-            return sequential_minmax_element_ind(
-                positions.begin(), positions.size(), f, proj);
+            return Algo::sequential_minmax_element_ind(
+                policy, positions.begin(), positions.size(), f, proj);
         }
 
         // parallel remote implementation
@@ -507,8 +512,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                         std::vector<result_type> res =
                             hpx::util::unwrapped(std::move(r));
-                        return sequential_minmax_element_ind(
-                            res.begin(), res.size(), f, proj);
+                        return Algo::sequential_minmax_element_ind(
+                            policy, res.begin(), res.size(), f, proj);
                     },
                     std::move(segments)));
         }
@@ -522,7 +527,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         minmax_element_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
             typedef std::pair<SegIter, SegIter> result_type;
 
             result_type result(first, first);

@@ -14,6 +14,7 @@
 
 #define HPX_BACKTRACE_SOURCE
 #include <hpx/async.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 
 #include <boost/config.hpp>
 
@@ -45,15 +46,17 @@
 #endif
 #ifdef BOOST_HAVE_UNWIND
 #include <unwind.h>
-#include <boost/cstdint.hpp>
 #endif
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
-#include <string.h>
-#include <stdlib.h>
 
 #if defined(HPX_MSVC)
 #include <windows.h>
@@ -76,7 +79,7 @@ namespace hpx { namespace util {
 
             void **array_;      // storage for the stack trace
             std::size_t size_;  // number of frames
-            boost::uint64_t cfa_;  // canonical frame address
+            std::uint64_t cfa_;  // canonical frame address
             std::size_t count_;
         };
 
@@ -95,7 +98,7 @@ namespace hpx { namespace util {
                 d.array_[d.count_] = reinterpret_cast<void *>(_Unwind_GetIP(ctx));
 
                 // Get the CFA.
-                boost::uint64_t cfa = _Unwind_GetCFA(ctx);
+                std::uint64_t cfa = _Unwind_GetCFA(ctx);
 
                 // Check if we're at the end of the stack.
                 if ((0 < d.count_) &&
@@ -165,14 +168,15 @@ namespace hpx { namespace util {
             res.imbue(std::locale::classic());
             res << std::left << std::setw(sizeof(void*)*2) << std::setfill(' ')
                 << ptr <<": ";
-            Dl_info info = {0, 0, 0, 0};
+            Dl_info info = {nullptr, nullptr, nullptr, nullptr};
             if(dladdr(ptr,&info) == 0) {
                 res << "???";
             }
             else {
                 if(info.dli_sname) {
                     int status = 0;
-                    char *demangled = abi::__cxa_demangle(info.dli_sname,0,0,&status);
+                    char *demangled =
+                        abi::__cxa_demangle(info.dli_sname,nullptr,nullptr,&status);
                     if(demangled) {
                         res << demangled;
                         free(demangled);
@@ -228,11 +232,11 @@ namespace hpx { namespace util {
         {
             char ** ptr = backtrace_symbols(&address,1);
             try {
-                if(ptr == 0)
+                if(ptr == nullptr)
                     return std::string();
                 std::string res = ptr[0];
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 return res;
             }
             catch(...) {
@@ -246,7 +250,7 @@ namespace hpx { namespace util {
         {
             char ** ptr = backtrace_symbols(address,size);
             try {
-                if(ptr==0)
+                if(ptr==nullptr)
                     return std::string();
                 std::string res = std::to_string(size)
                     + ((1==size)?" frame:":" frames:");
@@ -255,7 +259,7 @@ namespace hpx { namespace util {
                     res+=ptr[i];
                 }
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 return res;
             }
             catch(...) {
@@ -270,12 +274,12 @@ namespace hpx { namespace util {
             char ** ptr = backtrace_symbols(addresses,size);
             out << size << ((1==size)?" frame:":" frames:");
             try {
-                if(ptr==0)
+                if(ptr==nullptr)
                     return;
                 for(std::size_t i=0;i<size;i++)
                     out << '\n' << ptr[i];
                 free(ptr);
-                ptr = 0;
+                ptr = nullptr;
                 out << std::flush;
             }
             catch(...) {
@@ -287,12 +291,12 @@ namespace hpx { namespace util {
 #elif defined(HPX_MSVC)
 
         namespace {
-            HANDLE hProcess = 0;
+            HANDLE hProcess = nullptr;
             bool syms_ready = false;
 
             void init()
             {
-                if(hProcess == 0) {
+                if(hProcess == nullptr) {
                     hProcess = GetCurrentProcess();
                     SymSetOptions(SYMOPT_DEFERRED_LOADS);
 
@@ -306,7 +310,7 @@ namespace hpx { namespace util {
 
         HPX_API_EXPORT std::string get_symbol(void *ptr)
         {
-            if(ptr==0)
+            if(ptr==nullptr)
                 return std::string();
             init();
             std::ostringstream ss;
@@ -388,7 +392,7 @@ namespace hpx { namespace util {
         {
             out << size << ((1 == size)?" frame:":" frames:"); //-V128
             for(std::size_t i=0;i<size;i++) {
-                if(addresses[i]!=0)
+                if(addresses[i]!=nullptr)
                     out << '\n' << std::left << std::setw(sizeof(void*)*2)
                     << std::setfill(' ') << addresses[i];
             }
@@ -402,16 +406,20 @@ namespace hpx { namespace util {
     {
         if(frames_.empty())
             return std::string();
-        if (0 == threads::get_self_ptr())
+        if (nullptr == threads::get_self_ptr())
             return trace();
 
         lcos::local::futures_factory<std::string()> p(
             util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size()));
 
         error_code ec(lightweight);
-        p.apply(launch::fork, threads::thread_priority_default,
+        threads::thread_id_type tid = p.apply(
+            launch::fork, threads::thread_priority_default,
             threads::thread_stacksize_medium, ec);
         if (ec) return "<couldn't retrieve stack backtrace>";
+
+        // make sure this thread is executed last
+        hpx::this_thread::yield_to(thread::id(std::move(tid)));
 
         return p.get_future().get(ec);
     }

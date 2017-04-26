@@ -14,6 +14,7 @@
 
 #include <boost/utility/binary.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace hpx { namespace agas
@@ -36,7 +37,6 @@ enum namespace_action_code
     locality_ns_num_threads                 = BOOST_BINARY_U(1100110),
     locality_ns_statistics_counter          = BOOST_BINARY_U(1100111),
     locality_ns_resolve_locality            = BOOST_BINARY_U(1101000),
-    locality_ns_resolved_localities         = BOOST_BINARY_U(1101001),
 
     primary_ns_service                      = BOOST_BINARY_U(1000000),
     primary_ns_bulk_service                 = BOOST_BINARY_U(1000001),
@@ -220,11 +220,6 @@ namespace detail
           , counter_target_count
           , locality_ns_resolve_locality
           , locality_ns_statistics_counter }
-      , {   "count/resolved_localities"
-          , ""
-          , counter_target_time
-          , locality_ns_resolved_localities
-          , locality_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/free"
           , "ns"
@@ -250,11 +245,6 @@ namespace detail
           , "ns"
           , counter_target_time
           , locality_ns_resolve_locality
-          , locality_ns_statistics_counter }
-      , {   "time/resolved_localities"
-          , "ns"
-          , counter_target_time
-          , locality_ns_resolved_localities
           , locality_ns_statistics_counter }
     };
     static std::size_t const num_locality_namespace_services =
@@ -452,15 +442,6 @@ namespace detail
         std::string const& name
       , error_code& ec = throws
         );
-}
-
-namespace server
-{
-    // forward declarations
-    struct HPX_EXPORT locality_namespace;
-    struct HPX_EXPORT primary_namespace;
-    struct HPX_EXPORT component_namespace;
-    struct HPX_EXPORT symbol_namespace;
 }
 
 }}

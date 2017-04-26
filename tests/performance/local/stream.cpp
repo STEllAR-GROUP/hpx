@@ -22,11 +22,15 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/compute.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <cstddef>
+#include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifndef STREAM_TYPE
@@ -74,8 +78,19 @@ int checktick()
 
 template <typename Vector>
 void check_results(std::size_t iterations,
-    Vector const & a, Vector const & b, Vector const & c)
+    Vector const & a_res, Vector const & b_res, Vector const & c_res)
 {
+    std::vector<STREAM_TYPE> a(a_res.size());
+    std::vector<STREAM_TYPE> b(b_res.size());
+    std::vector<STREAM_TYPE> c(c_res.size());
+
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        a_res.begin(), a_res.end(), a.begin());
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        b_res.begin(), b_res.end(), b.begin());
+    hpx::parallel::copy(hpx::parallel::execution::par,
+        c_res.begin(), c_res.end(), c.begin());
+
     STREAM_TYPE aj,bj,cj,scalar;
     STREAM_TYPE aSumErr,bSumErr,cSumErr;
     STREAM_TYPE aAvgErr,bAvgErr,cAvgErr;
@@ -208,7 +223,12 @@ struct multiply_step
 {
     multiply_step(T factor) : factor_(factor) {}
 
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val) const
+    // FIXME : call operator of multiply_step is momentarily defined with
+    //         a generic parameter to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
     {
         return val * factor_;
     }
@@ -219,7 +239,12 @@ struct multiply_step
 template <typename T>
 struct add_step
 {
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    // FIXME : call operator of add_step is momentarily defined with
+    //         generic parameters to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2;
     }
@@ -230,7 +255,12 @@ struct triad_step
 {
     triad_step(T factor) : factor_(factor) {}
 
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(T val1, T val2) const
+    // FIXME : call operator of triad_step is momentarily defined with
+    //         generic parameters to allow the host_side result_of<>
+    //         (used in invoke()) to get the return type
+
+    template<typename U>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2 * factor_;
     }
@@ -239,10 +269,10 @@ struct triad_step
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Allocator, typename Executor, typename Target, typename Chunker>
+template <typename Allocator, typename Executor, typename Target, typename... Targets>
 std::vector<std::vector<double> >
 run_benchmark(
-    std::size_t iterations, std::size_t size, Target target, Chunker chunker)
+    std::size_t iterations, std::size_t size, Target target, Targets... targets)
 {
     // Creating our allocator ...
     Allocator alloc(target);
@@ -255,10 +285,10 @@ run_benchmark(
     vector_type c(size, alloc);
 
     // Creating our executor ....
-    Executor exec(target);
+    Executor exec(target, targets...);
 
     // Creating the policy used in the parallel algorithms
-    auto policy = hpx::parallel::par.on(exec).with(chunker);
+    auto policy = hpx::parallel::execution::par.on(exec);
 
     // Initialize arrays
     hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);
@@ -358,8 +388,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
+    std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
 
-    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
+    HPX_UNUSED(chunk_size);
 
     std::string chunker = vm["chunker"].as<std::string>();
 
@@ -399,83 +430,37 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(use_accel)
     {
 #if defined(HPX_HAVE_CUDA)
-        // Get the targets we want to run on
+        // Get the cuda targets we want to run on
         hpx::compute::cuda::target target;
 
-        typedef hpx::compute::cuda::default_executor executor_type;
+        // Get the host targets we want to run on
+        auto host_targets = hpx::compute::host::get_local_targets();
+
+        typedef hpx::compute::cuda::concurrent_executor<> executor_type;
+        //typedef hpx::compute::cuda::default_executor executor_type;
         typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
 #else
 #error "The STREAM benchmark currently requires CUDA to run on an accelerator"
 #endif
-
         // perform benchmark
-//         if(chunker == "auto")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::auto_chunk_size());
-//         }
-//         else if(chunker == "guided")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::guided_chunk_size());
-//         }
-//         else if(chunker == "dynamic")
-//         {
-//             timing =
-//                 run_benchmark<allocator_type, executor_type>(
-//                     iterations, vector_size, std::move(target),
-//                     hpx::parallel::dynamic_chunk_size());
-//         }
-//         else
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, std::move(target),
-                    hpx::parallel::static_chunk_size());
-        }
+        timing =
+            run_benchmark<allocator_type, executor_type>(
+                iterations, vector_size, std::move(target), std::move(host_targets));
+                //iterations, vector_size, std::move(target));
     }
     else
 #endif
     {
-        // Get the targets we want to run on
-        auto numa_nodes = hpx::compute::host::numa_domains();
-
         typedef hpx::compute::host::block_executor<> executor_type;
         typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
 
+        // Get the numa targets we want to run on
+        auto numa_nodes = hpx::compute::host::numa_domains();
+
         // perform benchmark
-        if(chunker == "auto")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::auto_chunk_size());
-        }
-        else if(chunker == "guided")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::guided_chunk_size());
-        }
-        else if(chunker == "dynamic")
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::dynamic_chunk_size());
-        }
-        else
-        {
-            timing =
-                run_benchmark<allocator_type, executor_type>(
-                    iterations, vector_size, numa_nodes,
-                    hpx::parallel::static_chunk_size());
-        }
+        timing =
+            run_benchmark<allocator_type, executor_type>(
+                iterations, vector_size, numa_nodes);
     }
     time_total = mysecond() - time_total;
 
@@ -530,50 +515,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Commandline handling ...
-//
-std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    if (numa_nodes == 0)
-        numa_nodes = topo.get_number_of_sockets();
-
-    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
-    if (num_numa_domains_str != "all")
-    {
-        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
-    }
-    return numa_nodes;
-}
-
-std::pair<std::size_t, std::size_t> get_num_numa_pus(
-    hpx::threads::topology const& topo, std::size_t numa_nodes,
-    boost::program_options::variables_map& vm)
-{
-    std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
-
-    std::string num_threads_str = vm["stream-threads"].as<std::string>();
-    std::size_t pus = numa_pus;
-
-    if(num_threads_str != "all")
-    {
-        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
-    }
-
-    return std::make_pair(numa_pus, pus);
-}
-
-
-// Launch with something like:
-//
-// --stream-numa-domains=2 --stream-threads=6
-//
-// Don't use --hpx:threads or --hpx:bind, those are computed internally.
-//
 int main(int argc, char* argv[])
 {
     using namespace boost::program_options;
@@ -590,16 +531,14 @@ int main(int argc, char* argv[])
         (   "iterations",
             boost::program_options::value<std::size_t>()->default_value(10),
             "number of iterations to repeat each test. (default: 10)")
-        (   "stream-threads",
-            boost::program_options::value<std::string>()->default_value("all"),
-            "number of threads per NUMA domain to use. (default: all)")
-        (   "stream-numa-domains",
-            boost::program_options::value<std::string>()->default_value("all"),
-            "number of NUMA domains to use. (default: all)")
         (   "chunker",
             boost::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
+        (   "chunk_size",
+             boost::program_options::value<std::size_t>()->default_value(0),
+            "size of vector (default: 1024)")
+
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
             "Use this flag to run the stream benchmark on the GPU")
@@ -617,42 +556,9 @@ int main(int argc, char* argv[])
     variables_map vm;
     store(opts, vm);
 
-    hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
-    std::pair<std::size_t, std::size_t> pus =
-        get_num_numa_pus(topo, numa_nodes, vm);
-    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
-
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
-
-    // block all cores of requested number of NUMA-domains
-    cfg.push_back(boost::str(
-        boost::format("hpx.cores=%d") % (numa_nodes * num_cores)
-    ));
-    cfg.push_back(boost::str(
-        boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)
-    ));
-
-    std::string node_name("numanode");
-    if (topo.get_number_of_numa_nodes() == 0)
-        node_name = "socket";
-
-    std::string bind_desc("hpx.bind!=");
-    for (std::size_t i = 0; i != numa_nodes; ++i)
-    {
-        if (i != 0)
-            bind_desc += ";";
-
-        std::size_t base_thread = i * pus.second;
-        bind_desc += boost::str(
-            boost::format("thread:%d-%d=%s:%d.core:0-%d.pu:0")
-              % base_thread % (base_thread+pus.second-1)  // thread:%d-%d
-              % node_name % i                             // %s:%d
-              % (pus.second-1)                            // core:0-%d
-        );
-    }
-    cfg.push_back(bind_desc);
+    std::vector<std::string> cfg = {
+        "hpx.numa_sensitive=2"  // no-cross NUMA stealing
+    };
 
     return hpx::init(cmdline, argc, argv, cfg);
 }

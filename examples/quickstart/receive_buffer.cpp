@@ -12,7 +12,9 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <cstddef>
 #include <deque>
+#include <utility>
 
 // This example assumes that the computational space is divided into two
 // partitions. Here we place both partitions on the same locality, but they

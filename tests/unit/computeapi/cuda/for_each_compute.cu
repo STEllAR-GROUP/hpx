@@ -29,13 +29,18 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 {
     std::vector<int> h_C(d_A.size());
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         d_A.begin(), d_A.end(), h_C.begin());
 
+    // FIXME : Lambda function given to for_each() is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used inside for_each()) to get the return
+    //         type
+
     hpx::parallel::for_each(
-        hpx::parallel::par.on(exec),
+        hpx::parallel::execution::par.on(exec),
         d_A.begin(), d_A.end(),
-        [] HPX_DEVICE (int & i)
+        [] HPX_HOST_DEVICE (int & i)
         {
              i += 5;
         });
@@ -48,7 +53,7 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -69,7 +74,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // copy data to device
     hpx::parallel::copy(
-        hpx::parallel::par,
+        hpx::parallel::execution::par,
         h_A.begin(), h_A.end(), d_A.begin());
 
     // create executor

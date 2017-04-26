@@ -12,7 +12,9 @@
 
 #include <boost/assert.hpp>
 
+#include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <benchmarks/network/osu_coll.hpp>

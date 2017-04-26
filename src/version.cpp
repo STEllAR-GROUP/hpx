@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #endif
 
 #include <hpx/exception.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/version.hpp>
@@ -24,6 +25,7 @@
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -34,22 +36,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    boost::uint8_t major_version()
+    std::uint8_t major_version()
     {
         return HPX_VERSION_MAJOR;
     }
 
-    boost::uint8_t minor_version()
+    std::uint8_t minor_version()
     {
         return HPX_VERSION_MINOR;
     }
 
-    boost::uint8_t subminor_version()
+    std::uint8_t subminor_version()
     {
         return HPX_VERSION_SUBMINOR;
     }
 
-    boost::uint32_t full_version()
+    std::uint32_t full_version()
     {
         return HPX_VERSION_FULL;
     }
@@ -62,7 +64,7 @@ namespace hpx
             HPX_VERSION_SUBMINOR);
     }
 
-    boost::uint8_t agas_version()
+    std::uint8_t agas_version()
     {
         return HPX_AGAS_VERSION;
     }
@@ -105,7 +107,7 @@ namespace hpx
             "A general purpose parallel C++ runtime system for "
             "distributed applications\n"
             "of any scale.\n\n"
-            "Copyright (c) 2007-2016, The STE||AR Group,\n"
+            "Copyright (c) 2007-2017, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
@@ -183,15 +185,10 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCELPORT_MPI=OFF\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_IPC)
-        strm << "  HPX_HAVE_PARCELPORT_IPC=ON\n";
+#if defined(HPX_HAVE_PARCELPORT_VERBS)
+        strm << "  HPX_HAVE_PARCELPORT_VERBS=ON\n";
 #else
-        strm << "  HPX_HAVE_PARCELPORT_IPC=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_VERBS=OFF\n";
 #endif
 #if defined(HPX_HAVE_VERIFY_LOCKS)
         strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
@@ -203,7 +200,7 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_HWLOC=OFF\n";
 #endif
-#if defined(HPX_HAVE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0
         strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
 #else
         strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
@@ -246,11 +243,20 @@ namespace hpx
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
 #endif
 
-        strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+        if (get_runtime_ptr() == nullptr)
+        {
+            strm << "  HPX_PREFIX (configured)=unknown\n";
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
-        strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
+            strm << "  HPX_PREFIX=unknown\n";
 #endif
-
+        }
+        else
+        {
+            strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
+            strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
+#endif
+        }
         return strm.str();
     }
 

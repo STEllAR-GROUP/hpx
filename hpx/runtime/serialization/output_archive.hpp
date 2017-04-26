@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
+
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
@@ -16,16 +18,15 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/mpl/or.hpp>
-#include <boost/type_traits/is_enum.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/cstdint.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -37,33 +38,28 @@ namespace hpx { namespace serialization
     {
         typedef basic_archive<output_archive> base_type;
 
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
-            boost::uint32_t flags = 0U,
-            boost::uint32_t dest_locality_id = ~0U,
+            std::uint32_t flags = 0U,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr,
-            new_gids_map* new_gids = nullptr)
+            binary_filter* filter = nullptr)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
-            , dest_locality_id_(dest_locality_id)
-            , new_gids_(new_gids)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            boost::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
+            std::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
             save(endianess);
 
             // send flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
             save(flags);
 
-            bool has_filter = filter != 0;
+            bool has_filter = filter != nullptr;
             save(has_filter);
 
             if (has_filter && enable_compression())
@@ -73,28 +69,21 @@ namespace hpx { namespace serialization
             }
         }
 
-        bool is_saving() const
+        void set_split_gids(split_gids_type& split_gids)
         {
-            return buffer_->is_saving();
+            split_gids_ = &split_gids;
         }
 
-        bool is_future_awaiting() const
+        bool is_preprocessing() const
         {
-            return buffer_->is_future_awaiting();
+            return buffer_->is_preprocessing();
         }
 
         template <typename Future>
         void await_future(Future const & f)
         {
-            if(f.is_ready()) return;
-
             buffer_->await_future(
                 *hpx::traits::future_access<Future>::get_shared_state(f));
-        }
-
-        boost::uint32_t get_dest_locality_id() const
-        {
-            return dest_locality_id_;
         }
 
         std::size_t bytes_written() const
@@ -103,14 +92,33 @@ namespace hpx { namespace serialization
         }
 
         void add_gid(naming::gid_type const & gid,
-            naming::gid_type const & splitted_gid);
+            naming::gid_type const & split_gid);
+
+        bool has_gid(naming::gid_type const & gid);
 
         naming::gid_type get_new_gid(naming::gid_type const & gid);
+
+        std::size_t get_num_chunks() const
+        {
+            return buffer_->get_num_chunks();
+        }
 
         // this function is needed to avoid a MSVC linker error
         std::size_t current_pos() const
         {
             return basic_archive<output_archive>::current_pos();
+        }
+
+        void reset()
+        {
+            buffer_->reset();
+            pointer_tracker_.clear();
+            basic_archive<output_archive>::reset();
+        }
+
+        void flush()
+        {
+            buffer_->flush();
         }
 
     private:
@@ -125,31 +133,23 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::disable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            !std::is_integral<T>::value && !std::is_enum<T>::value
         >::type
         save(T const & t)
         {
-            typedef std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<T>::value> use_optimized;
+            typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
 
             save_bitwise(t, use_optimized());
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
+        typename std::enable_if<
+            std::is_integral<T>::value || std::is_enum<T>::value
         >::type
         save(T t) //-V659
         {
-            save_integral(t,
-                typename boost::is_unsigned<T>::type());
+            save_integral(t, std::is_unsigned<T>());
         }
 
         void save(float f)
@@ -185,7 +185,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_bitwise(T const & t, std::true_type)
         {
-            static_assert(!boost::is_abstract<T>::value,
+            static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
@@ -198,36 +198,60 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, boost::mpl::false_)
+        void save_nonintrusively_polymorphic(T const & t, std::false_type)
         {
             access::serialize(*this, t, 0);
         }
 
         template <typename T>
-        void save_nonintrusively_polymorphic(T const & t, boost::mpl::true_)
+        void save_nonintrusively_polymorphic(T const & t, std::true_type)
         {
             detail::polymorphic_nonintrusive_factory::instance().save(*this, t);
         }
 
         template <typename T>
-        void save_integral(T val, boost::mpl::false_)
+        void save_integral(T val, std::false_type)
         {
-            save_integral_impl(static_cast<boost::int64_t>(val));
+            save_integral_impl(static_cast<std::int64_t>(val));
         }
 
         template <typename T>
-        void save_integral(T val, boost::mpl::true_)
+        void save_integral(T val, std::true_type)
         {
-            save_integral_impl(static_cast<boost::uint64_t>(val));
+            save_integral_impl(static_cast<std::uint64_t>(val));
         }
 
-#if defined(BOOST_HAS_INT128) && !defined(__CUDACC__)
-        void save_integral(boost::int128_type t, boost::mpl::false_)
+#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
+        void save_integral(boost::int128_type t, std::false_type)
         {
             save_integral_impl(t);
         }
 
-        void save_integral(boost::uint128_type t, boost::mpl::true_)
+        void save_integral(boost::uint128_type t, std::true_type)
+        {
+            save_integral_impl(t);
+        }
+
+        // On some platforms (gcc) std::is_integral<int128>::value
+        // evaluates to false. Thus these functions re-route the
+        // serialization for those types to the proper implementation
+        void save_bitwise(boost::int128_type t, std::false_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::int128_type t, std::true_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::uint128_type t, std::false_type)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_bitwise(boost::uint128_type t, std::true_type)
         {
             save_integral_impl(t);
         }
@@ -266,12 +290,12 @@ namespace hpx { namespace serialization
               buffer_->save_binary_chunk(address, count);
         }
 
-        typedef std::map<const void *, boost::uint64_t> pointer_tracker;
+        typedef std::map<const void *, std::uint64_t> pointer_tracker;
 
         // FIXME: make this function capable for ADL lookup and hence if used
         // as a dependent name it doesn't require output_archive to be complete
         // type or itself to be forwarded
-        friend boost::uint64_t track_pointer(output_archive& ar, const void* pos)
+        friend std::uint64_t track_pointer(output_archive& ar, const void* pos)
         {
             pointer_tracker::iterator it = ar.pointer_tracker_.find(pos);
             if(it == ar.pointer_tracker_.end())
@@ -284,8 +308,7 @@ namespace hpx { namespace serialization
 
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
-        boost::uint32_t dest_locality_id_;
-        new_gids_map * new_gids_;
+        split_gids_type * split_gids_;
     };
 }}
 

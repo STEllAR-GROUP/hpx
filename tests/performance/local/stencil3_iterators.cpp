@@ -10,11 +10,13 @@
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <numeric>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
-#include <boost/cstdint.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/range/functions.hpp>
 
@@ -213,7 +215,7 @@ namespace hpx { namespace experimental
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(stencil3_iterator_full const& other) const
         {
@@ -258,12 +260,12 @@ namespace hpx { namespace experimental
     }
 }}
 
-boost::uint64_t bench_stencil3_iterator_full()
+std::uint64_t bench_stencil3_iterator_full()
 {
     std::vector<int> values(partition_size);
     std::iota(boost::begin(values), boost::end(values), 0);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_full_range(
         values.begin(), values.end(), &values.back(), &values.front());
@@ -308,7 +310,7 @@ namespace hpx { namespace experimental
         {}
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         bool equal(stencil3_iterator_v1 const& other) const
         {
@@ -337,12 +339,12 @@ namespace hpx { namespace experimental
     }
 }}
 
-boost::uint64_t bench_stencil3_iterator_v1()
+std::uint64_t bench_stencil3_iterator_v1()
 {
     std::vector<int> values(partition_size);
     std::iota(boost::begin(values), boost::end(values), 0);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_range_v1(
         values.begin()+1, values.end()-1);
@@ -456,12 +458,12 @@ namespace hpx { namespace experimental
     }
 }}
 
-boost::uint64_t bench_stencil3_iterator_v2()
+std::uint64_t bench_stencil3_iterator_v2()
 {
     std::vector<int> values(partition_size);
     std::iota(boost::begin(values), boost::end(values), 0);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     auto r = hpx::experimental::make_stencil3_range_v2(
         values.begin()+1, values.end()-1);
@@ -485,12 +487,12 @@ boost::uint64_t bench_stencil3_iterator_v2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t bench_stencil3_iterator_explicit()
+std::uint64_t bench_stencil3_iterator_explicit()
 {
     std::vector<int> values(partition_size);
     std::iota(boost::begin(values), boost::end(values), 0);
 
-    boost::uint64_t start = hpx::util::high_resolution_clock::now();
+    std::uint64_t start = hpx::util::high_resolution_clock::now();
 
     // handle all elements explicitly
     int result = values.back() + values.front() + values[1];
@@ -527,7 +529,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     else {
         // first run full stencil3 tests
         {
-            boost::uint64_t t = 0;
+            std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_full();
             hpx::cout << "full: " << (t * 1e-9) / test_count << std::endl;
@@ -535,14 +537,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // now run explicit (no-check) stencil3 tests
         {
-            boost::uint64_t t = 0;
+            std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v1();
             hpx::cout << "nocheck(v1): " << (t * 1e-9) / test_count << std::endl;
         }
 
         {
-            boost::uint64_t t = 0;
+            std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v2();
             hpx::cout << "nocheck(v2): " << (t * 1e-9) / test_count << std::endl;
@@ -550,7 +552,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // now run explicit tests
         {
-            boost::uint64_t t = 0;
+            std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_explicit();
             hpx::cout << "explicit: " << (t * 1e-9) / test_count << std::endl;

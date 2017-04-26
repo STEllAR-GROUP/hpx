@@ -12,14 +12,22 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/insert_checked.hpp>
+#include <hpx/util/scoped_timer.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+
+#include <cstddef>
+#include <cstdint>
 #include <mutex>
-
 #include <string>
+#include <utility>
 #include <vector>
 
 // TODO: Remove the use of the name "prefix"
@@ -40,134 +48,6 @@ naming::id_type bootstrap_component_namespace_id()
 
 namespace server
 {
-// TODO: This isn't scalable, we have to update it every time we add a new
-// AGAS request/response type.
-response component_namespace::service(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{
-    switch (req.get_action_code())
-    {
-        case component_ns_bind_prefix:
-            {
-                update_time_on_exit update(
-                    counter_data_.bind_prefix_.time_
-                );
-                counter_data_.increment_bind_prefix_count();
-                return bind_prefix(req, ec);
-            }
-        case component_ns_bind_name:
-            {
-                update_time_on_exit update(
-                    counter_data_.bind_name_.time_
-                );
-                counter_data_.increment_bind_name_count();
-                return bind_name(req, ec);
-            }
-        case component_ns_resolve_id:
-            {
-                update_time_on_exit update(
-                    counter_data_.resolve_id_.time_
-                );
-                counter_data_.increment_resolve_id_count();
-                return resolve_id(req, ec);
-            }
-        case component_ns_unbind_name:
-            {
-                update_time_on_exit update(
-                    counter_data_.unbind_name_.time_
-                );
-                counter_data_.increment_unbind_name_ount();
-                return unbind(req, ec);
-            }
-        case component_ns_iterate_types:
-            {
-                update_time_on_exit update(
-                    counter_data_.iterate_types_.time_
-                );
-                counter_data_.increment_iterate_types_count();
-                return iterate_types(req, ec);
-            }
-        case component_ns_get_component_type_name:
-            {
-                update_time_on_exit update(
-                    counter_data_.get_component_type_name_.time_
-                );
-                counter_data_.increment_get_component_type_name_count();
-                return get_component_type_name(req, ec);
-            }
-        case component_ns_num_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_.num_localities_.time_
-                );
-                counter_data_.increment_num_localities_count();
-                return get_num_localities(req, ec);
-            }
-        case component_ns_statistics_counter:
-            return statistics_counter(req, ec);
-
-        case locality_ns_allocate:
-        case locality_ns_free:
-        case locality_ns_localities:
-        case locality_ns_num_localities:
-        case locality_ns_num_threads:
-        case locality_ns_resolve_locality:
-        case locality_ns_resolved_localities:
-        {
-            LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
-                "locality_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case primary_ns_route:
-        case primary_ns_bind_gid:
-        case primary_ns_resolve_gid:
-        case primary_ns_unbind_gid:
-        case primary_ns_increment_credit:
-        case primary_ns_decrement_credit:
-        case primary_ns_allocate:
-        case primary_ns_begin_migration:
-        case primary_ns_end_migration:
-        {
-            LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
-                "primary_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        case symbol_ns_bind:
-        case symbol_ns_resolve:
-        case symbol_ns_unbind:
-        case symbol_ns_iterate_names:
-        case symbol_ns_on_event:
-        {
-            LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
-                "symbol_namespace";
-            return naming::get_agas_client().service(req, ec);
-        }
-
-        default:
-        case locality_ns_service:
-        case component_ns_service:
-        case primary_ns_service:
-        case symbol_ns_service:
-        case invalid_request:
-        {
-            HPX_THROWS_IF(ec, bad_action_code
-              , "component_namespace::service"
-              , boost::str(boost::format(
-                    "invalid action code encountered in request, "
-                    "action_code(%x)")
-                    % boost::uint16_t(req.get_action_code())));
-            return response();
-        }
-    };
-} // }}}
-
 // register all performance counter types exposed by this component
 void component_namespace::register_counter_types(
     error_code& ec
@@ -271,14 +151,15 @@ void component_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
+    agas::register_name(launch::sync, instance_name_,
+        get_unmanaged_id().get_gid(), ec);
 }
 
 void component_namespace::unregister_server_instance(
     error_code& ec
     )
 {
-    agas::unregister_name_sync(instance_name_, ec);
+    agas::unregister_name(launch::sync, instance_name_, ec);
     this->base_type::finalize();
 }
 
@@ -287,36 +168,19 @@ void component_namespace::finalize()
     if (!instance_name_.empty())
     {
         error_code ec(lightweight);
-        agas::unregister_name_sync(instance_name_, ec);
+        agas::unregister_name(launch::sync, instance_name_, ec);
     }
 }
 
-// TODO: do/undo semantics (e.g. transactions)
-std::vector<response> component_namespace::bulk_service(
-    std::vector<request> const& reqs
-  , error_code& ec
-    )
-{
-    std::vector<response> r;
-    r.reserve(reqs.size());
-
-    for (request const& req : reqs)
-    {
-        error_code ign;
-        r.push_back(service(req, ign));
-    }
-
-    return r;
-}
-
-response component_namespace::bind_prefix(
-    request const& req
-  , error_code& ec
+components::component_type component_namespace::bind_prefix(
+    std::string const& key
+  , std::uint32_t prefix
     )
 { // {{{ bind_prefix implementation
-    // parameters
-    std::string key = req.get_name();
-    boost::uint32_t prefix = req.get_locality_id();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.bind_prefix_.time_
+    );
+    counter_data_.increment_bind_prefix_count();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -332,11 +196,11 @@ response component_namespace::bind_prefix(
         {
             l.unlock();
 
-            HPX_THROWS_IF(ec, lock_error
+            HPX_THROW_EXCEPTION(lock_error
               , "component_namespace::bind_prefix"
               , "component id table insertion failed due to a locking "
                 "error or memory corruption");
-            return response();
+            return components::component_invalid;
         }
 
         // If the insertion succeeded, we need to increment the type
@@ -357,13 +221,13 @@ response component_namespace::bind_prefix(
             // Duplicate type registration for this locality.
             l.unlock();
 
-            HPX_THROWS_IF(ec, duplicate_component_id
+            HPX_THROW_EXCEPTION(duplicate_component_id
               , "component_namespace::bind_prefix"
               , boost::str(boost::format(
                     "component id is already registered for the given "
                     "locality, key(%1%), prefix(%2%), ctype(%3%)")
                     % key % prefix % cit->second));
-            return response();
+            return components::component_invalid;
         }
 
         fit->second.insert(prefix);
@@ -376,12 +240,7 @@ response component_namespace::bind_prefix(
             "ctype(%3%), response(no_success)")
             % key % prefix % cit->second);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(component_ns_bind_prefix
-                      , cit->second
-                      , no_success);
+        return cit->second;
     }
 
     // Instead of creating a temporary and then inserting it, we insert
@@ -393,11 +252,11 @@ response component_namespace::bind_prefix(
     {
         l.unlock();
 
-        HPX_THROWS_IF(ec, lock_error
+        HPX_THROW_EXCEPTION(lock_error
             , "component_namespace::bind_prefix"
             , "factory table insertion failed due to a locking "
               "error or memory corruption");
-        return response();
+        return components::component_invalid;
     }
 
     fit->second.insert(prefix);
@@ -406,19 +265,17 @@ response component_namespace::bind_prefix(
         "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)")
         % key % prefix % cit->second);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_bind_prefix, cit->second);
+    return cit->second;
 } // }}}
 
-response component_namespace::bind_name(
-    request const& req
-  , error_code& ec
+components::component_type component_namespace::bind_name(
+    std::string const& key
     )
 { // {{{ bind_name implementation
-    // parameters
-    std::string key = req.get_name();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.bind_name_.time_
+    );
+    counter_data_.increment_bind_name_count();
 
     std::unique_lock<mutex_type> l(mutex_);
 
@@ -434,11 +291,11 @@ response component_namespace::bind_name(
         {
             l.unlock();
 
-            HPX_THROWS_IF(ec, lock_error
+            HPX_THROW_EXCEPTION(lock_error
               , "component_namespace::bind_name"
               , "component id table insertion failed due to a locking "
                 "error or memory corruption");
-            return response();
+            return components::component_invalid;
         }
 
         // If the insertion succeeded, we need to increment the type
@@ -450,19 +307,17 @@ response component_namespace::bind_name(
         "component_namespace::bind_name, key(%1%), ctype(%2%)")
         % key % it->second);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_bind_name, it->second);
+    return it->second;
 } // }}}
 
-response component_namespace::resolve_id(
-    request const& req
-  , error_code& ec
+std::vector<std::uint32_t> component_namespace::resolve_id(
+    components::component_type key
     )
 { // {{{ resolve_id implementation
-    // parameters
-    component_id_type key = req.get_component_type();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.resolve_id_.time_
+    );
+    counter_data_.increment_resolve_id_count();
 
     // If the requested component type is a derived type, use only its derived
     // part for the lookup.
@@ -482,16 +337,12 @@ response component_namespace::resolve_id(
             "component_namespace::resolve_id, key(%1%), localities(0)")
             % key);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(component_ns_resolve_id
-                      , std::vector<boost::uint32_t>());
+        return std::vector<std::uint32_t>();
     }
 
     else
     {
-        std::vector<boost::uint32_t> p;
+        std::vector<std::uint32_t> p;
 
         prefixes_type const& prefixes = it->second;
         prefixes_type::const_iterator pit = prefixes.begin()
@@ -504,20 +355,18 @@ response component_namespace::resolve_id(
             "component_namespace::resolve_id, key(%1%), localities(%2%)")
             % key % prefixes.size());
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(component_ns_resolve_id, p);
+        return p;
     }
 } // }}}
 
-response component_namespace::unbind(
-    request const& req
-  , error_code& ec
+bool component_namespace::unbind(
+    std::string const& key
     )
 { // {{{ unbind implementation
-    // parameters
-    std::string key = req.get_name();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.unbind_name_.time_
+    );
+    counter_data_.increment_unbind_name_count();
 
     std::lock_guard<mutex_type> l(mutex_);
 
@@ -530,10 +379,7 @@ response component_namespace::unbind(
             "component_namespace::unbind, key(%1%), response(no_success)")
             % key);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-       return response(component_ns_unbind_name, no_success);
+       return false;
     }
 
     // REVIEW: If there are no localities with this type, should we throw
@@ -545,19 +391,18 @@ response component_namespace::unbind(
         "component_namespace::unbind, key(%1%)")
         % key);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_unbind_name);
+    return true;
 } // }}}
 
 // TODO: catch exceptions
-response component_namespace::iterate_types(
-    request const& req
-  , error_code& ec
+void component_namespace::iterate_types(
+    iterate_types_function_type const& f
     )
 { // {{{ iterate implementation
-    iterate_types_function_type f = req.get_iterate_types_function();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.iterate_types_.time_
+    );
+    counter_data_.increment_iterate_types_count();
 
     std::lock_guard<mutex_type> l(mutex_);
 
@@ -569,11 +414,6 @@ response component_namespace::iterate_types(
     }
 
     LAGAS_(info) << "component_namespace::iterate_types";
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_iterate_types);
 } // }}}
 
 template <typename Map>
@@ -589,12 +429,14 @@ std::string get_component_name(Map const& m, components::component_type t)
     return (*it).second;
 }
 
-response component_namespace::get_component_type_name(
-    request const& req
-  , error_code& ec
+std::string component_namespace::get_component_type_name(
+    components::component_type t
     )
 { // {{{ get_component_type_name implementation
-    components::component_type t = req.get_component_type();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.get_component_type_name_.time_
+    );
+    counter_data_.increment_get_component_type_name_count();
 
     std::lock_guard<mutex_type> l(mutex_);
 
@@ -622,10 +464,7 @@ response component_namespace::get_component_type_name(
             % int(components::get_derived_type(t)) %
               int(components::get_base_type(t)));
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-       return response(component_ns_get_component_type_name, no_success);
+        return result;
     }
 
     LAGAS_(info) << (boost::format(
@@ -633,18 +472,17 @@ response component_namespace::get_component_type_name(
         % int(components::get_derived_type(t)) % int(components::get_base_type(t))
         % result);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_get_component_type_name, result);
+    return result;
 } // }}}
 
-response component_namespace::get_num_localities(
-    request const& req
-  , error_code& ec
+std::uint32_t component_namespace::get_num_localities(
+    components::component_type key
     )
 { // {{{ get_num_localities implementation
-    component_id_type key = req.get_component_type();
+    util::scoped_timer<boost::atomic<std::int64_t> > update(
+        counter_data_.num_localities_.time_
+    );
+    counter_data_.increment_num_localities_count();
 
     // If the requested component type is a derived type, use only its derived
     // part for the lookup.
@@ -661,43 +499,36 @@ response component_namespace::get_num_localities(
             "component_namespace::get_num_localities, key(%1%), localities(0)")
             % key);
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        response(component_ns_num_localities, boost::uint32_t(0), no_success);
+        return std::uint32_t(0);
     }
 
-    boost::uint32_t num_localities = static_cast<boost::uint32_t>(it->second.size());
+    std::uint32_t num_localities = static_cast<std::uint32_t>(it->second.size());
 
     LAGAS_(info) << (boost::format(
         "component_namespace::get_num_localities, key(%1%), localities(%2%)")
         % key % num_localities);
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_num_localities, num_localities);
+    return num_localities;
 } // }}}
 
-response component_namespace::statistics_counter(
-    request const& req
-  , error_code& ec
+naming::gid_type component_namespace::statistics_counter(
+    std::string const& name
     )
 { // {{{ statistics_counter implementation
     LAGAS_(info) << "component_namespace::statistics_counter";
 
-    std::string name(req.get_statistics_counter_name());
+    error_code ec;
 
     performance_counters::counter_path_elements p;
     performance_counters::get_counter_path_elements(name, p, ec);
-    if (ec) return response();
+    if (ec) return naming::invalid_gid;
 
     if (p.objectname_ != "agas")
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "component_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
+        return naming::invalid_gid;
     }
 
     namespace_action_code code = invalid_request;
@@ -716,16 +547,16 @@ response component_namespace::statistics_counter(
 
     if (code == invalid_request || target == detail::counter_target_invalid)
     {
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROW_EXCEPTION(bad_parameter,
             "component_namespace::statistics_counter",
             "unknown performance counter (unrelated to AGAS)");
-        return response();
+        return naming::invalid_gid;
     }
 
     typedef component_namespace::counter_data cd;
 
     using util::placeholders::_1;
-    util::function_nonser<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
@@ -762,10 +593,10 @@ response component_namespace::statistics_counter(
                 &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "component_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
+            return naming::invalid_gid;
         }
     }
     else {
@@ -800,68 +631,65 @@ response component_namespace::statistics_counter(
             get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
             break;
         default:
-            HPX_THROWS_IF(ec, bad_parameter
+            HPX_THROW_EXCEPTION(bad_parameter
               , "component_namespace::statistics"
               , "bad action code while querying statistics");
-            return response();
+            return naming::invalid_gid;
         }
     }
 
     performance_counters::counter_info info;
     performance_counters::get_counter_type(name, info, ec);
-    if (ec) return response();
+    if (ec) return naming::invalid_gid;
 
     performance_counters::complement_counter_info(info, ec);
-    if (ec) return response();
+    if (ec) return naming::invalid_gid;
 
     using performance_counters::detail::create_raw_counter;
     naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
-    if (ec) return response();
+    if (ec) return naming::invalid_gid;
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(component_ns_statistics_counter, gid);
+    return naming::detail::strip_credits_from_gid(gid);
 } // }}}
 
 // access current counter values
-boost::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
 {
     return util::get_and_reset_value(bind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
+std::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
 {
     return util::get_and_reset_value(resolve_id_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
+std::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
 {
     return util::get_and_reset_value(unbind_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
+std::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
 {
     return util::get_and_reset_value(iterate_types_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data
+std::int64_t component_namespace::counter_data
         ::get_component_type_name_count(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
+std::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
 {
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
+std::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.count_, reset) +
         util::get_and_reset_value(bind_name_.count_, reset) +
@@ -873,43 +701,43 @@ boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 }
 
 // access execution time counters
-boost::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
+std::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
 {
     return util::get_and_reset_value(bind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
+std::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
 {
     return util::get_and_reset_value(resolve_id_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
+std::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
 {
     return util::get_and_reset_value(unbind_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
+std::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
 {
     return util::get_and_reset_value(iterate_types_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data
+std::int64_t component_namespace::counter_data
         ::get_component_type_name_time(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
+std::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
 {
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_overall_time(bool reset)
+std::int64_t component_namespace::counter_data::get_overall_time(bool reset)
 {
     return util::get_and_reset_value(bind_prefix_.time_, reset) +
         util::get_and_reset_value(bind_name_.time_, reset) +
@@ -936,7 +764,7 @@ void component_namespace::counter_data::increment_resolve_id_count()
     ++resolve_id_.count_;
 }
 
-void component_namespace::counter_data::increment_unbind_name_ount()
+void component_namespace::counter_data::increment_unbind_name_count()
 {
     ++unbind_name_.count_;
 }

@@ -10,9 +10,8 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 
-#include <boost/assign/std/vector.hpp>
-#include <boost/chrono.hpp>
-
+#include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -27,7 +26,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::chrono::milliseconds;
+using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
@@ -55,14 +54,14 @@ using hpx::find_here;
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int64_t old_credit
+  , std::int64_t old_credit
     );
 
 HPX_PLAIN_ACTION(split);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
-inline boost::int64_t get_credit(id_type const& id)
+inline std::int64_t get_credit(id_type const& id)
 {
     return get_credit_from_gid(id.get_gid());
 }
@@ -71,7 +70,7 @@ inline boost::int64_t get_credit(id_type const& id)
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int64_t old_credit
+  , std::int64_t old_credit
     )
 {
     cout << "[" << find_here() << "/" << target << "]: "
@@ -105,7 +104,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
+    std::uint64_t const delay = vm["delay"].as<std::uint64_t>();
 
     typedef typename Client::server_type server_type;
 
@@ -178,15 +177,15 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(1000)
         , "number of milliseconds to wait for object destruction")
         ;
 
     // We need to explicitly enable the test components used by this test.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.components.simple_refcnt_checker.enabled! = 1";
-    cfg += "hpx.components.managed_refcnt_checker.enabled! = 1";
+    std::vector<std::string> const cfg = {
+        "hpx.components.simple_refcnt_checker.enabled! = 1",
+        "hpx.components.managed_refcnt_checker.enabled! = 1"
+    };
 
     // Initialize and run HPX.
     return init(cmdline, argc, argv, cfg);

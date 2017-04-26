@@ -15,14 +15,18 @@
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/cstdint.hpp>
+#include <boost/atomic.hpp>
 
-#include <deque>
+#include <cstddef>
+#include <cstdint>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
@@ -92,6 +96,8 @@ namespace hpx { namespace parcelset
         ///                 the routine returns immediately.
         virtual bool run(bool blocking = true) = 0;
 
+        virtual void flush_parcels() = 0;
+
         /// Stop the parcelport I/O thread pool.
         ///
         /// \param blocking [in] If blocking is set to \a false the routine will
@@ -105,7 +111,7 @@ namespace hpx { namespace parcelset
         /// parcelports are enabled.
         virtual bool can_connect(locality const &, bool use_alternative_parcelport)
         {
-            return can_bootstrap() || use_alternative_parcelport;
+            return use_alternative_parcelport || can_bootstrap();
         }
 
         /// Queues a parcel for transmission to another locality
@@ -173,7 +179,7 @@ namespace hpx { namespace parcelset
         virtual bool do_background_work(std::size_t num_thread) = 0;
 
         // retrieve performance counter value for given statistics type
-        virtual boost::int64_t get_connection_cache_statistics(
+        virtual std::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type, bool reset) = 0;
 
         /// Return the name of this locality
@@ -197,112 +203,78 @@ namespace hpx { namespace parcelset
         /// Performance counter data
 
         /// number of parcels sent
-        boost::uint64_t get_parcel_send_count(bool reset)
-        {
-            return parcels_sent_.num_parcels(reset);
-        }
+        std::int64_t get_parcel_send_count(bool reset);
 
         /// number of messages sent
-        boost::uint64_t get_message_send_count(bool reset)
-        {
-            return parcels_sent_.num_messages(reset);
-        }
+        std::int64_t get_message_send_count(bool reset);
 
         /// number of parcels received
-        boost::uint64_t get_parcel_receive_count(bool reset)
-        {
-            return parcels_received_.num_parcels(reset);
-        }
+        std::int64_t get_parcel_receive_count(bool reset);
 
         /// number of messages received
-        boost::uint64_t get_message_receive_count(bool reset)
-        {
-            return parcels_received_.num_messages(reset);
-        }
+        std::int64_t get_message_receive_count(bool reset);
 
         /// the total time it took for all sends, from async_write to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_sending_time(bool reset)
-        {
-            return parcels_sent_.total_time(reset);
-        }
+        std::int64_t get_sending_time(bool reset);
 
         /// the total time it took for all receives, from async_read to the
         /// completion handler (nanoseconds)
-        boost::int64_t get_receiving_time(bool reset)
-        {
-            return parcels_received_.total_time(reset);
-        }
+        std::int64_t get_receiving_time(bool reset);
 
         /// the total time it took for all sender-side serialization operations
         /// (nanoseconds)
-        boost::int64_t get_sending_serialization_time(bool reset)
-        {
-            return parcels_sent_.total_serialization_time(reset);
-        }
+        std::int64_t get_sending_serialization_time(bool reset);
 
         /// the total time it took for all receiver-side serialization
         /// operations (nanoseconds)
-        boost::int64_t get_receiving_serialization_time(bool reset)
-        {
-            return parcels_received_.total_serialization_time(reset);
-        }
-
-#if defined(HPX_HAVE_SECURITY)
-        /// the total time it took for all sender-side security operations
-        /// (nanoseconds)
-        boost::int64_t get_sending_security_time(bool reset)
-        {
-            return parcels_sent_.total_security_time(reset);
-        }
-
-        /// the total time it took for all receiver-side security
-        /// operations (nanoseconds)
-        boost::int64_t get_receiving_security_time(bool reset)
-        {
-            return parcels_received_.total_security_time(reset);
-        }
-#endif
+        std::int64_t get_receiving_serialization_time(bool reset);
 
         /// total data sent (bytes)
-        boost::uint64_t get_data_sent(bool reset)
-        {
-            return parcels_sent_.total_bytes(reset);
-        }
+        std::int64_t get_data_sent(bool reset);
 
         /// total data (uncompressed) sent (bytes)
-        boost::uint64_t get_raw_data_sent(bool reset)
-        {
-            return parcels_sent_.total_raw_bytes(reset);
-        }
+        std::int64_t get_raw_data_sent(bool reset);
 
         /// total data received (bytes)
-        boost::uint64_t get_data_received(bool reset)
-        {
-            return parcels_received_.total_bytes(reset);
-        }
+        std::int64_t get_data_received(bool reset);
 
         /// total data (uncompressed) received (bytes)
-        boost::uint64_t get_raw_data_received(bool reset)
-        {
-            return parcels_received_.total_raw_bytes(reset);
-        }
+        std::int64_t get_raw_data_received(bool reset);
 
-        boost::int64_t get_buffer_allocate_time_sent(bool reset)
-        {
-            return parcels_sent_.total_buffer_allocate_time(reset);
-        }
+        std::int64_t get_buffer_allocate_time_sent(bool reset);
+        std::int64_t get_buffer_allocate_time_received(bool reset);
 
-        boost::int64_t get_buffer_allocate_time_received(bool reset)
-        {
-            return parcels_received_.total_buffer_allocate_time(reset);
-        }
+        std::int64_t get_pending_parcels_count(bool /*reset*/);
 
-        boost::uint64_t get_pending_parcels_count(bool /*reset*/)
-        {
-            std::lock_guard<lcos::local::spinlock> l(mtx_);
-            return pending_parcels_.size();
-        }
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        // same as above, just separated data for each action
+        // number of parcels sent
+        std::int64_t get_action_parcel_send_count(
+            std::string const&, bool reset);
+
+        // number of parcels received
+        std::int64_t get_action_parcel_receive_count(
+            std::string const&, bool reset);
+
+        // the total time it took for all sender-side serialization operations
+        // (nanoseconds)
+        std::int64_t get_action_sending_serialization_time(
+            std::string const&, bool reset);
+
+        // the total time it took for all receiver-side serialization
+        // operations (nanoseconds)
+        std::int64_t get_action_receiving_serialization_time(
+            std::string const&, bool reset);
+
+        // total data sent (bytes)
+        std::int64_t get_action_data_sent(
+            std::string const&, bool reset);
+
+        // total data received (bytes)
+        std::int64_t get_action_data_received(
+            std::string const&, bool reset);
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         void set_applier(applier::applier * applier)
@@ -310,26 +282,28 @@ namespace hpx { namespace parcelset
             applier_ = applier;
         }
 
-        void add_received_parcel(parcel p, std::size_t num_thread = std::size_t(-1));
-
         /// Update performance counter data
-        void add_received_data(performance_counters::parcels::data_point const& data)
-        {
-            parcels_received_.add_data(data);
-        }
+        void add_received_data(
+            performance_counters::parcels::data_point const& data);
 
-        void add_sent_data(performance_counters::parcels::data_point const& data)
-        {
-            parcels_sent_.add_data(data);
-        }
+        void add_sent_data(
+            performance_counters::parcels::data_point const& data);
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        void add_received_data(char const* action,
+            performance_counters::parcels::data_point const& data);
+
+        void add_sent_data(char const* action,
+            performance_counters::parcels::data_point const& data);
+#endif
 
         /// Return the configured maximal allowed message data size
-        boost::uint64_t get_max_inbound_message_size() const
+        std::int64_t get_max_inbound_message_size() const
         {
             return max_inbound_message_size_;
         }
 
-        boost::uint64_t get_max_outbound_message_size() const
+        std::int64_t get_max_outbound_message_size() const
         {
             return max_outbound_message_size_;
         }
@@ -356,6 +330,10 @@ namespace hpx { namespace parcelset
             return async_serialization_;
         }
 
+        // callback while bootstrap the parcel layer
+        void early_pending_parcel_handler(boost::system::error_code const& ec,
+            parcel const & p);
+
     protected:
         /// mutex for all of the member data
         mutable lcos::local::spinlock mtx_;
@@ -363,19 +341,15 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef std::list<naming::gid_type> new_gids_type;
-        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
         typedef util::tuple<
             std::shared_ptr<std::vector<parcel> >
           , std::vector<write_handler_type>
-          , new_gids_map
         >
 #else
         typedef util::tuple<
             std::vector<parcel>
           , std::vector<write_handler_type>
-          , new_gids_map
         >
 #endif
             map_second_type;
@@ -384,17 +358,24 @@ namespace hpx { namespace parcelset
 
         typedef std::set<locality> pending_parcels_destinations;
         pending_parcels_destinations parcel_destinations_;
+        boost::atomic<std::uint32_t> num_parcel_destinations_;
 
         /// The local locality
         locality here_;
 
         /// The maximally allowed message size
-        boost::uint64_t const max_inbound_message_size_;
-        boost::uint64_t const max_outbound_message_size_;
+        std::int64_t const max_inbound_message_size_;
+        std::int64_t const max_outbound_message_size_;
 
-        /// Parcel timers and their data containers.
+        /// Overall parcel statistics
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
+
+#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+        // Per-action based parcel statistics
+        detail::per_action_data_counter action_parcels_sent_;
+        detail::per_action_data_counter action_parcels_received_;
+#endif
 
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;

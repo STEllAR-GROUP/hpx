@@ -33,15 +33,16 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
+
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
 #include <qthread/qthread.h>
-
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -54,18 +55,18 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Applications globals.
-boost::atomic<boost::uint64_t> donecount(0);
+boost::atomic<std::uint64_t> donecount(0);
 
 // Command-line variables.
-boost::uint64_t tasks = 500000;
-boost::uint64_t delay = 0;
+std::uint64_t tasks = 500000;
+std::uint64_t delay = 0;
 bool header = true;
 
 // delay in seconds
 double delay_sec=0;
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    boost::uint64_t cores
+    std::uint64_t cores
   , double walltime
     )
 {
@@ -123,7 +124,7 @@ int qthreads_main(
         // Start the clock.
         high_resolution_timer t;
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (std::uint64_t i = 0; i < tasks; ++i)
             qthread_fork(&worker, nullptr, nullptr);
 
         // Yield until all our null qthreads are done.
@@ -153,19 +154,19 @@ int main(
        , "print out program usage (this message)")
 
         ( "shepherds,s"
-        , value<boost::uint64_t>()->default_value(1),
+        , value<std::uint64_t>()->default_value(1),
          "number of shepherds to use")
 
         ( "workers-per-shepherd,w"
-        , value<boost::uint64_t>()->default_value(1),
+        , value<std::uint64_t>()->default_value(1),
          "number of worker OS-threads per shepherd")
 
         ( "tasks"
-        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , value<std::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks (e.g. qthreads) to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(0)
+        , value<std::uint64_t>(&delay)->default_value(0)
         , "delay in micro-seconds for the loop")
 
 
@@ -187,9 +188,9 @@ int main(
 
     // Set qthreads environment variables.
     std::string const shepherds = std::to_string
-        (vm["shepherds"].as<boost::uint64_t>());
+        (vm["shepherds"].as<std::uint64_t>());
     std::string const workers = std::to_string
-        (vm["workers-per-shepherd"].as<boost::uint64_t>());
+        (vm["workers-per-shepherd"].as<std::uint64_t>());
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);
     setenv("QT_NUM_WORKERS_PER_SHEPHERD", workers.c_str(), 1);

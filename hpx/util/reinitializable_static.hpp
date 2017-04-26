@@ -8,22 +8,14 @@
 #define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static_reinit.hpp>
 
-#include <boost/aligned_storage.hpp>
-#include <boost/call_traits.hpp>
-
-#include <boost/utility/addressof.hpp>
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/alignment_of.hpp>
-
-#include <boost/thread/once.hpp>
-
+#include <cstddef>
 #include <memory>   // for placement new
+#include <type_traits>
 
 #if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC HPX_EXPORT
@@ -99,24 +91,28 @@ namespace hpx { namespace util
         }
 
     public:
-        typedef typename boost::call_traits<T>::reference reference;
-        typedef typename boost::call_traits<T>::const_reference const_reference;
+        typedef T& reference;
+        typedef T const& const_reference;
 
         reinitializable_static()
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            compat::call_once(constructed_,
                 &reinitializable_static::default_constructor);
+#endif
         }
 
         template <typename U>
         reinitializable_static(U const& val)
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            compat::call_once(constructed_,
                 util::bind(
                     &reinitializable_static::template value_constructor<U>,
-                    const_cast<U const *>(boost::addressof(val))));
+                    const_cast<U const *>(std::addressof(val))));
+#endif
         }
 
         operator reference()
@@ -140,19 +136,19 @@ namespace hpx { namespace util
         }
 
     private:
-        typedef typename boost::add_pointer<value_type>::type pointer;
+        typedef typename std::add_pointer<value_type>::type pointer;
 
         static pointer get_address(std::size_t item)
         {
             HPX_ASSERT(item < N);
-            return static_cast<pointer>(data_[item].address());
+            return reinterpret_cast<pointer>(data_ + item);
         }
 
-        typedef boost::aligned_storage<sizeof(value_type),
-            boost::alignment_of<value_type>::value> storage_type;
+        typedef typename std::aligned_storage<sizeof(value_type),
+            std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_[N];
-        static boost::once_flag constructed_;
+        static compat::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>
@@ -160,8 +156,8 @@ namespace hpx { namespace util
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag reinitializable_static<
-        T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
+    compat::once_flag reinitializable_static<
+        T, Tag, N>::constructed_;
 }}
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,28 +40,27 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
+    protected:
         typedef typename std::conditional<
             std::is_void<Result>::value, util::unused_type, Result
         >::type result_type;
 
-    protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
-        virtual ~base_lco_with_value() {}
+        virtual ~base_lco_with_value() HPX_NOEXCEPT {}
 
         virtual void set_event()
         {
-#if defined(HPX_MSVC) && defined(__NVCC__)
-            RemoteResult result;
-            set_value(std::move(result));
-#else
             set_value(RemoteResult());
-#endif
         }
 
         virtual void set_value (RemoteResult && result) = 0;
 
-        virtual result_type get_value(error_code& ec = throws) = 0;
+        virtual result_type get_value() = 0;
+        virtual result_type get_value(error_code& ec)
+        {
+            return get_value();
+        }
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -86,15 +85,17 @@ namespace hpx { namespace lcos
         ///
         /// \param result [in] The result value to be transferred from the
         ///               remote operation back to this LCO instance.
-        void set_value_nonvirt (RemoteResult && result)
+
+        void set_value_nonvirt (RemoteResult&& result)
         {
             set_value(std::move(result));
         }
 
-        /// The \a function get_result_nonvirt is called whenever a
+   /// The \a function get_result_nonvirt is called whenever a
         /// \a get_result_action is applied on this LCO instance. This
         /// function just forwards to the virtual function \a get_result, which
         /// is overloaded by the derived concrete LCO.
+
         Result get_value_nonvirt()
         {
             return util::void_guard<Result>(), get_value();
@@ -169,11 +170,22 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_DECLARATION(                                            \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name))                                  \
-    HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(                                \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
+        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(Value, RemoteValue, Name) \
+    typedef hpx::lcos::base_lco_with_value<Value, RemoteValue>                  \
+        BOOST_PP_CAT(base_lco_with_value_, Name);                               \
+    HPX_REGISTER_ACTION_DECLARATION(                                            \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        BOOST_PP_CAT(set_value_action_, Name))                                  \
+    HPX_REGISTER_ACTION_DECLARATION(                                            \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        BOOST_PP_CAT(get_value_action_, Name))                                  \
+    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
 
@@ -184,9 +196,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION(                                                        \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name))                                  \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
@@ -200,9 +209,6 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_ID(                                                     \
         hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
         BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
@@ -217,20 +223,22 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION_ID(                                                     \
         BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
         BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
-    HPX_REGISTER_TYPED_CONTINUATION(                                            \
-        Value                                                                   \
-      , BOOST_PP_CAT(typed_continuation_, Name))                                \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
-
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::gid_type>, vector_gid_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::id_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
+    hpx::naming::id_type, hpx::naming::gid_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::naming::id_type, naming_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
+    std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>,
+    vector_id_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::id_type>, vector_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
@@ -246,6 +254,9 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint32_t, uint32_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<bool>, vector_bool_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<std::uint32_t>, vector_std_uint32_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
 

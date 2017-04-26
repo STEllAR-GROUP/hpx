@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2016 Louisiana State University
+.. Copyright (c) 2007-2017 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,24 +7,27 @@
  HPX
 *****
 
-HPX is a general purpose C++ runtime system for parallel and distributed
-applications of any scale. Even if that's quite a mouthful, we mean every
-word of it!
+HPX is a C++ Standard Library for Concurrency and Parallelism. It implements
+all of the corresponding facilities as defined by the C++ Standard.
+Additionally, in HPX we implement functionalities proposed as part of the
+ongoing C++ standardization process. We also extend the C++ Standard APIs to
+the distributed case.
 
 The goal of HPX is to create a high quality, freely available, open source
-implementation of the ParalleX model for conventional systems, such as
+implementation of a new programming model for conventional systems, such as
 classic Linux based Beowulf clusters or multi-socket highly parallel SMP
 nodes. At the same time, we want to have a very modular and well designed
 runtime system architecture which would allow us to port our implementation
 onto new computer system architectures. We want to use real world applications
 to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
-smooth migration path for developers. The API exposed by HPX is modelled
-after the interfaces defined by the C++11/14 ISO standard and adheres to the
-programming guidelines used by the Boost collection of C++ libraries. We
-aim improve the scalability of today's applications and to expose new
-levels of parallelism which are necessary to take advantage
-of the exascale systems of the future.
+smooth migration path for developers.
+
+The API exposed by HPX is not only modelled after the interfaces defined by the
+C++11/14/17 ISO standard, it also adheres to the programming guidelines used by the
+Boost collection of C++ libraries. We aim to improve the scalability of today's
+applications and to expose new levels of parallelism which are necessary to
+take advantage of the exascale systems of the future.
 
 ****************************
 What's so special about HPX?
@@ -32,7 +35,7 @@ What's so special about HPX?
 
 * HPX exposes an uniform, standards-oriented API for ease of programming
   parallel and distributed applications.
-* It enables programmers to write fully asynchronous  code using hundreds
+* It enables programmers to write fully asynchronous code using hundreds
   of millions of threads.
 * HPX provides unified syntax and semantics for local and remote operations.
 * HPX makes concurrency manageable with dataflow and future based
@@ -51,24 +54,26 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.11) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.11/html/index.html>`_.
+The documentation for the latest release of HPX (currently V1.0) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.33656.svg
-     :target: http://dx.doi.org/10.5281/zenodo.33656
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
+     :target: https://doi.org/10.5281/zenodo.556772
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
 `here <http://stellar-group.github.io/hpx/docs/html/>`_. We also have a
-single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
+single-page version of the documentation
+`here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.11) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V1.0) which can be
+`downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
-our `contiguous integration results website <http://hermione.cct.lsu.edu/console>`_.
+our `contiguous integration results website <http://rostam.cct.lsu.edu/console>`_.
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
@@ -84,7 +89,8 @@ In any case, if you happen to run into problems we very much encourage and appre
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
-Also, if you have any questions feel free to ask it over at `stackoverflow <http://stackoverflow.com>`_
+Also, if you have any questions feel free to ask it over at
+`stackoverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
 ********************
@@ -125,7 +131,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.11
+            ~/downloads/hpx_0.9.99
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -181,7 +187,7 @@ OS X (Mac)
       cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
             -DBOOST_ROOT=~/packages/boost \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.11
+            ~/downloads/hpx_0.9.99
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -227,15 +233,17 @@ Windows
    "Where to build the binaries:", enter the full path to the build folder you
    created in step 2.
 
-5) Add CMake variable definitions (if any) by clicking the "Add Entry" button and selecting type
-   "String". Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
-   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is
-   located as HWLOC_ROOT.
+5) Add CMake variable definitions (if any) by clicking the "Add Entry" button
+   and selecting type "String". Most probably you will need to at least add the
+   directories where `Boost <http://www.boost.org>`_ is located as BOOST_ROOT
+   and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is located as
+   HWLOC_ROOT.
 
 6) Press the "Configure" button. A window will pop up asking you which compiler
-   to use. Select the x64 Visual Studio 2012 compiler. Note that while it is possible to build HPX for x86
-   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
-   Windows system limitation affecting the number of HPX threads you can create.
+   to use. Select the x64 Visual Studio 2012 compiler. Note that while it is
+   possible to build HPX for x86 we don't recommend doing so as 32 bit runs are
+   severely restricted by a 32 bit Windows system limitation affecting the number
+   of HPX threads you can create.
 
 7) If the "Generate" button is not clickable, press "Configure" again. Repeat
    this step until the "Generate" button becomes clickable.
@@ -337,55 +345,6 @@ For more detailed information about building HPX for the Xeon/Phi please refer t
 the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.intel_mic_installation>`_.
 
 
-
-******************
- Docker
-******************
-
-We also provide several HPX docker images.
-Those can be used for rapid prototyping, demonstrations or writing minimal
-examples for issue reports. This also provides an HPX build environment for
-continuous integration of external projects.
-
-The following images are currently available:
-
-* ``stellargroup/hpx:dev``      (HEAD, updated on every commit to master which
-  builds successfully, see
-  `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
-  build status)
-* ``stellargroup/hpx:latest``   (latest release)
-* ``stellargroup/hpx:0.9.11``   (release v0.9.11)
-* ``stellargroup/hpx:0.9.10``   (release v0.9.10)
-
-While a more detailed introduction to docker can be found at the official
-`docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
-steps that explain how to use a docker image::
-
-    # Download/Update the image
-    docker pull stellargroup/hpx:dev
-
-    # Run a command.
-    # NOTICE: Docker images are read-only and will be reset after execution.
-    docker run stellargroup/hpx:dev hello_world
-
-    # Mount a host directory to make changes persistent.
-    # In this case, mount the current host directory $PWD to /hpx in the
-    # dockerfile via '-v'.
-    # Also, make /hpx the current working directory with '-w'.
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev <command> <arguments>
-
-    # For example, build the binary "example" from "example.cpp" using
-    # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
-    # other than the core library have to be linked explicitly (like hpx_iostreams).
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
-        hpxcxx example.cpp --exe=example -lhpx_iostreams
-
-    # Now run the resulting program:
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example
-
-
-
-
 ******************
  Acknowledgements
 ******************
@@ -424,3 +383,7 @@ HPX is currently funded by
 
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through
   the grant AZ-987-11.
+
+* The European Commission's Horizon 2020 programme through the grant
+  H2020-EU.1.2.2. 671603 (AllScale).
+

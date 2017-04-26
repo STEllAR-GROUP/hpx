@@ -24,7 +24,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -119,7 +119,7 @@ namespace hpx { namespace lcos
     /// \param ids       [in] A list of global identifiers identifying the
     ///                  target objects for which the given action will be
     ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    /// \param argN      [in] Any number of arbitrary arguments (passed
     ///                  by const reference) which will be forwarded to the
     ///                  action invocation.
     ///
@@ -152,6 +152,9 @@ namespace hpx { namespace lcos
 
 #include <boost/preprocessor/cat.hpp>
 
+#include <cstddef>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #if !defined(HPX_BROADCAST_FANOUT)
@@ -181,8 +184,8 @@ namespace hpx { namespace lcos
                 >::type
                 action_result;
             typedef
-                typename boost::mpl::if_<
-                    boost::is_same<void, action_result>
+                typename std::conditional<
+                    std::is_same<void, action_result>::value
                   , void
                   , std::vector<action_result>
                 >::type
@@ -205,7 +208,7 @@ namespace hpx { namespace lcos
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , std::size_t global_idx
-          , boost::mpl::false_
+          , std::false_type
           , Ts const&... vs
         );
 
@@ -219,7 +222,7 @@ namespace hpx { namespace lcos
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , std::size_t global_idx
-          , boost::mpl::true_
+          , std::true_type
           , Ts const&... vs
         );
 
@@ -422,7 +425,7 @@ namespace hpx { namespace lcos
 
             typedef detail::broadcast_invoker<
                         Action
-                      , typename boost::is_same<void, action_result>::type
+                      , typename std::is_void<action_result>::type
                       , typename util::tuple_element<
                             Is, typename Action::arguments_type
                         >::type...
@@ -537,7 +540,7 @@ namespace hpx { namespace lcos
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , std::size_t global_idx
-          , boost::mpl::true_
+          , std::true_type
           , Ts const&... vs
         )
         {
@@ -586,7 +589,7 @@ namespace hpx { namespace lcos
                           , act
                           , std::move(ids_next)
                           , global_idx + applied
-                          , boost::integral_constant<bool, true>::type()
+                          , std::true_type()
                           , vs...
                         )
                     );
@@ -610,7 +613,7 @@ namespace hpx { namespace lcos
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , std::size_t global_idx
-          , boost::mpl::false_
+          , std::false_type
           , Ts const&... vs
         )
         {
@@ -668,7 +671,7 @@ namespace hpx { namespace lcos
                           , act
                           , std::move(ids_next)
                           , global_idx + applied
-                          , boost::integral_constant<bool, false>::type()
+                          , std::false_type()
                           , vs...
                         )
                     );
@@ -783,7 +786,7 @@ namespace hpx { namespace lcos
               , Action()
               , ids
               , std::size_t(0)
-              , typename boost::is_same<void, action_result>::type()
+              , std::is_void<action_result>()
               , vs...
             );
     }
@@ -824,7 +827,7 @@ namespace hpx { namespace lcos
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::broadcast_apply",
-                "empty list of of targets for broadcast operation");
+                "empty list of targets for broadcast operation");
             return;
         }
 

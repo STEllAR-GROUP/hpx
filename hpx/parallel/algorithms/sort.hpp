@@ -17,8 +17,9 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/traits/projected.hpp>
@@ -30,6 +31,8 @@
 #include <boost/exception_ptr.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -43,52 +46,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R>
-        struct handle_sort_exception
-        {
-            static hpx::future<R> call(hpx::future<R> f)
-            {
-                HPX_ASSERT(f.has_exception());
-
-                // Intel complains if this is not explicitly moved
-                return std::move(f);
-            }
-
-            static hpx::future<R> call(boost::exception_ptr const& e)
-            {
-                try {
-                    boost::rethrow_exception(e);
-                }
-                catch (std::bad_alloc const&) {
-                    // rethrow bad_alloc
-                    return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
-                }
-                catch (...) {
-                    // package up everything else as an exception_list
-                    return hpx::make_exceptional_future<R>(
-                        exception_list(e));
-                }
-            }
-        };
-
-        template <typename R>
-        struct handle_sort_exception<parallel_vector_execution_policy, R>
-        {
-            HPX_ATTRIBUTE_NORETURN
-            static hpx::future<R> call(hpx::future<void> &&)
-            {
-                hpx::terminate();
-            }
-
-            HPX_ATTRIBUTE_NORETURN
-            static hpx::future<R> call(boost::exception_ptr const&)
-            {
-                hpx::terminate();
-            }
-        };
 
         ///////////////////////////////////////////////////////////////////////
         // std::is_sorted is not available on all supported platforms yet
@@ -260,13 +217,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::ref(policy), first, last, comp);
             }
             catch (...) {
-                return detail::handle_sort_exception<ExPolicy, RandomIt>::call(
+                return detail::handle_exception<ExPolicy, RandomIt>::call(
                     boost::current_exception());
             }
 
             if (result.has_exception())
             {
-                return detail::handle_sort_exception<ExPolicy, RandomIt>::call(
+                return detail::handle_exception<ExPolicy, RandomIt>::call(
                     std::move(result));
             }
 
@@ -365,37 +322,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in the
+    /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
     ///           \a hpx::future<RandomIt> if the execution policy is of
     ///           type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and returns \a RandomIt
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a RandomIt
     ///           otherwise.
     ///           The algorithm returns an iterator pointing to the first
     ///           element after the last element in the input sequence.
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, typename RandomIt,
         typename Proj = util::projection_identity,
-        typename Compare = std::less<
-            typename std::remove_reference<
-                typename traits::projected_result_of<Proj, RandomIt>::type
-            >::type
-        >,
+        typename Compare = detail::less,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<RandomIt>::value &&
         traits::is_projected<Proj, RandomIt>::value &&
         traits::is_indirect_callable<
-            Compare,
+            ExPolicy, Compare,
                 traits::projected<Proj, RandomIt>,
                 traits::projected<Proj, RandomIt>
         >::value)>
@@ -407,7 +360,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
-        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::sort<RandomIt>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

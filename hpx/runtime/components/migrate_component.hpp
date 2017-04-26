@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,13 +13,14 @@
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/server/migrate_component.hpp>
 #include <hpx/runtime/components/target_distribution_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -47,7 +48,7 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_component<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
         future<naming::id_type>
@@ -86,7 +87,7 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     Derived
 #else
-    inline typename boost::enable_if_c<
+    inline typename std::enable_if<
         traits::is_distribution_policy<DistPolicy>::value, Derived
     >::type
 #endif
@@ -119,8 +120,8 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<naming::id_type>
 #else
-    inline typename boost::enable_if<
-        traits::is_component<Component>, future<naming::id_type>
+    inline typename std::enable_if<
+        traits::is_component<Component>::value, future<naming::id_type>
     >::type
 #endif
     migrate(naming::id_type const& to_migrate,

@@ -15,12 +15,12 @@ described in the table below:
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*__hpx__ options (allowed on command line only)]]]
-    [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
-                                             values: 'full' (additionally prints options from components)]]
-    [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
-    [[`--hpx:info`]                         [print out __hpx__ configuration information]]
-    [[`--hpx:options-file arg`]             [specify a file containing command line options
-                                             (alternatively: @filepath)]]
+    [[`--hpx:help`]             [print out program usage (default: this message), possible
+                                 values: 'full' (additionally prints options from components)]]
+    [[`--hpx:version`]          [print out __hpx__ version and copyright information]]
+    [[`--hpx:info`]             [print out __hpx__ configuration information]]
+    [[`--hpx:options-file arg`] [specify a file containing command line options
+                                 (alternatively: @filepath)]]
 
     [[[*__hpx__ options (additionally allowed in an options file)]]]
     [[`--hpx:worker`]           [run this instance in worker mode]]
@@ -69,7 +69,7 @@ described in the table below:
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
-    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__ locality
+    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
@@ -85,8 +85,9 @@ described in the table below:
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
-                                 'local/l', 'local-priority/lo', 'abp/a', 'abp-priority',
-                                 'hierarchy/h', and 'periodic/pe' (default: local-priority/lo)]]
+                                 'local/l', 'local-priority-fifo/lo', 'local-priority-lifo', 'abp/a',
+                                 'abp-priority', 'hierarchy/h', and 'periodic/pe'
+                                 (default: local-priority-fifo/lo)]]
     [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
                                  `--hpx:queuing=hierarchy` only (default: 2)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
@@ -121,6 +122,9 @@ described in the table below:
                                        log channel and send all parcel transport
                                        logs to the target destination (default:
                                        cout)]]
+    [[`--hpx:debug-timing-log [arg]`] [enable all messages on the timing log
+                                       channel and send all timing logs to the
+                                       target destination (default: cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
                                     `startup` or `exception` (default: startup)]]
@@ -128,6 +132,10 @@ described in the table below:
     [[[*__hpx__ options related to performance counters]]]
     [[`--hpx:print-counter`]    [print the specified performance counter either
         repeatedly and/or at the times specified by `--hpx:print-counter-at`
+        (see also option `--hpx:print-counter-interval`)]]
+    [[`--hpx:print-counter-reset`] [print the specified performance counter either
+        repeatedly and/or at the times specified by `--hpx:print-counter-at`,
+        reset the counter after the value is queried.
         (see also option `--hpx:print-counter-interval`)]]
     [[`--hpx:print-counter-interval`][print the performance counter(s)
         specified with `--hpx:print-counter` repeatedly after the time interval
@@ -153,10 +161,20 @@ described in the table below:
         `--hpx:print-counter` and `csv` or `csv-short` format specified with
         `--hpx:print-counter-format` without header]]
     [[`--hpx:printer-counter-at arg`][print the performance counter(s)
-        specified with `--hpx:print-counter` at the given point in time,
+        specified with `--hpx:print-counter` (or `--hpx:print-counter-reset`)
+        at the given point in time,
         possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
-    [[`--hpx:reset-counters`][reset the performance counter(s) specified with
+    [[`--hpx:reset-counters`][reset all performance counter(s) specified with
         `--hpx:print-counter` after they have been evaluated]]
+    [[`--hpx:print-counter-at`][print the performance counter(s) specified with
+        `--hpx:print-counter` (or `--hpx:print-counter-reset`) at the given
+        point in time, possible argument are values: 'startup',
+        'shutdown' (default), 'noshutdown'.]]
+    [[`--hpx:print-counters-locally`]
+     [Each locality prints only its own local counters. If this is used with
+      `--hpx-print-counter-destination=<file>, the code will append a
+      `".<locality_id>"` to the file name in order to avoid clashes between
+      localities.]]
 ]
 
 [heading Command Line Argument Shortcuts]
@@ -196,7 +214,7 @@ every __hpx__ application.
 
 It is possible to define your own shortcut options. In fact, all of the shortcuts
 listed above are pre-defined using the technique described here.
-In fact, it is possible to redefine any of the pre-defined shortcuts to expand
+Also, it is possible to redefine any of the pre-defined shortcuts to expand
 differently as well.
 
 Shortcut options are obtained from the internal configuration database. They are
@@ -207,7 +225,7 @@ __configuration__. For instance, in order to define a command line shortcut
 `--pc` which should expand to `--hpx:print-counter`, the following configuration
 information needs to be added to one of the `ini` configuration files:
 ``
-    [hpx.commandline]
+    [hpx.commandline.aliases]
     --pc = --hpx:print-counter
 ``
 [teletype]

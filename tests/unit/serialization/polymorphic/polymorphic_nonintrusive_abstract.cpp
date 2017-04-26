@@ -12,6 +12,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -124,7 +125,7 @@ int main()
         iarchive >> b1;
         iarchive >> hpx::serialization::detail::raw_ptr(b2);
 
-        HPX_TEST(b2 != 0);
+        HPX_TEST(b2 != nullptr);
 
         HPX_TEST_EQ(d.print(), b1.print());
         HPX_TEST_EQ(d.size(), b1.size());

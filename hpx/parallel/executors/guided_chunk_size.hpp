@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -31,7 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// chunk size parameter defines the minimum block size. The default chunk
     /// size is 1.
     ///
-    /// \note This executor parameters type is equivalent to OpenMPs GUIDED
+    /// \note This executor parameters type is equivalent to OpenMP's GUIDED
     ///       scheduling directive.
     ///
     struct guided_chunk_size : executor_parameters_tag
@@ -43,27 +44,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                     schedule together.
         ///                     The default minimal chunk size is 1.
         ///
-        explicit guided_chunk_size(std::size_t min_chunk_size = 1)
+        HPX_CONSTEXPR explicit
+        guided_chunk_size(std::size_t min_chunk_size = 1)
           : min_chunk_size_(min_chunk_size)
         {}
 
         /// \cond NOINTERNAL
         // This executor parameters type provides variable chunk sizes and
         // needs to be invoked for each of the chunks to be combined.
-        template <typename Executor>
-        static bool variable_chunk_size(Executor&)
-        {
-            return true;
-        }
+        typedef std::true_type has_variable_chunk_size;
+
+//         template <typename Executor>
+//         static std::size_t get_maximal_number_of_chunks(
+//             Executor && exec, std::size_t cores, std:size_t num_tasks)
+//         {
+//             // FIXME: find appropriate approximation
+//             return ...;
+//         }
 
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t num_tasks)
+        HPX_CONSTEXPR std::size_t
+        get_chunk_size(Executor && exec, F &&, std::size_t cores,
+            std::size_t num_tasks)
         {
-            std::size_t const cores = executor_information_traits<Executor>::
-                processing_units_count(exec, *this);
-            std::size_t chunk = (num_tasks + cores - 1) / cores;
-
-            return (std::max)(min_chunk_size_, chunk);
+            return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }
         /// \endcond
 

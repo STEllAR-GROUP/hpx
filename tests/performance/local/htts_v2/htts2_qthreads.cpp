@@ -13,7 +13,11 @@
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>
 
-typedef boost::chrono::steady_clock BaseClock;
+#include <chrono>
+#include <cstdint>
+#include <iostream>
+
+typedef std::chrono::steady_clock BaseClock;
 
 extern "C" void stage_tasks(
     size_t start,
@@ -21,7 +25,7 @@ extern "C" void stage_tasks(
     void* payload_duration_
     )
 {
-    htts2::payload<BaseClock>(reinterpret_cast<boost::uint64_t>
+    htts2::payload<BaseClock>(reinterpret_cast<std::uint64_t>
         (payload_duration_ /* = p */));
 }
 

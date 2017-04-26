@@ -12,16 +12,19 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void barrier_test(hpx::id_type const& id, boost::atomic<std::size_t>& c)
+void barrier_test(std::size_t num, std::size_t rank, boost::atomic<std::size_t>& c)
 {
+    hpx::lcos::barrier b("local_barrier_test", num, rank);
     ++c;
 
     // wait for all threads to enter the barrier
-    hpx::lcos::stubs::barrier::wait(id);
+    b.wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,17 +41,13 @@ void local_tests(boost::program_options::variables_map& vm)
     hpx::id_type here = hpx::find_here();
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        using hpx::lcos::barrier;
-
-        // create a barrier waiting on 'count' threads
-        barrier b = barrier::create(here, pxthreads + 1);
-
         boost::atomic<std::size_t> c(0);
         for (std::size_t j = 0; j < pxthreads; ++j)
         {
-            hpx::async(hpx::util::bind(&barrier_test, b.get_id(), boost::ref(c)));
+            hpx::async(hpx::util::bind(&barrier_test, pxthreads + 1, j, std::ref(c)));
         }
 
+        hpx::lcos::barrier b("local_barrier_test", pxthreads + 1, pxthreads);
         b.wait();       // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c.load());
     }
@@ -57,39 +56,15 @@ void local_tests(boost::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 void remote_test_multiple(boost::program_options::variables_map& vm)
 {
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    if (localities.size() == 1)
-        return;     // nothing to be done here
-
     std::size_t iterations = 0;
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
 
-    using hpx::lcos::barrier;
-
     char const* const barrier_test_name = "/test/barrier/multiple";
 
-    hpx::id_type here = hpx::find_here();
-    if (hpx::find_root_locality() == here)
-    {
-        // create the barrier, register it with AGAS
-        barrier b = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
-
-        for (std::size_t i = 0; i != iterations; ++i)
-            b.wait();
-
-        HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
-    }
-    else
-    {
-        hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                barrier_test_name, hpx::agas::symbol_ns_bind, true).get();
-        hpx::lcos::barrier b(id);
-
-        for (std::size_t i = 0; i != iterations; ++i)
-            b.wait();
-    }
+    hpx::lcos::barrier b(barrier_test_name);
+    for (std::size_t i = 0; i != iterations; ++i)
+        b.wait();
 }
 
 void remote_test_single(boost::program_options::variables_map& vm)
@@ -102,50 +77,17 @@ void remote_test_single(boost::program_options::variables_map& vm)
     if (vm.count("iterations"))
         iterations = vm["iterations"].as<std::size_t>();
 
-    using hpx::lcos::barrier;
-
     char const* const barrier_test_name_outer = "/test/barrier/single_outer";
-
-    barrier outer;
-    hpx::id_type here = hpx::find_here();
-    if (hpx::find_root_locality() == here)
-    {
-        outer = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name_outer,
-            outer.get_id()));
-    }
-    else
-    {
-        hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                barrier_test_name_outer, hpx::agas::symbol_ns_bind, true).get();
-        outer = barrier(id);
-    }
+    hpx::lcos::barrier outer(barrier_test_name_outer);
 
     char const* const barrier_test_name = "/test/barrier/single";
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        if (hpx::find_root_locality() == here)
-        {
-            // create the barrier, register it with AGAS
-            barrier b = barrier::create(here, localities.size());
-            HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
-
-            b.wait();
-
-            HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name));
-        }
-        else
-        {
-            hpx::id_type id = hpx::agas::on_symbol_namespace_event(
-                    barrier_test_name, hpx::agas::symbol_ns_bind, true).get();
-            hpx::lcos::barrier b(id);
-            b.wait();
-        }
+        hpx::lcos::barrier b(barrier_test_name);
+        b.wait();
 
         outer.wait();
     }
-
-    HPX_TEST(hpx::agas::unregister_name_sync(barrier_test_name_outer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,11 +118,10 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
-    cfg += "hpx.run_hpx_main!=1";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all",
+        "hpx.run_hpx_main!=1"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

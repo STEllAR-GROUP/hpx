@@ -13,6 +13,9 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <cstddef>
+#include <sstream>
+
 namespace hpx { namespace threads { namespace detail
 {
     inline void create_thread(
@@ -24,6 +27,8 @@ namespace hpx { namespace threads { namespace detail
         // verify parameters
         switch (initial_state) {
         case pending:
+        case pending_do_not_schedule:
+        case pending_boost:
         case suspended:
             break;
 
@@ -51,7 +56,7 @@ namespace hpx { namespace threads { namespace detail
         thread_self* self = get_self_ptr();
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-        if (0 == data.parent_id) {
+        if (nullptr == data.parent_id) {
             if (self)
             {
                 data.parent_id = threads::get_self_id().get();
@@ -62,7 +67,7 @@ namespace hpx { namespace threads { namespace detail
             data.parent_locality_id = get_locality_id();
 #endif
 
-        if (0 == data.scheduler_base)
+        if (nullptr == data.scheduler_base)
             data.scheduler_base = scheduler;
 
         // Pass critical priority from parent to child.

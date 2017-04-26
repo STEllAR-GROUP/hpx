@@ -13,6 +13,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -60,7 +62,7 @@ int hpx_main(variables_map& vm)
         // create the threads which will wait on the barrier
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work(hpx::util::bind
-                (&local_barrier_test, boost::ref(b), boost::ref(c)));
+                (&local_barrier_test, std::ref(b), std::ref(c)));
 
         b.wait(); // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c);
@@ -86,10 +88,9 @@ int main(int argc, char* argv[])
         ;
 
     // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        std::to_string(hpx::threads::hardware_concurrency());
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=all"
+    };
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,

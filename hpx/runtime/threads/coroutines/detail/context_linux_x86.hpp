@@ -1,6 +1,6 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
 //
@@ -21,12 +21,12 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <sys/param.h>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #if defined(HPX_HAVE_VALGRIND)
@@ -50,11 +50,9 @@
 #if defined(__x86_64__)
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
-extern "C" void swapcontext_stack3 (void***, void**) throw();
 #else
 extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
 extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
-extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm(2)));
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,7 +139,7 @@ namespace hpx { namespace threads { namespace coroutines
             typedef x86_linux_context_impl_base context_impl_base;
 
             x86_linux_context_impl()
-                : m_stack(0)
+                : m_stack(nullptr)
             {}
 
             /**
@@ -153,7 +151,7 @@ namespace hpx { namespace threads { namespace coroutines
               : m_stack_size(stack_size == -1
                   ? static_cast<std::ptrdiff_t>(default_stack_size)
                   : stack_size),
-                m_stack(0)
+                m_stack(nullptr)
             {
                 if (0 != (m_stack_size % EXEC_PAGESIZE))
                 {
@@ -243,7 +241,7 @@ namespace hpx { namespace threads { namespace coroutines
                     context_size;
             }
 
-            typedef boost::atomic<boost::int64_t> counter_type;
+            typedef boost::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_unbind_counter()
             {
@@ -251,12 +249,12 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static boost::uint64_t get_stack_unbind_count(bool reset)
+            static std::uint64_t get_stack_unbind_count(bool reset)
             {
                 return util::get_and_reset_value(get_stack_unbind_counter(), reset);
             }
 
-            static boost::uint64_t increment_stack_unbind_count()
+            static std::uint64_t increment_stack_unbind_count()
             {
                 return ++get_stack_unbind_counter();
             }
@@ -267,12 +265,12 @@ namespace hpx { namespace threads { namespace coroutines
                 return counter;
             }
 
-            static boost::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t get_stack_recycle_count(bool reset)
             {
                 return util::get_and_reset_value(get_stack_recycle_counter(), reset);
             }
 
-            static boost::uint64_t increment_stack_recycle_count()
+            static std::uint64_t increment_stack_recycle_count()
             {
                 return ++get_stack_recycle_counter();
             }

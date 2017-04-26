@@ -22,11 +22,9 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/ref.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {
@@ -126,7 +124,7 @@ namespace hpx { namespace util
         template <typename Action, typename Continuation, typename Ts,
             typename Us>
         HPX_FORCEINLINE
-        typename boost::enable_if_c<
+        typename std::enable_if<
             traits::is_continuation<Continuation>::value, bool
         >::type
         bind_action_apply_cont2(Continuation && cont,
@@ -238,7 +236,7 @@ namespace hpx { namespace util
 
             template <typename Continuation, typename ...Us>
             HPX_FORCEINLINE
-            typename boost::enable_if_c<
+            typename std::enable_if<
                 traits::is_continuation<Continuation>::value, bool
             >::type
             apply_c(Continuation && cont, Us&&... us) const
@@ -273,7 +271,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
-    typename boost::enable_if_c<
+    typename std::enable_if<
         traits::is_action<typename util::decay<Action>::type>::value
       , detail::bound_action<
             typename util::decay<Action>::type
@@ -318,12 +316,12 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename BoundArgs>
     struct is_bind_expression<util::detail::bound_action<Action, BoundArgs> >
-      : boost::mpl::true_
+      : std::true_type
     {};
 
     template <typename Action, typename BoundArgs>
     struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
-      : boost::mpl::true_
+      : std::true_type
     {};
 }}
 

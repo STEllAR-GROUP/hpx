@@ -9,13 +9,19 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <hpx/runtime/serialization/detail/preprocess.hpp>
+
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 // This function will never be called
@@ -26,13 +32,13 @@ int test_function(hpx::serialization::serialize_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function, test_action)
 
 std::size_t get_archive_size(hpx::parcelset::parcel const& p,
-    boost::uint32_t flags,
+    std::uint32_t flags,
     std::vector<hpx::serialization::serialization_chunk>* chunks)
 {
     // gather the required size for the archive
-    hpx::serialization::detail::size_gatherer_container gather_size;
+    hpx::serialization::detail::preprocess gather_size;
     hpx::serialization::output_archive archive(
-        gather_size, flags, 0, chunks);
+        gather_size, flags, chunks);
     archive << p;
     return gather_size.size();
 }
@@ -44,7 +50,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function));
+        reinterpret_cast<std::uint64_t>(&test_function));
 
     // compose archive flags
 #ifdef BOOST_BIG_ENDIAN
@@ -76,7 +82,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     {
         std::string zero_copy_optimization =
             hpx::get_config_entry("hpx.parcel.zero_copy_optimization", "1");
-        if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+        if (!zerocopy || boost::lexical_cast<int>(zero_copy_optimization) == 0)
         {
             out_archive_flags |= hpx::serialization::disable_data_chunking;
         }
@@ -91,25 +97,29 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;
+    hpx::naming::gid_type dest = here.get_gid();
     if (continuation) {
-        outp = hpx::parcelset::parcel(here, addr,
+        outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
+            std::true_type(),
+            std::move(dest), std::move(addr),
             hpx::actions::typed_continuation<int>(here),
             test_action(), hpx::threads::thread_priority_normal, buffer
-            );
+            ));
     }
     else {
-        outp = hpx::parcelset::parcel(here, addr,
-            test_action(), hpx::threads::thread_priority_normal, buffer);
+        outp = hpx::parcelset::parcel(hpx::parcelset::detail::create_parcel::call(
+            std::false_type(),
+            std::move(dest), std::move(addr),
+            test_action(), hpx::threads::thread_priority_normal, buffer));
     }
 
-    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
     outp.set_source_id(here);
 
     std::vector<hpx::serialization::serialization_chunk>* chunks = nullptr;
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    boost::uint32_t dest_locality_id = outp.destination_locality_id();
+    std::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
@@ -122,7 +132,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an output archive and serialize the parcel
             hpx::serialization::output_archive archive(
-                out_buffer, out_archive_flags, dest_locality_id, chunks);
+                out_buffer, out_archive_flags, chunks);
             archive << outp;
             arg_size = archive.bytes_written();
         }

@@ -16,6 +16,7 @@
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -30,7 +31,7 @@ public:
     set_args_()
     {
         args_.resize(1);
-        args_[0] = 0;
+        args_[0] = nullptr;
     }
 
     explicit set_args_(const Range &args)
@@ -42,7 +43,7 @@ public:
             string_args_[i] = args[i];
             args_[i] = const_cast<char*>(string_args_[i].c_str());
         }
-        args_[args.size()] = 0;
+        args_[args.size()] = nullptr;
     }
 
     template <class PosixExecutor>
@@ -72,7 +73,7 @@ private:
         {
             args_[i] = const_cast<char*>(string_args_[i].c_str());
         }
-        args_[string_args_.size()] = 0;
+        args_[string_args_.size()] = nullptr;
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,8 @@
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
 #include <boost/exception_ptr.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace lcos
 {
@@ -110,21 +112,6 @@ namespace hpx { namespace lcos
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, disconnect_nonvirt,
             disconnect_action);
-
-        // Internal: The following functions are used for promise
-        // AGAS memory management
-        virtual void add_ref()
-        {
-            HPX_ASSERT(false);
-        }
-        virtual void release()
-        {
-            HPX_ASSERT(false);
-        }
-        virtual long count() const {
-            HPX_ASSERT(false);
-            return 0;
-        }
     };
 }}
 

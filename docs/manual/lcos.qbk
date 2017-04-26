@@ -20,11 +20,73 @@ special different ways adapted to HPX.
 
 # barrier
 
-# and_gate
+[heading Channels]
 
-# barrier
+Channels combine communication (the exchange of a value) with
+synchronization (guaranteeing that two calculations (tasks) are in a known
+state). A channel can transport any number of values of a given type from
+a sender to a receiver:
 
-# composable_guard - Composable guards operate in a manner similar to locks, but
+    hpx::lcos::local::channel<int> c;
+    c.set(42);
+    cout << c.get();      // will print '42'
+
+Channels can be handed to another thread (or in case of channel components,
+to other localities), thus establishing a communication channel between two
+independent places in the program:
+
+    void do_something(
+        hpx::lcos::local::receive_channel<int> c,
+        hpx::lcos::local::send_channel<> done)
+    {
+        cout << c.get();        // prints 42
+        done.set();             // signal back
+    }
+
+    {
+        hpx::lcos::local::channel<int> c;
+        hpx::lcos::local::channel<> done;
+
+        hpx::apply(&do_something, c, done);
+
+        c.set(42);              // send some value
+        done.get();             // wait for thread to be done
+    }
+
+A channel component is created on one locality and can be send to another
+locality using an action. This example also demonstrates how a channel can be
+used as a range of values:
+
+    // channel components need to be registered for each used type (not needed
+    // for hpx::lcos::local::channel)
+    HPX_REGISTER_CHANNEL(double);
+
+    void some_action(hpx::lcos::channel<double> c)
+    {
+        for (double d : c)
+            hpx::cout << d << std::endl;
+    }
+    HPX_REGISTER_ACTION(some_action);
+
+    {
+        // create the channel on this locality
+        hpx::lcos::channel<double> c(hpx::find_here());
+
+        // pass the channel to a (possibly remote invoked) action
+        hpx::apply(some_action(), hpx::find_here(), c);
+
+        // send some values to the receiver
+        std::vector<double> v = { 1.2, 3.4, 5.0 };
+        for (double d : v)
+            c.set(d);
+
+        // explicitly close the communication channel (implicit at destruction)
+        c.close();
+    }
+
+[heading Composable Guards]
+
+Composable guards operate in a manner similar to locks, but
 are applied only to asynchronous functions. The guard (or guards) is automatically
 locked at the beginning of a specified task and automatically unlocked at the end.
 Because guards are never added to an existing task's execution context, the calling
@@ -101,7 +163,7 @@ asynchronous operations to `hpx::future`, `hpx::shared_future`, and
     data to it. The current C++ standard does not allow one to register a
     continuation to a future. With `then`, instead of waiting for the result, a
     continuation is "attached" to the asynchronous operation, which is invoked
-    when the result is ready. Continuations registered using the then function
+    when the result is ready. Continuations registered using then function
     will help to avoid blocking waits or wasting threads on polling, greatly
     improving the responsiveness and scalability of an application.]]
  [[unwrapping constructor for `hpx::future`]

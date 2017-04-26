@@ -23,8 +23,10 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -46,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static std::pair<InIter, OutIter>
             sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                return util::move_helper(first, last, dest);
+                return util::move(first, last, dest);
             }
 
             template <typename ExPolicy, typename FwdIter, typename OutIter>
@@ -64,14 +66,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
-                        [](std::size_t, zip_iterator part_begin,
-                            std::size_t part_size)
+                        [](zip_iterator part_begin, std::size_t part_size,
+                            std::size_t)
                         {
                             using hpx::util::get;
 
-                            auto const& iters = part_begin.get_iterator_tuple();
-                            util::move_n_helper(get<0>(iters), part_size,
-                                get<1>(iters));
+                            auto iters = part_begin.get_iterator_tuple();
+                            util::move_n(get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator && last) -> zip_iterator
                         {
@@ -138,20 +139,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// The move assignments in the parallel \a move algorithm invoked
     /// with an execution policy object of type
-    /// \a sequential_execution_policy execute in sequential order in
+    /// \a sequenced_policy execute in sequential order in
     /// the calling thread.
     ///
     /// The move assignments in the parallel \a move algorithm invoked
     /// with an execution policy object of type
-    /// \a parallel_execution_policy or \a parallel_task_execution_policy are
+    /// \a parallel_policy or \a parallel_task_policy are
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a
     ///           \a  hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a move algorithm returns the pair of the input iterator
@@ -161,7 +162,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<

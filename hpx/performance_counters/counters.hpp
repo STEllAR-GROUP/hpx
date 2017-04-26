@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,12 +11,14 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstddef>
+#include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +138,20 @@ namespace hpx { namespace performance_counters
         ///           number of time units that elapse in one second.
         /// Average:  (Dx - N0) / F
         /// Type:     Difference
-        counter_elapsed_time
+        counter_elapsed_time,
+
+        /// \a counter_histogram exposes a histogram of the measured values
+        /// instead of a single value as many of the other counter types.
+        /// Counters of this type expose a \a counter_value_array instead of a
+        /// \a counter_value. Those will also not implement the
+        /// \a get_counter_value() functionality. The results are exposed
+        /// through a separate \a get_counter_values_array() function.
+        ///
+        /// The first three values in the returned array represent the lower
+        /// and upper boundaries, and the size of the histogram buckets. All
+        /// remaining values in the returned array represent the number of
+        /// measurements for each of the buckets in the histogram.
+        counter_histogram
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -223,7 +238,7 @@ namespace hpx { namespace performance_counters
         counter_path_elements(std::string const& objectname,
                 std::string const& countername, std::string const& parameters,
                 std::string const& parentname, std::string const& instancename,
-                boost::int64_t parentindex = -1, boost::int64_t instanceindex = -1,
+                std::int64_t parentindex = -1, std::int64_t instanceindex = -1,
                 bool parentinstance_is_basename = false)
           : counter_type_path_elements(objectname, countername, parameters),
             parentinstancename_(parentname), instancename_(instancename),
@@ -233,8 +248,8 @@ namespace hpx { namespace performance_counters
 
         std::string parentinstancename_;  ///< the name of the parent instance
         std::string instancename_;        ///< the name of the object instance
-        boost::int64_t parentinstanceindex_;    ///< the parent instance index
-        boost::int64_t instanceindex_;    ///< the instance index
+        std::int64_t parentinstanceindex_;    ///< the parent instance index
+        std::int64_t instanceindex_;    ///< the instance index
         bool parentinstance_is_basename_; ///< the parentinstancename_
                                           ///member holds a base counter name
 
@@ -324,14 +339,14 @@ namespace hpx { namespace performance_counters
 
         counter_info(counter_type type, std::string const& name,
                 std::string const& helptext = "",
-                boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
+                std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
                 std::string const& uom = "")
           : type_(type), version_(version), status_(status_invalid_data),
             fullname_(name), helptext_(helptext), unit_of_measure_(uom)
         {}
 
         counter_type type_;         ///< The type of the described counter
-        boost::uint32_t version_;   ///< The version of the described counter
+        std::uint32_t version_;   ///< The version of the described counter
                                     ///< using the 0xMMmmSSSS scheme
         counter_status status_;     ///< The status of the counter object
         std::string fullname_;      ///< The full name of this counter
@@ -392,17 +407,17 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     struct counter_value
     {
-        counter_value(boost::int64_t value = 0, boost::int64_t scaling = 1,
+        counter_value(std::int64_t value = 0, std::int64_t scaling = 1,
                 bool scale_inverse = false)
           : time_(), count_(0), value_(value), scaling_(scaling),
             status_(status_new_data),
             scale_inverse_(scale_inverse)
         {}
 
-        boost::uint64_t time_;      ///< The local time when data was collected
-        boost::uint64_t count_;     ///< The invocation counter for the data
-        boost::int64_t value_;      ///< The current counter value
-        boost::int64_t scaling_;    ///< The scaling of the current counter value
+        std::uint64_t time_;      ///< The local time when data was collected
+        std::uint64_t count_;     ///< The invocation counter for the data
+        std::int64_t value_;      ///< The current counter value
+        std::int64_t scaling_;    ///< The scaling of the current counter value
         counter_status status_;     ///< The status of the counter value
         bool scale_inverse_;        ///< If true, value_ needs to be divided by
                                     ///< scaling_, otherwise it has to be
@@ -447,6 +462,87 @@ namespace hpx { namespace performance_counters
         void serialize(Archive& ar, const unsigned int)
         {
             ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct counter_values_array
+    {
+        counter_values_array(std::int64_t scaling = 1,
+                bool scale_inverse = false)
+          : time_(), count_(0), values_(), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        counter_values_array(std::vector<std::int64_t> && values,
+                std::int64_t scaling = 1, bool scale_inverse = false)
+          : time_(), count_(0), values_(std::move(values)), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        counter_values_array(std::vector<std::int64_t> const& values,
+                std::int64_t scaling = 1, bool scale_inverse = false)
+          : time_(), count_(0), values_(values), scaling_(scaling),
+            status_(status_new_data),
+            scale_inverse_(scale_inverse)
+        {}
+
+        std::uint64_t time_;      ///< The local time when data was collected
+        std::uint64_t count_;     ///< The invocation counter for the data
+        std::vector<std::int64_t> values_;  ///< The current counter values
+        std::int64_t scaling_;    ///< The scaling of the current counter values
+        counter_status status_;     ///< The status of the counter value
+        bool scale_inverse_;        ///< If true, value_ needs to be divided by
+                                    ///< scaling_, otherwise it has to be
+                                    ///< multiplied.
+
+        /// \brief Retrieve the 'real' value of the counter_value, converted to
+        ///        the requested type \a T
+        template <typename T>
+        T get_value(std::size_t index, error_code& ec = throws) const
+        {
+            if (!status_is_valid(status_)) {
+                HPX_THROWS_IF(ec, invalid_status,
+                    "counter_values_array::get_value<T>",
+                    "counter value is in invalid status");
+                return T();
+            }
+            if (index >= values_.size()) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "counter_values_array::get_value<T>",
+                    "index out of bounds");
+                return T();
+            }
+
+            T val = static_cast<T>(values_[index]);
+
+            if (scaling_ != 1) {
+                if (scaling_ == 0) {
+                    HPX_THROWS_IF(ec, uninitialized_value,
+                        "counter_values_array::get_value<T>",
+                        "scaling should not be zero");
+                    return T();
+                }
+
+                // calculate and return the real counter value
+                if (scale_inverse_)
+                    return val / static_cast<T>(scaling_);
+
+                return val * static_cast<T>(scaling_);
+            }
+            return val;
+        }
+
+    private:
+        // serialization support
+        friend class hpx::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
         }
     };
 
@@ -556,12 +652,12 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Retrieve the meta data specific for the given counter instance
     HPX_API_EXPORT void get_counter_infos(counter_info const& info,
-        counter_type& type, std::string& helptext, boost::uint32_t& version,
+        counter_type& type, std::string& helptext, std::uint32_t& version,
         error_code& ec = throws);
 
     /// \brief Retrieve the meta data specific for the given counter instance
     HPX_API_EXPORT void get_counter_infos(std::string name, counter_type& type,
-        std::string& helptext, boost::uint32_t& version, error_code& ec = throws);
+        std::string& helptext, std::uint32_t& version, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -580,17 +676,29 @@ namespace hpx { namespace performance_counters
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<boost::int64_t()> const&, error_code&);
+            hpx::util::function_nonser<std::int64_t()> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<boost::int64_t(bool)> const&, error_code&);
+            hpx::util::function_nonser<std::int64_t(bool)> const&, error_code&);
+
+        // Helper function for creating counters encapsulating a function
+        // returning the counter values array.
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
+            hpx::util::function_nonser<std::vector<std::int64_t>()> const&,
+            error_code&);
+
+        // Helper function for creating counters encapsulating a function
+        // returning the counter values array.
+        HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
+            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&,
+            error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.
         HPX_EXPORT naming::gid_type create_raw_counter_value(
-            counter_info const&, boost::int64_t*, error_code&);
+            counter_info const&, std::int64_t*, error_code&);
 
         // Creation function for aggregating performance counters; to be
         // registered with the counter types.
@@ -615,7 +723,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         HPX_EXPORT naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters,
+            std::vector<std::int64_t> const& parameters,
             error_code& ec = throws);
 
         // \brief Create a new arithmetics performance counter instance based on

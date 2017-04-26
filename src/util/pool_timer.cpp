@@ -10,15 +10,17 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
+#include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -36,41 +38,39 @@ namespace hpx { namespace util { namespace detail
 
     public:
         pool_timer();
+
         pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown);
 
         ~pool_timer();
 
-        bool start(bool evaluate);
+        bool start(util::steady_duration const& time_duration, bool evaluate);
         bool stop();
 
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
-        void timer_handler();
+        void timer_handler(const boost::system::error_code&);
 
         void terminate();             // handle system shutdown
         bool stop_locked();
 
     private:
         typedef boost::asio::basic_deadline_timer<
-            boost::chrono::steady_clock,
-            util::chrono_traits<boost::chrono::steady_clock>
+            util::steady_clock,
+            util::chrono_traits<util::steady_clock>
         > deadline_timer;
 
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call
         util::function_nonser<void()> on_term_; ///< function to call on termination
-        boost::chrono::steady_clock::time_point abs_time_;    ///< time interval
         std::string description_;     ///< description of this interval timer
 
-        bool pre_shutdown_;           ///< execute termination during pre-shutdown
-        bool is_started_;             ///< timer has been started (is running)
-        bool first_start_;
-        ///^ flag to distinguish first invocation of start()
-        bool is_terminated_;          ///< The timer has been terminated
+        bool pre_shutdown_;    ///< execute termination during pre-shutdown
+        bool is_started_;      ///< timer has been started (is running)
+        bool first_start_;     ///< flag to distinguish first invocation of start()
+        bool is_terminated_;   ///< The timer has been terminated
         bool is_stopped_;
         deadline_timer* timer_;
     };
@@ -86,11 +86,10 @@ namespace hpx { namespace util { namespace detail
 
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            boost::chrono::steady_clock::time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown)
       : f_(f), on_term_(on_term),
-        abs_time_(abs_time), description_(description),
+        description_(description),
         pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
         is_terminated_(false), is_stopped_(false),
         timer_(new deadline_timer(
@@ -98,16 +97,18 @@ namespace hpx { namespace util { namespace detail
         )
     {}
 
-    void pool_timer::timer_handler()
+    void pool_timer::timer_handler(const boost::system::error_code& err)
     {
         if(!is_stopped_ || !is_terminated_)
         {
             is_started_ = false;
-            f_();
+            if(!err)
+                f_();
         }
     }
 
-    bool pool_timer::start(bool evaluate_)
+    bool pool_timer::start(util::steady_duration const& time_duration,
+        bool evaluate_)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)
@@ -135,10 +136,10 @@ namespace hpx { namespace util { namespace detail
             is_stopped_ = false;
             is_started_ = true;
 
-            HPX_ASSERT(timer_ != 0);
-            timer_->expires_at(abs_time_);
+            HPX_ASSERT(timer_ != nullptr);
+            timer_->expires_from_now(time_duration.value());
             timer_->async_wait(util::bind(&pool_timer::timer_handler,
-                this->shared_from_this()));
+                this->shared_from_this(), util::placeholders::_1));
 
             return true;
         }
@@ -157,7 +158,7 @@ namespace hpx { namespace util { namespace detail
             is_started_ = false;
             is_stopped_ = true;
 
-            HPX_ASSERT(timer_ != 0);
+            HPX_ASSERT(timer_ != nullptr);
             timer_->cancel();
             return true;
         }
@@ -177,7 +178,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
         delete timer_;
-        timer_ = 0;
+        timer_ = nullptr;
     }
 
     pool_timer::~pool_timer()
@@ -197,20 +198,10 @@ namespace hpx { namespace util
 
     pool_timer::pool_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            hpx::util::steady_time_point const& abs_time,
             std::string const& description,
             bool pre_shutdown)
       : timer_(std::make_shared<detail::pool_timer>(
-            f, on_term, abs_time.value(), description, pre_shutdown))
-    {}
-
-    pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            hpx::util::steady_duration const& rel_time,
-            std::string const& description,
-            bool pre_shutdown)
-      : timer_(std::make_shared<detail::pool_timer>(
-            f, on_term, rel_time.from_now(), description, pre_shutdown))
+            f, on_term, description, pre_shutdown))
     {}
 
     pool_timer::~pool_timer()
@@ -218,9 +209,10 @@ namespace hpx { namespace util
         timer_->terminate();
     }
 
-    bool pool_timer::start(bool evaluate)
+    bool pool_timer::start(util::steady_duration const& time_duration,
+        bool evaluate)
     {
-        return timer_->start(evaluate);
+        return timer_->start(time_duration, evaluate);
     }
 
     bool pool_timer::stop()

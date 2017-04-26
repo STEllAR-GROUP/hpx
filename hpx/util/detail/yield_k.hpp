@@ -11,6 +11,11 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/runtime/threads/thread_helpers.hpp>
+
+#include <chrono>
+#include <cstddef>
+
 namespace hpx { namespace util { namespace detail {
     inline void yield_k(std::size_t k, const char *thread_name)
     {
@@ -35,7 +40,8 @@ namespace hpx { namespace util { namespace detail {
             }
             else
             {
-                hpx::this_thread::suspend(hpx::threads::pending, thread_name);
+                hpx::this_thread::suspend(hpx::threads::pending_boost,
+                    thread_name);
             }
         }
         else
@@ -61,7 +67,7 @@ namespace hpx { namespace util { namespace detail {
             else
             {
                 hpx::this_thread::suspend(
-                    boost::chrono::microseconds(1), thread_name);
+                    std::chrono::microseconds(1), thread_name);
             }
         }
     }

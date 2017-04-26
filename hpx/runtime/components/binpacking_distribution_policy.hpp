@@ -23,25 +23,29 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace components
 {
     static char const* const default_binpacking_counter_name =
-        "/runtime/count/component@";
+        "/runtime{locality/total}/count/component@";
 
     namespace detail
     {
         /// \cond NOINTERNAL
         inline std::vector<std::size_t>
-        get_items_count(std::size_t count, std::vector<boost::uint64_t> && values)
+        get_items_count(std::size_t count, std::vector<std::uint64_t> const& values)
         {
             std::size_t maxcount = 0;
             std::size_t existing = 0;
 
-            for (boost::uint64_t value: values)
+            for (std::uint64_t value: values)
             {
                 maxcount = (std::max)(maxcount, std::size_t(value));
                 existing += value;
@@ -52,72 +56,50 @@ namespace hpx { namespace components
             // approximately the same
             std::size_t num_localities = values.size();
 
-            HPX_ASSERT(maxcount * num_localities >= std::size_t(existing));
-            std::size_t missing = maxcount * num_localities - existing;
-            if (missing == 0) missing = 1;
-
-            double hole_ratio = (std::min)(count, missing) / double(missing);
-            HPX_ASSERT(hole_ratio <= 1.);
-
-            std::size_t overflow_count =
-                (count > missing) ? (count - missing) / num_localities : 0;
-            std::size_t excess = count - overflow_count * num_localities;
-
             // calculate the number of new instances to create on each of the
             // localities
-            std::vector<std::size_t> to_create;
-            to_create.reserve(num_localities);
+            std::vector<std::size_t> to_create(num_localities, 0);
 
-            std::size_t created_count = 0;
-            for (std::size_t i = 0; i != num_localities; ++i)
+            bool even_fill = true;
+            while (even_fill)
             {
-                boost::uint64_t value = values[i];
-                std::size_t numcreate = overflow_count +
-                    std::size_t((maxcount - value) * hole_ratio);
+                even_fill = false;
+                for (std::size_t i = 0; i != num_localities; ++i)
+                {
+                    if(values[i] + to_create[i] >= maxcount) continue;
+                    even_fill = true;
 
-                if (excess != 0) {
-                    --excess;
-                    ++numcreate;
+                    ++to_create[i];
+                    --count;
+                    if (count == 0) break;
                 }
-
-                if (i == num_localities-1) {
-                    // last bin gets all the rest
-                    if (created_count + numcreate < count)
-                        numcreate = count - created_count;
-                }
-
-                if (created_count + numcreate > count)
-                    numcreate = count - created_count;
-
-                if (numcreate == 0)
-                    break;
-
-                // create all components  for each locality at a time
-                to_create.push_back(numcreate);
-
-                created_count += numcreate;
-                if (created_count >= count)
-                    break;
+            }
+            std::size_t i = 0;
+            while (count != 0)
+            {
+                ++to_create[i];
+                i = (i + 1) % num_localities;
+                --count;
             }
 
             return to_create;
         }
 
-        inline hpx::future<std::vector<boost::uint64_t> >
+        inline hpx::future<std::vector<std::uint64_t> >
         retrieve_counter_values(
             std::vector<performance_counters::performance_counter> && counters)
         {
             using namespace hpx::performance_counters;
 
-            std::vector<hpx::future<boost::uint64_t> > values;
+            std::vector<hpx::future<std::uint64_t> > values;
             values.reserve(counters.size());
 
             for (performance_counter const& counter: counters)
-                values.push_back(counter.get_value<boost::uint64_t>());
+                values.push_back(counter.get_value<std::uint64_t>());
 
             return hpx::dataflow(hpx::launch::sync,
                 hpx::util::unwrapped(
-                    [](std::vector<boost::uint64_t> && values)
+                    [](std::vector<std::uint64_t> && values)
                     {
                         return values;
                     }),
@@ -125,7 +107,7 @@ namespace hpx { namespace components
         }
 
         template <typename String>
-        hpx::future<std::vector<boost::uint64_t> > get_counter_values(
+        hpx::future<std::vector<std::uint64_t> > get_counter_values(
             String component_name, std::string const& counter_name,
             std::vector<hpx::id_type> const& localities)
         {
@@ -138,6 +120,7 @@ namespace hpx { namespace components
             if (counter_name[counter_name.size()-1] == '@')
             {
                 std::string name(counter_name + component_name);
+
                 for (hpx::id_type const& id: localities)
                     counters.push_back(performance_counter(name, id));
             }
@@ -152,14 +135,14 @@ namespace hpx { namespace components
         }
 
         inline hpx::id_type const& get_best_locality(
-            hpx::future<std::vector<boost::uint64_t> > && f,
+            hpx::future<std::vector<std::uint64_t> > && f,
             std::vector<hpx::id_type> const& localities)
         {
-            std::vector<boost::uint64_t> values = f.get();
+            std::vector<std::uint64_t> values = f.get();
 
             std::size_t best_locality = 0;
-            boost::uint64_t min_value =
-                (std::numeric_limits<boost::uint64_t>::max)();
+            std::uint64_t min_value =
+                (std::numeric_limits<std::uint64_t>::max)();
 
             for (std::size_t i = 0; i != values.size(); ++i)
             {
@@ -182,7 +165,7 @@ namespace hpx { namespace components
 
             template <typename ...Ts>
             hpx::future<hpx::id_type> operator()(
-                hpx::future<std::vector<boost::uint64_t> > && values,
+                hpx::future<std::vector<std::uint64_t> > && values,
                 Ts&&... vs) const
             {
                 hpx::id_type const& best_locality =
@@ -208,7 +191,7 @@ namespace hpx { namespace components
             template <typename ...Ts>
             hpx::future<std::vector<bulk_locality_result> >
             operator()(
-                hpx::future<std::vector<boost::uint64_t> > && values,
+                hpx::future<std::vector<std::uint64_t> > && values,
                 std::size_t count, Ts&&... vs) const
             {
                 std::vector<std::size_t> to_create =
@@ -235,15 +218,9 @@ namespace hpx { namespace components
 
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                             result.emplace_back(
                                     std::move(localities_[i]), v[i].get()
                                 );
-#else
-                            result.push_back(std::make_pair(
-                                    std::move(localities_[i]), v[i].get()
-                                ));
-#endif
                         }
                         return result;
                     },
@@ -294,6 +271,17 @@ namespace hpx { namespace components
             return binpacking_distribution_policy(locs, counter_name);
         }
 
+        /// Create a new \a default_distribution policy representing the given
+        /// set of localities.
+        ///
+        /// \param locs     [in] The list of localities the new instance should
+        ///                 represent
+        /// \param counter_name  [in] The name of the performance counter which
+        ///                      should be used as the distribution criteria
+        ///                      (by default the overall number of existing
+        ///                      instances of the given component type will be
+        ///                      used).
+        ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> && locs,
             char const* counter_name = default_binpacking_counter_name) const
@@ -352,7 +340,7 @@ namespace hpx { namespace components
             }
 
             // schedule creation of all objects across given localities
-            hpx::future<std::vector<boost::uint64_t> > values =
+            hpx::future<std::vector<std::uint64_t> > values =
                 detail::get_counter_values(
                     hpx::components::unique_component_name<
                         hpx::components::component_factory<
@@ -390,7 +378,7 @@ namespace hpx { namespace components
             if (localities_.size() > 1)
             {
                 // schedule creation of all objects across given localities
-                hpx::future<std::vector<boost::uint64_t> > values =
+                hpx::future<std::vector<std::uint64_t> > values =
                     detail::get_counter_values(
                         hpx::components::unique_component_name<
                             hpx::components::component_factory<
@@ -418,11 +406,7 @@ namespace hpx { namespace components
                     -> std::vector<bulk_locality_result>
                 {
                     std::vector<bulk_locality_result> result;
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     result.emplace_back(id, f.get());
-#else
-                    result.push_back(std::make_pair(id, f.get()));
-#endif
                     return result;
                 });
         }

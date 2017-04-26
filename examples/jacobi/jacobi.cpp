@@ -12,6 +12,7 @@
 #include "jacobi_component/grid.hpp"
 #include "jacobi_component/solver.hpp"
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

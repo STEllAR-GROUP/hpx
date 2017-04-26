@@ -12,10 +12,12 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/identity.hpp>
 #include <hpx/util/tagged.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/mpl/identity.hpp>
+#include <cstddef>
+#include <utility>
 
 namespace hpx { namespace util
 {
@@ -44,7 +46,7 @@ namespace hpx { namespace util
         struct tagged_type
         {
             typedef typename decay<T>::type decayed_type;
-            typedef typename boost::mpl::identity<Tag(decayed_type)>::type type;
+            typedef typename hpx::util::identity<Tag(decayed_type)>::type type;
         };
     }
 
@@ -126,7 +128,7 @@ namespace hpx { namespace util
         struct tagged_element_type
         {
             typedef typename tuple_element<I, Tuple>::type element_type;
-            typedef typename boost::mpl::identity<Tag(element_type)>::type type;
+            typedef typename hpx::util::identity<Tag(element_type)>::type type;
         };
 
         template <typename Tuple, typename Indicies, typename ...Tags>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,19 +9,21 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/exception_ptr.hpp>
 
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
@@ -34,14 +36,14 @@ namespace hpx { namespace lcos { namespace server
     template <typename ValueType, typename RemoteType>
     class queue
       : public lcos::base_lco_with_value<ValueType, RemoteType>
-      , public components::component_base<queue<ValueType, RemoteType> >
+      , public components::managed_component_base<queue<ValueType, RemoteType> >
     {
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
     private:
         typedef lcos::local::spinlock mutex_type;
-        typedef components::component_base<queue> base_type;
+        typedef components::managed_component_base<queue> base_type;
 
         typedef std::queue<ValueType> queue_type;
 
@@ -100,7 +102,28 @@ namespace hpx { namespace lcos { namespace server
         // queue). This method blocks if the value queue is empty. Waiting
         // threads are resumed automatically as soon as new values are placed
         // into the value queue.
-        ValueType get_value(error_code& ec = throws)
+        ValueType get_value()
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // cond_.wait() unlocks the lock before suspension and re-locks it
+            // afterwards. During this time span another thread may retrieve
+            // the next items from the queue for which the thread was resumed.
+            while (queue_.empty())
+            {
+                cond_.wait(l, "queue::get_value");
+            }
+            HPX_ASSERT(!queue_.empty());
+
+            // get the first value from the value queue and return it to the
+            // caller
+            ValueType value = std::move(queue_.front());
+            queue_.pop();
+
+            return value;
+        }
+
+        ValueType get_value(error_code& ec)
         {
             std::unique_lock<mutex_type> l(mtx_);
 
@@ -131,6 +154,47 @@ namespace hpx { namespace lcos { namespace server
         local::detail::condition_variable cond_;
     };
 }}}
+
+#define HPX_REGISTER_QUEUE_DECLARATION(...)                                   \
+    HPX_REGISTER_QUEUE_DECLARATION_(__VA_ARGS__)                              \
+/**/
+#define HPX_REGISTER_QUEUE_DECLARATION_(...)                                  \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_QUEUE_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)        \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_QUEUE_DECLARATION_1(type)                                \
+    HPX_REGISTER_QUEUE_DECLARATION_2(type, type)                              \
+/**/
+#define HPX_REGISTER_QUEUE_DECLARATION_2(type, name)                          \
+    typedef ::hpx::lcos::server::queue<type>                                  \
+        BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name));                     \
+/**/
+
+#define HPX_REGISTER_QUEUE(...)                                               \
+    HPX_REGISTER_QUEUE_(__VA_ARGS__)                                          \
+/**/
+#define HPX_REGISTER_QUEUE_(...)                                              \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_QUEUE_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_QUEUE_1(type)                                            \
+    HPX_REGISTER_QUEUE_2(type, type)                                          \
+/**/
+#define HPX_REGISTER_QUEUE_2(type, name)                                      \
+    typedef ::hpx::lcos::server::queue<type>                                  \
+        BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name));                     \
+    typedef ::hpx::components::managed_component<                             \
+            BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name))                  \
+        > BOOST_PP_CAT(__queue_component_, name);                             \
+    HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                   \
+        BOOST_PP_CAT(__queue_component_, name),                               \
+        BOOST_PP_CAT(__queue_component_, name),                               \
+        BOOST_PP_STRINGIZE(BOOST_PP_CAT(__base_lco_with_value_queue_, name))) \
+/**/
 
 #endif
 

@@ -9,7 +9,11 @@
 #define HPX_PARALLEL_ALGORITHM_TRANSFORM_EXCLUSIVE_SCAN_JAN_04_2015_0354PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
@@ -19,11 +23,14 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -43,7 +50,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = op(init, conv(*first));
+                init = hpx::util::invoke(op, init,
+                    hpx::util::invoke(conv, *first));
                 *dest = temp;
                 temp = init;
             }
@@ -58,9 +66,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init  = op(init, conv(*first));
+                init = hpx::util::invoke(op, init,
+                    hpx::util::invoke(conv, *first));
                 *dest = temp;
-                temp  = init;
+                temp = init;
             }
             return init;
         }
@@ -113,35 +122,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
+
+                auto f3 =
+                    [op, policy](
+                        zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> curr, hpx::shared_future<T> next
+                    )
+                    {
+                        HPX_UNUSED(policy);
+
+                        next.get();     // rethrow exceptions
+
+                        T val = curr.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+                        *dst++ = val;
+
+                        util::loop_n<ExPolicy>(
+                            dst, part_size - 1,
+                            [&op, &val](OutIter it)
+                            {
+                                *it = hpx::util::invoke(op, *it, val);
+                            });
+                    };
+
                 return util::scan_partitioner<ExPolicy, OutIter, T>::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
                     [op, conv](zip_iterator part_begin, std::size_t part_size) -> T
                     {
-                        T part_init = conv(get<0>(*part_begin++));
+                        T part_init =
+                            hpx::util::invoke(conv, get<0>(*part_begin++));
+
+                        auto iters = part_begin.get_iterator_tuple();
                         return sequential_transform_exclusive_scan_n(
-                            get<0>(part_begin.get_iterator_tuple()),
+                            get<0>(iters),
                             part_size - 1,
-                            get<1>(part_begin.get_iterator_tuple()),
+                            get<1>(iters),
                             conv, part_init, op);
                     },
                     // step 2 propagates the partition results from left
                     // to right
                     hpx::util::unwrapped(op),
                     // step 3 runs final_accumulation on each partition
-                    [op](zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<T> f_accu)
-                    {
-                        T val = f_accu.get();
-                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
-                        *dst++ = val;
-                        util::loop_n(dst, part_size - 1,
-                            [&op, &val](OutIter it)
-                            {
-                                *it = op(*it, val);
-                            });
-                    },
+                    std::move(f3),
                     // use this return value
                     [final_dest](std::vector<hpx::shared_future<T> > &&,
                         std::vector<hpx::future<void> > &&)
@@ -220,19 +244,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of those types.
     ///
     /// The reduce operations in the parallel \a transform_exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a sequential_execution_policy
+    /// invoked with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
     /// The reduce operations in the parallel \a transform_exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a parallel_execution_policy
-    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a \a hpx::future<OutIter> if
     ///           the execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a transform_exclusive_scan algorithm returns the output
     ///           iterator to the element in the destination range, one past
@@ -251,13 +275,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// a non-associative predicate.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
-        typename Conv, typename T, typename Op>
-    inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    >::type
-    transform_exclusive_scan(ExPolicy&& policy, InIter first, InIter last,
-        OutIter dest, Conv && conv, T init, Op && op)
+        typename T, typename Op, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_callable<
+                Conv(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Op(typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
+        OutIter dest, T init, Op && op, Conv && conv)
     {
         static_assert(
             (hpx::traits::is_input_iterator<InIter>::value),
@@ -278,6 +314,51 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             first, last, dest, std::forward<Conv>(conv), std::move(init),
             std::forward<Op>(op));
     }
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+    /// \cond NOINTERNAL
+    template <typename ExPolicy, typename InIter, typename OutIter,
+        typename T, typename Op, typename Conv,
+    HPX_CONCEPT_REQUIRES_(
+        is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_callable<
+                Conv(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Op(typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
+        OutIter dest, Conv && conv, T init, Op && op)
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                execution::is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
+
+        return detail::transform_exclusive_scan<OutIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::forward<Conv>(conv), std::move(init),
+            std::forward<Op>(op));
+    }
+    /// \endcond
+#endif
 }}}
 
 #endif

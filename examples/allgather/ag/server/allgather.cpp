@@ -11,8 +11,8 @@
 #include "allgather.hpp"
 
 #include <boost/format.hpp>
-#include <boost/ref.hpp>
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <mutex>

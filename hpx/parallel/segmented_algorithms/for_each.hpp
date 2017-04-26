@@ -23,6 +23,7 @@
 #include <iterator>
 #include <list>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
@@ -198,7 +199,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             Proj && proj, std::true_type)
         {
-            typedef parallel::is_sequential_execution_policy<ExPolicy> is_seq;
+            typedef parallel::execution::is_sequential_execution_policy<
+                    ExPolicy
+                > is_seq;
 
             if (first == last)
             {

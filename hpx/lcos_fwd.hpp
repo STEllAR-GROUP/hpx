@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos_fwd.hpp
-
 #ifndef HPX_LCOS_FWD_HPP
 #define HPX_LCOS_FWD_HPP
 
@@ -23,17 +21,17 @@ namespace hpx
             struct future_data_refcnt_base;
         }
 
-        class HPX_API_EXPORT base_lco;
+        class HPX_EXPORT base_lco;
 
-        template <typename Result, typename RemoteResult = Result>
-        class HPX_SINGLE_INHERITANCE base_lco_with_value;
+        template <typename Result, typename RemoteResult =
+            typename traits::promise_remote_result<Result>::type>
+        class base_lco_with_value;
 
         template <>
-        class HPX_SINGLE_INHERITANCE base_lco_with_value<void, void>;
+        class base_lco_with_value<void, void>;
 
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
+        template <typename Result, typename RemoteResult =
+            typename traits::promise_remote_result<Result>::type>
         class promise;
 
         template <typename Action,
@@ -50,12 +48,6 @@ namespace hpx
 
         template <typename ValueType>
         struct object_semaphore;
-
-        namespace stubs
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
 
         namespace server
         {

@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/steady_clock.hpp>
 
 #include <boost/intrusive/slist.hpp>
 
@@ -29,24 +29,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     private:
         typedef lcos::local::spinlock mutex_type;
-
-        class relock_guard
-        {
-            HPX_NON_COPYABLE(relock_guard);
-
-        public:
-            explicit relock_guard(std::unique_lock<mutex_type>& l)
-              : l_(l)
-            {}
-
-            ~relock_guard()
-            {
-                l_.lock();
-            }
-
-        private:
-            std::unique_lock<mutex_type>& l_;
-        };
 
     private:
         // define data structures needed for intrusive slist container used for
@@ -109,33 +91,32 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).
-        HPX_EXPORT bool notify_one(
-            std::unique_lock<mutex_type> lock, error_code& ec = throws);
+        HPX_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
+            threads::thread_priority priority, error_code& ec = throws);
 
-        HPX_EXPORT void notify_all(
-            std::unique_lock<mutex_type> lock, error_code& ec = throws);
+        HPX_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
+            threads::thread_priority priority, error_code& ec = throws);
+
+        bool notify_one(std::unique_lock<mutex_type> lock,
+            error_code& ec = throws)
+        {
+            return notify_one(std::move(lock),
+                threads::thread_priority_default, ec);
+        }
+
+        void notify_all(std::unique_lock<mutex_type> lock,
+            error_code& ec = throws)
+        {
+            return notify_all(std::move(lock),
+                threads::thread_priority_default, ec);
+        }
 
         HPX_EXPORT void abort_all(
             std::unique_lock<mutex_type> lock);
 
         HPX_EXPORT threads::thread_state_ex_enum wait(
-            std::unique_lock<mutex_type>&& lock,
-            char const* description, error_code& ec = throws);
-
-        threads::thread_state_ex_enum wait(
             std::unique_lock<mutex_type>& lock,
-            char const* description, error_code& ec = throws)
-        {
-            relock_guard rl(lock);
-            return wait(std::move(lock), description, ec);
-        }
-
-        threads::thread_state_ex_enum wait(
-            std::unique_lock<mutex_type>&& lock,
-            error_code& ec = throws)
-        {
-            return wait(std::move(lock), "condition_variable::wait", ec);
-        }
+            char const* description, error_code& ec = throws);
 
         threads::thread_state_ex_enum wait(
             std::unique_lock<mutex_type>& lock,
@@ -145,27 +126,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         HPX_EXPORT threads::thread_state_ex_enum wait_until(
-            std::unique_lock<mutex_type>&& lock,
-            util::steady_time_point const& abs_time,
-            char const* description, error_code& ec = throws);
-
-        threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
             util::steady_time_point const& abs_time,
-            char const* description, error_code& ec = throws)
-        {
-            relock_guard rl(lock);
-            return wait_until(std::move(lock), abs_time, description, ec);
-        }
-
-        threads::thread_state_ex_enum wait_until(
-            std::unique_lock<mutex_type>&& lock,
-            util::steady_time_point const& abs_time,
-            error_code& ec = throws)
-        {
-            return wait_until(std::move(lock), abs_time,
-                "condition_variable::wait_until", ec);
-        }
+            char const* description, error_code& ec = throws);
 
         threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
@@ -177,28 +140,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         threads::thread_state_ex_enum wait_for(
-            std::unique_lock<mutex_type>&& lock,
-            util::steady_duration const& rel_time,
-            char const* description, error_code& ec = throws)
-        {
-            return wait_until(std::move(lock), rel_time.from_now(), description, ec);
-        }
-
-        threads::thread_state_ex_enum wait_for(
             std::unique_lock<mutex_type>& lock,
             util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
-        }
-
-        threads::thread_state_ex_enum wait_for(
-            std::unique_lock<mutex_type>&& lock,
-            util::steady_duration const& rel_time,
-            error_code& ec = throws)
-        {
-            return wait_until(std::move(lock), rel_time.from_now(),
-                "condition_variable::wait_for", ec);
         }
 
         threads::thread_state_ex_enum wait_for(

@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -33,7 +34,7 @@ public:
     // we want to make sure anything else uses the std allocator
     template <typename U> struct rebind { typedef std::allocator<U> other; };
 
-    pointer allocate(size_type n, const void *hint=0)
+    pointer allocate(size_type n, const void *hint=nullptr)
     {
         HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::allocate(n, hint);

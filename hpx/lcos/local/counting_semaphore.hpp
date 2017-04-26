@@ -11,9 +11,9 @@
 #include <hpx/lcos/local/detail/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <mutex>
+#include <utility>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -54,7 +54,7 @@ namespace hpx { namespace lcos { namespace local
         ///                 are equivalent to the same number of signals pre-
         ///                 set, and negative values are equivalent to the
         ///                 same number of waits pre-set.
-        counting_semaphore_var(boost::int64_t value = N)
+        counting_semaphore_var(std::int64_t value = N)
           : sem_(value)
         {}
 
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
         ///                 be decremented. At the same time this is the minimum
         ///                 value of the lock count at which the thread is not
         ///                 yielded.
-        void wait(boost::int64_t count = 1)
+        void wait(std::int64_t count = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
             sem_.wait(l, count);
@@ -81,20 +81,20 @@ namespace hpx { namespace lcos { namespace local
         ///                 able to acquire the requested amount of credits.
         ///                 The function returns false if not sufficient credits
         ///                 are available at this point in time.
-        bool try_wait(boost::int64_t count = 1)
+        bool try_wait(std::int64_t count = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
             return sem_.try_wait(l, count);
         }
 
         /// \brief Signal the semaphore
-        void signal(boost::int64_t count = 1)
+        void signal(std::int64_t count = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
             sem_.signal(std::move(l), count);
         }
 
-        boost::int64_t signal_all()
+        std::int64_t signal_all()
         {
             std::unique_lock<mutex_type> l(mtx_);
             return sem_.signal_all(std::move(l));

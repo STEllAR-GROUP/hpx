@@ -23,11 +23,12 @@
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #  if !defined( BOOST_SP_HAS_SYNC )
+#    include <hpx/config/compiler_fence.hpp>
 #    include <boost/detail/interlocked.hpp>
 #  endif
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
-#    include <boost/smart_ptr/detail/spinlock_sync.hpp>
+#    include <boost/smart_ptr/detail/spinlock.hpp>
 #    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
 #      include <ia64intrin.h>
 #    endif
@@ -35,6 +36,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -54,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
 #if defined(__ANDROID__) && defined(ANDROID)
         int v_;
 #else
-        boost::uint64_t v_;
+        std::uint64_t v_;
 #endif
 
     public:
@@ -74,7 +76,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(hpx::threads::pending,
+                    hpx::this_thread::suspend(hpx::threads::pending_boost,
                         "hpx::lcos::local::spinlock::yield");
                 }
                 else
@@ -118,7 +120,7 @@ namespace hpx { namespace lcos { namespace local
                     rqtp.tv_sec = 0;
                     rqtp.tv_nsec = 1000;
 
-                    nanosleep( &rqtp, 0 );
+                    nanosleep( &rqtp, nullptr );
 #else
 #endif
                 }
@@ -181,10 +183,10 @@ namespace hpx { namespace lcos { namespace local
         bool acquire_lock()
         {
 #if !defined( BOOST_SP_HAS_SYNC )
-            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            BOOST_COMPILER_FENCE
+            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            HPX_COMPILER_FENCE
 #else
-            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
             return r == 0;
         }
@@ -192,8 +194,8 @@ namespace hpx { namespace lcos { namespace local
         void relinquish_lock()
         {
 #if !defined( BOOST_SP_HAS_SYNC )
-            BOOST_COMPILER_FENCE
-            *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+            HPX_COMPILER_FENCE
+            *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif

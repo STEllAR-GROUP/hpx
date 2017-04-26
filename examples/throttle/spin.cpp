@@ -4,11 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/hpx.hpp>
 
 #include <boost/format.hpp>
-#include <boost/assign/std/vector.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -18,11 +18,8 @@ using boost::program_options::options_description;
 using hpx::init;
 using hpx::finalize;
 
-using hpx::naming::get_agas_client;
-
 using hpx::naming::address;
 using hpx::naming::id_type;
-using hpx::naming::resolver_client;
 using hpx::naming::get_locality_id_from_gid;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,9 +77,9 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this application to use at least 2 threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=2";
+    std::vector<std::string> const cfg = {
+        "hpx.os_threads=2"
+    };
 
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv, cfg);
