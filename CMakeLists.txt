@@ -693,9 +693,9 @@ if(HPX_WITH_PARCEL_COALESCING)
 endif()
 
 # Developer tools
-hpx_option(HPX_WITH_VIM_YCM STRING
-  "Generate HPX completion file for VIM YouCompleteMe plugin and save in specified location"
-  "" ADVANCED)
+hpx_option(HPX_WITH_VIM_YCM BOOL
+  "Generate HPX completion file for VIM YouCompleteMe plugin"
+  OFF ADVANCED)
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
@@ -1825,9 +1825,17 @@ endif()
 
 
 if(HPX_WITH_VIM_YCM)
+  set(build_dir_file ${CMAKE_BINARY_DIR}/.ycm_extra_conf.py)
+  set(source_dir_file ${CMAKE_SOURCE_DIR}/.ycm_extra_conf.py)
   configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
-               ${HPX_WITH_VIM_YCM}/.ycm_extra_conf.py @ONLY)
-  hpx_info("VIM YouCompleteMe: to enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${HPX_WITH_VIM_YCM}/*']\"")
+               ${build_dir_file} @ONLY)
+  add_custom_target(
+    configure_ycm
+    COMMAND ${CMAKE_COMMAND} -E copy ${build_dir_file} ${source_dir_file}
+    COMMENT "Copying YCM config file to source directory"
+    VERBATIM
+  )
+  hpx_info("VIM YouCompleteMe: run 'make vim_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
 
 ################################################################################
@@ -1843,4 +1851,4 @@ execute_process(COMMAND
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
-message("")
+message("") 
