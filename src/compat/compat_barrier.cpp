@@ -6,6 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/barrier.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace compat
 {
     barrier::barrier(std::size_t number_of_threads)
