@@ -34,9 +34,9 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>

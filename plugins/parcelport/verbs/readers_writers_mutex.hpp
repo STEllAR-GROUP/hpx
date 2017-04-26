@@ -11,9 +11,8 @@
 #define HPX_READERS_WRITERS_MUTEX_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-//
-#include <boost/thread/locks.hpp>
 
 /*
  * Based on "Spinlocks and Read-Write Locks" by Dr. Steven Fuerst:

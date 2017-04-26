@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_OS_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/util/unique_function.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -104,7 +104,7 @@ namespace hpx { namespace threads { namespace executors
             static std::string get_unique_name();
 
             // protect scheduler initialization
-            typedef boost::mutex mutex_type;
+            typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
         };
     }

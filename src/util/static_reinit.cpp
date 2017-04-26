@@ -20,7 +20,7 @@ namespace hpx { namespace util
     {
         // Use util::spinlock instead of lcos::local::spinlock to avoid possible
         // suspensions of HPX threads as this will cause a deadlock when the
-        // register_functions function is called from within boost::call_once
+        // register_functions function is called from within compat::call_once
         typedef util::spinlock mutex_type;
 
         typedef util::function_nonser<void()> construct_type;

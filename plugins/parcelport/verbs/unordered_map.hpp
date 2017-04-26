@@ -12,6 +12,8 @@
 #include <plugins/parcelport/verbs/readers_writers_mutex.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 //
+#include <boost/thread/locks.hpp>
+//
 #include <unordered_map>
 #include <utility>
 

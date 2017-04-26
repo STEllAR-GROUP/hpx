@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -14,13 +15,12 @@
 #include <vector>
 
 #include <boost/range/functions.hpp>
-#include <boost/thread/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test(int passed_through)
+hpx::compat::thread::id test(int passed_through)
 {
     HPX_TEST_EQ(passed_through, 42);
-    return hpx::this_thread::get_id();
+    return hpx::compat::this_thread::get_id();
 }
 
 template <typename Executor>
@@ -28,7 +28,7 @@ void test_sync(Executor& exec)
 {
     HPX_TEST(
         hpx::parallel::execution::sync_execute(exec, &test, 42) !=
-        hpx::this_thread::get_id());
+        hpx::compat::this_thread::get_id());
 }
 
 template <typename Executor>
@@ -36,18 +36,18 @@ void test_async(Executor& exec)
 {
     HPX_TEST(
         hpx::parallel::execution::async_execute(exec, &test, 42).get() !=
-        hpx::this_thread::get_id());
+        hpx::compat::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test_f(hpx::future<void> f, int passed_through)
+hpx::compat::thread::id test_f(hpx::future<void> f, int passed_through)
 {
     HPX_ASSERT(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
     HPX_TEST_EQ(passed_through, 42);
-    return hpx::this_thread::get_id();
+    return hpx::compat::this_thread::get_id();
 }
 
 template <typename Executor>
@@ -57,20 +57,20 @@ void test_then(Executor& exec)
 
     HPX_TEST(
         hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        hpx::this_thread::get_id());
+        hpx::compat::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
+void bulk_test(int value, hpx::compat::thread::id tid, int passed_through) //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST(tid != hpx::compat::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 template <typename Executor>
 void test_bulk_sync(Executor& exec)
 {
-    hpx::thread::id tid = hpx::this_thread::get_id();
+    hpx::compat::thread::id tid = hpx::compat::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -87,7 +87,7 @@ void test_bulk_sync(Executor& exec)
 template <typename Executor>
 void test_bulk_async(Executor& exec)
 {
-    hpx::thread::id tid = hpx::this_thread::get_id();
+    hpx::compat::thread::id tid = hpx::compat::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -104,21 +104,21 @@ void test_bulk_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int value, hpx::shared_future<void> f, hpx::compat::thread::id tid,
     int passed_through) //-V813
 {
     HPX_ASSERT(f.is_ready());   // make sure, future is ready
 
     f.get();                    // propagate exceptions
 
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST(tid != hpx::compat::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
 template <typename Executor>
 void test_bulk_then(Executor& exec)
 {
-    hpx::thread::id tid = hpx::this_thread::get_id();
+    hpx::compat::thread::id tid = hpx::compat::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
