@@ -514,7 +514,7 @@ please share them with me. Thanks!
 
 These are the macros that specify what implementation of TSS (Thread Specific Storage)
 we will be using.
-Note that I did my best to remove the dependency on boost::thread
+Note that I did my best to remove the dependency on compat::thread
 - the only dependence left is
 when you use use a logger that writes everything @ref writer::on_dedicated_thread
 "on a dedicated thread".
@@ -523,11 +523,11 @@ By default, for TSS, we use the internal implementation (no dependency).
 
 The possibilities are:
 - @ref HPX_LOG_TSS_USE_INTERNAL : use our internal implementation
-  (no dependency on boost::thread)
-- @ref HPX_LOG_TSS_USE_BOOST : use the implementation from boost::thread
-  (dependency on boost::thread, of course).
+  (no dependency on compat::thread)
+- @ref HPX_LOG_TSS_USE_BOOST : use the implementation from compat::thread
+  (dependency on compat::thread, of course).
 - @ref HPX_LOG_TSS_USE_CUSTOM : uses a custom implementation.
-  The interface of this implementation should match boost::thread's interface of
+  The interface of this implementation should match compat::thread's interface of
   @c thread_specific_ptr class
 - @ref HPX_HAVE_LOG_NO_TSS : don't use TSS
 
@@ -538,13 +538,13 @@ If defined, it uses our internal implementation for @ref macros_tss "TSS"
 
 @subsubsection HPX_LOG_TSS_USE_BOOST HPX_LOG_TSS_USE_BOOST
 
-If defined, it uses the boost::thread's implementation for @ref macros_tss "TSS"
+If defined, it uses the compat::thread's implementation for @ref macros_tss "TSS"
 
 @subsubsection HPX_LOG_TSS_USE_CUSTOM HPX_LOG_TSS_USE_CUSTOM
 
 If defined, it uses a custom implementation for @ref macros_tss "TSS".
 The interface of this implementation should match
-boost::thread's interface of @c thread_specific_ptr class.
+compat::thread's interface of @c thread_specific_ptr class.
 
 Your class should have this interface:
 @code

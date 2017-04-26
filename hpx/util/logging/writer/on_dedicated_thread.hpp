@@ -22,14 +22,13 @@
 #endif
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // hpx::util::logging::manipulator
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/xtime.hpp>
-
+#include <chrono>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -57,7 +56,7 @@ namespace detail {
         hpx::util::logging::threading::mutex cs;
 
         // the thread doing the write
-        typedef std::shared_ptr<boost::thread> thread_ptr;
+        typedef std::shared_ptr<compat::thread> thread_ptr;
         thread_ptr writer;
 
         // ... so that reallocations are fast
@@ -152,7 +151,7 @@ struct on_dedicated_thread
     }
 
     ~on_dedicated_thread() {
-        std::shared_ptr<boost::thread> writer;
+        std::shared_ptr<compat::thread> writer;
         { scoped_lock lk( non_const_context_base::context().cs);
           non_const_context_base::context().is_working = false;
           writer = non_const_context_base::context().writer;
@@ -175,7 +174,7 @@ struct on_dedicated_thread
         scoped_lock lk( non_const_context_base::context().cs);
         if ( !non_const_context_base::context().writer)
             non_const_context_base::context().writer = thread_ptr(
-                new boost::thread( util::bind(&self_type::do_write,this) ));
+                new compat::thread( util::bind(&self_type::do_write,this) ));
 
         non_const_context_base::context().msgs.push_back(new_msg);
     }
@@ -213,14 +212,7 @@ struct on_dedicated_thread
     }
 private:
     static void do_sleep (int sleep_ms) {
-        const int NANOSECONDS_PER_SECOND = 1000 * 1000 * 1000;
-        boost::xtime to_wait;
-        xtime_get(&to_wait, boost::TIME_UTC_);
-        to_wait.sec += sleep_ms / 1000;
-        to_wait.nsec += (sleep_ms % 1000) * (NANOSECONDS_PER_SECOND / 1000);
-        to_wait.sec += to_wait.nsec / NANOSECONDS_PER_SECOND ;
-        to_wait.nsec %= NANOSECONDS_PER_SECOND ;
-        boost::thread::sleep( to_wait);
+        compat::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
 
     // normally it sleeps for sleep_ms millisecs

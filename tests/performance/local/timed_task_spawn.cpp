@@ -9,8 +9,10 @@
 // FIXME: Calling the tasks "workers" overloads the term worker-thread (which
 // refers to OS-threads).
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/algorithm/string/split.hpp>
@@ -18,8 +20,6 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/format.hpp>
 #include <boost/math/common_factor.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstdint>
 #include <functional>

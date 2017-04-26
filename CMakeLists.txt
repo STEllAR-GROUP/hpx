@@ -1044,6 +1044,18 @@ endif()
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
+# HPX_WITH_THREAD_COMPATIBILITY
+hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
+    "Use a compatibility implementation of std::thread (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_THREAD_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_COMPATIBILITY)
+else()
+  if(NOT HPX_WITH_CXX11_THREAD)
+    hpx_error("HPX needs support for C++11 std::thread")
+  endif()
+endif()
+
 ################################################################################
 # check for miscellaneous things
 ################################################################################

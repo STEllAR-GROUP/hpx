@@ -8,12 +8,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -26,7 +26,7 @@ struct mul
 {
     double operator()( double x1 , double x2 ) const
     {
-        //boost::this_thread::sleep( std::chrono::milliseconds(1000) );
+        //compat::this_thread::sleep_for( std::chrono::milliseconds(1000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1*x2;
     }
@@ -36,7 +36,7 @@ struct divide
 {
     double operator()( double x1 , double x2 ) const
     {
-        //boost::this_thread::sleep( std::chrono::milliseconds(1000) );
+        //compat::this_thread::sleep_for( std::chrono::milliseconds(1000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1/x2;
     }

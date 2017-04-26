@@ -22,13 +22,13 @@
 
 #if !defined(HPX_HAVE_LOG_NO_TS)
 
-#include <boost/thread/mutex.hpp>
+#include <hpx/compat/mutex.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
 namespace threading {
 
-    typedef boost::mutex mutex_boost;
+    typedef compat::mutex mutex_boost;
     typedef mutex::scoped_lock scoped_lock_boost;
 }
 

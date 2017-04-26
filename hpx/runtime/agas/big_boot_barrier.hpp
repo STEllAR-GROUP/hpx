@@ -10,6 +10,8 @@
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -21,9 +23,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
 #include <boost/lockfree/queue.hpp>
-
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -51,8 +50,8 @@ private:
     service_mode const service_type;
     parcelset::locality const bootstrap_agas;
 
-    boost::condition_variable cond;
-    boost::mutex mtx;
+    compat::condition_variable cond;
+    compat::mutex mtx;
     std::size_t connected;
 
     boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;

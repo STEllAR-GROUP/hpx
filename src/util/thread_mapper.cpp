@@ -5,11 +5,11 @@
 
 #include <hpx/util/thread_mapper.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -62,7 +62,7 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        boost::thread::id id = boost::this_thread::get_id();
+        compat::thread::id id = compat::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         if (it != thread_map_.end())
         {
@@ -96,7 +96,7 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        boost::thread::id id = boost::this_thread::get_id();
+        compat::thread::id id = compat::this_thread::get_id();
         thread_map_type::iterator it = thread_map_.find(id);
         return (it == thread_map_.end()) ? false : unmap_thread(it);
     }
