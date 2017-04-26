@@ -9,10 +9,10 @@
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT
 
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/thread/barrier.hpp>
 #include <boost/format.hpp>
 #include <boost/lockfree/stack.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -183,7 +183,7 @@ bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
 
 ///////////////////////////////////////////////////////////////////////////////
 void perform_iterations(
-    boost::barrier& b
+    hpx::compat::barrier& b
   , std::pair<double, double>& elapsed_control
   , std::pair<double, double>& elapsed_lockfree
     )
@@ -218,7 +218,7 @@ int app_main(
     std::vector<std::pair<double, double> >
         elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
     std::vector<compat::thread> workers;
-    boost::barrier b(threads);
+    hpx::compat::barrier b(threads);
 
     for (std::uint32_t i = 0; i != threads; ++i)
         workers.push_back(compat::thread(

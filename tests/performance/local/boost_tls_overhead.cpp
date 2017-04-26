@@ -5,13 +5,13 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/config.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/tss.hpp>
-#include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstdint>
@@ -35,7 +35,7 @@ static boost::thread_specific_ptr<double> global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    boost::barrier& b
+    hpx::compat::barrier& b
   , std::uint64_t updates
     )
 {
@@ -99,7 +99,7 @@ int main(
     // run the test
     std::vector<compat::thread> workers;
 
-    boost::barrier b(threads);
+    hpx::compat::barrier b(threads);
 
     high_resolution_timer t;
 
