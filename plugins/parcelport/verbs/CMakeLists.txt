@@ -3,6 +3,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#--------------------------------------------------
+# Some settings depend on machine
+#--------------------------------------------------
+set(COMPUTERNAME $ENV{COMPUTERNAME})
+if(COMPUTERNAME)
+  set(HOSTNAME $ENV{COMPUTERNAME})
+else(COMPUTERNAME)
+  set(HOSTNAME $ENV{HOSTNAME})
+endif(COMPUTERNAME)
+
+if(HOSTNAME MATCHES "jb-s76")
+  hpx_add_config_define_namespace(
+      DEFINE    LAPTOP_INFINIBAND_FAKE
+      NAMESPACE parcelport)
+endif()
+
 #------------------------------------------------------------------------------
 # If not enabled, define the empty registration macro and exit
 #------------------------------------------------------------------------------

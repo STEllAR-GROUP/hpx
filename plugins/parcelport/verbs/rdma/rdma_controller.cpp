@@ -7,7 +7,6 @@
 
 #if defined(HPX_HAVE_PARCELPORT_VERBS)
 
-#include <hpx/config/parcelport_verbs_defines.hpp>
 #include <hpx/config/parcelport_defines.hpp>
 //
 #include <plugins/parcelport/readers_writers_mutex.hpp>
@@ -36,6 +35,85 @@
 #include <cstring>
 //
 #include <netinet/in.h>
+
+#ifdef LAPTOP_INFINIBAND_FAKE
+
+struct ibv_device **ibv_get_device_list(int *num_devices) {return 0; }
+void ibv_free_device_list(struct ibv_device **list) {return; }
+const char *ibv_get_device_name(struct ibv_device *device) {return 0; }
+uint64_t ibv_get_device_guid(struct ibv_device *device) {return 0; }
+struct ibv_context *ibv_open_device(struct ibv_device *device) {return 0; }
+int ibv_close_device(struct ibv_context *context) {return 0; }
+int ibv_get_async_event(struct ibv_context *context, struct ibv_async_event *event) {return 0; }
+void ibv_ack_async_event(struct ibv_async_event *event) {return; }
+int ibv_query_device(struct ibv_context *context, struct ibv_device_attr *device_attr) {return 0; }
+struct ibv_mr *ibv_reg_mr(struct ibv_pd *pd, void *addr, size_t length, int access) {return 0; }
+int ibv_dereg_mr(struct ibv_mr *mr) {return 0; }
+struct ibv_comp_channel *ibv_create_comp_channel(struct ibv_context *context) {return 0; }
+int ibv_destroy_comp_channel(struct ibv_comp_channel *channel) {return 0; }
+struct ibv_cq *ibv_create_cq(struct ibv_context *context, int cqe, void *cq_context, struct ibv_comp_channel *channel, int comp_vector) {return 0; }
+int ibv_resize_cq(struct ibv_cq *cq, int cqe) {return 0; }
+int ibv_destroy_cq(struct ibv_cq *cq) {return 0; }
+int ibv_get_cq_event(struct ibv_comp_channel *channel, struct ibv_cq **cq, void **cq_context) {return 0; }
+void ibv_ack_cq_events(struct ibv_cq *cq, unsigned int nevents) {return; }
+struct ibv_srq *ibv_create_srq(struct ibv_pd *pd, struct ibv_srq_init_attr *srq_init_attr) {return 0; }
+int ibv_destroy_srq(struct ibv_srq *srq) {return 0; }
+struct ibv_pd *ibv_alloc_pd(struct ibv_context *context) {return 0; }
+int ibv_dealloc_pd(struct ibv_pd *pd) {return 0; }
+const char *ibv_wc_status_str(enum ibv_wc_status status) {return 0; }
+int ibv_modify_qp(struct ibv_qp *qp, struct ibv_qp_attr *attr, int attr_mask) {return 0; }
+
+//
+//
+//
+struct rdma_event_channel *rdma_create_event_channel(void) {return 0; }
+void rdma_destroy_event_channel(struct rdma_event_channel *channel) {return; }
+int rdma_create_id(struct rdma_event_channel *channel,
+           struct rdma_cm_id **id, void *context,
+           enum rdma_port_space ps) {return 0; }
+int rdma_create_ep(struct rdma_cm_id **id, struct rdma_addrinfo *res,
+           struct ibv_pd *pd, struct ibv_qp_init_attr *qp_init_attr) {return 0; }
+void rdma_destroy_ep(struct rdma_cm_id *id) {return; }
+int rdma_destroy_id(struct rdma_cm_id *id) {return 0; }
+int rdma_bind_addr(struct rdma_cm_id *id, struct sockaddr *addr) {return 0; }
+int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
+              struct sockaddr *dst_addr, int timeout_ms) {return 0; }
+int rdma_resolve_route(struct rdma_cm_id *id, int timeout_ms) {return 0; }
+int rdma_create_qp(struct rdma_cm_id *id, struct ibv_pd *pd,
+           struct ibv_qp_init_attr *qp_init_attr) {return 0; }
+int rdma_create_qp_ex(struct rdma_cm_id *id,
+              struct ibv_qp_init_attr_ex *qp_init_attr) {return 0; }
+int rdma_create_qp_exp(struct rdma_cm_id *id,
+               struct ibv_exp_qp_init_attr *qp_init_attr) {return 0; }
+void rdma_destroy_qp(struct rdma_cm_id *id) {return; }
+int rdma_connect(struct rdma_cm_id *id, struct rdma_conn_param *conn_param) {return 0; }
+int rdma_listen(struct rdma_cm_id *id, int backlog) {return 0; }
+int rdma_get_request(struct rdma_cm_id *listen, struct rdma_cm_id **id) {return 0; }
+int rdma_accept(struct rdma_cm_id *id, struct rdma_conn_param *conn_param) {return 0; }
+int rdma_reject(struct rdma_cm_id *id, const void *private_data,
+        uint8_t private_data_len) {return 0; }
+int rdma_notify(struct rdma_cm_id *id, enum ibv_event_type event) {return 0; }
+int rdma_disconnect(struct rdma_cm_id *id) {return 0; }
+int rdma_join_multicast(struct rdma_cm_id *id, struct sockaddr *addr,
+            void *context) {return 0; }
+int rdma_leave_multicast(struct rdma_cm_id *id, struct sockaddr *addr) {return 0; }
+int rdma_get_cm_event(struct rdma_event_channel *channel,
+              struct rdma_cm_event **event) {return 0; }
+int rdma_ack_cm_event(struct rdma_cm_event *event) {return 0; }
+uint16_t rdma_get_src_port(struct rdma_cm_id *id) {return 0; }
+uint16_t rdma_get_dst_port(struct rdma_cm_id *id) {return 0; }
+struct ibv_context **rdma_get_devices(int *num_devices) {return 0; }
+void rdma_free_devices(struct ibv_context **list) {return; }
+const char *rdma_event_str(enum rdma_cm_event_type event) {return 0; }
+int rdma_set_option(struct rdma_cm_id *id, int level, int optname,
+            void *optval, size_t optlen) {return 0; }
+int rdma_migrate_id(struct rdma_cm_id *id, struct rdma_event_channel *channel) {return 0; }
+int rdma_getaddrinfo(char *node, char *service,
+             struct rdma_addrinfo *hints,
+             struct rdma_addrinfo **res) {return 0; }
+void rdma_freeaddrinfo(struct rdma_addrinfo *res) {return; }
+
+#endif
 
 const int hpx::parcelset::policies::verbs::verbs_completion_queue::MaxQueueSize;
 
