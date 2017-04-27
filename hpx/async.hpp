@@ -133,7 +133,7 @@ namespace hpx { namespace detail
                     hpx::this_thread::yield_to(thread::id(std::move(tid)));
                 }
             }
-            return p.retrieve_future();
+            return p.get_future();
         }
 
         template <typename F, typename ...Ts>
@@ -171,7 +171,7 @@ namespace hpx { namespace detail
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
             p.apply(policy, policy.priority());
-            return p.retrieve_future();
+            return p.get_future();
         }
 
         template <typename F, typename ...Ts>
@@ -193,7 +193,7 @@ namespace hpx { namespace detail
             // make sure this thread is executed last
             threads::thread_id_type tid = p.apply(policy, policy.priority());
             hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            return p.retrieve_future();
+            return p.get_future();
         }
 
         template <typename F, typename ...Ts>
@@ -212,7 +212,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            return p.retrieve_future();
+            return p.get_future();
         }
     };
 
@@ -260,7 +260,7 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(sched,
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
             p.apply();
-            return p.retrieve_future();
+            return p.get_future();
         }
     };
 
