@@ -410,7 +410,7 @@ namespace verbs
         //  return a sender_connection object back to the parcelport_impl
         // --------------------------------------------------------------------
         sender_connection* get_connection(
-            parcelset::locality const& dest, error_code& ec)
+            parcelset::locality const& dest, uint64_t &fi_addr)
         {
             FUNC_START_DEBUG_MSG;
             const std::uint32_t &dest_ip = dest.get<locality>().ip_;
@@ -1274,7 +1274,7 @@ namespace verbs
 
         template <typename Handler>
         bool async_write(Handler && handler,
-            sender_connection *sender,
+            sender_connection *sender, uint64_t addr,
             snd_buffer_type &buffer)
         {
             FUNC_START_DEBUG_MSG;
