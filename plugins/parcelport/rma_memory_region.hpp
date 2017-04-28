@@ -15,6 +15,14 @@ namespace hpx {
 namespace parcelset
 {
     // --------------------------------------------------------------------
+    // a base class that provides an API for creating/accessing
+    // pinned memory blocks. This will be overridden by concrete
+    // implementations for each parcelport.
+    struct rma_memory_base {
+        rma_memory_base()
+    };
+
+    // --------------------------------------------------------------------
     template <typename RegionProvider>
     struct rma_memory_region
     {
@@ -46,7 +54,7 @@ namespace parcelset
             int ret = traits::rma_memory_region_traits<RegionProvider>::register_memory(
                 pd, const_cast<void*>(buffer), length,
                 traits::rma_memory_region_traits<RegionProvider>::flags(),
-                0, (uint64_t)address_, 0, &(region_), NULL);
+                0, (uint64_t)address_, 0, &(region_), nullptr);
 
             if (ret) {
                 LOG_ERROR_MSG(
@@ -82,7 +90,7 @@ namespace parcelset
             int ret = traits::rma_memory_region_traits<RegionProvider>::register_memory(
                 pd, const_cast<void*>(buffer), length,
                 traits::rma_memory_region_traits<RegionProvider>::flags(),
-                0, (uint64_t)address_, 0, &(region_), NULL);
+                0, (uint64_t)address_, 0, &(region_), nullptr);
 
             if (ret) {
                 LOG_ERROR_MSG(
@@ -128,7 +136,8 @@ namespace parcelset
                     uint32_t length = get_size();
                 );
                 //
-                if (traits::rma_memory_region_traits<RegionProvider>::unregister_memory(region_))
+                if (traits::rma_memory_region_traits<RegionProvider>::
+                    unregister_memory(region_))
                 {
                     LOG_ERROR_MSG("Error, fi_close mr failed\n");
                     return -1;

@@ -440,7 +440,8 @@ namespace verbs
                     , parcels_sent_
                 );
 
-                auto ok = connection_cache.insert(std::make_pair(dest_ip, connection_ptr));
+                auto ok =
+                    connection_cache.insert(std::make_pair(dest_ip, connection_ptr));
                 if (!ok.second) {
                     LOG_DEVEL_MSG("Duplicate connection_cache insert");
                     sender_connection *temp = connection_cache[dest_ip].get();

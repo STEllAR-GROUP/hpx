@@ -532,7 +532,8 @@ namespace hpx { namespace parcelset
             void
         >::type
         send_immediate_impl(
-            parcelport_impl &this_, locality const&dest_, write_handler_type &&f_, parcel&& p)
+            parcelport_impl &this_, locality const&dest_,
+            write_handler_type &&f_, parcel&& p)
         {
             std::uint64_t addr;
             error_code ec;
@@ -585,7 +586,8 @@ namespace hpx { namespace parcelset
             void
         >::type
         send_immediate_impl(
-            parcelport_impl &this_, locality const&dest_, write_handler_type &&f_, parcel&& p)
+            parcelport_impl &this_, locality const&dest_,
+            write_handler_type &&f_, parcel&& p)
         {
             HPX_ASSERT(false);
         }
@@ -848,7 +850,8 @@ namespace hpx { namespace parcelset
                 for (std::size_t i = 0; i < parcels.size(); ++i)
                 {
                     this->send_immediate_impl<ConnectionHandler>(
-                        *this, locality_id, std::move(handlers[i]), std::move(parcels[i]));
+                        *this, locality_id, std::move(handlers[i]),
+                        std::move(parcels[i]));
                 }
                 return;
             }

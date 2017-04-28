@@ -36,10 +36,10 @@ namespace concurrent {
     {
     public:
 
-        typedef hpx::lcos::local::readers_writer_mutex                      rw_mutex_type;
-        typedef hpx::parcelset::policies::libfabric::unique_lock<rw_mutex_type> write_lock;
-        typedef boost::shared_lock<rw_mutex_type>                           read_lock;
-        typedef boost::defer_lock_t                                         defer_lock;
+        typedef hpx::lcos::local::readers_writer_mutex  rw_mutex_type;
+        typedef std::unique_lock<rw_mutex_type>         write_lock;
+        typedef boost::shared_lock<rw_mutex_type>       read_lock;
+        typedef boost::defer_lock_t                     defer_lock;
 
     private:
         typedef std::unordered_map<Key, Value, Hash, KeyEqual, Allocator> base_map;

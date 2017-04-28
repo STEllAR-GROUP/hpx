@@ -16,6 +16,7 @@
 #include <rdma/fi_errno.h>
 //
 #include <memory>
+#include <utility>
 //
 namespace hpx {
 namespace parcelset {

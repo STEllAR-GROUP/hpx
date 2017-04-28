@@ -16,6 +16,8 @@
 #include <hpx/util/atomic_count.hpp>
 //
 #include <boost/container/small_vector.hpp>
+//
+#include <vector>
 
 namespace hpx {
 namespace parcelset {

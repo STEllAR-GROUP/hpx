@@ -11,11 +11,15 @@
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
-
+//
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
-
+//
 #include <hpx/util/detail/yield_k.hpp>
+//
+#include <utility>
+#include <cstddef>
+#include <cstdint>
 
 namespace hpx {
 namespace parcelset {
@@ -93,7 +97,8 @@ namespace libfabric
             // that it can now cleanup - all remote get operations are done.
             sender* snd = *reinterpret_cast<sender **>(header_region_->get_address());
             pre_post_receive();
-            LOG_DEBUG_MSG("Handling sender tag (RMA ack) completion: " << hexpointer(snd));
+            LOG_DEBUG_MSG("Handling sender tag (RMA ack) completion: "
+                << hexpointer(snd));
             ++acks_received_;
             snd->handle_message_completion_ack();
             return;
@@ -111,7 +116,8 @@ namespace libfabric
                     delete recv;
                 }
                 // Notify one possibly waiting reciever that one receive just finished
-                if (threads::threadmanager_is_at_least(state_running) && hpx::threads::get_self_ptr())
+                if (threads::threadmanager_is_at_least(state_running)
+                    && hpx::threads::get_self_ptr())
                 {
                     std::unique_lock<mutex_type> l(active_receivers_mtx_);
                     active_receivers_cv_.notify_one(std::move(l));
@@ -123,7 +129,8 @@ namespace libfabric
             const long max_receivers =
                 HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
             std::size_t k = 0;
-            if (threads::threadmanager_is_at_least(state_running) && hpx::threads::get_self_ptr())
+            if (threads::threadmanager_is_at_least(state_running)
+                && hpx::threads::get_self_ptr())
             {
                 while (active_receivers_ > max_receivers)
                 {

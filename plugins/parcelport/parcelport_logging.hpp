@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <thread>
 #include <chrono>
+#include <string>
 //
 #include <hpx/config.hpp>
 #include <hpx/config/parcelport_defines.hpp>
@@ -126,7 +127,7 @@ namespace detail {
         temp << "address " << hexpointer(address)
              << "length " << hexuint32(length)
              << "CRC32: " << hexuint32(crc32(address,length));
-        for (size_t i=0; i < std::min(length/8, size_t(128)); i++) {
+        for (size_t i=0; i < (std::min)(length/8, size_t(128)); i++) {
             temp << hexuint64(*uintBuf++);
         }
         temp << ": " << txt;

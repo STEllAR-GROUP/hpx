@@ -14,10 +14,11 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/detail/yield_k.hpp>
-
+//
 #include <rdma/fi_endpoint.h>
-
+//
 #include <memory>
+#include <cstddef>
 
 namespace hpx {
 namespace parcelset {

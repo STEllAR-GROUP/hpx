@@ -12,10 +12,12 @@
 #include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
-
+//
 #include <hpx/util/atomic_count.hpp>
-
+//
 #include <boost/container/small_vector.hpp>
+//
+#include <cstdint>
 
 namespace hpx {
 namespace parcelset {

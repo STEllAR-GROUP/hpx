@@ -35,7 +35,13 @@
 #include <atomic>
 #include <string>
 #include <utility>
+#include <array>
+#include <vector>
+#include <unordered_map>
+#include <sstream>
 #include <cstdint>
+#include <cstddef>
+#include <cstring>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_cm.h>
@@ -210,7 +216,8 @@ namespace libfabric
                 std::string pmi_key = "hpx_libfabric_" + std::to_string(i);
                 char encoded_data[locality::array_size*2];
                 int length = 0;
-                PMI2_KVS_Get(0, i, pmi_key.data(), encoded_data, encoded_length + 1, &length);
+                PMI2_KVS_Get(0, i, pmi_key.data(), encoded_data,
+                    encoded_length + 1, &length);
                 if (length != encoded_length)
                 {
                     LOG_ERROR_MSG("PMI value length mismatch, expected "
@@ -315,7 +322,8 @@ namespace libfabric
             }
             // we require message and RMA support, so ask for them
             // we also want receives to carry source address info
-            fabric_hints_->caps                   = FI_MSG | FI_RMA | FI_SOURCE | FI_WRITE | FI_READ | FI_REMOTE_READ | FI_REMOTE_WRITE | FI_RMA_EVENT;
+            fabric_hints_->caps                   = FI_MSG | FI_RMA | FI_SOURCE |
+                FI_WRITE | FI_READ | FI_REMOTE_READ | FI_REMOTE_WRITE | FI_RMA_EVENT;
             fabric_hints_->mode                   = FI_CONTEXT | FI_LOCAL_MR;
             fabric_hints_->fabric_attr->prov_name = strdup(provider.c_str());
             LOG_DEBUG_MSG("fabric provider " << fabric_hints_->fabric_attr->prov_name);
@@ -363,7 +371,7 @@ namespace libfabric
 
             uint64_t flags = 0;
             LOG_DEBUG_MSG("Getting initial info about fabric");
-            int ret = fi_getinfo(FI_VERSION(1,4), NULL, NULL,
+            int ret = fi_getinfo(FI_VERSION(1,4), nullptr, nullptr,
                 flags, fabric_hints_, &fabric_info_);
             if (ret) {
                 throw fabric_error(ret, "Failed to get fabric info");
@@ -376,14 +384,14 @@ namespace libfabric
             LOG_DEBUG_MSG("Fabric requires FI_CONTEXT " << context);
 
             LOG_DEBUG_MSG("Creating fabric object");
-            ret = fi_fabric(fabric_info_->fabric_attr, &fabric_, NULL);
+            ret = fi_fabric(fabric_info_->fabric_attr, &fabric_, nullptr);
             if (ret) {
                 throw fabric_error(ret, "Failed to get fi_fabric");
             }
 
             // Allocate a domain.
             LOG_DEBUG_MSG("Allocating domain ");
-            ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, NULL);
+            ret = fi_domain(fabric_, fabric_info_, &fabric_domain_, nullptr);
             if (ret) throw fabric_error(ret, "fi_domain");
 
             // Cray specific. Disable memory registration cache
@@ -426,7 +434,7 @@ namespace libfabric
             char *get_val;
 
             ret = fi_open_ops(&fabric_domain_->fid, FI_GNI_DOMAIN_OPS_1,
-                      0, (void **) &gni_domain_ops, NULL);
+                      0, (void **) &gni_domain_ops, nullptr);
             if (ret) throw fabric_error(ret, "fi_open_ops");
             LOG_DEBUG_MSG("domain ops returned " << hexpointer(gni_domain_ops));
 
@@ -437,7 +445,8 @@ namespace libfabric
             ret = gni_domain_ops->get_val(&fabric_domain_->fid,
                     (dom_ops_val_t)(op), &get_val);
             LOG_DEBUG_MSG("Cache mode set to " << get_val);
-            if (std::string(value) != std::string(get_val)) throw fabric_error(ret, "get val");
+            if (std::string(value) != std::string(get_val))
+                throw fabric_error(ret, "get val");
 #endif
         }
 
@@ -454,7 +463,7 @@ namespace libfabric
             LOG_DEBUG_MSG("Creating event queue");
             fi_eq_attr eq_attr = {};
             eq_attr.wait_obj = FI_WAIT_NONE;
-            int ret = fi_eq_open(fabric_, &eq_attr, &event_queue_, NULL);
+            int ret = fi_eq_open(fabric_, &eq_attr, &event_queue_, nullptr);
             if (ret) throw fabric_error(ret, "fi_eq_open");
 
             if (fabric_info_->ep_attr->type == FI_EP_MSG) {
@@ -468,7 +477,7 @@ namespace libfabric
 
                 LOG_DEBUG_MSG("Allocating shared receive context");
                 ret = fi_srx_context(fabric_domain_, fabric_info_->rx_attr,
-                    &ep_shared_rx_cxt_, NULL);
+                    &ep_shared_rx_cxt_, nullptr);
                 if (ret) throw fabric_error(ret, "fi_srx_context");
             }
             FUNC_END_DEBUG_MSG;
@@ -485,7 +494,7 @@ namespace libfabric
             id = &ep_active_->fid;
 #else
             LOG_DEBUG_MSG("Creating passive endpoint");
-            ret = fi_passive_ep(fabric_, fabric_info_, &ep_passive_, NULL);
+            ret = fi_passive_ep(fabric_, fabric_info_, &ep_passive_, nullptr);
             if (ret) {
                 throw fabric_error(ret, "Failed to create fi_passive_ep");
             }
@@ -524,7 +533,7 @@ namespace libfabric
             // create an 'active' endpoint that can be used for sending/receiving
             LOG_DEBUG_MSG("Creating active endpoint");
             LOG_DEBUG_MSG("Got info mode " << (info->mode & FI_NOTIFY_FLAGS_ONLY));
-            int ret = fi_endpoint(fabric_domain_, info, new_endpoint, NULL);
+            int ret = fi_endpoint(fabric_domain_, info, new_endpoint, nullptr);
             if (ret) throw fabric_error(ret, "fi_endpoint");
 
             if (info->ep_attr->type == FI_EP_MSG) {
@@ -589,7 +598,7 @@ namespace libfabric
                 const parcelset::endpoints_type &res = as.resolve_locality(l);
                 // get the fabric related data
                 auto it = res.find("libfabric");
-                LOG_DEBUG_MSG("locality resolution " << it->first << " => " << it->second);
+                LOG_DEBUG_MSG("locality resolution " << it->first << " => " <<it->second);
                 const hpx::parcelset::locality &fabric_locality = it->second;
                 const locality &loc = fabric_locality.get<locality>();
                 // put the provide specific data into the address vector
@@ -622,8 +631,10 @@ namespace libfabric
 
         // types we need for connection and disconnection callback functions
         // into the main parcelport code.
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)> ConnectionFunction;
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)> DisconnectionFunction;
+        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+            ConnectionFunction;
+        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+            DisconnectionFunction;
 
         // --------------------------------------------------------------------
         // Set a callback which will be called immediately after
@@ -800,16 +811,19 @@ namespace libfabric
 //             uint32_t *addr;
             uint32_t event;
             std::array<char, 256> buffer;
-            ssize_t rd = fi_eq_read(event_queue_, &event, buffer.data(), sizeof(buffer), 0);
+            ssize_t rd = fi_eq_read(event_queue_, &event,
+                buffer.data(), sizeof(buffer), 0);
             if (rd > 0) {
-                LOG_DEBUG_MSG("fi_eq_cm_entry " << decnumber(sizeof(fi_eq_cm_entry)) << " fi_eq_entry " << decnumber(sizeof(fi_eq_entry)));
+                LOG_DEBUG_MSG("fi_eq_cm_entry " << decnumber(sizeof(fi_eq_cm_entry))
+                    << " fi_eq_entry " << decnumber(sizeof(fi_eq_entry)));
                 LOG_DEBUG_MSG("got event " << event << " with bytes = " << decnumber(rd));
                 switch (event) {
                 case FI_CONNREQ:
                 {
                     cm_entry = reinterpret_cast<struct fi_eq_cm_entry*>(buffer.data());
                     locality::locality_data addressinfo;
-                    std::memcpy(addressinfo.data(), cm_entry->info->dest_addr, locality::array_size);
+                    std::memcpy(addressinfo.data(), cm_entry->info->dest_addr,
+                        locality::array_size);
                     locality loc(addressinfo);
                     LOG_DEBUG_MSG("FI_CONNREQ                 from "
                         << ipaddress(loc.ip_address()) << "-> "
@@ -824,7 +838,8 @@ namespace libfabric
                                 << ipaddress(loc.ip_address()) << "-> "
                                 << ipaddress(here_.ip_address())
                                 << "( " << ipaddress(here_.ip_address()) << " )");
-//                            int ret = fi_reject(ep_passive_, cm_entry->info->handle,  nullptr, 0);
+//                            int ret = fi_reject(ep_passive_, cm_entry->info->handle,
+//                                nullptr, 0);
 //                            if (ret) throw fabric_error(ret, "new_ep fi_reject failed");
                             fi_freeinfo(cm_entry->info);
                             return 0;
@@ -835,7 +850,8 @@ namespace libfabric
                             << ipaddress(loc.ip_address()) << "-> "
                             << ipaddress(here_.ip_address())
                             << "( " << ipaddress(here_.ip_address()) << " )");
-                        int ret = fi_accept(new_ep, &here_.ip_address(), sizeof(uint32_t));
+                        int ret = fi_accept(new_ep, &here_.ip_address(),
+                            sizeof(uint32_t));
                         if (ret) throw fabric_error(ret, "new_ep fi_accept failed");
                     }
                     fi_freeinfo(cm_entry->info);
@@ -931,7 +947,7 @@ namespace libfabric
                 cq_attr.format = FI_CQ_FORMAT_MSG;
 //             }
 
-            // open a completion queue on our fabric domain and set context ptr to tx queue
+            // open completion queue on fabric domain and set context ptr to tx queue
             cq_attr.wait_obj = FI_WAIT_NONE;
             cq_attr.size = info->tx_attr->size;
             info->tx_attr->op_flags |= FI_COMPLETION;
@@ -940,7 +956,7 @@ namespace libfabric
             ret = fi_cq_open(fabric_domain_, &cq_attr, &txcq_, &txcq_);
             if (ret) throw fabric_error(ret, "fi_cq_open");
 
-            // open a completion queue on our fabric domain and set context ptr to rx queue
+            // open completion queue on fabric domain and set context ptr to rx queue
             cq_attr.size = info->rx_attr->size;
             LOG_DEBUG_MSG("Creating CQ with rx size " << decnumber(info->rx_attr->size));
             ret = fi_cq_open(fabric_domain_, &cq_attr, &rxcq_, &rxcq_);
@@ -958,7 +974,7 @@ namespace libfabric
                 }
 
                 LOG_DEBUG_MSG("Creating address vector ");
-                ret = fi_av_open(fabric_domain_, &av_attr, &av_, NULL);
+                ret = fi_av_open(fabric_domain_, &av_attr, &av_, nullptr);
                 if (ret) throw fabric_error(ret, "fi_av_open");
             }
             FUNC_END_DEBUG_MSG;
@@ -995,7 +1011,7 @@ namespace libfabric
             }
 
             // get the future that was inserted or already present
-            // the future will become ready when the remote end accepts/rejects our connection
+            // the future will become ready when remote end accepts/rejects connection
             // or we accept a connection from a remote
             hpx::shared_future<struct fid_ep*> result = std::get<1>(it.first->second);
 

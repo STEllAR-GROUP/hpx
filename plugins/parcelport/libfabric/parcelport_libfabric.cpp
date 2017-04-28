@@ -173,7 +173,8 @@ namespace libfabric
         {
             sender *snd =
                new sender(this,
-                    libfabric_controller_->ep_active_, libfabric_controller_->get_domain(),
+                    libfabric_controller_->ep_active_,
+                    libfabric_controller_->get_domain(),
                     chunk_pool_);
             snd->postprocess_handler_ = [this](sender* s)
                 {
@@ -289,7 +290,8 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     // the root node has spacial handlig, this returns its Id
-    parcelset::locality parcelport::agas_locality(util::runtime_configuration const & ini) const
+    parcelset::locality parcelport::
+    agas_locality(util::runtime_configuration const & ini) const
     {
         FUNC_START_DEBUG_MSG;
         // load all components as described in the configuration information

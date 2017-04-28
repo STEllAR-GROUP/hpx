@@ -6,11 +6,17 @@
 
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
-
+//
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
-
+//
 #include <hpx/util/detail/yield_k.hpp>
+//
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <utility>
+#include <vector>
 
 namespace hpx {
 namespace parcelset {
@@ -200,7 +206,8 @@ namespace libfabric
                 {
                     LOG_EXCLUSIVE(
                         // write a pattern and dump out data for debugging purposes
-                        uint32_t *buffer = reinterpret_cast<uint32_t*>(get_region->get_address());
+                        uint32_t *buffer =
+                            reinterpret_cast<uint32_t*>(get_region->get_address());
                         std::fill(buffer, buffer + get_region->get_size()/4, 0x01010101);
                         LOG_TRACE_MSG(
                             CRC32_MEM(get_region->get_address(), c.size_,

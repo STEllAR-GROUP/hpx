@@ -189,8 +189,10 @@ namespace verbs
                 std::stringstream temp;
                 temp << "Send Buffer : \n";
                 for (int s=0; s<N; s++) {
-                    temp << "sge length " << decnumber(region[s]->get_message_length()) << ",";
-                    temp << "sge addr " << hexpointer(region[s]->get_address()) << ",";
+                    temp << "sge length "
+                         << decnumber(region[s]->get_message_length()) << ",";
+                    temp << "sge addr "
+                         << hexpointer(region[s]->get_address()) << ",";
                 }
                 temp << "\n";
             )

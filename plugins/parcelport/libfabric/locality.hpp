@@ -9,6 +9,8 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 //
+#include <utility>
+#include <cstring>
 #include <cstdint>
 #include <array>
 #include <rdma/fabric.h>

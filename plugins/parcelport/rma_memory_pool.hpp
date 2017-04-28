@@ -10,20 +10,23 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/atomic_count.hpp>
 //
+#include <hpx/config/parcelport_defines.hpp>
+//
+#include <plugins/parcelport/parcelport_logging.hpp>
+#include <plugins/parcelport/rma_memory_region.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
+//
+#include <boost/lockfree/stack.hpp>
+//
 #include <atomic>
 #include <stack>
 #include <unordered_map>
 #include <iostream>
 #include <cstddef>
 #include <memory>
-//
-#include <boost/lockfree/stack.hpp>
-//
-#include <hpx/config/parcelport_defines.hpp>
-//
-#include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/rma_memory_region.hpp>
-#include <plugins/parcelport/performance_counter.hpp>
+#include <array>
+#include <sstream>
+#include <string>
 
 // the default memory chunk size in bytes
 #define RDMA_POOL_1K_CHUNK_SIZE     0x001*0x0400 //  1KB
