@@ -80,15 +80,13 @@ set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
-set(delay_baseline_threaded_FLAGS NOLIBS
-    DEPENDENCIES
-        ${boost_library_dependencies})
+set(delay_baseline_threaded_FLAGS
+    DEPENDENCIES ${boost_library_dependencies})
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(benchmarks ${benchmarks}
-    boost_tls_overhead
     hpx_tls_overhead
     native_tls_overhead
    )

@@ -5,6 +5,11 @@
 
 // hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
 // hpxinspect:nodeprecatedname:boost::chrono
+// hpxinspect:nodeprecatedname:boost::thread
+// hpxinspect:nodeprecatedname:boost::this_thread::get_id
+// hpxinspect:nodeprecatedname:boost::this_thread::yield
+// hpxinspect:nodeprecatedname:boost::this_thread::sleep_until
+// hpxinspect:nodeprecatedname:boost::this_thread::sleep_for
 
 #ifndef HPX_COMPAT_THREAD_HPP
 #define HPX_COMPAT_THREAD_HPP

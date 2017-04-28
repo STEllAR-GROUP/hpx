@@ -7,6 +7,7 @@
 
 #include "worker_timed.hpp"
 
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -17,7 +18,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/thread/barrier.hpp>
 #include <boost/format.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
@@ -114,7 +114,7 @@ void invoke_n_workers_nowait(
 }
 
 void invoke_n_workers(
-    boost::barrier& b
+    hpx::compat::barrier& b
   , double& elapsed
   , std::uint64_t workers
     )
@@ -134,7 +134,7 @@ int app_main(
 
     std::vector<double> elapsed(threads - 1);
     std::vector<compat::thread> workers;
-    boost::barrier b(threads - 1);
+    hpx::compat::barrier b(threads - 1);
 
     for (std::uint32_t i = 0; i != threads - 1; ++i)
     {

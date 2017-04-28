@@ -3,6 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:boost::mutex
+// hpxinspect:nodeprecatedname:boost::recursive_mutex
+// hpxinspect:nodeprecatedname:boost::once_flag
+// hpxinspect:nodeprecatedname:boost::call_once
+
 #ifndef HPX_COMPAT_MUTEX_HPP
 #define HPX_COMPAT_MUTEX_HPP
 
