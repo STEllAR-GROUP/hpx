@@ -3,39 +3,49 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_rma_memory_region_HPP
-#define HPX_PARCELSET_POLICIES_rma_memory_region_HPP
+#ifndef HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION
+#define HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION
 
 #include <hpx/traits/rma_memory_region_traits.hpp>
-#include <plugins/parcelport/rma_memory_region_base.hpp>
+#include <hpx/runtime/parcelset/rma/memory_region.hpp>
 //
 #include <memory>
 //
 namespace hpx {
-namespace parcelset
+namespace parcelset {
+namespace rma {
+namespace detail
 {
     // --------------------------------------------------------------------
+    // a memory region is a pinned block of memory that has been specialized
+    // by a particular region provider. Each provider (infiniband, libfabric,
+    // other) has a different definition for the region object and the protection
+    // domain used to limit access.
+    // Code that does not 'know' which parcelport is being used, must use
+    // the memory_region class to manage regions, but parcelport code
+    // may use the correcft type for the parcelport in question.
+    // --------------------------------------------------------------------
     template <typename RegionProvider>
-    class rma_memory_region : public rma_memory_region_base
+    class memory_region_impl : public memory_region
     {
       public:
         typedef typename RegionProvider::provider_domain provider_domain;
         typedef typename RegionProvider::provider_region provider_region;
 
         // --------------------------------------------------------------------
-        rma_memory_region() :
-            rma_memory_region_base(), region_(nullptr) {}
+        memory_region_impl() :
+            memory_region(), region_(nullptr) {}
 
         // --------------------------------------------------------------------
-        rma_memory_region(
+        memory_region_impl(
             provider_region *region, char *address,
             char *base_address, uint64_t size, uint32_t flags)
-            : rma_memory_region_base(address, base_address, size, flags)
+            : memory_region(address, base_address, size, flags)
             , region_(region) {}
 
         // --------------------------------------------------------------------
         // construct a memory region object by registering an existing address buffer
-        rma_memory_region(provider_domain *pd, const void *buffer, const uint64_t length)
+        memory_region_impl(provider_domain *pd, const void *buffer, const uint64_t length)
         {
             address_    = static_cast<char *>(const_cast<void *>(buffer));
             base_addr_  = address_;
@@ -100,7 +110,7 @@ namespace parcelset
             }
 
             LOG_DEBUG_MSG("allocated/registered memory region " << hexpointer(this)
-                << "with desc " << hexnumber(get_desc())
+                << "with local key " << hexnumber(get_local_key())
                 << "at address " << hexpointer(get_address())
                 << "with length " << hexlength(get_size()));
             return 0;
@@ -108,7 +118,7 @@ namespace parcelset
 
         // --------------------------------------------------------------------
         // destroy the region and memory according to flag settings
-        ~rma_memory_region()
+        ~memory_region_impl()
         {
             if (get_partial_region()) return;
             release();
@@ -120,8 +130,8 @@ namespace parcelset
         int release(void)
         {
             if (region_ != nullptr) {
-                LOG_TRACE_MSG("About to release memory region with desc "
-                    << hexpointer(get_desc()));
+                LOG_TRACE_MSG("About to release memory region with local key "
+                    << hexpointer(get_local_key()));
                 // get these before deleting/unregistering (for logging)
                 const void *buffer = get_base_address();
                 LOG_EXCLUSIVE(
@@ -135,8 +145,8 @@ namespace parcelset
                     return -1;
                 }
                 else {
-                    LOG_DEBUG_MSG("deregistered memory region with desc "
-                        << hexpointer(get_desc())
+                    LOG_DEBUG_MSG("deregistered memory region with local key "
+                        << hexpointer(get_local_key())
                         << "at address " << hexpointer(buffer)
                         << "with length " << hexlength(length));
                 }
@@ -172,6 +182,6 @@ namespace parcelset
 
     };
 
-}}
+}}}}
 
 #endif

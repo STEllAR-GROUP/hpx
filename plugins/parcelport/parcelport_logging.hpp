@@ -118,6 +118,7 @@ namespace detail {
         return os;
     }
 
+#ifdef HPX_PARCELPORT_LOGGING_HAVE_TRACE_LOG
     // ------------------------------------------------------------------
     // helper fuction for printing CRC32
     // ------------------------------------------------------------------
@@ -146,23 +147,24 @@ namespace detail {
         temp << ": " << txt;
         return temp.str();
     }
+#endif
 
 }}}}}
 
 #define THREAD_ID "" \
     << hpx::parcelset::policies::libfabric::detail::rdma_thread_print_helper()
 
-#define CRC32(buf,len) "" \
-    << hpx::parcelset::policies::libfabric::detail::crc32(buf,len)
-
-#define CRC32_MEM(buf, len, txt) "" \
-    << hpx::parcelset::policies::libfabric::detail::mem_crc32(buf, len, txt)
-
 // ------------------------------------------------------------------
 // Trace messages are enabled for full debug
 // ------------------------------------------------------------------
 #ifdef HPX_PARCELPORT_LOGGING_HAVE_TRACE_LOG
 #  define LOG_TRACE_MSG(x) BOOST_LOG_TRIVIAL(trace)   << THREAD_ID << " " << x;
+
+# define CRC32(buf,len) "" \
+    << hpx::parcelset::policies::libfabric::detail::crc32(buf,len)
+
+# define CRC32_MEM(buf, len, txt) "" \
+    << hpx::parcelset::policies::libfabric::detail::mem_crc32(buf, len, txt)
 #else
 #  define LOG_TRACE_MSG(x)
 #endif

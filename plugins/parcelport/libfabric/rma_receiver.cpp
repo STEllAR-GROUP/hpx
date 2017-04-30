@@ -28,7 +28,7 @@ namespace libfabric
     rma_receiver::rma_receiver(
         parcelport* pp,
         fid_ep* endpoint,
-        rma_memory_pool<region_provider>* memory_pool,
+        rma::memory_pool<region_provider>* memory_pool,
         completion_handler&& handler)
       : pp_(pp)
       , endpoint_(endpoint)

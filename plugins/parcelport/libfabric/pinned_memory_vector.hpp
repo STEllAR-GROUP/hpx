@@ -8,8 +8,9 @@
 
 #include <hpx/config.hpp>
 //
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+//
 #include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
 //
 #include <vector>
 #include <functional>

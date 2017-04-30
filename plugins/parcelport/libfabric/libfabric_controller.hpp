@@ -17,6 +17,9 @@
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 //
+#include <hpx/runtime/parcelset/rma/detail/memory_region_impl.hpp>
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+//
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 #include <plugins/parcelport/libfabric/receiver.hpp>
@@ -84,6 +87,8 @@
             binary_from_base64<std::string::const_iterator>, 8, 6
     > binary_t;
 #endif
+
+using namespace hpx::parcelset;
 
 namespace hpx {
 namespace parcelset {
@@ -162,7 +167,7 @@ namespace libfabric
 
             // Create a memory pool for pinned buffers
             memory_pool_.reset(
-                new rma_memory_pool<libfabric_region_provider>(fabric_domain_));
+                new rma::memory_pool<libfabric_region_provider>(fabric_domain_));
 
             // setup a passive listener, or an active RDM endpoint
             here_ = create_local_endpoint();
@@ -958,7 +963,7 @@ namespace libfabric
         }
 
         // --------------------------------------------------------------------
-        inline rma_memory_pool<libfabric_region_provider>& get_memory_pool() {
+        inline rma::memory_pool<libfabric_region_provider>& get_memory_pool() {
             return *memory_pool_;
         }
 
@@ -1155,7 +1160,7 @@ namespace libfabric
         DisconnectionFunction disconnection_function_;
 
         // Pinned memory pool used for allocating buffers
-        std::unique_ptr<rma_memory_pool<libfabric_region_provider>>  memory_pool_;
+        std::unique_ptr<rma::memory_pool<libfabric_region_provider>> memory_pool_;
 
         // Shared completion queue for all endoints
         // Count outstanding receives posted to SRQ + Completion queue

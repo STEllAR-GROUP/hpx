@@ -7,13 +7,15 @@
 #ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_RECEIVER_HPP
 
-#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <hpx/runtime/parcelset/rma/detail/memory_region_impl.hpp>
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+#include <hpx/util/atomic_count.hpp>
+//
 #include <plugins/parcelport/performance_counter.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
+//
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
-//
-#include <hpx/util/atomic_count.hpp>
 //
 #include <boost/container/small_vector.hpp>
 //
@@ -35,14 +37,14 @@ namespace libfabric
     //         complete the transfer of the message
     struct receiver
     {
-        typedef libfabric_region_provider                      region_provider;
-        typedef rma_memory_region<region_provider>             region_type;
-        typedef boost::container::small_vector<region_type*,8> zero_copy_vector;
+        typedef libfabric_region_provider                        region_provider;
+        typedef rma::detail::memory_region_impl<region_provider> region_type;
+        typedef boost::container::small_vector<region_type*,8>   zero_copy_vector;
 
         // --------------------------------------------------------------------
         // construct receive object
         receiver(parcelport* pp, fid_ep* endpoint,
-                 rma_memory_pool<region_provider>& memory_pool);
+                 rma::memory_pool<region_provider>& memory_pool);
 
         // --------------------------------------------------------------------
         // these constructors are provided because boost::lockfree::stack requires them
@@ -73,10 +75,10 @@ namespace libfabric
         void cleanup();
 
     private:
-        parcelport                       *pp_;
-        fid_ep                           *endpoint_;
-        region_type                      *header_region_ ;
-        rma_memory_pool<region_provider>  *memory_pool_;
+        parcelport                        *pp_;
+        fid_ep                            *endpoint_;
+        region_type                       *header_region_ ;
+        rma::memory_pool<region_provider> *memory_pool_;
         //
         friend class libfabric_controller;
         //

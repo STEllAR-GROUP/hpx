@@ -18,6 +18,11 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/parcelset/rma/memory_region.hpp>
+#include <hpx/runtime/parcelset/rma/rma_allocator.hpp>
+//
+#include <plugins/parcelport/unordered_map.hpp>
+//
 #include <hpx/util/function.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
@@ -201,14 +206,20 @@ namespace hpx { namespace parcelset
         /// \brief provide a mechanism to allocate and deallocate memory blocks
         /// that can be used for RDMA operations
         ///
-        /// Allocate and deallocate memory blocks that are 'pinned' so that
-        /// the network layer can use them for RDMA operations
-        virtual rma_memory_region_base *allocate_region(std::size_t size);
+        /// Returns a memory region that can be used with rma operations
+        /// by the network layer.
+        virtual rma::memory_region *allocate_region(std::size_t size);
 
-        virtual int deallocate_region(rma_memory_region_base *region);
+        /// Return a region back to the system where it can be deleted or returned
+        /// to the memory pool for the parcelport (implementatio dependent)
+        virtual int deallocate_region(rma::memory_region *region);
 
-        /// Performance counter data
+        /// Returns an STL compatible allocator that can be used with a vector
+        /// in combination with rma_object semantics. This allocator must
+        /// be rebound to a new type to provide allocaors for <T>
+        rma::rma_allocator<char> *get_allocator();
 
+        /// \brief Performance counter data
         /// number of parcels sent
         std::int64_t get_parcel_send_count(bool reset);
 
@@ -341,6 +352,8 @@ namespace hpx { namespace parcelset
         mutable lcos::local::spinlock mtx_;
 
         hpx::applier::applier *applier_;
+
+        rma::rma_allocator<char> *allocator_;
 
         /// The cache for pending parcels
         typedef util::tuple<

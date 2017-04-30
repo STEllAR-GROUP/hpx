@@ -4,10 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/decode_parcels.hpp>
+//
 #include <plugins/parcelport/libfabric/receiver.hpp>
-
-#include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
@@ -29,7 +32,7 @@ namespace libfabric
 {
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint,
-        rma_memory_pool<region_provider>& memory_pool)
+        rma::memory_pool<region_provider>& memory_pool)
         : pp_(pp)
         , endpoint_(endpoint)
         , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))

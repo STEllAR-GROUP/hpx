@@ -43,14 +43,17 @@
 #define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
+//
+#include <hpx/runtime/parcelset/rma/detail/memory_region_impl.hpp>
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+//
 #include <plugins/parcelport/unordered_map.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
+//
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
-
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
-#include <plugins/parcelport/performance_counter.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
-#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 #include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
@@ -98,8 +101,8 @@ namespace libfabric
         typedef hpx::lcos::local::spinlock                                   mutex_type;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type> scoped_lock;
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type> unique_lock;
-        typedef rma_memory_region<libfabric_region_provider>                 region_type;
-        typedef memory_region_allocator<libfabric_region_provider>        allocator_type;
+        typedef rma::detail::memory_region_impl<libfabric_region_provider>   region_type;
+        //typedef memory_region_allocator<libfabric_region_provider>        allocator_type;
 
         // --------------------------------------------------------------------
         // main vars used to manage the RDMA controller and interface
@@ -121,10 +124,10 @@ namespace libfabric
 
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;
-        typedef rma_memory_pool<libfabric_region_provider>         memory_pool_type;
+        typedef rma::memory_pool<libfabric_region_provider> memory_pool_type;
         typedef pinned_memory_vector<char, header_size, region_type, memory_pool_type>
             snd_data_type;
-        typedef parcel_buffer<snd_data_type>                       snd_buffer_type;
+        typedef parcel_buffer<snd_data_type> snd_buffer_type;
         // when terminating the parcelport, this is used to restrict access
         mutex_type  stop_mutex;
 
@@ -182,18 +185,16 @@ namespace libfabric
 
         parcelset::locality create_locality() const;
 
-        rma_memory_region_base *allocate_region(std::size_t size) override {
+        rma::memory_region *allocate_region(std::size_t size) override {
             return libfabric_controller_->get_memory_pool().allocate_region(size);
         }
 
-        int deallocate_region(rma_memory_region_base *region) {
-            rma_memory_region<libfabric_region_provider> *r =
-                dynamic_cast<rma_memory_region<libfabric_region_provider>*>(region);
+        int deallocate_region(rma::memory_region *region) {
+            region_type *r = dynamic_cast<region_type*>(region);
             HPX_ASSERT(r);
             libfabric_controller_->get_memory_pool().deallocate(r);
             return 0;
         }
-
 
         static void suspended_task_debug(const std::string &match);
 
@@ -271,7 +272,6 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
 #ifdef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
         cfg.ini_config_.push_back("hpx.parcel.bootstrap!=libfabric");
 #endif
-
         FUNC_END_DEBUG_MSG;
     }
 

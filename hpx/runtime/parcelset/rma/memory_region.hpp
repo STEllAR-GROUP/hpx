@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_rma_memory_region_base_HPP
-#define HPX_PARCELSET_POLICIES_rma_memory_region_base_HPP
+#ifndef HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION_BASE
+#define HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION_BASE
 
 #include <hpx/traits/rma_memory_region_traits.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
@@ -12,13 +12,15 @@
 #include <memory>
 //
 namespace hpx {
-namespace parcelset
+namespace parcelset {
+namespace rma
 {
     // --------------------------------------------------------------------
     // a base class that provides an API for creating/accessing
     // pinned memory blocks. This will be overridden by concrete
     // implementations for each parcelport.
-    class rma_memory_region_base
+    // --------------------------------------------------------------------
+    class memory_region
     {
       public:
         // --------------------------------------------------------------------
@@ -29,15 +31,15 @@ namespace parcelset
             BLOCK_PARTIAL = 4,
         };
 
-        rma_memory_region_base() :
+        memory_region() :
             address_(nullptr), base_addr_(nullptr), size_(0), used_space_(0), flags_(0) {}
 
-        rma_memory_region_base(
+        memory_region(
             char *address, char *base_address, uint64_t size, uint32_t flags)
             : address_(address), base_addr_(base_address)
             , size_(size), used_space_(0), flags_(flags) {}
 
-        virtual ~rma_memory_region_base() {}
+        virtual ~memory_region() {}
 
         // --------------------------------------------------------------------
         // return the address of this memory region block. If this
@@ -118,7 +120,7 @@ namespace parcelset
 
         // --------------------------------------------------------------------
         friend std::ostream & operator<<(std::ostream & os,
-            rma_memory_region_base const & region)
+            memory_region const & region)
         {
             os  << "region " << hexpointer(&region)
                 << "base address " << hexpointer(region.base_addr_)
@@ -150,6 +152,6 @@ namespace parcelset
         uint32_t flags_;
     };
 
-}}
+}}}
 
 #endif

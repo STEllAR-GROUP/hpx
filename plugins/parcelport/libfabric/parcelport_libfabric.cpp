@@ -46,15 +46,16 @@
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
 // --------------------------------------------------------------------
+#include <hpx/runtime/parcelset/rma/memory_pool.hpp>
+//
+#include <plugins/parcelport/parcelport_logging.hpp>
+#include <plugins/parcelport/performance_counter.hpp>
 #include <plugins/parcelport/unordered_map.hpp>
+//
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
-
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
-#include <plugins/parcelport/performance_counter.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/connection_handler.hpp>
-#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 #include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 
@@ -164,6 +165,11 @@ namespace libfabric
         LOG_DEBUG_MSG("Fetching memory pool");
         chunk_pool_ = &libfabric_controller_->get_memory_pool();
 
+        // setup provider specific allocator for rma_object use
+        rma::detail::rma_allocator_impl<char, libfabric_region_provider> *default_allocator =
+            new rma::detail::rma_allocator_impl<char, libfabric_region_provider>(chunk_pool_);
+        allocator_ = default_allocator;
+        //
         for (std::size_t i = 0; i < HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS; ++i)
         {
             sender *snd =
