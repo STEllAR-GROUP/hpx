@@ -379,7 +379,8 @@ namespace hpx { namespace lcos { namespace local
             return task_->apply(policy, priority, stacksize, ec);
         }
 
-        // Result retrieval
+        // This is the same as get_future, except that it moves the
+        // shared state into the returned future.
         lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (!task_) {
@@ -391,30 +392,7 @@ namespace hpx { namespace lcos { namespace local
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "futures_factory<Result()>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::future<Result>();
-            }
-
-            future_obtained_ = true;
-
-            using traits::future_access;
-            return future_access<future<Result> >::create(task_);
-        }
-
-        // This is the same as get_future above, except that it moves the
-        // shared state into the returned future.
-        lcos::future<Result> retrieve_future(error_code& ec = throws)
-        {
-            if (!task_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "futures_factory<Result()>::get_future",
-                    "futures_factory invalid (has it been moved?)");
-                return lcos::future<Result>();
-            }
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "futures_factory<Result()>::get_future",
-                    "future already has been retrieved from this promise");
+                    "future already has been retrieved from this factory");
                 return lcos::future<Result>();
             }
 

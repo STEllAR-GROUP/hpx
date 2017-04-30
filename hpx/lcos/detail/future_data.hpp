@@ -798,6 +798,51 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename Allocator>
+    struct future_data_allocator : future_data<Result>
+    {
+        typedef typename future_data<Result>::init_no_addref init_no_addref;
+        typedef typename
+                std::allocator_traits<Allocator>::template
+                    rebind_alloc<future_data_allocator>
+            other_allocator;
+
+        future_data_allocator(other_allocator const& alloc)
+          : future_data<Result>(), alloc_(alloc)
+        {}
+        future_data_allocator(init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(no_addref), alloc_(alloc)
+        {}
+        template <typename Target>
+        future_data_allocator(Target && data, init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(boost::exception_ptr const& e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(e, no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(boost::exception_ptr && e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(std::move(e), no_addref), alloc_(alloc)
+        {}
+
+    private:
+        void destroy()
+        {
+            typedef std::allocator_traits<other_allocator> traits;
+
+            other_allocator alloc(alloc_);
+            traits::destroy(alloc, this);
+            traits::deallocate(alloc, this, 1);
+        }
+
+    private:
+        other_allocator alloc_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct timed_future_data : future_data<Result>
     {
@@ -1097,6 +1142,15 @@ namespace detail
 
     protected:
         threads::thread_id_type id_;
+    };
+}}}
+
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename R, typename Allocator>
+    struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+    {
+        typedef lcos::detail::future_data_allocator<R, Allocator> type;
     };
 }}}
 
