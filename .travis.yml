@@ -1,0 +1,90 @@
+language: cpp
+
+sudo: false
+
+env:
+    global:
+        - GCC_VERSION="4.9.2"
+        - CLANG_VERSION="3.6.0"
+        - BOOST_VERSION="1.57.0"
+        - COMPILER_FLAGS="-Wno-redeclared-class-member" # Hide Warnings caused by boost
+    matrix:
+        #- COMPILER=gcc HPX_BUILD_TYPE=Debug
+        #- COMPILER=gcc HPX_BUILD_TYPE=Release
+        - COMPILER=clang HPX_BUILD_TYPE=Debug
+        - COMPILER=clang HPX_BUILD_TYPE=Release
+
+branches:
+    only:
+        - master
+        - release
+
+before_cache:
+    - ls -lha ${TRAVIS_BUILD_DIR}/.deps
+    - du -sh ${TRAVIS_BUILD_DIR}/.deps
+    - du -sh ${TRAVIS_BUILD_DIR}/.deps/*
+
+cache:
+    ccache: false
+    directories:
+        - .deps
+
+before_install:
+    - export GCC_DIR="${TRAVIS_BUILD_DIR}/.deps/gcc-${GCC_VERSION}"
+    - export CLANG_DIR="${TRAVIS_BUILD_DIR}/.deps/clang-${CLANG_VERSION}"
+    - export BOOST_DIR="${TRAVIS_BUILD_DIR}/.deps/boost-${BOOST_VERSION}"
+    - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/.deps/tools"
+    - export GCC_CC="${GCC_DIR}/bin/gcc"
+    - export GCC_CXX="${GCC_DIR}/bin/g++"
+    - export CLANG_CC="${CLANG_DIR}/bin/clang"
+    - export CLANG_CXX="${CLANG_DIR}/bin/clang++"
+
+install:
+    - FAILURE="0"
+    - printenv
+    ### GCC ###
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${GCC_DIR}/bin:$PATH"; fi
+    - export CPATH="${GCC_DIR}/include"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/x86_64-unknown-linux-gnu"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/backward"
+    - export LDFLAGS="-L${GCC_DIR}/lib64"
+    - export LIBRARY_PATH="${GCC_DIR}/lib64"
+    - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
+    - export CC="${GCC_CC}"
+    - export CXX="${GCC_CXX}"
+    ### CLANG ###
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
+    ### TOOLS ###
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
+    ### BOOST ###
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi
+
+before_script:
+    - export CC="${CLANG_CC}"
+    - export CXX="${CLANG_CXX}"
+    - mkdir ${TRAVIS_BUILD_DIR}/build
+    - cd ${TRAVIS_BUILD_DIR}/build
+    - if [[ "$FAILURE" == "0" ]]; then g++ -E -x c++ - -v < /dev/null; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then clang++ -E -x c++ - -v < /dev/null; test "$FAILURE" == "0"; fi
+    - if [[ "$COMPILER" == "gcc" ]]; then export CC="${GCC_CC}"; fi
+    - if [[ "$COMPILER" == "gcc" ]]; then export CXX="${GCC_CXX}"; fi
+    - printenv
+
+script:
+    - if [[ "$FAILURE" == "0" ]]; then gcc --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then clang --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -DBOOST_ROOT="${BOOST_DIR}/${HPX_BUILD_TYPE}" -DCMAKE_CXX_FLAGS="$COMPILER_FLAGS" -Wdev || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world; echo "Sanity test exited with $?."; fi
+    - test "$FAILURE" == "0"
+
+notifications:
+    email: false
+
