@@ -12,6 +12,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/traits/is_iterator.hpp>
 
@@ -178,11 +179,9 @@ namespace hpx { namespace parcelset
         // serialization support
         friend class hpx::serialization::access;
 
-        template <class T>
-        void save(T& ar, const unsigned int version) const;
+        void save(serialization::output_archive& ar, const unsigned int version) const;
 
-        template <class T>
-        void load(T& ar, const unsigned int version);
+        void load(serialization::input_archive& ar, const unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
