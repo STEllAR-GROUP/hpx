@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,24 +7,74 @@
 #define HPX_PARALLEL_REBIND_EXECUTOR_SEP_07_2016_0658AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/executor_traits.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
-namespace hpx { namespace parallel { namespace execution
+#include <type_traits>
+
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
-    struct task_policy_tag
-    {
-        HPX_CONSTEXPR task_policy_tag() {}
-    };
+    /// Function invocations executed by a group of sequential execution agents
+    /// execute in sequential order.
+    using sequential_execution_tag =
+        parallel::execution::sequenced_execution_tag;
 
-    /// The execution policy tag \a task can be used to create a execution
-    /// policy which forces the given algorithm to be executed in an
-    /// asynchronous way.
-    static task_policy_tag HPX_CONSTEXPR_OR_CONST task;
-    /// \endcond
+    /// Function invocations executed by a group of parallel execution agents
+    /// execute in unordered fashion. Any such invocations executing in the
+    /// same thread are indeterminately sequenced with respect to each other.
+    ///
+    /// \note \a parallel_execution_tag is weaker than
+    ///       \a sequential_execution_tag.
+    using parallel_execution_tag =
+        parallel::execution::parallel_execution_tag;
+
+    /// Function invocations executed by a group of vector execution agents are
+    /// permitted to execute in unordered fashion when executed in different
+    /// threads, and un-sequenced with respect to one another when executed in
+    /// the same thread.
+    ///
+    /// \note \a vector_execution_tag is weaker than
+    ///       \a parallel_execution_tag.
+    using vector_execution_tag =
+        parallel::execution::unsequenced_execution_tag;
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename Category1, typename Category2>
+        struct is_not_weaker
+          : std::false_type
+        {};
+
+        template <typename Category>
+        struct is_not_weaker<Category, Category>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<parallel_execution_tag, vector_execution_tag>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<sequential_execution_tag, vector_execution_tag>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<sequential_execution_tag, parallel_execution_tag>
+          : std::true_type
+        {};
+        /// \endcond
+    }
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
@@ -36,12 +86,13 @@ namespace hpx { namespace parallel { namespace execution
         typedef typename hpx::util::decay<Parameters>::type parameters_type;
 
         typedef typename ExecutionPolicy::execution_category category1;
-        typedef typename executor_traits<executor_type>::execution_category
-            category2;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type category2;
 
         static_assert(
-            (parallel::v3::detail::is_not_weaker<category2, category1>::value),
-            "parallel::v3::detail::is_not_weaker<category2, category1>::value"
+            (parallel::v1::detail::is_not_weaker<category2, category1>::value),
+            "parallel::v1::detail::is_not_weaker<category2, category1>::value"
         );
         /// \endcond
 
@@ -51,5 +102,6 @@ namespace hpx { namespace parallel { namespace execution
             >::type type;
     };
 }}}
+#endif
 
 #endif

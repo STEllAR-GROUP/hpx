@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -485,7 +486,7 @@ namespace hpx { namespace components
 
     private:
         template <typename F>
-        static typename lcos::detail::future_then_result<Derived, F>::cont_result
+        static typename hpx::traits::future_then_result<Derived, F>::cont_result
         on_ready(shared_future<id_type> && fut, F f)
         {
             return f(Derived(std::move(fut)));
@@ -493,11 +494,11 @@ namespace hpx { namespace components
 
     public:
         template <typename F>
-        typename lcos::detail::future_then_result<Derived, F>::type
+        typename hpx::traits::future_then_result<Derived, F>::type
         then(F && f)
         {
             typedef
-                typename lcos::detail::future_then_result<Derived, F>::result_type
+                typename hpx::traits::future_then_result<Derived, F>::result_type
                 result_type;
 
             if (!shared_state_)
@@ -595,104 +596,6 @@ namespace hpx { namespace components
         client_base<Derived, Stub> const& rhs)
     {
         return lhs.get() < rhs.get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::id_type const& id)
-    {
-        return Client(id);
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::future<hpx::id_type> const& id)
-    {
-        return Client(id);
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::future<hpx::id_type> && id)
-    {
-        return Client(std::move(id));
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::shared_future<hpx::id_type> const& id)
-    {
-        return Client(id);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::id_type> const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::id_type const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::future<hpx::id_type> > const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::future<hpx::id_type> const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::future<hpx::id_type> > && ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::future<hpx::id_type>& id: ids)
-        {
-            result.push_back(Client(std::move(id)));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::shared_future<hpx::id_type> > const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::shared_future<hpx::id_type> const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
     }
 }}
 

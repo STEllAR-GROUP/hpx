@@ -178,6 +178,7 @@ namespace hpx
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
@@ -349,18 +350,6 @@ namespace hpx { namespace lcos
             std::size_t const needed_count_;
             bool goal_reached_on_calling_thread_;
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
-        struct wait_get_shared_state
-        {
-            HPX_FORCEINLINE
-            typename traits::detail::shared_state_ptr_for<Future>::type const&
-            operator()(Future const& f) const
-            {
-                return traits::detail::get_shared_state(f);
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -393,7 +382,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::wait_get_shared_state<Future>());
+            traits::detail::wait_get_shared_state<Future>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -451,7 +440,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
             lazy_values_.begin(),
-            detail::wait_get_shared_state<Future>());
+            traits::detail::wait_get_shared_state<Future>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -497,7 +486,7 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::wait_get_shared_state<future_type>());
+            traits::detail::wait_get_shared_state<future_type>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -521,7 +510,7 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         lazy_values_.resize(count);
-        detail::wait_get_shared_state<future_type> func;
+        traits::detail::wait_get_shared_state<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 

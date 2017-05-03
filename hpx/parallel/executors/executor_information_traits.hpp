@@ -14,7 +14,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>

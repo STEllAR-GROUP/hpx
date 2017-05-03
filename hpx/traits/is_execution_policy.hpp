@@ -61,7 +61,8 @@ namespace hpx { namespace parallel { namespace execution
     ///
     template <typename T>
     struct is_execution_policy
-      : detail::is_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -79,7 +80,8 @@ namespace hpx { namespace parallel { namespace execution
     ///
     template <typename T>
     struct is_parallel_execution_policy
-      : detail::is_parallel_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_parallel_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -100,7 +102,8 @@ namespace hpx { namespace parallel { namespace execution
     // extension:
     template <typename T>
     struct is_sequential_execution_policy
-      : detail::is_sequential_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_sequential_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -121,18 +124,21 @@ namespace hpx { namespace parallel { namespace execution
     // extension:
     template <typename T>
     struct is_async_execution_policy
-      : detail::is_async_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_async_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 
     template <typename T>
     struct is_rebound_execution_policy
-      : detail::is_rebound_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_rebound_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 
     // extension:
     template <typename T>
     struct is_vectorpack_execution_policy
-      : detail::is_vectorpack_execution_policy<typename hpx::util::decay<T>::type>
+      : execution::detail::is_vectorpack_execution_policy<
+            typename hpx::util::decay<T>::type>
     {};
 }}}
 

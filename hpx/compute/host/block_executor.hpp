@@ -10,9 +10,10 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
@@ -23,6 +24,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -34,11 +36,8 @@ namespace hpx { namespace compute { namespace host
     /// \tparam Executor The underlying executor to use
     template <typename Executor =
         hpx::threads::executors::local_priority_queue_attached_executor>
-    struct block_executor : hpx::parallel::executor_tag
+    struct block_executor
     {
-    private:
-        typedef hpx::parallel::executor_traits<Executor> executor_traits;
-
     public:
         typedef hpx::parallel::static_chunk_size executor_parameters_type;
 
@@ -90,11 +89,28 @@ namespace hpx { namespace compute { namespace host
             return *this;
         }
 
+        /// \cond NOINTERNAL
+        bool operator==(block_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return std::equal(targets_.begin(), targets_.end(),
+                rhs.targets_.begin());
+        }
+
+        bool operator!=(block_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        std::vector<host::target> const& context() const HPX_NOEXCEPT
+        {
+            return targets_;
+        }
+        /// \endcond
+
         template <typename F, typename ... Ts>
         void apply_execute(F && f, Ts &&... ts)
         {
-            executor_traits::apply_execute(
-                executors_[current_],
+            parallel::execution::post(executors_[current_],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -104,16 +120,16 @@ namespace hpx { namespace compute { namespace host
         async_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
-            return executor_traits::async_execute(executors_[current],
+            return parallel::execution::async_execute(executors_[current],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename ... Ts>
         typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
-        execute(F && f, Ts &&... ts)
+        sync_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
-            return executor_traits::execute(executors_[current],
+            return parallel::execution::sync_execute(executors_[current],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -123,7 +139,7 @@ namespace hpx { namespace compute { namespace host
                 F, Shape, Ts...
             >::type>
         >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             std::vector<hpx::future<
                 typename hpx::parallel::v3::detail::bulk_async_execute_result<
@@ -148,7 +164,7 @@ namespace hpx { namespace compute { namespace host
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto futures =
-                        executor_traits::bulk_async_execute(
+                        parallel::execution::async_bulk_execute(
                             executors_[i],
                             std::forward<F>(f),
                             boost::make_iterator_range(begin, part_end),
@@ -175,7 +191,7 @@ namespace hpx { namespace compute { namespace host
         typename hpx::parallel::v3::detail::bulk_execute_result<
             F, Shape, Ts...
         >::type
-        bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             typename hpx::parallel::v3::detail::bulk_execute_result<
                     F, Shape, Ts...
@@ -198,7 +214,7 @@ namespace hpx { namespace compute { namespace host
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto part_results =
-                        executor_traits::bulk_execute(
+                        parallel::execution::sync_bulk_execute(
                             executors_[i],
                             std::forward<F>(f),
                             boost::make_iterator_range(begin, part_end),
@@ -241,5 +257,39 @@ namespace hpx { namespace compute { namespace host
         std::vector<Executor> executors_;
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <typename Executor>
+    struct executor_execution_category<
+        compute::host::block_executor<Executor> >
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
+
+    template <typename Executor>
+    struct is_one_way_executor<
+        compute::host::block_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_two_way_executor<
+        compute::host::block_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_bulk_one_way_executor<
+        compute::host::block_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_bulk_two_way_executor<
+        compute::host::block_executor<Executor> >
+      : std::true_type
+    {};
+}}
 
 #endif

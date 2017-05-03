@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -254,10 +255,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             typedef typename ExPolicy::executor_type executor_type;
 
-            hpx::future<void> result =
-                executor_traits<executor_type>::async_execute(
-                    policy_.executor(), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            hpx::future<void> result = execution::async_execute(
+                policy_.executor(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
@@ -310,9 +310,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             typedef typename ExPolicy::executor_type executor_type;
 
-            hpx::future<void> result =
-                executor_traits<Executor>::async_execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::future<void> result = execution::async_execute(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));

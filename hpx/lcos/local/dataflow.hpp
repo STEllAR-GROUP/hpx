@@ -15,7 +15,7 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -156,10 +156,19 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-    // parallel executor
+    // parallel executors
     template <typename Executor>
     struct dataflow_dispatch<Executor,
-        typename std::enable_if<traits::is_executor<Executor>::value>::type>
+        typename std::enable_if<
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+            traits::is_executor<
+                typename std::decay<Executor>::type>::value ||
+#endif
+            traits::is_one_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value
+        >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -47,13 +48,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             operator()(ExPolicy && policy, RandIter first, RandIter last,
                 std::size_t size, F f, Proj proj, std::size_t chunks)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
                 if (chunks < 2)
                 {
-                    return executor_traits::async_execute(
+                    return execution::async_execute(
                         policy.executor(),
                         [first, last, f, proj]() -> RandIter
                         {
@@ -69,12 +66,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 RandIter mid = first;
                 std::advance(mid, mid_point);
 
-                hpx::future<RandIter> left = executor_traits::async_execute(
-                    policy.executor(), *this, policy, first, mid, mid_point,
-                    f, proj, chunks);
-                hpx::future<RandIter> right = executor_traits::async_execute(
-                    policy.executor(), *this, policy, mid, last, size - mid_point,
-                    f, proj, chunks);
+                hpx::future<RandIter> left = execution::async_execute(
+                    policy.executor(), *this, policy, first, mid,
+                    mid_point, f, proj, chunks);
+                hpx::future<RandIter> right = execution::async_execute(
+                    policy.executor(), *this, policy, mid, last,
+                    size - mid_point, f, proj, chunks);
 
                 return
                     dataflow(

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2016 Hartmut Kaiser
+# Copyright (c) 2014-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@ set(tests
     parallel_executor
     parallel_fork_executor
     persistent_executor_parameters
-    sequential_executor
+    sequenced_executor
     service_executors
     shared_parallel_executor
     this_thread_executors
@@ -27,6 +27,24 @@ set(tests
     timed_thread_pool_executors
    )
 
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      bulk_async_v1
+      created_executor_v1
+      minimal_async_executor_v1
+      minimal_sync_executor_v1
+      parallel_executor_v1
+      parallel_fork_executor_v1
+      sequential_executor_v1
+      service_executors_v1
+      shared_parallel_executor_v1
+      this_thread_executors_v1
+      thread_pool_attached_executors_v1
+      thread_pool_executors_v1
+      thread_pool_os_executors_v1
+     )
+endif()
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -35,13 +53,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/Parallel/Executors")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/Parallel/Executors/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Parallel/Executors")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 

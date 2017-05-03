@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
@@ -49,6 +50,16 @@ namespace hpx { namespace traits
             is_launch_policy<Policy>::value ||
                 is_threads_executor<Policy>::value>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Executor>
+    struct executor_execution_category<Executor,
+        typename std::enable_if<
+            is_threads_executor<Executor>::value
+        >::type>
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
 }}
 
 #endif

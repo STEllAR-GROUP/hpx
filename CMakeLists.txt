@@ -847,6 +847,14 @@ if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
 endif()
 
+# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
+    "Enable old (pre-concurrency TS) executor API (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+endif()
+
 # HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
     "Enable old execution policy names in API (default: ON)"

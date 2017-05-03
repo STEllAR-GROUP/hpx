@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/deferred_call.hpp>
 
@@ -26,10 +26,8 @@ int bulk_test(hpx::thread::id tid, int value, bool is_par, int passed_through) /
 }
 
 template <typename Executor>
-void test_bulk_async(Executor& exec, bool is_par = true)
+void test_bulk_sync(Executor& exec)
 {
-    typedef hpx::parallel::executor_traits<Executor> traits;
-
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
@@ -38,8 +36,29 @@ void test_bulk_async(Executor& exec, bool is_par = true)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    std::vector<hpx::future<int> > results = traits::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, tid, _1, is_par, _2), v, 42);
+    std::vector<int> results =
+        hpx::parallel::execution::sync_bulk_execute(exec,
+            hpx::util::bind(&bulk_test, tid, _1, false, _2), v, 42);
+
+    HPX_TEST(std::equal(
+        boost::begin(results), boost::end(results), boost::begin(v))
+    );
+}
+
+template <typename Executor>
+void test_bulk_async(Executor& exec)
+{
+    hpx::thread::id tid = hpx::this_thread::get_id();
+
+    std::vector<int> v(107);
+    std::iota(boost::begin(v), boost::end(v), 0);
+
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
+
+    std::vector<hpx::future<int> > results =
+        hpx::parallel::execution::async_bulk_execute(exec,
+            hpx::util::bind(&bulk_test, tid, _1, true, _2), v, 42);
 
     HPX_TEST(std::equal(
         boost::begin(results), boost::end(results), boost::begin(v),
@@ -54,11 +73,11 @@ int hpx_main(int argc, char* argv[])
 {
     using namespace hpx::parallel;
 
-    sequential_executor seq_exec;
-    parallel_executor par_exec;
-    parallel_executor par_fork_exec(hpx::launch::fork);
+    execution::sequenced_executor seq_exec;
+    test_bulk_sync(seq_exec);
 
-    test_bulk_async(seq_exec, false);
+    execution::parallel_executor par_exec;
+    execution::parallel_executor par_fork_exec(hpx::launch::fork);
     test_bulk_async(par_exec);
     test_bulk_async(par_fork_exec);
 
