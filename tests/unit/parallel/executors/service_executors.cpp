@@ -3,8 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -14,21 +15,21 @@
 #include <vector>
 
 #include <boost/range/functions.hpp>
-#include <boost/thread/thread.hpp>
+
+namespace compat = hpx::compat;
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test(int passed_through)
+compat::thread::id test(int passed_through)
 {
     HPX_TEST_EQ(passed_through, 42);
-    return hpx::this_thread::get_id();
+    return compat::this_thread::get_id();
 }
 
 template <typename Executor>
 void test_sync(Executor& exec)
 {
-    HPX_TEST(
-        hpx::parallel::execution::sync_execute(exec, &test, 42) !=
-        hpx::this_thread::get_id());
+    typedef hpx::parallel::executor_traits<Executor> traits;
+    HPX_TEST(traits::execute(exec, &test, 42) != compat::this_thread::get_id());
 }
 
 template <typename Executor>
@@ -56,14 +57,14 @@ void test_then(Executor& exec)
     hpx::future<void> f = hpx::make_ready_future();
 
     HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        hpx::this_thread::get_id());
+        traits::async_execute(exec, &test, 42).get() !=
+        compat::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
+void bulk_test(int value, compat::thread::id tid, int passed_through)
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST(tid != compat::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -71,6 +72,8 @@ template <typename Executor>
 void test_bulk_sync(Executor& exec)
 {
     hpx::thread::id tid = hpx::this_thread::get_id();
+
+    compat::thread::id tid = compat::this_thread::get_id();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -89,8 +92,7 @@ void test_bulk_async(Executor& exec)
 {
     hpx::thread::id tid = hpx::this_thread::get_id();
 
-    std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    compat::thread::id tid = compat::this_thread::get_id();
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;

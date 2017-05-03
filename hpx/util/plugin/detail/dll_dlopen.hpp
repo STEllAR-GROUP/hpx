@@ -11,6 +11,7 @@
 #define HPX_DLL_DLOPEN_HPP_VP_2004_08_24
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
@@ -19,8 +20,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/throw_exception.hpp>
 
 #include <iostream>
@@ -119,7 +118,7 @@ namespace hpx { namespace util { namespace plugin {
             {
                 if (nullptr != h_)
                 {
-                    std::lock_guard<boost::recursive_mutex> lock(
+                    std::lock_guard<compat::recursive_mutex> lock(
                         dll::mutex_instance());
 
                     dll::deinit_library(h_);
@@ -213,7 +212,7 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
+            std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
 
             static_assert(
                 std::is_pointer<SymbolType>::value,
@@ -282,7 +281,7 @@ namespace hpx { namespace util { namespace plugin {
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
             if (!dll_handle || force) {
-                std::unique_lock<boost::recursive_mutex> lock(mutex_instance());
+                std::unique_lock<compat::recursive_mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary(
@@ -368,7 +367,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (nullptr != dll_handle)
             {
-                std::lock_guard<boost::recursive_mutex> lock(mutex_instance());
+                std::lock_guard<compat::recursive_mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
                 dlerror();
@@ -377,9 +376,9 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         // protect access to dl... functions
-        static boost::recursive_mutex &mutex_instance()
+        static compat::recursive_mutex &mutex_instance()
         {
-            static boost::recursive_mutex mutex;
+            static compat::recursive_mutex mutex;
             return mutex;
         }
 

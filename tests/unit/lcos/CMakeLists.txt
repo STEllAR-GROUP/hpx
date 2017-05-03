@@ -41,9 +41,11 @@ set(tests
     local_dataflow_std_array
     local_event
     local_mutex
+    local_promise_allocator
     make_future
     packaged_action
     promise
+    promise_allocator
     reduce
     remote_dataflow
     remote_latch
@@ -51,6 +53,7 @@ set(tests
     shared_future
     sliding_semaphore
     unwrapped
+    use_allocator
     wait_all_std_array
     wait_any_std_array
     when_all

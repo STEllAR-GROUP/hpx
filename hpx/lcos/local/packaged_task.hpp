@@ -18,6 +18,7 @@
 
 #include <boost/exception_ptr.hpp>
 
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -50,6 +51,19 @@ namespace hpx { namespace lcos { namespace local
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
           , promise_()
+        {}
+
+        template <
+            typename Allocator,
+            typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, packaged_task>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type
+        >
+        explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
+          : function_(std::forward<F>(f))
+          , promise_(std::allocator_arg, a)
         {}
 
         packaged_task(packaged_task&& rhs)
@@ -148,5 +162,14 @@ namespace hpx { namespace lcos { namespace local
         local::promise<R> promise_;
     };
 }}}
+
+namespace std
+{
+    // Requires: Allocator shall be an allocator (17.6.3.5)
+    template <typename Sig, typename Allocator>
+    struct uses_allocator<hpx::lcos::local::packaged_task<Sig>, Allocator>
+      : std::true_type
+    {};
+}
 
 #endif /*HPX_LCOS_LOCAL_PACKAGED_TASK_HPP*/

@@ -776,6 +776,11 @@ if(HPX_WITH_NETWORKING)
   endif()
 endif()
 
+# Developer tools
+hpx_option(HPX_WITH_VIM_YCM BOOL
+  "Generate HPX completion file for VIM YouCompleteMe plugin"
+  OFF ADVANCED)
+
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
@@ -1043,6 +1048,18 @@ endif()
 
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
+# HPX_WITH_THREAD_COMPATIBILITY
+hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
+    "Use a compatibility implementation of std::thread, i.e. fall back to Boost.Thread (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_THREAD_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_COMPATIBILITY)
+else()
+  if(NOT HPX_WITH_CXX11_THREAD)
+    hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
+  endif()
+endif()
 
 ################################################################################
 # check for miscellaneous things
@@ -1453,6 +1470,10 @@ if(HPX_WITH_VALGRIND)
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
+if(HPX_WITH_VIM_YCM)
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
 # with incompatible options with the currently selected platform.
@@ -1810,6 +1831,20 @@ if(HPX_WITH_DOCUMENTATION)
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"
     PATTERN ".git" EXCLUDE)
+endif()
+
+if(HPX_WITH_VIM_YCM)
+  set(build_dir_file ${CMAKE_BINARY_DIR}/.ycm_extra_conf.py)
+  set(source_dir_file ${CMAKE_SOURCE_DIR}/.ycm_extra_conf.py)
+  configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
+               ${build_dir_file} @ONLY)
+  add_custom_target(
+    configure_ycm
+    COMMAND ${CMAKE_COMMAND} -E copy ${build_dir_file} ${source_dir_file}
+    COMMENT "Copying YCM config file to source directory"
+    VERBATIM
+  )
+  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
 
 ################################################################################

@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_HAVE_HWLOC)
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -110,7 +111,7 @@ public:
     }
 
     void set_thread_affinity_mask(
-        boost::thread& thrd
+        compat::thread& thrd
       , mask_cref_type mask
       , error_code& ec = throws
         ) const
@@ -150,7 +151,7 @@ public:
     }
 
     mask_type get_cpubind_mask(
-        boost::thread & handle
+        compat::thread & handle
       , error_code& ec = throws
         ) const
     {
@@ -165,7 +166,7 @@ public:
 #if defined(__ANDROID__) && defined(ANDROID)
         return std::size_t(::android_getCpuCount());
 #else
-        return std::size_t(boost::thread::hardware_concurrency());
+        return std::size_t(compat::thread::hardware_concurrency());
 #endif
     }
 
