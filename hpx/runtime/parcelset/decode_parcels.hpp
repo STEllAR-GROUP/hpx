@@ -120,13 +120,12 @@ namespace hpx { namespace parcelset
                     if(parcel_count == 0)
                     {
                         archive >> parcel_count; //-V128
-                        if (parcel_count > 1)
-                            deferred_parcels.reserve(parcel_count);
                     }
+                    if (parcel_count > 1)
+                        deferred_parcels.reserve(parcel_count);
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
-                        bool deferred_schedule = true;
-                        if (i == parcel_count - 1) deferred_schedule = false;
+                        bool deferred_schedule = parcel_count > 1;
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         std::size_t archive_pos = archive.current_pos();
@@ -134,8 +133,11 @@ namespace hpx { namespace parcelset
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
-                        // deferred_schedule will be set to false if it was previously
-                        // set to true and the action to be scheduled is direct.
+                        // deferred_schedule will be set to false if the action
+                        // to be loaded is a non direct action. If we only got
+                        // one parcel to decode, deferred_schedule will be
+                        // preset to false and the direct action will be called
+                        // directly
                         bool migrated = p.load_schedule(archive, num_thread,
                             deferred_schedule);
 
@@ -177,6 +179,7 @@ namespace hpx { namespace parcelset
                                 &detail::parcel_route_handler,
                                 threads::thread_priority_normal);
                         }
+                        // If we got a direct action,
                         else if (deferred_schedule)
                             deferred_parcels.push_back(std::move(p));
 
@@ -189,17 +192,11 @@ namespace hpx { namespace parcelset
                     data.num_parcels_ = parcel_count;
                     data.raw_bytes_ = archive.bytes_read();
 
-                    for (std::size_t i = 0; i != deferred_parcels.size(); ++i)
+                    if (!deferred_parcels.empty())
                     {
-                        // If we are the last deferred parcel, we don't need to spin
-                        // a new thread...
-                        if (i == deferred_parcels.size() - 1)
+                        for (std::size_t i = 1; i != deferred_parcels.size(); ++i)
                         {
-                            deferred_parcels[i].schedule_action(num_thread);
-                        }
-                        // ... otherwise, schedule the parcel on a new thread.
-                        else
-                        {
+                            // schedule all but the first parcel on a new thread.
                             hpx::applier::register_thread_nullary(
                                 util::bind(
                                     util::one_shot(
@@ -209,9 +206,12 @@ namespace hpx { namespace parcelset
                                         }
                                     ), std::move(deferred_parcels[i])),
                                 "schedule_parcel",
-                                threads::pending, true, threads::thread_priority_critical,
+                                threads::pending, true, threads::thread_priority_boost,
                                 num_thread, threads::thread_stacksize_default);
                         }
+                        // If we are the first deferred parcel, we don't need to spin
+                        // a new thread...
+                        deferred_parcels[0].schedule_action(num_thread);
                     }
                 }
 
