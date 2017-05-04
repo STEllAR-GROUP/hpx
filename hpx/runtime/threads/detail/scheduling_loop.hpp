@@ -607,8 +607,8 @@ namespace hpx { namespace threads { namespace detail
                             else
                             {
                                 // schedule other work
-                                scheduler.SchedulingPolicy::wait_or_add_new(
-                                    num_thread, running, idle_loop_count);
+                                next_thrd = scheduler.SchedulingPolicy::wait_or_add_new(
+                                    num_thread, running, idle_loop_count).get();
 
                                 // schedule this thread again immediately with
                                 // boosted priority

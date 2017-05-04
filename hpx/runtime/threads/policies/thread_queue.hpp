@@ -268,6 +268,7 @@ namespace hpx { namespace threads { namespace policies
 
             else
             {
+                hpx::util::unlock_guard<Lock> ull(lk);
                 // Allocate a new thread object.
                 thrd = threads::thread_data::create(data, memory_pool_, state);
             }
