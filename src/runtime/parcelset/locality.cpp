@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    void locality::save(serialization::output_archive& ar, const unsigned int version) const
+    void locality::save(serialization::output_archive& ar, const unsigned int) const
     {
         std::string t = type();
         ar << t;
@@ -24,7 +24,7 @@ namespace hpx { namespace parcelset
         impl_->save(ar);
     }
 
-    void locality::load(serialization::input_archive& ar, const unsigned int version)
+    void locality::load(serialization::input_archive& ar, const unsigned int)
     {
         std::string t;
         ar >> t;
