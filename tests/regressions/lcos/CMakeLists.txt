@@ -11,6 +11,7 @@ set(tests
     async_callback_non_deduced_context
     async_unwrap_1037
     call_promise_get_gid_more_than_once
+    barrier_hang
     dataflow_791
     dataflow_action_2008
     dataflow_future_swap

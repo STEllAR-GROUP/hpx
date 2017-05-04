@@ -170,18 +170,22 @@ namespace hpx { namespace parcelset
 
         void flush_parcels()
         {
-            do_background_work(0);
+            // We suspend our thread, which will make progress on the network
+            if(threads::get_self_ptr())
+            {
+                hpx::this_thread::suspend(hpx::threads::pending_boost,
+                    "parcelport_impl::flush_parcels");
+            }
 
             // make sure no more work is pending, wait for service pool to get
             // empty
 
             while(operations_in_flight_ != 0 || get_pending_parcels_count(false) != 0)
             {
-                do_background_work(0);
                 if(threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "parcelport_impl::stop");
+                    hpx::this_thread::suspend(hpx::threads::pending_boost,
+                        "parcelport_impl::flush_parcels");
                 }
             }
         }
@@ -929,11 +933,11 @@ namespace hpx { namespace parcelset
                     std::move(handlers));
             }
 
-            std::size_t num_thread(0);
             if(threads::get_self_ptr())
             {
-                num_thread = hpx::get_worker_thread_num();
-                do_background_work(num_thread);
+                // We suspend our thread, which will make progress on the network
+                hpx::this_thread::suspend(hpx::threads::pending_boost,
+                    "parcelport_impl::send_pending_parcels");
             }
         }
 

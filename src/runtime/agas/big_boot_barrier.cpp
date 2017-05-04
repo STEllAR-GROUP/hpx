@@ -665,15 +665,16 @@ big_boot_barrier::big_boot_barrier(
 {
     // register all not registered typenames
     if (service_type == service_mode_bootstrap)
+    {
         detail::register_unassigned_typenames();
+        // store endpoints of root locality for later
+        add_locality_endpoints(0, get_endpoints());
+    }
 }
 
 void big_boot_barrier::wait_bootstrap()
 { // {{{
     HPX_ASSERT(service_mode_bootstrap == service_type);
-
-    // store endpoints of root locality for later
-    add_locality_endpoints(0, get_runtime().endpoints());
 
     // the root just waits until all localities have connected
     spin();

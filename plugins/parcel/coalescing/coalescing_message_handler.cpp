@@ -192,9 +192,6 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::normal:
-            if (timer_.is_started())
-                break;
-
             // start deadline timer to flush buffer
             l.unlock();
             timer_.start(interval);
