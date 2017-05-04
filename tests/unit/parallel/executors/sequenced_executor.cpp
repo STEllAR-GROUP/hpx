@@ -59,7 +59,7 @@ void test_then()
 
     executor exec;
     HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
+        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() ==
         hpx::this_thread::get_id());
 }
 
