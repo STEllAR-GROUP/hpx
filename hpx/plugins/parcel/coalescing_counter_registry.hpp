@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/function.hpp>
@@ -26,6 +27,8 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     class coalescing_counter_registry
     {
+        typedef hpx::lcos::local::spinlock mutex_type;
+
         HPX_MOVABLE_ONLY(coalescing_counter_registry);
 
     public:
@@ -93,6 +96,7 @@ namespace hpx { namespace plugins { namespace parcel
                 coalescing_counter_registry, tag
             >;
 
+        mutable mutex_type mtx_;
         map_type map_;
     };
 }}}

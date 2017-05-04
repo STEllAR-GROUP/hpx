@@ -115,6 +115,9 @@ namespace hpx { namespace util { namespace detail
             return false;
 
         if (!is_started_) {
+            is_stopped_ = false;
+            is_started_ = true;
+
             if (first_start_) {
                 first_start_ = false;
 
@@ -132,9 +135,6 @@ namespace hpx { namespace util { namespace detail
                             this->shared_from_this()));
                 }
             }
-
-            is_stopped_ = false;
-            is_started_ = true;
 
             HPX_ASSERT(timer_ != nullptr);
             timer_->expires_from_now(time_duration.value());

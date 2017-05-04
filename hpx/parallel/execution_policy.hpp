@@ -13,10 +13,11 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/datapar/execution_policy.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
-#include <hpx/parallel/executors.hpp>
+#include <hpx/parallel/execution.hpp>
 #include <hpx/parallel/executors/executor_parameters.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
@@ -33,6 +34,10 @@
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// Default sequential execution policy object.
+    static task_policy_tag HPX_CONSTEXPR_OR_CONST task;
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequenced_task_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may not
@@ -44,7 +49,7 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_task_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::sequential_executor executor_type;
+        typedef sequenced_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -54,7 +59,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::sequential_execution_tag execution_category;
+        typedef sequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -106,11 +111,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 sequenced_task_policy, Executor,
@@ -196,8 +209,9 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -245,11 +259,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor_ && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
-                "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                "hpx::traits::is_executor<Executor>::value || "
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 sequenced_task_policy_shim, Executor_,
@@ -330,7 +352,7 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::sequential_executor executor_type;
+        typedef sequenced_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -340,7 +362,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::sequential_execution_tag execution_category;
+        typedef sequenced_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -355,7 +377,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR sequenced_policy() {}
+        HPX_CONSTEXPR sequenced_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new sequenced_task_policy.
@@ -391,11 +413,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 sequenced_policy, Executor, executor_parameters_type
@@ -459,7 +489,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default sequential execution policy object.
-    static sequenced_policy HPX_CONSTEXPR_OR_CONST seq;
+    HPX_STATIC_CONSTEXPR sequenced_policy seq;
 
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -476,8 +506,9 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -526,11 +557,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor_ && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
-                "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                "hpx::traits::is_executor<Executor>::value || "
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 sequenced_policy_shim, Executor_,
@@ -614,7 +653,7 @@ namespace hpx { namespace parallel { namespace execution
     struct parallel_task_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::parallel_executor executor_type;
+        typedef parallel_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -624,7 +663,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::parallel_execution_tag execution_category;
+        typedef parallel_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -674,11 +713,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 parallel_task_policy, Executor,
@@ -758,8 +805,9 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -807,11 +855,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor_ && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
-                "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                "hpx::traits::is_executor<Executor>::value || "
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 parallel_task_policy_shim, Executor_,
@@ -891,7 +947,7 @@ namespace hpx { namespace parallel { namespace execution
     struct parallel_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::parallel_executor executor_type;
+        typedef parallel_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -901,7 +957,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::parallel_execution_tag execution_category;
+        typedef parallel_execution_tag execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -916,7 +972,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_policy() {}
+        HPX_CONSTEXPR parallel_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new parallel_policy referencing a chunk size.
@@ -947,11 +1003,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 parallel_policy, Executor, executor_parameters_type
@@ -1013,7 +1077,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default parallel execution policy object.
-    static parallel_policy HPX_CONSTEXPR_OR_CONST par;
+    HPX_STATIC_CONSTEXPR parallel_policy par;
 
     /// The class parallel_policy_shim is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
@@ -1030,8 +1094,9 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef typename executor_traits<executor_type>::execution_category
-            execution_category;
+        typedef typename hpx::traits::executor_execution_category<
+                executor_type
+            >::type execution_category;
 
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
@@ -1080,11 +1145,19 @@ namespace hpx { namespace parallel { namespace execution
         >::type
         on(Executor_ && exec) const
         {
+            typedef typename std::decay<Executor>::type executor_type;
+
             static_assert(
-                hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
-                "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                hpx::traits::is_executor<executor_type>::value ||
+#endif
+                hpx::traits::is_threads_executor<executor_type>::value ||
+                hpx::traits::is_executor_any<executor_type>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+                "hpx::traits::is_executor<Executor>::value || "
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 parallel_policy_shim, Executor_,
@@ -1163,7 +1236,7 @@ namespace hpx { namespace parallel { namespace execution
     struct parallel_unsequenced_policy
     {
         /// The type of the executor associated with this execution policy
-        typedef parallel::parallel_executor executor_type;
+        typedef parallel_executor executor_type;
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
@@ -1173,10 +1246,10 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The category of the execution agents created by this execution
         /// policy.
-        typedef parallel::parallel_execution_tag execution_category;
+        typedef parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR parallel_unsequenced_policy() {}
+        HPX_CONSTEXPR parallel_unsequenced_policy() : exec_{}, params_{} {}
         /// \endcond
 
         /// Create a new parallel_unsequenced_policy from itself
@@ -1218,7 +1291,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 
     /// Default vector execution policy object.
-    static parallel_unsequenced_policy HPX_CONSTEXPR_OR_CONST par_unseq;
+    HPX_STATIC_CONSTEXPR parallel_unsequenced_policy par_unseq;
 
     ///////////////////////////////////////////////////////////////////////////
     // Allow to detect execution policies which were created as a result
@@ -1437,11 +1510,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     using task_execution_policy_tag = parallel::execution::task_policy_tag;
 
     ///////////////////////////////////////////////////////////////////////////
-    static sequential_execution_policy HPX_CONSTEXPR_OR_CONST seq;
-    static parallel_execution_policy HPX_CONSTEXPR_OR_CONST par;
-    static parallel_vector_execution_policy HPX_CONSTEXPR_OR_CONST par_vec;
+    HPX_STATIC_CONSTEXPR sequential_execution_policy seq;
+    HPX_STATIC_CONSTEXPR parallel_execution_policy par;
+    HPX_STATIC_CONSTEXPR parallel_vector_execution_policy par_vec;
 
-    static task_execution_policy_tag HPX_CONSTEXPR_OR_CONST task;
+    HPX_STATIC_CONSTEXPR task_execution_policy_tag task;
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     ///////////////////////////////////////////////////////////////////////////

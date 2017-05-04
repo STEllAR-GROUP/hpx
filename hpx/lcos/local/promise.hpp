@@ -17,7 +17,9 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
+#include <memory>
 #include <utility>
+#include <type_traits>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -32,11 +34,55 @@ namespace hpx { namespace lcos { namespace local
             typedef SharedState shared_state_type;
             typedef typename shared_state_type::init_no_addref init_no_addref;
 
+            template <typename Allocator>
+            struct deleter
+            {
+                template <typename SharedState_>
+                void operator()(SharedState_* state)
+                {
+                    typedef std::allocator_traits<Allocator> traits;
+                    traits::deallocate(alloc_, state, 1);
+                }
+
+                Allocator& alloc_;
+            };
+
         public:
             promise_base()
               : shared_state_(new shared_state_type(init_no_addref()), false)
               , future_retrieved_(false)
             {}
+
+            template <typename Allocator>
+            promise_base(std::allocator_arg_t, Allocator const& a)
+              : shared_state_()
+              , future_retrieved_(false)
+            {
+                typedef typename traits::detail::shared_state_allocator<
+                        SharedState, Allocator
+                    >::type allocator_shared_state_type;
+
+                typedef typename
+                        std::allocator_traits<Allocator>::template
+                            rebind_alloc<allocator_shared_state_type>
+                    other_allocator;
+                typedef std::allocator_traits<other_allocator> traits;
+                typedef std::unique_ptr<
+                        allocator_shared_state_type, deleter<other_allocator>
+                    > unique_pointer;
+
+                other_allocator alloc(a);
+                unique_pointer p (traits::allocate(alloc, 1),
+                    deleter<other_allocator>{alloc});
+
+#if BOOST_VERSION >= 105600
+                traits::construct(alloc, p.get(), init_no_addref(), alloc);
+                shared_state_.reset(p.release(), false);
+#else
+                traits::construct(alloc, p.get(), alloc);
+                shared_state_ = boost::intrusive_ptr<shared_state_type>(p.release());
+#endif
+            }
 
             promise_base(promise_base&& other) HPX_NOEXCEPT
               : shared_state_(std::move(other.shared_state_))
@@ -177,6 +223,14 @@ namespace hpx { namespace lcos { namespace local
           : base_type()
         {}
 
+        // Effects: constructs a promise object and a shared state. The
+        // constructor uses the allocator a to allocate the memory for the
+        // shared state.
+        template <typename Allocator>
+        promise(std::allocator_arg_t, Allocator const& a)
+          : base_type(std::allocator_arg, a)
+        {}
+
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
         //          constructed object.
@@ -285,6 +339,14 @@ namespace hpx { namespace lcos { namespace local
           : base_type()
         {}
 
+        // Effects: constructs a promise object and a shared state. The
+        // constructor uses the allocator a to allocate the memory for the
+        // shared state.
+        template <typename Allocator>
+        promise(std::allocator_arg_t, Allocator const& a)
+          : base_type(std::allocator_arg, a)
+        {}
+
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
         //          constructed object.
@@ -375,6 +437,14 @@ namespace hpx { namespace lcos { namespace local
           : base_type()
         {}
 
+        // Effects: constructs a promise object and a shared state. The
+        // constructor uses the allocator a to allocate the memory for the
+        // shared state.
+        template <typename Allocator>
+        promise(std::allocator_arg_t, Allocator const& a)
+          : base_type(std::allocator_arg, a)
+        {}
+
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
         //          constructed object.
@@ -460,5 +530,14 @@ namespace hpx { namespace lcos { namespace local
         x.swap(y);
     }
 }}}
+
+namespace std
+{
+    // Requires: Allocator shall be an allocator (17.6.3.5)
+    template <typename R, typename Allocator>
+    struct uses_allocator<hpx::lcos::local::promise<R>, Allocator>
+      : std::true_type
+    {};
+}
 
 #endif

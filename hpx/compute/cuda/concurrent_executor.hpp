@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#include <hpx/traits/executor_traits.hpp>
 
 #include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
@@ -18,7 +19,9 @@
 
 #include <boost/atomic.hpp>
 
+#include <array>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -26,16 +29,11 @@ namespace hpx { namespace compute { namespace cuda
 {
     template <typename Executor =
         hpx::threads::executors::local_priority_queue_attached_executor>
-    struct concurrent_executor : hpx::parallel::executor_tag
+    struct concurrent_executor
     {
     private:
         typedef host::block_executor<Executor> host_executor_type;
         typedef cuda::default_executor cuda_executor_type;
-
-        typedef hpx::parallel::executor_traits<host_executor_type>
-            host_executor_traits;
-        typedef hpx::parallel::executor_traits<cuda_executor_type>
-            cuda_executor_traits;
 
     public:
         // By default, this executor relies on a special executor parameters
@@ -85,7 +83,7 @@ namespace hpx { namespace compute { namespace cuda
 
         concurrent_executor& operator=(concurrent_executor&& other)
         {
-            if(&other != this)
+            if (&other != this)
             {
                 host_executor_ = std::move(other.host_executor_);
                 cuda_executors_ = std::move(other.cuda_executors_);
@@ -94,6 +92,25 @@ namespace hpx { namespace compute { namespace cuda
 
             return *this;
         }
+
+        /// \cond NOINTERNAL
+        bool operator==(concurrent_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return host_executor_ == rhs.host_executor_ &&
+                std::equal(cuda_executors_.begin(), cuda_executors_.end(),
+                    rhs.cuda_executors_.begin());
+        }
+
+        bool operator!=(concurrent_executor const& rhs) const HPX_NOEXCEPT
+        {
+            return !(*this == rhs);
+        }
+
+        host::target const& context() const HPX_NOEXCEPT
+        {
+            return host_executor_.context();
+        }
+        /// \endcond
 
         std::size_t processing_units_count() const
         {
@@ -104,10 +121,11 @@ namespace hpx { namespace compute { namespace cuda
         void apply_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
-            host_executor_traits::apply_execute(host_executor_,
+            parallel::execution::post(
+                host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    cuda_executor_traits::apply_execute(
+                    parallel::execution::post(
                         cuda_executors_[current], std::forward<F>(f),
                         std::forward<Ts>(ts)...);
                 },
@@ -119,10 +137,11 @@ namespace hpx { namespace compute { namespace cuda
         hpx::future<void> async_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
-            return host_executor_traits::async_execute(host_executor_,
+            return parallel::execution::async_execute(
+                host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    return cuda_executor_traits::async_execute(
+                    return parallel::execution::async_execute(
                         cuda_executors_[current], std::forward<F>(f),
                         std::forward<Ts>(ts)...);
                 },
@@ -131,13 +150,14 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename ... Ts>
-        void execute(F && f, Ts &&... ts)
+        void sync_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
-            host_executor_traits::execute(host_executor_,
+            parallel::execution::sync_execute(
+                host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable
                 {
-                    cuda_executor_traits::execute(
+                    parallel::execution::sync_execute(
                         cuda_executors_[current], std::forward<F>(f),
                         std::forward<Ts>(ts)...);
                 },
@@ -147,7 +167,7 @@ namespace hpx { namespace compute { namespace cuda
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<void> >
-        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
+        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
         {
 // Before Boost V1.56 boost::size() does not respect the iterator category of
 // its argument.
@@ -162,7 +182,7 @@ namespace hpx { namespace compute { namespace cuda
             for (auto const& s: shape)
             {
                 std::size_t current = ++current_ % cuda_executors_.size();
-                result.push_back(host_executor_traits::async_execute(
+                result.push_back(parallel::execution::async_execute(
                     host_executor_,
                     [this, current, s](F&& f, Ts&&... ts) mutable
                     {
@@ -170,7 +190,7 @@ namespace hpx { namespace compute { namespace cuda
                             shape_type;
 
                         std::array<shape_type, 1> cuda_shape{{s}};
-                        cuda_executor_traits::bulk_execute(
+                        parallel::execution::sync_bulk_execute(
                             cuda_executors_[current], std::forward<F>(f),
                             cuda_shape, std::forward<Ts>(ts)...);
                     },
@@ -185,6 +205,40 @@ namespace hpx { namespace compute { namespace cuda
         boost::atomic<std::size_t> current_;
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <typename Executor>
+    struct executor_execution_category<
+        compute::cuda::concurrent_executor<Executor> >
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
+
+    template <typename Executor>
+    struct is_one_way_executor<
+        compute::cuda::concurrent_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_two_way_executor<
+        compute::cuda::concurrent_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_bulk_one_way_executor<
+        compute::cuda::concurrent_executor<Executor> >
+      : std::true_type
+    {};
+
+    template <typename Executor>
+    struct is_bulk_two_way_executor<
+        compute::cuda::concurrent_executor<Executor> >
+      : std::true_type
+    {};
+}}
 
 #endif
 #endif

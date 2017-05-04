@@ -11,6 +11,7 @@ set(tests
     async_callback_non_deduced_context
     async_unwrap_1037
     call_promise_get_gid_more_than_once
+    barrier_hang
     dataflow_791
     dataflow_action_2008
     dataflow_future_swap
@@ -31,6 +32,7 @@ set(tests
     receive_buffer_1733
     safely_destroy_promise_1481
     set_hpx_limit_798
+    shared_future_continuation_order
     shared_future_then_2166
     shared_mutex_1702
     shared_stated_leaked_1211

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,33 +26,35 @@ struct test
 void test_sync()
 {
     typedef hpx::compute::cuda::default_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::compute::cuda::target target;
     executor exec(target);
-    traits::execute(exec, test());
+    hpx::parallel::execution::sync_execute(exec, test());
 }
 
 void test_async()
 {
     typedef hpx::compute::cuda::default_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::compute::cuda::target target;
     executor exec(target);
-    traits::async_execute(exec, test()).get();
+    hpx::parallel::execution::async_execute(exec, test()).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 struct bulk_test
 {
-    __device__ void operator()(int) {}
+    // FIXME : call operator of bulk_test is momentarily defined as
+    //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
+    //         result_of<> (used in traits::bulk_execute()) to get the return
+    //         type
+
+    HPX_HOST_DEVICE void operator()(int) {}
 };
 
 void test_bulk_sync()
 {
     typedef hpx::compute::cuda::default_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -63,13 +65,12 @@ void test_bulk_sync()
     hpx::compute::cuda::target target;
     executor exec(target);
 //    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
-    traits::bulk_execute(exec, bulk_test(), v);
+    hpx::parallel::execution::sync_bulk_execute(exec, bulk_test(), v);
 }
 
 void test_bulk_async()
 {
     typedef hpx::compute::cuda::default_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -83,7 +84,7 @@ void test_bulk_async()
 //        exec, hpx::util::bind(&bulk_test, _1), v)
 //    ).get();
     hpx::when_all(
-        traits::bulk_async_execute(exec, bulk_test(), v)
+        hpx::parallel::execution::async_bulk_execute(exec, bulk_test(), v)
     ).get();
 }
 

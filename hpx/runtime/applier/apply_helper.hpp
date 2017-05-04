@@ -8,6 +8,7 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -21,6 +22,7 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <chrono>
 #include <memory>
 #include <utility>
 
@@ -89,8 +91,8 @@ namespace hpx { namespace applier { namespace detail
 
             while (!threads::threadmanager_is_at_least(state_running))
             {
-                boost::this_thread::sleep(boost::get_system_time() +
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+                compat::this_thread::sleep_for(
+                    std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
             }
 
             traits::action_schedule_thread<Action>::call(
@@ -128,8 +130,8 @@ namespace hpx { namespace applier { namespace detail
 
             while (!threads::threadmanager_is_at_least(state_running))
             {
-                boost::this_thread::sleep(boost::get_system_time() +
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+                compat::this_thread::sleep_for(
+                    std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
             }
 
             traits::action_schedule_thread<Action>::call(

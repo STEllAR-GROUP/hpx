@@ -161,13 +161,6 @@ namespace hpx { namespace applier
             return memory_id_;
         }
 
-#if defined(HPX_HAVE_SECURITY)
-        void enable_verify_capabilities()
-        {
-            verify_capabilities_ = true;
-        }
-#endif
-
     public:
         // the TSS holds a pointer to the applier associated with a given
         // OS thread
@@ -181,9 +174,6 @@ namespace hpx { namespace applier
         threads::threadmanager_base& thread_manager_;
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;
-#if defined(HPX_HAVE_SECURITY)
-        bool verify_capabilities_;
-#endif
     };
 }}
 

@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -21,7 +22,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The hierarchy_scheduler maintains a tree of queues of work items
     /// (threads). Every OS threads walks that tree to obtain new work
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

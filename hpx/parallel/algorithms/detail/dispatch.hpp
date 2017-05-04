@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@
 
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
@@ -116,16 +116,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         >::type
         call_execute(ExPolicy && policy, std::false_type, Args&&... args) const
         {
-            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                executor_type;
-            typedef hpx::parallel::executor_traits<executor_type>
-                executor_traits;
-
-            executor_type exec = policy.executor();
-
             return parallel::util::detail::algorithm_result<
                     ExPolicy, local_result_type
-                >::get(executor_traits::execute(exec, derived(),
+                >::get(execution::sync_execute(policy.executor(), derived(),
                     std::forward<ExPolicy>(policy), std::forward<Args>(args)...));
         }
 
@@ -133,14 +126,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<ExPolicy>::type
         call_execute(ExPolicy && policy, std::true_type, Args&&... args) const
         {
-            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                executor_type;
-            typedef hpx::parallel::executor_traits<executor_type>
-                executor_traits;
-
-            executor_type exec = policy.executor();
-
-            executor_traits::execute(exec, derived(),
+            execution::sync_execute(policy.executor(), derived(),
                 std::forward<ExPolicy>(policy), std::forward<Args>(args)...);
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get();
@@ -172,14 +158,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             try {
                 // run the launched task on the requested executor
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
-                executor_type exec = policy.executor();
                 hpx::future<local_result_type> result =
-                    executor_traits::async_execute(exec, derived(),
+                    execution::async_execute(policy.executor(), derived(),
                         std::forward<ExPolicy>(policy),
                         std::forward<Args>(args)...);
 

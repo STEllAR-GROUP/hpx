@@ -60,7 +60,8 @@ namespace hpx { namespace util
             if (p == std::string::npos)
                 return false;
 
-            if (hpx::util::safe_lexical_cast(s.substr(hpx_prefix_len, p-hpx_prefix_len),
+            if (hpx::util::safe_lexical_cast(
+                    s.substr(hpx_prefix_len, p-hpx_prefix_len),
                     std::size_t(-1)) == node)
             {
                 // this option is for the current locality only
@@ -370,15 +371,12 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-                ("hpx:run-agas-server",
-                  "run AGAS server as part of this runtime instance")
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
                 ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
-                ("hpx:run-agas-server-only", "run only the AGAS server")
                 ("hpx:hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
@@ -500,6 +498,9 @@ namespace hpx { namespace util
                 ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the parcel transport log channel and send all "
                   "parcel transport logs to the target destination")
+                ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the timing log channel and send all "
+                  "timing logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
@@ -564,6 +565,8 @@ namespace hpx { namespace util
                 ("hpx:reset-counters",
                   "reset all performance counter(s) specified with --hpx:print-counter "
                   "after they have been evaluated")
+                ("hpx:print-counters-locally",
+                  "each locality prints only its own local counters")
             ;
 
             hidden_options.add_options()

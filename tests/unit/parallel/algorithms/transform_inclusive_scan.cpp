@@ -33,7 +33,7 @@ void test_transform_inclusive_scan1(ExPolicy policy, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::parallel::transform_inclusive_scan(policy,
@@ -59,7 +59,7 @@ void test_transform_inclusive_scan1_async(ExPolicy p, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::future<void> f =
@@ -129,8 +129,7 @@ void test_transform_inclusive_scan2(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::parallel::transform_inclusive_scan(policy,
@@ -155,8 +154,7 @@ void test_transform_inclusive_scan2_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
-    auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::future<void> f =

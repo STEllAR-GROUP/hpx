@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -34,6 +34,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/logging.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -109,18 +110,25 @@ namespace hpx { namespace parcelset
         count_routed_(0),
         write_handler_(&default_write_handler)
     {
-        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
+        LPROGRESS_;
+
+#if defined(HPX_HAVE_NETWORKING)
+        if (cfg.get_entry("hpx.parcel.enable", "1") != "0")
         {
-            std::shared_ptr<parcelport> pp;
-            pp.reset(
-                factory->create(
-                    cfg
-                  , on_start_thread
-                  , on_stop_thread
-                )
-            );
-            attach_parcelport(pp);
+            for (plugins::parcelport_factory_base* factory :
+                    get_parcelport_factories())
+            {
+                std::shared_ptr<parcelport> pp(
+                    factory->create(
+                        cfg
+                      , on_start_thread
+                      , on_stop_thread
+                    )
+                );
+                attach_parcelport(pp);
+            }
         }
+#endif
     }
 
     std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
@@ -148,12 +156,12 @@ namespace hpx { namespace parcelset
 
         for (pports_type::value_type& pp : pports_)
         {
+            pp.second->set_applier(applier);
             if(pp.second != get_bootstrap_parcelport())
             {
                 if(pp.first > 0)
                     pp.second->run(false);
             }
-            pp.second->set_applier(applier);
         }
     }
 
@@ -194,6 +202,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::attach_parcelport(std::shared_ptr<parcelport> const& pp)
     {
         using util::placeholders::_1;
+#if defined(HPX_HAVE_NETWORKING)
 
         if(!pp) return;
 
@@ -211,6 +220,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(pp->type() == pp->here().type());
         if(priority > 0)
             endpoints_[pp->type()] = pp->here();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -240,6 +250,7 @@ namespace hpx { namespace parcelset
     {
         bool did_some_work = false;
 
+#if defined(HPX_HAVE_NETWORKING)
         // flush all parcel buffers
         if(0 == num_thread)
         {
@@ -275,7 +286,7 @@ namespace hpx { namespace parcelset
                     did_some_work;
             }
         }
-
+#endif
         return did_some_work;
     }
 
@@ -356,10 +367,22 @@ namespace hpx { namespace parcelset
             }
         }
 
+        std::ostringstream strm;
+        strm << "target locality: " << dest_gid << "\n";
+        strm << "available destination endpoints:\n" << dest_endpoints << "\n";
+        strm << "available partcelports:\n";
+        for (auto const& pp : pports_)
+        {
+            list_parcelport(strm, pp.second->type(), pp.second->priority(),
+                pp.second == get_bootstrap_parcelport());
+            strm << "\t [" << pp.second->here() << "]\n";
+        }
+
         HPX_THROW_EXCEPTION(network_error,
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
-            "No valid parcelport configured.");
+            "No valid parcelport configured. Detailed information:\n" +
+            strm.str());
         return std::pair<std::shared_ptr<parcelport>, locality>();
     }
 
@@ -412,6 +435,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
         naming::gid_type const& gid = p.destination();
@@ -494,11 +518,18 @@ namespace hpx { namespace parcelset
         ++count_routed_;
 
         resolver_->route(std::move(p), std::move(wrapped_f));
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcel");
+#endif
     }
 
     void parcelhandler::put_parcels(std::vector<parcel> parcels,
         std::vector<write_handler_type> handlers)
     {
+#if defined(HPX_HAVE_NETWORKING)
         HPX_ASSERT(resolver_);
 
         if (parcels.size() != handlers.size())
@@ -644,6 +675,12 @@ namespace hpx { namespace parcelset
             resolver_->route(std::move(nonresolved_parcels[i]),
                 std::move(nonresolved_handlers[i]));
         }
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::put_parcels");
+#endif
     }
 
     std::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
@@ -661,6 +698,7 @@ namespace hpx { namespace parcelset
     void default_write_handler(boost::system::error_code const& ec,
         parcel const& p)
     {
+#if defined(HPX_HAVE_NETWORKING)
         if (ec) {
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
@@ -683,6 +721,7 @@ namespace hpx { namespace parcelset
 
             hpx::report_error(exception);
         }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -691,6 +730,7 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
@@ -699,7 +739,10 @@ namespace hpx { namespace parcelset
             std::shared_ptr<policies::message_handler> p;
 
             {
-                util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                // Just ignore the handlers_mtx_ while checking. We need to hold
+                // the lock here to avoid multiple registrations that happens
+                // right now in the parcel coalescing plugin
+                hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }
@@ -765,6 +808,13 @@ namespace hpx { namespace parcelset
             ec = make_success_code();
 
         return (*it).second.get();
+#else
+        HPX_THROW_EXCEPTION(invalid_status,
+            "Networking was disabled at configuration time. Please "
+            "reconfigure HPX using -DHPX_WITH_NETWORKING=On.",
+            "parcelhandler::get_message_handler");
+        return nullptr;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -866,28 +916,6 @@ namespace hpx { namespace parcelset
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_receiving_serialization_time(reset) : 0;
     }
-
-#if defined(HPX_HAVE_SECURITY)
-    // the total time it took for all sender-side security operations
-    // (nanoseconds)
-    std::int64_t parcelhandler::get_sending_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_sending_security_time(reset) : 0;
-    }
-
-    // the total time it took for all receiver-side security
-    // operations (nanoseconds)
-    std::int64_t parcelhandler::get_receiving_security_time(
-        std::string const& pp_type, bool reset) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_receiving_security_time(reset) : 0;
-    }
-#endif
 
     // total data sent (bytes)
     std::int64_t parcelhandler::get_data_sent(std::string const& pp_type,
@@ -1069,6 +1097,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
+#if defined(HPX_HAVE_NETWORKING)
         using util::placeholders::_1;
         using util::placeholders::_2;
 
@@ -1132,15 +1161,6 @@ namespace hpx { namespace parcelset
                 &parcelhandler::get_receiving_serialization_time, this,
                 pp_type, _1
             ));
-#endif
-
-#if defined(HPX_HAVE_SECURITY)
-        util::function_nonser<std::int64_t(bool)> sending_security_time(
-            util::bind(&parcelhandler::get_sending_security_time, this,
-                pp_type, _1));
-        util::function_nonser<std::int64_t(bool)> receiving_security_time(
-            util::bind(&parcelhandler::get_receiving_security_time, this,
-                pp_type, _1));
 #endif
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -1309,34 +1329,6 @@ namespace hpx { namespace parcelset
               "ns"
             },
 
-#if defined(HPX_HAVE_SECURITY)
-            { boost::str(boost::format("/security/time/%s/sent") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format(
-                  "returns the total time required to perform tasks related to "
-                  "security in the parcel layer for all sent parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, std::move(sending_security_time), _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-            { boost::str(boost::format("/security/time/%s/received") % pp_type),
-              performance_counters::counter_raw,
-              boost::str(boost::format(
-                  "returns the total time required to perform tasks related to "
-                  "security in the parcel layer for all received parcels "
-                  "using the %s connection type for the referenced locality") %
-                        pp_type),
-              HPX_PERFORMANCE_COUNTER_V1,
-              util::bind(&performance_counters::locality_raw_counter_creator,
-                  _1, std::move(receiving_security_time), _2),
-              &performance_counters::locality_counter_discoverer,
-              "ns"
-            },
-#endif
             { boost::str(boost::format("/data/count/%s/sent") % pp_type),
               performance_counters::counter_raw,
               boost::str(boost::format(
@@ -1430,6 +1422,7 @@ namespace hpx { namespace parcelset
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
+#endif
     }
 
     // register connection specific performance counters related to connection
@@ -1437,6 +1430,10 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_connection_cache_counter_types(
         std::string const& pp_type)
     {
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
+#if defined(HPX_HAVE_NETWORKING)
         util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions, _1));
@@ -1524,6 +1521,7 @@ namespace hpx { namespace parcelset
         };
         performance_counters::install_counter_types(connection_cache_types,
             sizeof(connection_cache_types)/sizeof(connection_cache_types[0]));
+#endif
     }
 
     std::vector<plugins::parcelport_factory_base *> &
@@ -1534,7 +1532,6 @@ namespace hpx { namespace parcelset
         {
             init_static_parcelport_factories(factories);
         }
-
         return factories;
     }
 
@@ -1561,9 +1558,10 @@ namespace hpx { namespace parcelset
 
     std::vector<std::string> parcelhandler::load_runtime_configuration()
     {
-        /// TODO: properly hide this in plugins ...
+        // TODO: properly hide this in plugins ...
         std::vector<std::string> ini_defs;
 
+#if defined(HPX_HAVE_NETWORKING)
         using namespace boost::assign;
         ini_defs +=
             "[hpx.parcel]",
@@ -1601,6 +1599,7 @@ namespace hpx { namespace parcelset
         {
             f->get_plugin_info(ini_defs);
         }
+#endif
 
         return ini_defs;
     }

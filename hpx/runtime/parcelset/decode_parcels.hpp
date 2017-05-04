@@ -112,21 +112,34 @@ namespace hpx { namespace parcelset
                     buffer.data_point_;
 
                 {
+                    std::vector<parcel> deferred_parcels;
                     // De-serialize the parcel data
                     serialization::input_archive archive(buffer.data_,
                         inbound_data_size, &chunks);
 
                     if(parcel_count == 0)
+                    {
                         archive >> parcel_count; //-V128
+                    }
+                    if (parcel_count > 1)
+                        deferred_parcels.reserve(parcel_count);
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
+                        bool deferred_schedule = parcel_count > 1;
+
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         std::size_t archive_pos = archive.current_pos();
                         std::int64_t serialize_time = timer.elapsed_nanoseconds();
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
-                        bool migrated = p.load_schedule(archive, num_thread);
+                        // deferred_schedule will be set to false if the action
+                        // to be loaded is a non direct action. If we only got
+                        // one parcel to decode, deferred_schedule will be
+                        // preset to false and the direct action will be called
+                        // directly
+                        bool migrated = p.load_schedule(archive, num_thread,
+                            deferred_schedule);
 
                         std::int64_t add_parcel_time = timer.elapsed_nanoseconds();
 
@@ -166,6 +179,9 @@ namespace hpx { namespace parcelset
                                 &detail::parcel_route_handler,
                                 threads::thread_priority_normal);
                         }
+                        // If we got a direct action,
+                        else if (deferred_schedule)
+                            deferred_parcels.push_back(std::move(p));
 
                         // be sure not to measure add_parcel as serialization time
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
@@ -175,6 +191,28 @@ namespace hpx { namespace parcelset
                     // complete received data with parcel count
                     data.num_parcels_ = parcel_count;
                     data.raw_bytes_ = archive.bytes_read();
+
+                    if (!deferred_parcels.empty())
+                    {
+                        for (std::size_t i = 1; i != deferred_parcels.size(); ++i)
+                        {
+                            // schedule all but the first parcel on a new thread.
+                            hpx::applier::register_thread_nullary(
+                                util::bind(
+                                    util::one_shot(
+                                        [num_thread](parcel&& p)
+                                        {
+                                            p.schedule_action(num_thread);
+                                        }
+                                    ), std::move(deferred_parcels[i])),
+                                "schedule_parcel",
+                                threads::pending, true, threads::thread_priority_boost,
+                                num_thread, threads::thread_stacksize_default);
+                        }
+                        // If we are the first deferred parcel, we don't need to spin
+                        // a new thread...
+                        deferred_parcels[0].schedule_action(num_thread);
+                    }
                 }
 
                 // store the time required for serialization

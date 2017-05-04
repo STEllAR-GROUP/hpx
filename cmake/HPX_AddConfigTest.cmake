@@ -361,6 +361,14 @@ macro(hpx_check_for_cxx11_std_shared_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_thread)
+  add_hpx_config_test(HPX_WITH_CXX11_THREAD
+    SOURCE cmake/tests/cxx11_std_thread.cpp
+    LIBRARIES "-pthread"
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_to_string)
   add_hpx_config_test(HPX_WITH_CXX11_TO_STRING
     SOURCE cmake/tests/cxx11_std_to_string.cpp
@@ -445,9 +453,9 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx_experimental_std_optional)
-  add_hpx_config_test(HPX_WITH_CXX1Y_EXPERIMENTAL_OPTIONAL
-    SOURCE cmake/tests/cxx1y_experimental_std_optional.cpp
+macro(hpx_check_for_libfun_std_experimental_optional)
+  add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
+    SOURCE cmake/tests/libfun_std_experimental_optional.cpp
     FILE ${ARGN})
 endmacro()
 

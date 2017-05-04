@@ -30,8 +30,14 @@ The following table summarizes the available command line options:
         [Description]
     ]
     [   [`--hpx:print-counter`]
-        [print the specified performance counter either repeatedly or
-         before shutting down the system (see option `--hpx:print-counter-interval`)]]
+        [print the specified performance counter either repeatedly and/or
+         at the times specified by `--hpx:print-counter-at`
+         (see also option `--hpx:print-counter-interval`)]]
+    [   [`--hpx:print-counter-reset`]
+        [print the specified performance counter either
+         repeatedly and/or at the times specified by `--hpx:print-counter-at`,
+         reset the counter after the value is queried.
+         (see also option `--hpx:print-counter-interval`)]]
     [   [`--hpx:print-counter-interval`]
         [print the performance counter(s) specified with `--hpx:print-counter`
          repeatedly after the time interval (specified in milliseconds)
@@ -45,10 +51,23 @@ The following table summarizes the available command line options:
         [list the description of all registered performance counters]]
     [   [`--hpx:print-counter-format`]
         [print the performance counter(s) specified with `--hpx:print-counter`, possible formats in csv format with  header or without any header (see option `--hpx:no-csv-header`)
-        values: 'csv' (prints counter values in CSV format with full names as header)
+         values: 'csv' (prints counter values in CSV format with full names as header)
                 'csv-short' (prints counter values in CSV format with shortnames provided with `--hpx:print-counter` as `--hpx:print-counter shortname,full-countername`)]]
     [   [`--hpx:no-csv-header`]
         [print the performance counter(s) specified with `--hpx:print-counter` and `csv` or `csv-short` format specified with `--hpx:print-counter-format` without header]]
+    [   [`--hpx:printer-counter-at arg`]
+        [print the performance counter(s)
+         specified with `--hpx:print-counter` (or `--hpx:print-counter-reset`)
+         at the given point in time,
+         possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
+    [   [`--hpx:reset-counters`]
+        [reset all performance counter(s) specified with
+         `--hpx:print-counter` after they have been evaluated]]
+    [   [`--hpx:print-counter-at`]
+        [print the performance counter(s) specified with
+         `--hpx:print-counter` (or `--hpx:print-counter-reset`) at the given
+         point in time, possible argument are values: 'startup',
+         'shutdown' (default), 'noshutdown'.]]
 ]
 
 While the options `--hpx:list-counters` and `--hpx:list-counter-infos` give a
@@ -359,12 +378,12 @@ For more information about the client component type see
  to print the result we must append .get() to retrieve the value. You
  could write the above example like this for more clarity:
 
-``` 
+```
     // print the current number of threads created on locality 0
     hpx::performance_counters::performance_counter count(
         "/threads{locality#0/total}/count/cumulative");
     hpx::future<int> result = count.get_value<int>();
-    hpx::cout << result.get() << hpx::endl; 
+    hpx::cout << result.get() << hpx::endl;
 ```
  ]
 

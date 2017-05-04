@@ -6,6 +6,7 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
@@ -71,6 +72,7 @@ namespace hpx { namespace threads
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
+#ifdef HPX_HAVE_NICE_THREADLEVEL
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
         tid = syscall(SYS_gettid);
@@ -89,6 +91,7 @@ namespace hpx { namespace threads
         }
 #elif defined(__bgq__)
         ThreadPriority_Low();
+#endif
 #endif
         return true;
     }
@@ -115,7 +118,7 @@ namespace hpx { namespace threads
 #elif defined(HPX_HAVE_HWLOC)
           : num_of_cores_(detail::hwloc_hardware_concurrency())
 #else
-          : num_of_cores_(boost::thread::hardware_concurrency())
+          : num_of_cores_(compat::thread::hardware_concurrency())
 #endif
         {
             if (num_of_cores_ == 0)

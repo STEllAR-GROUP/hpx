@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -21,14 +23,11 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -57,7 +56,7 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
+        void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
             bool& running);
 
     public:
@@ -146,7 +145,7 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
+        void stopped(bool blocking, compat::condition_variable& cond, compat::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -386,11 +385,10 @@ namespace hpx
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
-        util::detail::init_logging init_logging_;
         applier::applier applier_;
         boost::signals2::scoped_connection default_error_sink_;
 
-        boost::mutex mtx_;
+        compat::mutex mtx_;
         boost::exception_ptr exception_;
     };
 }

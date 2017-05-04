@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace detail {
         rank_(rank),
         num_(num),
         arity_(std::stol(get_config_entry("hpx.lcos.collectives.arity", 32))),
-        cut_off_(std::stol(get_config_entry("hpx.lcos.collectives.cut_off", 256))),
+        cut_off_(std::stol(get_config_entry("hpx.lcos.collectives.cut_off", -1))),
         local_barrier_(num)
     {
         if (num_ >= cut_off_)

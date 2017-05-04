@@ -4,9 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:boost::unique_lock
-
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/latch.hpp>
@@ -29,8 +30,6 @@
 #include <hpx/util/thread_mapper.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -160,9 +159,10 @@ namespace hpx {
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
-        init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_)
     {
+        LPROGRESS_;
+
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
 
@@ -170,10 +170,6 @@ namespace hpx {
         // and get_runtime_ptr) is already initialized at this point.
         applier_.init_tss();
 
-#if defined(HPX_HAVE_SECURITY)
-        // once all has been initialized, finalize security data for bootstrap
-        this->init_security();
-#endif
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, std::uint64_t(runtime_support_.get()),
@@ -182,11 +178,6 @@ namespace hpx {
 
         applier_.initialize(std::uint64_t(runtime_support_.get()),
         std::uint64_t(memory_.get()));
-
-#if defined(HPX_HAVE_SECURITY)
-        // enable parcel capability checking
-        applier_.enable_verify_capabilities();
-#endif
 
         // copy over all startup functions registered so far
         for (startup_function_type& f : global_pre_startup_functions)
@@ -234,6 +225,8 @@ namespace hpx {
         runtime_support_->tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
+
+        LPROGRESS_;
     }
 
     int pre_main(hpx::runtime_mode);
@@ -243,7 +236,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
-        LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
+        lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
@@ -251,12 +244,12 @@ namespace hpx {
         // Finish the bootstrap
         result = hpx::pre_main(mode_);
         if (result) {
-            LBT_(info) << "runtime_impl::run_helper: bootstrap "
-                          "aborted, bailing out";
+            lbt_ << "runtime_impl::run_helper: bootstrap "
+                    "aborted, bailing out";
             return threads::thread_result_type(threads::terminated, nullptr);
         }
 
-        LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
+        lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         set_state(state_running);
 
         parcel_handler_.enable_alternative_parcelports();
@@ -310,23 +303,23 @@ namespace hpx {
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
-        LBT_(info) << "(1st stage) runtime_impl::start: booting locality " //-V128
+        lbt_ << "(1st stage) runtime_impl::start: booting locality " //-V128
                    << here() << " on " << num_threads_ << " OS-thread"
                    << ((num_threads_ == 1) ? "" : "s");
 
         // start runtime_support services
         runtime_support_->run();
-        LBT_(info) << "(1st stage) runtime_impl::start: started "
+        lbt_ << "(1st stage) runtime_impl::start: started "
                       "runtime_support component";
 
         // start the io pool
         io_pool_.run(false);
-        LBT_(info) << "(1st stage) runtime_impl::start: started the application "
+        lbt_ << "(1st stage) runtime_impl::start: started the application "
                       "I/O service pool";
 
         // start the thread manager
         thread_manager_->run(num_threads_);
-        LBT_(info) << "(1st stage) runtime_impl::start: started threadmanager";
+        lbt_ << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
         // invoke the AGAS v2 notifications
@@ -334,7 +327,7 @@ namespace hpx {
 
         // {{{ launch main
         // register the given main function with the thread manager
-        LBT_(info) << "(1st stage) runtime_impl::start: launching run_helper "
+        lbt_ << "(1st stage) runtime_impl::start: launching run_helper "
                       "HPX thread";
 
         threads::thread_init_data data(
@@ -387,11 +380,11 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::wait_helper(
-        boost::mutex& mtx, boost::condition_variable& cond, bool& running)
+        compat::mutex& mtx, compat::condition_variable& cond, bool& running)
     {
         // signal successful initialization
         {
-            std::lock_guard<boost::mutex> lk(mtx);
+            std::lock_guard<compat::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -424,18 +417,18 @@ namespace hpx {
         LRT_(info) << "runtime_impl: about to enter wait state";
 
         // start the wait_helper in a separate thread
-        boost::mutex mtx;
-        boost::condition_variable cond;
+        compat::mutex mtx;
+        compat::condition_variable cond;
         bool running = false;
 
-        boost::thread t (util::bind(
+        compat::thread t (util::bind(
                 &runtime_impl<SchedulingPolicy>::wait_helper,
                 this, std::ref(mtx), std::ref(cond), std::ref(running)
             ));
 
         // wait for the thread to run
         {
-            boost::unique_lock<boost::mutex> lk(mtx);
+            std::unique_lock<compat::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -473,11 +466,11 @@ namespace hpx {
             // this is necessary as this function (stop()) might have been called
             // from a HPX thread, so it would deadlock by waiting for the thread
             // manager
-            boost::mutex mtx;
-            boost::condition_variable cond;
-            boost::unique_lock<boost::mutex> l(mtx);
+            compat::mutex mtx;
+            compat::condition_variable cond;
+            std::unique_lock<compat::mutex> l(mtx);
 
-            boost::thread t(util::bind(&runtime_impl::stopped, this, blocking,
+            compat::thread t(util::bind(&runtime_impl::stopped, this, blocking,
                 std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
@@ -506,7 +499,7 @@ namespace hpx {
     // a HPX thread!
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::stopped(
-        bool blocking, boost::condition_variable& cond, boost::mutex& mtx)
+        bool blocking, compat::condition_variable& cond, compat::mutex& mtx)
     {
         // wait for thread manager to exit
         runtime_support_->stopped();         // re-activate shutdown HPX-thread
@@ -517,7 +510,7 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        std::lock_guard<boost::mutex> l(mtx);
+        std::lock_guard<compat::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -534,10 +527,10 @@ namespace hpx {
 
             // store the exception to be able to rethrow it later
             {
-                std::lock_guard<boost::mutex> l(mtx_);
+                std::lock_guard<compat::mutex> l(mtx_);
                 exception_ = e;
             }
-            lcos::barrier::get_global_barrier().release();
+            lcos::barrier::get_global_barrier().detach();
 
             // initiate stopping the runtime system
             runtime_support_->notify_waiting_main();
@@ -579,7 +572,7 @@ namespace hpx {
     {
         if (state_.load() > state_running)
         {
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;
@@ -876,17 +869,17 @@ template class HPX_EXPORT hpx::runtime_impl<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
     > >;
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_lifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
     > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
     > >;
 #endif
 

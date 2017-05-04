@@ -12,21 +12,13 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
-
 #include <boost/exception_ptr.hpp>
 
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -61,6 +53,19 @@ namespace hpx { namespace lcos { namespace local
           , promise_()
         {}
 
+        template <
+            typename Allocator,
+            typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, packaged_task>::value
+             && traits::is_callable<FD&(Ts...), R>::value
+            >::type
+        >
+        explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
+          : function_(std::forward<F>(f))
+          , promise_(std::allocator_arg, a)
+        {}
+
         packaged_task(packaged_task&& rhs)
           : function_(std::move(rhs.function_))
           , promise_(std::move(rhs.promise_))
@@ -92,23 +97,8 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-#if HPX_HAVE_ITTNOTIFY != 0
-            util::itt::string_handle const& sh =
-                traits::get_function_annotation_itt<
-                    function_type
-                >::call(function_);
-            util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-            char const* name = traits::get_function_annotation<
-                    function_type
-                >::call(function_);
-            if (name != nullptr)
-            {
-                util::apex_wrapper apex_profiler(name);
-                invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
-            }
-            else
-#endif
+            hpx::util::annotate_function annotate(function_);
+            (void)annotate;     // suppress warning about unused variable
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -172,5 +162,14 @@ namespace hpx { namespace lcos { namespace local
         local::promise<R> promise_;
     };
 }}}
+
+namespace std
+{
+    // Requires: Allocator shall be an allocator (17.6.3.5)
+    template <typename Sig, typename Allocator>
+    struct uses_allocator<hpx::lcos::local::packaged_task<Sig>, Allocator>
+      : std::true_type
+    {};
+}
 
 #endif /*HPX_LCOS_LOCAL_PACKAGED_TASK_HPP*/

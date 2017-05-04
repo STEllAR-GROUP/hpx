@@ -3,14 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
-// hpxinspect:nodeprecatedname:boost::chrono
-// hpxinspect:nodeprecatedname:boost::unique_lock
-
 #if !defined(HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM)
 #define HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -24,11 +22,7 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -124,9 +118,9 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
-            boost::chrono::milliseconds period(++wait_count_);
+            std::chrono::milliseconds period(++wait_count_);
 
-            boost::unique_lock<boost::mutex> l(mtx_);
+            std::unique_lock<compat::mutex> l(mtx_);
             cond_.wait_for(l, period);
 #endif
         }
@@ -313,8 +307,8 @@ namespace hpx { namespace threads { namespace policies
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
-        boost::mutex mtx_;
-        boost::condition_variable cond_;
+        compat::mutex mtx_;
+        compat::condition_variable cond_;
         boost::atomic<std::uint32_t> wait_count_;
 #endif
 

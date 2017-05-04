@@ -8,7 +8,8 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015)
 #define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
 //
-#include <hpx/parallel/executors.hpp>
+#include <hpx/config.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 //
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -120,7 +121,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         // -------------------------------------------------------------------
-        // functor that actually computes the state using the stencil iterator
+        // callable that actually computes the state using the stencil iterator
         // -------------------------------------------------------------------
         template<
             typename Transformer, typename StencilIterType,
@@ -445,16 +446,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 RanIter2 values_first, OutIter keys_output, OutIter2 values_output,
                 Compare && comp, Func &&func)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 return util::detail::algorithm_result<ExPolicy,
                         std::pair<OutIter, OutIter2>
                     >::get(
-                        executor_traits::async_execute(
+                        execution::async_execute(
                             policy.executor(),
                             hpx::util::deferred_call(
                                 &hpx::parallel::v1::detail::reduce_by_key_impl<

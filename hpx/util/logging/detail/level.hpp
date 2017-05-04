@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace logging {
 
 */
 namespace level {
-    /** the higher the level , the more critical the error */
+    /** the higher the level, the more critical the error */
     typedef unsigned int type;
 
     enum {

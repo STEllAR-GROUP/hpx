@@ -10,6 +10,7 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -25,6 +26,8 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/init_logging.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
@@ -331,7 +334,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         void handle_list_and_print_options(hpx::runtime& rt,
-            boost::program_options::variables_map& vm)
+            boost::program_options::variables_map& vm,
+            bool print_counters_locally)
         {
             if (vm.count("hpx:list-counters")) {
                 // Print the names of all registered performance counters.
@@ -428,7 +432,8 @@ namespace hpx
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
                         std::ref(counters), std::ref(reset_counters), interval,
-                        destination, counter_format, counter_shortnames, csv_header);
+                        destination, counter_format, counter_shortnames, csv_header,
+                        print_counters_locally);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
@@ -489,8 +494,10 @@ namespace hpx
 
             // Add startup function related to listing counter names or counter
             // infos (on console only).
-            if (mode == runtime_mode_console)
-                handle_list_and_print_options(rt, vm);
+            bool print_counters_locally =
+                vm.count("hpx:print-counters-locally") != 0;
+            if (mode == runtime_mode_console || print_counters_locally)
+                handle_list_and_print_options(rt, vm, print_counters_locally);
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial")) {
@@ -692,6 +699,8 @@ namespace hpx
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
+            LPROGRESS_;
+
             add_startup_functions(rt, vm, mode, std::move(startup),
                 std::move(shutdown));
 
@@ -709,6 +718,8 @@ namespace hpx
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
+            LPROGRESS_;
+
             add_startup_functions(rt, vm, mode, std::move(startup),
                 std::move(shutdown));
 
@@ -764,6 +775,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_local: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -805,6 +818,8 @@ namespace hpx
                 "core-throttle_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            LPROGRESS_ << "run_throttle: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<throttle_queue_policy> runtime_type;
@@ -852,6 +867,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_static_priority: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -896,6 +913,8 @@ namespace hpx
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
+            LPROGRESS_ << "run_static: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -933,7 +952,7 @@ namespace hpx
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, Queuing
+                    compat::mutex, Queuing
                 > local_queue_policy;
 
             typename local_queue_policy::init_parameter_type init(
@@ -941,6 +960,8 @@ namespace hpx
                 numa_sensitive, "core-local_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            LPROGRESS_ << "run_priority_local: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -968,12 +989,14 @@ namespace hpx
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, hpx::threads::policies::lockfree_fifo
+                    compat::mutex, hpx::threads::policies::lockfree_fifo
                 > abp_priority_queue_policy;
 
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
                 cfg.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
+
+            LPROGRESS_ << "run_priority_abp: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -1011,6 +1034,8 @@ namespace hpx
             queue_policy::init_parameter_type init(cfg.num_threads_, arity,
                 1000, 0, "core-hierarchy_scheduler");
 
+            LPROGRESS_ << "run_hierarchy: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -1047,6 +1072,8 @@ namespace hpx
                 num_high_priority_queues, 1000, cfg.numa_sensitive_,
                 "core-periodic_priority_queue_scheduler");
 
+            LPROGRESS_ << "run_periodic: create runtime";
+
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
@@ -1074,7 +1101,9 @@ namespace hpx
             bool blocking)
         {
             int result = 0;
+#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
             set_error_handlers();
+#endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");
@@ -1092,7 +1121,6 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
-
             try {
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
@@ -1113,6 +1141,10 @@ namespace hpx
                         result = 0;     // --hpx:help
                     return result;
                 }
+
+                // initialize logging
+                util::detail::init_logging(cfg.rtcfg_,
+                    cfg.mode_ == runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 

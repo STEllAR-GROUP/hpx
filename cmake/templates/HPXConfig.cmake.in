@@ -70,6 +70,7 @@ endif()
 # Set variables to enable cuda/nvcc or cuda/clang when using add_hpx_executable()
 set(HPX_WITH_CUDA @HPX_WITH_CUDA@)
 set(HPX_WITH_CUDA_CLANG @HPX_WITH_CUDA_CLANG@)
+set(HPX_CUDA_CLANG_FLAGS @HPX_CUDA_CLANG_FLAGS@)
 
 # Set variables used by nvcc
 if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)

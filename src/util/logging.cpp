@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -176,7 +176,6 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-
             std::uint32_t locality_id = hpx::get_locality_id();
 
             if (naming::invalid_locality_id != locality_id) {
@@ -1076,8 +1075,8 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_LOGDESTINATION:console}",
                 "format = ${HPX_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%]|\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%]|\\n}",
 
                 // general console logging
                 "[hpx.logging.console]",
@@ -1085,8 +1084,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_LOGDESTINATION:\
-                    file(hpx.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_LOGDESTINATION:"
+                    "file(hpx.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
@@ -1096,8 +1095,8 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_TIMING_LOGDESTINATION:console}",
                 "format = ${HPX_TIMING_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [TIM] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
                 "[hpx.logging.console.timing]",
@@ -1105,8 +1104,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
 #else
-                "destination = \
-            ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
+                    "file(hpx.timing.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
@@ -1114,12 +1113,12 @@ namespace hpx { namespace util { namespace detail
                 "[hpx.logging.agas]",
                 "level = ${HPX_AGAS_LOGLEVEL:-1}",
 //                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
-                "destination = \
-                ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "destination = ${HPX_AGAS_LOGDESTINATION:"
+                    "file(hpx.agas.$[system.pid].log)}",
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%][AGAS] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
                 "[hpx.logging.console.agas]",
@@ -1127,20 +1126,20 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file\
-                    (hpx.agas.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
+                    "file(hpx.agas.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to the parcel transport
                 "[hpx.logging.parcel]",
                 "level = ${HPX_PARCEL_LOGLEVEL:-1}",
-                "destination = ${HPX_PARCEL_LOGDESTINATION:file\
-                (hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_PARCEL_LOGDESTINATION:"
+                    "file(hpx.parcel.$[system.pid].log)}",
                 "format = ${HPX_PARCEL_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%][  PT] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
 
                 // console logging related to the parcel transport
                 "[hpx.logging.console.parcel]",
@@ -1148,8 +1147,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:file\
-                    (hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
+                    "file(hpx.parcel.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
 
@@ -1159,8 +1158,8 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_APP_LOGDESTINATION:console}",
                 "format = ${HPX_APP_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [APP] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
                 "[hpx.logging.console.application]",
@@ -1168,8 +1167,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file\
-                    (hpx.application.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
+                    "file(hpx.application.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
 
@@ -1179,16 +1178,16 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_DEB_LOGDESTINATION:console}",
                 "format = ${HPX_DEB_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
-                    ") [%idx%] [DEB] |\\n}",
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
 
                 "[hpx.logging.console.debuglog]",
                 "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:file\
-                    (hpx.debuglog.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
+                    "file(hpx.debuglog.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
             };
@@ -1210,8 +1209,7 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    init_logging::init_logging(runtime_configuration& ini, bool isconsole,
-        naming::resolver_client& agas_client)
+    void init_logging(runtime_configuration& ini, bool isconsole)
     {
         // initialize normal logs
         init_agas_log(ini, isconsole);
@@ -1236,6 +1234,7 @@ namespace hpx { namespace util { namespace detail
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/init_logging.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <iostream>
 #include <string>
@@ -1243,24 +1242,21 @@ namespace hpx { namespace util { namespace detail
 
 namespace hpx { namespace util { namespace detail
 {
-    dummy_log_impl dummy_log = dummy_log_impl();
-
     std::vector<std::string> get_logging_data()
     {
         static std::vector<std::string> dummy_data;
         return dummy_data;
     }
 
-    init_logging::init_logging(runtime_configuration& ini, bool,
-        naming::resolver_client&)
+    void init_logging(runtime_configuration& ini, bool)
     {
         // warn if logging is requested
 
-        if (ini.get_entry("hpx.logging.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.timing.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.agas.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.debuglog.level", "0") != "0" ||
-            ini.get_entry("hpx.logging.application.level", "0") != "0")
+        if (util::get_entry_as<int>(ini, "hpx.logging.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.timing.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.agas.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.debuglog.level", -1) > 0 ||
+            util::get_entry_as<int>(ini, "hpx.logging.application.level", -1) > 0)
         {
             std::cerr << "hpx::init_logging: warning: logging is requested even "
                          "while it was disabled at compile time. If you "

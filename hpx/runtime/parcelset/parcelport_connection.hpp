@@ -50,35 +50,7 @@ namespace hpx { namespace parcelset {
         };
 #endif
 
-#if defined(HPX_HAVE_SECURITY) && defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-        parcelport_connection()
-          : first_message_(true)
-          , state_(state_initialized)
-        {}
-
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
-          : first_message_(true)
-          , state_(state_initialized)
-          , buffer_(alloc)
-        {}
-        bool first_message_;
-        state state_;
-#endif
-
-#if defined(HPX_HAVE_SECURITY) && !defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-        parcelport_connection()
-          : first_message_(true)
-        {}
-        bool first_message_;
-
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
-          : first_message_(true)
-          , buffer_(alloc)
-        {}
-        bool first_message_;
-#endif
-
-#if !defined(HPX_HAVE_SECURITY) && defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         parcelport_connection()
           : state_(state_initialized)
         {}
@@ -88,9 +60,7 @@ namespace hpx { namespace parcelset {
           , buffer_(alloc)
         {}
         state state_;
-#endif
-
-#if !defined(HPX_HAVE_SECURITY) && !defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+#else
         parcelport_connection()
         {}
 

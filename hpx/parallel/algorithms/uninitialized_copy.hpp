@@ -34,6 +34,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // provide our own implementation of std::uninitialized_copy as some
+        // versions of MSVC horribly fail at compiling it for some types T
+        template <typename InIter, typename FwdIter>
+        FwdIter std_uninitialized_copy(InIter first, InIter last, FwdIter d_first)
+        {
+            typedef typename std::iterator_traits<FwdIter>::value_type
+                value_type;
+
+            FwdIter current = d_first;
+            try {
+                for (/* */; first != last; ++first, (void) ++current) {
+                    ::new (static_cast<void*>(std::addressof(*current)))
+                        value_type(*first);
+                }
+                return current;
+            }
+            catch (...) {
+                for (/* */; d_first != current; ++d_first) {
+                    (*d_first).~value_type();
+                }
+                throw;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename FwdIter>
         FwdIter
         sequential_uninitialized_copy_n(Iter first, std::size_t count,
@@ -120,7 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static FwdIter
             sequential(ExPolicy, Iter first, Iter last, FwdIter dest)
             {
-                return std::uninitialized_copy(first, last, dest);
+                return std_uninitialized_copy(first, last, dest);
             }
 
             template <typename ExPolicy, typename Iter>

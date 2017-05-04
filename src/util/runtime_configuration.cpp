@@ -197,11 +197,17 @@ namespace hpx { namespace util
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
-            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:256}",
+            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:-1}",
 
             // connect back to the given latch if specified
             "[hpx.on_startup]",
             "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
+
+#if defined(HPX_HAVE_NETWORKING)
+            // by default, enable networking
+            "[hpx.parcel]",
+            "enable = 1",
+#endif
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -276,7 +282,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
                 "}",
             "service_mode = hosted",
-            "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
@@ -716,21 +721,6 @@ namespace hpx { namespace util
             }
         }
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
-    }
-
-    // Get whether the AGAS server is running as a dedicated runtime.
-    // This decides whether the AGAS actions are executed with normal
-    // priority (if dedicated) or with high priority (non-dedicated)
-    bool runtime_configuration::get_agas_dedicated_server() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
-                return hpx::util::get_entry_as<int>(
-                    *sec, "dedicated_server", 0) != 0;
-            }
-        }
-        return false;
     }
 
     bool runtime_configuration::get_itt_notify_mode() const

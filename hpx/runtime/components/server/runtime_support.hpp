@@ -9,10 +9,9 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/throw_exception.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/traits/action_capability_provider.hpp>
-#endif
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -39,8 +38,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -70,7 +67,6 @@ namespace hpx { namespace components { namespace server
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
         typedef lcos::local::spinlock plugin_map_mutex_type;
-        typedef boost::mutex mutex_type;
 
         struct component_factory
         {
@@ -160,10 +156,10 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Actions to create new objects
         template <typename Component>
-        HPX_HOST_DEVICE naming::gid_type create_component();
+        naming::gid_type create_component();
 
         template <typename Component, typename T, typename ...Ts>
-        HPX_HOST_DEVICE naming::gid_type create_component(T v, Ts... vs);
+        naming::gid_type create_component(T v, Ts... vs);
 
         template <typename Component>
         std::vector<naming::gid_type> bulk_create_component(std::size_t count);
@@ -330,6 +326,7 @@ namespace hpx { namespace components { namespace server
         bool keep_factory_alive(component_type t);
 
         void remove_here_from_connection_cache();
+        void remove_here_from_console_connection_cache();
 
         ///////////////////////////////////////////////////////////////////////
         void register_message_handler(char const* message_handler_type,
@@ -344,11 +341,6 @@ namespace hpx { namespace components { namespace server
 
         // notify of message being sent
         void dijkstra_make_black();
-
-#if defined(HPX_HAVE_SECURITY)
-        components::security::capability get_factory_capabilities(
-            components::component_type type);
-#endif
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -426,9 +418,9 @@ namespace hpx { namespace components { namespace server
 #endif
 
     private:
-        mutex_type mtx_;
-        boost::condition_variable wait_condition_;
-        boost::condition_variable stop_condition_;
+        compat::mutex mtx_;
+        compat::condition_variable wait_condition_;
+        compat::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
@@ -455,16 +447,18 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Functions wrapped by creat_component actions below
-#if defined(__NVCC__) || defined(__CUDACC__)
+#if defined(__NVCC__)
     template <typename Component>
-    HPX_HOST_DEVICE naming::gid_type runtime_support::create_component()
+    naming::gid_type runtime_support::create_component()
     {
+        HPX_ASSERT(false);
         return naming::gid_type();
     }
 
     template <typename Component, typename T, typename ...Ts>
-    HPX_HOST_DEVICE naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    naming::gid_type runtime_support::create_component(T v, Ts... vs)
     {
+        HPX_ASSERT(false);
         return naming::gid_type();
     }
 #else
@@ -1010,45 +1004,6 @@ namespace hpx { namespace traits
             return true;
         }
     };
-
-#if defined(HPX_HAVE_SECURITY)
-    ///////////////////////////////////////////////////////////////////////////
-    // Actions used to create components with constructors of various arities.
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_action<Component, Ts...> >
-    {
-        // return the required capabilities to invoke the given action
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-
-    template <typename Component, typename ...Ts>
-    struct action_capability_provider<
-        components::server::create_component_direct_action<Component, Ts...> >
-    {
-        static components::security::capability call(
-            naming::address::address_type lva)
-        {
-            components::server::runtime_support* rts =
-                get_lva<components::server::runtime_support>::call(lva);
-
-            components::component_type const type =
-                components::get_component_type<
-                    typename Component::wrapped_type>();
-            return rts->get_factory_capabilities(type);
-        }
-    };
-#endif
 
     // runtime_support is a (hand-rolled) component
     template <>

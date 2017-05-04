@@ -25,6 +25,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/scoped_timer.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -271,7 +272,7 @@ bool primary_namespace::end_migration(naming::gid_type id)
     );
     counter_data_.increment_end_migration_count();
 
-    std::lock_guard<mutex_type> l(mutex_);
+    std::unique_lock<mutex_type> l(mutex_);
 
     using hpx::util::get;
 
@@ -279,7 +280,11 @@ bool primary_namespace::end_migration(naming::gid_type id)
     if (it == migrating_objects_.end() || !get<0>(it->second))
         return false;
 
-    get<2>(it->second).notify_all(hpx::throws);
+    // ignore before notifying everyone about the ended migration.
+    {
+        hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+        get<2>(it->second).notify_all(hpx::throws);
+    }
 
     // flag this id as not being migrated anymore
     get<0>(it->second) = false;

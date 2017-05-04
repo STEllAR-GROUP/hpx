@@ -13,9 +13,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/format.hpp>
-#include <boost/serialization/vector.hpp>
-
 #include <cstddef>
 #include <list>
 #include <iostream>

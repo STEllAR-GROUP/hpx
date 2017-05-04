@@ -15,12 +15,13 @@
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -50,11 +51,6 @@ namespace hpx { namespace parallel { namespace util
             static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -78,7 +74,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, 1, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));
@@ -120,11 +116,6 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<R> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -153,7 +144,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, 1, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));
@@ -175,6 +166,8 @@ namespace hpx { namespace parallel { namespace util
                     [f2, f3, errors, scoped_param](
                         std::vector<hpx::future<Result> > && r) mutable -> R
                     {
+                        HPX_UNUSED(scoped_param);
+
                         detail::handle_local_exceptions<ExPolicy>::call(
                             r, errors, std::forward<F3>(f3));
                         return f2(std::move(r));

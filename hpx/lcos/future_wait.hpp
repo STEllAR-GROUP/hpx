@@ -244,10 +244,9 @@ namespace hpx { namespace lcos
             detail::wait_acquire_future<Future>());
 
         boost::atomic<std::size_t> success_counter(0);
-        lcos::local::futures_factory<return_type()> p =
-            lcos::local::futures_factory<return_type()>(
-                detail::wait_each<Future, F>(std::move(lazy_values_),
-                    std::forward<F>(f), &success_counter));
+        lcos::local::futures_factory<return_type()> p(
+            detail::wait_each<Future, F>(std::move(lazy_values_),
+                std::forward<F>(f), &success_counter));
 
         p.apply();
         p.get_future().get();
@@ -280,10 +279,9 @@ namespace hpx { namespace lcos
             detail::wait_acquire_future<Future>());
 
         boost::atomic<std::size_t> success_counter(0);
-        lcos::local::futures_factory<return_type()> p =
-            lcos::local::futures_factory<return_type()>(
-                detail::wait_each<Future, F>(std::move(lazy_values_),
-                    std::forward<F>(f), &success_counter));
+        lcos::local::futures_factory<return_type()> p(
+            detail::wait_each<Future, F>(std::move(lazy_values_),
+                std::forward<F>(f), &success_counter));
 
         p.apply();
         p.get_future().get();

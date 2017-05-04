@@ -1008,11 +1008,13 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ...Ts>
+    template <typename Is, typename ...Ts>
     struct is_bitwise_serializable<
-        ::hpx::util::tuple<Ts...>
+        ::hpx::util::detail::tuple_impl<Is, Ts...>
     > : ::hpx::util::detail::all_of<
-            hpx::traits::is_bitwise_serializable<Ts>...
+            hpx::traits::is_bitwise_serializable<
+                typename std::remove_const<Ts>::type
+            >...
         >
     {};
 }}
@@ -1028,7 +1030,7 @@ namespace hpx { namespace serialization
       , unsigned int const version = 0
     )
     {
-        t._impl.serialize(ar, version);
+        ar & t._impl;
     }
 
     template <typename Archive>

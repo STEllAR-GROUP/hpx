@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -23,7 +24,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -51,7 +51,7 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>

@@ -20,6 +20,7 @@
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -81,6 +82,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     first, last, dest,
                     [val, proj](T const& a)
                     {
+                        HPX_UNUSED(proj);
                         return !(a == val);
                     },
                     std::forward<Proj>(proj));

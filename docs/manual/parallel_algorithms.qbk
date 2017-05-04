@@ -436,24 +436,31 @@ described by the Parallelism TS, where multiple exceptions are collected into
 an __exception_list__. This list is reported through `async_execute()`'s
 returned future, or thrown directly by execute().
 
+[important Please note that the executor interface as described above has no been
+           deprecated. It has been replaced by separate executor customization
+           points, one for each of the exposed functions. Please see __cpp20_p0443__
+           for more details. The old interface based on `executor_traits` will
+           be supported for some time, you might have to enable the
+           `HPX_WITH_EXECUTOR_COMPATIBILITY` configuration setting, however.]
+
 In __hpx__ we have implemented the following executor types:
 
-* [classref hpx::parallel::v3::sequential_executor `hpx::parallel::sequential_executor`]:
+* [classref hpx::parallel::execution::sequenced_executor `hpx::parallel::execution::sequenced_executor`]:
   creates groups of sequential execution agents which execute in the calling
   thread. The sequential order is given by the lexicographical order of indices
   in the index space.
-* [classref hpx::parallel::v3::parallel_executor `hpx::parallel::parallel_executor`]:
+* [classref hpx::parallel::execution::parallel_executor `hpx::parallel::execution::parallel_executor`]:
   creates groups of parallel execution agents which execute in threads
   implicitly created by the executor. This executor uses a given launch policy.
-* [classref hpx::parallel::v3::service_executor `hpx::parallel::service_executor`]:
+* [classref hpx::parallel::execution::service_executor `hpx::parallel::execution::service_executor`]:
   creates groups of parallel execution agents which execute in one of the
   kernel threads associated with a given pool category (I/O, parcel, or timer
   pool, or on the main thread of the application).
-* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`],
-  [classref hpx::parallel::v3::local_queue_executor `hpx::parallel::local_queue_executor`]
-  [classref hpx::parallel::v3::static_priority_queue_executor `hpx::parallel::static_priority_queue_executor`]
+* [classref hpx::parallel::execution::local_priority_queue_executor `hpx::parallel::execution::local_priority_queue_executor`],
+  [classref hpx::parallel::execution::local_queue_executor `hpx::parallel::execution::local_queue_executor`]
+  [classref hpx::parallel::execution::static_priority_queue_executor `hpx::parallel::execution::static_priority_queue_executor`]
   create executors on top of the corresponding __hpx__ schedulers.
-* [classref hpx::parallel::v3::distribution_policy_executor `hpx::parallel::distribution_policy_executor`]
+* [classref hpx::parallel::execution::distribution_policy_executor `hpx::parallel::execution::distribution_policy_executor`]
   creates executors using any of the existing distribution policies (like
   [classref hpx::components::colocating_distribution_policy `hpx::components::colocating_distribution_policy]
   et.al.).

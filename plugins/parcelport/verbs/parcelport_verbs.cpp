@@ -5,6 +5,8 @@
 
 // config
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 // util
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -1195,7 +1197,9 @@ namespace verbs
 
         bool can_send_immediate() {
             while (!immediate_send_allowed_) {
-                background_work(0);
+                // We suspend our thread, which will make progress on the network
+                hpx::this_thread::suspend(hpx::threads::pending,
+                    "verbs::parcelport::can_send_immediate");
             }
             return true;
         }
@@ -1685,3 +1689,4 @@ HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::verbs::parcelport, verbs);
                 << decnumber(sends_posted+handled_receives+total_reads));
 */
 
+#endif

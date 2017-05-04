@@ -114,18 +114,12 @@ namespace hpx { namespace actions
             parcelset::parcelhandler* ph, parcelset::locality const& loc,
             parcelset::parcel const& p) const = 0;
 
-#if defined(HPX_HAVE_SECURITY)
-        /// Return the set of capabilities required to invoke this action
-        virtual components::security::capability get_required_capabilities(
-            naming::address_type lva) const = 0;
-#endif
-
         virtual void load(serialization::input_archive& ar) = 0;
         virtual void save(serialization::output_archive& ar) = 0;
 
         virtual void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread) = 0;
+            std::size_t num_thread, bool& deferred_schedule) = 0;
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         /// The function \a get_action_name_itt returns the name of this action

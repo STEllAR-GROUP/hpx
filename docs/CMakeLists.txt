@@ -118,7 +118,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequenced_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
@@ -330,8 +330,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=562
-                boost.image.h=104
+                boost.image.w=531
+                boost.image.h=105
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

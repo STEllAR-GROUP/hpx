@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -58,7 +58,7 @@ namespace hpx { namespace util
 
             void print_stats()
             {
-                LTIM_(fatal) << "profiler: " << description_ << ": "
+                LTIM_(error) << "profiler: " << description_ << ": "
                             << boost::accumulators::sum(totals_) << " ("
                             << boost::accumulators::count(totals_) << ", "
                             << boost::accumulators::mean(totals_) << ", "
@@ -126,7 +126,7 @@ namespace hpx { namespace util
 
             void print_stats()
             {
-                LTIM_(fatal) << "profiler: " << description_ << ": "
+                LTIM_(error) << "profiler: " << description_ << ": "
                             << extract_count(totals_) << ", "
                             << extract_mean(totals_);
             }
@@ -214,13 +214,13 @@ namespace hpx { namespace util
         // special interface for block_profiler_wrapper below
         void measure(double started)
         {
-            if (enable_logging_ && LTIM_ENABLED(fatal))
+            if (enable_logging_ && LTIM_ENABLED(error))
                 stats_.add(started);
         }
 
         double elapsed()
         {
-            return enable_logging_ && LTIM_ENABLED(fatal) ? stats_.elapsed() : 0;
+            return enable_logging_ && LTIM_ENABLED(error) ? stats_.elapsed() : 0;
         }
 
     private:

@@ -18,6 +18,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/range/functions.hpp>
 
@@ -68,6 +69,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
@@ -214,6 +217,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)
@@ -359,6 +364,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
+                        HPX_UNUSED(policy);
+
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
                             [&op, &tok](FwdIter const& curr)

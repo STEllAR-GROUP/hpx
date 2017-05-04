@@ -460,7 +460,7 @@
 #    if defined(HPX_DEBUG)
 #      define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #    else
-#      if defined(__powerpc__)
+#      if defined(__powerpc__) || defined(__INTEL_COMPILER)
 #         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #      else
 #         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte

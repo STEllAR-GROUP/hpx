@@ -192,9 +192,6 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::normal:
-            if (timer_.is_started())
-                break;
-
             // start deadline timer to flush buffer
             l.unlock();
             timer_.start(interval);
@@ -262,10 +259,14 @@ namespace hpx { namespace plugins { namespace parcel
         if (!stopped_ && stop_buffering)
         {
             stopped_ = true;
-            timer_.stop();              // interrupt timer
+            {
+                hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+                timer_.stop();              // interrupt timer
+            }
         }
         else if (cancel_timer)
         {
+            hpx::util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
 
@@ -288,7 +289,7 @@ namespace hpx { namespace plugins { namespace parcel
     std::int64_t
     coalescing_message_handler::get_average_time_between_parcels(bool reset)
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         std::int64_t now = util::high_resolution_clock::now();
         if (num_parcels_ == 0)
         {
@@ -373,6 +374,7 @@ namespace hpx { namespace plugins { namespace parcel
         std::unique_lock<mutex_type> l(mtx_);
         if (!time_between_parcels_)
         {
+            l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_message_handler::"
                     "get_time_between_parcels_histogram",
@@ -401,7 +403,7 @@ namespace hpx { namespace plugins { namespace parcel
         std::int64_t num_buckets,
         util::function_nonser<std::vector<std::int64_t>(bool)>& result)
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::lock_guard<mutex_type> l(mtx_);
         if (time_between_parcels_)
         {
             result = util::bind(&coalescing_message_handler::

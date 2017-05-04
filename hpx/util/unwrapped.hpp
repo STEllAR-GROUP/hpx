@@ -7,6 +7,9 @@
 #ifndef HPX_UTIL_UNWRAPPED_HPP
 #define HPX_UTIL_UNWRAPPED_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/util_fwd.hpp>
+
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -18,6 +21,9 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -62,10 +68,27 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Range, typename New>
+        struct rebind_range
+        {
+            typedef std::vector<New> type;
+        };
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+        template <typename T, std::size_t N, typename New>
+        struct rebind_range<std::array<T, N>, New>
+        {
+            typedef std::array<New, N> type;
+        };
+#endif
+
         template <typename T>
         struct unwrap_impl<
             T,
-            typename std::enable_if<traits::is_future_range<T>::value>::type
+            typename std::enable_if<
+                traits::is_future_range<T>::value &&
+                traits::detail::has_push_back<T>::value
+            >::type
         >
         {
             typedef typename T::value_type future_type;
@@ -83,6 +106,57 @@ namespace hpx { namespace util
                 for (typename Range::value_type& f : range)
                 {
                     result.push_back(unwrap_impl<future_type>::call(f));
+                }
+
+                return result;
+            }
+
+            template <typename Range>
+            static type call(Range& range, /*is_void=*/std::true_type)
+            {
+                for (typename Range::value_type& f : range)
+                {
+                    unwrap_impl<future_type>::call(f);
+                }
+            }
+
+            template <typename Range>
+            static type call(Range&& range)
+            {
+                return call(range, is_void());
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct unwrap_impl<
+            T,
+            typename std::enable_if<
+                traits::is_future_range<T>::value &&
+               !traits::detail::has_push_back<T>::value
+            >::type
+        >
+        {
+            typedef typename T::value_type future_type;
+            typedef typename traits::future_traits<future_type>::type value_type;
+            typedef std::is_void<value_type> is_void;
+
+            typedef typename std::conditional<
+                is_void::value, void,
+                typename rebind_range<
+                        typename std::decay<T>::type, value_type
+                    >::type
+            >::type type;
+
+            template <typename Range>
+            static type call(Range& range, /*is_void=*/std::false_type)
+            {
+                type result;
+
+                std::size_t i = 0;
+                for (typename Range::value_type& f : range)
+                {
+                    result[i++] = unwrap_impl<future_type>::call(f);
                 }
 
                 return result;
@@ -346,54 +420,92 @@ namespace hpx { namespace util
 
             F f_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Pack, typename Enable = void>
+        struct unwrap_dispatch;
+
+        template <typename T>
+        struct unwrap_dispatch<util::detail::pack<T>,
+            typename std::enable_if<
+                traits::is_future<T>::value ||
+                    traits::is_future_range<T>::value ||
+                    traits::is_future_tuple<T>::value
+            >::type>
+        {
+            typedef typename unwrap_impl<T>::type type;
+
+            template <typename Future>
+            static typename unwrap_impl<typename decay<Future>::type>::type
+            call(Future && f)
+            {
+                typedef unwrap_impl<typename decay<Future>::type> impl_type;
+                return impl_type::call(std::forward<Future>(f));
+            }
+        };
+
+        template <typename T>
+        struct unwrap_dispatch<util::detail::pack<T>,
+            typename std::enable_if<
+                !traits::is_future<T>::value &&
+                    !traits::is_future_range<T>::value &&
+                    !traits::is_future_tuple<T>::value
+            >::type>
+        {
+            typedef unwrapped_impl<T> type;
+
+            template <typename F>
+            static unwrapped_impl<typename decay<F>::type>
+            call(F && f)
+            {
+                typedef unwrapped_impl<typename decay<F>::type> impl_type;
+                return impl_type(std::forward<F>(f));
+            }
+        };
+
+        template <typename ... Ts>
+        struct unwrap_dispatch<util::detail::pack<Ts...>,
+            typename std::enable_if<
+                traits::is_future_tuple<util::tuple<Ts...> >::value &&
+                    (sizeof...(Ts) > 1)
+            >::type>
+        {
+            typedef typename unwrap_impl<util::tuple<Ts...> >::type type;
+
+            template <typename ... Ts_>
+            static typename unwrap_impl<
+                util::tuple<typename decay<Ts_>::type...>
+            >::type
+            call(Ts_ &&... ts)
+            {
+                typedef unwrap_impl<
+                        util::tuple<typename decay<Ts_>::type...>
+                    > impl_type;
+
+                return impl_type::call(
+                        util::forward_as_tuple(std::forward<Ts_>(ts)...)
+                    );
+            }
+        };
+
+        template <typename ... Ts>
+        struct unwrap_dispatch_result
+        {
+            typedef typename detail::unwrap_dispatch<
+                    util::detail::pack<typename std::decay<Ts>::type...>
+                >::type type;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    typename util::lazy_enable_if<
-        traits::is_future<typename decay<Future>::type>::value
-     || traits::is_future_range<typename decay<Future>::type>::value
-     || traits::is_future_tuple<typename decay<Future>::type>::value
-      , detail::unwrap_impl<typename decay<Future>::type>
-    >::type unwrapped(Future&& f)
+    template <typename ... Ts>
+    typename detail::unwrap_dispatch_result<Ts...>::type
+    unwrapped(Ts &&... ts)
     {
-        typedef
-            detail::unwrap_impl<typename decay<Future>::type>
-            unwrap_impl_t;
-
-        return unwrap_impl_t::call(std::forward<Future>(f));
-    }
-
-    template <typename F>
-    typename std::enable_if<
-        !traits::is_future<typename decay<F>::type>::value
-     && !traits::is_future_range<typename decay<F>::type>::value
-     && !traits::is_future_tuple<typename decay<F>::type>::value
-      , detail::unwrapped_impl<typename std::decay<F>::type>
-    >::type unwrapped(F && f)
-    {
-        detail::unwrapped_impl<typename std::decay<F>::type>
-            res(std::forward<F>(f));
-
-        return res;
-    }
-
-    template <typename ...Ts>
-    typename util::lazy_enable_if<
-        traits::is_future_tuple<util::tuple<
-            typename std::decay<Ts>::type...
-        > >::value
-      , detail::unwrap_impl<util::tuple<
-            typename std::decay<Ts>::type...
-        > >
-    >::type unwrapped(Ts&&... vs)
-    {
-        typedef detail::unwrap_impl<util::tuple<
-            typename std::decay<Ts>::type...
-        > > unwrap_impl_t;
-
-        return unwrap_impl_t::call(util::forward_as_tuple(
-            std::forward<Ts>(vs)...));
+        typedef detail::unwrap_dispatch<
+                util::detail::pack<typename std::decay<Ts>::type...>
+            > impl_type;
+        return impl_type::call(std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////

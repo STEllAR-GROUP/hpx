@@ -68,12 +68,12 @@ For instance:
     // remote creation of 'app::some_component' instances with 'hpx::new_<>()'
     //
     using some_component = app::some_component;
-    using component_type = hpx::components::simple_component<some_component>;
+    using some_component_type = hpx::components::simple_component<some_component>;
 
     // Please note that the second argument to this macro must be a
     // (system-wide) unique C++-style identifier (without any namespaces)
     //
-    ``[macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`]``(component_type, some_component);
+    ``[macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`]``(some_component_type, some_component);
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation in the corresponding
@@ -138,7 +138,7 @@ Instances of defined component types can be created in two different ways. If
 the component to create has a defined client side representation type, then this
 can be used, otherwise use the server type.
 
-The following examples assume that `component_type` is the type of the server
+The following examples assume that `some_component_type` is the type of the server
 side implementation of the component to create. All additional arguments
 (see `, ...` notation below) are passed through to the corresponding constructor
 calls of those objects.
@@ -146,23 +146,23 @@ calls of those objects.
     // create one instance on the given locality
     hpx::id_type here = hpx::find_here();
     hpx::future<hpx::id_type> f =
-        hpx::new_<component_type>(here, ...);
+        hpx::new_<some_component_type>(here, ...);
 
     // create one instance using the given distribution
     // policy (here: hpx::colocating_distribution_policy)
     hpx::id_type here = hpx::find_here();
     hpx::future<hpx::id_type> f =
-        hpx::new_<component_type>(hpx::colocated(here), ...);
+        hpx::new_<some_component_type>(hpx::colocated(here), ...);
 
 
     // create multiple instances on the given locality
     hpx::id_type here = find_here();
     hpx::future<std::vector<hpx::id_type>> f =
-        hpx::new_<component_type[]>(here, num, ...);
+        hpx::new_<some_component_type[]>(here, num, ...);
 
     // create multiple instances using the given distribution
     // policy (here: hpx::binpacking_distribution_policy)
-    hpx::future<std::vector<hpx::id_type>> f = hpx::new_<component_type[]>(
+    hpx::future<std::vector<hpx::id_type>> f = hpx::new_<some_component_type[]>(
         hpx::binpacking(hpx::find_all_localities()), num, ...);
 
 The examples below demonstrate the use of the same API functions for creating

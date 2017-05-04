@@ -3,16 +3,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/state.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/detail/barrier_node.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/unused.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <string>
 #include <utility>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_stopped_or_shutting_down();
+}
 
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
@@ -81,14 +92,42 @@ namespace hpx { namespace lcos {
     {
         if (node_)
         {
-            if (hpx::get_runtime_ptr() != nullptr)
+            if (hpx::get_runtime_ptr() != nullptr &&
+                hpx::threads::threadmanager_is(state_running) &&
+                !hpx::is_stopped_or_shutting_down())
+            {
+                hpx::future<void> f;
+                if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                    f = hpx::unregister_with_basename(
+                        (*node_)->base_name_, (*node_)->rank_);
+
+                // we need to wait on everyone to have its name unregistered,
+                // and hold on to our node long enough...
+                boost::intrusive_ptr<wrapping_type> node = node_;
+                hpx::when_all(f, wait(hpx::launch::async)).then(
+                    hpx::launch::sync,
+                    [node](hpx::future<void> f)
+                    {
+                        HPX_UNUSED(node);
+                        f.get();
+                    }
+                ).get();
+            }
+            node_.reset();
+        }
+    }
+
+    void barrier::detach()
+    {
+        if (node_)
+        {
+            if (hpx::get_runtime_ptr() != nullptr &&
+                hpx::threads::threadmanager_is(state_running) &&
+                !hpx::is_stopped_or_shutting_down())
             {
                 if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
                     hpx::unregister_with_basename(
-                        (*node_)->base_name_, (*node_)->rank_).get();
-
-                // we need to wait on everyone to have its name unregistered...
-                wait();
+                        (*node_)->base_name_, (*node_)->rank_);
             }
             node_.reset();
         }
@@ -98,7 +137,7 @@ namespace hpx { namespace lcos {
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        return barrier("/hpx/global_barrier", cfg.get_num_localities());
+        return barrier("/0/hpx/global_barrier", cfg.get_num_localities());
     }
 
     barrier& barrier::get_global_barrier()

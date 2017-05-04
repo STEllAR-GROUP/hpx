@@ -42,10 +42,13 @@ namespace hpx { namespace util
     query_counters::query_counters(std::vector<std::string> const& names,
             std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest, std::string const& form,
-            std::vector<std::string> const& shortnames, bool csv_header)
+            std::vector<std::string> const& shortnames, bool csv_header,
+            bool print_counters_locally)
       : names_(names), reset_names_(reset_names),
+        counters_(print_counters_locally),
         destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
+        print_counters_locally_(print_counters_locally),
         timer_(util::bind(&query_counters::evaluate, this_()),
             util::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
@@ -91,6 +94,9 @@ namespace hpx { namespace util
 
     void query_counters::start()
     {
+        if (print_counters_locally_ && destination_ != "cout")
+            destination_ += "." + std::to_string(hpx::get_locality_id());
+
         find_counters();
 
         counters_.start(launch::sync);

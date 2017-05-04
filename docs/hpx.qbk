@@ -11,7 +11,7 @@
     [quickbook 1.7]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 1.0.0]
+    [version 1.1.0]
     [copyright 2011 2012 2013 2014 2015 2016 2017 The STE||AR Group (http://stellar-group.org)]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -39,8 +39,9 @@
 [def __0_9_11__                 [link hpx.whats_new.hpx_previous.hpx_0_9_11 V0.9.11]]
 [def __0_9_99__                 [link hpx.whats_new.hpx_previous.hpx_0_9_99 V0.9.99]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
+[def __1_1_0__                  [link hpx.whats_new.hpx_1_1_0 V1.1.0]]
 
-[def __version__                __1_0_0__]
+[def __version__                __1_1_0__]
 
 [def __hpx__                    /HPX/]
 [def __hpx_compute__            /HPX.Compute/]
@@ -50,7 +51,7 @@
 [def __stellar_hpx_download__   [@http://stellar-group.org/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
 [def __stellar_hpx_github_issues__     [@http://github.com/STEllAR-GROUP/hpx/issues __hpx__ Issues]]
-[def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ __hpx__ Buildbot Website]]
+[def __stellar_hpx_buildbot__   [@http://rostam.cct.lsu.edu/ __hpx__ Buildbot Website]]
 [def __stellar_support__        [@http://stellar.cct.lsu.edu/support/ Support Website]]
 
 [def __hpxpi__                  [@http://github.com/STEllAR-GROUP/hpxpi/ HPXPI]]
@@ -150,6 +151,7 @@
 [def __cpp17_n4399__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html N4399]]
 [def __cpp17_n4560__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4560.pdf N4560]]
 [def __cpp20_p0075r1__          [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0075r1.pdf P0075R1]]
+[def __cpp20_p0443__            [@https://github.com/executors/issaquah_2016 P0443]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]

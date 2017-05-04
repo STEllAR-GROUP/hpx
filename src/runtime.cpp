@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -27,17 +28,10 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
-
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/parcel_suffix.hpp>
-#include <hpx/components/security/certificate_store.hpp>
-#include <hpx/components/security/verify.hpp>
-#include <hpx/util/security/root_certificate_authority.hpp>
-#include <hpx/util/security/subordinate_certificate_authority.hpp>
-#endif
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -221,7 +215,7 @@ namespace hpx
             "state_starting",     // 4
             "state_running",      // 5
             "state_suspended",    // 6
-            "state_pre_shutdown"  // 7
+            "state_pre_shutdown", // 7
             "state_shutdown",     // 8
             "state_stopping",     // 9
             "state_terminating",  // 10
@@ -236,268 +230,6 @@ namespace hpx
         return strings::runtime_state_names[st+1];
     }
 
-#if defined(HPX_HAVE_SECURITY)
-    namespace detail
-    {
-        struct manage_security_data
-        {
-            // manage certificates for root-CA and sub-CA
-            util::security::root_certificate_authority root_certificate_authority_;
-            util::security::subordinate_certificate_authority
-                subordinate_certificate_authority_;
-
-            // certificate store
-            std::unique_ptr<components::security::certificate_store> cert_store_;
-            components::security::signed_certificate locality_certificate_;
-        };
-    }
-
-    components::security::certificate_store const * runtime::cert_store(error_code& ec)
-        const
-    {
-        HPX_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_.get())     // should have been created
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "runtime::verify_parcel_suffix",
-                "the runtime system is not operational at this point");
-            return 0;
-        }
-
-        return security_data_->cert_store_.get();
-    }
-
-    // this is called on all nodes during runtime construction
-    void runtime::init_security()
-    {
-        // this is the AGAS bootstrap node (node zero)
-        if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
-        {
-            components::security::signed_certificate cert;
-
-            util::security::root_certificate_authority& root_ca =
-                security_data_->root_certificate_authority_;
-
-            {
-                // Initialize the root-CA
-                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-
-                root_ca.initialize();
-
-                HPX_ASSERT(security_data_->cert_store_.get() == 0);
-                security_data_->cert_store_.reset(
-                    new components::security::certificate_store(
-                        root_ca.get_certificate()));
-
-                // initialize the sub-CA
-                util::security::subordinate_certificate_authority& sub_ca =
-                    security_data_->subordinate_certificate_authority_;
-                sub_ca.initialize();
-
-                // sign the sub-CA's certificate
-                components::security::signed_certificate_signing_request csr =
-                    sub_ca.get_certificate_signing_request();
-                cert = root_ca.sign_certificate_signing_request(csr);
-
-                // finalize initialization of sub-CA
-                security_data_->locality_certificate_ = cert;
-                sub_ca.set_certificate(cert);
-            }
-
-            // add the sub-CA's certificate to the local certificate store
-            add_locality_certificate(cert);
-
-            LSEC_(debug) << (boost::format(
-                "runtime::init_security: initialized root certificate authority: %1%") %
-                root_ca.get_certificate());
-        }
-    }
-
-    components::security::signed_certificate_signing_request
-        runtime::get_certificate_signing_request() const
-    {
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-
-        // Initialize the sub-CA
-        security_data_->subordinate_certificate_authority_.initialize();
-        return security_data_->subordinate_certificate_authority_.
-            get_certificate_signing_request();
-    }
-
-    components::security::signed_certificate
-        runtime::sign_certificate_signing_request(
-            components::security::signed_certificate_signing_request csr)
-    {
-        LSEC_(debug) << (boost::format(
-            "runtime::sign_certificate_signing_request: received csr(%1%)") %
-            csr);
-
-        components::security::signed_certificate cert;
-
-        {
-            // tend to the given CSR
-            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-            cert = security_data_->root_certificate_authority_.
-                sign_certificate_signing_request(csr);
-        }
-
-        LSEC_(debug) << (boost::format(
-            "runtime::sign_certificate_signing_request: signed certificate(%1%)") %
-            cert);
-
-        // store the certificate into our store
-        add_locality_certificate(cert);
-        return cert;
-    }
-
-    // this is called on all non-root localities during locality registration
-    void runtime::store_root_certificate(
-        components::security::signed_certificate const& root_cert)
-    {
-        // Only worker nodes need to store the root certificate at this
-        // point, the root locality was already initialized (see above).
-        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
-        {
-            LSEC_(debug) << (boost::format(
-                "runtime::store_root_certificate: received certificate "
-                "root-CA(%1%)") % root_cert);
-
-            // initialize our certificate store
-            std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-
-            HPX_ASSERT(security_data_->cert_store_.get() == 0);
-            security_data_->cert_store_.reset(
-                new components::security::certificate_store(root_cert));
-        }
-    }
-
-    void runtime::store_subordinate_certificate(
-        components::security::signed_certificate const& root_subca_cert,
-        components::security::signed_certificate const& subca_cert)
-    {
-        // Only worker nodes need to store the root certificate at this
-        // point, the root locality was already initialized (see above).
-        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
-        {
-            LSEC_(debug) << (boost::format(
-                "runtime::store_subordinate_certificate: received certificates "
-                "root-sub-CA(%1%), sub-CA(%2%)") %
-                root_subca_cert % subca_cert);
-
-            {
-                // finish initializing our sub-CA
-                std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-                security_data_->locality_certificate_ = subca_cert;
-                security_data_
-                    ->subordinate_certificate_authority_.set_certificate(subca_cert);
-            }
-
-            // add the certificates of the root's sub-CA and our own
-            add_locality_certificate(subca_cert);
-            add_locality_certificate(root_subca_cert);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    components::security::signed_certificate
-        runtime::get_root_certificate(error_code& ec) const
-    {
-        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "runtime::get_root_certificate",
-                "the root's certificate is available on node zero only");
-            return components::security::signed_certificate::invalid_signed_type;
-        }
-
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        HPX_ASSERT(security_data_.get() != 0);
-        return security_data_->root_certificate_authority_.get_certificate(ec);
-    }
-
-    components::security::signed_certificate
-        runtime::get_certificate(error_code& ec) const
-    {
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        HPX_ASSERT(security_data_.get() != 0);
-        return security_data_->subordinate_certificate_authority_.get_certificate(ec);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // set the certificate for another locality
-    void runtime::add_locality_certificate(
-        components::security::signed_certificate const& cert)
-    {
-        HPX_ASSERT(security_data_.get() != 0);
-
-        LSEC_(debug) << (boost::format(
-            "runtime::add_locality_certificate: locality(%1%): adding locality "
-            "certificate: %2%") % here() % cert);
-
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        HPX_ASSERT(0 != security_data_->cert_store_.get());
-        // should have been created
-        security_data_->cert_store_->insert(cert);
-    }
-
-    components::security::signed_certificate const&
-        runtime::get_locality_certificate(error_code& ec) const
-    {
-        HPX_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_.get())     // should have been created
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "runtime::get_locality_certificate",
-                "the runtime system is not operational at this point");
-            return components::security::signed_certificate::invalid_signed_type;
-        }
-
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        return security_data_->locality_certificate_;
-    }
-
-    components::security::signed_certificate const&
-        runtime::get_locality_certificate(std::uint32_t locality_id,
-            error_code& ec) const
-    {
-        HPX_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_.get())     // should have been created
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "runtime::get_locality_certificate",
-                "the runtime system is not operational at this point");
-            return components::security::signed_certificate::invalid_signed_type;
-        }
-
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-
-        using util::security::get_subordinate_certificate_authority_gid;
-        return security_data_->cert_store_->at(
-            get_subordinate_certificate_authority_gid(locality_id)
-          , ec);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void runtime::sign_parcel_suffix(
-        components::security::parcel_suffix const& suffix,
-        components::security::signed_parcel_suffix& signed_suffix,
-        error_code& ec) const
-    {
-        HPX_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_.get())     // should have been created
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "runtime::sign_parcel_suffix",
-                "the runtime system is not operational at this point");
-            return;
-        }
-
-        std::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        signed_suffix = security_data_->subordinate_certificate_authority_.
-            get_key_pair().sign(suffix, ec);
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration & rtcfg
           , threads::policies::init_affinity_data const& affinity_init)
@@ -509,10 +241,9 @@ namespace hpx
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
-#if defined(HPX_HAVE_SECURITY)
-      , security_data_(new detail::manage_security_data)
-#endif
     {
+        LPROGRESS_;
+
         // initialize our TSS
         runtime::init_tss();
         util::reinit_construct();       // call only after TLS was initialized
@@ -525,6 +256,12 @@ namespace hpx
         // allow to reuse instance number if this was the only instance
         if (0 == instance_number_counter_)
             --instance_number_counter_;
+    }
+
+    void runtime::set_state(state s)
+    {
+        LPROGRESS_ << get_runtime_state_name(s);
+        state_.store(s);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -821,7 +558,7 @@ namespace hpx
     std::uint32_t runtime::assign_cores(std::string const& locality_basename,
         std::uint32_t cores_needed)
     {
-        std::lock_guard<boost::mutex> l(mtx_);
+        std::lock_guard<compat::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
@@ -1384,97 +1121,6 @@ namespace hpx { namespace threads
         return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
     }
 }}
-
-#if defined(HPX_HAVE_SECURITY)
-namespace hpx
-{
-    /// \brief Return the certificate for this locality
-    ///
-    /// \returns This function returns the signed certificate for this locality.
-    components::security::signed_certificate const&
-        get_locality_certificate(error_code& ec)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < state_initialized ||
-            rt->get_state() >= state_stopped)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::get_locality_certificate",
-                "the runtime system is not operational at this point");
-            return components::security::signed_certificate::invalid_signed_type;
-        }
-
-        return rt->get_locality_certificate(ec);
-    }
-
-    /// \brief Return the certificate for the given locality
-    ///
-    /// \param id The id representing the locality for which to retrieve
-    ///           the signed certificate.
-    ///
-    /// \returns This function returns the signed certificate for the locality
-    ///          identified by the parameter \a id.
-    components::security::signed_certificate const&
-        get_locality_certificate(std::uint32_t locality_id, error_code& ec)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < state_initialized ||
-            rt->get_state() >= state_stopped)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::get_locality_certificate",
-                "the runtime system is not operational at this point");
-            return components::security::signed_certificate::invalid_signed_type;
-        }
-
-        return rt->get_locality_certificate(locality_id, ec);
-    }
-
-    /// \brief Add the given certificate to the certificate store of this locality.
-    ///
-    /// \param cert The certificate to add to the certificate store of this
-    ///             locality
-    void add_locality_certificate(
-        components::security::signed_certificate const& cert,
-        error_code& ec)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (0 == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::add_locality_certificate",
-                "the runtime system is not operational at this point");
-            return;
-        }
-
-        rt->add_locality_certificate(cert);
-    }
-
-    /// \brief Sign the given parcel-suffix
-    ///
-    /// \param suffix         The parcel suffix to be signed
-    /// \param signed_suffix  The signed parcel suffix will be placed here
-    ///
-    void sign_parcel_suffix(
-        components::security::parcel_suffix const& suffix,
-        components::security::signed_parcel_suffix& signed_suffix,
-        error_code& ec)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (0 == rt)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::sign_parcel_suffix",
-                "the runtime system is not operational at this point");
-            return;
-        }
-
-        rt->sign_parcel_suffix(suffix, signed_suffix, ec);
-    }
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

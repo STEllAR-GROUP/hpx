@@ -11,7 +11,7 @@ add_hpx_executable(inspect
   FOLDER "Tools/Inspect")
 
 if(NOT MSVC)
-  target_link_libraries(inspect_exe ${Boost_LIBRARIES})
+  target_link_libraries(inspect_exe ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
 endif()
 
 # add dependencies to pseudo-target

@@ -85,27 +85,21 @@ namespace hpx { namespace lcos
         ///
         /// \param result [in] The result value to be transferred from the
         ///               remote operation back to this LCO instance.
-#if defined(__NVCC__) || defined(__CUDACC__)
-        HPX_DEVICE void set_value_nonvirt (RemoteResult&&) {}
-#else
+
         void set_value_nonvirt (RemoteResult&& result)
         {
             set_value(std::move(result));
         }
-#endif
 
-        /// The \a function get_result_nonvirt is called whenever a
+   /// The \a function get_result_nonvirt is called whenever a
         /// \a get_result_action is applied on this LCO instance. This
         /// function just forwards to the virtual function \a get_result, which
         /// is overloaded by the derived concrete LCO.
-#if defined(__NVCC__) || defined(__CUDACC__)
-        HPX_DEVICE Result get_value_nonvirt() { return Result(); }
-#else
+
         Result get_value_nonvirt()
         {
             return util::void_guard<Result>(), get_value();
         }
-#endif
 
     public:
         /// The \a set_value_action may be used to trigger any LCO instances
@@ -169,13 +163,6 @@ namespace hpx { namespace traits
     };
 }}
 
-#if defined(__NVCC__) || defined(__CUDACC__)
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(...)
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(...)
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE(...)
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(...)
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(...)
-#else
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(Value, Name)               \
     HPX_REGISTER_ACTION_DECLARATION(                                            \
         hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
@@ -240,7 +227,6 @@ namespace hpx { namespace traits
         BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
 /**/
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)

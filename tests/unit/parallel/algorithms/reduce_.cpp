@@ -32,7 +32,7 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    std::size_t const val(42);
+    std::size_t val(42);
     auto op =
         [val](std::size_t v1, std::size_t v2) {
             return v1 + v2 + val;
@@ -55,7 +55,7 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    std::size_t const val(42);
+    std::size_t val(42);
     auto op =
         [val](std::size_t v1, std::size_t v2) {
             return v1 + v2 + val;

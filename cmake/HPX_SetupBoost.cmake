@@ -12,6 +12,7 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.65.0" "1.65"
     "1.64.0" "1.64"
     "1.63.0" "1.63"
     "1.62.0" "1.62"
@@ -21,24 +22,33 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
-set(HPX_BOOST_LOG_LIBS "")
+set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
-  set(HPX_BOOST_LOG_LIBS log log_setup)
+  set(__boost_libraries ${__boost_libraries} log log_setup)
 endif()
+
+if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
+  set(__boost_libraries ${__boost_libraries} thread)
+  set(__boost_need_thread ON)
+endif()
+
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+  set(__boost_libraries ${__boost_libraries} chrono)
+endif()
+
+set(__boost_libraries
+  ${__boost_libraries}
+  date_time
+  filesystem
+  program_options
+  regex
+  system)
 
 find_package(Boost
   1.50
   REQUIRED
   COMPONENTS
-  chrono
-  date_time
-  filesystem
-  program_options
-  regex
-  system
-  thread
-  ${HPX_BOOST_LOG_LIBS}
-  )
+  ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")

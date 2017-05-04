@@ -8,6 +8,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/bind.hpp>
@@ -64,6 +65,21 @@ namespace hpx { namespace performance_counters
     bool performance_counter_set::find_counter(counter_info const& info,
         bool reset, error_code& ec)
     {
+        // keep only local counters if requested
+        if (print_counters_locally_)
+        {
+            counter_path_elements p;
+            get_counter_path_elements(info.fullname_, p, ec);
+            if (ec) return false;
+
+            if (p.parentinstanceindex_ != hpx::get_locality_id())
+            {
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+        }
+
         naming::id_type id = get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {

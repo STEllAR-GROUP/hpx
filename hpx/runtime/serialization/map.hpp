@@ -23,8 +23,8 @@ namespace hpx
         struct is_bitwise_serializable<std::pair<Key, Value> >
           : std::integral_constant<
                 bool,
-                is_bitwise_serializable<Key>::value
-             && is_bitwise_serializable<Value>::value
+                is_bitwise_serializable<typename std::remove_const<Key>::type>::value
+             && is_bitwise_serializable<typename std::remove_const<Value>::type>::value
             >
         {};
     }

@@ -33,7 +33,9 @@ namespace hpx { namespace performance_counters
 
     public:
         /// Create an empty set of performance counters
-        performance_counter_set() {}
+        performance_counter_set(bool print_counters_locally = false)
+          : print_counters_locally_(print_counters_locally)
+        {}
 
         /// Create a set of performance counters from a name, possibly
         /// containing wild-card characters
@@ -118,6 +120,8 @@ namespace hpx { namespace performance_counters
         std::vector<counter_info> infos_;     // counter instance names
         std::vector<naming::id_type> ids_;    // global ids of counter instances
         std::vector<std::uint8_t> reset_;     // != 0 if counter should be reset
+
+        bool print_counters_locally_;         // handle only local counters
     };
 }}
 

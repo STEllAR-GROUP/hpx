@@ -8,11 +8,10 @@
 #define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static_reinit.hpp>
-
-#include <boost/thread/once.hpp>
 
 #include <cstddef>
 #include <memory>   // for placement new
@@ -97,19 +96,23 @@ namespace hpx { namespace util
 
         reinitializable_static()
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            compat::call_once(constructed_,
                 &reinitializable_static::default_constructor);
+#endif
         }
 
         template <typename U>
         reinitializable_static(U const& val)
         {
+#if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            boost::call_once(constructed_,
+            compat::call_once(constructed_,
                 util::bind(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const *>(std::addressof(val))));
+#endif
         }
 
         operator reference()
@@ -145,7 +148,7 @@ namespace hpx { namespace util
             std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_[N];
-        static boost::once_flag constructed_;
+        static compat::once_flag constructed_;
     };
 
     template <typename T, typename Tag, std::size_t N>
@@ -153,8 +156,8 @@ namespace hpx { namespace util
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    boost::once_flag reinitializable_static<
-        T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
+    compat::once_flag reinitializable_static<
+        T, Tag, N>::constructed_;
 }}
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC
