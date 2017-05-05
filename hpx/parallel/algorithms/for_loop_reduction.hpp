@@ -139,6 +139,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         return reduction(var, T(), std::plus<T>());
     }
 
+    /// \cond NOINTERNAL
+    template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::plus<T> >
+    reduction_plus(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::plus<T>());
+    }
+
     template <typename T>
     HPX_FORCEINLINE detail::reduction_helper<T, std::multiplies<T> >
     reduction_multiplies(T& var)
