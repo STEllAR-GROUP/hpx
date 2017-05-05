@@ -171,6 +171,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 

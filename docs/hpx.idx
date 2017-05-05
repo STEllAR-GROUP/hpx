@@ -511,6 +511,14 @@ when_each_n                           "" "header\.hpx\.lcos\.when_each.*"
 wait_each                             "" "header\.hpx\.lcos\.wait_each.*"
 wait_each_n                           "" "header\.hpx\.lcos\.wait_each.*"
 
+# hpx/util/invoke.hpp
+invoke                                "" "header\.hpx\.util\.invoke.*"
+invoke_r                              "" "header\.hpx\.util\.invoke_r.*"
+
+# hpx/util/invoke_fused.hpp
+invoke_fused                          "" "header\.hpx\.util\.invoke_fused.*"
+invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
+
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"
 terminate                             "" "hpx\.terminate.*"
