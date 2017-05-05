@@ -216,10 +216,13 @@ namespace libfabric
             FUNC_END_DEBUG_MSG;
             return snd;
         }
-        else if(this_thread::has_sufficient_stack_space())
-        {
-            background_work_OS_thread();
-        }
+//         else if(threads::get_self_ptr())
+// //         else if(this_thread::has_sufficient_stack_space())
+//         {
+// //             background_work_OS_thread();
+//             hpx::this_thread::suspend(hpx::threads::pending_boost,
+//                 "libfabric::parcelport::async_write");
+//         }
 
         // if no senders are available shutdown
         FUNC_END_DEBUG_MSG;
@@ -353,13 +356,13 @@ namespace libfabric
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-         std::size_t k = 0;
-         while (senders_.empty())
-         {
-             background_work(0);
-             hpx::util::detail::yield_k(k, "libfabric::can_send_immediate");
-             ++k;
-         }
+//          std::size_t k = 0;
+//          while (senders_.empty())
+//          {
+// //              background_work(0);
+//              hpx::util::detail::yield_k(k, "libfabric::can_send_immediate");
+//              ++k;
+//          }
         return true;
     }
 
@@ -376,7 +379,10 @@ namespace libfabric
         snd->async_write_impl();
         // after a send poll to make progress on the network and
         // reduce latencies for receives coming in
-        background_work_OS_thread();
+//         background_work_OS_thread();
+//         if (hpx::threads::get_self_ptr())
+//             hpx::this_thread::suspend(hpx::threads::pending_boost,
+//                 "libfabric::parcelport::async_write");
         return true;
     }
 

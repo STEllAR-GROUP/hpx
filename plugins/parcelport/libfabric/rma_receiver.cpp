@@ -33,6 +33,7 @@ namespace libfabric
         endpoint_(endpoint),
         header_region_(nullptr),
         message_region_(nullptr),
+        header_(nullptr),
         memory_pool_(memory_pool),
         handler_(std::move(handler)),
         rma_count_(0)

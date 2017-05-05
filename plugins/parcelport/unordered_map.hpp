@@ -12,6 +12,8 @@
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 //
+#include <boost/thread/locks.hpp>
+//
 #include <unordered_map>
 #include <utility>
 

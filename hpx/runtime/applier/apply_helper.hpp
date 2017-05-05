@@ -152,7 +152,7 @@ namespace hpx { namespace applier { namespace detail
         {
             // Direct actions should be able to be executed from a non-HPX thread
             // as well
-            if (//this_thread::has_sufficient_stack_space() ||
+            if (this_thread::has_sufficient_stack_space() ||
                 !threads::threadmanager_is_at_least(state_running))
             {
                 Action::execute_function(lva, std::forward<Ts>(vs)...);
@@ -172,7 +172,7 @@ namespace hpx { namespace applier { namespace detail
         {
             // Direct actions should be able to be executed from a non-HPX thread
             // as well
-            if (//this_thread::has_sufficient_stack_space() ||
+            if (this_thread::has_sufficient_stack_space() ||
                 !threads::threadmanager_is_at_least(state_running))
             {
                 try {

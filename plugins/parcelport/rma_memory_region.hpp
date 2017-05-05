@@ -19,7 +19,7 @@ namespace parcelset
     // pinned memory blocks. This will be overridden by concrete
     // implementations for each parcelport.
     struct rma_memory_base {
-        rma_memory_base()
+        rma_memory_base();
     };
 
     // --------------------------------------------------------------------
