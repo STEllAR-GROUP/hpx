@@ -14,7 +14,7 @@
 # endif
 #endif
 
-#if defined(HPX_MSVC) || defined(HPX_WINDOWS)
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #include <hpx/util/plugin/detail/dll_windows.hpp>
 #elif defined(HPX_HAS_DLOPEN)
 #include <hpx/util/plugin/detail/dll_dlopen.hpp>
