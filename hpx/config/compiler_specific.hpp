@@ -72,6 +72,7 @@
 
 #if defined(__MINGW32__)
 #   define HPX_WINDOWS
+#   define HPX_MINGW
 #endif
 
 #if (defined(__NVCC__) || defined(__CUDACC__)) && defined(HPX_HAVE_CUDA)
