@@ -144,6 +144,9 @@ struct locality {
 
     const void *fabric_data() const { return data_.data(); }
 
+    char *fabric_data_writable() { return reinterpret_cast<char*>(data_.data()); }
+
+
     bool valid() { return true; }
 
 private:

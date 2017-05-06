@@ -230,7 +230,7 @@ namespace libfabric
                 locality new_locality;
                 std::copy(binary_t(encoded_data),
                           binary_t(encoded_data + encoded_length),
-                          (char*)(new_locality.fabric_data()));
+                          (new_locality.fabric_data_writable()));
 
                 // insert locality into address vector
                 LOG_DEBUG_MSG("Calling insert_address for " << decnumber(i)
