@@ -1064,8 +1064,13 @@ namespace hpx { namespace threads
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            if (hwloc_get_thread_cpubind(topo, (HANDLE)(handle.native_handle()), cpuset,
+#if defined(HPX_MINGW)
+            if (hwloc_get_thread_cpubind(topo, pthread_gethandle(handle.native_handle()), cpuset,
                     HWLOC_CPUBIND_THREAD))
+#else
+	            if (hwloc_get_thread_cpubind(topo, handle.native_handle(), cpuset,
+                    HWLOC_CPUBIND_THREAD))
+#endif
             {
                 hwloc_bitmap_free(cpuset);
                 HPX_THROWS_IF(ec, kernel_error
