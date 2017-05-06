@@ -878,7 +878,7 @@ namespace hpx { namespace serialization
     }}                                                                        \
 /**/
 
-#if defined(HPX_MSVC) || defined(HPX_WINDOWS)
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
 /**/
 #else
