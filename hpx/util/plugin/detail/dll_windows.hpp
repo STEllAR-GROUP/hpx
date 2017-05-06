@@ -31,7 +31,7 @@
 #include <Shlwapi.h>
 #include <windows.h>
 
-#if !defined(HPX_MSVC) && !defined(HPX_WINDOWS)
+#if !defined(HPX_MSVC) && !defined(HPX_MINGW)
 #error "This file shouldn't be included directly, use the file hpx/util/plugin/dll.hpp only."
 #endif
 
