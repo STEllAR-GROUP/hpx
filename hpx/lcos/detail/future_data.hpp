@@ -178,6 +178,22 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct handle_continuation_recursion_count
+    {
+        handle_continuation_recursion_count()
+          : count_(threads::get_continuation_recursion_count())
+        {
+            ++count_;
+        }
+        ~handle_continuation_recursion_count()
+        {
+            --count_;
+        }
+
+        std::size_t& count_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
     class compose_cb_impl
     {
@@ -241,22 +257,6 @@ namespace detail
         > result_type;
         return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct handle_continuation_recursion_count
-    {
-        handle_continuation_recursion_count()
-          : count_(threads::get_continuation_recursion_count())
-        {
-            ++count_;
-        }
-        ~handle_continuation_recursion_count()
-        {
-            --count_;
-        }
-
-        std::size_t& count_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool run_on_completed_on_new_thread(
