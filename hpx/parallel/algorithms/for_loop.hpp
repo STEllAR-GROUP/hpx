@@ -291,7 +291,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             typedef std::integral_constant<bool,
                     execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<B>::value
+                    (!std::is_integral<B>::value &&
+                     !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
