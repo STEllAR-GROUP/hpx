@@ -236,8 +236,9 @@ namespace hpx
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
+        resource_partitioner_(resource::resource_partitioner::get_resource_partitioner_ptr()),
         affinity_init_(affinity_init),
-        topology_(threads::create_topology()),
+        topology_(resource_partitioner_->get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -1352,4 +1353,3 @@ namespace hpx
         if (nullptr != rt) rt->stop_evaluating_counters();
     }
 }
-

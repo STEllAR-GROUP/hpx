@@ -24,6 +24,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/runtime/resource/resource_partitioner.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
@@ -340,8 +341,12 @@ namespace hpx
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
+        // pointer to the resource_partitioner
+        resource::resource_partitioner* resource_partitioner_;
+
+        // topology and affinity data
         threads::policies::init_affinity_data affinity_init_;
-        threads::topology& topology_;
+        threads::topology const& topology_;
 
         // locality basename -> used cores
         typedef std::map<std::string, std::uint32_t> used_cores_map_type;
