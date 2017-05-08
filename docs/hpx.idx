@@ -345,6 +345,7 @@ binpacked                             '' "hpx\.components\.binpacked.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.new_id.*"
+local_new                             "" "hpx\.local_new.*"
 
 # hpx/runtime/components/copy_component.hpp
 copy                                  "" "hpx\.components\.copy.*"

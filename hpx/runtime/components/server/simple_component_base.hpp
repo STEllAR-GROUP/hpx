@@ -117,6 +117,8 @@ namespace hpx { namespace components
                 std::uint64_t(static_cast<this_component_type const*>(this)));
         }
 
+#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) && !defined(__NVCC__) && \
+    !defined(__CUDACC__)
     protected:
         // declare friends which are allowed to access get_base_gid()
         template <typename Component_>
@@ -129,6 +131,10 @@ namespace hpx { namespace components
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
             util::unique_function_nonser<void(void*)> const& ctor);
+
+        template <typename Component_, typename ...Ts>
+        friend naming::gid_type server::create_with_args(Ts&&... ts);
+#endif
 
         // Create a new GID (if called for the first time), assign this
         // GID to this instance of a component and register this gid
