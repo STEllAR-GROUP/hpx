@@ -68,6 +68,17 @@ namespace libfabric
         void handle_message_with_zerocopy_rma();
 
         // --------------------------------------------------------------------
+        // Process a message where the chunk inf0ormation did not fit into
+        // the header. An extra RMA read of chunk data must be made before
+        // the chunks can be identified (and possibly retrieved from the remote node)
+        void handle_message_no_chunk_data();
+
+        // --------------------------------------------------------------------
+        // After remote chunks have been read by rma, process the chunk list
+        // and initiate further rma reads if necessary
+        int handle_chunks_read_message();
+
+        // --------------------------------------------------------------------
         // Each RMA read completion will enter this function and count down until
         // all are done, then we can process the parcel and cleanup
         void handle_rma_read_completion();
@@ -84,18 +95,31 @@ namespace libfabric
         // --------------------------------------------------------------------
         void handle_error(struct fi_cq_err_entry err) override;
 
+        // --------------------------------------------------------------------
+        // convenience function to execute a read for each zero-copy chunk
+        // in the chunks_ variable
+        void read_chunk_list();
+
+        // --------------------------------------------------------------------
+        // convenience function to execute a read, given the right params
+        void read_one_chunk(
+            fi_addr_t src_addr, region_type *get_region,
+            const void *remoteAddr, uint64_t rkey);
+
     private:
-        parcelport                   *pp_;
-        fid_ep                       *endpoint_;
-        region_type                  *header_region_;
-        region_type                  *message_region_;
-        header_type                  *header_;
-        std::vector<chunk_struct>     chunks_;
-        zero_copy_vector              rma_regions_;
+        parcelport                       *pp_;
+        fid_ep                           *endpoint_;
+        region_type                      *header_region_;
+        region_type                      *chunk_region_;
+        region_type                      *message_region_;
+        header_type                      *header_;
+        std::vector<chunk_struct>         chunks_;
+        zero_copy_vector                  rma_regions_;
         rma_memory_pool<region_provider> *memory_pool_;
-        fi_addr_t                     src_addr_;
-        completion_handler            handler_;
-        hpx::util::atomic_count       rma_count_;
+        fi_addr_t                         src_addr_;
+        completion_handler                handler_;
+        hpx::util::atomic_count           rma_count_;
+        bool                              chunk_fetch_;
 
         double start_time_;
 

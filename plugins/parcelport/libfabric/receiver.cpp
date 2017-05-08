@@ -145,8 +145,8 @@ namespace libfabric
 
         HPX_ASSERT(recv);
 
-        // We save the received region and swap it with a newly allocated
-        // to be able to post a recv again as soon as possible.
+        // We save the received region and swap it with a newly allocated one
+        // so that we can post a recv again as soon as possible.
         region_type* region = header_region_;
         header_region_ = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
         pre_post_receive();

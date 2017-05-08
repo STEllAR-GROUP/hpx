@@ -57,6 +57,7 @@ namespace libfabric
           , memory_pool_(memory_pool)
           , buffer_(snd_data_type(memory_pool_), memory_pool_)
           , header_region_(nullptr)
+          , chunk_region_(nullptr)
           , message_region_(nullptr)
           , completion_count_(0)
           , sends_posted_(0)
@@ -126,6 +127,7 @@ namespace libfabric
         fi_addr_t                 dst_addr_;
         snd_buffer_type           buffer_;
         region_type              *header_region_;
+        region_type              *chunk_region_;
         region_type              *message_region_;
         header_type              *header_;
         zero_copy_vector          rma_regions_;

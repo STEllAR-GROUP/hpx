@@ -19,6 +19,7 @@
 //
 #include <memory>
 #include <cstddef>
+#include <cstring>
 
 namespace hpx {
 namespace parcelset {
@@ -89,7 +90,7 @@ namespace libfabric
             << ", tag " << hexuint64(header_->tag())
         );
 
-        // reserve some space or zero copy information
+        // reserve some space for zero copy information
         rma_regions_.reserve(buffer_.num_chunks_.first);
 
         // Get the block of pinned memory where the message was encoded
@@ -121,8 +122,17 @@ namespace libfabric
                 << "Chunk info is piggybacked");
         }
         else {
-            throw std::runtime_error("@TODO : implement chunk info rdma get "
-                "when zero-copy chunks exceed header space");
+            LOG_DEBUG_MSG("Setting up header-chunk rma data with "
+                << "zero-copy chunks " << decnumber(rma_regions_.size()));
+            auto &cb = header_->chunk_header_ptr()->chunk_rma;
+            chunk_region_  = memory_pool_->allocate_region(cb.size_);
+            cb.data_.pos_  = chunk_region_->get_address();
+            cb.rkey_       = chunk_region_->get_remote_key();
+            std::memcpy(cb.data_.pos_, buffer_.chunks_.data(), cb.size_);
+            LOG_DEBUG_MSG("Set up header-chunk rma data with "
+                << "size " << decnumber(cb.size_)
+                << "rkey " << hexpointer(cb.rkey_)
+                << "addr " << hexpointer(cb.data_.cpos_));
         }
 
         int ret = 0;
@@ -186,11 +196,6 @@ namespace libfabric
             }
         }
 
-        // log the time spent in performance counter
-//                buffer.data_point_.time_ =
-//                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-
-        // parcels_posted_.add_data(buffer.data_point_);
         FUNC_END_DEBUG_MSG;
     }
 
@@ -231,9 +236,15 @@ namespace libfabric
         error_code ec;
         handler_(ec);
 
+        // cleanup header and message region
         memory_pool_->deallocate(message_region_);
         message_region_ = nullptr;
         header_         = nullptr;
+        // cleanup chunk region
+        if (chunk_region_) {
+            memory_pool_->deallocate(chunk_region_);
+            chunk_region_ = nullptr;
+        }
 
         for (auto& region: rma_regions_) {
             memory_pool_->deallocate(region);
