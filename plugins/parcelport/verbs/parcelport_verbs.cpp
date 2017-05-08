@@ -1197,7 +1197,9 @@ namespace verbs
 
         bool can_send_immediate() {
             while (!immediate_send_allowed_) {
-                background_work(0);
+                // We suspend our thread, which will make progress on the network
+                hpx::this_thread::suspend(hpx::threads::pending,
+                    "verbs::parcelport::can_send_immediate");
             }
             return true;
         }

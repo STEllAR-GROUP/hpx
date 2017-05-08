@@ -181,6 +181,7 @@ int future_int_f_vector(std::vector<future<int> >& vf)
         HPX_TEST(f.is_ready());
         sum += f.get();
     }
+    ++future_int_f_vector_count;
     return sum;
 }
 
@@ -248,6 +249,8 @@ void future_function_pointers(Executor& exec)
     future<int> f5 = dataflow(exec, &future_int_f_vector, std::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
+    HPX_TEST_EQ(future_int_f1_count, 10u);
+    HPX_TEST_EQ(future_int_f_vector_count, 1u);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,7 +322,7 @@ void plain_deferred_arguments(Executor& exec)
 int hpx_main(variables_map&)
 {
     {
-        hpx::parallel::sequential_executor exec;
+        hpx::parallel::execution::sequenced_executor exec;
         function_pointers(exec);
         future_function_pointers(exec);
         plain_arguments(exec);
@@ -327,7 +330,7 @@ int hpx_main(variables_map&)
     }
 
     {
-        hpx::parallel::parallel_executor exec;
+        hpx::parallel::execution::parallel_executor exec;
         function_pointers(exec);
         future_function_pointers(exec);
         plain_arguments(exec);

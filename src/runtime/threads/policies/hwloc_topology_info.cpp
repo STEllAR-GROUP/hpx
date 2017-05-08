@@ -9,6 +9,7 @@
 
 #if defined(HPX_HAVE_HWLOC)
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
@@ -21,7 +22,6 @@
 #include <boost/format.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <iomanip>
@@ -355,7 +355,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     void hwloc_topology_info::set_thread_affinity_mask(
-        boost::thread&
+        compat::thread&
       , mask_cref_type //mask
       , error_code& ec
         ) const
@@ -1054,7 +1054,7 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type hwloc_topology_info::get_cpubind_mask(boost::thread& handle,
+    mask_type hwloc_topology_info::get_cpubind_mask(compat::thread& handle,
         error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
@@ -1064,8 +1064,13 @@ namespace hpx { namespace threads
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+#if defined(HPX_MINGW)
+            if (hwloc_get_thread_cpubind(topo, pthread_gethandle(handle.native_handle()),
+                    cpuset, HWLOC_CPUBIND_THREAD))
+#else
             if (hwloc_get_thread_cpubind(topo, handle.native_handle(), cpuset,
                     HWLOC_CPUBIND_THREAD))
+#endif
             {
                 hwloc_bitmap_free(cpuset);
                 HPX_THROWS_IF(ec, kernel_error

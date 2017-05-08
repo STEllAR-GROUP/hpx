@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/inline_namespace.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>

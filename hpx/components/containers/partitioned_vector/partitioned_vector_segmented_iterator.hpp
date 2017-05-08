@@ -521,6 +521,11 @@ namespace hpx
           : base_type(it), data_(data)
         {}
 
+        operator BaseIter const &() const
+        {
+            return this->base_type::base_reference();
+        }
+
         partitioned_vector<T, Data>* get_data() { return data_; }
         partitioned_vector<T, Data> const* get_data() const { return data_; }
 
@@ -554,6 +559,11 @@ namespace hpx
                 partitioned_vector<T, Data> const* data = nullptr)
           : base_type(it), data_(data)
         {}
+
+        operator BaseIter const &() const
+        {
+            return this->base_type::base_reference();
+        }
 
         partitioned_vector<T, Data> const* get_data() const { return data_; }
 
@@ -852,6 +862,14 @@ namespace hpx { namespace traits
                 iter.get_global_index());
         }
 
+        //  Conceptually this function is supposed to retrieve the closest
+        //  local segment of the segment i in locality id.
+        static local_segment_iterator local_segment(
+            segment_iterator i, segment_iterator end, std::uint32_t locality_id)
+        {
+            return local_segment_iterator(i,end,locality_id);
+        }
+
         //  This function should specify which is the current segment and
         //  the exact position to which local iterator is pointing.
         static local_iterator local(iterator iter)
@@ -940,6 +958,14 @@ namespace hpx { namespace traits
         {
             return iter.get_data()->get_const_segment_iterator(
                 iter.get_global_index());
+        }
+
+        //  Conceptually this function is supposed to retrieve the closest
+        //  local segment of the segment i in locality id.
+        static local_segment_iterator local_segment(
+            segment_iterator i, segment_iterator end, std::uint32_t locality_id)
+        {
+            return local_segment_iterator(i,end,locality_id);
         }
 
         //  This function should specify which is the current segment and

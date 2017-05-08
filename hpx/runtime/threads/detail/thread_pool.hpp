@@ -7,6 +7,9 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/barrier.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -21,9 +24,6 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -53,8 +53,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t init(std::size_t num_threads,
             policies::init_affinity_data const& data);
 
-        bool run(std::unique_lock<boost::mutex>& l, std::size_t num_threads);
-        void stop(std::unique_lock<boost::mutex>& l, bool blocking = true);
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+        void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
 
@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace detail
         {
             return threads_.size();
         }
-        boost::thread& get_os_thread_handle(std::size_t num_thread);
+        compat::thread& get_os_thread_handle(std::size_t num_thread);
 
         void create_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state, bool run_now, error_code& ec);
@@ -167,11 +167,11 @@ namespace hpx { namespace threads { namespace detail
         void deinit_tss();
 
         void thread_func(std::size_t num_thread, topology const& topology,
-            boost::barrier& startup);
+            compat::barrier& startup);
 
     private:
         // this thread manager has exactly as many OS-threads as requested
-        std::vector<boost::thread> threads_;
+        std::vector<compat::thread> threads_;
 
         // refer to used scheduler
         Scheduler& sched_;
@@ -179,7 +179,7 @@ namespace hpx { namespace threads { namespace detail
         std::string pool_name_;
 
         // startup barrier
-        boost::scoped_ptr<boost::barrier> startup_;
+        boost::scoped_ptr<compat::barrier> startup_;
 
         // count number of executed HPX-threads and thread phases (invocations)
         std::vector<std::int64_t> executed_threads_;

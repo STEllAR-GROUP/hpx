@@ -19,6 +19,12 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
+#endif
+#include <hpx/parallel/executors/execution.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -71,6 +77,7 @@ namespace hpx { namespace detail
         }
     };
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     // parallel::executor
     template <typename Executor>
     struct apply_dispatch<Executor,
@@ -87,6 +94,29 @@ namespace hpx { namespace detail
         call(Executor& exec, F&& f, Ts&&... ts)
         {
             parallel::executor_traits<Executor>::apply_execute(exec,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return false;
+        }
+    };
+#endif
+
+    // parallel::execution::executor
+    template <typename Executor>
+    struct apply_dispatch<Executor,
+        typename std::enable_if<
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value
+        >::type>
+    {
+        template <typename F, typename ...Ts>
+        HPX_FORCEINLINE static
+        typename std::enable_if<
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            bool
+        >::type
+        call(Executor& exec, F && f, Ts &&... ts)
+        {
+            parallel::execution::post(exec,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }

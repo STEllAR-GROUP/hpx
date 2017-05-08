@@ -51,9 +51,13 @@ namespace hpx { namespace threads { namespace coroutines
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 
                 std::swap(*ctx, ctx_);
-#else
+#elif BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
+#else
+                ctx_ =
+                    boost::context::detail::make_fcontext(
+                            stack_pointer_, stack_size_, funp_);
 #endif
             }
         }

@@ -20,6 +20,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -32,7 +33,11 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#endif
+#include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
@@ -302,15 +307,34 @@ namespace hpx { namespace lcos { namespace detail
             hpx::apply(sched, &dataflow_frame::done, std::move(this_));
         }
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         // handle executors through their executor_traits
         template <typename Executor>
         HPX_FORCEINLINE
-        typename std::enable_if<traits::is_executor<Executor>::value>::type
+        typename std::enable_if<
+            traits::is_executor<Executor>::value
+        >::type
         finalize(Executor& exec)
         {
             boost::intrusive_ptr<dataflow_frame> this_(this);
             parallel::executor_traits<Executor>::apply_execute(exec,
                 &dataflow_frame::done, std::move(this_));
+        }
+#endif
+
+        template <typename Executor>
+        HPX_FORCEINLINE
+        typename std::enable_if<
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value
+        >::type
+        finalize(Executor& exec)
+        {
+            execute_function_type f = &dataflow_frame::execute;
+            boost::intrusive_ptr<dataflow_frame> this_(this);
+
+            parallel::execution::post(exec,
+                f, std::move(this_), indices_type(), is_void());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -706,7 +730,7 @@ namespace hpx
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<
-                Action, typename std::decay<F>::type
+                typename std::decay<Action>::type, typename std::decay<F>::type
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }

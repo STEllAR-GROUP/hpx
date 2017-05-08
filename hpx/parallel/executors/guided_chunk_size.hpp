@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F>
         HPX_CONSTEXPR std::size_t
         get_chunk_size(Executor && exec, F &&, std::size_t cores,
-            std::size_t num_tasks)
+            std::size_t num_tasks) const
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }

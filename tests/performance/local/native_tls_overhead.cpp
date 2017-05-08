@@ -5,19 +5,19 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/compat/barrier.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/config.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
-#include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstdint>
-#include <iostream>
-
 #include <functional>
+#include <iostream>
+#include <vector>
 
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
@@ -44,6 +44,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ static HPX_NATIVE_TLS double* global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    boost::barrier& b
+    hpx::compat::barrier& b
   , std::uint64_t updates
     )
 {
@@ -113,16 +114,20 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
 
-    boost::barrier b(threads);
+    hpx::compat::barrier b(threads);
 
     high_resolution_timer t;
 
     for (std::uint32_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, std::ref(b), updates));
+        workers.push_back(compat::thread(worker, std::ref(b), updates));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     const double duration = t.elapsed();
 

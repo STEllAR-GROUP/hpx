@@ -1,6 +1,6 @@
 //  Copyright (C) 2012-2013 Vicente Botet
 //  Copyright (c) 2013 Agustin Berge
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -26,7 +26,7 @@ int p1()
     return 1;
 }
 
-int p2(hpx::lcos::future<int> f)
+int p2(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -34,7 +34,7 @@ int p2(hpx::lcos::future<int> f)
     return 2 * i;
 }
 
-void p3(hpx::lcos::future<int> f)
+void p3(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -43,7 +43,7 @@ void p3(hpx::lcos::future<int> f)
     return;
 }
 
-hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
+hpx::future<int> p4(hpx::future<int> f)
 {
     return hpx::async(p2, std::move(f));
 }
@@ -52,12 +52,12 @@ hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
 template <typename Executor>
 void test_return_int(Executor& exec)
 {
-    hpx::lcos::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(exec, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(exec, &p2);
+    hpx::future<int> f2 = f1.then(exec, &p2);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get()==2);
+        HPX_TEST(f2.get() == 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -71,9 +71,9 @@ void test_return_int(Executor& exec)
 template <typename Executor>
 void test_return_void(Executor& exec)
 {
-    hpx::lcos::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(exec, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<void> f2 = f1.then(exec, &p3);
+    hpx::future<void> f2 = f1.then(exec, &p3);
     HPX_TEST(f2.valid());
     try {
         f2.wait();
@@ -90,12 +90,12 @@ void test_return_void(Executor& exec)
 template <typename Executor>
 void test_implicit_unwrapping(Executor& exec)
 {
-    hpx::lcos::future<int> f1 = hpx::async(exec, &p1);
+    hpx::future<int> f1 = hpx::async(exec, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(exec, &p4);
+    hpx::future<int> f2 = f1.then(exec, &p4);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get()==2);
+        HPX_TEST(f2.get() == 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -109,41 +109,41 @@ void test_implicit_unwrapping(Executor& exec)
 template <typename Executor>
 void test_simple_then(Executor& exec)
 {
-    hpx::lcos::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
-    HPX_TEST(f2.get()==2);
+    hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
+    HPX_TEST(f2.get() == 2);
 }
 
 template <typename Executor>
 void test_simple_deferred_then(Executor& exec)
 {
-    hpx::lcos::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
-    HPX_TEST(f2.get()==2);
+    hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2);
+    HPX_TEST(f2.get() == 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
 void test_complex_then(Executor& exec)
 {
-    hpx::lcos::future<int> f1 = hpx::async(exec, p1);
-    hpx::lcos::future<int> f21 = f1.then(exec, &p2);
-    hpx::lcos::future<int> f2= f21.then(exec, &p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f1 = hpx::async(exec, p1);
+    hpx::future<int> f21 = f1.then(exec, &p2);
+    hpx::future<int> f2 = f21.then(exec, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
 void test_complex_then_chain_one(Executor& exec)
 {
-    hpx::lcos::future<int> f1 = hpx::async(exec, p1);
-    hpx::lcos::future<int> f2= f1.then(exec, &p2).then(exec, &p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f1 = hpx::async(exec, p1);
+    hpx::future<int> f2 = f1.then(exec, &p2).then(exec, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
 void test_complex_then_chain_two(Executor& exec)
 {
-    hpx::lcos::future<int> f2 =
+    hpx::future<int> f2 =
         hpx::async(exec, p1).then(exec, &p2).then(exec, &p2);
     HPX_TEST(f2.get()==4);
 }
@@ -168,12 +168,12 @@ using boost::program_options::options_description;
 int hpx_main(variables_map&)
 {
     {
-        hpx::parallel::sequential_executor exec;
+        hpx::parallel::execution::sequenced_executor exec;
         test_then(exec);
     }
 
     {
-        hpx::parallel::parallel_executor exec;
+        hpx::parallel::execution::parallel_executor exec;
         test_then(exec);
     }
 

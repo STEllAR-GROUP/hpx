@@ -6,6 +6,7 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
@@ -117,7 +118,7 @@ namespace hpx { namespace threads
 #elif defined(HPX_HAVE_HWLOC)
           : num_of_cores_(detail::hwloc_hardware_concurrency())
 #else
-          : num_of_cores_(boost::thread::hardware_concurrency())
+          : num_of_cores_(compat::thread::hardware_concurrency())
 #endif
         {
             if (num_of_cores_ == 0)

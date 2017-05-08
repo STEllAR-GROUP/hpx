@@ -15,8 +15,8 @@
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -50,11 +50,6 @@ namespace hpx { namespace parallel { namespace util
             static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -78,7 +73,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, 1, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));
@@ -119,11 +114,6 @@ namespace hpx { namespace parallel { namespace util
             {
                 HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -167,7 +157,7 @@ namespace hpx { namespace parallel { namespace util
 
                     HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
-                    workitems = executor_traits::bulk_async_execute(
+                    workitems = execution::async_bulk_execute(
                         policy.executor(),
                         partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                         std::move(shape));
@@ -199,11 +189,6 @@ namespace hpx { namespace parallel { namespace util
             static R call_with_index(ExPolicy && policy, FwdIter first,
                 std::size_t count, Stride stride, F1 && f1, F2 && f2)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -227,7 +212,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, stride, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));
@@ -266,11 +251,6 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<R> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -299,7 +279,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, 1, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));
@@ -339,11 +319,6 @@ namespace hpx { namespace parallel { namespace util
             {
                 HPX_ASSERT(boost::size(data) >= boost::size(chunk_sizes));
 
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -390,7 +365,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                     HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
-                    workitems = executor_traits::bulk_async_execute(
+                    workitems = execution::async_bulk_execute(
                         policy.executor(),
                         partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                         std::move(shape));
@@ -421,11 +396,6 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, Stride stride,
                 F1 && f1, F2 && f2)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -454,7 +424,7 @@ namespace hpx { namespace parallel { namespace util
                             first, count, stride, has_variable_chunk_size());
 
                     std::vector<hpx::future<Result> > workitems =
-                        executor_traits::bulk_async_execute(
+                        execution::async_bulk_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
                             std::move(shapes));

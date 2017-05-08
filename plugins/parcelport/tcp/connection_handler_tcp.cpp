@@ -7,12 +7,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
-// hpxinspect:nodeprecatedname:boost::chrono
-
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/compat/thread.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -23,10 +21,10 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -185,8 +183,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         "connection_handler(tcp)::create_connection");
                 }
                 else {
-                    boost::this_thread::sleep_for(
-                        boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+                    compat::this_thread::sleep_for(
+                        std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
             }
             catch (boost::system::system_error const& e) {

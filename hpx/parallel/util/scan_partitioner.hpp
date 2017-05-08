@@ -17,7 +17,7 @@
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
@@ -54,11 +54,6 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -124,7 +119,7 @@ namespace hpx { namespace parallel { namespace util
                         std::size_t size = hpx::util::get<1>(elem);
 
                         hpx::shared_future<Result1> prev = workitems.back();
-                        auto curr = executor_traits::async_execute(
+                        auto curr = execution::async_execute(
                             policy.executor(), f1, it, size).share();
 
                         finalitems.push_back(dataflow(hpx::launch::sync,
@@ -168,11 +163,6 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, T && init, F1 && f1,
                 F2 && f2, F3 && f3, F4 && f4)
             {
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
@@ -243,7 +233,7 @@ namespace hpx { namespace parallel { namespace util
                         std::size_t size = hpx::util::get<1>(elem);
 
                         hpx::shared_future<Result1> prev = workitems.back();
-                        auto curr = executor_traits::async_execute(
+                        auto curr = execution::async_execute(
                             policy.executor(), f1, it, size).share();
 
                         workitems.push_back(dataflow(hpx::launch::sync,

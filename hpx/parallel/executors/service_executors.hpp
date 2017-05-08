@@ -9,12 +9,11 @@
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/runtime/threads/executors/service_executors.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { namespace execution
 {
     /// A \a service_executor exposes one of the predefined HPX thread pools
     /// through an executor interface.
@@ -113,5 +112,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {}
     };
 }}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/thread_executor_traits.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Compatibility layer
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+{
+    using service_executor = execution::service_executor;
+    using io_pool_executor = execution::io_pool_executor;
+    using parcel_pool_executor = execution::parcel_pool_executor;
+    using timer_pool_executor = execution::timer_pool_executor;
+    using main_pool_executor = execution::main_pool_executor;
+}}}
+#endif
 
 #endif

@@ -11,6 +11,8 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
+#include <vector>
+
 namespace hpx
 {
     /// \namespace lcos
@@ -62,6 +64,10 @@ namespace hpx
             template <typename R>
             class promise;
         }
+
+        // forward declare wait_all()
+        template <typename Future>
+        void wait_all(std::vector<Future>&& values);
     }
 
     using lcos::future;

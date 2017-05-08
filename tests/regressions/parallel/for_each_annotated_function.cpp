@@ -27,7 +27,12 @@ int hpx_main()
                 hpx::util::thread_description desc(
                     hpx::threads::get_thread_description(hpx::threads::get_self_id())
                 );
-                HPX_TEST(std::string(desc.get_description()) == "annotated_function");
+                HPX_TEST_EQ(std::string(desc.get_description()),
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                        "annotated_function");
+#else
+                        "<unknown>");
+#endif
             },
             "annotated_function"
         )

@@ -9,7 +9,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.8.10
+# We require at least CMake V2.8.12
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 # explicitly set certain policies
@@ -50,7 +50,7 @@ endif()
 project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
+set(HPX_MINOR_VERSION 1)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
@@ -776,6 +776,11 @@ if(HPX_WITH_NETWORKING)
   endif()
 endif()
 
+# Developer tools
+hpx_option(HPX_WITH_VIM_YCM BOOL
+  "Generate HPX completion file for VIM YouCompleteMe plugin"
+  OFF ADVANCED)
+
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
@@ -840,6 +845,14 @@ hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
     OFF ADVANCED)
 if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
+endif()
+
+# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
+    "Enable old (pre-concurrency TS) executor API (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 endif()
 
 # HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
@@ -1035,6 +1048,18 @@ endif()
 
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
+# HPX_WITH_THREAD_COMPATIBILITY
+hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
+    "Use a compatibility implementation of std::thread, i.e. fall back to Boost.Thread (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_THREAD_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_COMPATIBILITY)
+else()
+  if(NOT HPX_WITH_CXX11_THREAD)
+    hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
+  endif()
+endif()
 
 ################################################################################
 # check for miscellaneous things
@@ -1445,6 +1470,10 @@ if(HPX_WITH_VALGRIND)
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
+if(HPX_WITH_VIM_YCM)
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
 # with incompatible options with the currently selected platform.
@@ -1802,6 +1831,20 @@ if(HPX_WITH_DOCUMENTATION)
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"
     PATTERN ".git" EXCLUDE)
+endif()
+
+if(HPX_WITH_VIM_YCM)
+  set(build_dir_file ${CMAKE_BINARY_DIR}/.ycm_extra_conf.py)
+  set(source_dir_file ${CMAKE_SOURCE_DIR}/.ycm_extra_conf.py)
+  configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
+               ${build_dir_file} @ONLY)
+  add_custom_target(
+    configure_ycm
+    COMMAND ${CMAKE_COMMAND} -E copy ${build_dir_file} ${source_dir_file}
+    COMMENT "Copying YCM config file to source directory"
+    VERBATIM
+  )
+  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
 
 ################################################################################
