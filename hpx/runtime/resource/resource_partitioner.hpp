@@ -6,9 +6,11 @@
 #if !defined(HPX_RESOURCE_PARTITIONER)
 #define HPX_RESOURCE_PARTITIONER
 
-#include <hpx/include/runtime.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
+
+//#include <hpx/runtime/threads/detail/thread_pool.hpp>
+//#include <hpx/include/runtime.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -48,13 +50,10 @@ namespace hpx{
 
         // mechanism for adding resources
         void add_resource(std::size_t pu_number){
-            if(pool_name_.empty()){
-                std::cout << "[TP - add_resource] empty pool name\n" ;
-            }
-            std::cout << "adding resource to pool " << pool_name_ << "\n";
             my_pus_.push_back(pu_number);
 
-            //! throw exception if resource does not exist or something ...
+            //! throw exception if resource does not exist
+            //! or the input parameter is invalid or something like that ...
 
         }
 
@@ -62,13 +61,14 @@ namespace hpx{
         std::string pool_name_;
         std::vector<std::size_t> my_pus_;
         //! does it need to hold the information "run HPX on me/not"? ie "can be used for runtime"/not?
+        //! would make life easier for ppl who want to run HPX side-by-sie with OpenMP ofr example?
 
     };
 
     class resource_partitioner{
     public:
-        resource_partitioner() // queries hwloc, sets internal parameters
-//          :
+        resource_partitioner()
+          : topology_(threads::create_topology())
         {
             // allow only one resource_partitioner instance
             if(instance_number_counter_++ >= 0){
@@ -77,15 +77,9 @@ namespace hpx{
 
             // set pointer to self
             resource_partitioner_ptr = this;
-
-                //! do not allow the creation of more than one RP instance
-                //! cf counter for runtime, do the same and add test and exception here
-
-                //! topology is gonna be tricky? see where create_topology is called
-                //! probs move it from runtime to RP
         }
 
-        //! constructors with a bunch of strings, in case I know my names already
+        //! additional constructors with a bunch of strings, in case I know my names already
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         initial_thread_pool* create_thread_pool(std::string name)
@@ -99,8 +93,6 @@ namespace hpx{
         }
 
         void add_resource(std::size_t resource, std::string pool_name){
-            std::cout << "[RP - add_resource] \n";
-            std::cout << "[RP ] adding resource to pool " << get_pool(pool_name)->get_name() << "\n";
             get_pool(pool_name)->add_resource(resource);
         }
 
@@ -109,6 +101,12 @@ namespace hpx{
             return thread_pools_.size();
         }*/
 
+        threads::topology const& get_topology() const
+        {
+            return topology_;
+        }
+
+        // if resource manager has not been instantiated yet, it simply returns a nullptr
         static resource_partitioner* get_resource_partitioner_ptr() {
             return resource_partitioner_ptr;
         }
@@ -116,20 +114,12 @@ namespace hpx{
     private:
         ////////////////////////////////////////////////////////////////////////
 
-/*        resource_partitioner* get(){ // for get_ptr function
-            return
-        }*/
 
-
-        // has to be private bc pointers become invalid after data member thread_pools_ is resized
-        // we don't want to allow the user to use it
-        // WARNING will be invalidated
+        //! this is ugly, I should probably delete it
         uint64_t get_pool_index(std::string pool_name){
-            std::cout << "[get_pool] \n";
             std::size_t N = initial_thread_pool_.size();
             for(size_t i(0); i<N; i++) {
                 if (initial_thread_pool_[i].get_name() == pool_name) {
-                    std::cout << "found!\n";
                     return i;
                 }
             }
@@ -139,25 +129,21 @@ namespace hpx{
 
         }
 
+        // has to be private bc pointers become invalid after data member thread_pools_ is resized
+        // we don't want to allow the user to use it
         initial_thread_pool* get_pool(std::string pool_name){
-            std::cout << "[get_pool_ptr] \n";
-
             auto pool = std::find_if(
                     initial_thread_pool_.begin(), initial_thread_pool_.end(),
                     [&pool_name](initial_thread_pool itp) -> bool {return (itp.get_name() == pool_name);}
             );
 
             if(pool != initial_thread_pool_.end()){
-                initial_thread_pool* ret(&(*pool));
+                initial_thread_pool* ret(&(*pool)); //! ugly
                 return ret;
             }
 
             throw std::invalid_argument(
                     "the resource partitioner does not own a thread pool named \"" + pool_name + "\" \n");
-        }
-
-        std::size_t get_instance_number_counter() const{
-            return static_cast<std::size_t>(instance_number_counter_);
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -170,34 +156,25 @@ namespace hpx{
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
-        //! instead of a struct, should I just have a map of names to vector<size_t>??
+        //! instead of a struct, should I just have a map of names (std:string) to vector<size_t>??
         std::vector<initial_thread_pool> initial_thread_pool_;
 
         // actual thread pools of OS-threads
-//        std::vector<threads::detail::thread_pool> thread_pools_; //! template param?
+//        std::vector<threads::detail::thread_pool> thread_pools_; //! template param needed?
 
         // list of schedulers or is it enough if they're owned by thread_pool?
 
         // reference to the topology
-//        threads::topology& topology_;
+        threads::topology& topology_;
 
         // reference to affinity data
-
+        //! I'll probably have to take this away from runtime
 
     };
-
-/*    resource_partitioner * get_resource_partitioner_ptr() const
-    {
-        //! throw exception if this is called before the RP has been instanciated
-        // if resource_partitioner has been instanciated already (most cases)
-        resource_partitioner** rp = runtime::runtime_.get();
-        return rp ? *rp : nullptr;
-    }*/
 
     boost::atomic<int> resource_partitioner::instance_number_counter_(-1); //! move to .cpp
 
     resource_partitioner* resource_partitioner::resource_partitioner_ptr(nullptr); //! move to .cpp probably
-
 
 }
 
