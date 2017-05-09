@@ -76,6 +76,11 @@ namespace hpx { namespace resource {
         return topology_;
     }
 
+    std::size_t resource_partitioner::dummy_access() const //! delete this in the future
+    {
+        return topology_.socket_numbers_[0] + 1;
+    }
+
     ////////////////////////////////////////////////////////////////////////
 
     util::thread_specific_ptr<resource_partitioner*, resource_partitioner::tls_tag> resource_partitioner::resource_partitioner_;
@@ -149,7 +154,7 @@ namespace hpx { namespace resource {
             return rp ? *rp : nullptr;
         } else {
             //! if the runtime already has been instantiated
-            return hpx::get_runtime_ptr()->get_resource_partitioner_ptr_();
+            return hpx::get_runtime_ptr()->get_resource_partitioner_ptr();
         }
     }
 

@@ -33,10 +33,19 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+namespace hpx { namespace resource {
+        class resource_partitioner;
+    }
+}
+
 namespace hpx { namespace threads
 {
+
     struct HPX_EXPORT hwloc_topology_info : topology
     {
+
+        friend resource::resource_partitioner;
+
         hwloc_topology_info();
         ~hwloc_topology_info();
 
