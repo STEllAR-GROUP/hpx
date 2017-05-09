@@ -134,8 +134,13 @@ namespace hpx { namespace serialization
 
     private:
         friend struct basic_archive<input_archive>;
+
         template <class T>
         friend class array;
+
+        template <typename T>
+        friend void hpx::serialization::detail::load_impl(input_archive &,
+            hpx::parcelset::rma::rma_vector<T> & , std::true_type);
 
         template <typename T>
         void load_bitwise(T & t, std::false_type)
@@ -257,6 +262,17 @@ namespace hpx { namespace serialization
                 buffer_->load_binary_chunk(address, count);
 
             size_ += count;
+        }
+
+        void load_rma_chunk(void * address, std::size_t count,
+            hpx::parcelset::rma::memory_region *region)
+        {
+            if(count == 0) return;
+            size_ += count;
+            if(disable_data_chunking())
+              buffer_->load_binary(address, count);
+            else
+              buffer_->load_rma_chunk(address, count, region);
         }
 
         // make functions visible through adl

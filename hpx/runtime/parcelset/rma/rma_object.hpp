@@ -3,9 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UNKNOWN_RMA_OBJECT_HPP
-#define HPX_UNKNOWN_RMA_OBJECT_HPP
+#ifndef HPX_RUNTIME_PARCELSET_RMA_OBJECT_HPP
+#define HPX_RUNTIME_PARCELSET_RMA_OBJECT_HPP
 
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/rma/memory_region.hpp>
 #include <hpx/runtime/parcelset/rma/memory_pool.hpp>
@@ -49,6 +51,39 @@ namespace rma
             return this->shared_from_this();
         }
 
+        operator T&() {
+            return *obj_;
+        }
+
+        operator const T&() {
+            return *obj_;
+        }
+
+        T* operator->() {
+            return obj_;
+        }
+
+        const T* operator->() const {
+            return obj_;
+        }
+
+        T& get() {
+            return *obj_;
+        }
+
+        bool operator ==(const rma::rma_object<T> & other) const {
+            return (*other.obj_)==(*obj_);
+        }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & (*obj_);
+        }
+
+        template <typename U>
+        friend std::ostream& operator<<(std::ostream& os, rma::rma_object<U> const& c);
+
     public:
         // make_rma_object must have access to our private constructor
         template <typename T2, typename... Args>
@@ -56,13 +91,19 @@ namespace rma
             make_rma_object_impl(T2*, Args&&... args);
 
         template <typename T2, typename... Args>
-        friend rma_object<std::vector<T2, rma::rma_allocator<T2>>>
-            make_rma_object_impl(std::vector<T2, rma::rma_allocator<T2>>*,
+        friend rma_object<std::vector<T2, rma::allocator<T2>>>
+            make_rma_object_impl(std::vector<T2, rma::allocator<T2>>*,
                                  Args&&... args);
 
         // default empty constructor
         rma_object<T>() : region_(nullptr) {}
-
+/*
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & *obj_;
+        }
+*/
     private:
         // Create an rma object with a memory region
         rma_object<T>(T *obj, memory_region *region, parcelport *pp)
@@ -73,7 +114,14 @@ namespace rma
         memory_region *region_;
         parcelport    *pp_;
     };
-
+/*
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, rma::rma_object<T> const& c)
+    {
+        os << *c.obj_;
+        return os;
+    }
+*/
     // ---------------------------------------------------------------------------
     // default rma object creator function.
     //
@@ -102,18 +150,18 @@ namespace rma
     // overloaded vector rma object creator
 
     template <typename T, typename... Args>
-    rma_object<std::vector<T, rma::rma_allocator<T>>>
-    make_rma_object_impl(std::vector<T, rma::rma_allocator<T>>*, Args&&... args)
+    rma_object<std::vector<T, rma::allocator<T>>>
+    make_rma_object_impl(std::vector<T, rma::allocator<T>>*, Args&&... args)
     {
-        using vec_type = std::vector<T, rma::rma_allocator<T>>;
+        using vec_type = std::vector<T, rma::allocator<T>>;
         //
         parcelset::parcelhandler &ph =
             hpx::get_runtime().get_parcel_handler();
         auto pp = ph.get_default_parcelport();
 
-        rma::rma_allocator<char> *allocator = pp->get_allocator();
+        rma::allocator<char> *allocator = pp->get_allocator();
         typedef typename
-            std::allocator_traits<rma::rma_allocator<char>>::template rebind_alloc<T>
+            std::allocator_traits<rma::allocator<char>>::template rebind_alloc<T>
             T_allocator;
         //
         T_allocator alloc(allocator->get_memory_pool());
@@ -128,12 +176,22 @@ namespace rma
         return rma_object<vec_type>(obj, region, pp.get());
     }
 
+    template <typename T>
+    using rma_vector = std::vector<T, hpx::parcelset::rma::allocator<T>>;
+
     // ---------------------------------------------------------------------------
     // main entry point for making rma objects
     template <typename T, typename... Args>
     rma_object<T> make_rma_object(Args&&... args)
     {
         return make_rma_object_impl(static_cast<T*>(nullptr), args...);
+    }
+
+    // convenience function for making rma vectors
+    template <typename T, typename... Args>
+    rma_vector<T> make_rma_vector(Args&&... args)
+    {
+        return make_rma_object_impl(static_cast<std::vector<T,rma::allocator<T>>*>(nullptr), args...);
     }
 
 }}}

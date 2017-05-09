@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/runtime/parcelset/rma/rma_allocator.hpp>
+#include <hpx/runtime/parcelset/rma/allocator.hpp>
 
 #include <vector>
 #include <type_traits>
@@ -25,9 +25,8 @@ namespace hpx { namespace traits
         : is_bitwise_serializable<T>
     {};
 
-    template <>
     template <typename T>
-    struct is_rma_elegible<std::vector<T, parcelset::rma::rma_allocator<T>>>
+    struct is_rma_elegible<std::vector<T, parcelset::rma::allocator<T>>>
         : is_bitwise_serializable<T>
     {};
 
@@ -36,7 +35,7 @@ namespace hpx { namespace traits
 #define HPX_IS_RMA_ELIGIBLE(T)                                                \
 namespace hpx { namespace traits {                                            \
     template <>                                                               \
-    struct is_rma_eligible< T >                                               \
+    struct is_rma_elegible< T >                                               \
       : std::true_type                                                        \
     {};                                                                       \
 }}                                                                            \

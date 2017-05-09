@@ -81,7 +81,7 @@ namespace hpx { namespace parcelset
         return 0;
     }
 
-    rma::rma_allocator<char> *parcelport::get_allocator()
+    rma::allocator<char> *parcelport::get_allocator()
     {
         return allocator_;
     }

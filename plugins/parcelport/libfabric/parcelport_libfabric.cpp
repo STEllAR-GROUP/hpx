@@ -166,8 +166,8 @@ namespace libfabric
         chunk_pool_ = &libfabric_controller_->get_memory_pool();
 
         // setup provider specific allocator for rma_object use
-        rma::detail::rma_allocator_impl<char, libfabric_region_provider> *default_allocator =
-            new rma::detail::rma_allocator_impl<char, libfabric_region_provider>(chunk_pool_);
+        rma::detail::allocator_impl<char, libfabric_region_provider> *default_allocator =
+            new rma::detail::allocator_impl<char, libfabric_region_provider>(chunk_pool_);
         allocator_ = default_allocator;
         //
         for (std::size_t i = 0; i < HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS; ++i)

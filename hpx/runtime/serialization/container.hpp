@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/runtime/rma_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <cstddef>
@@ -33,6 +34,9 @@ namespace hpx { namespace serialization
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual std::size_t save_binary_chunk(
             void const* address, std::size_t count) = 0;
+        virtual std::size_t save_rma_chunk(
+            void const* address, std::size_t count,
+            parcelset::rma::memory_region *) = 0;
         virtual void reset() = 0;
         virtual std::size_t get_num_chunks() const = 0;
         virtual void flush() = 0;
@@ -46,6 +50,8 @@ namespace hpx { namespace serialization
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void load_binary(void * address, std::size_t count) = 0;
         virtual void load_binary_chunk(void * address, std::size_t count) = 0;
+        virtual void load_rma_chunk(void * address, std::size_t count,
+            parcelset::rma::memory_region *) = 0;
     };
 }}
 

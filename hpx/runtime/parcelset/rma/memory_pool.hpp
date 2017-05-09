@@ -73,6 +73,18 @@ namespace rma
         //----------------------------------------------------------------------------
         virtual void deallocate(void *address, size_t size) = 0;
 
+        //----------------------------------------------------------------------------
+        virtual memory_region *region_from_address(void const * addr) = 0;
+
+        //----------------------------------------------------------------------------
+        // release a region back to the pool
+        virtual void release_region(memory_region *region) = 0;
+
+        //----------------------------------------------------------------------------
+        memory_region *get_region(size_t length)
+        {
+            return region_from_address(allocate(length));
+        }
     };
 
     // ---------------------------------------------------------------------------
@@ -268,12 +280,16 @@ namespace rma
             deallocate(region);
         }
 
+        void release_region(memory_region *region) {
+            deallocate(region);
+        }
+
         //----------------------------------------------------------------------------
         // find an verbs_memory_region* from the memory address it wraps
         // this is only valid for regions allocated sing the STL allocate method
         // and if you are cling this, then you probably should have allocated
         // a region instead in the first place
-        inline region_type *region_from_address(void * const addr)
+        inline region_type *region_from_address(void const * addr)
         {
             return region_alloc_pointer_map_[addr];
         }

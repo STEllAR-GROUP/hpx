@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION
-#define HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION
+#ifndef HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION_IMPL
+#define HPX_PARCELSET_POLICIES_RMA_MEMORY_REGION_IMPL
 
 #include <hpx/traits/rma_memory_region_traits.hpp>
 #include <hpx/runtime/parcelset/rma/memory_region.hpp>
@@ -62,7 +62,6 @@ namespace detail
                 LOG_ERROR_MSG(
                     "error registering region "
                     << hexpointer(buffer) << hexlength(length));
-                throw std::runtime_error("error in memory registration");
             }
             else {
                 LOG_DEBUG_MSG(
@@ -98,7 +97,6 @@ namespace detail
                 LOG_ERROR_MSG(
                     "error registering region "
                     << hexpointer(buffer) << hexlength(length));
-                throw std::runtime_error("error in memory registration");
             }
             else {
                 LOG_DEBUG_MSG(

@@ -15,7 +15,6 @@
 //
 #include <hpx/config.hpp>
 #include <hpx/config/parcelport_defines.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 //
 #include <boost/preprocessor.hpp>
@@ -73,6 +72,7 @@
 // include files needed for boost::log
 // ------------------------------------------------------------------
 #ifdef HPX_PARCELPORT_LOGGING_INCLUDE_FILES
+#  include <hpx/runtime/threads/thread.hpp>
 #  include <boost/log/trivial.hpp>
 #  include <boost/log/expressions/formatter.hpp>
 #  include <boost/log/expressions/formatters.hpp>
@@ -105,6 +105,7 @@ namespace detail {
     inline std::ostream& operator<<(
         std::ostream& os, const rdma_thread_print_helper&)
     {
+#ifdef HPX_PARCELPORT_LOGGING_INCLUDE_FILES
         if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
             os << "------------------ ";
         }
@@ -115,6 +116,9 @@ namespace detail {
         }
         os << nhex(12) << std::this_thread::get_id() << " cpu "
            << decnumber(sched_getcpu());
+#else
+        os << "------------------ ";
+#endif
         return os;
     }
 
@@ -256,33 +260,5 @@ namespace detail {
 #  define LOG_TIMED_MSG(name, level, delay, x)
 #  define LOG_TIMED_BLOCK(name, level, delay, x)
 #endif
-
-// ------------------------------------------------------------------
-// Utility to allow automatic printing of enum names in log messages
-//
-// example of usage
-// DEFINE_ENUM_WITH_STRING_CONVERSIONS(test_type, (test1)(test2)(test3))
-// ------------------------------------------------------------------
-
-#  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \
-    case elem : return HPX_PP_STRINGIZE(elem);                                \
-/**/
-
-#  define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)              \
-    enum name {                                                               \
-        BOOST_PP_SEQ_ENUM(enumerators)                                        \
-    };                                                                        \
-                                                                              \
-    static const char* ToString(name v) {                                     \
-        switch (v) {                                                          \
-            BOOST_PP_SEQ_FOR_EACH(                                            \
-                X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE,          \
-                name,                                                         \
-                enumerators                                                   \
-            )                                                                 \
-            default: return "[Unknown " HPX_PP_STRINGIZE(name) "]";           \
-        }                                                                     \
-    }                                                                         \
-/**/
 
 #endif

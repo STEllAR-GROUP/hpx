@@ -163,6 +163,33 @@ namespace hpx { namespace serialization
             }
         }
 
+        void load_rma_chunk(void* address, std::size_t count,
+            parcelset::rma::memory_region *) // override
+        {
+            HPX_ASSERT((std::int64_t)count >= 0);
+
+            if (filter_.get() || chunks_ == nullptr ||
+                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                // fall back to serialization_chunk-less archive
+                this->input_container::load_binary(address, count);
+            }
+            else {
+                HPX_ASSERT(current_chunk_ != std::size_t(-1));
+                HPX_ASSERT(get_chunk_type(current_chunk_) == chunk_type_rma);
+
+                if (get_chunk_size(current_chunk_) != count)
+                {
+                    HPX_THROW_EXCEPTION(serialization_error
+                      , "input_container::load_binary_chunk"
+                      , "archive data bstream data chunk size mismatch");
+                    return;
+                }
+                // the parcelport will have transferred data into the memory buffer
+                // using RMA, so we need to do nothing here
+                ++current_chunk_;
+            }
+        }
+
         Container const& cont_;
         std::size_t current_;
         std::unique_ptr<binary_filter> filter_;

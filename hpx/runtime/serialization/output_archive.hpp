@@ -18,6 +18,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/runtime/rma_fwd.hpp>
 
 #if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
 #include <boost/cstdint.hpp>
@@ -205,6 +206,10 @@ namespace hpx { namespace serialization
         friend class array;
 
         template <typename T>
+        friend void hpx::serialization::detail::save_impl(output_archive &,
+            const hpx::parcelset::rma::rma_vector<T> & , std::true_type);
+
+        template <typename T>
         void invoke_impl(T const & t)
         {
             save(t);
@@ -367,6 +372,19 @@ namespace hpx { namespace serialization
             else {
                 // the size might grow if optimizations are not used
                 size_ += buffer_->save_binary_chunk(address, count);
+            }
+        }
+
+        void save_rma_chunk(void const * address, std::size_t count,
+            hpx::parcelset::rma::memory_region *region)
+        {
+            if(count == 0) return;
+            if (disable_data_chunking()) {
+                size_ += count;
+                buffer_->save_binary(address, count);
+            }
+            else {
+                size += buffer_->save_rma_chunk(address, count, region);
             }
         }
 

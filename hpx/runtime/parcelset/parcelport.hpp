@@ -19,7 +19,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/rma/memory_region.hpp>
-#include <hpx/runtime/parcelset/rma/rma_allocator.hpp>
+#include <hpx/runtime/parcelset/rma/allocator.hpp>
 //
 #include <plugins/parcelport/unordered_map.hpp>
 //
@@ -217,7 +217,7 @@ namespace hpx { namespace parcelset
         /// Returns an STL compatible allocator that can be used with a vector
         /// in combination with rma_object semantics. This allocator must
         /// be rebound to a new type to provide allocaors for <T>
-        rma::rma_allocator<char> *get_allocator();
+        rma::allocator<char> *get_allocator();
 
         /// \brief Performance counter data
         /// number of parcels sent
@@ -353,7 +353,7 @@ namespace hpx { namespace parcelset
 
         hpx::applier::applier *applier_;
 
-        rma::rma_allocator<char> *allocator_;
+        rma::allocator<char> *allocator_;
 
         /// The cache for pending parcels
         typedef util::tuple<
