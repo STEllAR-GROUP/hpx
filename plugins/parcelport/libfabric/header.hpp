@@ -148,8 +148,11 @@ namespace libfabric
                 else {
                     // the message isn't piggybacked and neither is the chunk data
                     // so we must add rma-get information for the message
-                    detail::message_chunk *mc =
-                        reinterpret_cast<detail::message_chunk*>(&data_[chunkbytes]);
+                    detail::message_chunk *mc = reinterpret_cast<detail::message_chunk*>
+                        (&data_[message_info_offset()]);
+                    LOG_DEBUG_MSG("Setting chunk free message size to "
+                        << decnumber(buffer.size_)
+                        << "offset " << decnumber(message_info_offset()));
                     mc->message_rma =
                         serialization::create_pointer_chunk(nullptr, buffer.size_, 0);
                 }
@@ -326,7 +329,11 @@ namespace libfabric
             // if the data is not piggybacked then look at the final chunk
             chunktype *chunks = reinterpret_cast<chunktype *>(chunk_ptr());
             if (!chunks) {
-                throw std::runtime_error("Don't call message_size without chunk data");
+                detail::message_chunk *mc = message_chunk_ptr();
+                LOG_DEBUG_MSG("chunk free message size is "
+                    << decnumber(mc->message_rma.size_)
+                    << "offset was " << decnumber(message_info_offset()));
+                return mc->message_rma.size_;
             }
             return chunks[message_header.num_chunks-1].size_;
         }
@@ -345,9 +352,12 @@ namespace libfabric
                 detail::message_chunk *mc = message_chunk_ptr();
                 chunks = &mc->message_rma;
             }
+            else {
+                chunks = &chunks[message_header.num_chunks-1];
+            }
             // the last chunk will be our RMA message chunk
-            chunks[message_header.num_chunks-1].rkey_       = key;
-            chunks[message_header.num_chunks-1].data_.cpos_ = addr;
+            chunks->rkey_       = key;
+            chunks->data_.cpos_ = addr;
         }
 
         std::uint32_t num_chunks()
