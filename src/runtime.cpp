@@ -236,9 +236,10 @@ namespace hpx
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        resource_partitioner_(resource::resource_partitioner::get_resource_partitioner_ptr()),
+        resource_partitioner_(resource::get_resource_partitioner_ptr()),
         affinity_init_(affinity_init),
         topology_(resource_partitioner_->get_topology()),
+//        topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -284,7 +285,7 @@ namespace hpx
             runtime::uptime_.reset(new std::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::thread_self::init_self();
+            threads::thread_self::init_self(); // done in resource_partitioner
         }
     }
 

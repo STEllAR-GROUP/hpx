@@ -8,6 +8,8 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 
 //#include <hpx/runtime/threads/detail/thread_pool.hpp>
 //#include <hpx/include/runtime.hpp>
@@ -48,9 +50,14 @@ namespace hpx{ namespace resource {
 
     };
 
-    class resource_partitioner{
+    class HPX_EXPORT resource_partitioner{
     public:
         resource_partitioner();
+
+        //! used to make a global accessible pointer. Copied from runtime.hpp
+        // the TSS holds a pointer to the runtime associated with a given OS thread
+        struct tls_tag {};
+        static util::thread_specific_ptr<resource_partitioner*, tls_tag> resource_partitioner_;
 
         //! additional constructors with a bunch of strings, in case I know my names already
 
@@ -64,14 +71,14 @@ namespace hpx{ namespace resource {
             return thread_pools_.size();
         }*/
 
-        threads::topology const& get_topology() const;
+        threads::topology& get_topology() const;
 
+        //! this is an old version
         // if resource manager has not been instantiated yet, it simply returns a nullptr
-        static resource_partitioner* get_resource_partitioner_ptr();
+        //HPX_API_EXPORT static resource_partitioner* get_resource_partitioner_ptr(); //! does not work everywhere at the moment
 
     private:
         ////////////////////////////////////////////////////////////////////////
-
 
         //! this is ugly, I should probably delete it
         uint64_t get_pool_index(std::string pool_name);
@@ -79,6 +86,9 @@ namespace hpx{ namespace resource {
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
         initial_thread_pool* get_pool(std::string pool_name);
+
+        void init_tss();
+/*        void deinit_tss();*/ //! is this even needed ???
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -106,7 +116,12 @@ namespace hpx{ namespace resource {
 
     };
 
-}}
+    /// The function \a get_runtime returns a reference to the (thread
+    /// specific) runtime instance.
+    HPX_API_EXPORT resource_partitioner* get_resource_partitioner_ptr();
+
+
+    }}
 
 
 

@@ -3,7 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/resource/resource_partitioner.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 namespace hpx { namespace resource {
 
@@ -42,6 +43,9 @@ namespace hpx { namespace resource {
     resource_partitioner::resource_partitioner()
         : topology_(threads::create_topology())
     {
+        // initialize our TSS
+        resource_partitioner::init_tss();
+
         // allow only one resource_partitioner instance
         if(instance_number_counter_++ >= 0){
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
@@ -66,15 +70,45 @@ namespace hpx { namespace resource {
         get_pool(pool_name)->add_resource(resource);
     }
 
-    threads::topology const& resource_partitioner::get_topology() const
+    threads::topology& resource_partitioner::get_topology() const
     {
         return topology_;
     }
 
-    // if resource manager has not been instantiated yet, it simply returns a nullptr
-    static resource_partitioner* resource_partitioner::get_resource_partitioner_ptr() {
-        return resource_partitioner_ptr;
+    ////////////////////////////////////////////////////////////////////////
+
+    util::thread_specific_ptr<resource_partitioner*, resource_partitioner::tls_tag> resource_partitioner::resource_partitioner_;
+
+    void resource_partitioner::init_tss()
+    {
+        // initialize our TSS
+        if (nullptr == resource_partitioner::resource_partitioner_.get())
+        {
+            HPX_ASSERT(nullptr == threads::thread_self::get_self());
+            resource_partitioner::resource_partitioner_.reset(new resource_partitioner* (this));
+            //!threads::thread_self::init_self();//!
+        }
     }
+
+    //! never called ... ?!?
+/*    void resource_partitioner::deinit_tss()
+    {
+        // reset our TSS
+        threads::thread_self::reset_self();
+        util::reset_held_lock_data();
+        threads::reset_continuation_recursion_count();
+    }*/
+
+
+
+    // if resource manager has not been instantiated yet, it simply returns a nullptr
+    resource_partitioner* get_resource_partitioner_ptr() {
+        resource_partitioner** rp = resource_partitioner::resource_partitioner_.get();
+        return rp ? *rp : nullptr;
+    }
+/*    resource_partitioner* resource_partitioner::get_resource_partitioner_ptr() {
+        return resource_partitioner_ptr;
+    }*/
 
     ////////////////////////////////////////////////////////////////////////
 
