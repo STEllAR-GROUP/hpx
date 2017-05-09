@@ -116,12 +116,11 @@ namespace hpx{ namespace resource {
 
     };
 
-    /// The function \a get_runtime returns a reference to the (thread
-    /// specific) runtime instance.
-    HPX_API_EXPORT resource_partitioner* get_resource_partitioner_ptr();
+    } // namespace resource
 
+    HPX_API_EXPORT resource::resource_partitioner* get_resource_partitioner_ptr();
 
-    }}
+} // namespace hpx
 
 
 

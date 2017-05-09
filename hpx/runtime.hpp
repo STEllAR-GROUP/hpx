@@ -167,6 +167,11 @@ namespace hpx
             return topology_;
         }
 
+        resource::resource_partitioner* get_resource_partitioner_ptr_() const
+        {
+            return resource_partitioner_;
+        }
+
         std::uint32_t assign_cores(std::string const& locality_basename,
             std::uint32_t num_threads);
 

@@ -5,6 +5,7 @@
 
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/include/runtime.hpp>
 
 namespace hpx { namespace resource {
 
@@ -100,16 +101,6 @@ namespace hpx { namespace resource {
     }*/
 
 
-
-    // if resource manager has not been instantiated yet, it simply returns a nullptr
-    resource_partitioner* get_resource_partitioner_ptr() {
-        resource_partitioner** rp = resource_partitioner::resource_partitioner_.get();
-        return rp ? *rp : nullptr;
-    }
-/*    resource_partitioner* resource_partitioner::get_resource_partitioner_ptr() {
-        return resource_partitioner_ptr;
-    }*/
-
     ////////////////////////////////////////////////////////////////////////
 
     uint64_t resource_partitioner::get_pool_index(std::string pool_name){
@@ -144,9 +135,22 @@ namespace hpx { namespace resource {
 
     ////////////////////////////////////////////////////////////////////////
 
-    boost::atomic<int> resource_partitioner::instance_number_counter_(-1); //! move to .cpp
+    boost::atomic<int> resource_partitioner::instance_number_counter_(-1);
 
-    resource_partitioner* resource_partitioner::resource_partitioner_ptr(nullptr); //! move to .cpp probably
+    resource_partitioner* resource_partitioner::resource_partitioner_ptr(nullptr); //! I don't need this anymore, do I?
 
+    } // namespace resource
 
-} }
+    // if resource partitioner has not been instantiated yet, it simply returns a nullptr
+    resource::resource_partitioner* get_resource_partitioner_ptr() {
+        if(hpx::get_runtime_ptr() == nullptr){
+            //! if the runtime has not yet been instantiated
+            resource::resource_partitioner** rp = resource::resource_partitioner::resource_partitioner_.get();
+            return rp ? *rp : nullptr;
+        } else {
+            //! if the runtime already has been instantiated
+            return hpx::get_runtime_ptr()->get_resource_partitioner_ptr_();
+        }
+    }
+
+} // namespace hpx

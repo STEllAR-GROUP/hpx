@@ -236,10 +236,9 @@ namespace hpx
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        resource_partitioner_(resource::get_resource_partitioner_ptr()),
+        resource_partitioner_(get_resource_partitioner_ptr()),
         affinity_init_(affinity_init),
         topology_(resource_partitioner_->get_topology()),
-//        topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -328,7 +327,7 @@ namespace hpx
         return *thread_support_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
     void runtime::register_query_counters(
         std::shared_ptr<util::query_counters> const& active_counters)
     {
