@@ -15,7 +15,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 //
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
 #include <boost/log/trivial.hpp>
 #include <boost/preprocessor.hpp>

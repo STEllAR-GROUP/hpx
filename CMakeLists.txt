@@ -358,6 +358,12 @@ if(HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
+hpx_option(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD STRING
+  "The threshhold in bytes to when perform zero copy optimizations (default: 128)"
+  "128"
+  ADVANCED)
+hpx_add_config_define(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ${HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD})
+
 hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
   OFF
@@ -606,6 +612,9 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   ## Parcelport related build options
+  hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
+    "Enable the libfabric based parcelport. This is currently an experimental feature"
+    OFF CATEGORY "Parcelport" ADVANCED)
   hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)

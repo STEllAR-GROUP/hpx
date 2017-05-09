@@ -123,6 +123,7 @@ namespace hpx { namespace parcelset
                     }
                     if (parcel_count > 1)
                         deferred_parcels.reserve(parcel_count);
+
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
                         bool deferred_schedule = parcel_count > 1;
@@ -176,7 +177,7 @@ namespace hpx { namespace parcelset
                                 hpx::naming::get_agas_client();
                             client.route(
                                 std::move(p),
-                                &detail::parcel_route_handler,
+                                &parcelset::detail::parcel_route_handler,
                                 threads::thread_priority_normal);
                         }
                         // If we got a direct action,

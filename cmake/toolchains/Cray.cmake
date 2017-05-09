@@ -54,14 +54,21 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-set(HPX_WITH_PARCELPORT_TCP OFF CACHE BOOL "")
+set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED OFF CACHE BOOL "")
 
-# We default to system as our allocator on the BGQ
-if(NOT DEFINED HPX_WITH_MALLOC)
-  set(HPX_WITH_MALLOC "system" CACHE STRING "")
-endif()
+set(HPX_WITH_PARCELPORT_LIBFABRIC ON CACHE BOOL "")
+set(HPX_PARCELPORT_LIBFABRIC_PROVIDER "gni" CACHE STRING
+  "See libfabric docs for details, gni,verbs,psm2 etc etc")
+set(HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS "256" CACHE STRING
+  "Max number of messages in flight at once")
+set(HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE OFF CACHE BOOL
+  "Custom libfabric logging flag")
+set(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING  OFF CACHE BOOL
+  "Libfabric parcelport logging on/off flag")
+set(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD "4096" CACHE STRING
+  "The threshhold in bytes to when perform zero copy optimizations (default: 128)")
 
 # We do a cross compilation here ...
 set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
