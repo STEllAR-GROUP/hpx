@@ -151,6 +151,26 @@ namespace hpx { namespace lcos
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
+
+    // Helper for define_spmd_block()
+    namespace detail
+    {
+        // Overload for lambdas
+        template <typename F>
+        typename std::enable_if_t<!hpx::traits::is_action<F>::value>
+        initialize_if_lambda(F && f)
+        {
+            auto dummy = hpx::actions::lambda_to_action(f);
+            HPX_UNUSED(dummy);
+        }
+
+        // Overload for actions
+        template <typename F>
+        typename std::enable_if_t<hpx::traits::is_action<F>::value>
+        initialize_if_lambda(F &&)
+        {}
+    }
+
     // Helpers for bulk_execute() invoked in define_spmd_block()
     namespace detail
     {
@@ -168,6 +188,14 @@ namespace hpx { namespace lcos
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
+                using first_type =
+                    typename hpx::lcos::detail::extract_first_parameter<
+                                typename F::arguments_type>::type;
+
+                static_assert(std::is_same<spmd_block, first_type>::value,
+                    "define_spmd_block() needs an action that " \
+                    "has at least a spmd_block as 1st argument");
+
                 spmd_block block(name_, num_images_, image_id);
 
                 hpx::async<F>(
@@ -187,6 +215,14 @@ namespace hpx { namespace lcos
             template <typename ... Ts>
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
+                using first_type =
+                    typename hpx::lcos::detail::extract_first_parameter<
+                                decltype(&F::operator())>::type;
+
+                static_assert(std::is_same<spmd_block, first_type>::value,
+                    "define_spmd_block() needs a lambda that " \
+                    "has at least a spmd_block as 1st argument");
+
                 spmd_block block(name_, num_images_, image_id);
 
                 int * dummy = nullptr;
@@ -198,77 +234,21 @@ namespace hpx { namespace lcos
         };
     }
 
-    // Overload for lambdas (Note : it implies some undefined behaviour)
-    template <typename F, typename ... Args>
-    typename std::enable_if_t<!hpx::traits::is_action<F>::value,
-        hpx::future<void> >
-    define_spmd_block(std::string && name, std::size_t images_per_locality,
-        F && f, Args && ... args)
-    {
-        using ftype = typename std::decay<F>::type;
-
-        using first_type =
-            typename hpx::lcos::detail::extract_first_parameter<
-                        decltype(&ftype::operator())>::type;
-
-        using executor_type =
-            hpx::parallel::execution::parallel_executor;
-
-        static_assert(std::is_same<spmd_block, first_type>::value,
-            "define_spmd_block() needs a lambda that " \
-            "has at least a spmd_block as 1st argument");
-
-        std::size_t num_images
-            = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
-
-        // Force f to be initialized at compile-time
-        auto dummy = hpx::actions::lambda_to_action(f);
-        HPX_UNUSED(dummy);
-
-        auto act = hpx::actions::lambda_to_action(
-            []( std::string name,
-                std::size_t images_per_locality,
-                std::size_t num_images,
-                Args... args)
-            {
-                executor_type exec;
-                std::size_t offset = hpx::get_locality_id();
-                offset *= images_per_locality;
-
-                hpx::parallel::executor_traits<
-                    executor_type
-                    >::bulk_execute(
-                        exec,
-                        detail::spmd_block_helper<ftype>{name,num_images},
-                        boost::irange(
-                            offset, offset + images_per_locality),
-                        args...);
-            });
-
-        return
-            hpx::lcos::broadcast(
-                act, hpx::find_all_localities(),
-                    std::forward<std::string>(name), images_per_locality,
-                        num_images, std::forward<Args>(args)...);
-    }
-
-    // Helper for the action version of define_spmd_block()
+    // Helper for define_spmd_block()
     namespace detail
     {
-        // Overload for actions
-        template <typename F, typename ReturnType, typename ... Args>
+        template <typename F, typename ... Args>
         struct spmd_block_helper_action
         {
-            using executor_type =
-                hpx::parallel::execution::parallel_executor;
-
-            static
-            ReturnType call(
+            static void call(
                 std::string name,
                 std::size_t images_per_locality,
                 std::size_t num_images,
                 Args... args)
             {
+                using executor_type =
+                    hpx::parallel::execution::parallel_executor;
+
                 executor_type exec;
                 std::size_t offset = hpx::get_locality_id();
                 offset *= images_per_locality;
@@ -285,33 +265,22 @@ namespace hpx { namespace lcos
         };
     }
 
-    // Overload for actions
     template <typename F, typename ... Args>
-    typename std::enable_if_t<hpx::traits::is_action<F>::value,
-        hpx::future<void> >
+    hpx::future<void>
     define_spmd_block(std::string && name, std::size_t images_per_locality,
         F && f, Args && ... args)
     {
-        using action_type = typename std::decay<F>::type;
-
-        using first_type =
-            typename hpx::lcos::detail::extract_first_parameter<
-                        typename action_type::arguments_type>::type;
-
-        static_assert(std::is_same<spmd_block, first_type>::value,
-            "define_spmd_block() needs an action that " \
-            "has at least a spmd_block as 1st argument");
-
-        using result_type = typename action_type::result_type;
+        using ftype = typename std::decay<F>::type;
 
         using helper_type =
             hpx::lcos::detail::spmd_block_helper_action<
-                action_type, result_type,
-                    typename std::decay<Args>::type... >;
+               ftype, typename std::decay<Args>::type...>;
 
         using helper_action_type =
             typename hpx::actions::make_action<
                 decltype( &helper_type::call ), &helper_type::call >::type;
+
+        hpx::lcos::detail::initialize_if_lambda(f);
 
         helper_action_type act;
 
