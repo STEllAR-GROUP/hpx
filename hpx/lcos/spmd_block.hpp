@@ -6,6 +6,7 @@
 #if !defined(HPX_LCOS_SPMD_BLOCK_HPP)
 #define HPX_LCOS_SPMD_BLOCK_HPP
 
+#include <hpx/include/plain_actions.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
@@ -150,11 +151,35 @@ namespace hpx { namespace lcos
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
-    // Helper for the lambda version of define_spmd_block()
+    // Helpers for bulk_execute() invoked in define_spmd_block()
     namespace detail
     {
+        template <typename F, bool Condition =
+            hpx::traits::is_action<F>::value >
+        struct spmd_block_helper;
+
+        // Overload for actions
         template <typename F>
-        struct spmd_block_helper
+        struct spmd_block_helper<F,true>
+        {
+            std::string name_;
+            std::size_t num_images_;
+
+            template <typename ... Ts>
+            void operator()(std::size_t image_id, Ts && ... ts) const
+            {
+                spmd_block block(name_, num_images_, image_id);
+
+                hpx::async<F>(
+                    hpx::find_here(),
+                    std::move(block),
+                    std::forward<Ts>(ts)...).get();
+            }
+        };
+
+        // Overload for lambdas
+        template <typename F>
+        struct spmd_block_helper<F,false>
         {
             std::string name_;
             std::size_t num_images_;
@@ -227,13 +252,44 @@ namespace hpx { namespace lcos
                         num_images, std::forward<Args>(args)...);
     }
 
+    // Helper for the action version of define_spmd_block()
+    namespace detail
+    {
+        // Overload for actions
+        template <typename F, typename ReturnType, typename ... Args>
+        struct spmd_block_helper_action
+        {
+            using executor_type =
+                hpx::parallel::execution::parallel_executor;
+
+            static
+            ReturnType call(
+                std::string name,
+                std::size_t images_per_locality,
+                std::size_t num_images,
+                Args... args)
+            {
+                executor_type exec;
+                std::size_t offset = hpx::get_locality_id();
+                offset *= images_per_locality;
+
+                hpx::parallel::executor_traits<
+                    executor_type
+                    >::bulk_execute(
+                        exec,
+                        detail::spmd_block_helper<F>{name,num_images},
+                        boost::irange(
+                            offset, offset + images_per_locality),
+                        args...);
+            }
+        };
+    }
+
     // Overload for actions
-    // Note : images_per_locality is fixed to 1 even if a different value is
-    // given by the user.
     template <typename F, typename ... Args>
     typename std::enable_if_t<hpx::traits::is_action<F>::value,
         hpx::future<void> >
-    define_spmd_block(std::string && name, std::size_t,
+    define_spmd_block(std::string && name, std::size_t images_per_locality,
         F && f, Args && ... args)
     {
         using action_type = typename std::decay<F>::type;
@@ -246,14 +302,27 @@ namespace hpx { namespace lcos
             "define_spmd_block() needs an action that " \
             "has at least a spmd_block as 1st argument");
 
-        std::size_t num_images
-            = hpx::get_num_localities(hpx::launch::sync);
+        using result_type = typename action_type::result_type;
 
-        spmd_block block(name, num_images);
+        using helper_type =
+            hpx::lcos::detail::spmd_block_helper_action<
+                action_type, result_type,
+                    typename std::decay<Args>::type... >;
+
+        using helper_action_type =
+            typename hpx::actions::make_action<
+                decltype( &helper_type::call ), &helper_type::call >::type;
+
+        helper_action_type act;
+
+        std::size_t num_images
+            = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
 
         return
-            hpx::lcos::broadcast(f, hpx::find_all_localities(),
-                    std::move(block), std::forward<Args>(args)...);
+            hpx::lcos::broadcast(
+                act, hpx::find_all_localities(),
+                    std::forward<std::string>(name), images_per_locality,
+                        num_images, std::forward<Args>(args)...);
     }
 }}
 

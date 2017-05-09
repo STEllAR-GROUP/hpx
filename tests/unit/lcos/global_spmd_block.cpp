@@ -22,14 +22,14 @@ boost::atomic<std::size_t> c1(0), c2(0);
 void bulk_test_function(hpx::lcos::spmd_block block)
 {
     std::size_t num_images
-        = hpx::get_num_localities(hpx::launch::sync);
+        = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
 
     HPX_TEST_EQ(block.get_num_images(), num_images);
     HPX_TEST_EQ(block.this_image() < num_images, true);
 
-    for(std::size_t i=0, test_count = 1;
+    for(std::size_t i=0, test_count = images_per_locality;
         i<iterations;
-        i++, test_count++)
+        i++, test_count+=images_per_locality)
     {
         ++c2;
         block.sync_all();
