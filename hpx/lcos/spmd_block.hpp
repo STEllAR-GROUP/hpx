@@ -80,10 +80,6 @@ namespace hpx { namespace lcos
     {
         spmd_block(){}
 
-        explicit spmd_block(std::string name, std::size_t num_images)
-        : name_(name), num_images_(num_images), image_id_(hpx::get_locality_id())
-        {}
-
         explicit spmd_block(std::string name, std::size_t num_images,
             std::size_t image_id)
         : name_(name), num_images_(num_images), image_id_(image_id)
@@ -104,25 +100,11 @@ namespace hpx { namespace lcos
 
         void sync_all() const
         {
-            if(!barrier_)
-            {
-                barrier_ =
-                    std::make_shared<hpx::lcos::barrier>(
-                    name_ + "_barrier", num_images_, image_id_);
-            }
-
            barrier_->wait();
         }
 
         hpx::future<void> sync_all(hpx::launch::async_policy const &) const
         {
-            if(!barrier_)
-            {
-                barrier_ =
-                    std::make_shared<hpx::lcos::barrier>(
-                    name_ + "_barrier", num_images_, image_id_);
-            }
-
            return barrier_->wait(hpx::launch::async);
         }
 
@@ -130,25 +112,18 @@ namespace hpx { namespace lcos
         std::string name_;
         std::size_t num_images_;
         std::size_t image_id_;
+
+        // Note : barrier is stored as a pointer because hpx::lcos::barrier
+        // default constructor does not exist (Needed by
+        // spmd_block::spmd_block())
         mutable std::shared_ptr<hpx::lcos::barrier> barrier_;
 
     private:
         friend class hpx::serialization::access;
 
+        // dummy serialization functionality
         template <typename Archive>
-        void save(Archive& ar, unsigned const) const
-        {
-            ar << name_ << num_images_;
-        }
-
-        template <typename Archive>
-        void load(Archive& ar, const unsigned int)
-        {
-            ar >> name_ >> num_images_;
-            image_id_ = hpx::get_locality_id();
-        }
-
-        HPX_SERIALIZATION_SPLIT_MEMBER()
+        void serialize(Archive &, unsigned) {}
     };
 
 
@@ -198,10 +173,10 @@ namespace hpx { namespace lcos
 
                 spmd_block block(name_, num_images_, image_id);
 
-                hpx::async<F>(
+                F()(hpx::launch::sync,
                     hpx::find_here(),
                     std::move(block),
-                    std::forward<Ts>(ts)...).get();
+                    std::forward<Ts>(ts)...);
             }
         };
 
@@ -280,6 +255,7 @@ namespace hpx { namespace lcos
             typename hpx::actions::make_action<
                 decltype( &helper_type::call ), &helper_type::call >::type;
 
+        // Initialize f at compile-time in case when f is a lambda function
         hpx::lcos::detail::initialize_if_lambda(f);
 
         helper_action_type act;
