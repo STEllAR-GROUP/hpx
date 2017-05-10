@@ -1140,13 +1140,10 @@ namespace hpx
                         pu_offset, pu_step, affinity_domain, affinity_desc);
 
                 // Setup all parameters of the resource_partitioner
-                // if it has not been instantiated yet, do so now
-
                 auto &rp = hpx::get_resource_partitioner();
                 rp.set_init_affinity_data(affinity_init);
                 rp.set_default_pool(cfg.num_threads_);
                 rp.set_default_schedulers(cfg.queuing_);
-
 
                 // Initialize the resource_partitioner
                 rp.init();

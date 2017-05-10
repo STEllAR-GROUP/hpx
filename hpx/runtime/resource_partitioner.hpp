@@ -77,19 +77,19 @@ namespace hpx {
     class HPX_EXPORT resource_partitioner{
     public:
 
-        //! constructors
+/*        static resource_partitioner& get_resource_partitioner_(){
+            util::static_<resource::resource_partitioner, std::false_type> rp;
+            return rp.get();
+        }*/
+
+        //! constructor
+        //! users shouldn't use the constructor but rather get_resource_partitioner
         resource_partitioner();
-        resource_partitioner(hpx::threads::policies::init_affinity_data init_affdat, std::size_t num_threads, std::string queueing);
 
-        //! used to make a global accessible pointer. Copied from runtime.hpp
-        // the TSS holds a pointer to the runtime associated with a given OS thread
-        struct tls_tag {};
-        static util::thread_specific_ptr<resource_partitioner*, tls_tag> resource_partitioner_;
-
-        //! additional constructors with a bunch of strings, in case I know my names already
 
         // create a new thread_pool, add it to the RP and return a pointer to it
-        init_pool_data* create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::local_priority_fifo);
+        void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);
+        void create_default_pool(scheduling_policy sched = scheduling_policy::unspecified);
 
         //! called in hpx_init run_or_start
         void set_init_affinity_data(hpx::threads::policies::init_affinity_data init_affdat);
@@ -98,6 +98,7 @@ namespace hpx {
 
         //! setup stuff related to pools
         void add_resource(std::size_t resource, std::string pool_name);
+        void add_resource_to_default(std::size_t resource);
         void set_scheduler(scheduling_policy sched, std::string pool_name);
 
         // called in hpx_init
@@ -112,12 +113,8 @@ namespace hpx {
         threads::topology& get_topology() const;
         threads::policies::init_affinity_data get_init_affinity_data() const;
 
-        static resource_partitioner & create_resource_partitioner();
-/*        static resource_partitioner & get_resource_partitioner();*/
 
     private:
-
-
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -127,9 +124,6 @@ namespace hpx {
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
         init_pool_data* get_pool(std::string pool_name);
-
-        void init_tss();
-/*        void deinit_tss();*/ //! is this even needed ? probs should delete this
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -156,26 +150,12 @@ namespace hpx {
 
     } // namespace resource
 
-    static resource::resource_partitioner & get_resource_partitioner();
-    resource::resource_partitioner & get_resource_partitioner()
+    static resource::resource_partitioner & get_resource_partitioner()
     {
-        return resource::resource_partitioner::create_resource_partitioner();
-/*
-        resource::resource_partitioner::
-        if(hpx::get_runtime_ptr() == nullptr){
-            //! if the runtime has not yet been instantiated
-            resource::resource_partitioner** rp = resource::resource_partitioner::resource_partitioner_.get();
-            return rp ? *rp : nullptr;
-        } else {
-            //! if the runtime already has been instantiated
-            return hpx::get_runtime_ptr()->get_resource_partitioner_ptr_();
-        }
-        */
-
+        util::static_<resource::resource_partitioner, std::false_type> rp;
+        return rp.get();
+        //return resource::resource_partitioner::get_resource_partitioner_();
     }
-
-
-    HPX_API_EXPORT resource::resource_partitioner* get_resource_partitioner_ptr();
 
 } // namespace hpx
 

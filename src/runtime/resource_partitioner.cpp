@@ -51,48 +51,12 @@ namespace hpx { namespace resource {
     ////////////////////////////////////////////////////////////////////////
 
     resource_partitioner::resource_partitioner()
-        : topology_(threads::create_topology())
-          /*affinity_data_(static_cast<std::size_t>(0)) //! to be changed!!!*/
+            : topology_(threads::create_topology())
     {
-
-
-
-        // initialize our TSS
-        resource_partitioner::init_tss();
-
         // allow only one resource_partitioner instance
         if(instance_number_counter_++ >= 0){
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
         }
-    }
-
-    // Constructor called from hpx_init in int run_or_start(...)
-    // if the resource partitioner has not been instantiated by the user in int main()
-    resource_partitioner::resource_partitioner(
-            hpx::threads::policies::init_affinity_data init_affdat,
-            std::size_t num_threads, std::string queueing
-    )
-            : topology_(threads::create_topology()), //! this thing doesn't work but I don't know why ... :(
-              init_affinity_data_(init_affdat)
-    {
-        // initialize our TSS
-        resource_partitioner::init_tss();
-
-        // allow only one resource_partitioner instance
-        if(instance_number_counter_++ >= 0){
-            throw std::runtime_error("Cannot instantiate more than one resource partitioner");
-        }
-
-        set_default_pool(num_threads); //! give it default argument specifying the scheduler for the default pool
-
-    }
-
-    // if resource partitioner has not been instantiated yet, it simply returns a nullptr
-    resource_partitioner & resource_partitioner::create_resource_partitioner() {
-        util::static_<
-                resource_partitioner, std::false_type
-        > rp;
-        return rp.get();
     }
 
     void resource_partitioner::set_init_affinity_data(hpx::threads::policies::init_affinity_data init_affdat){
@@ -104,7 +68,6 @@ namespace hpx { namespace resource {
         //! In this case, do nothing
         //! take all non-assigned resources and throw them in a regular default pool
         //! Ugh, how exactly should this interact with num_threads_ specified in cmd line??
-
     }
 
     void resource_partitioner::set_default_schedulers(std::string queueing){
@@ -162,8 +125,7 @@ namespace hpx { namespace resource {
     }
 
 
-
-        // create a new thread_pool, add it to the RP and return a pointer to it
+    // create a new thread_pool, add it to the RP and return a pointer to it
     init_pool_data* resource_partitioner::create_thread_pool(std::string name, scheduling_policy sched)
     {
         if(name.empty())
@@ -173,9 +135,16 @@ namespace hpx { namespace resource {
         init_pool_data* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);
         return ret;
     }
+    init_pool_data* resource_partitioner::create_default_pool(scheduling_policy sched = scheduling_policy::unspecified) {
+        create_thread_pool("default", sched);
+    }
+
 
     void resource_partitioner::add_resource(std::size_t resource, std::string pool_name){
         get_pool(pool_name)->add_resource(resource);
+    }
+    void resource_partitioner::add_resource_to_default(std::size_t resource){
+        add_resource(resource, "default");
     }
 
     void resource_partitioner::set_scheduler(scheduling_policy sched, std::string pool_name){
@@ -183,7 +152,13 @@ namespace hpx { namespace resource {
     }
 
     void resource_partitioner::init(){
+
         //! what do I actually need to do?
+
+        //! en gros:
+
+        //! if nothing else, than just take all previous little setups and stick them here
+
     }
 
 
@@ -196,33 +171,6 @@ namespace hpx { namespace resource {
     { //! should this return a pointer instead of a copy?
         return init_affinity_data_;
     }
-
-
-
-
-        ////////////////////////////////////////////////////////////////////////
-
-    util::thread_specific_ptr<resource_partitioner*, resource_partitioner::tls_tag> resource_partitioner::resource_partitioner_;
-
-    void resource_partitioner::init_tss()
-    {
-        // initialize our TSS
-        if (nullptr == resource_partitioner::resource_partitioner_.get())
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
-            resource_partitioner::resource_partitioner_.reset(new resource_partitioner* (this));
-            //!threads::thread_self::init_self();//!
-        }
-    }
-
-    //! never called ... ?!?
-/*    void resource_partitioner::deinit_tss()
-    {
-        // reset our TSS
-        threads::thread_self::reset_self();
-        util::reset_held_lock_data();
-        threads::reset_continuation_recursion_count();
-    }*/
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -261,26 +209,6 @@ namespace hpx { namespace resource {
 
     boost::atomic<int> resource_partitioner::instance_number_counter_(-1);
 
-
     } // namespace resource
-
-    // if resource partitioner has not been instantiated yet, it simply returns a nullptr
-    /*
-    resource::resource_partitioner & get_resource_partitioner()
-    {
-        return resource::resource_partitioner::create_resource_partitioner();
-
-        resource::resource_partitioner::
-        if(hpx::get_runtime_ptr() == nullptr){
-            //! if the runtime has not yet been instantiated
-            resource::resource_partitioner** rp = resource::resource_partitioner::resource_partitioner_.get();
-            return rp ? *rp : nullptr;
-        } else {
-            //! if the runtime already has been instantiated
-            return hpx::get_runtime_ptr()->get_resource_partitioner_ptr();
-        }
-
-
-    }*/
 
 } // namespace hpx
