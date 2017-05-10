@@ -230,7 +230,7 @@ namespace libfabric
                 locality new_locality;
                 std::copy(binary_t(encoded_data),
                           binary_t(encoded_data + encoded_length),
-                          (char*)(new_locality.fabric_data()));
+                          (new_locality.fabric_data_writable()));
 
                 // insert locality into address vector
                 LOG_DEBUG_MSG("Calling insert_address for " << decnumber(i)
@@ -720,11 +720,11 @@ namespace libfabric
                 int err_sz = fi_cq_readerr(txcq_, &e ,0);
                 // flags might not be set correctly
                 if (e.flags == (FI_MSG | FI_SEND)) {
-                    LOG_ERROR_MSG("txcq Error for FI_SEND with len " << e.len
+                    LOG_ERROR_MSG("txcq Error for FI_SEND with len " << hexlength(e.len)
                         << "context " << hexpointer(e.op_context));
                 }
                 if (e.flags & FI_RMA) {
-                    LOG_ERROR_MSG("txcq Error for FI_RMA with len " << e.len
+                    LOG_ERROR_MSG("txcq Error for FI_RMA with len " << hexlength(e.len)
                         << "context " << hexpointer(e.op_context));
                 }
                 rma_base *base = reinterpret_cast<rma_base*>(e.op_context);
@@ -788,7 +788,8 @@ namespace libfabric
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(rxcq_, &e ,0);
-                LOG_ERROR_MSG("rxcq Error with flags " << e.flags << " len " << e.len);
+                LOG_ERROR_MSG("rxcq Error with flags " << hexlength(e.flags)
+                    << "len " << hexlength(e.len));
             }
             else {
                 LOG_ERROR_MSG("unknown error in completion rxcq read");
