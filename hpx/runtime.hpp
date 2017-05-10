@@ -86,9 +86,7 @@ namespace hpx
             std::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(
-            util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init);
+        runtime(util::runtime_configuration & rtcfg);
 
         virtual ~runtime();
 

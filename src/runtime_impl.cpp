@@ -131,9 +131,8 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::runtime_impl(
             util::runtime_configuration & rtcfg,
             runtime_mode locality_mode, std::size_t num_threads,
-            init_scheduler_type const& init,
-            threads::policies::init_affinity_data const& init_affinity)
-      : runtime(rtcfg, init_affinity),
+            init_scheduler_type const& init)
+      : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
             util::bind(&runtime_impl::init_tss, This(), "main-thread",

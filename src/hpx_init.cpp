@@ -759,8 +759,6 @@ namespace hpx
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
             std::size_t numa_sensitive =
@@ -772,16 +770,13 @@ namespace hpx
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, 1000, numa_sensitive,
                 "core-local_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             LPROGRESS_ << "run_local: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             return run_or_start(blocking, std::move(rt), cfg,
                 std::move(startup), std::move(shutdown));
@@ -806,9 +801,7 @@ namespace hpx
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
             std::size_t num_high_priority_queues =
-                get_num_high_priority_queues(cfg);
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
+                get_num_high_priority_queues(cfg);          //! take out the stuff I don't actually use!
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
             std::size_t numa_sensitive =
@@ -821,16 +814,13 @@ namespace hpx
                 cfg.num_threads_, num_high_priority_queues,
                 1000, numa_sensitive,
                 "core-static_priority_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             LPROGRESS_ << "run_static_priority: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             return run_or_start(blocking, std::move(rt), cfg,
                 std::move(startup), std::move(shutdown));
@@ -854,8 +844,6 @@ namespace hpx
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
             std::size_t numa_sensitive =
@@ -867,16 +855,13 @@ namespace hpx
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, 1000, numa_sensitive,
                 "core-static_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             LPROGRESS_ << "run_static: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             return run_or_start(blocking, std::move(rt), cfg,
                 std::move(startup), std::move(shutdown));
@@ -896,16 +881,14 @@ namespace hpx
             shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
+            ensure_hierarchy_arity_compatibility(cfg.vm_);      //! take out the stuff I don't actually use!
 
             std::size_t num_high_priority_queues =
                 get_num_high_priority_queues(cfg);
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
             std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
+                    get_affinity_description(cfg, affinity_desc);
+
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler<
@@ -915,16 +898,13 @@ namespace hpx
             typename local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
                 numa_sensitive, "core-local_priority_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             LPROGRESS_ << "run_priority_local: create runtime";
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             return run_or_start(blocking, std::move(rt), cfg,
                 std::move(startup), std::move(shutdown));
@@ -941,7 +921,7 @@ namespace hpx
             ensure_hierarchy_arity_compatibility(cfg.vm_);
             ensure_hwloc_compatibility(cfg.vm_);
 
-            std::size_t num_high_priority_queues =
+            std::size_t num_high_priority_queues =      //! take out the stuff I don't actually use!
                 get_num_high_priority_queues(cfg);
 
             // scheduling policy
@@ -978,7 +958,7 @@ namespace hpx
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_high_priority_compatibility(cfg.vm_);            //! take out the stuff I don't actually use!
             ensure_numa_sensitivity_compatibility(cfg.vm_);
             ensure_hwloc_compatibility(cfg.vm_);
 
@@ -1016,7 +996,7 @@ namespace hpx
             util::command_line_handling& cfg, bool blocking)
         {
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
+            ensure_hierarchy_arity_compatibility(cfg.vm_);      //! take out the stuff I don't actually use!
             ensure_hwloc_compatibility(cfg.vm_);
 
             std::size_t num_high_priority_queues =
@@ -1149,6 +1129,27 @@ namespace hpx
                         result = 0;     // --hpx:help
                     return result;
                 }
+
+                // Setup the initial affinity data
+                std::size_t pu_offset = get_pu_offset(cfg);
+                std::size_t pu_step = get_pu_step(cfg);
+                std::string affinity_domain = get_affinity_domain(cfg);
+                std::string affinity_desc;
+                std::size_t numa_sensitive = get_affinity_description(cfg, affinity_desc);
+                threads::policies::init_affinity_data affinity_init(
+                        pu_offset, pu_step, affinity_domain, affinity_desc);
+
+                // Setup all parameters of the resource_partitioner
+                // if it has not been instantiated yet, do so now
+
+                auto &rp = hpx::get_resource_partitioner();
+                rp.set_init_affinity_data(affinity_init);
+                rp.set_default_pool(cfg.num_threads_);
+                rp.set_default_schedulers(cfg.queuing_);
+
+
+                // Initialize the resource_partitioner
+                rp.init();
 
                 // initialize logging
                 util::detail::init_logging(cfg.rtcfg_,

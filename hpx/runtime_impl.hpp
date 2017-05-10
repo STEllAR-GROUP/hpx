@@ -74,9 +74,7 @@ namespace hpx
         explicit runtime_impl(util::runtime_configuration & rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1,
-            init_scheduler_type const& init = init_scheduler_type(),
-            threads::policies::init_affinity_data const& affinity_init =
-                threads::policies::init_affinity_data());
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.

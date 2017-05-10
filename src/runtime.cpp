@@ -231,13 +231,12 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init)
+    runtime::runtime(util::runtime_configuration & rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        resource_partitioner_(get_resource_partitioner_ptr()),
-        affinity_init_(affinity_init),
+        resource_partitioner_(&get_resource_partitioner()),
+        affinity_init_(resource_partitioner_->get_init_affinity_data()),
         topology_(resource_partitioner_->get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
