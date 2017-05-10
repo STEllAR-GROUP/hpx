@@ -11,7 +11,7 @@ namespace hpx { namespace resource {
 
     ////////////////////////////////////////////////////////////////////////
 
-    initial_thread_pool::initial_thread_pool(std::string name, scheduling_policy sched)
+    init_pool_data::init_pool_data(std::string name, scheduling_policy sched)
         : pool_name_(name),
           scheduling_policy_(sched)
     {
@@ -19,20 +19,20 @@ namespace hpx { namespace resource {
         throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
     };
 
-    std::string initial_thread_pool::get_name() const {
+    std::string init_pool_data::get_name() const {
         return pool_name_;
     }
 
-    std::size_t initial_thread_pool::get_number_pus() const {
+    std::size_t init_pool_data::get_number_pus() const {
         return my_pus_.size();
     }
 
-    std::vector<size_t> initial_thread_pool::get_pus() const {
+    std::vector<size_t> init_pool_data::get_pus() const {
         return my_pus_;
     }
 
     // mechanism for adding resources
-    void initial_thread_pool::add_resource(std::size_t pu_number){
+    void init_pool_data::add_resource(std::size_t pu_number){
         my_pus_.push_back(pu_number);
 
         //! throw exception if resource does not exist
@@ -40,7 +40,7 @@ namespace hpx { namespace resource {
 
     }
 
-    void initial_thread_pool::set_scheduler(scheduling_policy sched){
+    void init_pool_data::set_scheduler(scheduling_policy sched){
         scheduling_policy_ = sched;
     }
 
@@ -48,6 +48,7 @@ namespace hpx { namespace resource {
 
     resource_partitioner::resource_partitioner()
         : topology_(threads::create_topology())
+          /*affinity_data_(static_cast<std::size_t>(0)) //! to be changed!!!*/
     {
         // initialize our TSS
         resource_partitioner::init_tss();
@@ -56,19 +57,16 @@ namespace hpx { namespace resource {
         if(instance_number_counter_++ >= 0){
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
         }
-
-        // set pointer to self
-        resource_partitioner_ptr = this;
     }
 
     // create a new thread_pool, add it to the RP and return a pointer to it
-    initial_thread_pool* resource_partitioner::create_thread_pool(std::string name, scheduling_policy sched)
+    init_pool_data* resource_partitioner::create_thread_pool(std::string name, scheduling_policy sched)
     {
         if(name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
 
-        initial_thread_pools_.push_back(initial_thread_pool(name, sched));
-        initial_thread_pool* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);
+        initial_thread_pools_.push_back(init_pool_data(name, sched));
+        init_pool_data* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);
         return ret;
     }
 
@@ -133,14 +131,14 @@ namespace hpx { namespace resource {
 
     // has to be private bc pointers become invalid after data member thread_pools_ is resized
     // we don't want to allow the user to use it
-    initial_thread_pool* resource_partitioner::get_pool(std::string pool_name){
+    init_pool_data* resource_partitioner::get_pool(std::string pool_name){
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
-                [&pool_name](initial_thread_pool itp) -> bool {return (itp.get_name() == pool_name);}
+                [&pool_name](init_pool_data itp) -> bool {return (itp.get_name() == pool_name);}
         );
 
         if(pool != initial_thread_pools_.end()){
-            initial_thread_pool* ret(&(*pool)); //! ugly
+            init_pool_data* ret(&(*pool)); //! ugly
             return ret;
         }
 
@@ -151,8 +149,6 @@ namespace hpx { namespace resource {
     ////////////////////////////////////////////////////////////////////////
 
     boost::atomic<int> resource_partitioner::instance_number_counter_(-1);
-
-    resource_partitioner* resource_partitioner::resource_partitioner_ptr(nullptr); //! I don't need this anymore, do I?
 
     } // namespace resource
 

@@ -9,7 +9,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
-//! #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 
@@ -39,10 +39,10 @@ namespace hpx { namespace resource {
 
     // structure used to encapsulate all characteristics of thread_pools
     // as specified by the user in int main()
-    class initial_thread_pool{
+    class init_pool_data {
     public:
 
-        initial_thread_pool(std::string name, scheduling_policy = scheduling_policy::local_priority_fifo);
+        init_pool_data(std::string name, scheduling_policy = scheduling_policy::local_priority_fifo);
 
         //! another constructor with size param in case the user already knows at cstrction how many resources will be allocated?
         //! this constructor would call "reserve" on data member and be a little more mem-efficient
@@ -82,7 +82,7 @@ namespace hpx { namespace resource {
         //! additional constructors with a bunch of strings, in case I know my names already
 
         // create a new thread_pool, add it to the RP and return a pointer to it
-        initial_thread_pool* create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::local_priority_fifo);
+        init_pool_data* create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::local_priority_fifo);
 
         void add_resource(std::size_t resource, std::string pool_name);
         void set_scheduler(scheduling_policy sched, std::string pool_name);
@@ -104,7 +104,7 @@ namespace hpx { namespace resource {
 
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
-        initial_thread_pool* get_pool(std::string pool_name);
+        init_pool_data* get_pool(std::string pool_name);
 
         void init_tss();
 /*        void deinit_tss();*/ //! is this even needed ? probs should delete this
@@ -114,25 +114,20 @@ namespace hpx { namespace resource {
         // counter for instance numbers
         static boost::atomic<int> instance_number_counter_;
 
-        // pointer to global unique instance of resource_partitioner
-        static resource_partitioner* resource_partitioner_ptr;
-
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
-        std::vector<initial_thread_pool> initial_thread_pools_;
+        std::vector<init_pool_data> initial_thread_pools_;
 
         // actual thread pools of OS-threads
 //        std::vector<threads::detail::thread_pool> thread_pools_; //! template param needed? owned via thread_manager? Different data structure?
-
-        // list of schedulers or is it enough if they're owned by thread_pool?
 
         // reference to the topology
         threads::hwloc_topology_info& topology_;
 
         // reference to affinity data
         //! I'll probably have to take this away from runtime
-        //! hpx::threads::policies::init_affinity_data init_affinity_data_;
-        //! hpx::threads::policies::affinity_data affinity_data_;
+        hpx::threads::policies::init_affinity_data init_affinity_data_;
+        hpx::threads::policies::detail::affinity_data affinity_data_;
 
     };
 

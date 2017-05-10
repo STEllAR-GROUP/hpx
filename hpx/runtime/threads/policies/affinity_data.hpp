@@ -13,11 +13,19 @@
 #include <string>
 #include <vector>
 
+namespace hpx { namespace resource {
+        class resource_partitioner;
+    }
+}
+
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
     struct init_affinity_data
     {
+
+        friend resource::resource_partitioner;
+
         init_affinity_data(std::size_t pu_offset = std::size_t(-1),
                 std::size_t pu_step = 1, std::string const& affinity = "pu",
                 std::string const& affinity_desc = "")
@@ -52,7 +60,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     // for the shepherd threads of this instance
     struct affinity_data
     {
-        affinity_data(std::size_t num_threads);
+
+        friend resource::resource_partitioner;
+
+        affinity_data(std::size_t num_threads = 0); //! to be changed!!!! well ... that's actually not such a bad solution
 
         std::size_t init(init_affinity_data const& data,
                 topology const& toplogy);
