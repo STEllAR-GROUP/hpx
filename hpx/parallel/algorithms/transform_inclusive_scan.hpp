@@ -278,6 +278,49 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \a transform_inclusive_scan may be non-deterministic.
     ///
     template <typename ExPolicy, typename InIter, typename OutIter,
+        typename Op, typename Conv, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<OutIter>::value &&
+        hpx::traits::is_callable<
+                Conv(typename std::iterator_traits<InIter>::value_type)
+            >::value &&
+        hpx::traits::is_callable<
+            Op(typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type,
+                typename hpx::util::result_of<
+                    Conv(typename std::iterator_traits<InIter>::value_type)
+                >::type)
+            >::value)>
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    transform_inclusive_scan(ExPolicy && policy, InIter first, InIter last,
+        OutIter dest, Op && op, Conv && conv, T init)
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<InIter>::value),
+            "Requires at least input iterator.");
+        static_assert(
+            (hpx::traits::is_output_iterator<OutIter>::value ||
+                hpx::traits::is_input_iterator<OutIter>::value),
+            "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                is_sequential_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
+
+        return detail::transform_inclusive_scan<OutIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, dest, std::forward<Conv>(conv), std::move(init),
+            std::forward<Op>(op));
+    }
+
+#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+    /// \cond NOINTERNAL
+    template <typename ExPolicy, typename InIter, typename OutIter,
         typename T, typename Op, typename Conv,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
@@ -318,8 +361,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<Op>(op));
     }
 
-#if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
-    /// \cond NOINTERNAL
     template <typename ExPolicy, typename InIter, typename OutIter,
         typename T, typename Op, typename Conv,
     HPX_CONCEPT_REQUIRES_(
