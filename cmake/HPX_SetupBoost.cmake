@@ -52,7 +52,7 @@ hpx_option(
   "Use Boost.Context as the underlying coroutines context switch implementation."
   ${__use_generic_coroutine_context} ADVANCED)
 
-if(HPX_WITH_GENERIC_CONTEXT_COROUTINE)
+if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   set(__boost_libraries ${__boost_libraries} context)
   # if context is needed, we should still link with boost thread and chrono
   if(NOT __boost_need_thread)
