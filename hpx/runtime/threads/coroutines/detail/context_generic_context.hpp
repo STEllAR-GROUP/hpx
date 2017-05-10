@@ -40,6 +40,10 @@
 #include <boost/context/detail/fcontext.hpp>
 #endif
 
+#if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
+#include <boost/throw_exception.hpp>
+#endif
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -105,7 +109,6 @@ namespace hpx { namespace threads { namespace coroutines
 #else
                 void* limit = std::calloc(size, sizeof(char));
                 if (!limit) boost::throw_exception(std::bad_alloc());
-
 #endif
                 return static_cast<char*>(limit) + size;
             }
