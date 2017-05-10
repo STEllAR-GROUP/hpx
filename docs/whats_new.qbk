@@ -21,6 +21,16 @@ particular order):
   available and to fall back to the corresponding Boost facilities otherwise.
   The cmake configuration option `-DHPX_WITH_THREAD_COMPATIBILITY=On` can be
   used to force using the Boost equivalents.
+* The parameter sequence for the `hpx::parallel::transform_inclusive_scan` overload
+  taking one iterator range has changed (again) to match the changes this algorithm
+  has undergone while being moved to C++17. The old overloads can be still enabled
+  at configure time by specifying `-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On`
+  to __cmake__.
+* The parameter sequence for the `hpx::parallel::inclusive_scan` overload
+  taking one iterator range has changed to match the changes this algorithm
+  has undergone while being moved to C++17. The old overloads can be still enabled
+  at configure time by specifying `-DHPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY=On`
+  to __cmake__.
 
 [heading Breaking Changes]
 
