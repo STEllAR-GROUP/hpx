@@ -26,7 +26,7 @@ work, but we do not test __hpx__ with other platforms, so please be warned.
 In the simplest case, __hpx__ depends on one set of libraries: __boost__. So,
 before you read further, please make sure you have a recent version of
 __boost__ installed on your target machine. __hpx__ currently requires at least
-Boost V1.50.0 to work properly. It may build and run with older versions, but
+Boost V1.51.0 to work properly. It may build and run with older versions, but
 we do not test __hpx__ with those versions, so please be warned.
 
 Installing the Boost libraries is described in detail in Boost's own
@@ -70,7 +70,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
 ]
 
 [important When compiling __hpx__ using clang/libc++ on OSX platform it is advised not
-        to use Boost V1.58 and V1.60.]
+        to use Boost V1.58 or V1.60.]
 
 [important When compiling with the Intel Compiler on Linux systems, we only support
   C++ Standard Libraries provided by gcc 4.8 and upwards. If the 'g++' in your
