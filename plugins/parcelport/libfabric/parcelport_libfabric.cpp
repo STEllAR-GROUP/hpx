@@ -180,6 +180,7 @@ namespace libfabric
                 {
                     --senders_in_use_;
                     senders_.push(s);
+                    trigger_pending_work();
                 };
            senders_.push(snd);
         }

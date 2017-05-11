@@ -544,61 +544,45 @@ namespace hpx { namespace parcelset
             std::uint64_t addr;
             error_code ec;
             // First try to get a connection ...
-            connection *sender = nullptr;
-
-            std::size_t k = 0;
-            while (true)
-            {
-                sender = this_.connection_handler().get_connection(dest_, addr);
-                if (sender != nullptr)
-                    break;
-                if (k == 4096)
-                    break;
-                hpx::util::detail::yield_k(k, "parcelport_impl::send_immediate_impl");
-                ++k;
-            }
+            connection *sender = this_.connection_handler().get_connection(dest_, addr);
 
             // If we couldn't get one ... enqueue the parcel and move on
-            if (sender == nullptr)
+            std::size_t encoded_parcels = 0;
+            if (sender != nullptr)
             {
-                for (std::size_t i = 0; i != num_parcels; ++i)
+                auto encoded_buffer = sender->get_new_buffer();
+                // encode the parcels
+                encoded_parcels = encode_parcels(this_, ps, num_parcels,
+                    encoded_buffer,
+                    this_.archive_flags_,
+                    this_.get_max_outbound_message_size());
+
+                typedef detail::call_for_each handler_type;
+
+                if (sender->parcelport_->async_write(
+                    handler_type(
+                        handler_type::handlers_type(
+                            std::make_move_iterator(fs),
+                            std::make_move_iterator(fs + encoded_parcels)),
+                        handler_type::parcels_type(
+                            std::make_move_iterator(ps),
+                            std::make_move_iterator(ps + encoded_parcels))
+                    ),
+                    sender, addr,
+                    encoded_buffer))
                 {
-                    parcel &p = ps[i];
-                    write_handler_type &f_ = fs[i];
-                    enqueue_parcel(dest_, std::move(p), std::move(f_));
+                    // we don't propagate errors for now
                 }
-                return;
             }
-
-            auto encoded_buffer = sender->get_new_buffer();
-            // encode the parcels
-            std::size_t encoded_parcels = encode_parcels(this_, ps, num_parcels,
-                encoded_buffer,
-                this_.archive_flags_,
-                this_.get_max_outbound_message_size());
-
-            typedef detail::call_for_each handler_type;
-
-            if (sender->parcelport_->async_write(
-                handler_type(
-                    handler_type::handlers_type(
-                        std::make_move_iterator(fs),
-                        std::make_move_iterator(fs + encoded_parcels)),
-                    handler_type::parcels_type(
-                        std::make_move_iterator(ps),
-                        std::make_move_iterator(ps + encoded_parcels))
-                ),
-                sender, addr,
-                encoded_buffer))
+            if (num_parcels != encoded_parcels)
             {
-                // we don't propagate errors for now
-            }
-
-            for (std::size_t i = encoded_parcels; i != num_parcels; ++i)
-            {
-                parcel &p = ps[i];
-                write_handler_type &f_ = fs[i];
-                enqueue_parcel(dest_, std::move(p), std::move(f_));
+                std::vector<parcel> parcels(
+                    std::make_move_iterator(ps + encoded_parcels),
+                    std::make_move_iterator(ps + num_parcels));
+                std::vector<write_handler_type> handlers(
+                    std::make_move_iterator(fs + encoded_parcels),
+                    std::make_move_iterator(fs + num_parcels));
+                enqueue_parcels(dest_, std::move(parcels), std::move(handlers));
             }
         }
 
@@ -821,7 +805,7 @@ namespace hpx { namespace parcelset
             }
             return false;
         }
-    private:
+
         bool trigger_pending_work()
         {
             if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
@@ -854,7 +838,7 @@ namespace hpx { namespace parcelset
             return true;
         }
 
-
+    private:
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
             locality const& locality_id, bool background = false)
