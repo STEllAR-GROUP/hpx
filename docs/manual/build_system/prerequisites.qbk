@@ -63,7 +63,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][3.1              ][2.8.10           ]]
 
     [[[*Required Libraries]]]
-    [[__boost_libraries__        ][1.57.0 or newer    ][1.50.0          ]
+    [[__boost_libraries__        ][1.57.0 or newer    ][1.51.0          ]
         [See below for an important limitation when using Boost V1.54.0.]]
     [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]
         [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
@@ -89,10 +89,10 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__visual_cxx__ (x64)       ][2013               ][2013            ]]
 
     [[[*Build System]]]
-    [[__cmake__                  ][3.1              ][2.8.10           ]]
+    [[__cmake__                  ][3.1                ][2.8.10           ]]
 
     [[[*Required Libraries]]]
-    [[__boost__                  ][1.57.0 or newer    ][1.49.0          ]
+    [[__boost__                  ][1.57.0 or newer    ][1.51.0          ]
      [See below for an important limitation when using Boost V1.55.0.]]
     [[__hwloc__                  ][1.10                ][1.5             ]
         [Used for OS-thread pinning and NUMA awareness.]]

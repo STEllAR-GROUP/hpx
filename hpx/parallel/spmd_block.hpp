@@ -110,8 +110,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     // Asynchronous version
     template <typename ExPolicy, typename F, typename ... Args,
-        typename = std::enable_if_t<
-            hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>
+        typename = typename std::enable_if<
+            hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
         >
     std::vector<hpx::future<void>>
     define_spmd_block(ExPolicy && policy,
@@ -150,8 +150,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     // Synchronous version
     template <typename ExPolicy, typename F, typename ... Args,
-        typename = std::enable_if_t<
-            !hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>
+        typename = typename std::enable_if<
+            !hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
         >
     void
     define_spmd_block(ExPolicy && policy,

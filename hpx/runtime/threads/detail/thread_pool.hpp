@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
@@ -23,7 +24,6 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/barrier.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -167,7 +167,7 @@ namespace hpx { namespace threads { namespace detail
         void deinit_tss();
 
         void thread_func(std::size_t num_thread, topology const& topology,
-            boost::barrier& startup);
+            compat::barrier& startup);
 
     private:
         // this thread manager has exactly as many OS-threads as requested
@@ -179,7 +179,7 @@ namespace hpx { namespace threads { namespace detail
         std::string pool_name_;
 
         // startup barrier
-        boost::scoped_ptr<boost::barrier> startup_;
+        boost::scoped_ptr<compat::barrier> startup_;
 
         // count number of executed HPX-threads and thread phases (invocations)
         std::vector<std::int64_t> executed_threads_;

@@ -82,9 +82,6 @@ namespace hpx { namespace parallel { namespace execution
         {
             static T const value;
         };
-
-        template <typename T>
-        T const static_const<T>::value = T{};
     }
     /// \endcond
 

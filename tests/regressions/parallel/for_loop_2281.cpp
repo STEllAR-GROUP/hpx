@@ -30,6 +30,18 @@ int hpx_main()
 
     HPX_TEST(thread_ids.size() > std::size_t(1));
 
+    thread_ids.clear();
+
+    hpx::parallel::for_loop_n(
+        hpx::parallel::execution::par, 0, 100,
+        [&](int i)
+        {
+            std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
+            thread_ids.insert(hpx::this_thread::get_id());
+        });
+
+    HPX_TEST(thread_ids.size() > std::size_t(1));
+
     return hpx::finalize();
 }
 

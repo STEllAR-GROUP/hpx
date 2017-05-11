@@ -6,7 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_ERROR_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_RDMA_ERROR_HPP
 
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <stdexcept>
 #include <string>

@@ -10,6 +10,7 @@ set(parcelport_plugins)
 
 if(HPX_WITH_NETWORKING)
   set(parcelport_plugins ${parcelport_plugins}
+    libfabric
     verbs
     mpi
     tcp)
@@ -93,6 +94,7 @@ macro(add_static_parcelports)
     add_parcelport_tcp_module()
     add_parcelport_mpi_module()
     add_parcelport_verbs_module()
+    add_parcelport_libfabric_module()
   endif()
 endmacro()
 
@@ -114,3 +116,20 @@ macro(add_parcelport_modules)
                  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
                  @ONLY)
 endmacro()
+
+#------------------------------------------------------------------------------
+# Write parcelport_defines.hpp
+#------------------------------------------------------------------------------
+# write config to build dir
+write_config_defines_file(
+  TEMPLATE ""
+  NAMESPACE "parcelport"
+  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/parcelport_defines.hpp")
+
+# write config to install dir
+write_config_defines_file(
+  TEMPLATE ""
+  NAMESPACE "parcelport"
+  FILENAME
+  "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_defines.hpp")
+

@@ -317,7 +317,7 @@ namespace hpx { namespace threads { namespace detail
             0,
             thread_priority_critical,
             num_thread,
-            std::size_t(-1),
+            get_stack_size(thread_stacksize_large),
             &scheduler);
 
         // Create in suspended to prevent the thread from being scheduled

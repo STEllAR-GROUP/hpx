@@ -5,6 +5,7 @@
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
@@ -31,7 +32,6 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/thread/barrier.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -390,7 +390,7 @@ namespace hpx { namespace threads { namespace detail
         try {
             HPX_ASSERT(startup_.get() == nullptr);
             startup_.reset(
-                new boost::barrier(static_cast<unsigned>(num_threads+1))
+                new compat::barrier(static_cast<unsigned>(num_threads+1))
             );
 
             // run threads and wait for initialization to complete
@@ -457,8 +457,8 @@ namespace hpx { namespace threads { namespace detail
             // trigger the barrier
             if (startup_.get() != nullptr)
             {
-                while (num_threads-- != 0 && !startup_->wait())
-                    ;
+                while (num_threads-- != 0)
+                    startup_->wait();
             }
 
             stop(l);
@@ -560,7 +560,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::thread_func(std::size_t num_thread,
-        topology const& topology, boost::barrier& startup)
+        topology const& topology, compat::barrier& startup)
     {
         // Set the affinity for the current thread.
         threads::mask_cref_type mask =

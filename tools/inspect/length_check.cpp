@@ -97,7 +97,6 @@ namespace boost
             while (p < someline.size())
             {
                 currline++;
-                std::size_t rend = someline[p].find_last_of("\r");
                 bool check_not = false;
                 boost::regex error_note, http_note;
 

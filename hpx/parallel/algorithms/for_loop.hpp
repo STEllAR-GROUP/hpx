@@ -252,7 +252,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             }
 
             // the for_loop should be executed sequentially either if the
-            // execution policy enforces sequential execution of if the
+            // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
                     execution::is_sequential_execution_policy<ExPolicy>::value ||
@@ -289,9 +289,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
+            // the for_loop_n should be executed sequentially either if the
+            // execution policy enforces sequential execution or if the
+            // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
                     execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<B>::value
+                    (!std::is_integral<B>::value &&
+                     !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);

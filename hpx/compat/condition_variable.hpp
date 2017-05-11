@@ -7,6 +7,9 @@
 // hpxinspect:nodeprecatedinclude:boost/thread/locks.hpp
 // hpxinspect:nodeprecatedname:boost::chrono
 // hpxinspect:nodeprecatedname:boost::unique_lock
+// hpxinspect:nodeprecatedname:boost::cv_status
+// hpxinspect:nodeprecatedname:boost::condition_variable
+// hpxinspect:nodeprecatedname:boost::mutex
 
 #ifndef HPX_COMPAT_CONDITION_VARIABLE_HPP
 #define HPX_COMPAT_CONDITION_VARIABLE_HPP
