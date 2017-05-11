@@ -6,7 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_PROTECTION_DOMAIN
 #define HPX_PARCELSET_POLICIES_VERBS_PROTECTION_DOMAIN
 
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 //
 #include <infiniband/verbs.h>

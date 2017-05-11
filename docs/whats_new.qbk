@@ -13,12 +13,24 @@
 
 [heading General Changes]
 
+Here are some of the main highlights and changes for this release (in no
+particular order):
+
+* Added a compatibility layer for `std::thread`, `std::mutex`, and
+  `std::condition_variable` allowing for the code to use those facilities where
+  available and to fall back to the corresponding Boost facilities otherwise.
+  The cmake configuration option `-DHPX_WITH_THREAD_COMPATIBILITY=On` can be
+  used to force using the Boost equivalents.
+
 [heading Breaking Changes]
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2599] - Compatibility layer for threading support
+* [pr    2598] - V1.1
+* [pr    2597] - Release V1.0
 
 [endsect]
 

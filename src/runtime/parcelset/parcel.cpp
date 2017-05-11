@@ -47,7 +47,8 @@ namespace hpx { namespace parcelset
             creation_time_(util::high_resolution_timer::now()),
 #endif
             source_id_(naming::invalid_gid),
-            dest_(naming::invalid_gid)
+            dest_(naming::invalid_gid),
+            has_continuation_(false)
         {}
 
         parcel_data::parcel_data(naming::gid_type&& dest, naming::address&& addr,

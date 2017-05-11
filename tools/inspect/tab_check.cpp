@@ -37,7 +37,7 @@ namespace boost
        if (contents.find("hpxinspect:" "notab") != string::npos) return;
        string total, linenum;
        long errors = 0, currline = 0;
-       size_t p = 0, extend = 0;
+       size_t p = 0;
        std::vector<std::string> someline, lineorder;
 
        char_separator<char> sep("\n", "", boost::keep_empty_tokens);

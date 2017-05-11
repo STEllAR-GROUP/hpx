@@ -22,24 +22,53 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
-set(HPX_BOOST_LOG_LIBS "")
-if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
-  set(HPX_BOOST_LOG_LIBS log log_setup)
+set(__boost_libraries)
+if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
+   HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
+  set(__boost_libraries ${__boost_libraries} log log_setup)
 endif()
 
-find_package(Boost
-  1.50
-  REQUIRED
-  COMPONENTS
-  chrono
+if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
+  set(__boost_libraries ${__boost_libraries} thread)
+  set(__boost_need_thread ON)
+endif()
+
+if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+  set(__boost_libraries ${__boost_libraries} chrono)
+endif()
+
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+  set(__use_generic_coroutine_context ON)
+endif()
+if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
+  set(__use_generic_coroutine_context ON)
+endif()
+hpx_option(
+  HPX_WITH_GENERIC_CONTEXT_COROUTINES
+  BOOL
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${__use_generic_coroutine_context} ADVANCED)
+
+if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
+  set(__boost_libraries ${__boost_libraries} context)
+  # if context is needed, we should still link with boost thread and chrono
+  if(NOT __boost_need_thread)
+    set(__boost_libraries ${__boost_libraries} thread chrono)
+  endif()
+endif()
+
+set(__boost_libraries
+  ${__boost_libraries}
   date_time
   filesystem
   program_options
   regex
-  system
-  thread
-  ${HPX_BOOST_LOG_LIBS}
-  )
+  system)
+
+find_package(Boost 1.51 REQUIRED COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -54,32 +83,10 @@ if(UNIX AND NOT CYGWIN)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_UNDERLYING_THREAD_LIBRARY})
 endif()
 
-# Set configuration option to use Boost.Context or not. This depends on the Boost
-# version (Boost.Context was included with 1.51) and the Platform
-set(use_generic_coroutine_context OFF)
-if(Boost_VERSION GREATER 105000)
-  find_package(Boost 1.50 QUIET COMPONENTS context)
-  if(Boost_CONTEXT_FOUND)
-    hpx_info("  context")
-  endif()
-  if(APPLE)
-    set(use_generic_coroutine_context ON)
-  endif()
-  if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
-    set(use_generic_coroutine_context ON)
-  endif()
-endif()
-
-hpx_option(
-  HPX_WITH_GENERIC_CONTEXT_COROUTINES
-  BOOL
-  "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${use_generic_coroutine_context} ADVANCED)
-
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.49 QUIET COMPONENTS iostreams)
+  find_package(Boost 1.51 QUIET COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
@@ -89,7 +96,7 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 # attempt to load Boost.Random (if available), it's needed for one example only
-find_package(Boost 1.49 QUIET COMPONENTS random)
+find_package(Boost 1.51 QUIET COMPONENTS random)
 if(Boost_RANDOM_FOUND)
   hpx_info("  random")
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
