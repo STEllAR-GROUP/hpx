@@ -232,8 +232,6 @@ namespace hpx { namespace threads
         std::size_t new_allocation)
     {
         HPX_ASSERT(!proxies_static_allocation_data_.empty());
-        HPX_ASSERT(number_to_free == release_cores_to_min ||
-            number_to_free == release_borrowed_cores);
 
         // Ask previously allocated schedulers to release surplus cores,
         // until either the request is satisfied, or we're out of
@@ -303,15 +301,13 @@ namespace hpx { namespace threads
             //
             // The new scheduler requesting an allocation is sn with desired
             // des[n] and minimum min[n].
-            for (allocation_data_map_type::iterator it =
-                    proxies_static_allocation_data_.begin();
-                 it != proxies_static_allocation_data_.end(); ++it)
+            for (auto & data : proxies_static_allocation_data_)
             {
                 // skip new allocation
-                if ((*it).first == new_allocation)
+                if (data.first == new_allocation)
                     continue;
 
-                static_allocation_data st = (*it).second;
+                static_allocation_data st = data.second;
 
                 // Only take into account existing schedulers that have > Min.
                 // We work with the number of 'owned' cores here instead of the
@@ -343,20 +339,18 @@ namespace hpx { namespace threads
                 scaled_static_allocation_data[new_allocation] =
                     proxies_static_allocation_data_[new_allocation];
 
-                for (allocation_data_map_type::iterator it =
-                        proxies_static_allocation_data_.begin();
-                     it != proxies_static_allocation_data_.end(); ++it)
+                for (auto const& data : proxies_static_allocation_data_)
                 {
                     // skip new allocation
-                    if ((*it).first == new_allocation)
+                    if (data.first == new_allocation)
                         continue;
 
-                    static_allocation_data st = (*it).second;
+                    static_allocation_data st = data.second;
                     if (st.num_owned_cores_ > st.min_proxy_cores_)
                     {
                         HPX_ASSERT(st.adjusted_desired_ == double(st.max_proxy_cores_));
                         scaled_static_allocation_data.insert(
-                            allocation_data_map_type::value_type((*it).first, st));
+                            allocation_data_map_type::value_type(data.first, st));
 
                         total_desired += st.adjusted_desired_;
                     }
@@ -370,11 +364,9 @@ namespace hpx { namespace threads
                     scaling = double(total_allocated) / total_desired;
 
                     // multiply the scaling factor by each schedulers 'desired'.
-                    for (allocation_data_map_type::iterator it =
-                            proxies_static_allocation_data_.begin();
-                         it != proxies_static_allocation_data_.end(); ++it)
+                    for (auto & data : proxies_static_allocation_data_)
                     {
-                        static_allocation_data& st = (*it).second;
+                        static_allocation_data& st = data.second;
                         st.scaled_allocation_ = st.adjusted_desired_ * scaling;
                     }
 
@@ -384,17 +376,15 @@ namespace hpx { namespace threads
                         total_allocated);
 
                     bool re_calculate = false;
-                    for (allocation_data_map_type::iterator it =
-                            scaled_static_allocation_data.begin();
-                         it != scaled_static_allocation_data.end(); ++it)
+                    for (auto & data : scaled_static_allocation_data)
                     {
                         // skip new allocation
-                        if ((*it).first == new_allocation)
+                        if (data.first == new_allocation)
                             continue;
 
                         // Keep recursing until previous allocations do not
                         // increase (excluding the current scheduler).
-                        static_allocation_data& st = (*it).second;
+                        static_allocation_data& st = data.second;
                         if (st.allocation_ > st.num_owned_cores_)
                         {
                             double modifier = static_cast<double>(
@@ -414,11 +404,9 @@ namespace hpx { namespace threads
                     {
 #if defined(HPX_DEBUG)
                         double sum_desired = 0.0;
-                        for (allocation_data_map_type::iterator it =
-                                scaled_static_allocation_data.begin();
-                             it != scaled_static_allocation_data.end(); ++it)
+                        for (auto const& data : scaled_static_allocation_data)
                         {
-                            sum_desired += (*it).second.adjusted_desired_;
+                            sum_desired += data.second.adjusted_desired_;
                         }
                         HPX_ASSERT(
                             total_desired >= sum_desired - epsilon &&
@@ -427,13 +415,11 @@ namespace hpx { namespace threads
                         continue;
                     }
 
-                    for (allocation_data_map_type::iterator it =
-                            proxies_static_allocation_data_.begin();
-                         it != proxies_static_allocation_data_.end(); ++it)
+                    for (auto & data : proxies_static_allocation_data_)
                     {
                         // Keep recursing until all allocations are no greater
                         // than desired (including the current scheduler).
-                        static_allocation_data& st = (*it).second;
+                        static_allocation_data& st = data.second;
                         if (st.allocation_ > st.max_proxy_cores_)
                         {
                             double modifier = st.max_proxy_cores_ /
@@ -453,11 +439,9 @@ namespace hpx { namespace threads
                     {
 #if defined(HPX_DEBUG)
                         double sum_desired = 0.0;
-                        for (allocation_data_map_type::iterator it =
-                                scaled_static_allocation_data.begin();
-                             it != scaled_static_allocation_data.end(); ++it)
+                        for (auto const& data : scaled_static_allocation_data)
                         {
-                            sum_desired += (*it).second.adjusted_desired_;
+                            sum_desired += data.second.adjusted_desired_;
                         }
                         HPX_ASSERT(
                             total_desired >= sum_desired - epsilon &&
@@ -466,13 +450,11 @@ namespace hpx { namespace threads
                         continue;
                     }
 
-                    for (allocation_data_map_type::iterator it =
-                            proxies_static_allocation_data_.begin();
-                         it != proxies_static_allocation_data_.end(); ++it)
+                    for (auto & data : proxies_static_allocation_data_)
                     {
                         // Keep recursing until all allocations are at least
                         // minimum (including the current scheduler).
-                        static_allocation_data& st = (*it).second;
+                        static_allocation_data& st = data.second;
                         if (st.min_proxy_cores_ > st.allocation_)
                         {
                             double new_desired = st.min_proxy_cores_ / scaling;
@@ -489,11 +471,9 @@ namespace hpx { namespace threads
                     {
 #if defined(HPX_DEBUG)
                         double sum_desired = 0.0;
-                        for (allocation_data_map_type::iterator it =
-                                scaled_static_allocation_data.begin();
-                             it != scaled_static_allocation_data.end(); ++it)
+                        for (auto const& data : scaled_static_allocation_data)
                         {
-                            sum_desired += (*it).second.adjusted_desired_;
+                            sum_desired += data.second.adjusted_desired_;
                         }
                         HPX_ASSERT(
                             total_desired >= sum_desired - epsilon &&
@@ -504,18 +484,16 @@ namespace hpx { namespace threads
 
 #if defined(HPX_DEBUG)
                     hpx::error_code ec(lightweight);
-                    for (allocation_data_map_type::iterator it =
-                            scaled_static_allocation_data.begin();
-                            it != scaled_static_allocation_data.end(); ++it)
+                    for (auto const& data : scaled_static_allocation_data)
                     {
                         // skip new allocation
-                        if ((*it).first == new_allocation)
+                        if (data.first == new_allocation)
                             continue;
 
                         HPX_ASSERT(
-                            (*it).second.proxy_->get_policy_element(
+                            data.second.proxy_->get_policy_element(
                                     hpx::threads::detail::min_concurrency, ec) <=
-                                (*it).second.allocation_);
+                                data.second.allocation_);
                     }
 
                     static_allocation_data const& st =
@@ -586,11 +564,9 @@ namespace hpx { namespace threads
         double epsilon = 1e-07;
         double fraction = 0.0;
 
-        for (allocation_data_map_type::iterator it =
-                scaled_static_allocation_data.begin();
-             it != scaled_static_allocation_data.end(); ++it)
+        for (auto & data : scaled_static_allocation_data)
         {
-            static_allocation_data& st = (*it).second;
+            static_allocation_data& st = data.second;
             st.allocation_ = static_cast<std::size_t>(st.scaled_allocation_);
             st.scaled_allocation_ -= st.allocation_;
         }
@@ -660,9 +636,9 @@ namespace hpx { namespace threads
 
 #if defined(HPX_DEBUG)
         std::size_t sum_allocation = 0;
-        for (helper_type::iterator it = d.begin(); it != d.end(); ++it)
+        for (auto & data : d)
         {
-            sum_allocation += it->second->second.allocation_;
+            sum_allocation += data.second->second.allocation_;
         }
         HPX_ASSERT(sum_allocation == total_allocated);
 #endif
@@ -677,10 +653,9 @@ namespace hpx { namespace threads
         proxies_map_type::iterator it;
         proxies_static_allocation_data_.clear();
 
-        for (proxies_map_type::iterator it = proxies_.begin();
-             it != proxies_.end(); ++it)
+        for (auto & proxy : proxies_)
         {
-            proxy_data& p = (*it).second;
+            proxy_data& p = proxy.second;
             static_allocation_data st;
             st.proxy_ = p.proxy_;
 
@@ -708,7 +683,7 @@ namespace hpx { namespace threads
             }
 
             proxies_static_allocation_data_.insert(
-                std::make_pair((*it).first , st));
+                std::make_pair(proxy.first , st));
         }
 
         std::size_t cookie = next_cookie_ + 1;
@@ -872,10 +847,10 @@ namespace hpx { namespace threads
         for (proxies_map_type::const_iterator it = proxies_.begin();
              it != end; ++it)
         {
-            result.push_back(resource_allocation(
+            result.emplace_back(
                 (*it).second.proxy_->get_description(),
                 (*it).second.core_ids_
-            ));
+            );
         }
         return result;
     }

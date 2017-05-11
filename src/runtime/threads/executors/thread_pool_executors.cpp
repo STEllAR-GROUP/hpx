@@ -430,7 +430,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // inform the scheduler to stop the virtual core
         boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state oldstate = state.exchange(state_stopped);
-        HPX_ASSERT(oldstate == state_running || oldstate == state_suspended ||
+        HPX_ASSERT(oldstate == state_starting ||
+            oldstate == state_running || oldstate == state_suspended ||
             oldstate == state_stopped);
         --curr_punits_;
     }
