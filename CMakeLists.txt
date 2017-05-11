@@ -13,7 +13,7 @@
 cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 2.8.12)
+cmake_policy(VERSION 3.0.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
