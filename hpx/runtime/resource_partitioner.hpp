@@ -65,6 +65,8 @@ namespace hpx {
         // mechanism for adding resources
         void add_resource(std::size_t pu_number);
 
+        void print_me();
+
     private:
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
@@ -82,9 +84,10 @@ namespace hpx {
             return rp.get();
         }*/
 
-        //! constructor
-        //! users shouldn't use the constructor but rather get_resource_partitioner
+        //! constructor: users shouldn't use the constructor but rather get_resource_partitioner
         resource_partitioner();
+
+        void print_me(); //! used by shoshijak for testing. To be deleted.
 
 
         // create a new thread_pool, add it to the RP and return a pointer to it
@@ -100,6 +103,7 @@ namespace hpx {
         void add_resource(std::size_t resource, std::string pool_name);
         void add_resource_to_default(std::size_t resource);
         void set_scheduler(scheduling_policy sched, std::string pool_name);
+        bool default_pool();
 
         // called in hpx_init
         void init();
@@ -114,6 +118,7 @@ namespace hpx {
         threads::policies::init_affinity_data get_init_affinity_data() const;
 
 
+
     private:
 
         ////////////////////////////////////////////////////////////////////////
@@ -124,6 +129,7 @@ namespace hpx {
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
         init_pool_data* get_pool(std::string pool_name);
+        init_pool_data* get_default_pool();
 
         ////////////////////////////////////////////////////////////////////////
 
