@@ -12,9 +12,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
-#include <cstdio>
-#include <iostream>
 #include <string>
+#include <vector>
 
 #include <boost/atomic.hpp>
 #include <boost/range/irange.hpp>
