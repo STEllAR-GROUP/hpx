@@ -619,6 +619,9 @@ namespace hpx { namespace components
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
             util::unique_function_nonser<void(void*)> const& ctor);
+
+        template <typename Component_, typename ...Ts>
+        friend naming::gid_type server::create_with_args(Ts&&... ts);
 #endif
 
         naming::gid_type get_base_gid(
