@@ -403,12 +403,12 @@ namespace hpx
                     action_type_(), priority
                 );
 
-            auto f = [](parcelset::parcel&& p)
+            parcelset::detail::parcel_await(std::move(p), parcelset::write_handler_type(), 0,
+                [](parcelset::parcel&& p, parcelset::write_handler_type&&)
                 {
                     hpx::get_runtime().get_parcel_handler()
                         .sync_put_parcel(std::move(p));
-                };
-            parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
+                }).apply();
             return false;     // destination is remote
         }
 

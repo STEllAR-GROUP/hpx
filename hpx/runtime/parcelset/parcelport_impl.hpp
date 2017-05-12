@@ -207,101 +207,32 @@ namespace hpx { namespace parcelset
         }
 
     public:
-        // this is the handler used by put_parcel - it deals with a single parcel
-        // at a time
-        struct parcel_await_handler
-        {
-            parcelport_impl& this_;
-            locality dest_;
-            write_handler_type f_;
-
-            void operator()(parcel&& p)
-            {
-                if (connection_handler_traits<ConnectionHandler>::
-                    send_immediate_parcels::value &&
-                    this_.can_send_immediate_impl<ConnectionHandler>())
-                {
-                    this_.send_immediate_impl<ConnectionHandler>(
-                        this_, dest_, &f_, &p, 1);
-                }
-                else
-                {
-                    // enqueue the outgoing parcel ...
-                    this_.enqueue_parcel(dest_, std::move(p), std::move(f_));
-
-                    this_.get_connection_and_send_parcels(dest_);
-                }
-            }
-        };
-
-        // this is the handler used by put_parcels - this version handles a vector
-        // of parcels rather than just a single one
-        struct parcel_await_handlers
-        {
-            parcelport_impl* this_;
-            locality dest_;
-            std::vector<write_handler_type> handler_;
-            std::vector<parcel> parcels_;
-
-            parcel_await_handlers(
-                parcelport_impl& pp,
-                locality dest,
-                std::vector<write_handler_type>&& handler)
-              : this_(&pp),
-                dest_(std::move(dest)),
-                handler_(std::move(handler))
-            {}
-
-            parcel_await_handlers(parcel_await_handlers&& other)
-              : this_(other.this_),
-                dest_(std::move(other.dest_)),
-                handler_(std::move(other.handler_)),
-                parcels_(std::move(other.parcels_))
-            {}
-
-            parcel_await_handlers& operator=(parcel_await_handlers&& other)
-            {
-                this_ = other.this_;
-                dest_ = std::move(other.dest_);
-                handler_ = std::move(other.handler_);
-                parcels_ = std::move(other.parcels_);
-                return *this;
-            }
-
-            HPX_MOVABLE_ONLY(parcel_await_handlers);
-
-            void operator()(parcel&& p)
-            {
-                parcels_.push_back(std::move(p));
-                // enqueue the outgoing parcels ...
-
-                if (parcels_.size() == handler_.size())
-                {
-                    if (connection_handler_traits<ConnectionHandler>::
-                        send_immediate_parcels::value &&
-                        this_->can_send_immediate_impl<ConnectionHandler>())
-                    {
-                        this_->send_immediate_impl<ConnectionHandler>(
-                            *this_, dest_, handler_.data(), parcels_.data(), parcels_.size());
-                    }
-                    else
-                    {
-                        this_->enqueue_parcels(
-                            dest_, std::move(parcels_), std::move(handler_));
-
-                        this_->get_connection_and_send_parcels(dest_);
-                    }
-                }
-            }
-        };
-
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
         {
             HPX_ASSERT(dest.type() == type());
 
-            std::make_shared<detail::parcel_await>(
-                std::move(p), archive_flags_,
-                parcel_await_handler{*this, dest, std::move(f)})->apply();
+            // We create a shared pointer of the parcels_await object since it
+            // needs to be kept alive as long as there are futures not ready
+            // or GIDs to be split. This is necessary to preserve the identiy
+            // of the this pointer.
+            std::make_shared<detail::parcel_await>(std::move(p), std::move(f),
+                archive_flags_, [this, dest](parcel&& p, write_handler_type&& f)
+                {
+                    if (connection_handler_traits<ConnectionHandler>::
+                        send_immediate_parcels::value &&
+                        can_send_immediate_impl<ConnectionHandler>())
+                    {
+                        send_immediate_impl<ConnectionHandler>(
+                            *this, dest, &f, &p, 1);
+                    }
+                    else
+                    {
+                        // enqueue the outgoing parcel ...
+                        enqueue_parcel(dest, std::move(p), std::move(f));
+
+                        get_connection_and_send_parcels(dest);
+                    }
+                })->apply();
         }
 
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
@@ -323,12 +254,29 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
-            parcel_await_handlers handler(
-                *this, dest, std::move(handlers));
-            handler.parcels_.reserve(parcels.size());
+            // We create a shared pointer of the parcels_await object since it
+            // needs to be kept alive as long as there are futures not ready
+            // or GIDs to be split. This is necessary to preserve the identiy
+            // of the this pointer.
+            std::make_shared<detail::parcels_await>(std::move(parcels), std::move(handlers),
+                archive_flags_, [this, dest](std::vector<parcel>&& parcels,
+                    std::vector<write_handler_type>&& handlers)
+                {
+                    if (connection_handler_traits<ConnectionHandler>::
+                        send_immediate_parcels::value &&
+                        can_send_immediate_impl<ConnectionHandler>())
+                    {
+                        send_immediate_impl<ConnectionHandler>(
+                            *this, dest, handlers.data(), parcels.data(), parcels.size());
+                    }
+                    else
+                    {
+                        enqueue_parcels(
+                            dest, std::move(parcels), std::move(handlers));
 
-            std::make_shared<detail::parcel_await>(
-                std::move(parcels), archive_flags_, std::move(handler))->apply();
+                        get_connection_and_send_parcels(dest);
+                    }
+                })->apply();
         }
 
         void send_early_parcel(locality const & dest, parcel p)
