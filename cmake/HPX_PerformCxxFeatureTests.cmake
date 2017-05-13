@@ -118,6 +118,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_to_string(
     REQUIRED "HPX needs support for C++11 std::to_string")
 
+  hpx_check_for_cxx11_std_tuple(
+    DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+
   hpx_check_for_cxx11_std_unique_lock(
     REQUIRED "HPX needs support for C++11 std::unique_lock")
 
@@ -133,7 +136,7 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_type_traits(
     DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
 
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -156,11 +159,17 @@ macro(hpx_perform_cxx_feature_tests)
   endif()
 
   # check for experimental facilities
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # check for Library Fundamentals TS v2's experimental/optional only if in
     # C++1y or C++14 mode.
     hpx_check_for_libfun_std_experimental_optional(
       DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
+  endif()
+
+  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+    # Check the availability of certain C++17 language features
+    hpx_check_for_cxx17_fold_expressions(
+        DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
   endif()
 endmacro()
 

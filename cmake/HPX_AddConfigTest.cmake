@@ -376,6 +376,13 @@ macro(hpx_check_for_cxx11_std_to_string)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_tuple)
+  add_hpx_config_test(HPX_WITH_CXX11_TUPLE
+    SOURCE cmake/tests/cxx11_std_tuple.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_type_traits)
   add_hpx_config_test(HPX_WITH_CXX11_TYPE_TRAITS
     SOURCE cmake/tests/cxx11_std_type_traits.cpp
@@ -456,6 +463,13 @@ endmacro()
 macro(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/libfun_std_experimental_optional.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx17_fold_expressions)
+  add_hpx_config_test(HPX_WITH_CXX17_FOLD_EXPRESSIONS
+    SOURCE cmake/tests/cxx17_fold_expressions.cpp
     FILE ${ARGN})
 endmacro()
 
