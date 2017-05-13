@@ -12,6 +12,12 @@
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
+namespace hpx { namespace util
+{
+    class steady_time_point;
+    class steady_time_duration;
+}}
+
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -26,12 +32,65 @@ namespace hpx { namespace parallel { namespace execution
         struct async_execute_after_tag {};
 
         // forward declare customization point implementations
-        template <> struct customization_point<post_at_tag>;
-        template <> struct customization_point<post_after_tag>;
-        template <> struct customization_point<sync_execute_at_tag>;
-        template <> struct customization_point<sync_execute_after_tag>;
-        template <> struct customization_point<async_execute_at_tag>;
-        template <> struct customization_point<async_execute_after_tag>;
+        template <>
+        struct customization_point<post_at_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_time_point const& abs_time,
+                F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<post_after_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_duration const& rel_time,
+                F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<sync_execute_at_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_time_point const& abs_time,
+                F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<sync_execute_after_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_duration const& rel_time,
+                F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<async_execute_at_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_time_point const& abs_time,
+                F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<async_execute_after_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec,
+                hpx::util::steady_duration const& rel_time,
+                F && f, Ts &&... ts) const;
+        };
         /// \endcond
     }
 

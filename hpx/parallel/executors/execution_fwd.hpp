@@ -68,13 +68,69 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         // forward declare customization point implementations
-        template <> struct customization_point<post_tag>;
-        template <> struct customization_point<sync_execute_tag>;
-        template <> struct customization_point<async_execute_tag>;
-        template <> struct customization_point<then_execute_tag>;
-        template <> struct customization_point<sync_bulk_execute_tag>;
-        template <> struct customization_point<async_bulk_execute_tag>;
-        template <> struct customization_point<then_bulk_execute_tag>;
+        template <>
+        struct customization_point<post_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<sync_execute_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<async_execute_tag>
+        {
+            template <typename Executor, typename F, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<then_execute_tag>
+        {
+            template <typename Executor, typename F, typename Future,
+                typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Future& predecessor,
+                Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<sync_bulk_execute_tag>
+        {
+            template <typename Executor, typename F, typename Shape,
+                typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Shape const& shape,
+                Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<async_bulk_execute_tag>
+        {
+            template <typename Executor, typename F, typename Shape,
+                typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Shape const& shape,
+                Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<then_bulk_execute_tag>
+        {
+            template <typename Executor, typename F, typename Shape,
+                typename Future, typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Shape const& shape,
+                Future& predecessor, Ts &&... ts) const;
+        };
 
         // Helper facility to avoid ODR violations
         template <typename T>
@@ -82,6 +138,9 @@ namespace hpx { namespace parallel { namespace execution
         {
             static T const value;
         };
+
+        template <typename T>
+        T const static_const<T>::value = T{};
     }
     /// \endcond
 
