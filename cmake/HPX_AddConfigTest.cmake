@@ -361,6 +361,13 @@ macro(hpx_check_for_cxx11_std_shared_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_shuffle)
+  add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
+    SOURCE cmake/tests/cxx11_std_shuffle.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_thread)
   add_hpx_config_test(HPX_WITH_CXX11_THREAD
     SOURCE cmake/tests/cxx11_std_thread.cpp
