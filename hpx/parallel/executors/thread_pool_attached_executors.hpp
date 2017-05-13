@@ -45,20 +45,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
     using local_queue_attached_executor =
-        execution::local_queue_attached_executor;
+        threads::executors::local_queue_attached_executor;
 #endif
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     using static_queue_attached_executor =
-        execution::static_queue_attached_executor;
+        threads::executors::static_queue_attached_executor;
 #endif
 
     using local_priority_queue_attached_executor =
-        execution::local_priority_queue_attached_executor;
+        threads::executors::local_priority_queue_attached_executor;
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     using static_priority_queue_attached_executor =
-        execution::static_priority_queue_attached_executor;
+        threads::executors::static_priority_queue_attached_executor;
 #endif
 }}}
 #endif

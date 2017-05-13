@@ -13,9 +13,11 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/datapar/execution_policy.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
-#include <hpx/parallel/execution.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/executor_parameters.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
+#include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_execution_policy.hpp>

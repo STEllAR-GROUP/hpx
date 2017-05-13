@@ -680,10 +680,11 @@ namespace hpx { namespace parallel { namespace execution
         post_dispatch(int,
                 NonBlockingOneWayExecutor && exec, F && f, Ts &&... ts)
         ->  decltype(
-                exec.post(std::forward<F>(f), std::forward<Ts>(ts)...)
+                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
             )
         {
-            return exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return exec.apply_execute(std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         template <typename Executor>

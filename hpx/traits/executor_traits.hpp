@@ -9,9 +9,16 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detected.hpp>
 
+#include <hpx/parallel/config/inline_namespace.hpp>
+
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+{
+    struct static_chunk_size;
+}}}
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -75,6 +82,19 @@ namespace hpx { namespace parallel { namespace execution
         using type = hpx::util::detected_or_t<
             typename executor_shape<Executor>::type, index_type, Executor>;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Executor>
+    struct executor_parameters_type
+    {
+    private:
+        template <typename T>
+        using parameters_type = typename T::parameters_type;
+
+    public:
+        using type = hpx::util::detected_or_t<
+            parallel::static_chunk_size, parameters_type, Executor>;
+    };
 }}}
 
 namespace hpx { namespace traits
@@ -111,6 +131,17 @@ namespace hpx { namespace traits
 
     template <typename Executor>
     using executor_index_t = typename executor_index<Executor>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // extension
+    template <typename Executor, typename Enable = void>
+    struct executor_parameters_type
+      : parallel::execution::executor_parameters_type<Executor>
+    {};
+
+    template <typename Executor>
+    using executor_parameters_type_t =
+        typename executor_parameters_type<Executor>::type;
 }}
 
 #endif

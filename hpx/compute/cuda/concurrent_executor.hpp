@@ -28,7 +28,7 @@
 namespace hpx { namespace compute { namespace cuda
 {
     template <typename Executor =
-        hpx::threads::executors::local_priority_queue_attached_executor>
+        hpx::parallel::execution::local_priority_queue_attached_executor>
     struct concurrent_executor
     {
     private:

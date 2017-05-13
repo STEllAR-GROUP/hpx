@@ -9,6 +9,8 @@
 #include <hpx/parallel/executors.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/timed_execution.hpp>
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
 
 #endif
 

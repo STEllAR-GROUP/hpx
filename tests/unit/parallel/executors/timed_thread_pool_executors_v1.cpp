@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -25,53 +24,79 @@ hpx::thread::id test(int passed_through)
     return hpx::this_thread::get_id();
 }
 
-void test_timed_sync()
+template <typename Executor>
+void test_timed_sync(Executor& exec)
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::parallel::timed_executor_traits<Executor> traits;
 
-    executor exec;
     HPX_TEST(
-        hpx::parallel::execution::sync_execute_after(
+        traits::execute_after(
             exec, milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 
     HPX_TEST(
-        hpx::parallel::execution::sync_execute_at(
+        traits::execute_at(
             exec, steady_clock::now() + milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 }
 
-void test_timed_async()
+template <typename Executor>
+void test_timed_async(Executor& exec)
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::parallel::timed_executor_traits<Executor> traits;
 
-    executor exec;
     HPX_TEST(
-        hpx::parallel::execution::async_execute_after(
+        traits::async_execute_after(
             exec, milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
+
     HPX_TEST(
-        hpx::parallel::execution::async_execute_at(
+        traits::async_execute_at(
             exec, steady_clock::now() + milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
 }
 
-void test_timed_apply()
+template <typename Executor>
+void test_timed_apply(Executor& exec)
 {
-    typedef hpx::parallel::execution::parallel_executor executor;
+    typedef hpx::parallel::timed_executor_traits<Executor> traits;
 
-    executor exec;
-    hpx::parallel::execution::post_after(exec, milliseconds(1), &test, 42);
-    hpx::parallel::execution::post_at(
+    traits::apply_execute_after(exec, milliseconds(1), &test, 42);
+    traits::apply_execute_at(
         exec, steady_clock::now() + milliseconds(1), &test, 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename Executor>
+void test_timed_thread_pool_executor(Executor& exec)
+{
+    test_timed_sync(exec);
+    test_timed_async(exec);
+    test_timed_apply(exec);
+}
+
 int hpx_main(int argc, char* argv[])
 {
-    test_timed_sync();
-    test_timed_async();
-    test_timed_apply();
+    std::size_t num_threads = hpx::get_os_thread_count();
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    {
+        hpx::parallel::static_queue_executor exec(num_threads);
+        test_timed_thread_pool_executor(exec);
+    }
+#endif
+
+    {
+        hpx::parallel::local_priority_queue_executor exec(num_threads);
+        test_timed_thread_pool_executor(exec);
+    }
+
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+    {
+        hpx::parallel::static_priority_queue_executor exec(num_threads);
+        test_timed_thread_pool_executor(exec);
+    }
+#endif
 
     return hpx::finalize();
 }
