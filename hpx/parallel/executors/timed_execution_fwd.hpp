@@ -15,7 +15,7 @@
 namespace hpx { namespace util
 {
     class steady_time_point;
-    class steady_time_duration;
+    class steady_duration;
 }}
 
 namespace hpx { namespace parallel { namespace execution
