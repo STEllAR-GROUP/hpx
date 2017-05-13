@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_TIMED_EXECUTION_FWD_JAN_07_2017_0720AM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
 namespace hpx { namespace parallel { namespace execution
