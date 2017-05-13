@@ -980,7 +980,7 @@ if(NOT MSVC)
 
       if(HPX_WITH_CXX1Y OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
                                 AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
-        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1y)
+        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1Y)
       endif()
 
       if(HPX_WITH_CXX1Y)
