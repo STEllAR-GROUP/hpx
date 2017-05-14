@@ -103,18 +103,14 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), params);
         }
 
-        template <>
-        struct customization_point<processing_units_count_tag>
+        template <typename Executor, typename Parameters>
+        HPX_FORCEINLINE
+        auto customization_point<processing_units_count_tag>::operator()(
+            Executor && exec, Parameters& params) const
         {
-            template <typename Executor, typename Parameters>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, Parameters& params) const
-            {
-                return processing_units_count(std::forward<Executor>(exec),
-                    params);
-            }
-        };
-
+            return processing_units_count(std::forward<Executor>(exec),
+                params);
+        }
         /// \endcond
     }
 
@@ -162,17 +158,13 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec));
         }
 
-        template <>
-        struct customization_point<has_pending_closures_tag>
+        template <typename Executor>
+        HPX_FORCEINLINE
+        auto customization_point<has_pending_closures_tag>::operator()(
+            Executor && exec) const
         {
-            template <typename Executor>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec) const
-            {
-                return has_pending_closures(std::forward<Executor>(exec));
-            }
-        };
-
+            return has_pending_closures(std::forward<Executor>(exec));
+        }
         /// \endcond
     }
 
@@ -225,18 +217,13 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
 
-        template <>
-        struct customization_point<get_pu_mask_tag>
+        template <typename Executor>
+        HPX_FORCEINLINE
+        auto customization_point<get_pu_mask_tag>::operator()(
+            Executor && exec, threads::topology& topo, std::size_t thread_num) const
         {
-            template <typename Executor>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, threads::topology& topo,
-                std::size_t thread_num) const
-            {
-                return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
-            }
-        };
-
+            return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
+        }
         /// \endcond
     }
 
@@ -284,17 +271,13 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), mode);
         }
 
-        template <>
-        struct customization_point<set_scheduler_mode_tag>
+        template <typename Executor, typename Mode>
+        HPX_FORCEINLINE
+        auto customization_point<set_scheduler_mode_tag>::operator()(
+            Executor && exec, Mode const& mode) const
         {
-            template <typename Executor, typename Mode>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, Mode const& mode) const
-            {
-                return set_scheduler_mode(std::forward<Executor>(exec), mode);
-            }
-        };
-
+            return set_scheduler_mode(std::forward<Executor>(exec), mode);
+        }
         /// \endcond
     }
 }}}

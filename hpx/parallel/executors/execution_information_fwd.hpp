@@ -10,7 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/traits/executor_traits.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -24,10 +27,38 @@ namespace hpx { namespace parallel { namespace execution
         struct set_scheduler_mode_tag {};
 
         // forward declare customization point implementations
-        template <> struct customization_point<processing_units_count_tag>;
-        template <> struct customization_point<has_pending_closures_tag>;
-        template <> struct customization_point<get_pu_mask_tag>;
-        template <> struct customization_point<set_scheduler_mode_tag>;
+        template <>
+        struct customization_point<processing_units_count_tag>
+        {
+            template <typename Executor, typename Parameters>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, Parameters& params) const;
+        };
+
+        template <>
+        struct customization_point<has_pending_closures_tag>
+        {
+            template <typename Executor>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec) const;
+        };
+
+        template <>
+        struct customization_point<get_pu_mask_tag>
+        {
+            template <typename Executor>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, threads::topology& topo,
+                std::size_t thread_num) const;
+        };
+
+        template <>
+        struct customization_point<set_scheduler_mode_tag>
+        {
+            template <typename Executor, typename Mode>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, Mode const& mode) const;
+        };
     }
     /// \endcond
 
