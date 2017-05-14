@@ -27,9 +27,10 @@ namespace hpx { namespace serialization
             typedef typename std::vector<T, Allocator>::size_type size_type;
             size_type size;
             ar >> size; //-V128
-            if(size == 0) return;
+            if (size == 0) return;
 
-            vs.resize(size);
+            if (vs.size() < size)
+                vs.resize(size);
             for(size_type i = 0; i != size; ++i)
             {
                 ar >> vs[i];
@@ -52,7 +53,8 @@ namespace hpx { namespace serialization
                 ar >> size; //-V128
                 if(size == 0) return;
 
-                v.resize(size);
+                if (v.size() < size)
+                    v.resize(size);
                 ar >> hpx::serialization::make_array(v.data(), v.size());
             }
         }
