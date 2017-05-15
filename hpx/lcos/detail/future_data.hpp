@@ -289,6 +289,7 @@ namespace detail
         virtual void wait(error_code& = throws) = 0;
         virtual future_status wait_until(util::steady_clock::time_point const&,
             error_code& = throws) = 0;
+        virtual boost::exception_ptr get_exception_ptr() const = 0;
 
         enum state
         {
@@ -787,6 +788,12 @@ namespace detail
                 ec = make_success_code();
 
             return future_status::ready; //-V110
+        }
+
+        boost::exception_ptr get_exception_ptr() const
+        {
+            HPX_ASSERT(state_ == exception);
+            return *reinterpret_cast<boost::exception_ptr const*>(&storage_);
         }
 
     protected:
