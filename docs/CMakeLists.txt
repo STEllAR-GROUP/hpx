@@ -282,9 +282,11 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
   set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}] [/ ${_cat} Options]\n\n")
 endforeach()
 
+set(QUICKBOOK_CMAKE_VARIABLES_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_variables.qbk")
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
-  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+  ${QUICKBOOK_CMAKE_VARIABLES_DEST}
   @ONLY
 )
 
@@ -309,10 +311,11 @@ foreach(_toolchain ${_toolchain_files})
   set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n")
 endforeach()
 
-
+set(QUICKBOOK_CMAKE_TOOLCHAINS_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_toolchains.qbk")
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
-  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+  ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
   @ONLY
 )
 
@@ -321,8 +324,8 @@ hpx_quickbook_to_html(hpx
   INDEX hpx.idx
   DEPENDENCIES
     ${all_documentation_dependencies}
-    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
-    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+    ${QUICKBOOK_CMAKE_VARIABLES_DEST}
+    ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
   XSLTPROC_ARGS chunk.section.depth=4
                 chunk.first.sections=1
