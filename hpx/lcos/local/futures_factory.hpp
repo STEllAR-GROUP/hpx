@@ -407,6 +407,17 @@ namespace hpx { namespace lcos { namespace local
             return !!task_;
         }
 
+        void set_exception(boost::exception_ptr const& e)
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "futures_factory<Result()>::set_exception",
+                    "futures_factory invalid (has it been moved?)");
+                return;
+            }
+            task_->set_exception(e);
+        }
+
     protected:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
