@@ -129,8 +129,7 @@ namespace hpx { namespace actions { namespace detail
 
         if (id >= this_.cache_.size())
         {
-            std::string msg(
-                "Unknown type desciptor " + std::to_string(id));
+            std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
             if (name != nullptr)
             {
@@ -189,4 +188,10 @@ namespace hpx { namespace actions { namespace detail
 #endif
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    std::uint32_t get_action_id_from_name(char const* action_name)
+    {
+        using hpx::actions::detail::action_registry;
+        return action_registry::get_id(action_name);
+    }
 }}}

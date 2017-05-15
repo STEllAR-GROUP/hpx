@@ -508,17 +508,15 @@ namespace hpx { namespace parcelset
 
     void parcel::serialize(serialization::output_archive & ar, unsigned)
     {
-        using hpx::actions::detail::action_registry;
         using hpx::serialization::access;
 
         ar & data_;
 #if !defined(HPX_DEBUG)
-        const std::uint32_t id =
-            action_registry::get_id(action_->get_action_name());
+        const std::uint32_t id = action_->get_action_id();
         ar << id;
 #else
         std::string const name(action_->get_action_name());
-        const std::uint32_t id = action_registry::get_id(name);
+        const std::uint32_t id = action_->get_action_id();
         ar << id;
         ar << name;
 #endif
