@@ -16,8 +16,10 @@
 #include <chrono>
 #include <cstddef>
 
-namespace hpx { namespace util { namespace detail {
-    inline void yield_k(std::size_t k, const char *thread_name)
+namespace hpx { namespace util { namespace detail
+{
+    inline void yield_k(std::size_t k, const char *thread_name,
+        hpx::threads::thread_state_enum p = hpx::threads::pending_boost)
     {
         if (k < 4) //-V112
         {}
@@ -40,8 +42,7 @@ namespace hpx { namespace util { namespace detail {
             }
             else
             {
-                hpx::this_thread::suspend(hpx::threads::pending_boost,
-                    thread_name);
+                hpx::this_thread::suspend(p, thread_name);
             }
         }
         else
