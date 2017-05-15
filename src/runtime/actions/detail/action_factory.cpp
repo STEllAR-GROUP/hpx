@@ -143,7 +143,7 @@ namespace hpx { namespace actions { namespace detail
         }
 
         ctor_t ctor = this_.cache_[id];
-        if (ctor != nullptr)
+        if (ctor == nullptr)
         {
             std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
