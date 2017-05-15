@@ -40,7 +40,6 @@ namespace hpx
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl : public runtime
     {
     private:
@@ -59,11 +58,7 @@ namespace hpx
             bool& running);
 
     public:
-        typedef SchedulingPolicy scheduling_policy_type;
         typedef threads::policies::callback_notifier notification_policy_type;
-
-        typedef typename scheduling_policy_type::init_parameter_type
-            init_scheduler_type;
 
         /// Construct a new HPX runtime instance
         ///
@@ -73,8 +68,7 @@ namespace hpx
         ///                       by the thread-manager.
         explicit runtime_impl(util::runtime_configuration & rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
-            std::size_t num_threads = 1,
-            init_scheduler_type const& init = init_scheduler_type());
+            std::size_t num_threads = 1);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -378,7 +372,6 @@ namespace hpx
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool timer_pool_;
-        scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
         boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
         parcelset::parcelhandler parcel_handler_;

@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
@@ -30,8 +31,18 @@
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
+namespace hpx {
+
+namespace detail
 {
+        std::string get_affinity_domain(util::command_line_handling const& cfg);
+        std::size_t get_affinity_description(util::command_line_handling const& cfg,
+            std::string& affinity_desc);
+}
+
+namespace threads
+{
+
     struct register_thread_tag {};
     struct register_work_tag {};
     struct set_state_tag {};
@@ -173,7 +184,8 @@ namespace hpx { namespace threads
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
         /// thread-manager instance.
-        virtual void register_counter_types() = 0;
+//        virtual void register_counter_types() = 0;
+        void register_counter_types(){}
 
         /// Returns of the number of the processing unit the given thread
         /// is allowed to run on
@@ -186,20 +198,23 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
-        virtual std::int64_t get_executed_threads(
+/*        virtual std::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual std::int64_t get_executed_thread_phases(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
-
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;*/
+        std::int64_t get_executed_threads( //! FIXME
+                std::size_t num = std::size_t(-1), bool reset = false){
+            return 1;
+        }
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        virtual std::int64_t get_thread_phase_duration(
+/*        virtual std::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual std::int64_t get_thread_duration(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual std::int64_t get_thread_phase_overhead(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
         virtual std::int64_t get_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
+            std::size_t num = std::size_t(-1), bool reset = false) = 0;*/
 #endif
 #endif
 

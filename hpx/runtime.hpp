@@ -68,7 +68,6 @@ namespace hpx
     int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
 
     class HPX_EXPORT runtime
@@ -163,11 +162,6 @@ namespace hpx
         threads::topology const& get_topology() const
         {
             return topology_;
-        }
-
-        resource::resource_partitioner* get_resource_partitioner_ptr() const
-        {
-            return resource_partitioner_;
         }
 
         std::uint32_t assign_cores(std::string const& locality_basename,

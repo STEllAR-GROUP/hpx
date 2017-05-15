@@ -11,6 +11,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
@@ -35,53 +36,65 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Scheduler>
-    struct init_tss_helper;
 
     ///////////////////////////////////////////////////////////////////////////
+    struct manage_active_thread_count
+    {
+        manage_active_thread_count(boost::atomic<long>& counter)
+                : counter_(counter)
+        {
+            ++counter_;
+        }
+        ~manage_active_thread_count()
+        {
+            --counter_;
+        }
+
+        boost::atomic<long>& counter_;
+    };
+
+
     // note: this data structure has to be protected from races from the outside
-    template <typename Scheduler>
     class thread_pool
     {
     public:
-        thread_pool(Scheduler& sched,
+        thread_pool(
             threads::policies::callback_notifier& notifier, char const* pool_name,
             policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
 
-        std::size_t init(std::size_t num_threads,
-            policies::init_affinity_data const& data);
+        virtual std::size_t init(std::size_t num_threads,
+            policies::init_affinity_data const& data) = 0;
 
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+        virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;
         void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
-        template <typename Lock>
-        void stop_locked(Lock& l, bool blocking = true);
+
+        //! used to be templated over the lock. Now not bc can't have templated virtual functions ...
+        virtual void stop_locked(std::unique_lock<lcos::local::no_mutex>& l, bool blocking = true) = 0;
+        virtual void stop_locked(std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
         std::size_t get_worker_thread_num() const;
-        std::size_t get_os_thread_count() const
-        {
-            return threads_.size();
-        }
-        compat::thread& get_os_thread_handle(std::size_t num_thread);
+        virtual std::size_t get_os_thread_count() const = 0;
 
-        void create_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state, bool run_now, error_code& ec);
-        void create_work(thread_init_data& data,
-            thread_state_enum initial_state, error_code& ec);
+        virtual compat::thread& get_os_thread_handle(std::size_t num_thread) = 0;
+
+        virtual void create_thread(thread_init_data& data, thread_id_type& id,
+            thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
+        virtual void create_work(thread_init_data& data,
+            thread_state_enum initial_state, error_code& ec) = 0;
 
         thread_state set_state(thread_id_type const& id,
             thread_state_enum new_state, thread_state_ex_enum new_state_ex,
             thread_priority priority, error_code& ec);
 
-        thread_id_type set_state(util::steady_time_point const& abs_time,
+        virtual thread_id_type set_state(util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex, thread_priority priority,
-            error_code& ec);
+            error_code& ec) = 0;
 
-        std::size_t get_pu_num(std::size_t num_thread) const;
-        mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const;
+        virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
+        virtual mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const = 0;
         mask_cref_type get_used_processing_units() const;
 
         // performance counters
@@ -106,32 +119,32 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-        std::int64_t avg_creation_idle_rate(bool reset);
-        std::int64_t avg_cleanup_idle_rate(bool reset);
+        virtual std::int64_t avg_creation_idle_rate(bool reset) = 0;
+        virtual std::int64_t avg_cleanup_idle_rate(bool reset) = 0;
 #endif
 #endif
 
-        std::int64_t get_queue_length(std::size_t num_thread) const;
+        virtual std::int64_t get_queue_length(std::size_t num_thread) const = 0;
 
 #if defined(HPX_HAVE_THREAD_QUEUE_WAITTIME)
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread) const;
+            std::size_t num_thread) const = 0;
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread) const;
+            std::size_t num_thread) const = 0;
 #endif
 
 #if defined(HPX_HAVE_THREAD_STEALING_COUNTS)
-        std::int64_t get_num_pending_misses(std::size_t num, bool reset);
-        std::int64_t get_num_pending_accesses(std::size_t num, bool reset);
+        virtual std::int64_t get_num_pending_misses(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_pending_accesses(std::size_t num, bool reset) = 0;
 
-        std::int64_t get_num_stolen_from_pending(std::size_t num, bool reset);
-        std::int64_t get_num_stolen_to_pending(std::size_t num, bool reset);
-        std::int64_t get_num_stolen_from_staged(std::size_t num, bool reset);
-        std::int64_t get_num_stolen_to_staged(std::size_t num, bool reset);
+        virtual std::int64_t get_num_stolen_from_pending(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_pending(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_from_staged(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_staged(std::size_t num, bool reset) = 0;
 #endif
 
-        std::int64_t get_thread_count(thread_state_enum state,
-            thread_priority priority, std::size_t num_thread, bool reset) const;
+        virtual std::int64_t get_thread_count(thread_state_enum state,
+            thread_priority priority, std::size_t num_thread, bool reset) const = 0;
 
         std::int64_t get_scheduler_utilization() const;
 
@@ -139,49 +152,41 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t get_busy_loop_count(std::size_t num) const;
 
         ///////////////////////////////////////////////////////////////////////
-        bool enumerate_threads(
+        virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const;
+            thread_state_enum state = unknown) const = 0;
 
-        void reset_thread_distribution();
+        virtual void reset_thread_distribution() = 0;
 
-        void set_scheduler_mode(threads::policies::scheduler_mode mode);
+        virtual void set_scheduler_mode(threads::policies::scheduler_mode mode)= 0;
 
         //
-        void abort_all_suspended_threads();
-        bool cleanup_terminated(bool delete_all);
+        virtual void abort_all_suspended_threads() = 0;
+        virtual bool cleanup_terminated(bool delete_all) = 0;
 
-        hpx::state get_state() const;
-        hpx::state get_state(std::size_t num_thread) const;
+        virtual hpx::state get_state() const = 0;
+        virtual hpx::state get_state(std::size_t num_thread) const = 0;
 
-        bool has_reached_state(hpx::state s) const;
+        virtual bool has_reached_state(hpx::state s) const = 0;
 
-        void do_some_work(std::size_t num_thread);
+        virtual void do_some_work(std::size_t num_thread) = 0;
 
-        void report_error(std::size_t num, std::exception_ptr const& e);
-
-        Scheduler& get_sched() const
-        {
-            return sched_;
-        }
+        virtual void report_error(std::size_t num, std::exception_ptr const& e) = 0;
 
     protected:
-        friend struct init_tss_helper<Scheduler>;
 
         void init_tss(std::size_t num);
         void deinit_tss();
 
-        void thread_func(std::size_t num_thread, topology const& topology,
-            compat::barrier& startup);
+        virtual  void thread_func(std::size_t num_thread, topology const& topology,
+            compat::barrier& startup) = 0;
 
-    private:
-        // this thread manager has exactly as many OS-threads as requested
-        std::vector<compat::thread> threads_;
+        double timestamp_scale_;    // scale timestamps to nanoseconds
 
-        // refer to used scheduler
-        Scheduler& sched_;
+//! should I leave them here or move them to thread_pool_impl?
+//    private:
         threads::policies::callback_notifier& notifier_;
-        std::string pool_name_;
+        std::string pool_name_; //! used for debugging purposes, now will also be used by API to designate this TP
 
         // startup barrier
         boost::scoped_ptr<compat::barrier> startup_;
@@ -190,8 +195,6 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::int64_t> executed_threads_;
         std::vector<std::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
-
-        double timestamp_scale_;    // scale timestamps to nanoseconds
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         // timestamps/values of last reset operation for various performance

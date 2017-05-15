@@ -12,6 +12,10 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/util/command_line_handling.hpp>
+
 
 //#include <hpx/runtime/threads/detail/thread_pool.hpp>
 //#include <hpx/include/runtime.hpp>
@@ -27,6 +31,7 @@ namespace hpx {
 
 
     namespace resource {
+
 
     // scheduler assigned to thread_pool
     // choose same names as in command-line options except with _ instead of -
@@ -95,25 +100,53 @@ namespace hpx {
         void create_default_pool(scheduling_policy sched = scheduling_policy::unspecified);
 
         //! called in hpx_init run_or_start
-        void set_init_affinity_data(hpx::threads::policies::init_affinity_data init_affdat);
+        void set_init_affinity_data(hpx::util::command_line_handling cfg);
         void set_default_pool(std::size_t num_threads);
         void set_default_schedulers(std::string queueing);
 
         //! setup stuff related to pools
         void add_resource(std::size_t resource, std::string pool_name);
         void add_resource_to_default(std::size_t resource);
+
+        //! stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, std::string pool_name);
-        bool default_pool();
+        void set_threadmanager();
+//        threads::threadmanager_base* set_and_get_thread_manager(
+//                util::io_service_pool& timer_pool, threads::policies::callback_notifier& notifier);
+        threads::threadmanager_base* get_thread_manager();
+        bool default_pool(); // returns whether a default pool already exists
+
+        //! used for handing the thread pool its scheduler. To be written better in the future.
+        void set_config(util::command_line_handling cfg){
+            cfg_ = &cfg;
+        }
+
+        //! called in the threadmanager's constructor to setup the thread pools
+        util::command_line_handling get_config(){
+            return *cfg_;
+        }
+
 
         // called in hpx_init
         void init();
 
         // lots of get_functions
+
 /*        std::size_t get_number_pools(){
             return thread_pools_.size();
             // get pointer to a particular pool?
         }*/
 
+        ////////////////////////////////////////////////////////////////////////
+
+        // this function is called in the constructor of thread_pool
+        // returns a scheduler (moved) that thread pool should have as a data member
+        hpx::threads::policies::scheduler_base* create_scheduler(std::string pool_name) const;
+
+
+        ////////////////////////////////////////////////////////////////////////
+
+        scheduling_policy which_scheduler(std::string pool_name);
         threads::topology& get_topology() const;
         threads::policies::init_affinity_data get_init_affinity_data() const;
 
@@ -124,7 +157,7 @@ namespace hpx {
         ////////////////////////////////////////////////////////////////////////
 
         //! this is ugly, I should probably delete it
-        uint64_t get_pool_index(std::string pool_name);
+        uint64_t get_pool_index(std::string pool_name) const;
 
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
@@ -140,8 +173,8 @@ namespace hpx {
         // that will be passed to the runtime
         std::vector<init_pool_data> initial_thread_pools_;
 
-        // actual thread pools of OS-threads
-//        std::vector<threads::detail::thread_pool> thread_pools_; //! template param needed? owned via thread_manager? Different data structure?
+        // reference to the threadmanager instance
+        hpx::threads::threadmanager_base* thread_manager_;
 
         // reference to the topology
         threads::hwloc_topology_info& topology_;
@@ -150,6 +183,9 @@ namespace hpx {
         //! I'll probably have to take this away from runtime
         hpx::threads::policies::init_affinity_data init_affinity_data_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
+
+        //! used for handing the thread_pool its scheduler. will have to be written better in the future
+        hpx::util::command_line_handling* cfg_;
 
 
     };

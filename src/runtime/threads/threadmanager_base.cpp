@@ -15,7 +15,56 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
+namespace hpx {
+
+namespace detail {
+
+    std::string get_affinity_domain(util::command_line_handling const& cfg)
+    {
+        std::string affinity_domain("pu");
+#if defined(HPX_HAVE_HWLOC)
+        if (cfg.affinity_domain_ != "pu")
+        {
+            affinity_domain = cfg.affinity_domain_;
+            if (0 != std::string("pu").find(affinity_domain) &&
+                0 != std::string("core").find(affinity_domain) &&
+                0 != std::string("numa").find(affinity_domain) &&
+                0 != std::string("machine").find(affinity_domain))
+            {
+                throw detail::command_line_error("Invalid command line option "
+                                                         "--hpx:affinity, value must be one of: pu, core, numa, "
+                                                         "or machine.");
+            }
+        }
+#endif
+        return affinity_domain;
+    }
+
+    std::size_t get_affinity_description(
+            util::command_line_handling const& cfg, std::string& affinity_desc)
+    {
+#if defined(HPX_HAVE_HWLOC)
+        if (cfg.affinity_bind_.empty())
+            return cfg.numa_sensitive_;
+
+        if (cfg.pu_offset_ != std::size_t(-1) || cfg.pu_step_ != 1 ||
+            cfg.affinity_domain_ != "pu")
+        {
+            throw detail::command_line_error(
+                    "Command line option --hpx:bind "
+                            "should not be used with --hpx:pu-step, --hpx:pu-offset, "
+                            "or --hpx:affinity.");
+        }
+
+        affinity_desc = cfg.affinity_bind_;
+#endif
+        return cfg.numa_sensitive_;
+    }
+
+} // namespace detail
+
+
+namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on

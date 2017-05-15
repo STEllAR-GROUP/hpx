@@ -16,7 +16,6 @@ namespace hpx
     class HPX_API_EXPORT runtime;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
     class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread

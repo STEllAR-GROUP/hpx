@@ -41,7 +41,6 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
-    template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl : public threadmanager_base
     {
     private:
@@ -50,15 +49,13 @@ namespace hpx { namespace threads
         typedef compat::mutex mutex_type;
 
     public:
-        typedef SchedulingPolicy scheduling_policy_type;
         typedef threads::policies::callback_notifier notification_policy_type;
 
+        threadmanager_impl(
+                util::io_service_pool& timer_pool,
+                notification_policy_type& notifier,
+                std::size_t num_threads);
 
-        ///
-        threadmanager_impl(util::io_service_pool& timer_pool,
-            scheduling_policy_type& scheduler,
-            notification_policy_type& notifier,
-            std::size_t num_threads);
         ~threadmanager_impl();
 
         std::size_t init(policies::init_affinity_data const& data);
@@ -147,7 +144,7 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         state status() const
         {
-            return pool_.get_state();
+            return pool_->get_state();
         }
 
         /// \brief return the number of HPX-threads with the given state
@@ -180,13 +177,13 @@ namespace hpx { namespace threads
         std::size_t get_os_thread_count() const
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            return pool_.get_os_thread_count();
+            return pool_->get_os_thread_count();
         }
 
         compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            return pool_.get_os_thread_handle(num_thread);
+            return pool_->get_os_thread_handle(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -204,20 +201,20 @@ namespace hpx { namespace threads
         /// available
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
-            pool_.do_some_work(num_thread);
+            pool_->do_some_work(num_thread);
         }
 
         /// API functions forwarding to notification policy
         void report_error(std::size_t num_thread, std::exception_ptr const& e)
         {
-            pool_.report_error(num_thread, e);
+            pool_->report_error(num_thread, e);
         }
 
         std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
-            return pool_.get_worker_thread_num();
+            return pool_->get_worker_thread_num();
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -263,13 +260,14 @@ namespace hpx { namespace threads
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
         /// thread-manager instance.
+        template <typename Scheduler>
         void register_counter_types();
 
         /// Returns of the number of the processing units the given thread
         /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread) const
         {
-            return pool_.get_pu_num(num_thread);
+            return pool_->get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed
@@ -277,24 +275,24 @@ namespace hpx { namespace threads
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
         {
-            return pool_.get_pu_mask(topology, num_thread);
+            return pool_->get_pu_mask(topology, num_thread);
         }
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
         mask_cref_type get_used_processing_units() const
         {
-            return pool_.get_used_processing_units();
+            return pool_->get_used_processing_units();
         }
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
-            pool_.set_scheduler_mode(mode);
+            pool_->set_scheduler_mode(mode);
         }
 
         void reset_thread_distribution()
         {
-            pool_.reset_thread_distribution();
+            pool_->reset_thread_distribution();
         }
 
         // Returns the underlying scheduling policy
@@ -305,8 +303,9 @@ namespace hpx { namespace threads
 
     private:
         // counter creator functions
-        naming::gid_type queue_length_counter_creator(
+/*        naming::gid_type queue_length_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -314,20 +313,25 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+        template <typename Scheduler>
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
         naming::gid_type task_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #endif
 
+        template <typename Scheduler>
         naming::gid_type scheduler_utilization_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 
+        template <typename Scheduler>
         naming::gid_type idle_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
         naming::gid_type busy_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-
+*/
     private:
         mutable mutex_type mtx_;   // mutex protecting the members
 
@@ -338,7 +342,7 @@ namespace hpx { namespace threads
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        detail::thread_pool<scheduling_policy_type> pool_;
+        detail::thread_pool* pool_; //! stick with 1 for the moment and make everything work. Later ove on to a vector of thread pools
         notification_policy_type& notifier_;
     };
 }}

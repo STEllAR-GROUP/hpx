@@ -6,8 +6,52 @@
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/include/runtime.hpp>
+//#include <hpx/runtime/threads/policies/schedulers.hpp>
 
-namespace hpx { namespace resource {
+namespace hpx {
+
+    namespace detail {
+
+        std::size_t get_pu_offset(util::command_line_handling const& cfg)
+        {
+            std::size_t pu_offset = std::size_t(-1);
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.pu_offset_ != std::size_t(-1))
+            {
+                pu_offset = cfg.pu_offset_;
+                if (pu_offset >= hpx::threads::hardware_concurrency())
+                {
+                    throw detail::command_line_error(
+                            "Invalid command line option "
+                                    "--hpx:pu-offset, value must be smaller than number of "
+                                    "available processing units.");
+                }
+            }
+#endif
+            return pu_offset;
+        }
+
+        std::size_t get_pu_step(util::command_line_handling const& cfg)
+        {
+            std::size_t pu_step = 1;
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.pu_step_ != 1) {
+                pu_step = cfg.pu_step_;
+                if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
+                {
+                    throw detail::command_line_error(
+                            "Invalid command line option "
+                                    "--hpx:pu-step, value must be non-zero and smaller than "
+                                    "number of available processing units.");
+                }
+            }
+#endif
+            return pu_step;
+        }
+
+    } // namespace detail
+
+    namespace resource {
 
     ////////////////////////////////////////////////////////////////////////
 
@@ -65,26 +109,16 @@ namespace hpx { namespace resource {
         std::cout << "[pool \"" << pool_name_ << "\"] with scheduler " ;
         std::string sched;
         switch(scheduling_policy_) {
-            case -1 :
-                sched = "unspecified"; break;
-            case 0 :
-                sched = "local"; break;
-            case 1 :
-                sched = "local_priority_fifo"; break;
-            case 2 :
-                sched = "local_priority_lifo"; break;
-            case 3 :
-                sched = "static"; break;
-            case 4 :
-                sched = "static_priority"; break;
-            case 5 :
-                sched = "abp_priority"; break;
-            case 6 :
-                sched = "hierarchy"; break;
-            case 7 :
-                sched = "periodic_priority"; break;
-            case 8 :
-                sched = "throttle"; break;
+            case -1 : sched = "unspecified";        break;
+            case 0 : sched = "local";               break;
+            case 1 : sched = "local_priority_fifo"; break;
+            case 2 : sched = "local_priority_lifo"; break;
+            case 3 : sched = "static";              break;
+            case 4 : sched = "static_priority";     break;
+            case 5 : sched = "abp_priority";        break;
+            case 6 : sched = "hierarchy";           break;
+            case 7 : sched = "periodic_priority";   break;
+            case 8 : sched = "throttle";            break;
         }
         std::cout << "\"" << sched << "\"\n"
                   << "is running on PUs : ";
@@ -103,8 +137,17 @@ namespace hpx { namespace resource {
         }
     }
 
-    void resource_partitioner::set_init_affinity_data(hpx::threads::policies::init_affinity_data init_affdat){
-        init_affinity_data_ = init_affdat;
+    void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling cfg){
+
+        // Setup the initial affinity data
+        std::size_t pu_offset = hpx::detail::get_pu_offset(cfg);
+        std::size_t pu_step = hpx::detail::get_pu_step(cfg);
+        std::string affinity_domain = hpx::detail::get_affinity_domain(cfg);
+        std::string affinity_desc;
+        std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg, affinity_desc);
+
+        init_affinity_data_ = threads::policies::init_affinity_data(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
     }
 
     void resource_partitioner::set_default_pool(std::size_t num_threads) {
@@ -194,8 +237,13 @@ namespace hpx { namespace resource {
         }
     }
 
+    void resource_partitioner::set_threadmanager(){
+        thread_manager_ = &(get_runtime_ptr()->get_thread_manager());
+    }
 
-    // create a new thread_pool, add it to the RP and return a pointer to it
+
+
+        // create a new thread_pool, add it to the RP and return a pointer to it
     void resource_partitioner::create_thread_pool(std::string name, scheduling_policy sched)
     {
         if(name.empty())
@@ -231,6 +279,20 @@ namespace hpx { namespace resource {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////
+
+    // this function is called in the constructor of thread_pool
+    // returns a scheduler (moved) that thread pool should have as a data member
+    scheduling_policy resource_partitioner::which_scheduler(std::string pool_name) {
+
+        // look up which scheduler is needed
+        scheduling_policy sched_type = get_pool(pool_name)->get_scheduling_policy();
+        if(sched_type == unspecified)
+            throw std::invalid_argument("Thread pool " + pool_name + " cannot be instantiated with unspecified scheduler type.");
+
+        return sched_type;
+    }
+
 
     threads::topology& resource_partitioner::get_topology() const
     {
@@ -245,7 +307,7 @@ namespace hpx { namespace resource {
 
     ////////////////////////////////////////////////////////////////////////
 
-    uint64_t resource_partitioner::get_pool_index(std::string pool_name){
+    uint64_t resource_partitioner::get_pool_index(std::string pool_name) const {
         std::size_t N = initial_thread_pools_.size();
         for(size_t i(0); i<N; i++) {
             if (initial_thread_pools_[i].get_name() == pool_name) {
@@ -260,7 +322,7 @@ namespace hpx { namespace resource {
 
     // has to be private bc pointers become invalid after data member thread_pools_ is resized
     // we don't want to allow the user to use it
-    init_pool_data* resource_partitioner::get_pool(std::string pool_name){
+    init_pool_data* resource_partitioner::get_pool(std::string pool_name) {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [&pool_name](init_pool_data itp) -> bool {return (itp.get_name() == pool_name);}
@@ -276,7 +338,7 @@ namespace hpx { namespace resource {
         //! Add names of available pools?
     }
 
-    init_pool_data* resource_partitioner::get_default_pool(){
+    init_pool_data* resource_partitioner::get_default_pool() {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [](init_pool_data itp) -> bool {return (itp.get_name() == "default");}
