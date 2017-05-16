@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { inline namespace v2
         typename = typename std::enable_if<
             hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
         >
-    inline std::vector<hpx::future<void>>
+    std::vector<hpx::future<void>>
     define_spmd_block(ExPolicy && policy,
         std::size_t num_images, F && f, Args && ... args)
     {
@@ -46,8 +46,7 @@ namespace hpx { namespace parallel { inline namespace v2
         typename = typename std::enable_if<
             !hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
         >
-    inline void
-    define_spmd_block(ExPolicy && policy,
+    void define_spmd_block(ExPolicy && policy,
         std::size_t num_images, F && f, Args && ... args)
     {
         hpx::lcos::local::define_spmd_block(
@@ -56,7 +55,7 @@ namespace hpx { namespace parallel { inline namespace v2
     }
 
     template <typename F, typename ... Args>
-    inline void define_spmd_block(std::size_t num_images,
+    void define_spmd_block(std::size_t num_images,
         F && f, Args && ... args)
     {
         hpx::lcos::local::define_spmd_block(parallel::execution::par,
