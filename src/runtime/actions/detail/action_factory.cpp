@@ -184,7 +184,7 @@ namespace hpx { namespace actions { namespace detail
     std::string action_registry::collect_registered_typenames()
     {
 #if defined(HPX_DEBUG)
-        std::string msg("known constructors:\n");
+        std::string msg("\nknown constructors:\n");
 
         for (auto const& desc : typename_to_ctor_)
         {
