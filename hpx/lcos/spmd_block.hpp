@@ -16,6 +16,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/unused.hpp>
@@ -39,30 +40,12 @@ namespace hpx { namespace lcos
         struct extract_first_parameter
         {};
 
-        // Specialization for lambdas
-        template <typename ClassType, typename ReturnType>
-        struct extract_first_parameter<ReturnType(ClassType::*)() const>
-        {
-            using type = std::false_type;
-        };
-
-        // Specialization for actions
         template <>
         struct extract_first_parameter< hpx::util::tuple<> >
         {
             using type = std::false_type;
         };
 
-        // Specialization for lambdas
-        template <typename ClassType,
-            typename ReturnType, typename Arg0, typename... Args>
-        struct extract_first_parameter<
-            ReturnType(ClassType::*)(Arg0, Args...) const>
-        {
-            using type = typename std::decay<Arg0>::type;
-        };
-
-        // Specialization for actions
         template <typename Arg0, typename... Args>
         struct extract_first_parameter< hpx::util::tuple<Arg0, Args...> >
         {
@@ -127,36 +110,11 @@ namespace hpx { namespace lcos
         void serialize(Archive &, unsigned) {}
     };
 
-
-    // Helper for define_spmd_block()
-    namespace detail
-    {
-        // Overload for lambdas
-        template <typename F>
-        typename std::enable_if_t<!hpx::traits::is_action<F>::value>
-        initialize_if_lambda(F && f)
-        {
-            auto dummy = hpx::actions::lambda_to_action(f);
-            HPX_UNUSED(dummy);
-        }
-
-        // Overload for actions
-        template <typename F>
-        typename std::enable_if_t<hpx::traits::is_action<F>::value>
-        initialize_if_lambda(F &&)
-        {}
-    }
-
     // Helpers for bulk_execute() invoked in define_spmd_block()
     namespace detail
     {
-        template <typename F, bool Condition =
-            hpx::traits::is_action<F>::value >
-        struct spmd_block_helper;
-
-        // Overload for actions
         template <typename F>
-        struct spmd_block_helper<F,true>
+        struct spmd_block_helper
         {
             std::string name_;
             std::size_t num_images_;
@@ -176,34 +134,6 @@ namespace hpx { namespace lcos
 
                 F()(hpx::launch::sync,
                     hpx::find_here(),
-                    std::move(block),
-                    std::forward<Ts>(ts)...);
-            }
-        };
-
-        // Overload for lambdas
-        template <typename F>
-        struct spmd_block_helper<F,false>
-        {
-            std::string name_;
-            std::size_t num_images_;
-
-            template <typename ... Ts>
-            void operator()(std::size_t image_id, Ts && ... ts) const
-            {
-                using first_type =
-                    typename hpx::lcos::detail::extract_first_parameter<
-                                decltype(&F::operator())>::type;
-
-                static_assert(std::is_same<spmd_block, first_type>::value,
-                    "define_spmd_block() needs a lambda that " \
-                    "has at least a spmd_block as 1st argument");
-
-                spmd_block block(name_, num_images_, image_id);
-
-                int * dummy = nullptr;
-                hpx::util::invoke(
-                    reinterpret_cast<const F&>(*dummy),
                     std::move(block),
                     std::forward<Ts>(ts)...);
             }
@@ -241,7 +171,9 @@ namespace hpx { namespace lcos
         };
     }
 
-    template <typename F, typename ... Args>
+    template <typename F, typename ... Args,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_action<F>::value)
+        >
     hpx::future<void>
     define_spmd_block(std::string && name, std::size_t images_per_locality,
         F && f, Args && ... args)
@@ -255,9 +187,6 @@ namespace hpx { namespace lcos
         using helper_action_type =
             typename hpx::actions::make_action<
                 decltype( &helper_type::call ), &helper_type::call >::type;
-
-        // Initialize f at compile-time in case when f is a lambda function
-        hpx::lcos::detail::initialize_if_lambda(f);
 
         helper_action_type act;
 
