@@ -11,22 +11,16 @@
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/runtime/actions/lambda_to_action.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_execution_policy.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
-#include <cstdio>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <type_traits>

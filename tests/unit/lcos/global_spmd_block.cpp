@@ -11,8 +11,6 @@
 #include <boost/atomic.hpp>
 
 #include <cstddef>
-#include <cstdio>
-#include <iostream>
 #include <utility>
 
 std::size_t images_per_locality = 4;
