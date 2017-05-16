@@ -316,7 +316,15 @@ bool addressing_service::register_locality(
                     prefix
                   , endpoints
                 ));
-            HPX_ASSERT(res.second);
+
+            if (!res.second)
+            {
+                l.unlock();
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "addressing_service::register_locality",
+                    "locality insertion failed because of a duplicate");
+                return false;
+            }
         }
 
         return true;
@@ -380,6 +388,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 std::stringstream strm;
                 strm << "couldn't resolve the given target locality ("
                      << gid << ")";
+                l.unlock();
+
                 HPX_THROWS_IF(ec, bad_parameter,
                     "addressing_service::resolve_locality",
                     strm.str());
@@ -1858,6 +1868,7 @@ void addressing_service::update_cache_entry(
                     if (!gva_cache_->get_entry(key, idbase, e))
                     {
                         // This is impossible under sane conditions.
+                        l.unlock();
                         HPX_THROWS_IF(ec, invalid_data
                           , "addressing_service::update_cache_entry"
                           , "data corruption or lock error occurred in cache");
