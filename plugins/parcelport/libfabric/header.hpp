@@ -374,7 +374,9 @@ namespace libfabric
             }
             uint32_t num=0;
             for (uint32_t i=0; i<message_header.num_chunks; ++i) {
-                if (chunks[i].type_ == serialization::chunk_type::chunk_type_pointer) {
+                if (chunks[i].type_ == serialization::chunk_type::chunk_type_pointer ||
+                    chunks[i].type_ == serialization::chunk_type::chunk_type_rma)
+                {
                     ++num;
                 }
             }

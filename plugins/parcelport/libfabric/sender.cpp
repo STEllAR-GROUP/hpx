@@ -37,9 +37,13 @@ namespace libfabric
         // increment counter of total messages sent
         ++sends_posted_;
 
+        // reserve some space for zero copy information
+        rma_regions_.reserve(buffer_.num_chunks_.first);
+
         // for each zerocopy chunk, we must create a memory region for the data
         // do this before creating the header as the chunk details will be copied
         // into the header space
+        int rma_chunks = 0;
         int index = 0;
         for (auto &c : buffer_.chunks_)
         {
@@ -61,8 +65,8 @@ namespace libfabric
 
                 // set the region remote access key in the chunk space
                 c.rkey_  = zero_copy_region->get_remote_key();
-                    LOG_DEBUG_MSG("Time to register memory (ns) "
-                        << decnumber(regtimer.elapsed_nanoseconds()));
+                LOG_DEBUG_MSG("Time to register memory (ns) "
+                    << decnumber(regtimer.elapsed_nanoseconds()));
                 LOG_DEBUG_MSG("Created zero-copy rdma Get region "
                     << decnumber(index) << *zero_copy_region
                     << "for rkey " << hexpointer(c.rkey_));
@@ -71,6 +75,11 @@ namespace libfabric
                     CRC32_MEM(zero_copy_region->get_address(),
                         zero_copy_region->get_message_length(),
                         "zero_copy_region (pre-send) "));
+            }
+            else if (c.type_ == serialization::chunk_type_rma)
+            {
+                LOG_DEVEL_MSG("an RMA chunk was found");
+                rma_chunks++;
             }
             ++index;
         }
@@ -90,9 +99,6 @@ namespace libfabric
             << ", chunk_flag " << decnumber(header_->header_length())
             << ", tag " << hexuint64(header_->tag())
         );
-
-        // reserve some space for zero copy information
-        rma_regions_.reserve(buffer_.num_chunks_.first);
 
         // Get the block of pinned memory where the message was encoded
         // during serialization
@@ -114,7 +120,8 @@ namespace libfabric
 
         desc_[0] = header_region_->get_local_key();
         desc_[1] = message_region_->get_local_key();
-        if (rma_regions_.size()>0 || !header_->message_piggy_back()) {
+        if (rma_regions_.size()>0 || rma_chunks>0 || !header_->message_piggy_back())
+        {
             completion_count_ = 2;
         }
 
@@ -123,8 +130,9 @@ namespace libfabric
                 << "Chunk info is piggybacked");
         }
         else {
-            LOG_DEBUG_MSG("Setting up header-chunk rma data with "
-                << "zero-copy chunks " << decnumber(rma_regions_.size()));
+            LOG_DEVEL_MSG("Setting up header-chunk rma data with "
+                << "zero-copy chunks " << decnumber(rma_regions_.size())
+                << "rma chunks " << decnumber(rma_chunks));
             auto &cb = header_->chunk_header_ptr()->chunk_rma;
             chunk_region_  = memory_pool_->allocate_region(cb.size_);
             cb.data_.pos_  = chunk_region_->get_address();

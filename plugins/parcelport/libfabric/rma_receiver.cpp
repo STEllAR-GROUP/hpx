@@ -130,8 +130,10 @@ namespace libfabric
 
         int zc_chunks =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type_pointer ||
+                       c.type_ == serialization::chunk_type_rma;
             });
+        HPX_ASSERT(zc_chunks==0);
         int oo_chunks = chunks_.size() - zc_chunks;
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
@@ -175,7 +177,7 @@ namespace libfabric
                 << " index " << decnumber(c.data_.index_));
         });
 
-        rma_regions_.reserve(header_->num_zero_copy_chunks());
+        rma_regions_.reserve(rma_count_);
 
         // for each zerocopy chunk, schedule a read operation
         read_chunk_list();
@@ -247,7 +249,8 @@ namespace libfabric
         // for each zerocopy chunk, schedule a read operation
         uint64_t zc_count =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type_pointer ||
+                       c.type_ == serialization::chunk_type_rma;
             });
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "Restarting RMA reads with " << decnumber(rma_count_) << "chunks");
@@ -264,8 +267,13 @@ namespace libfabric
     {
         for (chunk_struct &c : chunks_)
         {
-            if (c.type_ == serialization::chunk_type_pointer)
+            if (c.type_ == serialization::chunk_type_pointer ||
+                c.type_ == serialization::chunk_type_rma)
             {
+                if (c.type_ == serialization::chunk_type_rma) {
+                    LOG_DEVEL_MSG("Reading an rma chunk");
+                }
+
                 region_type *get_region =
                     memory_pool_->allocate_region(c.size_);
                 LOG_TRACE_MSG(
@@ -452,7 +460,8 @@ namespace libfabric
 
         int zc_chunks =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type_pointer ||
+                       c.type_ == serialization::chunk_type_rma;
             });
         int oo_chunks = chunks_.size() - zc_chunks;
 
