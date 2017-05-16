@@ -65,7 +65,6 @@
 #include <dbghelp.h>
 #endif
 
-
 namespace hpx { namespace util {
 
     namespace stack_trace
