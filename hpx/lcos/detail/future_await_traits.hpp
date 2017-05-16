@@ -28,6 +28,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // this was removed from the TS, so we define our own
+    struct suspend_if
+    {
+        bool is_ready_;
+
+        explicit suspend_if(bool cond) HPX_NOEXCEPT : is_ready_(!cond) {}
+
+        bool await_ready() HPX_NOEXCEPT { return is_ready_; }
+        void await_suspend(std::experimental::coroutine_handle<>) HPX_NOEXCEPT {}
+        void await_resume() HPX_NOEXCEPT {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // Allow using co_await with an expression which evaluates to
     // hpx::future<T>.
     template <typename T>
@@ -125,13 +139,12 @@ namespace hpx { namespace lcos { namespace detail
             return std::experimental::suspend_never{};
         }
 
-        std::experimental::suspend_if final_suspend()
+        suspend_if final_suspend()
         {
             // This gives up the coroutine's reference count on the shared
             // state. If this was the last reference count, the coroutine
             // should not suspend before exiting.
-            return std::experimental::suspend_if{
-                !this->base_type::requires_delete()};
+            return suspend_if{!this->base_type::requires_delete()};
         }
 
         void set_exception(std::exception_ptr e)
