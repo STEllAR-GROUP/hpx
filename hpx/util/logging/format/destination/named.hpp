@@ -21,8 +21,9 @@
 # pragma once
 #endif
 
-#if defined(HPX_MSVC)
-#pragma warning ( disable : 4355)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(push)
+#pragma warning(disable: 4355)
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
@@ -256,6 +257,10 @@ struct named_t : is_generic, non_const_context<detail
 typedef named_t<> named;
 
 }}}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #endif
 

@@ -76,7 +76,7 @@
   This page generated from file pool.hpp.
  */
 
-#ifdef BOOST_MSVC
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable:4127)  // Conditional expression is constant
 #endif
@@ -746,7 +746,7 @@ namespace details
 
 }}}}
 
-#ifdef BOOST_MSVC
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
