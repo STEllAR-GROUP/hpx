@@ -74,10 +74,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if(num_system_pus > 1)
             pu_step_ = data.pu_step_ % num_system_pus;
 
-        std::string dummy;
-        dummy = data.affinity_domain_;
-        affinity_domain_ = dummy;
-//        affinity_domain_ = data.affinity_domain_;
+        affinity_domain_ = data.affinity_domain_;
         pu_nums_.clear();
 
         const std::size_t used_cores = data.used_cores_;
@@ -93,6 +90,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             threads::resize(no_affinity_, num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, i);
+        }
+        else if (data.affinity_desc_ == "affinity-from-resource-partitioner")
+        {
+            //! TODO
         }
         else if (!data.affinity_desc_.empty())
         {

@@ -67,6 +67,7 @@ namespace hpx
         /// \param num_threads    [in] The initial number of threads to be started
         ///                       by the thread-manager.
         explicit runtime_impl(util::runtime_configuration & rtcfg,
+            util::command_line_handling cfg,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1);
 

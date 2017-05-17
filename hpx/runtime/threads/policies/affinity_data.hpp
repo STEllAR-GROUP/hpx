@@ -21,9 +21,6 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     struct init_affinity_data
     {
-
-//        friend resource::resource_partitioner;
-
         init_affinity_data(std::size_t pu_offset = std::size_t(-1),
                 std::size_t pu_step = 1, std::string const& affinity = "pu",
                 std::string const& affinity_desc = "")

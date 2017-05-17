@@ -54,7 +54,8 @@ namespace hpx { namespace threads
         threadmanager_impl(
                 util::io_service_pool& timer_pool,
                 notification_policy_type& notifier,
-                std::size_t num_threads);
+                std::size_t num_threads,
+                util::command_line_handling cfg);
 
         ~threadmanager_impl();
 

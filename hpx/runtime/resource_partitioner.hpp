@@ -6,18 +6,13 @@
 #if !defined(HPX_RESOURCE_PARTITIONER)
 #define HPX_RESOURCE_PARTITIONER
 
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
+#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-//#include <hpx/runtime/get_resource_partitioner.hpp>
-
-
-//#include <hpx/runtime/threads/detail/thread_pool.hpp>
-//#include <hpx/include/runtime.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -27,10 +22,6 @@
 #include <algorithm>
 
 namespace hpx {
-/*
-    struct threads::policies::scheduler_base;
-    struct threads::policies::detail::affinity_data;
-    struct threads::policies::init_affinity_data;*/
 
     namespace resource {
 
@@ -57,9 +48,6 @@ namespace hpx {
 
         init_pool_data(std::string name, scheduling_policy = scheduling_policy::unspecified);
 
-        //! another constructor with size param in case the user already knows at cstrction how many resources will be allocated?
-        //! this constructor would call "reserve" on data member and be a little more mem-efficient
-
         // set functions
         void set_scheduler(scheduling_policy sched);
 
@@ -72,30 +60,21 @@ namespace hpx {
         // mechanism for adding resources
         void add_resource(std::size_t pu_number);
 
-        void print_me();
+        void print_pools();
 
     private:
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
         std::vector<std::size_t> my_pus_;
-        //! does it need to hold the information "run HPX on me/not"? ie "can be used for runtime"/not?
-        //! would make life easier for ppl who want to run HPX side-by-sie with OpenMP for example?
-
     };
 
     class HPX_EXPORT resource_partitioner{
     public:
 
-/*        static resource_partitioner& get_resource_partitioner_(){
-            util::static_<resource::resource_partitioner, std::false_type> rp;
-            return rp.get();
-        }*/
-
         //! constructor: users shouldn't use the constructor but rather get_resource_partitioner
         resource_partitioner();
 
-        void print_me(); //! used by shoshijak for testing. To be deleted.
-
+        void print_pool();
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);
@@ -113,58 +92,39 @@ namespace hpx {
         //! stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, std::string pool_name);
         void set_threadmanager(threads::threadmanager_base* thrd_manag);
-//        threads::threadmanager_base* set_and_get_thread_manager(
-//                util::io_service_pool& timer_pool, threads::policies::callback_notifier& notifier);
         threads::threadmanager_base* get_thread_manager();
+
         //! called in hpx_init
         void set_affinity_data(std::size_t num_threads) {
             affinity_data_.set_num_threads(num_threads);
         }
+
         //! called by constructor of scheduler_base
         threads::policies::detail::affinity_data* get_affinity_data(){
             return &affinity_data_;
         }
         bool default_pool(); // returns whether a default pool already exists
 
-        //! used for handing the thread pool its scheduler. To be written better in the future.
-        void set_config(util::command_line_handling cfg){
-            cfg_ = &cfg;
-        }
-
-        //! called in the threadmanager's constructor to setup the thread pools
-        util::command_line_handling* get_config(){
-            return cfg_;
-        }
-
-
         // called in hpx_init
         void init_rp();
+
+        // called in runtime::assign_cores()
         size_t init(threads::policies::init_affinity_data data){
+            //! if the user specified the affinity in main, then set affinity according to this
+            //! FIXME is this the behavior I want? simple override??
+            if(set_affinity_from_resource_partitioner_)
+                data.affinity_desc_ = "affinity-from-resource-partitioner";
+
             std::size_t ret = affinity_data_.init(data, topology_);
             thread_manager_->init(data);
             return ret;
         }
-
-        // lots of get_functions
-
-/*        std::size_t get_number_pools(){
-            return thread_pools_.size();
-            // get pointer to a particular pool?
-        }*/
-
-        ////////////////////////////////////////////////////////////////////////
-
-        // this function is called in the constructor of thread_pool
-        // returns a scheduler (moved) that thread pool should have as a data member
-        hpx::threads::policies::scheduler_base* create_scheduler(std::string pool_name) const;
-
 
         ////////////////////////////////////////////////////////////////////////
 
         scheduling_policy which_scheduler(std::string pool_name);
         threads::topology& get_topology() const;
         threads::policies::init_affinity_data get_init_affinity_data() const;
-
 
 
     private:
@@ -184,27 +144,28 @@ namespace hpx {
         // counter for instance numbers
         static boost::atomic<int> instance_number_counter_;
 
+        // if true, then the affinity_masks for OS-threads get set
+        // according to the instructions given by the user in main
+        // which are stored in initial_thread_pool
+        // this flag gets set to "true" if add_resource is called
+        bool set_affinity_from_resource_partitioner_;
+
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
         std::vector<init_pool_data> initial_thread_pools_;
 
-        // reference to the threadmanager instance
+        // pointer to the threadmanager instance
         hpx::threads::threadmanager_base* thread_manager_;
 
         // reference to the topology
         threads::hwloc_topology_info& topology_;
 
         // reference to affinity data
-        //! I'll probably have to take this away from runtime
         hpx::threads::policies::init_affinity_data init_affinity_data_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
 
         //! used for handing the thread_pool its scheduler. will have to be written better in the future
         hpx::util::command_line_handling* cfg_;
-
-        //! copied from thread_pool,I'm not sure whether we need this ... or whether it should go somewhere else
-        std::size_t cores_used;
-
 
     };
 
@@ -214,7 +175,6 @@ namespace hpx {
     {
         util::static_<resource::resource_partitioner, std::false_type> rp;
         return rp.get();
-        //return resource::resource_partitioner::get_resource_partitioner_();
     }
 
 

@@ -129,6 +129,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     runtime_impl::runtime_impl(
             util::runtime_configuration & rtcfg,
+            util::command_line_handling cfg,
             runtime_mode locality_mode, std::size_t num_threads)
       : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
@@ -147,7 +148,7 @@ namespace hpx {
         notifier_(runtime_impl::get_notification_policy("worker-thread")),
         thread_manager_(
             new hpx::threads::threadmanager_impl(
-                timer_pool_, notifier_, num_threads)),
+                timer_pool_, notifier_, num_threads, cfg)),
         parcel_handler_(rtcfg, thread_manager_.get(),
             util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
                 util::placeholders::_1, util::placeholders::_2, true),
