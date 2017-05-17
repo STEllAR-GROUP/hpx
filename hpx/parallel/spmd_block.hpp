@@ -139,13 +139,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         return
             hpx::parallel::executor_traits<
-                typename std::decay<executor_type>::type
+                    typename std::decay<executor_type>::type
                 >::bulk_async_execute(
                     policy.executor(),
                     detail::spmd_block_helper<F>{
                         barrier, std::forward<F>(f), num_images
                     },
-                    boost::irange(0ul, num_images), std::forward<Args>(args)...);
+                    boost::irange(std::size_t(0), num_images),
+                    std::forward<Args>(args)...);
     }
 
     // Synchronous version
@@ -178,13 +179,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             = std::make_shared<hpx::lcos::local::barrier>(num_images);
 
         hpx::parallel::executor_traits<
-            typename std::decay<executor_type>::type
+                typename std::decay<executor_type>::type
             >::bulk_execute(
                 policy.executor(),
                 detail::spmd_block_helper<F>{
                     barrier, std::forward<F>(f), num_images
                 },
-                boost::irange(0ul, num_images), std::forward<Args>(args)...);
+                boost::irange(std::size_t(0), num_images),
+                std::forward<Args>(args)...);
     }
 
     template <typename F, typename ... Args>
