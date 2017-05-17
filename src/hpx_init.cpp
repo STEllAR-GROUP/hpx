@@ -628,18 +628,18 @@ namespace hpx
 
                 // Setup all parameters of the resource_partitioner
                 auto &rp = hpx::get_resource_partitioner();
-                rp.set_init_affinity_data(cfg);
+                rp.set_init_affinity_data(cfg); //! this sets only INIT affinity data. When should affinity data be set?
+                rp.set_affinity_data(cfg.num_threads_);
                 rp.set_config(cfg);
                 rp.set_default_pool(cfg.num_threads_);
                 rp.set_default_schedulers(cfg.queuing_);
-//                rp.set_threadmanager(cfg); //! this is from a previous version ... drop it
 
                 //! is there any more initialization to do?
                 //! if so, write i here.
                 //! FIXME when I'm done, move all the above to rp.init();
 
                 // Initialize the resource_partitioner
-                rp.init(); //! doesn't do anything at the moment
+//                rp.init_rp(); //! doesn't do anything at the moment
 
                 // initialize logging
                 util::detail::init_logging(cfg.rtcfg_,
@@ -654,8 +654,6 @@ namespace hpx
                 typedef hpx::runtime_impl runtime_type;
                 std::unique_ptr<hpx::runtime> rt(
                         new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_));
-
-                rp.set_threadmanager();
 
                 result = run_or_start(blocking, std::move(rt), cfg,
                                     std::move(startup), std::move(shutdown));

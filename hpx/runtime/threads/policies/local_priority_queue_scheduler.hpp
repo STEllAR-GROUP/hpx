@@ -1025,11 +1025,11 @@ namespace hpx { namespace threads { namespace policies
             std::vector<mask_type> core_masks(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = get_pu_num(i);
+                std::size_t num_pu = get_resource_partitioner().get_affinity_data()->get_pu_num(i);
                 numa_masks[i] =
-                    topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
+                    get_resource_partitioner().get_topology().get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
                 core_masks[i] =
-                    topology_.get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
+                    get_resource_partitioner().get_topology().get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
             }
 
             // iterate over the number of threads again to determine where to
@@ -1037,9 +1037,9 @@ namespace hpx { namespace threads { namespace policies
             std::ptrdiff_t radius =
                 static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
             victim_threads_[num_thread].reserve(num_threads);
-            std::size_t num_pu = get_pu_num(num_thread);
+            std::size_t num_pu = get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
             mask_cref_type pu_mask =
-                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
+                get_resource_partitioner().get_topology().get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
 

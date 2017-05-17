@@ -669,7 +669,7 @@ namespace hpx
         }
 
         return static_cast<std::uint32_t>(
-            this->get_thread_manager().init(affinity_init_));
+            hpx::get_resource_partitioner().init(affinity_init_));
     }
 
     ///////////////////////////////////////////////////////////////////////////

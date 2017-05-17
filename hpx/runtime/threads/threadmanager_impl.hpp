@@ -58,7 +58,7 @@ namespace hpx { namespace threads
 
         ~threadmanager_impl();
 
-        std::size_t init(policies::init_affinity_data const& data);
+        void init(policies::init_affinity_data const& data);
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -342,7 +342,13 @@ namespace hpx { namespace threads
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        detail::thread_pool* pool_; //! stick with 1 for the moment and make everything work. Later ove on to a vector of thread pools
+        detail::thread_pool* pool_; //! stick with 1 for the moment and make everything work.
+        threads::policies::scheduler_base* sched_; //! stick with 1 for the moment and make everything work.
+        //! later move on to:
+        //! - 2 vectors
+        //! map
+        //! vector pairs
+
         notification_policy_type& notifier_;
     };
 }}

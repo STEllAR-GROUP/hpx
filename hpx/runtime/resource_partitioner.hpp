@@ -9,12 +9,11 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/command_line_handling.hpp>
+//#include <hpx/runtime/get_resource_partitioner.hpp>
 
 
 //#include <hpx/runtime/threads/detail/thread_pool.hpp>
@@ -28,7 +27,10 @@
 #include <algorithm>
 
 namespace hpx {
-
+/*
+    struct threads::policies::scheduler_base;
+    struct threads::policies::detail::affinity_data;
+    struct threads::policies::init_affinity_data;*/
 
     namespace resource {
 
@@ -110,10 +112,18 @@ namespace hpx {
 
         //! stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, std::string pool_name);
-        void set_threadmanager();
+        void set_threadmanager(threads::threadmanager_base* thrd_manag);
 //        threads::threadmanager_base* set_and_get_thread_manager(
 //                util::io_service_pool& timer_pool, threads::policies::callback_notifier& notifier);
         threads::threadmanager_base* get_thread_manager();
+        //! called in hpx_init
+        void set_affinity_data(std::size_t num_threads) {
+            affinity_data_.set_num_threads(num_threads);
+        }
+        //! called by constructor of scheduler_base
+        threads::policies::detail::affinity_data* get_affinity_data(){
+            return &affinity_data_;
+        }
         bool default_pool(); // returns whether a default pool already exists
 
         //! used for handing the thread pool its scheduler. To be written better in the future.
@@ -122,13 +132,18 @@ namespace hpx {
         }
 
         //! called in the threadmanager's constructor to setup the thread pools
-        util::command_line_handling get_config(){
-            return *cfg_;
+        util::command_line_handling* get_config(){
+            return cfg_;
         }
 
 
         // called in hpx_init
-        void init();
+        void init_rp();
+        size_t init(threads::policies::init_affinity_data data){
+            std::size_t ret = affinity_data_.init(data, topology_);
+            thread_manager_->init(data);
+            return ret;
+        }
 
         // lots of get_functions
 
@@ -187,6 +202,9 @@ namespace hpx {
         //! used for handing the thread_pool its scheduler. will have to be written better in the future
         hpx::util::command_line_handling* cfg_;
 
+        //! copied from thread_pool,I'm not sure whether we need this ... or whether it should go somewhere else
+        std::size_t cores_used;
+
 
     };
 
@@ -198,6 +216,7 @@ namespace hpx {
         return rp.get();
         //return resource::resource_partitioner::get_resource_partitioner_();
     }
+
 
 } // namespace hpx
 

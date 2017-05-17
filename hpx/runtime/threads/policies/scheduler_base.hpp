@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util_fwd.hpp>
@@ -72,9 +73,7 @@ namespace hpx { namespace threads { namespace policies
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
-          : topology_(get_topology())
-          , affinity_data_(num_threads)
-          , mode_(mode)
+          : mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
@@ -87,31 +86,6 @@ namespace hpx { namespace threads { namespace policies
 
         virtual ~scheduler_base()
         {
-        }
-
-        threads::mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const
-        {
-            return affinity_data_.get_pu_mask(topology, num_thread,
-                this->numa_sensitive());
-        }
-
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            return affinity_data_.get_pu_num(num_thread);
-        }
-
-        char const* get_description() const { return description_; }
-
-        void add_punit(std::size_t virt_core, std::size_t thread_num)
-        {
-            affinity_data_.add_punit(virt_core, thread_num, topology_);
-        }
-
-        std::size_t init(init_affinity_data const& data,
-            topology const& topology)
-        {
-            return affinity_data_.init(data, topology);
         }
 
         void idle_callback(std::size_t /*num_thread*/)
@@ -302,8 +276,6 @@ namespace hpx { namespace threads { namespace policies
         virtual void reset_thread_distribution() {}
 
     protected:
-        topology const& topology_;
-        detail::affinity_data affinity_data_;
         boost::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)

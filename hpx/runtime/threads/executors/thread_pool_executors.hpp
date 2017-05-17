@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -78,7 +79,7 @@ namespace hpx { namespace threads { namespace executors
             mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
-                return scheduler_.Scheduler::get_pu_mask(topology, num_thread);
+                return hpx::get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, false);
             }
 
             /// Set the new scheduler mode

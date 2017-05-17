@@ -8,6 +8,8 @@
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -17,18 +19,33 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
 
+    //! Constructor used in constructor of threadmanager
     template <typename Scheduler>
     thread_pool_impl<Scheduler>::thread_pool_impl(
-            Scheduler& sched,
+            Scheduler* sched,
             threads::policies::callback_notifier& notifier,
             char const* pool_name, policies::scheduler_mode m)
             : thread_pool(notifier, pool_name, m),
-              sched_(sched)
+              sched_(*sched)
     {
         timestamp_scale_ = 1.0;
     }
 
+    //! Constructor used in constructor of thread_pool_os_executor
     template <typename Scheduler>
+    thread_pool_impl<Scheduler>::thread_pool_impl(
+        Scheduler& sched,
+        threads::policies::callback_notifier& notifier,
+        char const* pool_name,
+        policies::scheduler_mode m)
+        : thread_pool(notifier, pool_name, m),
+          sched_(sched)
+    {
+        timestamp_scale_ = 1.0;
+    }
+
+
+            template <typename Scheduler>
     thread_pool_impl<Scheduler>::~thread_pool_impl()
     {
         if (!threads_.empty()) {
@@ -75,32 +92,30 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    std::size_t thread_pool_impl<Scheduler>::init(
+    void thread_pool_impl<Scheduler>::init(
             std::size_t num_threads,
             policies::init_affinity_data const& data)
     {
-        topology const& topology_ = get_topology();
-        std::size_t cores_used = sched_.Scheduler::init(data, topology_);
+        topology const& topology_ = get_topology(); //! this should go ...
 
         resize(used_processing_units_, threads::hardware_concurrency());
         for (std::size_t i = 0; i != num_threads; ++i)
-            used_processing_units_ |= sched_.Scheduler::get_pu_mask(topology_, i);
+            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, i, false);
 
-        return cores_used;
     }
 
         ///////////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
         std::size_t thread_pool_impl<Scheduler>::get_pu_num(std::size_t num_thread) const
         {
-            return sched_.Scheduler::get_pu_num(num_thread);
+            return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
         }
 
         template <typename Scheduler>
         mask_cref_type thread_pool_impl<Scheduler>::get_pu_mask(
                 topology const& topology, std::size_t num_thread) const
         {
-            return sched_.Scheduler::get_pu_mask(topology, num_thread);
+            return get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, false);
         }
 
 
@@ -321,7 +336,7 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t thread_num = num_threads;
                 while (thread_num-- != 0) {
                     threads::mask_cref_type mask =
-                            sched_.Scheduler::get_pu_mask(topology_, thread_num);
+                            get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, thread_num, false);
 
                     LTM_(info) //-V128
                             << "thread_pool::run: " << pool_name_
@@ -512,7 +527,7 @@ namespace hpx { namespace threads { namespace detail
         {
             // Set the affinity for the current thread.
             threads::mask_cref_type mask =
-                    sched_.Scheduler::get_pu_mask(topology, num_thread);
+                    get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, false);
 
             if (LHPX_ENABLED(debug))
                 topology.write_to_log();

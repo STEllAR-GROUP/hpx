@@ -319,7 +319,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             {
                 std::lock_guard<mutex_type> l(mtx_);
-                scheduler_.add_punit(virt_core, thread_num);
+                get_resource_partitioner().get_affinity_data()->add_punit(virt_core, thread_num, get_topology());
                 scheduler_.on_start_thread(virt_core);
             }
 

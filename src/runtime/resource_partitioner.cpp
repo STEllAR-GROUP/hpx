@@ -237,8 +237,8 @@ namespace hpx {
         }
     }
 
-    void resource_partitioner::set_threadmanager(){
-        thread_manager_ = &(get_runtime_ptr()->get_thread_manager());
+    void resource_partitioner::set_threadmanager(threads::threadmanager_base* thrd_manag){
+        thread_manager_ = thrd_manag;
     }
 
 
@@ -269,7 +269,7 @@ namespace hpx {
         get_pool(pool_name)->set_scheduler(sched);
     }
 
-    void resource_partitioner::init(){
+    void resource_partitioner::init_rp(){
 
         //! what do I actually need to do?
 

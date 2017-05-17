@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -44,11 +45,16 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
     }
 
-    affinity_data::affinity_data(std::size_t num_threads)
-      : num_threads_(num_threads), pu_offset_(std::size_t(-1)), pu_step_(1),
+    affinity_data::affinity_data()
+      : num_threads_(0), pu_offset_(std::size_t(-1)), pu_step_(1),
         affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
         no_affinity_()
-    {}
+    {
+        // allow only one affinity-data instance
+        if(instance_number_counter_++ >= 0){
+            throw std::runtime_error("Cannot instantiate more than one affinity data instance");
+        }
+    }
 
     std::size_t affinity_data::init(init_affinity_data const& data,
         topology const & topology)
@@ -68,7 +74,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if(num_system_pus > 1)
             pu_step_ = data.pu_step_ % num_system_pus;
 
-        affinity_domain_ = data.affinity_domain_;
+        std::string dummy;
+        dummy = data.affinity_domain_;
+        affinity_domain_ = dummy;
+//        affinity_domain_ = data.affinity_domain_;
         pu_nums_.clear();
 
         const std::size_t used_cores = data.used_cores_;
@@ -237,4 +246,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         // number of processing units.
         return (num_pu + offset) % hardware_concurrency;
     }
+
+    boost::atomic<int> affinity_data::instance_number_counter_(-1);
+
+
+
 }}}}

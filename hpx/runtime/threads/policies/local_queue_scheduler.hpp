@@ -347,7 +347,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
-                std::size_t pu_number = get_pu_num(num_thread);
+                std::size_t pu_number = get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 if (test(steals_in_numa_domain_, pu_number)) //-V600 //-V111
 #endif
@@ -363,7 +363,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = get_pu_num(idx);
+                        std::size_t pu_num = get_resource_partitioner().get_affinity_data()->get_pu_num(idx);
                         if (!test(this_numa_domain, pu_num)) //-V560 //-V600 //-V111
                             continue;
 
@@ -392,7 +392,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = get_pu_num(idx);
+                        std::size_t pu_num = get_resource_partitioner().get_affinity_data()->get_pu_num(idx);
                         if (!test(numa_domain, pu_num)) //-V560 //-V600 //-V111
                             continue;
 
@@ -631,7 +631,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
-                std::size_t pu_number = get_pu_num(num_thread);
+                std::size_t pu_number = get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 if (test(steals_in_numa_domain_, pu_number)) //-V600 //-V111
 #endif
@@ -645,7 +645,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, get_pu_num(idx))) //-V600
+                        if (!test(numa_domain_mask, get_resource_partitioner().get_affinity_data()->get_pu_num(idx))) //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -672,7 +672,7 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, get_pu_num(idx))) //-V600
+                        if (!test(numa_domain_mask, get_resource_partitioner().get_affinity_data()->get_pu_num(idx))) //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -750,12 +750,12 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
 
             // pre-calculate certain constants for the given thread number
-            std::size_t num_pu = get_pu_num(num_thread);
-            mask_cref_type machine_mask = topology_.get_machine_affinity_mask();
+            std::size_t num_pu = get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
+            mask_cref_type machine_mask = get_resource_partitioner().get_topology().get_machine_affinity_mask();
             mask_cref_type core_mask =
-                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
+                get_resource_partitioner().get_topology().get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
             mask_cref_type node_mask =
-                topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
+                get_resource_partitioner().get_topology().get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
 
             if (any(core_mask) && any(node_mask))
             {

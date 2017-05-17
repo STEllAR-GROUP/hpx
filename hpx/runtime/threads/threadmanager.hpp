@@ -60,7 +60,7 @@ namespace threads
 
         virtual ~threadmanager_base() {}
 
-        virtual std::size_t init(policies::init_affinity_data const& data) = 0;
+        virtual void init(policies::init_affinity_data const& data) = 0;
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;

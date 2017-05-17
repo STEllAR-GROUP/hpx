@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace detail
             policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
 
-        virtual std::size_t init(std::size_t num_threads,
+        virtual void init(std::size_t num_threads,
             policies::init_affinity_data const& data) = 0;
 
         virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;

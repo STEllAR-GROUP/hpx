@@ -9,14 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace resource {
-        class resource_partitioner;
-    }
-}
 
 namespace hpx { namespace threads { namespace policies
 {
@@ -24,7 +22,7 @@ namespace hpx { namespace threads { namespace policies
     struct init_affinity_data
     {
 
-        friend resource::resource_partitioner;
+//        friend resource::resource_partitioner;
 
         init_affinity_data(std::size_t pu_offset = std::size_t(-1),
                 std::size_t pu_step = 1, std::string const& affinity = "pu",
@@ -61,12 +59,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     struct affinity_data
     {
 
-        friend resource::resource_partitioner;
-
-        affinity_data(std::size_t num_threads = 0); //! to be changed!!!! well ... that's actually not such a bad solution
+        affinity_data();
 
         std::size_t init(init_affinity_data const& data,
                 topology const& toplogy);
+
+        void set_num_threads(size_t num_threads){
+            num_threads_ = num_threads;
+        }
 
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread, bool numa_sensitive) const;
@@ -94,6 +94,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
         mask_type no_affinity_;     ///< mask of processing units which have no affinity
+        static boost::atomic<int> instance_number_counter_; // counter for instance numbers
+
     };
 }}}}
 

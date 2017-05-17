@@ -7,6 +7,7 @@
 #define HPX_THREAD_POOL_HPP
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/policies/schedulers.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -15,13 +16,21 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     struct init_tss_helper;
 
-    ///////////////////////////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    class thread_pool_impl: public thread_pool
+    class thread_pool_impl : public thread_pool
     {
     public:
 
+        //! Constructor used in constructor of threadmanager
+        thread_pool_impl(
+            Scheduler* sched,
+            threads::policies::callback_notifier& notifier,
+            char const* pool_name,
+            policies::scheduler_mode m = policies::nothing_special);
+
+        //! Constructor used in constructor of thread_pool_os_executor
         thread_pool_impl(
             Scheduler& sched,
             threads::policies::callback_notifier& notifier,
@@ -33,7 +42,7 @@ namespace hpx { namespace threads { namespace detail
         hpx::state get_state() const;
         hpx::state get_state(std::size_t num_thread) const;
         bool has_reached_state(hpx::state s) const;
-        std::size_t init(std::size_t num_threads, policies::init_affinity_data const& data);
+        void init(std::size_t num_threads, policies::init_affinity_data const& data);
 
         std::size_t get_pu_num(std::size_t num_thread) const;
 
@@ -119,8 +128,8 @@ namespace hpx { namespace threads { namespace detail
 
 
     private:
-        // refer to used scheduler
-        Scheduler& sched_;
+        // hold the used scheduler
+        Scheduler& sched_;//! previously: reference to
 
 
     };
