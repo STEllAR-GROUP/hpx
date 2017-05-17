@@ -120,11 +120,12 @@ namespace hpx { namespace lcos
                     typename hpx::lcos::detail::extract_first_parameter<
                                 typename F::arguments_type>::type;
 
-                static_assert(std::is_same<spmd_block, first_type>::value,
-                    "define_spmd_block() needs an action that " \
-                    "has at least a spmd_block as 1st argument");
+                static_assert(std::is_same<hpx::lcos::spmd_block,
+                    first_type>::value,
+                        "define_spmd_block() needs an action that " \
+                        "has at least a spmd_block as 1st argument");
 
-                spmd_block block(name_, num_images_, image_id);
+                hpx::lcos::spmd_block block(name_, num_images_, image_id);
 
                 F()(hpx::launch::sync,
                     hpx::find_here(),
