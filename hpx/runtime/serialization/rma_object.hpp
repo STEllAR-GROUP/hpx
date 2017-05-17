@@ -14,7 +14,9 @@
 #include <hpx/traits/is_rma_eligible.hpp>
 #include <hpx/runtime/parcelset/rma/allocator.hpp>
 #include <hpx/runtime/parcelset/rma/rma_object.hpp>
-
+//
+#include <plugins/parcelport/parcelport_logging.hpp>
+//
 #include <type_traits>
 #include <vector>
 
@@ -44,8 +46,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void load_impl(input_archive & ar, rma::rma_vector<T> & v,
-            std::true_type)
+        void load_impl(input_archive & ar, rma::rma_vector<T> & v, std::true_type)
         {
             if(ar.disable_array_optimization())
             {
@@ -57,12 +58,20 @@ namespace hpx { namespace serialization
                 typedef typename rma::rma_vector<T>::size_type size_type;
                 size_type size;
                 ar >> size; //-V128
-                if(size == 0) return;
-
-                v.resize(size);
-                // bitwise (zero-copy) load with rma overload...
-                ar.load_rma_chunk(v.data(), v.size() * sizeof(T),
-                    v.get_allocator().get_memory_region(v.data()));
+                if (size == 0) {
+                    return;
+                }
+                //
+                v.resize(size/sizeof(T));
+                //
+                if (size < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                    ar.load_binary(v.data(), size);
+                }
+                else {
+                    // bitwise (zero-copy) load with rma overload...
+                    ar.load_rma_chunk(v.data(), v.size() * sizeof(T),
+                        v.get_allocator().get_memory_region(v.data()));
+                }
             }
         }
     }
@@ -82,7 +91,8 @@ namespace hpx { namespace serialization
     namespace detail
     {
         template <typename T>
-        void save_impl(output_archive & ar, const rma::rma_vector<T> & vs, std::false_type)
+        void save_impl(
+            output_archive & ar, const rma::rma_vector<T> & vs, std::false_type)
         {
             // normal save ...
             typedef typename rma::rma_vector<T>::value_type value_type;
@@ -93,14 +103,15 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        void save_impl(output_archive & ar, const rma::rma_vector<T> & v, std::true_type)
+        void save_impl(
+            output_archive & ar, const rma::rma_vector<T> & v, std::true_type)
         {
-            if (ar.disable_array_optimization())
+            if (v.size() < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
-                save_impl(ar, v, std::false_type());
+                // fall back to serialization_chunk-less archive
+                ar.save_binary(v.data(), v.size() * sizeof(T));
             }
-            else
-            {
+            else {
                 // bitwise (zero-copy) save with rma overload...
                 ar.save_rma_chunk(v.data(), v.size() * sizeof(T),
                     v.get_allocator().get_memory_region(v.data()));
@@ -111,11 +122,15 @@ namespace hpx { namespace serialization
     template <typename T>
     void serialize(output_archive & ar, const rma::rma_vector<T> & v, unsigned)
     {
-        typedef std::true_type use_optimized;
-
         ar << v.size(); //-V128
-        if(v.empty()) return;
-        detail::save_impl(ar, v, use_optimized());
+        if (v.empty()) return;
+
+        if (ar.disable_array_optimization()) {
+            detail::save_impl(ar, v, std::false_type());
+        }
+        else {
+            detail::save_impl(ar, v, std::true_type());
+        }
     }
 }}
 
