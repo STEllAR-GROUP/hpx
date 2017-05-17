@@ -258,7 +258,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                 {
-                    std::size_t chunk_size = buffer_.transmission_chunks_[i].second;
+                    std::size_t chunk_size = static_cast<std::size_t>(
+                        buffer_.transmission_chunks_[i].second);
                     buffer_.chunks_[i].resize(chunk_size);
                     buffers.push_back(
                         boost::asio::buffer(buffer_.chunks_[i].data(), chunk_size));

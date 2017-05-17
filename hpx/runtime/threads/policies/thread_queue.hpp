@@ -952,7 +952,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::vector<thread_id_type> ids;
-            ids.reserve(count);
+            ids.reserve(static_cast<std::size_t>(count));
 
             if (state == unknown)
             {

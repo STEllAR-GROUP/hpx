@@ -48,7 +48,7 @@ namespace hpx { namespace components
             for (std::uint64_t value: values)
             {
                 maxcount = (std::max)(maxcount, std::size_t(value));
-                existing += value;
+                existing += std::size_t(value);
             }
 
             // distribute the number of components to create in a way, so that
