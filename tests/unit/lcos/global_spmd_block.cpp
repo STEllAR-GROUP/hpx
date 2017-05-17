@@ -15,15 +15,17 @@
 
 std::size_t images_per_locality = 4;
 std::size_t iterations = 20;
+std::size_t test_value = 4;
 boost::atomic<std::size_t> c(0);
 
-void bulk_test_function(hpx::lcos::spmd_block block)
+void bulk_test_function(hpx::lcos::spmd_block block, std::size_t arg)
 {
     std::size_t num_images
         = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
 
     HPX_TEST_EQ(block.get_num_images(), num_images);
     HPX_TEST_EQ(block.this_image() < num_images, true);
+    HPX_TEST_EQ(arg, test_value * 10);
 
     for(std::size_t i=0, test_count = images_per_locality;
         i<iterations;
@@ -40,11 +42,13 @@ HPX_PLAIN_ACTION(bulk_test_function, bulk_test_action);
 
 int main()
 {
+    std::size_t arg = test_value * 10;
+
     bulk_test_action act;
 
     hpx::future<void> join =
         hpx::lcos::define_spmd_block(
-            "block1", images_per_locality, std::move(act));
+            "block1", images_per_locality, std::move(act), arg );
 
     hpx::wait_all(join);
 
