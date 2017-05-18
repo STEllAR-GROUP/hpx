@@ -10,7 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -252,16 +252,16 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename T1>
-            local::futures_factory<void()> push_ff(T1 && val)
+            local::packaged_task<void()> push_pt(T1 && val)
             {
-                return local::futures_factory<void()>(
+                return local::packaged_task<void()>(
                     util::deferred_call(
                         &one_element_queue_async::set_deferred, this,
                         std::forward<T1>(val)));
             }
-            local::futures_factory<T()> pop_ff()
+            local::packaged_task<T()> pop_pt()
             {
-                return local::futures_factory<T()>(
+                return local::packaged_task<T()>(
                     util::deferred_call(&one_element_queue_async::get, this));
             }
 
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos { namespace local
                                 "attempting to write to a busy queue"));
                     }
 
-                    push_ = push_ff(std::forward<T1>(val));
+                    push_ = push_pt(std::forward<T1>(val));
                     push_active_ = true;
                     return push_.get_future();
                 }
@@ -294,7 +294,6 @@ namespace hpx { namespace lcos { namespace local
                 set(std::forward<T1>(val));
                 if (pop_active_)
                 {
-                    util::scoped_unlock<Lock> ul(l);
                     pop_();                          // trigger waiting pop
                 }
                 return hpx::make_ready_future();
@@ -327,7 +326,7 @@ namespace hpx { namespace lcos { namespace local
                                 "attempting to read from an empty queue"));
                     }
 
-                    pop_ = pop_ff();
+                    pop_ = pop_pt();
                     pop_active_ = true;
                     return pop_.get_future();
                 }
@@ -335,7 +334,6 @@ namespace hpx { namespace lcos { namespace local
                 T val = get();
                 if (push_active_)
                 {
-                    util::scoped_unlock<Lock> ul(l);
                     push_();                        // trigger waiting push
                 }
                 return hpx::make_ready_future(val);
@@ -357,8 +355,8 @@ namespace hpx { namespace lcos { namespace local
 
         private:
             T val_;
-            local::futures_factory<void()> push_;
-            local::futures_factory<T()> pop_;
+            local::packaged_task<void()> push_;
+            local::packaged_task<T()> pop_;
             bool empty_;
             bool push_active_;
             bool pop_active_;
