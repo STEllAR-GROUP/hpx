@@ -145,7 +145,8 @@ namespace hpx { namespace lcos { namespace local
                     detail::spmd_block_helper<F>{
                         barrier, std::forward<F>(f), num_images
                     },
-                    boost::irange(std::size_t(0), num_images), std::forward<Args>(args)...);
+                    boost::irange(std::size_t(0), num_images),
+                        std::forward<Args>(args)...);
     }
 
     // Synchronous version
@@ -184,7 +185,8 @@ namespace hpx { namespace lcos { namespace local
                 detail::spmd_block_helper<F>{
                     barrier, std::forward<F>(f), num_images
                 },
-                boost::irange(std::size_t(0), num_images), std::forward<Args>(args)...);
+                boost::irange(std::size_t(0), num_images),
+                    std::forward<Args>(args)...);
     }
 
     template <typename F, typename ... Args>
