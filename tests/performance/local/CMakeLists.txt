@@ -96,6 +96,7 @@ set(benchmarks ${benchmarks}
     function_object_wrapper_overhead
     future_overhead
     serialization_overhead
+    serialization_performance
     sizeof
    )
 

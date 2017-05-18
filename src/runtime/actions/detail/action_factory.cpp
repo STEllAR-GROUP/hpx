@@ -203,4 +203,10 @@ namespace hpx { namespace actions { namespace detail
 #endif
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    std::uint32_t get_action_id_from_name(char const* action_name)
+    {
+        using hpx::actions::detail::action_registry;
+        return action_registry::get_id(action_name);
+    }
 }}}

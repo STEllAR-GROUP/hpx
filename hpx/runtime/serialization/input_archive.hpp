@@ -41,8 +41,8 @@ namespace hpx { namespace serialization
 
         template <typename Container>
         input_archive(Container & buffer,
-            std::size_t inbound_data_size = 0,
-            const std::vector<serialization_chunk>* chunks = nullptr)
+                std::size_t inbound_data_size = 0,
+                const std::vector<serialization_chunk>* chunks = nullptr)
           : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {

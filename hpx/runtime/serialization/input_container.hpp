@@ -50,7 +50,8 @@ namespace hpx { namespace serialization
         input_container(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)),
+            current_chunk_size_(0)
         {}
 
         input_container(Container const& cont,
@@ -58,7 +59,8 @@ namespace hpx { namespace serialization
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(nullptr), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+            chunks_(nullptr), current_chunk_(std::size_t(-1)),
+            current_chunk_size_(0)
         {
             if (chunks && chunks->size() != 0)
             {
@@ -90,7 +92,8 @@ namespace hpx { namespace serialization
                 filter_->load(address, count);
             }
             else {
-                if (current_+count > cont_.size())
+                std::size_t new_current = current_ + count;
+                if (new_current > cont_.size())
                 {
                     HPX_THROW_EXCEPTION(serialization_error
                       , "input_container::load_binary"
@@ -98,11 +101,35 @@ namespace hpx { namespace serialization
                     return;
                 }
 
-                if (count == 1)
-                    *static_cast<unsigned char*>(address) = cont_[current_];
-                else
-                    std::memcpy(address, &cont_[current_], count);
-                current_ += count;
+                void const* src = &cont_[current_];
+                switch (count)
+                {
+                case 8:
+                    *static_cast<std::uint64_t*>(address) =
+                        *static_cast<std::uint64_t const*>(src);
+                    break;
+
+                case 4:
+                    *static_cast<std::uint32_t*>(address) =
+                        *static_cast<std::uint32_t const*>(src);
+                    break;
+
+                case 2:
+                    *static_cast<std::uint16_t*>(address) =
+                        *static_cast<std::uint16_t const*>(src);
+                    break;
+
+                case 1:
+                    *static_cast<std::uint8_t*>(address) =
+                        *static_cast<std::uint8_t const*>(src);
+                    break;
+
+                default:
+                    std::memcpy(address, src, count);
+                    break;
+                }
+
+                current_ = new_current;
 
                 if (chunks_) {
                     current_chunk_size_ += count;
@@ -130,8 +157,10 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT((std::int64_t)count >= 0);
 
-            if (filter_.get() || chunks_ == nullptr ||
-                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+            if (chunks_ == nullptr ||
+                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ||
+                filter_)
+            {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);
             }

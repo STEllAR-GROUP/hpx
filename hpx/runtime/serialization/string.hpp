@@ -25,7 +25,8 @@ namespace hpx { namespace serialization
         ar >> size; //-V128
 
         s.clear();
-        s.resize(size);
+        if (s.size() < size)
+            s.resize(size);
 
         load_binary(ar, &s[0], size * sizeof(Char));
     }
