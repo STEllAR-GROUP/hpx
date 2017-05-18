@@ -66,24 +66,28 @@ namespace rma {
         // virtual allocate so that a concrete instance
         virtual value_type* allocate(std::size_t const n)
         {
+            LOG_DEVEL_MSG("STL allocate " << hexlength(n*sizeof(value_type)));
             return static_cast<value_type*>(pool_->allocate(n*sizeof(value_type)));
         }
 
         virtual void deallocate(value_type* const p, std::size_t const n)
         {
+            LOG_DEVEL_MSG("STL deallocate " << hexlength(n*sizeof(value_type)));
             pool_->deallocate(p, n);
         }
 
         template <class U, class ...A>
         void construct(U* const p, A&& ...args)
         {
-          new (p) U(std::forward<A>(args)...);
+            LOG_DEVEL_MSG("STL construct ");
+            new (p) U(std::forward<A>(args)...);
         }
 
         template <class U>
         void destroy(U* const p)
         {
-          p->~U();
+            LOG_DEVEL_MSG("STL destruct ");
+            p->~U();
         }
 
         // ---------------------------------------------------------------------------
@@ -96,7 +100,9 @@ namespace rma {
         // retrieve a memory region handle from the address (presumed to have been
         // supplied by the allocator previously)
         memory_region *get_memory_region(void const * addr) const {
-            return pool_->region_from_address(addr);
+            memory_region *region = pool_->region_from_address(addr);
+            LOG_DEVEL_MSG("STL region_from_address " << *region);
+            return region;
         }
 
     protected:

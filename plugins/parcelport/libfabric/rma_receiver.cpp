@@ -271,7 +271,7 @@ namespace libfabric
                 c.type_ == serialization::chunk_type_rma)
             {
                 if (c.type_ == serialization::chunk_type_rma) {
-                    LOG_DEVEL_MSG("Reading an rma chunk");
+                    LOG_DEBUG_MSG("Reading an rma chunk");
                 }
 
                 region_type *get_region =

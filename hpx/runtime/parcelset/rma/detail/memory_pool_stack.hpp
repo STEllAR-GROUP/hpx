@@ -144,7 +144,8 @@ namespace detail
             );
 
             if (!free_list_.push(region)) {
-                LOG_ERROR_MSG(PoolType::desc() << "Error in memory pool push");
+                LOG_ERROR_MSG(PoolType::desc() << "Error in memory pool push "
+                    << *region);
             }
             // decrement one reference
             --in_use_;
