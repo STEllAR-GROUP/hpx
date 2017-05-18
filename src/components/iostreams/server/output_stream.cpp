@@ -20,6 +20,7 @@
 #include <hpx/util/io_service_pool.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <utility>
 

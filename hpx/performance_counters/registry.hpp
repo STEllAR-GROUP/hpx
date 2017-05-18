@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
