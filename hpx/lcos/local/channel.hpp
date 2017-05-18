@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/iterator_facade.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -272,11 +273,17 @@ namespace hpx { namespace lcos { namespace local
             template <typename T1, typename Lock>
             hpx::future<void> push(T1 && val, Lock& l)
             {
+                HPX_ASSERT_OWNS_LOCK(l);
                 if (!empty_)
                 {
                     if (push_active_)
                     {
-                        // error!
+                        l.unlock();
+                        return hpx::make_exceptional_future<void>(
+                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                                "hpx::lcos::local::detail::"
+                                    "one_element_queue_async::push",
+                                "attempting to write to a busy queue"));
                     }
 
                     push_ = push_ff(std::forward<T1>(val));
@@ -293,8 +300,10 @@ namespace hpx { namespace lcos { namespace local
                 return hpx::make_ready_future();
             }
 
-            void cancel(boost::exception_ptr const& e)
+            template <typename Lock>
+            void cancel(boost::exception_ptr const& e, Lock& l)
             {
+                HPX_ASSERT_OWNS_LOCK(l);
                 if (pop_active_)
                 {
                     pop_.set_exception(e);
@@ -305,11 +314,17 @@ namespace hpx { namespace lcos { namespace local
             template <typename Lock>
             hpx::future<T> pop(Lock& l)
             {
+                HPX_ASSERT_OWNS_LOCK(l);
                 if (empty_)
                 {
                     if (pop_active_)
                     {
-                        // error!
+                        l.unlock();
+                        return hpx::make_exceptional_future<T>(
+                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                                "hpx::lcos::local::detail::"
+                                    "one_element_queue_async::pop",
+                                "attempting to read from an empty queue"));
                     }
 
                     pop_ = pop_ff();
@@ -326,13 +341,17 @@ namespace hpx { namespace lcos { namespace local
                 return hpx::make_ready_future(val);
             }
 
-            bool is_empty() const
+            template <typename Lock>
+            bool is_empty(Lock& l) const
             {
+                HPX_ASSERT_OWNS_LOCK(l);
                 return empty_;
             }
 
-            bool has_pending_request() const
+            template <typename Lock>
+            bool has_pending_request(Lock& l) const
             {
+                HPX_ASSERT_OWNS_LOCK(l);
                 return push_active_;
             }
 
@@ -363,7 +382,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                if (buffer_.is_empty() && !buffer_.has_pending_request())
+                if (buffer_.is_empty(l) && !buffer_.has_pending_request(l))
                 {
                     if (closed_)
                     {
@@ -405,7 +424,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                if (buffer_.is_empty() && !buffer_.has_pending_request() && closed_)
+                if (buffer_.is_empty(l) && !buffer_.has_pending_request(l) && closed_)
                     return false;
 
                 if (f != nullptr)
@@ -446,16 +465,20 @@ namespace hpx { namespace lcos { namespace local
 
                 closed_ = true;
 
-                if (buffer_.is_empty() || !buffer_.has_pending_request())
+                if (buffer_.is_empty(l) || !buffer_.has_pending_request(l))
                     return;
 
                 // all pending requests which can't be satisfied have to be
                 // canceled at this point
-                buffer_.cancel(boost::exception_ptr(
+                boost::exception_ptr e;
+                {
+                    util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                    e = boost::exception_ptr(
                         HPX_GET_EXCEPTION(hpx::future_cancelled,
                             "hpx::lcos::local::close",
-                            "canceled waiting on this entry")
-                    ));
+                            "canceled waiting on this entry"));
+                }
+                buffer_.cancel(std::move(e), l);
             }
 
             void set_exception(boost::exception_ptr e)
@@ -463,8 +486,8 @@ namespace hpx { namespace lcos { namespace local
                 std::unique_lock<mutex_type> l(mtx_);
                 closed_ = true;
 
-                if (!buffer_.is_empty())
-                    buffer_.cancel(e);
+                if (!buffer_.is_empty(l))
+                    buffer_.cancel(e, l);
             }
 
         private:
@@ -766,7 +789,6 @@ namespace hpx { namespace lcos { namespace local
 
     private:
         friend class channel_iterator<T>;
-        friend class receive_channel<T>;
         friend class send_channel<T>;
 
     public:
@@ -1030,7 +1052,6 @@ namespace hpx { namespace lcos { namespace local
 
     private:
         friend class channel_iterator<void>;
-        friend class receive_channel<void>;
         friend class send_channel<void>;
 
     public:
