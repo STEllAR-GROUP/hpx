@@ -62,6 +62,12 @@ namespace hpx { namespace threads
         mask |= bits(idx);
     }
 
+    inline void unset(mask_type& mask, std::size_t idx)
+    {
+        HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        mask &= not_(bits(idx));
+    }
+
     inline std::size_t mask_size(mask_cref_type mask)
     {
         return CHAR_BIT * sizeof(mask_type);

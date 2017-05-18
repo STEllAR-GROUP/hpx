@@ -92,6 +92,10 @@ namespace hpx { namespace threads { namespace detail
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
+        std::size_t get_pool_name() const
+        {
+            return pool_name_;
+        }
         virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
         virtual mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const = 0;

@@ -163,7 +163,8 @@ namespace threads
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns
         ///               \a false.
-        virtual bool run(std::size_t num_threads = 1) = 0;
+        //! FIXME parameter is commentary is obsolete
+        virtual bool run() = 0;
 
         /// \brief Forcefully stop the thread-manager
         ///

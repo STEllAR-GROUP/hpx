@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
+//  Copyright (c)      2017 Shoshana Jakobovits
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -33,6 +34,7 @@
 #include <numeric>
 #include <type_traits>
 #include <vector>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -50,6 +52,9 @@ namespace hpx { namespace threads
 
     public:
         typedef threads::policies::callback_notifier notification_policy_type;
+        typedef detail::thread_pool* pool_type;
+        typedef threads::policies::scheduler_base* scheduler_type;
+        typedef std::vector<std::pair<pool_type, scheduler_type> > pool_and_sched_type;
 
         threadmanager_impl(
                 util::io_service_pool& timer_pool,
@@ -60,6 +65,11 @@ namespace hpx { namespace threads
         ~threadmanager_impl();
 
         void init(policies::init_affinity_data const& data);
+
+        //! get a pointer to
+        //! write overloads with ids instead of names
+        pool_type get_pool(std::string pool_name) const;
+        pool_type get_default_pool() const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -134,7 +144,8 @@ namespace hpx { namespace threads
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns
         ///               \a false.
-        bool run(std::size_t num_threads = 1);
+        //! FIXME parameter in commentary is obsolete
+        bool run();
 
         /// \brief Forcefully stop the thread-manager
         ///
@@ -143,9 +154,20 @@ namespace hpx { namespace threads
         void stop (bool blocking = true);
 
         /// \brief Return whether the thread manager is still running
+        //! This returns the "minimal state", i.e. the state of the
+        //! least advanced thread pool
         state status() const
         {
-            return pool_->get_state();
+            hpx::state result(last_valid_runtime_state);
+
+            typedef boost::atomic<hpx::state> state_type;
+            for (auto& pools_iter : pools_)
+            {
+                hpx::state s = pools_iter.first->get_state();
+                result = (std::min)(result, s);
+            }
+
+            return result;
         }
 
         /// \brief return the number of HPX-threads with the given state
@@ -178,13 +200,18 @@ namespace hpx { namespace threads
         std::size_t get_os_thread_count() const
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            return pool_->get_os_thread_count();
+            std::size_t total;
+            for(auto& pool_iter : pools_){
+                total += pool_iter.first->get_os_thread_count();
+            }
+            return total;
         }
 
-        compat::thread& get_os_thread_handle(std::size_t num_thread)
+        //! overload which takes id instead of string, and use "default" by default?
+        compat::thread& get_os_thread_handle(std::string pool_name, std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            return pool_->get_os_thread_handle(num_thread);
+            return get_pool(pool_name)->get_os_thread_handle(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -200,22 +227,29 @@ namespace hpx { namespace threads
     public:
         /// this notifies the thread manager that there is some more work
         /// available
-        void do_some_work(std::size_t num_thread = std::size_t(-1))
+        //! shoshijak: I couldn't find where this was used, so just taking it off for the moment...
+/*        void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             pool_->do_some_work(num_thread);
-        }
+        }*/
 
         /// API functions forwarding to notification policy
         void report_error(std::size_t num_thread, std::exception_ptr const& e)
         {
-            pool_->report_error(num_thread, e);
+            // propagate the error reporting to all pools, which in turn
+            // will propagate to schedulers
+            for(auto& pools_iter : pools_){
+                pools_iter.first->report_error(num_thread, e);
+            }
         }
 
-        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
+        //! return the worker thread num of the pool designated by the given index parameter
+        //! querry default pool if not specified?
+        std::size_t get_worker_thread_num(std::string pool_name, bool* numa_sensitive = nullptr)
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
-            return pool_->get_worker_thread_num();
+            return get_pool(pool_name)->get_worker_thread_num();
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -266,16 +300,16 @@ namespace hpx { namespace threads
 
         /// Returns of the number of the processing units the given thread
         /// is allowed to run on
-        std::size_t get_pu_num(std::size_t num_thread) const
+        std::size_t get_pu_num(std::size_t pool_name, std::size_t num_thread) const
         {
-            return pool_->get_pu_num(num_thread);
+            return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
-        {
+        {//! this should deduce from num_thread which pool we're talking about and call appropriate function
             return pool_->get_pu_mask(topology, num_thread);
         }
 
@@ -334,21 +368,19 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
 */
     private:
-        mutable mutex_type mtx_;   // mutex protecting the members
+        mutable mutex_type mtx_; // mutex protecting the members
 
-        std::size_t num_threads_;
+        std::size_t num_threads_; // specified by the user in command line, or 1 by default
+        // represents the total number of OS threads, irrespective of how many are in which pool.
+        //! FIXME is this even used?? where do I need this ???
+
         util::io_service_pool& timer_pool_;     // used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        detail::thread_pool* pool_; //! stick with 1 for the moment and make everything work.
-        threads::policies::scheduler_base* sched_; //! stick with 1 for the moment and make everything work.
-        //! later move on to:
-        //! - 2 vectors
-        //! map
-        //! vector pairs
+        pool_and_sched_type pools_;
 
         notification_policy_type& notifier_;
     };

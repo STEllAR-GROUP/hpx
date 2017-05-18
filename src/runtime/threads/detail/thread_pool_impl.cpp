@@ -96,26 +96,26 @@ namespace hpx { namespace threads { namespace detail
             std::size_t num_threads,
             policies::init_affinity_data const& data)
     {
-        topology const& topology_ = get_topology(); //! this should go ...
+        topology const& topology_ = get_topology(); //! FIXME this should go ...
 
         resize(used_processing_units_, threads::hardware_concurrency());
         for (std::size_t i = 0; i != num_threads; ++i)
-            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, i, false);
+            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, i, sched_.numa_sensitive());
 
     }
 
-        ///////////////////////////////////////////////////////////////////////////
-        template <typename Scheduler>
-        std::size_t thread_pool_impl<Scheduler>::get_pu_num(std::size_t num_thread) const
-        {
-            return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
-        }
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::size_t thread_pool_impl<Scheduler>::get_pu_num(std::size_t num_thread) const
+    {
+        return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
+    }
 
         template <typename Scheduler>
         mask_cref_type thread_pool_impl<Scheduler>::get_pu_mask(
                 topology const& topology, std::size_t num_thread) const
         {
-            return get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, false);
+            return get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, sched_.numa_sensitive());
         }
 
 
@@ -336,7 +336,7 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t thread_num = num_threads;
                 while (thread_num-- != 0) {
                     threads::mask_cref_type mask =
-                            get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, thread_num, false);
+                            get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, thread_num, sched_.numa_sensitive());
 
                     LTM_(info) //-V128
                             << "thread_pool::run: " << pool_name_
@@ -527,7 +527,7 @@ namespace hpx { namespace threads { namespace detail
         {
             // Set the affinity for the current thread.
             threads::mask_cref_type mask =
-                    get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, false);
+                    get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, sched_.numa_sensitive());
 
             if (LHPX_ENABLED(debug))
                 topology.write_to_log();
