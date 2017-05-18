@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <cstdint>
 #include <deque>
 
 namespace hpx { namespace serialization
@@ -16,8 +17,7 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, std::deque<T, Allocator> & d, unsigned)
     {
         // normal load ...
-        typedef typename std::deque<T, Allocator>::size_type size_type;
-        size_type size;
+        std::uint64_t size;
         ar >> size; //-V128
 
         d.resize(size);
@@ -33,7 +33,8 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const std::deque<T, Allocator> & d, unsigned)
     {
         // normal save ...
-        ar << d.size(); //-V128
+        std::uint64_t size = d.size();
+        ar << size;
         if(d.empty()) return;
 
         for(auto const & e: d)

@@ -11,6 +11,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <type_traits>
 #include <vector>
 
@@ -24,14 +26,13 @@ namespace hpx { namespace serialization
             std::false_type)
         {
             // normal load ...
-            typedef typename std::vector<T, Allocator>::size_type size_type;
-            size_type size;
+            std::uint64_t size;
             ar >> size; //-V128
             if (size == 0) return;
 
             if (vs.size() < size)
                 vs.resize(size);
-            for(size_type i = 0; i != size; ++i)
+            for(std::size_t i = 0; i != size; ++i)
             {
                 ar >> vs[i];
             }
@@ -48,8 +49,7 @@ namespace hpx { namespace serialization
             else
             {
                 // bitwise load ...
-                typedef typename std::vector<T, Allocator>::size_type size_type;
-                size_type size;
+                std::uint64_t size;
                 ar >> size; //-V128
                 if(size == 0) return;
 
@@ -63,8 +63,7 @@ namespace hpx { namespace serialization
     template <typename Allocator>
     void serialize(input_archive & ar, std::vector<bool, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<bool, Allocator>::size_type size_type;
-        size_type size = 0;
+        std::uint64_t size = 0;
         ar >> size; //-V128
 
         v.clear();
@@ -72,7 +71,7 @@ namespace hpx { namespace serialization
 
         v.reserve(size);
         // normal load ... no chance of doing bitwise here ...
-        for(size_type i = 0; i != size; ++i)
+        for(std::size_t i = 0; i != size; ++i)
         {
             bool b = false;
             ar >> b;
@@ -129,11 +128,11 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const std::vector<bool, Allocator> & v,
         unsigned)
     {
-        typedef typename std::vector<bool, Allocator>::size_type size_type;
-        ar << v.size(); //-V128
+        std::uint64_t size = v.size();
+        ar << size;
         if(v.empty()) return;
         // normal save ... no chance of doing bitwise here ...
-        for(size_type i = 0; i < v.size(); ++i)
+        for(std::size_t i = 0; i < v.size(); ++i)
         {
             bool b = v[i];
             ar << b;
@@ -151,7 +150,8 @@ namespace hpx { namespace serialization
                 >::type
             >::value> use_optimized;
 
-        ar << v.size(); //-V128
+        std::uint64_t size = v.size();
+        ar << size;
         if(v.empty()) return;
         detail::save_impl(ar, v, use_optimized());
     }

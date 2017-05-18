@@ -9,11 +9,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.8.12
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+# We require at least CMake V3.0.2
+cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 2.8.12)
+cmake_policy(VERSION 3.0.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
@@ -878,6 +878,14 @@ hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
     ON ADVANCED)
 if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+endif()
+
+# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
+    "Enable old overloads for inclkusive_scan (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
 ################################################################################
