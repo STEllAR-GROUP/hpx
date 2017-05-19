@@ -426,6 +426,7 @@ namespace libfabric
 
         for (auto &r : rma_regions_)
         {
+            HPX_UNUSED(r);
             LOG_TRACE_MSG(CRC32_MEM(r->get_address(), r->get_message_length(),
                 "rdma region (recv) "));
         }
