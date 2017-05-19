@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2014      Allan Porterfield
+//  Copyright (c) 2017      Khalid Hasanov
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,13 +11,18 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
+//#include <hpx/compute/host.hpp>
+//#include <hpx/compute/host/target.hpp>
+
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
+#include <hwloc.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,6 +30,7 @@
 #include <string>
 #include <time.h>
 #include <vector>
+#include <thread>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -74,6 +81,7 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {
             disabled_os_threads_.resize(hpx::get_os_thread_count());
+	    init_num_cores();
         }
 
         virtual ~throttling_scheduler()
@@ -101,12 +109,11 @@ namespace hpx { namespace threads { namespace policies
                 thread_queue_type* q = queues_[num_thread];
 	        while (q->get_next_thread(thrd)) {
 		      this->wait_or_add_new(num_thread, running, idle_loop_count) ;
-        	      this->schedule_thread(thrd, num_thread, thread_priority_unknown); 
+        	      this->schedule_thread(thrd, num_thread, thread_priority_normal); 
 		}
 
-		boost::chrono::milliseconds period(1);
 		boost::unique_lock<boost::mutex> l(mtx_);
-        	cond_.wait_for(l, period);
+        	cond_.wait(l);
             }
 
             // grab work if available
@@ -137,6 +144,25 @@ namespace hpx { namespace threads { namespace policies
 
 	    queues_[num_thread]->schedule_thread(thrd);
         }
+
+	/// Inits the number of physical and logical cores
+	void init_num_cores()
+	{
+            hwloc_topology_t topology;
+            hwloc_topology_init(&topology);
+            hwloc_topology_load(topology);
+	 
+            int core_depth = hwloc_get_type_depth(topology, HWLOC_OBJ_CORE);  
+	    HPX_ASSERT(core_depth != HWLOC_TYPE_DEPTH_UNKNOWN);
+                
+ 	    num_physical_cores = hwloc_get_nbobjs_by_depth(topology, core_depth); 
+	    num_logical_cores = std::thread::hardware_concurrency();
+	    HPX_ASSERT(num_logical_cores % num_physical_cores == 0);
+
+            num_hw_threads = num_logical_cores/num_physical_cores;
+
+            //numa_domains = hpx::compute::host::numa_domains()
+	}
 
 	/// Disables specific OS thread requested by the user/application
         void disable(std::size_t shepherd) 
@@ -176,20 +202,31 @@ namespace hpx { namespace threads { namespace policies
                         "invalid number of threads");
                 }
 
-	        if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
+		/// If we don't have the requested number of available threads return
+	        if (disabled_os_threads_.size() - disabled_os_threads_.count() < num_threads ) {
                     return;
                 }
 
-		const std::size_t wtid = hpx::get_worker_thread_num();
+                if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
+                    return;
+                }
+
+		std::size_t wtid = hpx::get_worker_thread_num();
 
                 std::size_t cnt = 0;
-                for (std::size_t i=0; i<disabled_os_threads_.size(); i++)
-                    if (!disabled_os_threads_[i] && i != wtid) {
-                       disabled_os_threads_[i] = true;
-                       cnt++;
-                       std::cout << "Disable worker_id: " << i << std::endl;
-                       if (cnt == num_threads) break;
-                    }
+                std::size_t tid_start = 0;
+                while ( cnt < num_threads ) {
+			for (std::size_t i=tid_start; i<disabled_os_threads_.size(); i += num_hw_threads) 
+			{
+			    if (!disabled_os_threads_[i] && i != wtid) {
+			       disabled_os_threads_[i] = true;
+			       cnt++;
+			       //std::cout << "Disable worker_id: " << i << std::endl;
+			       if (cnt == num_threads) return;
+			    }
+			}
+                        tid_start++;
+                }
         }
 
 	/// Enable specific OS thread requested by the user/application
@@ -223,7 +260,7 @@ namespace hpx { namespace threads { namespace policies
                           disabled_os_threads_[i] = false;
                           cond_.notify_one();
 			  cnt++;
-                          std::cout << "Enabled worker_id: " << i << std::endl;
+                //          std::cout << "Enabled worker_id: " << i << std::endl;
 			  if (cnt == num_threads) break;
                        }
                 }
@@ -240,6 +277,10 @@ namespace hpx { namespace threads { namespace policies
 	mutex_type throttle_mtx_;
 	mutable boost::mutex mtx_;
         mutable boost::dynamic_bitset<> disabled_os_threads_;
+//        std::vector<hpx::compute::host::target> numa_domains;
+	int num_physical_cores;
+	int num_logical_cores;
+	int num_hw_threads;
     };
 }}}
 

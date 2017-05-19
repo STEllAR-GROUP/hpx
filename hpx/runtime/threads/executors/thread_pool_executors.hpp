@@ -193,7 +193,7 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
     struct HPX_EXPORT throttling_executor : public scheduled_executor
     {
         throttling_executor();
