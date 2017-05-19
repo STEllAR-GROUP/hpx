@@ -7,8 +7,6 @@
 #define HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM
 
 #include <hpx/config.hpp>
-#include <hpx/config/inline_namespace.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
@@ -145,7 +143,7 @@ namespace hpx { namespace parallel { namespace execution
 #if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     template <typename T>
     using is_execution_policy =

@@ -13,7 +13,6 @@
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -22,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The timed_executor_traits type is used to request execution agents from

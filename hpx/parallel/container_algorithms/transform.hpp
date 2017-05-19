@@ -26,7 +26,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     /// Applies the given function \a f to the given range \a rng and stores
     /// the result in another range, beginning at dest.

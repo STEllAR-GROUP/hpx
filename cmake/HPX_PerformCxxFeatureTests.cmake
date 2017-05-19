@@ -46,7 +46,7 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
   hpx_check_for_cxx11_inline_namespaces(
-    DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+    REQUIRED "HPX needs support for C++11 inline namespaces")
 
   hpx_check_for_cxx11_lambdas(
     REQUIRED "HPX needs support for C++11 lambdas")

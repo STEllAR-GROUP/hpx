@@ -7,14 +7,12 @@
 #define HPX_TRAITS_IS_TIMED_EXECUTOR_AUG_05_2015_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/config/inline_namespace.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     struct timed_executor_tag : executor_tag {};

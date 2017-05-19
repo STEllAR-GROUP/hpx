@@ -10,7 +10,6 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/datapar/execution_policy.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors/execution.hpp>
@@ -1477,7 +1476,7 @@ namespace hpx { namespace parallel { namespace execution
 #if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     using sequential_task_execution_policy =

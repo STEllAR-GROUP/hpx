@@ -9,13 +9,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/config/inline_namespace.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     struct executor_tag {};
