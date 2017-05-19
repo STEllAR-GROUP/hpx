@@ -58,13 +58,21 @@ namespace hpx { namespace lcos
     {
         spmd_block(){}
 
-        explicit spmd_block(std::string name, std::size_t num_images,
-            std::size_t image_id)
-        : name_(name), num_images_(num_images), image_id_(image_id)
+        explicit spmd_block(std::string name, std::size_t images_per_locality,
+            std::size_t num_images, std::size_t image_id)
+        : name_(name), images_per_locality_(images_per_locality)
+        , num_images_(num_images), image_id_(image_id)
         , barrier_(
             std::make_shared<hpx::lcos::barrier>(
                 name_ + "_barrier", num_images_, image_id_))
         {}
+
+
+        std::size_t get_images_per_locality() const
+        {
+            return images_per_locality_;
+        }
+
 
         std::size_t get_num_images() const
         {
@@ -88,6 +96,7 @@ namespace hpx { namespace lcos
 
     private:
         std::string name_;
+        std::size_t images_per_locality_;
         std::size_t num_images_;
         std::size_t image_id_;
 
@@ -111,6 +120,7 @@ namespace hpx { namespace lcos
         struct spmd_block_helper
         {
             std::string name_;
+            std::size_t images_per_locality_;
             std::size_t num_images_;
 
             template <typename ... Ts>
@@ -125,7 +135,8 @@ namespace hpx { namespace lcos
                         "define_spmd_block() needs an action that " \
                         "has at least a spmd_block as 1st argument");
 
-                hpx::lcos::spmd_block block(name_, num_images_, image_id);
+                hpx::lcos::spmd_block block(name_, images_per_locality_,
+                    num_images_, image_id);
 
                 F()(hpx::launch::sync,
                     hpx::find_here(),
@@ -158,7 +169,8 @@ namespace hpx { namespace lcos
                     executor_type
                     >::bulk_execute(
                         exec,
-                        detail::spmd_block_helper<F>{name,num_images},
+                        detail::spmd_block_helper<F>{
+                            name,images_per_locality, num_images},
                         boost::irange(
                             offset, offset + images_per_locality),
                         args...);

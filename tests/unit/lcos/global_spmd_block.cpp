@@ -23,6 +23,7 @@ void bulk_test_function(hpx::lcos::spmd_block block, std::size_t arg)
     std::size_t num_images
         = hpx::get_num_localities(hpx::launch::sync) * images_per_locality;
 
+    HPX_TEST_EQ(block.get_images_per_locality(), images_per_locality);
     HPX_TEST_EQ(block.get_num_images(), num_images);
     HPX_TEST_EQ(block.this_image() < num_images, true);
     HPX_TEST_EQ(arg, test_value * 10);
