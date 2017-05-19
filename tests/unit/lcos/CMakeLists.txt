@@ -52,6 +52,8 @@ set(tests
     run_guarded
     shared_future
     sliding_semaphore
+    split_future
+    split_shared_future
     unwrapped
     use_allocator
     wait_all_std_array
@@ -71,13 +73,6 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       future_then_executor_v1
       local_dataflow_executor_v1
      )
-endif()
-
-if(NOT MSVC12)
-  # MSVC12 can't cope with split_future
-  set(tests ${tests}
-      split_future
-      split_shared_future)
 endif()
 
 if(HPX_WITH_AWAIT)

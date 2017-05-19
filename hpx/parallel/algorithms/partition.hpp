@@ -265,14 +265,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<BidirIter>::value &&
-        traits::is_projected<Proj, BidirIter>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj, BidirIter>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, BidirIter>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     stable_partition(ExPolicy && policy, BidirIter first, BidirIter last,
         F && f, Proj && proj = Proj())

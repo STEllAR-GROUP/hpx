@@ -377,11 +377,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_WINDOWS) && defined(HPX_MSVC) && HPX_MSVC < 1900
-#  define snprintf _snprintf
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no HPX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 200000

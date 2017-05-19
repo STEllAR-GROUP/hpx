@@ -290,12 +290,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             BOOST_PP_STRINGIZE(func) " is not possible")                      \
     /**/
 
-#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
-// for MSVC 12 disable: warning C4520: '...' : multiple default constructors specified
-#pragma warning(push)
-#pragma warning(disable: 4520)
-#endif
-
         template <typename ... Params>
         struct executor_parameters : public unwrapper<Params>...
         {
@@ -347,10 +341,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// \endcond
     }
-
-#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
-#pragma warning(pop)
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ... Params>

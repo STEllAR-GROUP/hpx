@@ -918,8 +918,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC11 OR MSVC12 OR MSVC14))
-    hpx_error("MSVC x64 2012 or higher is required.")
+  if(NOT (MSVC14))
+    hpx_error("MSVC x64 2015 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
   endif()
@@ -1156,15 +1156,13 @@ if(WIN32)
     # VS2013 and above know how to do link time constant data segment folding
     # VS2013 update 2 and above know how to remove debug information for
     #     non-referenced functions and data (-Zc:inline)
-    if(MSVC12 OR MSVC14)
-      hpx_add_target_compile_option(-Zc:inline)
-      hpx_add_target_compile_option(-Gw
-        CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-      hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
-      if(HPX_WITH_DATAPAR_VC)
-        hpx_add_target_compile_option(-std:c++latest)
-        hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
-      endif()
+    hpx_add_target_compile_option(-Zc:inline)
+    hpx_add_target_compile_option(-Gw
+      CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+    hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+    if(HPX_WITH_DATAPAR_VC)
+      hpx_add_target_compile_option(-std:c++latest)
+      hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
 
     # Exceptions

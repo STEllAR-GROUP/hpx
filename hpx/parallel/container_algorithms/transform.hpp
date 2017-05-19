@@ -103,14 +103,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected_range<Proj, Rng>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<
@@ -224,16 +220,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj1, Rng>::value &&
-        traits::is_projected<Proj2, InIter2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
                 traits::projected_range<Proj1, Rng>,
                 traits::projected<Proj2, InIter2>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
@@ -351,16 +343,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         traits::is_range<Rng2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected_range<Proj1, Rng1>::value &&
-        traits::is_projected_range<Proj2, Rng2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected_range<Proj2, Rng2>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
                 traits::projected_range<Proj1, Rng1>,
                 traits::projected_range<Proj2, Rng2>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<

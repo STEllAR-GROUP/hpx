@@ -43,16 +43,11 @@ set(tests
     shared_mutex_1702
     shared_stated_leaked_1211
     sliding_semaphore_2338
+    split_future_2246
     wait_all_hang_1946
     wait_for_1751
     when_all_vectors_1623
    )
-
-if(NOT MSVC12)
-  set(tests ${tests}
-      split_future_2246
-     )
-endif()
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
