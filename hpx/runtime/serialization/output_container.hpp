@@ -35,12 +35,12 @@ namespace hpx { namespace serialization
 
             HPX_CONSTEXPR static bool is_preprocessing() { return false; }
 
-            HPX_CONSTEXPR static void await_future(
+            static void await_future(
                 Container& cont
               , hpx::lcos::detail::future_data_refcnt_base & future_data)
             {}
 
-            HPX_CONSTEXPR static void add_gid(Container& cont,
+            static void add_gid(Container& cont,
                 naming::gid_type const & gid,
                 naming::gid_type const & split_gid)
             {}
@@ -89,7 +89,7 @@ namespace hpx { namespace serialization
                 return filter->flush(&cont[current], size, written);
             }
 
-            HPX_CONSTEXPR static void reset(Container& cont)
+            static void reset(Container& cont)
             {}
         };
 
@@ -103,7 +103,7 @@ namespace hpx { namespace serialization
                 return 0;
             }
 
-            HPX_CONSTEXPR static void set_chunk_size(std::size_t)
+            static void set_chunk_size(std::size_t)
             {
             }
 
@@ -122,9 +122,9 @@ namespace hpx { namespace serialization
                 return 1;
             }
 
-            HPX_CONSTEXPR static void push_back(serialization_chunk && chunk) {}
+            static void push_back(serialization_chunk && chunk) {}
 
-            HPX_CONSTEXPR static void reset() {}
+            static void reset() {}
         };
 
         struct vector_chunker
