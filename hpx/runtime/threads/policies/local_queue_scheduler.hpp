@@ -612,18 +612,17 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        virtual thread_id_type wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count)
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
-            std::size_t added = 0;
-            bool result = true;
+            thread_id_type next_thrd = nullptr;
 
-            result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
+            next_thrd = queues_[num_thread]->wait_or_add_new(running,
+                idle_loop_count);
+            if (next_thrd) return next_thrd;
 
             if (numa_sensitive_ != 0)   // limited or no stealing across domains
             {
@@ -646,13 +645,13 @@ namespace hpx { namespace threads { namespace policies
                         if (!test(numa_domain_mask, get_pu_num(idx))) //-V600
                             continue;
 
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
-                        if (0 != added)
+                        next_thrd = queues_[num_thread]->wait_or_add_new(running,
+                            idle_loop_count, queues_[idx]);
+                        if (next_thrd)
                         {
-                            queues_[idx]->increment_num_stolen_from_staged(added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(added);
-                            return result;
+                            queues_[idx]->increment_num_stolen_from_staged(1);
+                            queues_[num_thread]->increment_num_stolen_to_staged(1);
+                            return next_thrd;
                         }
                     }
                 }
@@ -673,13 +672,13 @@ namespace hpx { namespace threads { namespace policies
                         if (!test(numa_domain_mask, get_pu_num(idx))) //-V600
                             continue;
 
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
-                        if (0 != added)
+                        next_thrd = queues_[num_thread]->wait_or_add_new(running,
+                            idle_loop_count, queues_[idx]);
+                        if (next_thrd)
                         {
-                            queues_[idx]->increment_num_stolen_from_staged(added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(added);
-                            return result;
+                            queues_[idx]->increment_num_stolen_from_staged(1);
+                            queues_[num_thread]->increment_num_stolen_to_staged(1);
+                            return next_thrd;
                         }
                     }
                 }
@@ -695,13 +694,13 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    result = queues_[num_thread]->wait_or_add_new(running,
-                        idle_loop_count, added, queues_[idx]) && result;
-                    if (0 != added)
+                    next_thrd = queues_[num_thread]->wait_or_add_new(running,
+                        idle_loop_count, queues_[idx]);
+                    if (next_thrd)
                     {
-                        queues_[idx]->increment_num_stolen_from_staged(added);
-                        queues_[num_thread]->increment_num_stolen_to_staged(added);
-                        return result;
+                        queues_[idx]->increment_num_stolen_from_staged(1);
+                        queues_[num_thread]->increment_num_stolen_to_staged(1);
+                        return next_thrd;
                     }
                 }
             }
@@ -733,7 +732,7 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            return result;
+            return nullptr;
         }
 
         ///////////////////////////////////////////////////////////////////////
