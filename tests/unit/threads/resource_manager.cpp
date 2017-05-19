@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -51,7 +52,6 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
     boost::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
-    typedef hpx::parallel::executor_traits<Executor> traits;
     typedef hpx::parallel::executor_information_traits<Executor> infotraits;
 
     std::size_t num_execs = processing_units / num_pus;
@@ -79,7 +79,7 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         {
             for (int i = 0; i != num_tasks; ++i)
             {
-                traits::apply_execute(exec,
+                hpx::parallel::execution::post(exec,
                     [&count_invocations]()
                     {
                         ++count_invocations;
@@ -124,7 +124,6 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
     boost::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
-    typedef hpx::parallel::executor_traits<Executor> traits;
     typedef hpx::parallel::executor_information_traits<Executor> infotraits;
 
     // create one executor which can give back processing units
@@ -165,7 +164,7 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
         {
             for (int i = 0; i != num_tasks; ++i)
             {
-                traits::apply_execute(exec,
+                hpx::parallel::execution::post(exec,
                     [&count_invocations]()
                     {
                         ++count_invocations;
