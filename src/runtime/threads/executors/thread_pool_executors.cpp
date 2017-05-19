@@ -13,9 +13,6 @@
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
-#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
-#endif
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
 #include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 #endif
@@ -466,21 +463,6 @@ namespace hpx { namespace threads { namespace executors
     {}
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
-    ///////////////////////////////////////////////////////////////////////////
-    throttle_queue_executor::throttle_queue_executor()
-      : scheduled_executor(new detail::thread_pool_executor<
-            policies::throttle_queue_scheduler<> >(
-                get_os_thread_count(), 1))
-    {}
-
-    throttle_queue_executor::throttle_queue_executor(
-            std::size_t max_punits, std::size_t min_punits)
-      : scheduled_executor(new detail::thread_pool_executor<
-            policies::throttle_queue_scheduler<> >(
-                max_punits, min_punits))
-    {}
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()

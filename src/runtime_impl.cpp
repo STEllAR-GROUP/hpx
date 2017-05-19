@@ -855,11 +855,6 @@ template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::static_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
-template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::throttle_queue_scheduler<> >;
-#endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
