@@ -367,7 +367,7 @@ To compile this program, go to your __hpx__ build directory (see __getting_start
 for information on configuring and building __hpx__) and enter:
 
 ``
-    make examples.accumulator.accumulator
+    make examples.accumulators.accumulator
 ``
 
 To run the program type:
