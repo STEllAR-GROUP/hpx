@@ -22,7 +22,6 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/manual_profiling.hpp>
-#include <hpx/config/noexcept.hpp>
 #include <hpx/config/version.hpp>
 
 #include <boost/version.hpp>

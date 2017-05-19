@@ -479,7 +479,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::bound<Sig> >
     {
         static std::size_t
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -489,7 +489,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::one_shot_wrapper<F> >
     {
         static std::size_t
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -501,7 +501,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::bound<Sig> >
     {
         static char const*
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -511,7 +511,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::one_shot_wrapper<F> >
     {
         static char const*
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }

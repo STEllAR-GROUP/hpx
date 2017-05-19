@@ -59,19 +59,19 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(parallel_executor const& rhs) const noexcept
         {
             return l_ == rhs.l_ &&
                 num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 
-        bool operator!=(parallel_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(parallel_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        parallel_executor const& context() const HPX_NOEXCEPT
+        parallel_executor const& context() const noexcept
         {
             return *this;
         }

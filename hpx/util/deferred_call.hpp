@@ -148,7 +148,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::deferred<Sig> >
     {
         static std::size_t
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -160,7 +160,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::deferred<Sig> >
     {
         static char const*
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }

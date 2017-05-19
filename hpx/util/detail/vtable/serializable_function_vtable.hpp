@@ -27,7 +27,7 @@ namespace hpx { namespace util { namespace detail
         char const* name;
 
         template <typename T>
-        serializable_function_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        serializable_function_vtable(construct_vtable<T>) noexcept
           : VTable(construct_vtable<T>())
           , serializable_vtable(construct_vtable<T>())
           , name(this->empty ? "empty" : get_function_name<VTable, T>())

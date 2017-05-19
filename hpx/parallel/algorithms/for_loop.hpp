@@ -1130,7 +1130,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_address<
                     typename hpx::util::decay<F>::type
@@ -1144,7 +1144,7 @@ namespace hpx { namespace traits
     {
         static char const* call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_annotation<
                     typename hpx::util::decay<F>::type

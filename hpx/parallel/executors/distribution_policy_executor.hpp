@@ -132,17 +132,17 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(distribution_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_;
         }
 
-        bool operator!=(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(distribution_policy_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        distribution_policy_executor const& context() const HPX_NOEXCEPT
+        distribution_policy_executor const& context() const noexcept
         {
             return *this;
         }

@@ -49,7 +49,7 @@ namespace hpx { namespace util
         }
 #endif
 
-        value_type const& value() const HPX_NOEXCEPT
+        value_type const& value() const noexcept
         {
             return _abs_time;
         }
@@ -89,12 +89,12 @@ namespace hpx { namespace util
         }
 #endif
 
-        value_type const& value() const HPX_NOEXCEPT
+        value_type const& value() const noexcept
         {
             return _rel_time;
         }
 
-        steady_clock::time_point from_now() const HPX_NOEXCEPT
+        steady_clock::time_point from_now() const noexcept
         {
             return steady_clock::now() + _rel_time;
         }

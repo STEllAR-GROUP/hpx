@@ -281,7 +281,7 @@ namespace detail
         typedef util::unused_type result_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
-        virtual ~future_data() HPX_NOEXCEPT {}
+        virtual ~future_data() noexcept {}
         virtual void execute_deferred(error_code& = throws) = 0;
         virtual bool cancelable() const = 0;
         virtual void cancel() = 0;
@@ -378,7 +378,7 @@ namespace detail
             state_ = exception;
         }
 
-        virtual ~future_data() HPX_NOEXCEPT
+        virtual ~future_data() noexcept
         {
             reset();
         }

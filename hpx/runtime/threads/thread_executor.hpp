@@ -55,12 +55,12 @@ namespace hpx { namespace threads
     private:
         std::size_t id_;
 
-        friend bool operator== (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
-        friend bool operator!= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
-        friend bool operator< (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
-        friend bool operator> (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
-        friend bool operator<= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
-        friend bool operator>= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT;
+        friend bool operator== (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator!= (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator< (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator> (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator<= (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator>= (executor_id const& x, executor_id const& y) noexcept;
 
         template <typename Char, typename Traits>
         friend std::basic_ostream<Char, Traits>&
@@ -69,36 +69,36 @@ namespace hpx { namespace threads
         friend class detail::executor_base;
 
     public:
-        executor_id() HPX_NOEXCEPT : id_(0) {}
-        explicit executor_id(std::size_t i) HPX_NOEXCEPT : id_(i) {}
+        executor_id() noexcept : id_(0) {}
+        explicit executor_id(std::size_t i) noexcept : id_(i) {}
     };
 
-    inline bool operator== (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator== (executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ == y.id_;
     }
 
-    inline bool operator!= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator!= (executor_id const& x, executor_id const& y) noexcept
     {
         return !(x == y);
     }
 
-    inline bool operator< (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator< (executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ < y.id_;
     }
 
-    inline bool operator> (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator> (executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ > y.id_;
     }
 
-    inline bool operator<= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator<= (executor_id const& x, executor_id const& y) noexcept
     {
         return !(x.id_ > y.id_);
     }
 
-    inline bool operator>= (executor_id const& x, executor_id const& y) HPX_NOEXCEPT
+    inline bool operator>= (executor_id const& x, executor_id const& y) noexcept
     {
         return !(x.id_ < y.id_);
     }
@@ -327,7 +327,7 @@ namespace hpx { namespace threads
             return executor_data_->set_scheduler_mode(mode);
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             // avoid compiler warning about conversion to bool
             return executor_data_.get() ? true : false;

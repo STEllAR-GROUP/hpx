@@ -1529,14 +1529,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             virtual ~execution_policy_base() {}
 
-            virtual std::type_info const& type() const HPX_NOEXCEPT  = 0;
+            virtual std::type_info const& type() const noexcept  = 0;
 
             virtual execution_policy make_async(
                 task_policy_tag tag) const = 0;
             virtual launch launch_policy() const = 0;
 
-            virtual void* get() HPX_NOEXCEPT = 0;
-            virtual void const* get() const HPX_NOEXCEPT = 0;
+            virtual void* get() noexcept = 0;
+            virtual void const* get() const noexcept = 0;
         };
 
         template <typename ExPolicy>
@@ -1549,7 +1549,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : policy_(std::move(policy))
             {}
 
-            std::type_info const& type() const HPX_NOEXCEPT
+            std::type_info const& type() const noexcept
             {
                 return typeid(ExPolicy);
             }
@@ -1558,12 +1558,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             execution_policy make_async(task_policy_tag tag) const;
             launch launch_policy() const;
 
-            void* get() HPX_NOEXCEPT
+            void* get() noexcept
             {
                 return &policy_;
             }
 
-            void const* get() const HPX_NOEXCEPT
+            void const* get() const noexcept
             {
                 return &policy_;
             }
@@ -1686,7 +1686,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Returns: typeid(T), such that T is the type of the execution policy
         ///          object contained by *this
-        std::type_info const& type() const HPX_NOEXCEPT
+        std::type_info const& type() const noexcept
         {
             return inner_->type();
         }
@@ -1695,7 +1695,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///          execution policy object; otherwise a null pointer
         /// Requires: is_execution_policy<T>::value is true
         template <typename ExPolicy>
-        ExPolicy* get() HPX_NOEXCEPT
+        ExPolicy* get() noexcept
         {
             static_assert(
                 !(std::is_same<ExPolicy, execution_policy>::value),
@@ -1714,7 +1714,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///          execution policy object; otherwise a null pointer
         /// Requires: is_execution_policy<T>::value is true
         template <typename ExPolicy>
-        ExPolicy const* get() const HPX_NOEXCEPT
+        ExPolicy const* get() const noexcept
         {
             static_assert(
                 !(std::is_same<ExPolicy, execution_policy>::value),

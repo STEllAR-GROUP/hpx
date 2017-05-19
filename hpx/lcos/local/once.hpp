@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace local
         HPX_NON_COPYABLE(once_flag);
 
     public:
-        once_flag() HPX_NOEXCEPT
+        once_flag() noexcept
           : status_(0)
         {}
 

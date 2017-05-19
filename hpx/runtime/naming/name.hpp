@@ -150,7 +150,7 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return 0 != id_lsb_ || 0 != id_msb_;
         }

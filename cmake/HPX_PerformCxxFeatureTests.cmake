@@ -52,7 +52,7 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 lambdas")
 
   hpx_check_for_cxx11_noexcept(
-    DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+    REQUIRED "HPX needs support for C++11 noexcept")
 
   hpx_check_for_cxx11_nullptr(
     REQUIRED "HPX needs support for C++11 nullptr")

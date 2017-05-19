@@ -24,11 +24,11 @@ namespace hpx { namespace components
             HPX_NON_COPYABLE(pinned_ptr_base);
 
         public:
-            pinned_ptr_base() HPX_NOEXCEPT
+            pinned_ptr_base() noexcept
               : lva_(0)
             {}
 
-            explicit pinned_ptr_base(naming::address::address_type lva) HPX_NOEXCEPT
+            explicit pinned_ptr_base(naming::address::address_type lva) noexcept
               : lva_(lva)
             {}
 
@@ -44,9 +44,9 @@ namespace hpx { namespace components
             HPX_NON_COPYABLE(pinned_ptr);
 
         public:
-            pinned_ptr() HPX_NOEXCEPT {}
+            pinned_ptr() noexcept {}
 
-            explicit pinned_ptr(naming::address::address_type lva) HPX_NOEXCEPT
+            explicit pinned_ptr(naming::address::address_type lva) noexcept
               : pinned_ptr_base(lva)
             {
                 HPX_ASSERT(0 != this->lva_);

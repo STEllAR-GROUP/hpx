@@ -402,7 +402,7 @@ namespace hpx { namespace lcos { namespace local
             return future_access<future<Result> >::create(std::move(task_));
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !!task_;
         }

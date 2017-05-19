@@ -36,17 +36,17 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_executor
     {
         /// \cond NOINTERNAL
-        bool operator==(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(sequenced_executor const& rhs) const noexcept
         {
             return true;
         }
 
-        bool operator!=(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(sequenced_executor const& rhs) const noexcept
         {
             return false;
         }
 
-        sequenced_executor const& context() const HPX_NOEXCEPT
+        sequenced_executor const& context() const noexcept
         {
             return *this;
         }
