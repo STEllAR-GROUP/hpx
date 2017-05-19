@@ -31,6 +31,10 @@ particular order):
   has undergone while being moved to C++17. The old overloads can be still enabled
   at configure time by specifying `-DHPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY=On`
   to __cmake__.
+* Added a helper facility `hpx::local_new` which is equivalent to `hpx::new_`
+  except that it creates components locally only. As a consequence, the used
+  component constructor may accept non-serializable argument types and/or
+  non-const references or pointers.
 
 [heading Breaking Changes]
 
@@ -38,9 +42,51 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2639] - Fix a tiny typo in tutorial.
+* [pr    2636] - Add and use HPX_MSVC_WARNING_PRAGMA for #pragma warning
+* [pr    2632] - Making sure container serialization uses size-compatible types
+* [pr    2628] - Making sure that shutdown does not hang
+* [pr    2627] - Fix serialization
+* [pr    2626] - Generate `cmake_variables.qbk` and `cmake_toolchains.qbk` outside
+                 of the source tree
+* [pr    2624] - Fixing a smalll cmake typo
+* [pr    2622] - Update CMake minimum required version to 3.0.2 (closes #2621)
+* [issue 2621] - Compiling hpx master fails with /usr/bin/ld: final link failed:
+                 Bad value
+* [pr    2620] - Remove warnings due to some captured variables
+* [pr    2618] - Some fixes to libfabric that didn't get caught before the merge
+* [pr    2617] - Adding `hpx::local_new`
+* [pr    2616] - Documentation: Extract all entities in order to autolink functions
+                 correctly
+* [issue 2615] - Documentation: Linking functions is broken
+* [pr    2614] - Adding serialization for std::deque
+* [pr    2613] - We need to link with boost.thread and boost.chrono if we use
+                 boost.context
+* [pr    2612] - Making sure for_loop_n(par, ...) is actually executed in parallel
+* [pr    2610] - Added reduction templates using an identity value
+* [pr    2608] - Fixing some unused vars in inspect
+* [pr    2607] - Fixed build for mingw
+* [pr    2606] - Supporting generic context for boost >= 1.61
+* [pr    2605] - Parcelport libfabric3
+* [pr    2604] - Adding allocator support to promise and friends
+* [pr    2603] - Barrier hang
+* [pr    2600] - Compat fixes
 * [pr    2599] - Compatibility layer for threading support
 * [pr    2598] - V1.1
 * [pr    2597] - Release V1.0
+* [pr    2592] - First attempt to introduce spmd_block in hpx
+* [pr    2586] - local_segment in segmented_iterator_traits
+* [issue 2584] - Add allocator support to promise, packaged_task and friends
+* [pr    2576] - Add missing dependencies of cuda based tests
+* [pr    2575] - Remove warnings due to some captured variables
+* [issue 2574] - MSVC 2015 Compiler crash when building HPX
+* [issue 2543] - make install fails due to a non-existing .so file
+* [pr    2495] - wait_or_add_new returning thread_id_type
+* [issue 2471] - no type named 'fcontext_t' in namespace
+* [issue 2266] - hpx_0.9.99 make tests fail
+* [pr    2453] - Timed executor support
+* [pr    2447] - Implementing new executor API (P0443)
+* [pr    2195] - Support for code completion in VIM
 
 [endsect]
 
