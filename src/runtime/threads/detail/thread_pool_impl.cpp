@@ -36,9 +36,9 @@ namespace hpx { namespace threads { namespace detail
     thread_pool_impl<Scheduler>::thread_pool_impl(
         Scheduler& sched,
         threads::policies::callback_notifier& notifier,
-        char const* pool_name,
+        std::size_t index, char const* pool_name,
         policies::scheduler_mode m)
-        : thread_pool(notifier, pool_name, m),
+        : thread_pool(notifier, index, pool_name, m),
           sched_(sched)
     {
         timestamp_scale_ = 1.0;

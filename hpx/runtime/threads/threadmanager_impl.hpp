@@ -374,7 +374,8 @@ namespace hpx { namespace threads
 
         std::size_t num_threads_; // specified by the user in command line, or 1 by default
         // represents the total number of OS threads, irrespective of how many are in which pool.
-        //! FIXME is this even used?? where do I need this ???
+
+        std::map<std::size_t, detail::pool_id_type> threads_lookup_;
 
         util::io_service_pool& timer_pool_;     // used for timed set_state
 

@@ -27,14 +27,14 @@ namespace hpx { namespace threads { namespace detail
         thread_pool_impl(
             Scheduler* sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name,
+            std::size_t index, char const* pool_name,
             policies::scheduler_mode m = policies::nothing_special);
 
         //! Constructor used in constructor of thread_pool_os_executor
         thread_pool_impl(
             Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name,
+            std::size_t index, char const* pool_name,
             policies::scheduler_mode m = policies::nothing_special);
 
         ~thread_pool_impl();

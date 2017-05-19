@@ -282,11 +282,20 @@ namespace hpx {
         set_state_logger_("threadmanager_impl::set_state"),
         notifier_(notifier)
     {
-        auto& rp = hpx::get_resource_partitioner();
+        auto &rp = hpx::get_resource_partitioner();
         rp.set_threadmanager(this);
         size_t num_pools = rp.get_num_pools();
         std::string name;
 
+        // fill the thread-lookup table
+        for (auto& pool_iter : pools_) {
+            size_t nt = rp.get_num_threads(pool_iter.first->get_pool_name());
+            for (size_t j(0); j < nt; i++) {
+                threads_lookup_[i] = pool_iter.first->get_pool_id();
+            }
+        }
+
+        // instantiate the pools
         for(size_t i(0); i<num_pools; i++) {
 
             name = rp.get_pool_name(i);
@@ -324,7 +333,7 @@ namespace hpx {
                     //! in its constructor or in "init"
                     threads::policies::scheduler_base* sched = new local_sched_type(init);
                     detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, name.c_str(),
+                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
@@ -356,7 +365,7 @@ namespace hpx {
                     // instantiate pool and corresponding scheduler
                     threads::policies::scheduler_base* sched = new local_sched_type(init);
                     detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, name.c_str(),
+                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));

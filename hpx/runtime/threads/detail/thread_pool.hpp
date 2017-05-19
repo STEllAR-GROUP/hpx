@@ -54,14 +54,31 @@ namespace hpx { namespace threads { namespace detail
     };
 
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct pool_id_type
+    {
+        pool_id_type(std::size_t index, std::string name)
+                : index_(index), name_(name)
+        {}
+
+        std::size_t index_;
+        std::string name_;
+        //! could get an hpx::naming::id_type in the future
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
     class thread_pool
     {
     public:
         thread_pool(
-            threads::policies::callback_notifier& notifier, char const* pool_name,
-            policies::scheduler_mode m = policies::nothing_special);
+            threads::policies::callback_notifier& notifier, std::size_t index,
+            char const* pool_name, policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
+
+        pool_id_type get_pool_id(){
+            return id_;
+        }
 
         virtual void init(std::size_t num_threads,
             policies::init_affinity_data const& data) = 0;
@@ -190,7 +207,7 @@ namespace hpx { namespace threads { namespace detail
 //! should I leave them here or move them to thread_pool_impl?
 //    private:
         threads::policies::callback_notifier& notifier_;
-        std::string pool_name_; //! used for debugging purposes, now will also be used by API to designate this TP
+        pool_id_type id_;
 
         // startup barrier
         boost::scoped_ptr<compat::barrier> startup_;
