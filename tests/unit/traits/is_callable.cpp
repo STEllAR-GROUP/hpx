@@ -28,12 +28,11 @@ void nullary_function()
 void lambdas()
 {
     using hpx::traits::is_callable;
-#   if defined(HPX_HAVE_CXX11_LAMBDAS)
+
     auto lambda = [](){};
 
     typedef decltype(lambda) f;
     HPX_TEST_MSG((is_callable<f()>::value == true), "lambda");
-#   endif
 }
 
 void functions_byval_params()

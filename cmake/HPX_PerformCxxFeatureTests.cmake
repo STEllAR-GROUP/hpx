@@ -49,7 +49,7 @@ macro(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
   hpx_check_for_cxx11_lambdas(
-    DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+    REQUIRED "HPX needs support for C++11 lambdas")
 
   hpx_check_for_cxx11_noexcept(
     DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
