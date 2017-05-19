@@ -77,8 +77,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     typedef threads::executors::throttling_executor throttling_executor;
 #endif
 
-
-
 }}}
 
 #endif

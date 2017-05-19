@@ -1221,6 +1221,11 @@ namespace hpx
                     result = run_throttling(std::move(startup),
                         std::move(shutdown), cfg, blocking);
                 }
+                else if (0 == std::string("throttling").find(cfg.queuing_)) {
+                    cfg.queuing_ = "throttling";
+                    result = run_throttling(std::move(startup),
+                        std::move(shutdown), cfg, blocking);
+                }
                 else {
                     throw detail::command_line_error(
                         "Bad value for command line option --hpx:queuing");
