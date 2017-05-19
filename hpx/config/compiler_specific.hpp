@@ -62,8 +62,9 @@
 #endif
 
 #if defined(_MSC_VER)
-#  define HPX_MSVC _MSC_VER
 #  define HPX_WINDOWS
+#  define HPX_MSVC _MSC_VER
+#  define HPX_MSVC_WARNING_PRAGMA
 #  if defined(__NVCC__)
 #    define HPX_MSVC_NVCC
 #  endif

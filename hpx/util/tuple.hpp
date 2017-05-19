@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4520) // multiple default constructors specified
 #endif
@@ -1043,7 +1043,7 @@ namespace hpx { namespace serialization
     {}
 }}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
