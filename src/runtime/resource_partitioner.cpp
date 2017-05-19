@@ -143,15 +143,19 @@ namespace hpx {
 
     ////////////////////////////////////////////////////////////////////////
 
-    resource_partitioner::resource_partitioner(std::size_t num_pools_ = 1)
-            : initial_thread_pools_(std::vector<init_pool_data>(0).reserve(num_pools_)),
-              thread_manager_(nullptr),
+    resource_partitioner::resource_partitioner(std::size_t num_special_pools_)
+            : thread_manager_(nullptr),
               topology_(threads::create_topology())
     {
+        // Reserve the appropriate size of initial thread pools
+        initial_thread_pools_.reserve(num_special_pools_ + 1);
+
+        // Create the default pool
+        initial_thread_pools_.push_back(init_pool_data("default"));
+
         // allow only one resource_partitioner instance
-        if(instance_number_counter_++ >= 0){
+        if(instance_number_counter_++ >= 0)
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
-        }
     }
 
     void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling cfg)
@@ -210,20 +214,14 @@ namespace hpx {
                     + num_threads_desired_total+1 + "\n");
         }
 
-        // check whether the user has created a default_pool already. If not, create one now
-        if(!default_pool()) {
-            create_default_pool();
-        } else {
-            // If the user had already created a default pool
-            // AND if the default pool has resources assigned to it,
-            // set its number of threads (all that's left over from the number specified in
-            // command line.
-            //! FIXME is this right, or should we add all free resources to the default pool,
-            //! even though the user has not assigned these to the default pool himself?
-            if(threads::any(get_default_pool()->get_pus())) {
-                get_default_pool()->set_thread_num(affinity_data_.get_num_threads() - num_threads_desired_total);
-                return;
-            }
+        // If the default pool already has resources assigned to it (by the user),
+        // set its number of threads (all that's left over from the number specified in
+        // command line.
+        //! FIXME is this right, or should we add all free resources to the default pool,
+        //! even though the user has not assigned these to the default pool himself?
+        if(threads::any(get_default_pool()->get_pus())) {
+            get_default_pool()->set_thread_num(affinity_data_.get_num_threads() - num_threads_desired_total);
+            return;
         }
 
         // take all resources that have not been assigned to any thread pool yet
@@ -362,6 +360,9 @@ namespace hpx {
     {
         if(name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
+
+        if(name == "default")
+            throw std::invalid_argument("cannot instantiate a initial_thread_pool named \"default\". The default pool is instantiated automatically by the resource-partitioner");
 
         initial_thread_pools_.push_back(init_pool_data(name, sched));
         /*init_pool_data* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);

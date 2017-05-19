@@ -78,41 +78,39 @@ namespace hpx {
     class HPX_EXPORT resource_partitioner{
     public:
 
-        //! constructor: users shouldn't use the constructor but rather get_resource_partitioner
-        resource_partitioner();
+        // constructor: users shouldn't use the constructor but rather get_resource_partitioner
+        resource_partitioner(std::size_t num_special_pools_ = 0);
 
         void print_pool();
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);
-        void create_default_pool(scheduling_policy sched = scheduling_policy::unspecified);
 
-        //! called in hpx_init run_or_start
+        // called in hpx_init run_or_start
         void set_init_affinity_data(hpx::util::command_line_handling cfg);
         void set_default_pool(std::size_t num_threads);
         void set_default_schedulers(std::string queueing);
         bool check_oversubscription() const;
         bool check_empty_pools() const;
 
-        //! setup stuff related to pools
+        // setup stuff related to pools
         void add_resource(std::size_t resource, std::string pool_name);
         void add_resource_to_default(std::size_t resource);
 
-        //! stuff that has to be done during hpx_init ...
+        // stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, std::string pool_name);
         void set_threadmanager(threads::threadmanager_base* thrd_manag);
         threads::threadmanager_base* get_thread_manager();
 
-        //! called in hpx_init
+        // called in hpx_init
         void set_affinity_data(std::size_t num_threads) {
             affinity_data_.set_num_threads(num_threads);
         }
 
-        //! called by constructor of scheduler_base
+        // called by constructor of scheduler_base
         threads::policies::detail::affinity_data* get_affinity_data(){
             return &affinity_data_;
         }
-        bool default_pool(); // returns whether a default pool already exists
 
         // called in hpx_init
         void init_rp();

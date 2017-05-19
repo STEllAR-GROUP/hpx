@@ -599,22 +599,44 @@ namespace hpx {
 
     pool_type threadmanager_impl::default_pool() const
     {
-        return
+        return pools_[0].first;
     }
     pool_type threadmanager_impl::default_scheduler() const
     {
-        return
+        return pools_[0].second;
     }
     pool_type threadmanager_impl::get_scheduler(std::string pool_name) const
     {
+        // if the given pool_name is default, we don't need to look for it
+        if(pool_name == "default"){
+            return default_scheduler();
+        }
 
+        auto pool = std::find_if(
+                pools_.begin(), pools_.end(), //! FIXME don't start at begin() since the first one is the default, start one further
+                [&pool_name](std::pair<pool_type,scheduler_type> itp) -> bool {
+                    return (itp.first->get_pool_name() == pool_name);}
+        );
+
+        if(pool != pools_.end()){
+            pool_type ret((&(*pool))->second); //! FIXME this is ugly
+            return ret;
+        }
+
+        throw std::invalid_argument(
+                "the resource partitioner does not own a thread pool named \""
+                + pool_name + "\". \n");
+        //! FIXME Add names of available pools?
     }
     pool_type threadmanager_impl::get_pool(std::string pool_name) const
     {
-        //! pool_name is default, then just call the other function
+        // if the given pool_name is default, we don't need to look for it
+        if(pool_name == "default"){
+            return default_pool();
+        }
 
         auto pool = std::find_if(
-                pools_.begin(), pools_.end(),
+                pools_.begin(), pools_.end(), //! FIXME don't start at begin() since the first one is the default, start one further
                 [&pool_name](std::pair<pool_type,scheduler_type> itp) -> bool {
                     return (itp.first->get_pool_name() == pool_name);}
         );
@@ -698,7 +720,7 @@ namespace hpx {
             thread_state_enum initial_state, bool run_now, error_code& ec)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
-        pool_->create_thread(data, id, initial_state, run_now, ec);
+        default_pool()->create_thread(data, id, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -706,7 +728,7 @@ namespace hpx {
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
-        pool_->create_work(data, initial_state, ec);
+        default_pool()->create_work(data, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1736,7 +1758,9 @@ namespace hpx {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
 
         std::unique_lock<mutex_type> lk(mtx_);
-        pool_->stop(lk, blocking);
+        for(auto& pool_iter : pools_) {
+            pool_->stop(lk, blocking);
+        }
 
         LTM_(info) << "stop: stopping timer pool";
         timer_pool_.stop();             // stop timer pool as well
@@ -1801,7 +1825,11 @@ namespace hpx {
     std::int64_t threadmanager_impl::
         get_cumulative_duration(std::size_t num, bool reset)
     {
-        return pool_->get_cumulative_duration(num, reset);
+        std::int64_t result = 0;
+        for(auto& pool_iter : pools_) {
+            result += pool_iter.first->get_cumulative_duration(num, reset);
+        }
+        return result;
     }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES

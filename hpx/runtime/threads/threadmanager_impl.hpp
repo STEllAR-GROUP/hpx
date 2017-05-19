@@ -66,10 +66,12 @@ namespace hpx { namespace threads
 
         void init(policies::init_affinity_data const& data);
 
-        //! get a pointer to
-        //! write overloads with ids instead of names
+        // Get functions
+        //! FIXME write overloads with ids instead of names
+        pool_type default_pool() const;
+        pool_type default_scheduler() const;
         pool_type get_pool(std::string pool_name) const;
-        pool_type get_default_pool() const;
+        pool_type get_scheduler(std::string pool_name) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds

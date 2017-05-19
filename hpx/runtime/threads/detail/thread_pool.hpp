@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace detail
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
-        std::size_t get_pool_name() const
+        std::string get_pool_name() const
         {
             return pool_name_;
         }
