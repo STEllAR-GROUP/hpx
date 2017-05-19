@@ -127,9 +127,6 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
 
-  hpx_check_for_cxx11_std_type_traits(
-    DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
-
   if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(

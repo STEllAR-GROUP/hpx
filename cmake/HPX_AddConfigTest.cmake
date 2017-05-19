@@ -369,13 +369,6 @@ macro(hpx_check_for_cxx11_std_to_string)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_type_traits)
-  add_hpx_config_test(HPX_WITH_CXX11_TYPE_TRAITS
-    SOURCE cmake/tests/cxx11_std_type_traits.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_std_unique_lock)
   add_hpx_config_test(HPX_WITH_CXX11_UNIQUE_LOCK
     SOURCE cmake/tests/cxx11_std_unique_lock.cpp
