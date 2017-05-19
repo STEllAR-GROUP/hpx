@@ -1096,7 +1096,7 @@ namespace hpx
             shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
@@ -1130,7 +1130,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=throttling "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttling -DHPX_WITH_ALLSCALE'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttling'.");
 #endif
         }
 

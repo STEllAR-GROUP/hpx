@@ -512,11 +512,6 @@ hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
-hpx_option(HPX_WITH_ALLSCALE BOOL
-  "Enable AllScale scheduling integration." OFF CATEGORY "Profiling")
-if(HPX_WITH_ALLSCALE)
-  hpx_add_config_define(HPX_HAVE_ALLSCALE)   # tell HPX that we have AllScale integration
-endif()
 
 
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
@@ -567,12 +562,10 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
-   # The throttling scheduler has not been tested neither on Windows nor on Mac
-  if(HPX_WITH_ALLSCALE AND NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLLING" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
-      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
-    endif()
+  # The throttling scheduler has not been tested neither on Windows nor on Mac
+  if(_scheduler STREQUAL "THROTTLLING" OR _all)
+    hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
+    set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()

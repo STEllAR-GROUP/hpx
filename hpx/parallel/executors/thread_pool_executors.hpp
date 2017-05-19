@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
 
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_ALLSCALE)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
     /// Creates a new throttling_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
