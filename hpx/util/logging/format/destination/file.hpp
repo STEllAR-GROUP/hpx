@@ -21,8 +21,9 @@
 # pragma once
 #endif
 
-#if defined(HPX_MSVC)
-#pragma warning ( disable : 4355)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(push)
+#pragma warning(disable: 4355)
 #endif
 
 #include <hpx/util/spinlock.hpp>
@@ -154,6 +155,10 @@ typename file_t<convert_dest>::mutex_type file_t<convert_dest>::mtx_;
 typedef file_t<> file;
 
 }}}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #endif
 
