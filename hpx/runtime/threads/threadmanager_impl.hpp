@@ -67,11 +67,11 @@ namespace hpx { namespace threads
         void init(policies::init_affinity_data const& data);
 
         // Get functions
-        //! FIXME write overloads with ids instead of names
         pool_type default_pool() const;
-        pool_type default_scheduler() const;
+        scheduler_type default_scheduler() const;
         pool_type get_pool(std::string pool_name) const;
-        pool_type get_scheduler(std::string pool_name) const;
+        pool_type get_pool(detail::pool_id_type pool_id) const;
+        scheduler_type get_scheduler(std::string pool_name) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -210,10 +210,12 @@ namespace hpx { namespace threads
         }
 
         //! overload which takes id instead of string, and use "default" by default?
-        compat::thread& get_os_thread_handle(std::string pool_name, std::size_t num_thread)
+        compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            return get_pool(pool_name)->get_os_thread_handle(num_thread);
+            detail::pool_id_type myid = threads_lookup_[num_thread];
+            pool_type mypool = get_pool(myid);
+            return mypool->get_os_thread_handle(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -229,11 +231,10 @@ namespace hpx { namespace threads
     public:
         /// this notifies the thread manager that there is some more work
         /// available
-        //! shoshijak: I couldn't find where this was used, so just taking it off for the moment...
-/*        void do_some_work(std::size_t num_thread = std::size_t(-1))
+        void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
-            pool_->do_some_work(num_thread);
-        }*/
+            default_pool()->do_some_work(num_thread);
+        }
 
         /// API functions forwarding to notification policy
         void report_error(std::size_t num_thread, std::exception_ptr const& e)
@@ -245,13 +246,12 @@ namespace hpx { namespace threads
             }
         }
 
-        //! return the worker thread num of the pool designated by the given index parameter
-        //! querry default pool if not specified?
-        std::size_t get_worker_thread_num(std::string pool_name, bool* numa_sensitive = nullptr)
+        //! FIXME understand what this actually does and fix accordingly
+        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
-            return get_pool(pool_name)->get_worker_thread_num();
+            return default_pool()->get_worker_thread_num();
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -302,7 +302,7 @@ namespace hpx { namespace threads
 
         /// Returns of the number of the processing units the given thread
         /// is allowed to run on
-        std::size_t get_pu_num(std::size_t pool_name, std::size_t num_thread) const
+        std::size_t get_pu_num(std::size_t num_thread) const
         {
             return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
         }
@@ -311,25 +311,36 @@ namespace hpx { namespace threads
         /// to run on.
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
-        {//! this should deduce from num_thread which pool we're talking about and call appropriate function
-            return pool_->get_pu_mask(topology, num_thread);
+        {//! FIXME pool::get_pu_mask could be called via RP rather than via TP -> sched
+            return default_pool()->get_pu_mask(topology, num_thread);
         }
 
-        // Returns the mask identifying all processing units used by this
-        // thread manager.
+        /// Returns the mask identifying all processing units used by this
+        /// thread manager.
         mask_cref_type get_used_processing_units() const
         {
-            return pool_->get_used_processing_units();
+            mask_cref_type total_used_processing_punits = mask_cref_type();
+            threads::resize(total_used_processing_punits, hardware_concurrency());
+
+            for(auto& pool_iter : pools_) {
+                total_used_processing_punits |= pool_iter.first->get_used_processing_units();
+            }
+
+            return total_used_processing_punits;
         }
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
-            pool_->set_scheduler_mode(mode);
+            for(auto& pool_iter : pools_){
+                pool_iter.first->set_scheduler_mode(mode);
+            }
         }
 
         void reset_thread_distribution()
         {
-            pool_->reset_thread_distribution();
+            for(auto& pool_iter : pools_){
+                pool_iter.first->reset_thread_distribution();;
+            }
         }
 
         // Returns the underlying scheduling policy
@@ -375,7 +386,7 @@ namespace hpx { namespace threads
         std::size_t num_threads_; // specified by the user in command line, or 1 by default
         // represents the total number of OS threads, irrespective of how many are in which pool.
 
-        std::map<std::size_t, detail::pool_id_type> threads_lookup_;
+        std::vector<detail::pool_id_type> threads_lookup_;
 
         util::io_service_pool& timer_pool_;     // used for timed set_state
 

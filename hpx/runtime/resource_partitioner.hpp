@@ -52,7 +52,7 @@ namespace hpx {
         // set functions
         void set_scheduler(scheduling_policy sched);
         void set_mask(threads::mask_type mask);
-        std::size_t set_thread_num(std::size_t num_threads);
+        void set_thread_num(std::size_t num_threads);
 
         // get functions
         std::string get_name() const;
@@ -66,7 +66,7 @@ namespace hpx {
         //! FIXME overloads to add cores, sockets etc.
         void add_resource(std::size_t pu_index);
 
-        void print_pools();
+        void print_pool() const;
 
     private:
         std::string pool_name_;
@@ -81,7 +81,7 @@ namespace hpx {
         // constructor: users shouldn't use the constructor but rather get_resource_partitioner
         resource_partitioner(std::size_t num_special_pools_ = 0);
 
-        void print_pool();
+        void print_pools() const;
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);
@@ -100,7 +100,7 @@ namespace hpx {
         // stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, std::string pool_name);
         void set_threadmanager(threads::threadmanager_base* thrd_manag);
-        threads::threadmanager_base* get_thread_manager();
+        threads::threadmanager_base* get_thread_manager() const;
 
         // called in hpx_init
         void set_affinity_data(std::size_t num_threads) {
@@ -108,7 +108,7 @@ namespace hpx {
         }
 
         // called by constructor of scheduler_base
-        threads::policies::detail::affinity_data* get_affinity_data(){
+        threads::policies::detail::affinity_data* get_affinity_data() {
             return &affinity_data_;
         }
 
@@ -124,11 +124,11 @@ namespace hpx {
 
         ////////////////////////////////////////////////////////////////////////
 
-        scheduling_policy which_scheduler(std::string pool_name) const;
+        scheduling_policy which_scheduler(std::string pool_name);
         threads::topology& get_topology() const;
         threads::policies::init_affinity_data get_init_affinity_data() const;
         size_t get_num_pools() const;
-        size_t get_num_threads(std::string pool_name) const;
+        size_t get_num_threads(std::string pool_name);
         std::string get_pool_name(size_t index) const;
 
     private:

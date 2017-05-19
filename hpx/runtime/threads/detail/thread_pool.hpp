@@ -111,8 +111,9 @@ namespace hpx { namespace threads { namespace detail
 
         std::string get_pool_name() const
         {
-            return pool_name_;
+            return id_.name_;
         }
+
         virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
         virtual mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const = 0;

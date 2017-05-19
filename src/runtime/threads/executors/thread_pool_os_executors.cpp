@@ -60,7 +60,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       : scheduler_(num_punits),
         executor_name_(get_unique_name()),
         notifier_(get_notification_policy(executor_name_.c_str())),
-        pool_(new hpx::threads::detail::thread_pool_impl<Scheduler>(scheduler_, notifier_, executor_name_.c_str())),
+        //! FIXME the "index" data member of thread-pool is just set to 0
+        pool_(new hpx::threads::detail::thread_pool_impl<Scheduler>(scheduler_, notifier_, 0, executor_name_.c_str())),
         num_threads_(num_punits)
     {
         if (num_punits > hpx::threads::hardware_concurrency())

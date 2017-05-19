@@ -57,10 +57,11 @@ namespace hpx {
     init_pool_data::init_pool_data(std::string name, scheduling_policy sched)
         : pool_name_(name),
           scheduling_policy_(sched),
-          assigned_pus_(0), num_threads_(0)
+          num_threads_(0)
     {
         if(name.empty())
-        throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
+            throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
+        threads::resize(assigned_pus_, hpx::threads::hardware_concurrency());
     };
 
     std::string init_pool_data::get_name() const {
@@ -86,8 +87,7 @@ namespace hpx {
     // mechanism for adding resources
     void init_pool_data::add_resource(std::size_t pu_index){
         if(pu_index >= hpx::threads::hardware_concurrency()) {
-            throw std::invalid_argument("Processing unit index out of bounds: this machine has only " +
-                                                hpx::threads::hardware_concurrency() + " processing units.");
+            throw std::invalid_argument("Processing unit index out of bounds."); //! FIXME give actual number of PUs
         }
 
         threads::set(assigned_pus_, pu_index);
@@ -119,7 +119,7 @@ namespace hpx {
         std::cout << "\n";
     }
 
-    void init_pool_data::print_pool(){
+    void init_pool_data::print_pool() const {
         std::cout << "[pool \"" << pool_name_ << "\"] with scheduler " ;
         std::string sched;
         switch(scheduling_policy_) {
@@ -136,8 +136,8 @@ namespace hpx {
         }
         std::cout << "\"" << sched << "\"\n"
                   << "is running on PUs : ";
-        std::size_t num_pus = hpx::threads::hardware_concurrency();
-        std::cout << std::bitset<num_pus>(assigned_pus_) << "\n";
+        std::cout << std::bitset<24>(assigned_pus_) << "\n";
+        //! FIXME how can I have hpx::threads::hardware_concurrency(); as template param of bitset, s.t. correct length is printed?
     }
 
 
@@ -210,8 +210,8 @@ namespace hpx {
             /*if(allow-empty-pool-policy){
                 if(num_threads_desired_total > )
                     throw ;*/
-            throw std::invalid_argument("The desired number of threads is greater than the number of threads provided in the command line. Please re-run this program with the option --hpx:threads N, with N greater or equal to "
-                    + num_threads_desired_total+1 + "\n");
+            throw std::invalid_argument("The desired number of threads is greater than the number of threads provided in the command line. \n");
+            //! FIXME give indication: --hpx:threads N >= (num_threads_desired_total+1)
         }
 
         // If the default pool already has resources assigned to it (by the user),
@@ -235,7 +235,8 @@ namespace hpx {
 
         threads::mask_type default_mask = threads::not_(cummulated_pu_usage);
         //! cut off the bits that are above hardware concurrency ...
-        default_mask = default_mask & threads::mask_type(2^(topology_.get_number_of_pus())-1);
+        std::size_t hwc = topology_.get_number_of_pus();
+        default_mask &= threads::mask_type((2^(hwc)) - 1);
 
         // make sure mask for the default pool has resources in it
         //! FIXME add allow-empty-default-pool policy
@@ -326,7 +327,7 @@ namespace hpx {
     // called in set_default_pool()
     bool resource_partitioner::check_oversubscription() const
     {
-        threads::mask_type pus_in_common(2^(topology_.get_number_of_pus())-1);
+        threads::mask_type pus_in_common((2^(topology_.get_number_of_pus()))-1);
 
         for(auto& itp : initial_thread_pools_){
             pus_in_common = pus_in_common & itp.get_pus();
@@ -368,11 +369,6 @@ namespace hpx {
         /*init_pool_data* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);
         return ret;*/ //! or should I return a pointer to that pool?
     }
-
-    void resource_partitioner::create_default_pool(scheduling_policy sched) {
-        create_thread_pool("default", sched);
-    }
-
 
     void resource_partitioner::add_resource(std::size_t resource, std::string pool_name){
         get_pool(pool_name)->add_resource(resource);
@@ -425,23 +421,24 @@ namespace hpx {
         return initial_thread_pools_.size();
     }
 
-    size_t resource_partitioner::get_num_threads(std::string pool_name) const
+    size_t resource_partitioner::get_num_threads(std::string pool_name)
     {
         return get_pool(pool_name)->get_num_threads();
     }
 
-    std::string resource_partitioner::get_pool_name(size_t index) const{
+    std::string resource_partitioner::get_pool_name(size_t index) const {
         if(index >= initial_thread_pools_.size())
-            throw std::invalid_argument(
-                    "pool " + i + " (zero-based index) requested out of bounds. "
+            throw std::invalid_argument("pool requested out of bounds.");
+                    //! FIXME more detailed error message:
+                    /*"pool " + i + " (zero-based index) requested out of bounds. "
                     "The resource_partitioner owns only " + initial_thread_pools_.size()
-                    + " pools\n");
-        return initial_thread_pools_[i].get_name();
+                    + " pools\n");*/
+        return initial_thread_pools_[index].get_name();
     }
 
     ////////////////////////////////////////////////////////////////////////
 
-    uint64_t resource_partitioner::get_pool_index(std::string pool_name) const {
+    std::size_t resource_partitioner::get_pool_index(std::string pool_name) const {
         std::size_t N = initial_thread_pools_.size();
         for(size_t i(0); i<N; i++) {
             if (initial_thread_pools_[i].get_name() == pool_name) {
@@ -487,24 +484,11 @@ namespace hpx {
                 "the resource partitioner does not own a default pool \n");
     }
 
-    bool resource_partitioner::default_pool(){
-        auto pool = std::find_if(
-                initial_thread_pools_.begin(), initial_thread_pools_.end(),
-                [](init_pool_data itp) -> bool {return (itp.get_name() == "default");}
-        );
-
-        if(pool != initial_thread_pools_.end()){
-            return true;
-        }
-        return false;
-    }
-
-
-    void resource_partitioner::print_pools(){           //! make this prettier
+    void resource_partitioner::print_pools() const {           //! make this prettier
         std::cout << "the resource partitioner owns "
                   << initial_thread_pools_.size() << " pool(s) : \n";
         for(auto itp : initial_thread_pools_){
-            itp.print_me();
+            itp.print_pool();
         }
     }
 

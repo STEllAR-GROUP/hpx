@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
