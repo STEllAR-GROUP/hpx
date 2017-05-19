@@ -106,8 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             for_each_iteration(for_each_iteration const&) = default;
             for_each_iteration(for_each_iteration&&) = default;
 #else

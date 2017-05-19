@@ -28,7 +28,7 @@ macro(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
 
   hpx_check_for_cxx11_defaulted_functions(
-    DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+    REQUIRED "HPX needs support for C++11 defaulted functions")
 
   hpx_check_for_cxx11_deleted_functions(
     REQUIRED "HPX needs support for C++11 deleted functions")

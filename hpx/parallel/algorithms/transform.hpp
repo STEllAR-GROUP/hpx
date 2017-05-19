@@ -80,8 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             transform_iteration(transform_iteration const&) = default;
             transform_iteration(transform_iteration&&) = default;
 #else
@@ -340,8 +339,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj2_(std::forward<Proj2_>(proj2))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             transform_binary_iteration(transform_binary_iteration const&) = default;
             transform_binary_iteration(transform_binary_iteration&&) = default;
 #else
