@@ -20,6 +20,7 @@
 #include <hpx/util/io_service_pool.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <utility>
 
@@ -50,16 +51,17 @@ namespace hpx { namespace iostreams { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
-        std::uint64_t count, detail::buffer in)
+        std::uint64_t count, detail::buffer const& in)
     { // {{{
         // Perform the IO operation.
-        pending_output_.output(locality_id, count, std::move(in), write_f, mtx_);
+        pending_output_.output(locality_id, count, in, write_f, mtx_);
     } // }}}
 
     void output_stream::write_async(std::uint32_t locality_id,
-        std::uint64_t count, detail::buffer in)
+        std::uint64_t count, detail::buffer const& buf_in)
     { // {{{
         // Perform the IO in another OS thread.
+        detail::buffer in(buf_in);
         hpx::get_thread_pool("io_pool")->get_io_service().post(
             util::bind(&output_stream::call_write_async, this, locality_id,
                 count, std::move(in)));
@@ -67,22 +69,24 @@ namespace hpx { namespace iostreams { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_sync(std::uint32_t locality_id,
-        std::uint64_t count, detail::buffer in, threads::thread_id_type caller)
+        std::uint64_t count, detail::buffer const& in,
+        threads::thread_id_type caller)
     {
         // Perform the IO operation.
-        pending_output_.output(locality_id, count, std::move(in), write_f, mtx_);
+        pending_output_.output(locality_id, count, in, write_f, mtx_);
 
         // Wake up caller.
         threads::set_thread_state(caller, threads::pending);
     }
 
     void output_stream::write_sync(std::uint32_t locality_id,
-        std::uint64_t count, detail::buffer in)
+        std::uint64_t count, detail::buffer const& buf_in)
     { // {{{
         // Perform the IO in another OS thread.
+        detail::buffer in(buf_in);
         hpx::get_thread_pool("io_pool")->get_io_service().post(
             util::bind(&output_stream::call_write_sync, this, locality_id,
-                count, std::move(in), threads::get_self_id()));
+                count, std::ref(in), threads::get_self_id()));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::suspended, "output_stream::write_sync");

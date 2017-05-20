@@ -26,8 +26,9 @@ namespace hpx { namespace iostreams { namespace detail
 
         template <typename F, typename Mutex>
         void output(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer in, F const& write_f, Mutex& mtx)
+            detail::buffer const& buf_in, F const& write_f, Mutex& mtx)
         {
+            detail::buffer in(buf_in);
             std::unique_lock<Mutex> l(mtx);
             data_type& data = output_data_map_[locality_id]; //-V108
 

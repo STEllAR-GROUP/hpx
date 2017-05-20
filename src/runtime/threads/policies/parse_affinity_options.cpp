@@ -309,7 +309,9 @@ namespace hpx { namespace threads { namespace detail
         for (std::int64_t index : b)
         {
             masks.push_back(util::make_tuple(
-                index, t.init_socket_affinity_mask_from_socket(index)
+                static_cast<std::size_t>(index),
+                t.init_socket_affinity_mask_from_socket(
+                    static_cast<std::size_t>(index))
             ));
         }
         return masks;
@@ -322,7 +324,9 @@ namespace hpx { namespace threads { namespace detail
         for (std::int64_t index : b)
         {
             masks.push_back(util::make_tuple(
-                index, t.init_numa_node_affinity_mask_from_numa_node(index)
+                static_cast<std::size_t>(index),
+                t.init_numa_node_affinity_mask_from_numa_node(
+                    static_cast<std::size_t>(index))
             ));
         }
         return masks;
@@ -419,8 +423,10 @@ namespace hpx { namespace threads { namespace detail
                 for (std::int64_t index : bounds)
                 {
                     mask_type mask =
-                        t.init_core_affinity_mask_from_core(index + base);
-                    masks.push_back(util::make_tuple(index, mask & socket_mask));
+                        t.init_core_affinity_mask_from_core(
+                            static_cast<std::size_t>(index + base));
+                    masks.push_back(util::make_tuple(
+                        static_cast<std::size_t>(index), mask & socket_mask));
                 }
             }
             break;
@@ -503,8 +509,10 @@ namespace hpx { namespace threads { namespace detail
                         }
                     }
 
-                    mask_type mask = t.init_thread_affinity_mask(base_core, index);
-                    masks.push_back(util::make_tuple(index, mask & core_mask));
+                    mask_type mask = t.init_thread_affinity_mask(base_core,
+                        static_cast<std::size_t>(index));
+                    masks.push_back(util::make_tuple(
+                        static_cast<std::size_t>(index), mask & core_mask));
                 }
             }
             break;

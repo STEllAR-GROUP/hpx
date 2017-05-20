@@ -681,7 +681,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<std::int64_t> const& parameters, error_code& ec)
+            std::vector<std::size_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().

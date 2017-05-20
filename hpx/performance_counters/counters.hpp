@@ -723,7 +723,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         HPX_EXPORT naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<std::int64_t> const& parameters,
+            std::vector<std::size_t> const& parameters,
             error_code& ec = throws);
 
         // \brief Create a new arithmetics performance counter instance based on
