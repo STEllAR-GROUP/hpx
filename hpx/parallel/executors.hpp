@@ -9,21 +9,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/executor_information_traits.hpp>
-#endif
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/timed_executor_traits.hpp>
-#endif
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/thread_executor_information_traits.hpp>
-#endif
-#include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
-#include <hpx/parallel/executors/thread_timed_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_information_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/timed_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_information_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_timed_executor_traits.hpp>
 #endif
 
 #include <hpx/parallel/executors/default_executor.hpp>

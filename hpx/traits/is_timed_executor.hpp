@@ -7,7 +7,7 @@
 #define HPX_TRAITS_IS_TIMED_EXECUTOR_AUG_05_2015_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>

@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedinclude:boost/ref.hpp
+// hpxinspect:nodeprecatedname:boost::reference_wrapper
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
@@ -19,6 +22,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/ref.hpp>
 
 #include "../algorithms/foreach_tests.hpp"
 
@@ -49,19 +54,19 @@ template <typename ... Parameters>
 void parameters_test(Parameters &&... params)
 {
     parameters_test_impl(std::ref(params)...);
-    parameters_test_impl(std::ref(params)...);
+    parameters_test_impl(boost::ref(params)...);
     parameters_test_impl(std::forward<Parameters>(params)...);
 }
 
 void test_dynamic_chunk_size()
 {
     {
-        hpx::parallel::dynamic_chunk_size dcs;
+        hpx::parallel::execution::dynamic_chunk_size dcs;
         parameters_test(dcs);
     }
 
     {
-        hpx::parallel::dynamic_chunk_size dcs(100);
+        hpx::parallel::execution::dynamic_chunk_size dcs(100);
         parameters_test(dcs);
     }
 }
@@ -69,12 +74,12 @@ void test_dynamic_chunk_size()
 void test_static_chunk_size()
 {
     {
-        hpx::parallel::static_chunk_size scs;
+        hpx::parallel::execution::static_chunk_size scs;
         parameters_test(scs);
     }
 
     {
-        hpx::parallel::static_chunk_size scs(100);
+        hpx::parallel::execution::static_chunk_size scs(100);
         parameters_test(scs);
     }
 }
@@ -82,12 +87,12 @@ void test_static_chunk_size()
 void test_guided_chunk_size()
 {
     {
-        hpx::parallel::guided_chunk_size gcs;
+        hpx::parallel::execution::guided_chunk_size gcs;
         parameters_test(gcs);
     }
 
     {
-        hpx::parallel::guided_chunk_size gcs(100);
+        hpx::parallel::execution::guided_chunk_size gcs(100);
         parameters_test(gcs);
     }
 }
@@ -95,12 +100,12 @@ void test_guided_chunk_size()
 void test_auto_chunk_size()
 {
     {
-        hpx::parallel::auto_chunk_size acs;
+        hpx::parallel::execution::auto_chunk_size acs;
         parameters_test(acs);
     }
 
     {
-        hpx::parallel::auto_chunk_size acs(std::chrono::milliseconds(1));
+        hpx::parallel::execution::auto_chunk_size acs(std::chrono::milliseconds(1));
         parameters_test(acs);
     }
 }
@@ -108,7 +113,7 @@ void test_auto_chunk_size()
 void test_persistent_auto_chunk_size()
 {
     {
-        hpx::parallel::persistent_auto_chunk_size pacs;
+        hpx::parallel::execution::persistent_auto_chunk_size pacs;
         parameters_test(pacs);
     }
 
@@ -127,7 +132,7 @@ void test_persistent_auto_chunk_size()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
+struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
       : name_(name)
@@ -143,6 +148,14 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
 
     std::string name_;
 };
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor_parameters<timer_hooks_parameters>
+      : std::true_type
+    {};
+}}
 
 void test_combined_hooks()
 {

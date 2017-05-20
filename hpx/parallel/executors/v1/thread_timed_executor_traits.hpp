@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/thread_timed_executor_traits.hpp
+/// \file parallel/executors/v1/thread_timed_executor_traits.hpp
 
 #if !defined(HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM)
 #define HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM
@@ -13,8 +13,8 @@
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
-#include <hpx/parallel/executors/timed_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/timed_executor_traits.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/steady_clock.hpp>
 

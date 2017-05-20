@@ -16,7 +16,8 @@
 
 namespace hpx { namespace compute { namespace cuda
 {
-    struct default_executor_parameters : parallel::executor_parameters_tag
+    struct default_executor_parameters
+      : parallel::execution::executor_parameters_tag
     {
         template <typename Executor, typename F>
         std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,

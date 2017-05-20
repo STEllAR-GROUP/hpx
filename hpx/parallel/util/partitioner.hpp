@@ -18,7 +18,7 @@
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -49,11 +49,9 @@ namespace hpx { namespace parallel { namespace util
             static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
+                typedef typename execution::extract_executor_parameters<
+                        hpx::util::decay<ExPolicy>::type::executor_type
+                    >::type parameters_type;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -64,8 +62,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape(policy, inititems, f1,
@@ -188,11 +187,9 @@ namespace hpx { namespace parallel { namespace util
             static R call_with_index(ExPolicy && policy, FwdIter first,
                 std::size_t count, Stride stride, F1 && f1, F2 && f2)
             {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
+                typedef typename execution::extract_executor_parameters<
+                        hpx::util::decay<ExPolicy>::type::executor_type
+                    >::type parameters_type;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -203,8 +200,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(policy, inititems, f1,
@@ -250,11 +248,9 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<R> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
+                typedef typename execution::extract_executor_parameters<
+                        hpx::util::decay<ExPolicy>::type::executor_type
+                    >::type parameters_type;
 
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
@@ -270,8 +266,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape(policy, inititems, f1,
@@ -395,11 +392,9 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, Stride stride,
                 F1 && f1, F2 && f2)
             {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
+                typedef typename execution::extract_executor_parameters<
+                        hpx::util::decay<ExPolicy>::type::executor_type
+                    >::type parameters_type;
 
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
@@ -415,8 +410,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(policy, inititems, f1,

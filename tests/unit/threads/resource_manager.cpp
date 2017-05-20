@@ -24,9 +24,9 @@
 namespace test
 {
     struct dummy_parameters
-      : hpx::parallel::executor_parameters_tag
+      : hpx::parallel::execution::executor_parameters_tag
     {
-        dummy_parameters() {}
+        dummy_parameters() = default;
     };
 
     static const dummy_parameters dummy;

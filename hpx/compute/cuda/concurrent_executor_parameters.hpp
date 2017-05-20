@@ -15,13 +15,14 @@
 
 namespace hpx { namespace compute { namespace cuda
 {
-    struct concurrent_executor_parameters : parallel::executor_parameters_tag
+    struct concurrent_executor_parameters
+        : parallel::execution::executor_parameters_tag
     {
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,
-            std::size_t num_tasks)
+        std::size_t get_chunk_size(
+            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
         {
-            return (num_tasks + cores - 1)/cores;
+            return (num_tasks + cores - 1) / cores;
         }
     };
 }}}

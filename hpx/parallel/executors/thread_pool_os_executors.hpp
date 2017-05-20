@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { namespace execution
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer

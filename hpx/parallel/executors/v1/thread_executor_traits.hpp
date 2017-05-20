@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/thread_executor_traits.hpp
+/// \file parallel/executors/v1/thread_executor_traits.hpp
 
 #if !defined(HPX_PARALLEL_THREAD_EXECUTOR_TRAITS_AUG_07_2015_0826AM)
 #define HPX_PARALLEL_THREAD_EXECUTOR_TRAITS_AUG_07_2015_0826AM
@@ -15,7 +15,7 @@
 #include <hpx/async.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,8 +13,9 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v3
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
@@ -25,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v3
     /// \note This executor parameters type is equivalent to OpenMP's DYNAMIC
     ///       scheduling directive.
     ///
-    struct dynamic_chunk_size : executor_parameters_tag
+    struct dynamic_chunk_size
     {
         /// Construct a \a dynamic_chunk_size executor parameters object
         ///
@@ -63,5 +64,26 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \endcond
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<parallel::execution::dynamic_chunk_size>
+        : std::true_type
+    {};
+    /// \endcond
+}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+
+#include <hpx/traits/v1/is_executor_parameters.hpp>
+
+namespace hpx { namespace parallel { inline namespace v3
+{
+    using dynamic_chunk_size = execution::dynamic_chunk_size;
+}}}
+
+#endif
 
 #endif

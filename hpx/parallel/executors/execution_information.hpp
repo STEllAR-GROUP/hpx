@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nounnamed
-
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_JAN_16_2017_0444PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_JAN_16_2017_0444PM
 
@@ -41,12 +39,12 @@ namespace hpx { namespace parallel { inline namespace v3 { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution
 {
-    // customization point for interface processing_units_count()
     namespace detail
     {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
+        // customization point for interface processing_units_count()
         template <typename Executor>
         struct processing_units_count_fn_helper<Executor,
             typename std::enable_if<

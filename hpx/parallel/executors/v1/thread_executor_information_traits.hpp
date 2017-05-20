@@ -1,9 +1,9 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/thread_executor_information_traits.hpp
+/// \file parallel/executors/v1/thread_executor_information_traits.hpp
 
 #if !defined(HPX_PARALLEL_THREAD_EXECUTOR_INFORMATION_TRAITS_AUG_26_2015_1141AM)
 #define HPX_PARALLEL_THREAD_EXECUTOR_INFORMATION_TRAITS_AUG_26_2015_1141AM
@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/executor_information_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_information_traits.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/topology.hpp>

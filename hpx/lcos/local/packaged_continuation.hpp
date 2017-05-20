@@ -16,7 +16,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #endif
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/bind.hpp>

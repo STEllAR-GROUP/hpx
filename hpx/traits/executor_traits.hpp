@@ -14,13 +14,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v3
-{
-    struct static_chunk_size;
-}}}
-
 namespace hpx { namespace parallel { namespace execution
 {
+    ///////////////////////////////////////////////////////////////////////////
+    struct static_chunk_size;
+
     ///////////////////////////////////////////////////////////////////////////
     struct sequenced_execution_tag;
     struct parallel_execution_tag;

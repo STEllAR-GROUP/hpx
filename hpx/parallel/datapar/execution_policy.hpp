@@ -10,8 +10,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_parameters.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>

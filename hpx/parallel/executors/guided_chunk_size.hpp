@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v3
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Iterations are dynamically assigned to threads in blocks as threads
@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { inline namespace v3
     /// \note This executor parameters type is equivalent to OpenMP's GUIDED
     ///       scheduling directive.
     ///
-    struct guided_chunk_size : executor_parameters_tag
+    struct guided_chunk_size
     {
         /// Construct a \a guided_chunk_size executor parameters object
         ///
@@ -85,5 +85,26 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \endcond
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<parallel::execution::guided_chunk_size>
+      : std::true_type
+    {};
+    /// \endcond
+}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+
+#include <hpx/traits/v1/is_executor_parameters.hpp>
+
+namespace hpx { namespace parallel { inline namespace v3
+{
+    using guided_chunk_size = execution::guided_chunk_size;
+}}}
+
+#endif
 
 #endif

@@ -213,9 +213,9 @@ namespace hpx { namespace traits
 }}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 
 namespace hpx { namespace parallel { inline namespace v3
 {
