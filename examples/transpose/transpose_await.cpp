@@ -209,7 +209,7 @@ hpx::future<sub_block> transpose_phase(
         transpose(co_await from, co_await to, block_order, tile_size);
     }
 
-    return sub_block();
+    co_return sub_block();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
