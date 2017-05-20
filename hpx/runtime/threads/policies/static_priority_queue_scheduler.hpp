@@ -71,15 +71,12 @@ namespace hpx { namespace threads { namespace policies
 
             typedef typename base_type::thread_queue_type thread_queue_type;
 
-            if (num_thread < this->high_priority_queues_.size())
-            {
-                thread_queue_type* q = this->high_priority_queues_[num_thread];
+            thread_queue_type* q = &this->high_priority_queue_;
 
-                q->increment_num_pending_accesses();
-                if (q->get_next_thread(thrd))
-                    return true;
-                q->increment_num_pending_misses();
-            }
+            q->increment_num_pending_accesses();
+            if (q->get_next_thread(thrd))
+                return true;
+            q->increment_num_pending_misses();
 
             {
                 HPX_ASSERT(num_thread < queues_size);
@@ -114,12 +111,9 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = true;
 
-            if (num_thread < this->high_priority_queues_.size())
-            {
-                result = this->high_priority_queues_[num_thread]->
-                    wait_or_add_new(running, idle_loop_count, added) && result;
-                if (0 != added) return result;
-            }
+            result = this->high_priority_queue_.
+                wait_or_add_new(running, idle_loop_count, added) && result;
+            if (0 != added) return result;
 
             result = this->queues_[num_thread]->wait_or_add_new(running,
                 idle_loop_count, added) && result;
