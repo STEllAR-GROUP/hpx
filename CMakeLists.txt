@@ -81,6 +81,7 @@ include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
+include(HPX_CreateSymbolicLink)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
@@ -1871,9 +1872,8 @@ endif()
 include(HPX_GeneratePackage)
 
 # Create a symlink in share pointing to the latest HPX installation
-execute_process(COMMAND
-  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/share")
+create_symbolic_link("${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}"
+                     "${CMAKE_BINARY_DIR}/share/hpx")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")

@@ -381,20 +381,22 @@ endif()
 
 # Create links to properly view the docs in the build directory
 set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
+
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/src"
+                     "${DOCS_OUTPUT_DIR}/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/images"
+                     "${DOCS_OUTPUT_DIR}/images")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/hpx"
+                     "${DOCS_OUTPUT_DIR}/code/hpx")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/src"
+                     "${DOCS_OUTPUT_DIR}/code/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/examples"
+                     "${DOCS_OUTPUT_DIR}/code/examples")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
+                     "${DOCS_OUTPUT_DIR}/code/tests")
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
