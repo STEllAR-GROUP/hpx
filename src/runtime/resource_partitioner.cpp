@@ -57,6 +57,7 @@ namespace hpx {
     init_pool_data::init_pool_data(std::string name, scheduling_policy sched)
         : pool_name_(name),
           scheduling_policy_(sched),
+          assigned_pus_(0),
           num_threads_(0)
     {
         if(name.empty())
@@ -228,7 +229,7 @@ namespace hpx {
         // and give them to the default pool
         //! get a mask of all used PUs by doing a bitwise or on all the masks
         std::size_t num_pus = topology_.get_number_of_pus();
-        threads::mask_type cummulated_pu_usage;
+        threads::mask_type cummulated_pu_usage = threads::mask_type(0);
         for(auto itp : initial_thread_pools_) {
             cummulated_pu_usage = cummulated_pu_usage | itp.get_pus();
         }
@@ -236,7 +237,7 @@ namespace hpx {
         threads::mask_type default_mask = threads::not_(cummulated_pu_usage);
         //! cut off the bits that are above hardware concurrency ...
         std::size_t hwc = topology_.get_number_of_pus();
-        default_mask &= threads::mask_type((2^(hwc)) - 1);
+        default_mask &= threads::mask_type((1<<hwc) - 1);
 
         // make sure mask for the default pool has resources in it
         //! FIXME add allow-empty-default-pool policy
@@ -342,8 +343,9 @@ namespace hpx {
     // called in set_default_pool()
     bool resource_partitioner::check_empty_pools() const
     {
-        for(auto& itp : initial_thread_pools_){
-            if(threads::any(itp.get_pus())){
+        std::size_t num_thread_pools = initial_thread_pools_.size();
+        for(size_t i(1); i<num_thread_pools; i++){
+            if(threads::any(initial_thread_pools_[i].get_pus())){
                 return true;
             }
         }
