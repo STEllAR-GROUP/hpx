@@ -46,7 +46,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
 
-            template <typename Scheduler>
+    template <typename Scheduler>
     thread_pool_impl<Scheduler>::~thread_pool_impl()
     {
         if (!threads_.empty()) {
@@ -60,6 +60,18 @@ namespace hpx { namespace threads { namespace detail
             threads_.clear();
         }
     }
+
+    template <typename Scheduler>
+    void thread_pool_impl<Scheduler>::print_pool()
+    {
+        std::cout << "[pool \"" << id_.name_ << "\", #" << id_.index_
+                  <<"] with scheduler " << sched_.get_scheduler_name()
+                  << "\n"
+                  << "is running on PUs : ";
+        std::cout << std::bitset<24>(used_processing_units_) << "\n";
+        //! FIXME how can I have hpx::threads::hardware_concurrency(); as template param of bitset, s.t. correct length is printed?
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
 

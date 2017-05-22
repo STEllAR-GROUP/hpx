@@ -498,7 +498,7 @@ namespace hpx {
                 "the resource partitioner does not own a default pool \n");
     }
 
-    void resource_partitioner::print_pools() const {           //! make this prettier
+    void resource_partitioner::print_init_pool_data() const {           //! make this prettier
         std::cout << "the resource partitioner owns "
                   << initial_thread_pools_.size() << " pool(s) : \n";
         for(auto itp : initial_thread_pools_){

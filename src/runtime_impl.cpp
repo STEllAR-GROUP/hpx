@@ -310,7 +310,7 @@ namespace hpx {
                       "I/O service pool";
 
         // start the thread manager
-        thread_manager_->run(); //! FIXME argzment not actually needed.
+        thread_manager_->run();
         lbt_ << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 

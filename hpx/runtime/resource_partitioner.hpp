@@ -81,7 +81,7 @@ namespace hpx {
         // constructor: users shouldn't use the constructor but rather get_resource_partitioner
         resource_partitioner(std::size_t num_special_pools_ = 0);
 
-        void print_pools() const;
+        void print_init_pool_data() const;
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);

@@ -39,6 +39,8 @@ namespace hpx { namespace threads { namespace detail
 
         ~thread_pool_impl();
 
+        void print_pool();
+
         hpx::state get_state() const;
         hpx::state get_state(std::size_t num_thread) const;
         bool has_reached_state(hpx::state s) const;

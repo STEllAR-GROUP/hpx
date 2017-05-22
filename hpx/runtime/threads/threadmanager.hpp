@@ -62,6 +62,9 @@ namespace threads
 
         virtual void init(policies::init_affinity_data const& data) = 0;
 
+        //! FIXME keep this?
+        virtual void print_pools() = 0;
+
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;
 

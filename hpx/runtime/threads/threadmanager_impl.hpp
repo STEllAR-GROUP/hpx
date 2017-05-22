@@ -66,6 +66,9 @@ namespace hpx { namespace threads
 
         void init(policies::init_affinity_data const& data);
 
+        //! FIXME keep this?
+        void print_pools();
+
         // Get functions
         pool_type default_pool() const;
         scheduler_type default_scheduler() const;

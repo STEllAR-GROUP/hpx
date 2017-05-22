@@ -76,6 +76,8 @@ namespace hpx { namespace threads { namespace detail
             char const* pool_name, policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
 
+        virtual void print_pool() = 0;
+
         pool_id_type get_pool_id(){
             return id_;
         }
