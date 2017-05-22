@@ -19,6 +19,7 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -156,17 +157,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         result = hpx::make_ready_future(std::move(last));
                     }
 
-                    typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                        executor_type;
                     typedef typename
                         hpx::util::decay<ExPolicy>::type::executor_parameters_type
                         parameters_type;
 
                     typedef executor_parameter_traits<parameters_type> traits;
-                    typedef executor_information_traits<executor_type> info_traits;
 
                     std::size_t const cores =
-                        info_traits::processing_units_count(policy.executor(),
+                        execution::processing_units_count(policy.executor(),
                                 policy.parameters());
                     std::size_t max_chunks = traits::maximal_number_of_chunks(
                         policy.parameters(), policy.executor(), cores, size);

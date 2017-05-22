@@ -33,6 +33,7 @@ namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
+    struct HPX_EXPORT topology;
 
     template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl;

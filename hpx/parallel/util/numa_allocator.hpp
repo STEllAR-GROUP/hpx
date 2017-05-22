@@ -12,7 +12,7 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/executor_information_traits.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/topology.hpp>
@@ -109,12 +109,10 @@ namespace hpx { namespace parallel { namespace util
                                 topo_.get_thread_affinity_mask_from_lva(
                                     reinterpret_cast<hpx::naming::address_type>(&val));
 
-                            typedef hpx::parallel::executor_information_traits<
-                                executor_type> traits;
-
                             std::size_t thread_num = hpx::get_worker_thread_num();
                             hpx::threads::mask_cref_type thread_mask =
-                                traits::get_pu_mask(executors_[i], topo_, thread_num);
+                                hpx::parallel::execution::get_pu_mask(
+                                    executors_[i], topo_, thread_num);
 
                             HPX_ASSERT(threads::mask_size(mem_mask) ==
                                 threads::mask_size(thread_mask));
