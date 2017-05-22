@@ -184,6 +184,7 @@ namespace hpx {
     void resource_partitioner::set_default_pool(std::size_t num_threads) {
 
         // check whether any of the pools defined up to now are empty
+        // note: does not check "default", this one is allowed not to be given resources by the user
         if(check_empty_pools())
             throw std::invalid_argument("Pools empty of resources are not allowed. Please re-run this program with allow-empty-pool-policy (not implemented yet)");
         //! FIXME add allow-empty-pools policy. Wait, does this even make sense??
@@ -206,6 +207,7 @@ namespace hpx {
 
         // make sure the sum of the number of desired threads is strictly smaller
         // than the total number of OS-threads that will be created (specified by --hpx:threads)
+        //! FIXME should we check whether it's an exact match?
         if(num_threads_desired_total >= affinity_data_.get_num_threads()){
             //! FIXME add allow-empty-default-pool policy
             /*if(allow-empty-pool-policy){
@@ -236,8 +238,7 @@ namespace hpx {
 
         threads::mask_type default_mask = threads::not_(cummulated_pu_usage);
         //! cut off the bits that are above hardware concurrency ...
-        std::size_t hwc = topology_.get_number_of_pus();
-        default_mask &= threads::mask_type((1<<hwc) - 1);
+        default_mask &= threads::mask_type((1<<topology_.get_number_of_pus()) - 1);
 
         // make sure mask for the default pool has resources in it
         //! FIXME add allow-empty-default-pool policy
@@ -252,7 +253,7 @@ namespace hpx {
         std::size_t num_threads_default_pool = affinity_data_.get_num_threads() - num_threads_desired_total; //! hpx:threads - (threads used for other pools)
 
         if(num_threads_default_pool > num_available_threads_for_default){
-            //! throw oversubscription exception except if policy blahblha
+            //! throw oversubscription exception except if policy blahblah
         } else if (num_threads_default_pool == num_available_threads_for_default){
             //! it's all fine :) just set that number :)
         } else { //! num_threads_default_pool < num_available_threads_for_default
@@ -262,6 +263,8 @@ namespace hpx {
                 threads::unset(default_mask, threads::find_first(default_mask));
                 excess_pus--;
             }
+            // re-set default mask since it has been modified
+            get_default_pool()->set_mask(default_mask);
             //! FIXME reduce in a smart way: eg try to take PUs that are close together or something like that
             //! current implementation = just unset the number of bits required in order of appearance in the mask...
         }
@@ -328,14 +331,18 @@ namespace hpx {
     // called in set_default_pool()
     bool resource_partitioner::check_oversubscription() const
     {
-        threads::mask_type pus_in_common((2^(topology_.get_number_of_pus()))-1);
+        threads::mask_type pus_in_common((1<<(topology_.get_number_of_pus()))-1);
 
         for(auto& itp : initial_thread_pools_){
-            pus_in_common = pus_in_common & itp.get_pus();
+            for(auto& itp_comp : initial_thread_pools_){
+                if(itp.get_name() != itp_comp.get_name()){
+                    if(threads::any(itp.get_pus() & itp_comp.get_pus())){
+                        return true;
+                    }
+                }
+            }
         }
 
-        if(threads::any(pus_in_common))
-            return true;
         return false;
     }
 
@@ -345,7 +352,7 @@ namespace hpx {
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++){
-            if(threads::any(initial_thread_pools_[i].get_pus())){
+            if(!threads::any(initial_thread_pools_[i].get_pus())){
                 return true;
             }
         }
@@ -367,9 +374,14 @@ namespace hpx {
         if(name == "default")
             throw std::invalid_argument("cannot instantiate a initial_thread_pool named \"default\". The default pool is instantiated automatically by the resource-partitioner");
 
+        //! if there already exists a pool with this name
+        std::size_t num_thread_pools = initial_thread_pools_.size();
+        for(size_t i(1); i<num_thread_pools; i++) {
+            if(name == initial_thread_pools_[i].get_name())
+                throw std::invalid_argument("there already exists a pool named " + name + ".\n");
+        }
+
         initial_thread_pools_.push_back(init_pool_data(name, sched));
-        /*init_pool_data* ret(&initial_thread_pools_[initial_thread_pools_.size()-1]);
-        return ret;*/ //! or should I return a pointer to that pool?
     }
 
     void resource_partitioner::add_resource(std::size_t resource, std::string pool_name){
