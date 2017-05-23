@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/iostreams.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_impl.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -64,11 +65,11 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void thread_pool_impl<Scheduler>::print_pool()
     {
-        std::cout << "[pool \"" << id_.name_ << "\", #" << id_.index_
+        hpx::cout << "[pool \"" << id_.name_ << "\", #" << id_.index_
                   <<"] with scheduler " << sched_.get_scheduler_name()
                   << "\n"
                   << "is running on PUs : ";
-        std::cout << std::bitset<24>(used_processing_units_) << "\n";
+        hpx::cout << std::bitset<24>(used_processing_units_) << "\n";
         //! FIXME how can I have hpx::threads::hardware_concurrency(); as template param of bitset, s.t. correct length is printed?
     }
 

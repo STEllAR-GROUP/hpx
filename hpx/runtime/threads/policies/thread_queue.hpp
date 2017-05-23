@@ -836,7 +836,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        /// Return the next thread to be executed, return false if non is
+        /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(threads::thread_data*& thrd,
             bool allow_stealing = false, bool steal = false) HPX_HOT

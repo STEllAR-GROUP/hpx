@@ -70,7 +70,8 @@ namespace threads
 
         /// \brief return the number of HPX-threads with the given state
         virtual std::int64_t get_thread_count(
-            thread_state_enum state = unknown,
+            thread_state_enum
+            = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;

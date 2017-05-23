@@ -173,6 +173,7 @@ namespace hpx { namespace threads
             }
 
             return result;
+//            return default_pool()->get_state();
         }
 
         /// \brief return the number of HPX-threads with the given state
