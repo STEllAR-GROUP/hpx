@@ -21,6 +21,7 @@ set(subdirs
     quickstart
     qt
     random_mem_access
+    resource_partitioner
     spell_check
     startup_shutdown
     thread_aware_timer
