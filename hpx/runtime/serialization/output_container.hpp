@@ -402,7 +402,9 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT(count != 0);
 
-            filter_->save(address, count);
+            // during construction the filter may not have been set yet
+            if (filter_ != nullptr)
+                filter_->save(address, count);
             this->current_ += count;
         }
 
