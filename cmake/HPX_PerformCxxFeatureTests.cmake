@@ -24,9 +24,6 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 decltype")
   hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
 
-  hpx_check_for_cxx11_decltype_n3276(
-    DEFINITIONS HPX_HAVE_CXX11_DECLTYPE_N3276)
-
   hpx_check_for_cxx11_sfinae_expression(
     DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
 
@@ -52,7 +49,7 @@ macro(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
   hpx_check_for_cxx11_lambdas(
-    DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+    REQUIRED "HPX needs support for C++11 lambdas")
 
   hpx_check_for_cxx11_noexcept(
     DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
@@ -129,9 +126,6 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
-
-  hpx_check_for_cxx11_std_type_traits(
-    DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
 
   if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
     # Check the availability of certain C++14 language features

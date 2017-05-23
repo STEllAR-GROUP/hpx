@@ -158,13 +158,6 @@ macro(hpx_check_for_cxx11_decltype)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_decltype_n3276)
-  add_hpx_config_test(HPX_WITH_CXX11_DECLTYPE_N3276
-    SOURCE cmake/tests/cxx11_decltype_n3276.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_sfinae_expression)
   add_hpx_config_test(HPX_WITH_CXX11_SFINAE_EXPRESSION
     SOURCE cmake/tests/cxx11_sfinae_expression.cpp
@@ -372,13 +365,6 @@ endmacro()
 macro(hpx_check_for_cxx11_std_to_string)
   add_hpx_config_test(HPX_WITH_CXX11_TO_STRING
     SOURCE cmake/tests/cxx11_std_to_string.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_std_type_traits)
-  add_hpx_config_test(HPX_WITH_CXX11_TYPE_TRAITS
-    SOURCE cmake/tests/cxx11_std_type_traits.cpp
     FILE ${ARGN})
 endmacro()
 
