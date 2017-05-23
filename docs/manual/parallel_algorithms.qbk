@@ -204,9 +204,6 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref fill_n] ]
      [Assigns a value to a number of elements.]
      [`<hpx/include/parallel_fill.hpp>`]]
-    [[ [algoref transform] ]
-     [Applies a function to a range of elements.]
-     [`<hpx/include/parallel_transform.hpp>`]]
     [[ [algoref generate] ]
      [Saves the result of a function in a range.]
      [`<hpx/include/parallel_generate.hpp>`]]
@@ -250,6 +247,9 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref swap_ranges] ]
      [Swaps two ranges of elements.]
      [`<hpx/include/parallel_swap_ranges.hpp>`]]
+    [[ [algoref transform] ]
+     [Applies a function to a range of elements.]
+     [`<hpx/include/parallel_transform.hpp>`]]
 ]
 
 [table Set operations on sorted sequences(In Header: <hpx/include/parallel_algortithm.hpp>)
