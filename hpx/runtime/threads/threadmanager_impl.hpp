@@ -15,6 +15,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -308,7 +309,7 @@ namespace hpx { namespace threads
         /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread) const
         {
-            return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
+            return hpx::get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed

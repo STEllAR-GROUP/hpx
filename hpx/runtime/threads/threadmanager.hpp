@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -64,6 +65,12 @@ namespace threads
 
         //! FIXME keep this?
         virtual void print_pools() = 0;
+
+        // Get functions
+        typedef detail::thread_pool* pool_type;
+        typedef threads::policies::scheduler_base* scheduler_type;
+        virtual pool_type get_pool(std::string pool_name) const = 0;
+        virtual scheduler_type get_scheduler(std::string pool_name) const = 0;
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;
