@@ -143,13 +143,13 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
 
         std::size_t get_num_high_priority_queues(
-                util::command_line_handling const& cfg)
+                util::command_line_handling const& cfg, std::size_t num_threads)
         {
-            std::size_t num_high_priority_queues = cfg.num_threads_;
+            std::size_t num_high_priority_queues = num_threads;
             if (cfg.vm_.count("hpx:high-priority-threads")) {
                 num_high_priority_queues =
                         cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
-                if (num_high_priority_queues > cfg.num_threads_)
+                if (num_high_priority_queues > num_threads)
                 {
                     throw detail::command_line_error(
                             "Invalid command line option: "
@@ -350,7 +350,7 @@ namespace hpx {
                 {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_);
+                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
                     std::string affinity_desc;
                     std::size_t numa_sensitive =
                             hpx::detail::get_affinity_description(cfg_, affinity_desc);
@@ -377,7 +377,7 @@ namespace hpx {
                 {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_);
+                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
                     std::string affinity_desc;
                     std::size_t numa_sensitive =
                             hpx::detail::get_affinity_description(cfg_, affinity_desc);
@@ -439,7 +439,7 @@ namespace hpx {
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_);
+                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
                     std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
                     std::string affinity_desc;
                     std::size_t numa_sensitive =
@@ -476,7 +476,7 @@ namespace hpx {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_);
+                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
 
                     typedef hpx::threads::policies::local_priority_queue_scheduler<
                             compat::mutex, hpx::threads::policies::lockfree_fifo
@@ -543,7 +543,7 @@ namespace hpx {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_);
+                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
                     typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                             local_sched_type;
                     local_sched_type::init_parameter_type init(
