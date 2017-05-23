@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -622,7 +621,7 @@ namespace hpx {
 
     void threadmanager_impl::print_pools()
     {
-        hpx::cout << "The threadmanager owns "
+        std::cout << "The threadmanager owns "
                   << pools_.size() << " pool(s) : \n";
         for(auto itp : pools_){
             itp.first->print_pool();

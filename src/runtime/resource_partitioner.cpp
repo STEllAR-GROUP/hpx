@@ -6,8 +6,6 @@
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/include/iostreams.hpp>
-
 
 namespace hpx {
 
@@ -501,7 +499,7 @@ namespace hpx {
     }
 
     void resource_partitioner::print_init_pool_data() const {           //! make this prettier
-        hpx::cout << "the resource partitioner owns "
+        std::cout << "the resource partitioner owns "
                   << initial_thread_pools_.size() << " pool(s) : \n";
         for(auto itp : initial_thread_pools_){
             itp.print_pool();
