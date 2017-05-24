@@ -8,11 +8,24 @@
 //
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
 //
+#include <cmath>
+//
 #include "system_characteristics.h"
+
+
+void do_stuff(){
+    std::cout << "[do stuff] \n";
+    for(size_t i(18); i < 42; i++){
+        std::cout << "sin(" << i << ") = " << sin(i) << ", ";
+    }
+    std::cout << "\n";
+}
+
 
 int hpx_main(int argc, char* argv[])
 {
@@ -31,6 +44,14 @@ int hpx_main(int argc, char* argv[])
 
     // print system characteristics
     print_system_characteristics();
+
+    // get executors
+    hpx::threads::executors::customized_pool_executor my_exec("first_pool");
+    hpx::cout << "\n\n [hpx_main] got customized executor " << "\n";
+
+    // use these executors to schedule work
+    my_exec.add(do_stuff);
+
 
     return hpx::finalize();
 }
