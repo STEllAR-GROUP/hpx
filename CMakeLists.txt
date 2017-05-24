@@ -111,6 +111,17 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_LIBRARY_VERSION)
   unset(HPX_SOVERSION)
 endif()
+
+# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
+if(MSVC)
+  hpx_option(HPX_WITH_VCPKG BOOL
+    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
+    OFF ADVANCED)
+  if(HPX_WITH_VCPKG)
+    hpx_add_config_define(HPX_HAVE_VCPKG)
+  endif()
+endif()
+
 ################################################################################
 
 ################################################################################
@@ -1236,6 +1247,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # 'int': forcing value to bool 'true' or 'false' (performance warning)
     hpx_add_compile_flag(-wd4800)
+
+    # vcpkg enables the /utf-8 option which causes (benign) warnings in the
+    # Spirit headers
+    if(HPX_WITH_VCPKG)
+      # The file contains a character starting at offset ... that is illegal in
+      # the current source character set
+      hpx_add_compile_flag(-wd4828)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
