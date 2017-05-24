@@ -147,7 +147,8 @@ endmacro()
 macro(hpx_check_for_cxx11_alias_templates)
   add_hpx_config_test(HPX_WITH_CXX11_ALIAS_TEMPLATES
     SOURCE cmake/tests/cxx11_alias_templates.cpp
-    FILE ${ARGN})
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_alias_templates)
 endmacro()
 
 ###############################################################################
@@ -201,7 +202,8 @@ endmacro()
 macro(hpx_check_for_cxx11_explicit_cvt_ops)
   add_hpx_config_test(HPX_WITH_CXX11_EXPLICIT_CONVERSION_OPERATORS
     SOURCE cmake/tests/cxx11_explicit_cvt_ops.cpp
-    FILE ${ARGN})
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_explicit_conversions)
 endmacro()
 
 ###############################################################################
@@ -215,7 +217,8 @@ endmacro()
 macro(hpx_check_for_cxx11_extended_friend_declarations)
   add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
     SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp
-    FILE ${ARGN})
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_extended_friend_declarations)
 endmacro()
 
 ###############################################################################
