@@ -107,6 +107,9 @@ namespace hpx { namespace threads { namespace executors
             // Remove the given processing unit from the scheduler.
             void remove_processing_unit(std::size_t thread_num, error_code& ec);
 
+            // return the description string of the underlying scheduler
+            char const* get_description() const;
+
             // give invoking context a chance to catch up with its tasks
             void suspend_back_into_calling_context(std::size_t virt_core);
 
@@ -130,6 +133,7 @@ namespace hpx { namespace threads { namespace executors
             // policy elements
             std::size_t const max_punits_;
             std::size_t const min_punits_;
+            boost::atomic<std::size_t> curr_punits_;
 
             // resource manager registration
             std::size_t cookie_;

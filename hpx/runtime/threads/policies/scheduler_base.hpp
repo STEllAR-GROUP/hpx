@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -101,6 +101,8 @@ namespace hpx { namespace threads { namespace policies
         {
             return affinity_data_.get_pu_num(num_thread);
         }
+
+        char const* get_description() const { return description_; }
 
         void add_punit(std::size_t virt_core, std::size_t thread_num)
         {

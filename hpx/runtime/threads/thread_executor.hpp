@@ -143,6 +143,9 @@ namespace hpx { namespace threads
             // Remove the given processing unit from the scheduler.
             virtual void remove_processing_unit(std::size_t thread_num,
                 error_code& ec) = 0;
+
+            // return the description string of the underlying scheduler
+            virtual char const* get_description() const = 0;
         };
 
         ///////////////////////////////////////////////////////////////////////
