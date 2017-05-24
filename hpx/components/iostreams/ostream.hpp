@@ -38,7 +38,7 @@ namespace hpx { namespace iostreams
         struct buffer_sink;
     }
 
-    template <typename Char = char, typename Sink = detail::buffer_sink<char> >
+    template <typename Char = char, typename Sink = detail::buffer_sink<Char> >
     struct ostream;
 
     ///////////////////////////////////////////////////////////////////////////
