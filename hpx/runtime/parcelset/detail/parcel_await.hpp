@@ -32,9 +32,7 @@ namespace hpx { namespace parcelset { namespace detail {
 
         put_parcel_type put_parcel_;
         std::vector<parcel> parcels_;
-        hpx::serialization::detail::preprocess preprocess_;
-        hpx::serialization::output_archive archive_;
-        std::size_t overhead_;
+        int archive_flags_;
         std::size_t idx_;
     };
 }}}
