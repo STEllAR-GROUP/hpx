@@ -126,25 +126,25 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
 endif()
 
 # Boost preprocessor definitions
-hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
+hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
 if(MSVC)
   hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
     "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
     OFF ADVANCED)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
     set(HPX_WITH_BOOST_ALL_DYNAMIC_LINK ON)
-    hpx_add_config_define(BOOST_ALL_DYN_LINK)
+    hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
   endif()
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
 hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
-hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
+hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 # Disable usage of std::atomics in lockfree
 if(Boost_VERSION LESS 105300)
-  hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
+  hpx_add_config_cond_define(BOOST_NO_0X_HDR_ATOMIC)
 endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})

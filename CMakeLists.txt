@@ -1216,12 +1216,12 @@ if(WIN32)
   # Boost
   ##############################################################################
 
-  hpx_add_config_define(BOOST_USE_WINDOWS_H)
+  hpx_add_config_cond_define(BOOST_USE_WINDOWS_H)
   if (NOT Boost_USE_STATIC_LIBS)
-    hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+    hpx_add_config_cond_define(BOOST_SERIALIZATION_DYN_LINK)
   endif()
   if(NOT CMAKE_CL_64)
-    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+    hpx_add_config_cond_define(BOOST_NO_ALIGNMENT)
   endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)

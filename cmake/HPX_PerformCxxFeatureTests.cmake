@@ -22,7 +22,7 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_decltype(
     REQUIRED "HPX needs support for C++11 decltype")
-  hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
+  hpx_add_config_cond_define(BOOST_RESULT_OF_USE_DECLTYPE)
 
   hpx_check_for_cxx11_sfinae_expression(
     DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
