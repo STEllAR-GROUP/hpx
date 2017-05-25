@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Hartmut Kaiser
+// Copyright (C) 2015-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,14 +24,14 @@ hpx::future<int> fib1(int n)
 {
     if (n >= 2)
         n = co_await fib1(n - 1) + co_await fib1(n - 2);
-    return n;
+    co_return n;
 }
 
 hpx::future<int> fib2(int n)
 {
     if (n >= 2)
         n = co_await hpx::async(&fib2, n - 1) + co_await fib2(n - 2);
-    return n;
+    co_return n;
 }
 
 void simple_await_test()

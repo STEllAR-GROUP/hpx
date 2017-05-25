@@ -539,7 +539,6 @@ namespace hpx { namespace lcos { namespace detail
 
             typedef typename shared_state_type::result_type result_type;
 
-
             error_code ec(lightweight);
             detail::future_get_result<result_type>::call(this->shared_state_, ec);
             if (!ec)
@@ -782,7 +781,8 @@ namespace hpx { namespace lcos { namespace detail
             detail::await_suspend(*static_cast<Derived*>(this), rh);
         }
 
-        R await_resume()
+        auto await_resume()
+        ->  decltype(detail::await_resume(std::declval<Derived>()))
         {
             return detail::await_resume(*static_cast<Derived*>(this));
         }
