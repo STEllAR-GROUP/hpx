@@ -93,6 +93,9 @@ function(write_config_defines_file)
     string(FIND ${def} " " _pos)
     if(NOT ${_pos} EQUAL -1)
       string(SUBSTRING ${def} 0 ${_pos} defname)
+    else()
+      set(defname ${def})
+      string(STRIP ${defname} defname)
     endif()
     set(hpx_config_defines
         "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n")#"
