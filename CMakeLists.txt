@@ -1163,7 +1163,7 @@ if(WIN32)
       hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
       if(HPX_WITH_DATAPAR_VC)
         hpx_add_target_compile_option(-std:c++latest)
-        hpx_add_config_define(_HAS_AUTO_PTR_ETC 1)
+        hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
       endif()
     endif()
 
@@ -1180,7 +1180,7 @@ if(WIN32)
 
       # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
       # atomics
-      hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+      hpx_add_config_cond_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
 
       # Update 3 allows to flag rvalue misuses and enforces strict string const-
       # qualification conformance
@@ -1203,13 +1203,14 @@ if(WIN32)
   ##############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
-  hpx_add_config_define(_WIN32_WINNT 0x0601)
-  hpx_add_config_define(_SCL_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_CRT_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
-  hpx_add_config_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_WIN32_WINNT 0x0601)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
 
   ##############################################################################
   # Boost
@@ -1225,7 +1226,7 @@ if(WIN32)
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
-  hpx_add_config_define(PSAPI_VERSION 1)
+  hpx_add_config_cond_define(PSAPI_VERSION 1)
 endif()
 
 # Configure Warnings
