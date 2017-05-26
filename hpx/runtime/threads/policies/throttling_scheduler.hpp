@@ -14,6 +14,7 @@
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
 //#include <hpx/compute/host.hpp>
@@ -231,9 +232,6 @@ namespace hpx { namespace threads { namespace policies
         void enable(std::size_t shepherd)
         {
             std::lock_guard<mutex_type> l(throttle_mtx_);
-
-            if (shepherd == -1)
-               return;
 
             if (shepherd >= disabled_os_threads_.size()) {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttling_scheduler::enable",
