@@ -132,6 +132,12 @@ namespace hpx { namespace lcos { namespace local
             promise_ = local::promise<R>();
         }
 
+        // extension
+        void set_exception(boost::exception_ptr const& e)
+        {
+            promise_.set_exception(e);
+        }
+
     private:
         // synchronous execution
         template <typename ...Vs>
