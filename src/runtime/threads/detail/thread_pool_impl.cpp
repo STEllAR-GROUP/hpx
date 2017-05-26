@@ -12,7 +12,14 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
-
+//
+#include <bitset>
+//
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+    typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> bitset_type;
+#else
+    typedef std::bitset<32> bitset_type;
+#endif
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -68,8 +75,7 @@ namespace hpx { namespace threads { namespace detail
                   <<"] with scheduler " << sched_.get_scheduler_name()
                   << "\n"
                   << "is running on PUs : ";
-        std::cout << std::bitset<24>(used_processing_units_) << "\n";
-        //! FIXME how can I have hpx::threads::hardware_concurrency(); as template param of bitset, s.t. correct length is printed?
+        std::cout << bitset_type(used_processing_units_) << "\n";
     }
 
 

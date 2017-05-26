@@ -35,6 +35,15 @@ namespace hpx { namespace threads
     {
         virtual ~topology() {}
 
+        /// \brief Return the Socket number of the processing unit the
+        ///        given thread is running on.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual std::size_t get_socket_number(std::size_t num_thread,
+            error_code& ec = throws) const = 0;
+
         /// \brief Return the NUMA node number of the processing unit the
         ///        given thread is running on.
         ///

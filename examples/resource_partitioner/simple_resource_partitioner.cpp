@@ -18,10 +18,10 @@
 #include "system_characteristics.h"
 
 
-void do_stuff(){
-    std::cout << "[do stuff] \n";
-    for(size_t i(18); i < 42; i++){
-        std::cout << "sin(" << i << ") = " << sin(i) << ", ";
+void do_stuff(std::size_t n){
+    std::cout << "[do stuff] " << n << "\n";
+    for (std::size_t  i(0); i<n; ++i){
+        std::cout << "sin(" << i << ") = " << sin(2*M_PI*i/n) << ", ";
     }
     std::cout << "\n";
 }
@@ -29,29 +29,40 @@ void do_stuff(){
 
 int hpx_main(int argc, char* argv[])
 {
-    hpx::cout << "[hpx_main] starting ..." << "\n";
+    std::cout << "[hpx_main] starting ..." << "\n";
 
     // get a pointer to the resource_partitioner instance
     hpx::resource::resource_partitioner& rpart = hpx::get_resource_partitioner();
 
     // print partition characteristics
-    hpx::cout << "\n\n [hpx_main] print resource_partitioner characteristics : " << "\n";
+    std::cout << "\n\n[hpx_main] print resource_partitioner characteristics : " << "\n";
     rpart.print_init_pool_data();
 
     // print partition characteristics
-    hpx::cout << "\n\n [hpx_main] print thread-manager characteristics : " << "\n";
+    std::cout << "\n\n[hpx_main] print thread-manager characteristics : " << "\n";
     hpx::threads::get_thread_manager().print_pools();
 
     // print system characteristics
     print_system_characteristics();
 
     // get executors
-    hpx::threads::executors::customized_pool_executor my_exec("first_pool");
-    hpx::cout << "\n\n [hpx_main] got customized executor " << "\n";
+    hpx::threads::executors::customized_pool_executor my_exec1("first_core");
+    std::cout << "\n\n[hpx_main] got customized executor " << "\n";
+
+    // get executors
+    hpx::threads::executors::customized_pool_executor my_exec2("last_core");
+    std::cout << "\n\n[hpx_main] got customized executor " << "\n";
 
     // use these executors to schedule work
-    my_exec.add(do_stuff);
+    my_exec1.add(std::bind(&do_stuff, 16));
 
+    hpx::future<void> future_1 = hpx::async(my_exec1, &do_stuff, 32);
+
+    auto future_2 = future_1.then(my_exec2, [](hpx::future<void> &&f) {
+        do_stuff(64);
+    });
+
+    future_2.get();
 
     return hpx::finalize();
 }
@@ -61,21 +72,34 @@ int main(int argc, char* argv[])
     std::cout << "[main] " << "Starting program... \n";
 
     auto &rp = hpx::get_resource_partitioner();
-
+    auto &topo = rp.get_topology();
     std::cout << "[main] " << "obtained reference to the resource_partitioner\n";
 
-    rp.create_thread_pool("first_pool");
-    rp.create_thread_pool("second_pool", hpx::resource::abp_priority);
-
+    rp.create_thread_pool("first_core");
+    rp.create_thread_pool("last_core", hpx::resource::abp_priority);
+    rp.create_thread_pool("single_thread");
     std::cout << "[main] " << "thread_pools created \n";
 
-    rp.add_resource(1, "first_pool");
-    rp.add_resource(0, "second_pool");
-    rp.add_resource_to_default(1);
-    rp.add_resource_to_default(3);
-
+    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "first_core");
+    rp.add_resource(rp.get_numa_domains().back().cores_.back().pus_,  "last_core");
+    //
+    for (const hpx::resource::numa_domain &d : rp.get_numa_domains()) {
+        for (const hpx::resource::core &c : d.cores_) {
+            for (const hpx::resource::pu &p : c.pus_) {
+                if (p.id_ == rp.get_topology().get_number_of_pus()/2) {
+                    rp.add_resource(p, "single_thread");
+                }
+/*
+                std::cout << "[PU] number : " << p << " is on ... \n"
+                          << "socket    : " << topo.get_socket_number(p) << "\n"
+                          << "numa-node : " << topo.get_numa_node_number(p) << "\n"
+                          << "core      : " << topo.get_core_number(p) << hpx::flush << "\n";
+*/
+            }
+        }
+    }
     std::cout << "[main] " << "resources added to thread_pools \n";
-    std::cout << "[main] " << "Calling hpx::init... \n";
 
+    std::cout << "[main] " << "Calling hpx::init... \n";
     return hpx::init(argc, argv);
 }
