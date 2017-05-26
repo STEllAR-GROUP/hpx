@@ -160,10 +160,10 @@ namespace hpx { namespace threads { namespace detail
 
         void report_error(std::size_t num, boost::exception_ptr const& e);
 
-        Scheduler& get_sched() const 
+        Scheduler& get_sched() const
         {
             return sched_;
-        }       
+        }
  
     protected:
         friend struct init_tss_helper<Scheduler>;

@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace execution
     using static_priority_queue_executor =
         threads::executors::static_priority_queue_executor;
 #endif
-    
+
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
     /// Creates a new throttling_executor
     ///
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { namespace execution
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    using throttling_executor = 
+    using throttling_executor =
         threads::executors::throttling_executor;
 #endif
 }}}
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
 
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
-    using throttling_executor = 
+    using throttling_executor =
         threads::executors::throttling_executor;
 #endif
 

@@ -16,12 +16,7 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
-
-//#include <hpx/compute/host.hpp>
-//#include <hpx/compute/host/target.hpp>
-
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <hpx/compat/mutex.hpp>
 
 #include <hwloc.h>
 
@@ -35,7 +30,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-static boost::shared_mutex init_mutex;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = hpx::compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -118,7 +112,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // grab work if available
-            return this->base_type::get_next_thread(num_thread, 
+            return this->base_type::get_next_thread(num_thread,
                 running, idle_loop_count, thrd);
         }
 
@@ -172,7 +166,8 @@ namespace hpx { namespace threads { namespace policies
             if (disabled(shepherd))
                 return;
 
-                if (disabled_os_threads_.size() - disabled_os_threads_.count() < 2 ) {
+            if (disabled_os_threads_.size() - disabled_os_threads_.count()
+                        < 2 ) {
                 return;
             }
 
@@ -198,18 +193,18 @@ namespace hpx { namespace threads { namespace policies
             std::lock_guard<mutex_type> l(throttle_mtx_);
 
             if (num_threads >= disabled_os_threads_.size()) {
-                 HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                      "throttling_scheduler::disable_more",
                      "invalid number of threads");
             }
 
             /// If we don't have the requested number of available threads return
-            if (disabled_os_threads_.size() - disabled_os_threads_.count() 
+            if (disabled_os_threads_.size() - disabled_os_threads_.count()
                     < num_threads ) {
                 return;
             }
 
-            if (disabled_os_threads_.size() - disabled_os_threads_.count() 
+            if (disabled_os_threads_.size() - disabled_os_threads_.count()
                         < 2 ) {
                 return;
             }
@@ -219,7 +214,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t cnt = 0;
             std::size_t tid_start = 0;
             while ( cnt < num_threads ) {
-                for (std::size_t i=tid_start; i<disabled_os_threads_.size(); 
+                for (std::size_t i=tid_start; i<disabled_os_threads_.size();
                      i += num_hw_threads)
                 {
                     if (!disabled_os_threads_[i] && i != wtid) {
@@ -277,7 +272,6 @@ namespace hpx { namespace threads { namespace policies
         mutex_type throttle_mtx_;
         mutable std::mutex mtx_;
         mutable boost::dynamic_bitset<> disabled_os_threads_;
-        //std::vector<hpx::compute::host::target> numa_domains;
         int num_physical_cores;
         int num_logical_cores;
         int num_hw_threads;
