@@ -79,7 +79,7 @@ namespace hpx { namespace util
                 > result_type;
 
 // conversion from 'const __int64' to 'const double', possible loss of data
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4244)
 #endif
@@ -106,7 +106,7 @@ namespace hpx { namespace util
                     this->bin_positions_[i] = minimum_ + (i - 1.0) * bin_size_;
                 }
             }
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

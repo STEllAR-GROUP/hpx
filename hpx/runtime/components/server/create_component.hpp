@@ -41,12 +41,9 @@ namespace hpx { namespace components { namespace server
 
         Component::destroy(c, count);
 
-        std::ostringstream strm;
-        strm << "global id " << gid << " is already bound to a different "
-                "component instance";
-        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
             "create<Component>",
-            strm.str());
+            "can't assign global id");
 
         return naming::invalid_gid;
     }
@@ -73,14 +70,11 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        Component::heap_type::free(c, 1); //-V107
+        Component::destroy(c, 1);
 
-        std::ostringstream strm;
-        strm << "global id " << gid << " is already bound to a different "
-                "component instance";
-        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
             "create<Component>(ctor)",
-            strm.str());
+            "can't assign global id");
 
         return naming::invalid_gid;
     }
@@ -107,14 +101,44 @@ namespace hpx { namespace components { namespace server
             return gid;
         }
 
-        Component::heap_type::free(c, 1); //-V107
+        Component::destroy(c, 1);
 
         std::ostringstream strm;
-        strm << "global id " << assigned_gid <<
+        strm << "global id " << gid <<
             " is already bound to a different component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
             strm.str());
+
+        return naming::invalid_gid;
+    }
+
+    template <typename Component, typename ...Ts>
+    naming::gid_type create_with_args(Ts&&... ts)
+    {
+        void * cv = Component::heap_type::alloc(1);
+        try {
+            new (cv) Component(std::forward<Ts>(ts)...);
+        }
+        catch(...)
+        {
+            Component::heap_type::free(cv, 1); //-V107
+            throw;
+        }
+        Component *c = static_cast<Component *>(cv);
+
+        naming::gid_type gid = c->get_base_gid();
+        if (gid)
+        {
+            // everything is ok, return the new id
+            return gid;
+        }
+
+        Component::destroy(c, 1);
+
+        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+            "create_with_args<Component>(Ts&&...)",
+            "can't assign global id");
 
         return naming::invalid_gid;
     }
@@ -141,8 +165,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename ...Ts>
     naming::gid_type construct(Ts&&... vs)
     {
-        return server::create<Component>(
-            detail::construct_function<Component>(std::forward<Ts>(vs)...));
+        return server::create_with_args<Component>(std::forward<Ts>(vs)...);
     }
 }}}
 

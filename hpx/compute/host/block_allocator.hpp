@@ -48,7 +48,7 @@ namespace hpx { namespace compute { namespace host
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
     template <typename T, typename Executor =
-        hpx::threads::executors::local_priority_queue_attached_executor>
+        hpx::parallel::execution::local_priority_queue_attached_executor>
     struct block_allocator
     {
         typedef T value_type;

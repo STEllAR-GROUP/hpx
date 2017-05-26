@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace serialization
@@ -20,12 +21,12 @@ namespace hpx { namespace serialization
         Allocator> & s, unsigned)
     {
         typedef std::basic_string<Char, CharTraits, Allocator> string_type;
-        typedef typename string_type::size_type size_type;
-        size_type size = 0;
+        std::uint64_t size = 0;
         ar >> size; //-V128
 
         s.clear();
-        s.resize(size);
+        if (s.size() < size)
+            s.resize(size);
 
         load_binary(ar, &s[0], size * sizeof(Char));
     }
@@ -35,7 +36,8 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const std::basic_string<Char, CharTraits,
         Allocator> & s, unsigned)
     {
-        ar << s.size(); //-V128
+        std::uint64_t size = s.size();
+        ar << size;
         save_binary(ar, s.data(), s.size() * sizeof(Char));
     }
 }}

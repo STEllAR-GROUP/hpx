@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -1418,17 +1419,17 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
     > >;
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_lifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
     > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
     > >;
 #endif
 

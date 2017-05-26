@@ -34,6 +34,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // provide our own implementation of std::uninitialized_fill as some
+        // versions of MSVC horribly fail at compiling it for some types T
+        template <typename FwdIter, typename T>
+        void std_uninitialized_fill(FwdIter first, FwdIter last,
+            T const& value)
+        {
+            typedef typename std::iterator_traits<FwdIter>::value_type
+                value_type;
+
+            FwdIter current = first;
+            try {
+                for (/* */; current != last; ++current) {
+                    ::new (static_cast<void*>(std::addressof(*current)))
+                        value_type(value);
+                }
+            }
+            catch (...) {
+                for (/* */; first != current; ++first) {
+                    (*first).~value_type();
+                }
+                throw;
+            }
+        }
+
         template <typename FwdIter, typename T>
         FwdIter sequential_uninitialized_fill_n(FwdIter first, std::size_t count,
             T const& value, util::cancellation_token<util::detail::no_data>& tok)
@@ -106,7 +131,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static hpx::util::unused_type
             sequential(ExPolicy, Iter first, Iter last, T const& value)
             {
-                std::uninitialized_fill(first, last, value);
+                std_uninitialized_fill(first, last, value);
                 return hpx::util::unused;
             }
 
@@ -193,6 +218,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // provide our own implementation of std::uninitialized_fill_n as some
+        // versions of MSVC horribly fail at compiling it for some types T
+        template <typename FwdIter, typename Size, typename T>
+        FwdIter std_uninitialized_fill_n(FwdIter first, Size count,
+            T const& value)
+        {
+            typedef typename std::iterator_traits<FwdIter>::value_type
+                value_type;
+
+            FwdIter current = first;
+            try {
+                for (/* */; count > 0; ++current, (void) --count) {
+                    ::new (static_cast<void*>(std::addressof(*current)))
+                        value_type(value);
+                }
+                return current;
+            }
+            catch (...) {
+                for (/* */; first != current; ++first) {
+                    (*first).~value_type();
+                }
+                throw;
+            }
+        }
+
         struct uninitialized_fill_n
           : public detail::algorithm<uninitialized_fill_n>
         {
@@ -205,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy, FwdIter first, std::size_t count,
                 T const& value)
             {
-                std::uninitialized_fill_n(first, count, value);
+                std_uninitialized_fill_n(first, count, value);
                 return hpx::util::unused;
             }
 

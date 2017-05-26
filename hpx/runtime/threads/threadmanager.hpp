@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -179,7 +180,7 @@ namespace hpx { namespace threads
         /// is allowed to run on
         virtual std::size_t get_pu_num(std::size_t) const = 0;
 
-        virtual boost::thread & get_os_thread_handle(std::size_t) = 0;
+        virtual compat::thread & get_os_thread_handle(std::size_t) = 0;
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.

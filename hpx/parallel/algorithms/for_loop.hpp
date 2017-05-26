@@ -11,7 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -30,6 +35,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -97,7 +103,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F, typename S, typename ...Ts>
         struct part_iterations<F, S, hpx::util::tuple<Ts...> >
         {
-            typename hpx::util::decay<F>::type f_;
+            typedef typename hpx::util::decay<F>::type fun_type;
+
+            fun_type f_;
             S stride_;
             hpx::util::tuple<Ts...> args_;
 
@@ -110,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename B>
             HPX_HOST_DEVICE
-            void operator()(B part_begin, std::size_t part_steps,
+            void execute(B part_begin, std::size_t part_steps,
                 std::size_t part_index)
             {
                 auto pack = typename hpx::util::detail::make_index_pack<
@@ -132,6 +140,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                         part_begin, part_steps, chunk);
                     part_steps -= chunk;
                 }
+            }
+
+            template <typename B>
+            HPX_HOST_DEVICE
+            void operator()(B part_begin, std::size_t part_steps,
+                std::size_t part_index)
+            {
+                hpx::util::annotate_function annotate(f_);
+                (void)annotate;     // suppress warning about unused variable
+                execute(part_begin, part_steps, part_index);
             }
         };
 
@@ -234,7 +252,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             }
 
             // the for_loop should be executed sequentially either if the
-            // execution policy enforces sequential execution of if the
+            // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
                     execution::is_sequential_execution_policy<ExPolicy>::value ||
@@ -271,9 +289,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
+            // the for_loop_n should be executed sequentially either if the
+            // execution policy enforces sequential execution or if the
+            // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
                     execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<B>::value
+                    (!std::is_integral<B>::value &&
+                     !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
@@ -1098,6 +1120,39 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             std::forward<Args>(args)...);
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename F, typename S, typename Tuple>
+    struct get_function_address<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static std::size_t call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename F, typename S, typename Tuple>
+    struct get_function_annotation<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static char const* call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif
 

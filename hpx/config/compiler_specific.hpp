@@ -62,8 +62,9 @@
 #endif
 
 #if defined(_MSC_VER)
-#  define HPX_MSVC _MSC_VER
 #  define HPX_WINDOWS
+#  define HPX_MSVC _MSC_VER
+#  define HPX_MSVC_WARNING_PRAGMA
 #  if defined(__NVCC__)
 #    define HPX_MSVC_NVCC
 #  endif
@@ -72,6 +73,7 @@
 
 #if defined(__MINGW32__)
 #   define HPX_WINDOWS
+#   define HPX_MINGW
 #endif
 
 #if (defined(__NVCC__) || defined(__CUDACC__)) && defined(HPX_HAVE_CUDA)

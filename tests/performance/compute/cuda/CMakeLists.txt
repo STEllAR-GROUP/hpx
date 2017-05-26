@@ -11,6 +11,10 @@ if(HPX_WITH_CUDA)
   set_source_files_properties(synchronize.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
 endif()
 
+if(HPX_WITH_CUDA_CLANG)
+  set_source_files_properties(synchronize.cpp PROPERTIES COMPILE_FLAGS -xcuda)
+endif()
+
 foreach(benchmark ${benchmarks})
   set(sources
       ${benchmark}.cpp)

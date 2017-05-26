@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <map>
 #include <mutex>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace serialization { namespace detail
@@ -113,7 +114,7 @@ namespace hpx { namespace serialization { namespace detail
             {
                 std::lock_guard<mutex_type> l(mtx_);
                 done_ = true;
-                if(num_futures_ == triggered_futures_)
+                if (num_futures_ == triggered_futures_)
                 {
                     promise_.set_value();
                 }
@@ -140,7 +141,9 @@ namespace hpx { namespace serialization { namespace detail
     template <>
     struct access_data<preprocess>
     {
-        static bool is_preprocessing() { return true; }
+        typedef std::true_type preprocessing_only;
+
+        HPX_CONSTEXPR static bool is_preprocessing() { return true; }
 
         static void await_future(
             preprocess& cont
@@ -167,7 +170,7 @@ namespace hpx { namespace serialization { namespace detail
         {
         }
 
-        static bool
+        HPX_CONSTEXPR static bool
         flush(binary_filter* filter, preprocess& cont,
             std::size_t current, std::size_t size, std::size_t written)
         {

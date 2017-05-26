@@ -59,6 +59,9 @@ namespace hpx { namespace util
         }
     };
 
+#if defined(HPX_MSVC_NVCC)
+    HPX_CONSTANT
+#endif
     HPX_CONSTEXPR_OR_CONST unused_type unused = unused_type();
 }}
 

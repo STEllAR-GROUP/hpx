@@ -17,15 +17,95 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/thread_description.hpp>
+
+#if HPX_HAVE_ITTNOTIFY != 0
+#include <hpx/runtime/get_thread_name.hpp>
+#include <hpx/util/itt_notify.hpp>
+#elif defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 #endif
 
 #include <cstddef>
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util
 {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+#if HPX_HAVE_ITTNOTIFY != 0
+    struct annotate_function
+    {
+        HPX_NON_COPYABLE(annotate_function);
+
+        explicit annotate_function(char const* name)
+          : task_(hpx::get_thread_itt_domain(),
+                hpx::util::itt::string_handle(name))
+        {}
+        template <typename F>
+        explicit annotate_function(F && f)
+          : task_(hpx::get_thread_itt_domain(),
+                hpx::traits::get_function_annotation_itt<
+                    typename std::decay<F>::type
+                >::call(f))
+        {}
+
+    private:
+        hpx::util::itt::task task_;
+    };
+#elif defined(HPX_HAVE_APEX)
+    struct annotate_function
+    {
+        HPX_NON_COPYABLE(annotate_function);
+
+        explicit annotate_function(char const* name)
+          : apex_profiler_(name, threads::get_self_apex_data())
+        {}
+        template <typename F>
+        explicit annotate_function(F && f)
+          : apex_profiler_(hpx::util::thread_description(f),
+                threads::get_self_apex_data())
+        {}
+
+    private:
+        hpx::util::apex_wrapper apex_profiler_;
+    };
+#else
+    struct annotate_function
+    {
+        HPX_NON_COPYABLE(annotate_function);
+
+        explicit annotate_function(char const* name)
+          : desc_(hpx::threads::get_self_ptr() ?
+                hpx::threads::set_thread_description(hpx::threads::get_self_id(),
+                    name) :
+                nullptr)
+        {}
+        template <typename F>
+        explicit annotate_function(F && f)
+          : desc_(hpx::threads::get_self_ptr() ?
+                hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(),
+                    hpx::traits::get_function_annotation<
+                        typename std::decay<F>::type
+                    >::call(f)) :
+                nullptr)
+        {}
+
+        ~annotate_function()
+        {
+            if (hpx::threads::get_self_ptr())
+                hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(), desc_);
+        }
+
+        hpx::util::thread_description desc_;
+    };
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename F>
@@ -43,38 +123,12 @@ namespace hpx { namespace util
               : f_(std::move(f)), name_(name)
             {}
 
-        private:
-            struct reset_name
-            {
-                reset_name(annotated_function& f) HPX_NOEXCEPT
-                  : f_(f), desc_()
-                {
-                    if (f_.name_)
-                    {
-                        desc_ = threads::set_thread_description(
-                            threads::get_self_id(), f_.name_);
-                    }
-                }
-                ~reset_name()
-                {
-                    if (desc_)
-                    {
-                        threads::set_thread_description(
-                            threads::get_self_id(), desc_);
-                    }
-                }
-
-                annotated_function& f_;
-                util::thread_description desc_;
-            };
-            friend struct reset_name;
-
         public:
             template <typename ... Ts>
             typename deferred_result_of<F(Ts...)>::type
             operator()(Ts && ... ts)
             {
-                reset_name on_exit(*this);
+                annotate_function func(name_);
                 return util::invoke(f_, std::forward<Ts>(ts)...);
             }
 
@@ -108,7 +162,18 @@ namespace hpx { namespace util
     {
         return detail::annotated_function<F>(std::forward<F>(f), name);
     }
+
 #else
+    ///////////////////////////////////////////////////////////////////////////
+    struct annotate_function
+    {
+        HPX_NON_COPYABLE(annotate_function);
+
+        explicit annotate_function(char const* name) {}
+        template <typename F> explicit annotate_function(F && f) {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     F && annotated_function(F && f, char const* = nullptr)
     {

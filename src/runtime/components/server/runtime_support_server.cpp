@@ -4,10 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:boost::unique_lock
-
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
@@ -588,10 +587,13 @@ namespace hpx { namespace components { namespace server
         threads::threadmanager_base& tm = appl.get_thread_manager();
 
         for (std::size_t k = 0;
-            tm.get_thread_count() > std::size_t(1 + hpx::get_os_thread_count());
+            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
             ++k)
         {
-            util::detail::yield_k(k, "runtime_support::dijkstra_termination");
+            // avoid timed suspension, don't boost priority
+            util::detail::yield_k(k % 32,
+                "runtime_support::dijkstra_termination",
+                hpx::threads::pending);
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -629,8 +631,10 @@ namespace hpx { namespace components { namespace server
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
                 ++k)
             {
-                util::detail::yield_k(k,
-                    "runtime_support::dijkstra_termination_detection");
+                // avoid timed suspension, don't boost priority
+                util::detail::yield_k(k % 32,
+                    "runtime_support::dijkstra_termination_detection",
+                    hpx::threads::pending);
             }
 
             return 0;
@@ -690,8 +694,10 @@ namespace hpx { namespace components { namespace server
             tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
             ++k)
         {
-            util::detail::yield_k(k,
-                "runtime_support::send_dijkstra_termination_token");
+            // avoid timed suspension, don't boost priority
+            util::detail::yield_k(k % 32,
+                "runtime_support::send_dijkstra_termination_token",
+                hpx::threads::pending);
         }
 
         // Now this locality has become passive, thus we can send the token
@@ -766,8 +772,10 @@ namespace hpx { namespace components { namespace server
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
                 ++k)
             {
-                util::detail::yield_k(k,
-                    "runtime_support::dijkstra_termination_detection");
+                // avoid timed suspension, don't boost priority
+                util::detail::yield_k(k % 32,
+                    "runtime_support::dijkstra_termination_detection",
+                    hpx::threads::pending);
             }
 
             return 0;
@@ -1036,7 +1044,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         stopped_ = false;
         terminated_ = false;
         shutdown_all_invoked_.store(false);
@@ -1044,7 +1052,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         while (!stopped_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -1075,7 +1083,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         if (!stopped_) {
             // push pending logs
             components::cleanup_logging();
@@ -1094,7 +1102,8 @@ namespace hpx { namespace components { namespace server
             stopped_ = true;
 
             for (std::size_t k = 0;
-                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                tm.get_thread_count() >
+                    std::int64_t(1 + hpx::get_os_thread_count());
                 ++k)
             {
                 // let thread-manager clean up threads
@@ -1107,7 +1116,10 @@ namespace hpx { namespace components { namespace server
                     timed_out = true;
                     break;
                 }
-                util::detail::yield_k(k, "runtime_support::stop");
+
+                // avoid timed suspension, don't boost priority
+                util::detail::yield_k(k % 32,
+                    "runtime_support::stop", hpx::threads::pending);
             }
 
             // If it took longer than expected, kill all suspended threads as
@@ -1117,7 +1129,8 @@ namespace hpx { namespace components { namespace server
                 start_time = t.elapsed();
 
                 for (std::size_t k = 0;
-                    tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                    tm.get_thread_count() >
+                        std::int64_t(1 + hpx::get_os_thread_count());
                     ++k)
                 {
                     // abort all suspended threads
@@ -1132,7 +1145,10 @@ namespace hpx { namespace components { namespace server
                         // we waited long enough
                         break;
                     }
-                    util::detail::yield_k(k, "runtime_support::stop");
+
+                    // avoid timed suspension, don't boost priority
+                    util::detail::yield_k(k % 32,
+                        "runtime_support::stop", hpx::threads::pending);
                 }
             }
 
@@ -1175,7 +1191,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        boost::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock<compat::mutex> l(mtx_);
         if (!stopped_) {
             stopped_ = true;
             wait_condition_.notify_all();
@@ -1186,7 +1202,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::lock_guard<compat::mutex> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination

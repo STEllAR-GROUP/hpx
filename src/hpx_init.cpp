@@ -10,6 +10,7 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -908,7 +909,7 @@ namespace hpx
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, Queuing
+                    compat::mutex, Queuing
                 > local_queue_policy;
 
             typename local_queue_policy::init_parameter_type init(
@@ -945,7 +946,7 @@ namespace hpx
 
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, hpx::threads::policies::lockfree_fifo
+                    compat::mutex, hpx::threads::policies::lockfree_fifo
                 > abp_priority_queue_policy;
 
             abp_priority_queue_policy::init_parameter_type init(

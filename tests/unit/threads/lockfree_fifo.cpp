@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+
+namespace compat = hpx::compat;
 
 std::vector<boost::lockfree::queue<std::uint64_t>*> queues;
 std::vector<std::uint64_t> stolen;
@@ -109,12 +111,16 @@ int main(int argc, char** argv)
     }
 
     {
-        boost::thread_group tg;
+        std::vector<compat::thread> tg;
 
         for (std::uint64_t i = 0; i != threads; ++i)
-            tg.create_thread(hpx::util::bind(&worker_thread, i));
+            tg.push_back(compat::thread(hpx::util::bind(&worker_thread, i)));
 
-        tg.join_all();
+        for (compat::thread& t : tg)
+        {
+            if (t.joinable())
+                t.join();
+        }
     }
 
     for (std::uint64_t i = 0; i < threads; ++i)

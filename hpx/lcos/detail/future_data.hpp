@@ -18,6 +18,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
@@ -26,17 +27,6 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
-
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -68,26 +58,6 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
-
-
-    ///MENIM
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct handle_continuation_recursion_count
-    {
-        handle_continuation_recursion_count()
-          : count_(threads::get_continuation_recursion_count())
-        {
-            ++count_;
-        }
-        ~handle_continuation_recursion_count()
-        {
-            --count_;
-        }
-
-        std::size_t& count_;
-    };
-
 
     void intrusive_ptr_add_ref(future_data_refcnt_base* p);
     void intrusive_ptr_release(future_data_refcnt_base* p);
@@ -208,6 +178,22 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct handle_continuation_recursion_count
+    {
+        handle_continuation_recursion_count()
+          : count_(threads::get_continuation_recursion_count())
+        {
+            ++count_;
+        }
+        ~handle_continuation_recursion_count()
+        {
+            --count_;
+        }
+
+        std::size_t& count_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
     class compose_cb_impl
     {
@@ -273,23 +259,6 @@ namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-/*    struct handle_continuation_recursion_count
-    {
-        handle_continuation_recursion_count()
-          : count_(threads::get_continuation_recursion_count())
-        {
-            ++count_;
-        }
-        ~handle_continuation_recursion_count()
-        {
-            --count_;
-        }
-
-        std::size_t& count_;
-    };
-*/
-
-    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool run_on_completed_on_new_thread(
         util::unique_function_nonser<bool()> && f, error_code& ec);
 
@@ -320,6 +289,7 @@ namespace detail
         virtual void wait(error_code& = throws) = 0;
         virtual future_status wait_until(util::steady_clock::time_point const&,
             error_code& = throws) = 0;
+        virtual boost::exception_ptr get_exception_ptr() const = 0;
 
         enum state
         {
@@ -534,23 +504,8 @@ namespace detail
             boost::exception_ptr& ptr)
         {
             try {
-#if HPX_HAVE_ITTNOTIFY != 0
-                util::itt::string_handle const& sh =
-                    traits::get_function_annotation_itt<
-                            completed_callback_type
-                        >::call(on_completed);
-                util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-                char const* name = traits::get_function_annotation<
-                        completed_callback_type
-                    >::call(on_completed);
-                if (name != nullptr)
-                {
-                    util::apex_wrapper apex_profiler(name);
-                    on_completed();
-                }
-                else
-#endif
+                hpx::util::annotate_function annotate(on_completed);
+                (void)annotate;     // suppress warning about unused variable
                 on_completed();
             }
             catch (...) {
@@ -835,12 +790,63 @@ namespace detail
             return future_status::ready; //-V110
         }
 
+        boost::exception_ptr get_exception_ptr() const
+        {
+            HPX_ASSERT(state_ == exception);
+            return *reinterpret_cast<boost::exception_ptr const*>(&storage_);
+        }
+
     protected:
         completed_callback_type on_completed_;
 
     private:
         local::detail::condition_variable cond_;    // threads waiting in read
         typename future_data_storage<Result>::type storage_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename Allocator>
+    struct future_data_allocator : future_data<Result>
+    {
+        typedef typename future_data<Result>::init_no_addref init_no_addref;
+        typedef typename
+                std::allocator_traits<Allocator>::template
+                    rebind_alloc<future_data_allocator>
+            other_allocator;
+
+        future_data_allocator(other_allocator const& alloc)
+          : future_data<Result>(), alloc_(alloc)
+        {}
+        future_data_allocator(init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(no_addref), alloc_(alloc)
+        {}
+        template <typename Target>
+        future_data_allocator(Target && data, init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(boost::exception_ptr const& e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(e, no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(boost::exception_ptr && e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(std::move(e), no_addref), alloc_(alloc)
+        {}
+
+    private:
+        void destroy()
+        {
+            typedef std::allocator_traits<other_allocator> traits;
+
+            other_allocator alloc(alloc_);
+            traits::destroy(alloc, this);
+            traits::deallocate(alloc, this, 1);
+        }
+
+    private:
+        other_allocator alloc_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1143,6 +1149,15 @@ namespace detail
 
     protected:
         threads::thread_id_type id_;
+    };
+}}}
+
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename R, typename Allocator>
+    struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+    {
+        typedef lcos::detail::future_data_allocator<R, Allocator> type;
     };
 }}}
 

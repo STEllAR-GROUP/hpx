@@ -629,7 +629,7 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        HPX_EXPORT domain(char const*) {}
+        domain(char const*) {}
         ~domain() {}
     };
 
@@ -674,8 +674,8 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct task
     {
-        HPX_EXPORT task(domain const&, util::thread_description const&) {}
-        HPX_EXPORT task(domain const&, string_handle const&) {}
+        task(domain const&, util::thread_description const&) {}
+        task(domain const&, string_handle const&) {}
 
         ~task() {}
     };

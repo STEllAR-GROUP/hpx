@@ -13,12 +13,12 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/future.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_locks.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_endpoint.hpp>
 //
-#include <plugins/parcelport/verbs/unordered_map.hpp>
+#include <plugins/parcelport/unordered_map.hpp>
 //
 #include <memory>
 #include <deque>

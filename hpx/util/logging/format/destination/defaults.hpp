@@ -38,11 +38,7 @@ template<class convert_dest = do_convert_destination > struct cout_t : is_generi
 hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
-#ifndef HPX_LOG_USE_WCHAR_T
         convert_dest::write(msg, std::cout);
-#else
-        convert_dest::write(msg, std::wcout);
-#endif
     }
 };
 
@@ -54,11 +50,7 @@ template<class convert_dest = do_convert_destination > struct cerr_t : is_generi
 hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
-#ifndef HPX_LOG_USE_WCHAR_T
         convert_dest::write(msg, std::cerr);
-#else
-        convert_dest::write(msg, std::wcerr);
-#endif
     }
 };
 
@@ -115,11 +107,7 @@ hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
 #ifdef HPX_WINDOWS
-#ifndef HPX_LOG_USE_WCHAR_T
     ::OutputDebugStringA( convert_dest::do_convert(msg, into<const char*>() ) );
-#else
-    ::OutputDebugStringW( convert_dest::do_convert(msg, into<const wchar_t*>() ) );
-#endif
 #else
         // non windows - dump to console
         std::cout << msg;

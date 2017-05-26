@@ -40,6 +40,9 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compute/*.cpp"
   APPEND)
+add_hpx_library_sources(hpx
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
+  APPEND)
 
 
 # libhpx_init sources
@@ -120,6 +123,9 @@ add_hpx_library_headers(hpx
   APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compute/*.hpp"
+  APPEND)
+add_hpx_library_headers(hpx
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/compat/*.hpp"
   APPEND)
 
 if(HPX_WITH_STATIC_LINKING)
@@ -240,10 +246,6 @@ if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
 endif()
 if(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES)
   target_link_libraries(hpx ${HPX_TLL_PRIVATE} ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES})
-endif()
-
-if(HPX_WITH_APEX)
-  add_definitions(-DAPEX_HAVE_HPX)   # tell APEX that it runs withing HPX
 endif()
 
 foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})

@@ -11,11 +11,11 @@
 #define HPX_RUNTIME_THREADS_TOPOLOGY_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-
-#include <boost/thread/thread.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -31,7 +31,7 @@
 
 namespace hpx { namespace threads
 {
-    struct HPX_EXPORT topology
+    struct topology
     {
         virtual ~topology() {}
 
@@ -123,7 +123,7 @@ namespace hpx { namespace threads
         ///
         /// \note  Use this function on systems where the affinity must be
         ///        set from outside the thread itself.
-        virtual void set_thread_affinity_mask(boost::thread& t,
+        virtual void set_thread_affinity_mask(compat::thread& t,
             mask_cref_type mask, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
@@ -188,7 +188,7 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
-        virtual mask_type get_cpubind_mask(boost::thread & handle,
+        virtual mask_type get_cpubind_mask(compat::thread & handle,
             error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;

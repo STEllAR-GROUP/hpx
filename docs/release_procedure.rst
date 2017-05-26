@@ -124,6 +124,9 @@ the lines as they are completed to avoid confusion.
     *   Update version
     *   Update links to documentation
 
+#.  Push changes to new branch numbered after the next release (not the current
+    one).
+
 #.  Tag the release.
 
 #.  Roll a release candidate using ``tools/roll_release.sh`` (from root directory), and add the
@@ -144,9 +147,21 @@ the lines as they are completed to avoid confusion.
 
 #.  Write a new blog post announcing the release.
 
-#.  Create a DOI number using Zenodo
+#.  Create a release on github
 
-    *   https://zenodo.org/
+    *   A DOI number using Zenodo is automatically assigned once the release is
+        created as such on github.
+    *   Verify on Zenodo (https://zenodo.org/) that release was uploaded.
+        Logging into zenodo using the github credentials might be necessary to
+        see the new release as it usually takes a while for it to propagate to
+        the search engine used on zenodo.
+    *   Fix zenodo reference number in main Readme.rst on the branch which holds
+        the versioning changes.
+
+#.  Merge release branch into master.
+
+#.  Merge new branch containing next version numbers to master, resolve conflicts
+    if necessary.
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu,
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,

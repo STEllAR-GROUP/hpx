@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 
@@ -42,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
         HPX_CONSTEXPR std::size_t
-        get_chunk_size(Executor&, F &&, std::size_t, std::size_t)
+        get_chunk_size(Executor&, F &&, std::size_t, std::size_t) const
         {
             return chunk_size_;
         }

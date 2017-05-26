@@ -37,7 +37,7 @@
 
 namespace hpx { namespace actions
 {
-#if defined(HPX_MSVC) && HPX_MSVC < 1900
+#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
 // for MSVC 12 disable: warning C4520: '...' : multiple default constructors specified
 #pragma warning(push)
 #pragma warning(disable: 4520)
@@ -134,6 +134,13 @@ namespace hpx { namespace actions
         char const* get_action_name() const
         {
             return detail::get_action_name<derived_type>();
+        }
+
+        /// The function \a get_serialization_id returns the id which has been
+        /// associated with this action (mainly used for serialization purposes).
+        std::uint32_t get_action_id() const
+        {
+            return detail::get_action_id<derived_type>();
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -315,7 +322,7 @@ namespace hpx { namespace actions
         }
     };
 
-#if defined(HPX_MSVC) && HPX_MSVC < 1900
+#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
 #pragma warning(pop)
 #endif
 

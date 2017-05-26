@@ -19,13 +19,12 @@
 #define HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 
 #include <hpx/config.hpp>
-
+#include <hpx/compat/thread.hpp>
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
 #include <hpx/util/lockfree/freelist.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/lockfree/detail/tagged_ptr.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <iostream>

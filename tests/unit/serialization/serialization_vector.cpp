@@ -12,7 +12,9 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <vector>
+#include <numeric>
 
 template <typename T>
 struct A
@@ -169,6 +171,25 @@ void test_fp(T min, T max)
     }
 }
 
+template <class T>
+void test_long_vector_serialization()
+{
+    std::vector<T> os(
+            (HPX_ZERO_COPY_SERIALIZATION_THRESHOLD / sizeof(T)) + 1);
+    std::iota(os.begin(), os.end(), T());
+
+    std::vector<char> buffer;
+    hpx::serialization::output_archive oarchive(buffer);
+    oarchive << os;
+
+    std::vector<T> is;
+    hpx::serialization::input_archive iarchive(buffer);
+    iarchive >> is;
+    HPX_TEST_EQ(os.size(), is.size());
+    for (std::size_t i = 0; i < os.size(); ++i)
+        HPX_TEST_EQ(os[i], is[i]);
+}
+
 int main()
 {
     test_bool();
@@ -203,6 +224,10 @@ int main()
     test<double>((std::numeric_limits<double>::max)() - 100,
         (std::numeric_limits<double>::max)()); //it's the same
     test<double>(-100, 100);
+
+    test_long_vector_serialization<int>();
+    test_long_vector_serialization<double>();
+    test_long_vector_serialization<std::int64_t>();
 
     return hpx::util::report_errors();
 }

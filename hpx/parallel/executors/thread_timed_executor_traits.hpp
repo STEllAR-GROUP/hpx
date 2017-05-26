@@ -9,6 +9,8 @@
 #define HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -243,4 +245,5 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     };
 }}}
 
+#endif
 #endif

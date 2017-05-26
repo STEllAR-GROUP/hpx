@@ -115,7 +115,7 @@ macro(add_hpx_library name)
     set(_target_flags ${_target_flags} PLUGIN)
   endif()
 
-  if(${${name}_STATIC})
+  if(${name}_STATIC)
     set(${name}_lib_linktype STATIC)
   else()
     if(HPX_WITH_STATIC_LINKING)

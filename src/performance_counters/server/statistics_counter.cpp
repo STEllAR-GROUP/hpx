@@ -41,6 +41,7 @@
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
@@ -64,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -95,7 +96,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -127,7 +128,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag(aggregating_type_tag)>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -158,7 +159,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t parameter2)
+            counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
@@ -192,7 +193,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -223,7 +224,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -250,7 +251,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::uint64_t parameter1, std::uint64_t parameter2)
+            std::size_t parameter1, std::size_t parameter2)
       : base_type_holder(info),
         timer_(util::bind(&statistics_counter::evaluate, this_()),
             util::bind(&statistics_counter::on_terminate, this_()),
@@ -561,7 +562,7 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_name(paths.parentinstancename_, base_name, ec);
                 if (ec) return naming::invalid_gid;
 
-                std::vector<std::int64_t> parameters;
+                std::vector<std::size_t> parameters;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as interval
                     // time (ms)

@@ -8,6 +8,7 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -150,7 +151,7 @@ namespace hpx { namespace threads { namespace policies
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_lifo,
         typename StagedQueuing = lockfree_lifo,
         typename TerminatedQueuing = lockfree_fifo>
@@ -951,7 +952,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::vector<thread_id_type> ids;
-            ids.reserve(count);
+            ids.reserve(static_cast<std::size_t>(count));
 
             if (state == unknown)
             {

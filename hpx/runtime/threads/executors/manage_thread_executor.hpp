@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,6 +49,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         void remove_processing_unit(std::size_t thread_num, error_code& ec)
         {
             sched_.remove_processing_unit(thread_num, ec);
+        }
+
+        // return the description string of the underlying scheduler
+        char const* get_description() const
+        {
+            return sched_.get_description();
         }
 
     private:

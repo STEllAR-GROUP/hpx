@@ -5,6 +5,9 @@
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
+#include <hpx/compat/barrier.hpp>
+#include <hpx/compat/thread.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
@@ -29,9 +32,6 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/thread/barrier.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -243,7 +243,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    boost::thread& thread_pool<Scheduler>::get_os_thread_handle(
+    compat::thread& thread_pool<Scheduler>::get_os_thread_handle(
         std::size_t num_thread)
     {
         HPX_ASSERT(num_thread < threads_.size());
@@ -288,7 +288,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    bool thread_pool<Scheduler>::run(std::unique_lock<boost::mutex>& l,
+    bool thread_pool<Scheduler>::run(std::unique_lock<compat::mutex>& l,
         std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
@@ -390,7 +390,7 @@ namespace hpx { namespace threads { namespace detail
         try {
             HPX_ASSERT(startup_.get() == nullptr);
             startup_.reset(
-                new boost::barrier(static_cast<unsigned>(num_threads+1))
+                new compat::barrier(static_cast<unsigned>(num_threads+1))
             );
 
             // run threads and wait for initialization to complete
@@ -414,7 +414,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
                 // create a new thread
-                threads_.push_back(boost::thread(
+                threads_.push_back(compat::thread(
                         &thread_pool::thread_func, this, thread_num,
                         std::ref(topology_), std::ref(*startup_)
                     ));
@@ -457,8 +457,8 @@ namespace hpx { namespace threads { namespace detail
             // trigger the barrier
             if (startup_.get() != nullptr)
             {
-                while (num_threads-- != 0 && !startup_->wait())
-                    ;
+                while (num_threads-- != 0)
+                    startup_->wait();
             }
 
             stop(l);
@@ -474,7 +474,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void thread_pool<Scheduler>::stop (
-        std::unique_lock<boost::mutex>& l, bool blocking)
+        std::unique_lock<compat::mutex>& l, bool blocking)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -560,7 +560,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::thread_func(std::size_t num_thread,
-        topology const& topology, boost::barrier& startup)
+        topology const& topology, compat::barrier& startup)
     {
         // Set the affinity for the current thread.
         threads::mask_cref_type mask =
@@ -652,7 +652,7 @@ namespace hpx { namespace threads { namespace detail
                     // threads exist or if some other thread has terminated
                     HPX_ASSERT(!sched_.Scheduler::get_thread_count(
                             unknown, thread_priority_default, num_thread) ||
-                        sched_.get_state(num_thread) == state_terminating);
+                        sched_.get_state(num_thread) >= state_terminating);
                 }
                 catch (hpx::exception const& e) {
                     LFATAL_ //-V128
@@ -1455,17 +1455,17 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_fifo
     > >;
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_lifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_lifo
     > >;
 
 #if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<
-        boost::mutex, hpx::threads::policies::lockfree_abp_fifo
+        hpx::compat::mutex, hpx::threads::policies::lockfree_abp_fifo
     > >;
 #endif
 

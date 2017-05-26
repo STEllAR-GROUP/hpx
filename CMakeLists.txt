@@ -9,11 +9,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.8.10
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+# We require at least CMake V3.0.2
+cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 2.8.12)
+cmake_policy(VERSION 3.0.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
@@ -50,7 +50,7 @@ endif()
 project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
+set(HPX_MINOR_VERSION 1)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
@@ -81,6 +81,7 @@ include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
+include(HPX_CreateSymbolicLink)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
@@ -110,6 +111,17 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_LIBRARY_VERSION)
   unset(HPX_SOVERSION)
 endif()
+
+# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
+if(MSVC)
+  hpx_option(HPX_WITH_VCPKG BOOL
+    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
+    OFF ADVANCED)
+  if(HPX_WITH_VCPKG)
+    hpx_add_config_define(HPX_HAVE_VCPKG)
+  endif()
+endif()
+
 ################################################################################
 
 ################################################################################
@@ -248,18 +260,17 @@ if(HPX_WITH_CUDA)
   hpx_add_config_define(HPX_HAVE_CUDA)
   hpx_add_config_define(HPX_HAVE_COMPUTE)
   if(NOT HPX_WITH_CUDA_ARCH)
-    message(STATUS "HPX_WITH_CUDA_ARCH has not been defined, default value is sm_20")
+    hpx_info("HPX_WITH_CUDA_ARCH has not been defined, default value is sm_20")
     set(HPX_WITH_CUDA_ARCH sm_20)
   endif()
-  string(REGEX MATCHALL "sm_[0-9][0-9]" HPX_WITH_CUDA_ARCH ${HPX_WITH_CUDA_ARCH})
-  if(NOT HPX_WITH_CUDA_ARCH)
-    hpx_error("Each arch defined in HPX_WITH_CUDA_ARCH should have the form sm_XX and must be comma-separated")
-  endif()
   foreach(arch ${HPX_WITH_CUDA_ARCH})
+    string(REGEX MATCHALL "sm_[0-9][0-9]" arch ${arch})
+    if(NOT arch)
+      hpx_error("Each architecture defined in HPX_WITH_CUDA_ARCH should be a list of items, each of the form sm_XX")
+    endif()
     string(APPEND HPX_CUDA_CLANG_FLAGS " --cuda-gpu-arch=${arch}")
   endforeach()
   string(REGEX REPLACE ";" " " HPX_WITH_CUDA_ARCH_INFO "${HPX_WITH_CUDA_ARCH}")
-  message(STATUS "HPX_WITH_CUDA_ARCH has been set with values : ${HPX_WITH_CUDA_ARCH_INFO}")
 else()
   set(HPX_TLL_PUBLIC "PUBLIC")      # keywords for target_link_libraries
   set(HPX_TLL_PRIVATE "PRIVATE")
@@ -318,6 +329,19 @@ else()
 endif()
 
 ################################################################################
+# Threadlevel Nice option
+################################################################################
+hpx_option(HPX_WITH_NICE_THREADLEVEL BOOL
+  "Set HPX worker threads to have high NICE level (may impact performance) (default: OFF)"
+  OFF ADVANCED)
+if(HPX_WITH_NICE_THREADLEVEL)
+  hpx_info("Nice threadlevel is enabled.")
+  hpx_add_config_define(HPX_HAVE_NICE_THREADLEVEL)
+else()
+  hpx_info("Nice threadlevel is disabled.")
+endif()
+
+################################################################################
 # Utility configuration
 ################################################################################
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
@@ -345,6 +369,12 @@ hpx_option(HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
 if(HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
+
+hpx_option(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD STRING
+  "The threshhold in bytes to when perform zero copy optimizations (default: 128)"
+  "128"
+  ADVANCED)
+hpx_add_config_define(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ${HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD})
 
 hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
@@ -499,6 +529,7 @@ hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)   # tell HPX that we use APEX
+  hpx_add_config_define(APEX_HAVE_HPX)   # tell APEX that we use HPX
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
 endif()
@@ -595,6 +626,9 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   ## Parcelport related build options
+  hpx_option(HPX_WITH_PARCELPORT_LIBFABRIC BOOL
+    "Enable the libfabric based parcelport. This is currently an experimental feature"
+    OFF CATEGORY "Parcelport" ADVANCED)
   hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
@@ -765,6 +799,11 @@ if(HPX_WITH_NETWORKING)
   endif()
 endif()
 
+# Developer tools
+hpx_option(HPX_WITH_VIM_YCM BOOL
+  "Generate HPX completion file for VIM YouCompleteMe plugin"
+  OFF ADVANCED)
+
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
@@ -831,6 +870,14 @@ if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
 endif()
 
+# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
+hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
+    "Enable old (pre-concurrency TS) executor API (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+endif()
+
 # HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
     "Enable old execution policy names in API (default: ON)"
@@ -845,6 +892,14 @@ hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
     ON ADVANCED)
 if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
+endif()
+
+# HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
+    "Enable old overloads for inclkusive_scan (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -982,46 +1037,40 @@ endif()
 ################################################################################
 # CUDA features
 ################################################################################
-if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-  hpx_libraries(cudadevrt)
-  if(NOT MSVC)
+if(HPX_WITH_CUDA)
+  hpx_info("HPX_WITH_CUDA_ARCH has been set with values: ${HPX_WITH_CUDA_ARCH_INFO}")
+  if(NOT HPX_WITH_CUDA_CLANG)
+    hpx_libraries(cudadevrt)
+    if(NOT MSVC)
+      hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+      link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+    else()
+      set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+      hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
+      link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
+      set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi;-Xcompiler=-bigobj)
+      set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi;-Xcompiler=-bigobj)
+      set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1;-Xcompiler=-bigobj)
+      set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
+    endif()
+    set(CUDA_SEPARABLE_COMPILATION ON)
+    foreach(arch ${HPX_WITH_CUDA_ARCH})
+      string(REPLACE "sm_" "" arch ${arch})
+      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_${arch},code=sm_${arch})
+    endforeach()
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
+  else()
+    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE)
+    hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
+    hpx_libraries(cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-#     set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-std=c++11;-Xcompiler=-g,-O0)
-#     set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-std=c++11;-g;-Xcompiler=-g,-O3)
-#     set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1-std=c++11;;-Xcompiler=-g,-O1)
-#     set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3;-std=c++11;-Xcompiler=-O3)
-  else()
-    set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-    hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-    link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G;-Xcompiler=-MDd;-Xcompiler=-Od;-Xcompiler=-Zi;-Xcompiler=-bigobj)
-    set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O2;-g;-Xcompiler=-MD,-O2,-Zi;-Xcompiler=-bigobj)
-    set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1;-Xcompiler=-MD,-O1;-Xcompiler=-bigobj)
-    set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O2;-Xcompiler=-MD,-Ox;-Xcompiler=-bigobj)
   endif()
-  set(CUDA_SEPARABLE_COMPILATION ON)
-  foreach(arch ${HPX_WITH_CUDA_ARCH})
-    string(REPLACE "sm_" "" arch ${arch})
-    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_${arch},code=sm_${arch})
-  endforeach()
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${CXX_FLAG})
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=sm_30)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=sm_35)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_30,code=compute_30)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode=arch=compute_35,code=compute_35)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-relaxed-constexpr)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--expt-extended-lambda)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--default-stream per-thread)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
-  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
-endif()
-if(HPX_WITH_CUDA AND HPX_WITH_CUDA_CLANG)
-  hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE)
-  hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
-  hpx_libraries(cudart)
-  hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-  link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 endif()
 
 ################################################################################
@@ -1030,6 +1079,18 @@ endif()
 
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
+# HPX_WITH_THREAD_COMPATIBILITY
+hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
+    "Use a compatibility implementation of std::thread, i.e. fall back to Boost.Thread (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_THREAD_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_COMPATIBILITY)
+else()
+  if(NOT HPX_WITH_CXX11_THREAD)
+    hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
+  endif()
+endif()
 
 ################################################################################
 # check for miscellaneous things
@@ -1077,7 +1138,11 @@ endif()
 if(WIN32)
   if(MSVC)
     enable_language(ASM_MASM)
+
     hpx_add_target_compile_option(-Ox CONFIGURATIONS Release)
+
+    # even VS2017 has an ICE when compiling with -Ob2
+    hpx_add_target_compile_option(-Ob1 CONFIGURATIONS Release)
 
     if(NOT HPX_WITH_AWAIT)
       # /RTC1 is incompatible with /await
@@ -1100,7 +1165,7 @@ if(WIN32)
       hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
       if(HPX_WITH_DATAPAR_VC)
         hpx_add_target_compile_option(-std:c++latest)
-        hpx_add_config_define(_HAS_AUTO_PTR_ETC 1)
+        hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
       endif()
     endif()
 
@@ -1117,7 +1182,7 @@ if(WIN32)
 
       # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
       # atomics
-      hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+      hpx_add_config_cond_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
 
       # Update 3 allows to flag rvalue misuses and enforces strict string const-
       # qualification conformance
@@ -1140,29 +1205,30 @@ if(WIN32)
   ##############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
-  hpx_add_config_define(_WIN32_WINNT 0x0601)
-  hpx_add_config_define(_SCL_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_CRT_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
-  hpx_add_config_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_WIN32_WINNT 0x0601)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
 
   ##############################################################################
   # Boost
   ##############################################################################
 
-  hpx_add_config_define(BOOST_USE_WINDOWS_H)
+  hpx_add_config_cond_define(BOOST_USE_WINDOWS_H)
   if (NOT Boost_USE_STATIC_LIBS)
-    hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+    hpx_add_config_cond_define(BOOST_SERIALIZATION_DYN_LINK)
   endif()
   if(NOT CMAKE_CL_64)
-    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+    hpx_add_config_cond_define(BOOST_NO_ALIGNMENT)
   endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
-  hpx_add_config_define(PSAPI_VERSION 1)
+  hpx_add_config_cond_define(PSAPI_VERSION 1)
 endif()
 
 # Configure Warnings
@@ -1184,6 +1250,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # 'int': forcing value to bool 'true' or 'false' (performance warning)
     hpx_add_compile_flag(-wd4800)
+
+    # vcpkg enables the /utf-8 option which causes (benign) warnings in the
+    # Spirit headers
+    if(HPX_WITH_VCPKG)
+      # The file contains a character starting at offset ... that is illegal in
+      # the current source character set
+      hpx_add_compile_flag(-wd4828)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
@@ -1376,7 +1451,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v1.1
+    v1.2
     ${_hpx_apex_no_update}
     VERBOSE)
 
@@ -1434,6 +1509,10 @@ if(HPX_WITH_VALGRIND)
   endif()
   include_directories(${VALGRIND_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_VALGRIND)
+endif()
+
+if(HPX_WITH_VIM_YCM)
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
 ################################################################################
@@ -1795,6 +1874,20 @@ if(HPX_WITH_DOCUMENTATION)
     PATTERN ".git" EXCLUDE)
 endif()
 
+if(HPX_WITH_VIM_YCM)
+  set(build_dir_file ${CMAKE_BINARY_DIR}/.ycm_extra_conf.py)
+  set(source_dir_file ${CMAKE_SOURCE_DIR}/.ycm_extra_conf.py)
+  configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
+               ${build_dir_file} @ONLY)
+  add_custom_target(
+    configure_ycm
+    COMMAND ${CMAKE_COMMAND} -E copy ${build_dir_file} ${source_dir_file}
+    COMMENT "Copying YCM config file to source directory"
+    VERBATIM
+  )
+  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
+endif()
+
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
@@ -1802,9 +1895,8 @@ endif()
 include(HPX_GeneratePackage)
 
 # Create a symlink in share pointing to the latest HPX installation
-execute_process(COMMAND
-  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/share")
+create_symbolic_link("${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}"
+                     "${CMAKE_BINARY_DIR}/share/hpx")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")

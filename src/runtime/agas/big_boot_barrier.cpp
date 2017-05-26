@@ -7,11 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
-// hpxinspect:nodeprecatedname:boost::chrono
-// hpxinspect:nodeprecatedname:boost::unique_lock
-
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -40,11 +37,7 @@
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/format.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -628,7 +621,7 @@ void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    boost::unique_lock<boost::mutex> lock(mtx);
+    std::unique_lock<compat::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 
@@ -672,15 +665,16 @@ big_boot_barrier::big_boot_barrier(
 {
     // register all not registered typenames
     if (service_type == service_mode_bootstrap)
+    {
         detail::register_unassigned_typenames();
+        // store endpoints of root locality for later
+        add_locality_endpoints(0, get_endpoints());
+    }
 }
 
 void big_boot_barrier::wait_bootstrap()
 { // {{{
     HPX_ASSERT(service_mode_bootstrap == service_type);
-
-    // store endpoints of root locality for later
-    add_locality_endpoints(0, get_runtime().endpoints());
 
     // the root just waits until all localities have connected
     spin();
@@ -768,7 +762,7 @@ void big_boot_barrier::notify()
 
     bool notify = false;
     {
-        std::lock_guard<boost::mutex> lk(mtx, std::adopt_lock);
+        std::lock_guard<compat::mutex> lk(mtx, std::adopt_lock);
         if (agas_client.get_status() == state_starting)
         {
             --connected;

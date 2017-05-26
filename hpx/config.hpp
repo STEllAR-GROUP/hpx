@@ -27,9 +27,9 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 105000
+#if BOOST_VERSION < 105100
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.50.0
+#error HPX cannot be compiled with a Boost version earlier than 1.51.0
 #endif
 
 #if BOOST_VERSION == 105400
@@ -43,7 +43,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#if defined(HPX_MSVC)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define _WINSOCKAPI_

@@ -8,6 +8,7 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -21,7 +22,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -53,7 +53,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -134,6 +134,10 @@ namespace hpx { namespace threads { namespace policies
 
             if (!deferred_initialization)
             {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
                 BOOST_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
                     queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
@@ -144,6 +148,9 @@ namespace hpx { namespace threads { namespace policies
                     high_priority_queues_[i] =
                         new thread_queue_type(init.max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
         }
 
@@ -975,6 +982,10 @@ namespace hpx { namespace threads { namespace policies
         {
             if (nullptr == queues_[num_thread])
             {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
                 queues_[num_thread] =
                     new thread_queue_type(max_queue_thread_count_);
 
@@ -983,6 +994,9 @@ namespace hpx { namespace threads { namespace policies
                     high_priority_queues_[num_thread] =
                         new thread_queue_type(max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
 
             // forward this call to all queues etc.

@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
@@ -77,7 +77,7 @@ struct HPX_EXPORT sed_transform
 
 }}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

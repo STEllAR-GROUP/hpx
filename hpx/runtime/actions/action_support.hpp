@@ -145,6 +145,14 @@ namespace hpx { namespace actions
         }
 #endif
 
+        template <typename Action>
+        std::uint32_t get_action_id()
+        {
+            static std::uint32_t id = get_action_id_from_name(
+                get_action_name<Action>());
+            return id;
+        }
+
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename Action>
         util::itt::string_handle const& get_action_name_itt()

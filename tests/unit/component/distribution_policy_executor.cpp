@@ -31,20 +31,20 @@ void test_distribution_policy_executor()
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
     {
-        auto exec = make_distribution_policy_executor(hpx::colocated(loc));
-        typedef executor_traits<decltype(exec)> executor_traits;
+        auto exec = execution::make_distribution_policy_executor(
+            hpx::colocated(loc));
 
-        HPX_TEST_EQ(executor_traits::async_execute(exec, call_pfo()).get(), loc);
-        HPX_TEST_EQ(executor_traits::async_execute(exec, call_action()).get(), loc);
+        HPX_TEST_EQ(execution::async_execute(exec, call_pfo()).get(), loc);
+        HPX_TEST_EQ(execution::async_execute(exec, call_action()).get(), loc);
     }
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
     {
-        auto exec = make_distribution_policy_executor(hpx::colocated(loc));
-        typedef executor_traits<decltype(exec)> executor_traits;
+        auto exec = execution::make_distribution_policy_executor(
+            hpx::colocated(loc));
 
-        HPX_TEST_EQ(executor_traits::execute(exec, call_pfo()), loc);
-        HPX_TEST_EQ(executor_traits::execute(exec, call_action()), loc);
+        HPX_TEST_EQ(execution::sync_execute(exec, call_pfo()), loc);
+        HPX_TEST_EQ(execution::sync_execute(exec, call_action()), loc);
     }
 }
 

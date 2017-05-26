@@ -148,7 +148,7 @@ namespace hpx { namespace actions
 /// The default value for the third argument (the typename of the defined
 /// action) is derived from the name of the function (as passed as the second
 /// argument) by appending '_action'. The third argument can be omitted only
-/// if the first argument with an appended suffix '_action' resolves to a valid,
+/// if the second argument with an appended suffix '_action' resolves to a valid,
 /// unqualified C++ type name.
 ///
 #define HPX_DEFINE_COMPONENT_ACTION(...)                                      \

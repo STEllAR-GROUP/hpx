@@ -9,17 +9,21 @@
 #define HPX_PARALLEL_EXECUTOR_INFORMATION_TRAITS_AUG_26_2015_1133AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_v1.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -211,6 +215,65 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             detail::call_set_scheduler_mode(exec, mode);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // compatibility layer mapping new customization points onto
+    // executor_information_traits
+
+    // processing_units_count()
+    template <typename Executor, typename Parameters>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value, std::size_t
+    >::type
+    processing_units_count(Executor && exec, Parameters& params)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_information_traits<executor_type>::processing_units_count(
+            std::forward<Executor>(exec), params);
+    }
+
+    // has_pending_closures()
+    template <typename Executor>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value, bool
+    >::type
+    has_pending_closures(Executor && exec)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_information_traits<executor_type>::has_pending_closures(
+            std::forward<Executor>(exec));
+    }
+
+    // get_pu_mask()
+    template <typename Executor>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value,
+        threads::mask_cref_type
+    >::type
+    get_pu_mask(Executor && exec, threads::topology& topo,
+        std::size_t thread_num)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_information_traits<executor_type>::get_pu_mask(
+            std::forward<Executor>(exec), topo, thread_num);
+    }
+
+    // set_scheduler_mode()
+    template <typename Executor, typename Mode>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_executor<Executor>::value
+    >::type
+    set_scheduler_mode(Executor && exec, Mode const& mode)
+    {
+        typedef typename std::decay<Executor>::type executor_type;
+        return executor_information_traits<executor_type>::set_scheduler_mode(
+            std::forward<Executor>(exec), mode);
+    }
 }}}
 
+#endif
 #endif

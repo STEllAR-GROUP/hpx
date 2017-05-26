@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,11 +9,12 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/thread_execution_information.hpp>
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
@@ -25,7 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    typedef threads::executors::local_queue_executor local_queue_executor;
+    using local_queue_executor = threads::executors::local_queue_executor;
 #endif
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
@@ -37,7 +38,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    typedef threads::executors::static_queue_executor static_queue_executor;
+    using static_queue_executor = threads::executors::static_queue_executor;
 #endif
 
     /// Creates a new local_priority_queue_executor
@@ -48,8 +49,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    typedef threads::executors::local_priority_queue_executor
-        local_priority_queue_executor;
+    using local_priority_queue_executor =
+        threads::executors::local_priority_queue_executor;
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     /// Creates a new static_priority_queue_executor
@@ -60,11 +61,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    typedef threads::executors::static_priority_queue_executor
-        static_priority_queue_executor;
+    using static_priority_queue_executor =
+        threads::executors::static_priority_queue_executor;
 #endif
-
-
+    
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
     /// Creates a new throttling_executor
     ///
@@ -74,9 +74,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///                     associate with the newly created executor
     ///                     (default: 1).
     ///
-    typedef threads::executors::throttling_executor throttling_executor;
+    using throttling_executor = 
+        threads::executors::throttling_executor;
+#endif
+}}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/thread_executor_traits.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Compatibility layer
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+{
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+    using local_queue_executor =
+        threads::executors::local_queue_executor;
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    using static_queue_executor =
+        threads::executors::static_queue_executor;
+#endif
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+    using throttling_executor = 
+        threads::executors::throttling_executor;
+#endif
+
+    using local_priority_queue_executor =
+        threads::executors::local_priority_queue_executor;
+
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+    using static_priority_queue_executor =
+        threads::executors::static_priority_queue_executor;
 #endif
 
 }}}
+#endif
 
 #endif

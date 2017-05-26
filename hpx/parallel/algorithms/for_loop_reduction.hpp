@@ -140,10 +140,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::plus<T> >
+    reduction_plus(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::plus<T>());
+    }
+
+    template <typename T>
     HPX_FORCEINLINE detail::reduction_helper<T, std::multiplies<T> >
     reduction_multiplies(T& var)
     {
         return reduction(var, T(1), std::multiplies<T>());
+    }
+
+    template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::multiplies<T> >
+    reduction_multiplies(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::multiplies<T>());
     }
 
     template <typename T>
@@ -154,10 +168,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::bit_and<T> >
+    reduction_bit_and(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::bit_and<T>());
+    }
+
+    template <typename T>
     HPX_FORCEINLINE detail::reduction_helper<T, std::bit_or<T> >
     reduction_bit_or(T& var)
     {
         return reduction(var, T(), std::bit_or<T>());
+    }
+
+    template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::bit_or<T> >
+    reduction_bit_or(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::bit_or<T>());
     }
 
     template <typename T>
@@ -168,6 +196,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, std::bit_xor<T> >
+    reduction_bit_xor(T& var, T const& identity)
+    {
+        return reduction(var, identity, std::bit_xor<T>());
+    }
+
+    template <typename T>
     HPX_FORCEINLINE detail::reduction_helper<T, v1::detail::min_of<T> >
     reduction_min(T& var)
     {
@@ -175,10 +210,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, v1::detail::min_of<T> >
+    reduction_min(T& var, T const& identity)
+    {
+        return reduction(var, identity, v1::detail::min_of<T>());
+    }
+
+    template <typename T>
     HPX_FORCEINLINE detail::reduction_helper<T, v1::detail::max_of<T> >
     reduction_max(T& var)
     {
         return reduction(var, var, v1::detail::max_of<T>());
+    }
+
+    template <typename T>
+    HPX_FORCEINLINE detail::reduction_helper<T, v1::detail::max_of<T> >
+    reduction_max(T& var, T const& identity)
+    {
+        return reduction(var, identity, v1::detail::max_of<T>());
     }
     /// \endcond
 }}}

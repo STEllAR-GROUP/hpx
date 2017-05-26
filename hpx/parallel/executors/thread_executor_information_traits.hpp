@@ -9,17 +9,14 @@
 #define HPX_PARALLEL_THREAD_EXECUTOR_INFORMATION_TRAITS_AUG_26_2015_1141AM
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/result_of.hpp>
-#include <hpx/util/unwrapped.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -97,4 +94,5 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     };
 }}}
 
+#endif
 #endif

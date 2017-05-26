@@ -13,8 +13,8 @@
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
 
 #include <algorithm>
@@ -64,10 +64,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             parameters_type;
         typedef executor_parameter_traits<parameters_type> traits;
 
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-            executor_type;
-        std::size_t const cores = executor_information_traits<executor_type>::
-            processing_units_count(policy.executor(), policy.parameters());
+        std::size_t const cores = execution::processing_units_count(
+            policy.executor(), policy.parameters());
 
         std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -140,10 +138,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
 
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-            executor_type;
-        std::size_t const cores = executor_information_traits<executor_type>::
-            processing_units_count(policy.executor(), policy.parameters());
+        std::size_t const cores = execution::processing_units_count(
+            policy.executor(), policy.parameters());
 
         std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -224,10 +220,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             parameters_type;
         typedef executor_parameter_traits<parameters_type> traits;
 
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-            executor_type;
-        std::size_t const cores = executor_information_traits<executor_type>::
-            processing_units_count(policy.executor(), policy.parameters());
+        std::size_t const cores = execution::processing_units_count(
+            policy.executor(), policy.parameters());
 
         std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -302,10 +296,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t, std::size_t> tuple_type;
 
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-            executor_type;
-        std::size_t const cores = executor_information_traits<executor_type>::
-            processing_units_count(policy.executor(), policy.parameters());
+        std::size_t const cores = execution::processing_units_count(
+            policy.executor(), policy.parameters());
 
         std::size_t max_chunks = traits::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);

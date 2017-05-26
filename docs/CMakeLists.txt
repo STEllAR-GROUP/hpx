@@ -118,7 +118,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequenced_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
@@ -282,9 +282,11 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
   set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}] [/ ${_cat} Options]\n\n")
 endforeach()
 
+set(QUICKBOOK_CMAKE_VARIABLES_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_variables.qbk")
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
-  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+  ${QUICKBOOK_CMAKE_VARIABLES_DEST}
   @ONLY
 )
 
@@ -309,10 +311,11 @@ foreach(_toolchain ${_toolchain_files})
   set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n")
 endforeach()
 
-
+set(QUICKBOOK_CMAKE_TOOLCHAINS_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_toolchains.qbk")
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
-  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+  ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
   @ONLY
 )
 
@@ -321,8 +324,8 @@ hpx_quickbook_to_html(hpx
   INDEX hpx.idx
   DEPENDENCIES
     ${all_documentation_dependencies}
-    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
-    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+    ${QUICKBOOK_CMAKE_VARIABLES_DEST}
+    ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
   XSLTPROC_ARGS chunk.section.depth=4
                 chunk.first.sections=1
@@ -330,8 +333,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=562
-                boost.image.h=104
+                boost.image.w=531
+                boost.image.h=105
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
@@ -378,20 +381,22 @@ endif()
 
 # Create links to properly view the docs in the build directory
 set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
+
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/src"
+                     "${DOCS_OUTPUT_DIR}/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/images"
+                     "${DOCS_OUTPUT_DIR}/images")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/hpx"
+                     "${DOCS_OUTPUT_DIR}/code/hpx")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/src"
+                     "${DOCS_OUTPUT_DIR}/code/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/examples"
+                     "${DOCS_OUTPUT_DIR}/code/examples")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
+                     "${DOCS_OUTPUT_DIR}/code/tests")
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})

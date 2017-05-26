@@ -1430,6 +1430,9 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_connection_cache_counter_types(
         std::string const& pp_type)
     {
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
 #if defined(HPX_HAVE_NETWORKING)
         util::function_nonser<std::int64_t(bool)> cache_insertions(
             util::bind(&parcelhandler::get_connection_cache_statistics,

@@ -10,6 +10,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 
+#include <cstddef>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,5 +47,41 @@ namespace hpx { namespace parallel { namespace util
         };
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+
+namespace hpx { namespace traits
+{
+    template <typename Result, typename F>
+    struct get_function_address<
+        parallel::util::detail::partitioner_iteration<Result, F> >
+    {
+        static std::size_t call(
+            parallel::util::detail::partitioner_iteration<Result, F> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename Result, typename F>
+    struct get_function_annotation<
+        parallel::util::detail::partitioner_iteration<Result, F> >
+    {
+        static char const* call(
+            parallel::util::detail::partitioner_iteration<Result, F> const& f)
+                HPX_NOEXCEPT
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+}}
+#endif
 
 #endif

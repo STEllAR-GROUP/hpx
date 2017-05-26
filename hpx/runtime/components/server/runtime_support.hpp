@@ -9,6 +9,8 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -36,8 +38,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -67,7 +67,6 @@ namespace hpx { namespace components { namespace server
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
         typedef lcos::local::spinlock plugin_map_mutex_type;
-        typedef boost::mutex mutex_type;
 
         struct component_factory
         {
@@ -419,9 +418,9 @@ namespace hpx { namespace components { namespace server
 #endif
 
     private:
-        mutex_type mtx_;
-        boost::condition_variable wait_condition_;
-        boost::condition_variable stop_condition_;
+        compat::mutex mtx_;
+        compat::condition_variable wait_condition_;
+        compat::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
@@ -447,7 +446,7 @@ namespace hpx { namespace components { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Functions wrapped by creat_component actions below
+    // Functions wrapped by create_component actions below
 #if defined(__NVCC__)
     template <typename Component>
     naming::gid_type runtime_support::create_component()

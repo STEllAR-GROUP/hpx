@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -132,7 +133,7 @@ struct sub_block
 ///////////////////////////////////////////////////////////////////////////////
 // dirty workaround to avoid serialization of executors
 typedef
-    hpx::threads::executors::local_priority_queue_attached_executor
+    hpx::parallel::execution::local_priority_queue_attached_executor
     executor_type;
 typedef
     std::vector<executor_type>

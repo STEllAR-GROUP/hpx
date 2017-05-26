@@ -38,7 +38,7 @@ namespace hpx { namespace iostreams
         struct buffer_sink;
     }
 
-    template <typename Char = char, typename Sink = detail::buffer_sink<char> >
+    template <typename Char = char, typename Sink = detail::buffer_sink<Char> >
     struct ostream;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ namespace hpx { namespace iostreams
 
         bool flush()
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             if (!this->detail::buffer::empty_locked())
             {
                 // Create the next buffer, returns the previous buffer
@@ -279,7 +279,7 @@ namespace hpx { namespace iostreams
         template <typename Tag>
         void uninitialize(Tag tag)
         {
-            std::unique_lock<mutex_type> l(mtx_, std::try_to_lock);
+            std::unique_lock<mutex_type> l(*mtx_, std::try_to_lock);
             if (l)
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks
@@ -301,28 +301,28 @@ namespace hpx { namespace iostreams
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::async_flush manipulator
         ostream& operator<<(hpx::iostreams::async_flush_type const& m)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             return streaming_operator_async(m, l);
         }
 
         // hpx::async_endl manipulator
         ostream& operator<<(hpx::iostreams::async_endl_type const& m)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             return streaming_operator_async(m, l);
         }
 
@@ -330,14 +330,14 @@ namespace hpx { namespace iostreams
         template <typename T>
         ostream& operator<<(T const& subject)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(*mtx_);
             return streaming_operator_lazy(subject);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             util::ignore_while_checking<std::unique_lock<mutex_type> > ignore(&l);
             return streaming_operator_lazy(manip_fun);
         }
