@@ -515,6 +515,7 @@ namespace libfabric
         //
         memory_pool_->deallocate(header_region_);
         header_region_ = nullptr;
+        chunk_region_ = nullptr;
         header_        = nullptr;
         src_addr_      = 0 ;
         //

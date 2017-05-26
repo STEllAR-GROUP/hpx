@@ -230,6 +230,12 @@ namespace libfabric
         return nullptr;
     }
 
+    void parcelport::reclaim_connection(sender* s)
+    {
+        --senders_in_use_;
+        senders_.push(s);
+    }
+
     // --------------------------------------------------------------------
     // return a sender object back to the parcelport_impl
     // this is for compatibility with non send_immediate operation
