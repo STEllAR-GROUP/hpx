@@ -43,9 +43,6 @@ namespace hpx { namespace parcelset
     {
         struct parcel_data
         {
-        private:
-            HPX_MOVABLE_ONLY(parcel_data);
-
         public:
             parcel_data();
             parcel_data(naming::gid_type&& dest, naming::address&& addr,
@@ -104,7 +101,6 @@ namespace hpx { namespace parcelset
     public:
         parcel(parcel && other);
         parcel &operator=(parcel && other);
-        HPX_MOVABLE_ONLY(parcel);
 
         void reset();
 

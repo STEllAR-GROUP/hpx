@@ -32,7 +32,7 @@ namespace test
     class thread_group
     {
     private:
-        HPX_MOVABLE_ONLY(thread_group);
+        HPX_NON_COPYABLE(thread_group);
 
         typedef hpx::lcos::local::shared_mutex mutex_type;
 

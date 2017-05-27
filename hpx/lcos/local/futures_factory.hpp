@@ -295,9 +295,6 @@ namespace hpx { namespace lcos { namespace local
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
-    private:
-        HPX_MOVABLE_ONLY(futures_factory);
-
     public:
         // construction and destruction
         futures_factory()

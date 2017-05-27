@@ -39,8 +39,6 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable<R(Ts...)> vtable;
         typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_ONLY(unique_function);
-
     public:
         typedef typename base_type::result_type result_type;
 

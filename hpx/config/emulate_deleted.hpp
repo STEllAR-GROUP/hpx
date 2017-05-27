@@ -31,9 +31,4 @@
     HPX_DELETE_MOVE_ASSIGN(cls)                                               \
 /**/
 
-#define HPX_MOVABLE_ONLY(cls)                                                 \
-    HPX_DELETE_COPY_CTOR(cls);                                                \
-    HPX_DELETE_COPY_ASSIGN(cls)                                               \
-/**/
-
 #endif

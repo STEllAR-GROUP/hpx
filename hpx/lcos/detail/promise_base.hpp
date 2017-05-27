@@ -161,8 +161,6 @@ namespace lcos {
         class promise_base
           : public hpx::lcos::local::detail::promise_base<Result, SharedState>
         {
-            HPX_MOVABLE_ONLY(promise_base);
-
             typedef hpx::lcos::local::detail::promise_base<
                     Result, SharedState
                 > base_type;

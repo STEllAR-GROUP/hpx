@@ -24,7 +24,7 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT pool_timer
     {
-        HPX_MOVABLE_ONLY(pool_timer);
+        HPX_NON_COPYABLE(pool_timer);
 
     public:
         pool_timer();

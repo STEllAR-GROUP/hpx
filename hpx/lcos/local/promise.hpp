@@ -29,8 +29,6 @@ namespace hpx { namespace lcos { namespace local
             typename SharedState = lcos::detail::future_data<R>>
         class promise_base
         {
-            HPX_MOVABLE_ONLY(promise_base);
-
             typedef SharedState shared_state_type;
             typedef typename shared_state_type::init_no_addref init_no_addref;
 
@@ -213,8 +211,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise : public detail::promise_base<R>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<R> base_type;
 
     public:
@@ -329,8 +325,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<R&> base_type;
 
     public:
@@ -427,8 +421,6 @@ namespace hpx { namespace lcos { namespace local
     template <>
     class promise<void> : public detail::promise_base<void>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<void> base_type;
 
     public:

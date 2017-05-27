@@ -32,7 +32,7 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_continuation_action : transfer_base_action<Action>
     {
-        HPX_MOVABLE_ONLY(transfer_continuation_action);
+        HPX_NON_COPYABLE(transfer_continuation_action);
 
         typedef transfer_base_action<Action> base_type;
         typedef typename base_type::continuation_type continuation_type;

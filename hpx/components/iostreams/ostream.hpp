@@ -164,7 +164,7 @@ namespace hpx { namespace iostreams
         typedef BOOST_IOSTREAMS_BASIC_OSTREAM(Char, stream_traits_type) std_stream_type;
         typedef detail::buffer::mutex_type mutex_type;
 
-        HPX_MOVABLE_ONLY(ostream);
+        HPX_NON_COPYABLE(ostream);
 
     private:
         using detail::buffer::mtx_;
