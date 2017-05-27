@@ -168,15 +168,6 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-    struct HPX_EXPORT throttle_queue_executor : public scheduled_executor
-    {
-        throttle_queue_executor();
-
-        explicit throttle_queue_executor(std::size_t max_punits,
-            std::size_t min_punits = 1);
-    };
-#endif
 
     struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
     {
@@ -195,6 +186,21 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 #endif
+
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+    struct HPX_EXPORT throttling_executor : public scheduled_executor
+    {
+        throttling_executor();
+
+        explicit throttling_executor(std::size_t max_punits,
+            std::size_t min_punits = 1);
+    };
+#endif
+
+
+
+
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>

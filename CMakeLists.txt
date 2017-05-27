@@ -543,6 +543,8 @@ hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
+
+
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 
@@ -576,13 +578,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  # The throttle scheduler is not supported neither on Windows nor on Mac
-  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLE" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
-      set(HPX_WITH_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
-    endif()
-  endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -590,6 +585,13 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  # The throttling scheduler has not been tested neither on Windows nor on Mac
+  if(NOT WIN32 AND NOT APPLE)
+    if(_scheduler STREQUAL "THROTTLLING" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
+      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
+    endif()
   endif()
   unset(_all)
 endforeach()
