@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct entry_data
         {
-        private:
+        public:
             HPX_NON_COPYABLE(entry_data);
 
         public:
@@ -249,7 +249,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct entry_data
         {
-        private:
+        public:
             HPX_NON_COPYABLE(entry_data);
 
         public:

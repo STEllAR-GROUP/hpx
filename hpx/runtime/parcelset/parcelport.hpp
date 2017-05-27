@@ -57,6 +57,7 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelport
       : public std::enable_shared_from_this<parcelport>
     {
+    public:
         HPX_NON_COPYABLE(parcelport);
 
     private:

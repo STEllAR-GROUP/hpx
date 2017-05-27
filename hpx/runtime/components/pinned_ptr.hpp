@@ -21,6 +21,7 @@ namespace hpx { namespace components
     {
         class pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr_base);
 
         public:
@@ -41,6 +42,7 @@ namespace hpx { namespace components
         template <typename Component>
         class pinned_ptr : public pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr);
 
         public:

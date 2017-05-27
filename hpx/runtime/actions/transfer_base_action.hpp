@@ -40,6 +40,7 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_base_action : base_action
     {
+    public:
         HPX_NON_COPYABLE(transfer_base_action);
 
     public:

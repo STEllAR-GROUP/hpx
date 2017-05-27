@@ -29,6 +29,7 @@ namespace hpx { namespace plugins { namespace parcel
     {
         typedef hpx::lcos::local::spinlock mutex_type;
 
+    public:
         HPX_NON_COPYABLE(coalescing_counter_registry);
 
     public:

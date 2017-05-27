@@ -81,8 +81,10 @@ namespace hpx { namespace threads
     /// implemented by the thread-manager.
     class thread_data
     {
+    public:
         HPX_NON_COPYABLE(thread_data);
 
+    private:
         // Avoid warning about using 'this' in initializer list
         thread_data* this_() { return this; }
 

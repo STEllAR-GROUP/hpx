@@ -40,7 +40,7 @@ struct notification_header;
 
 struct HPX_EXPORT big_boot_barrier
 {
-private:
+public:
     HPX_NON_COPYABLE(big_boot_barrier);
 
 private:

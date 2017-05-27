@@ -446,6 +446,7 @@ namespace hpx { namespace components { namespace server
     ///
     class memory_block
     {
+    public:
         HPX_NON_COPYABLE(memory_block);
 
     public:

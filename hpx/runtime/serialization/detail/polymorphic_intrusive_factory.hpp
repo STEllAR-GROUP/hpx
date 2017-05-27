@@ -22,8 +22,10 @@ namespace hpx { namespace serialization { namespace detail
 {
     class polymorphic_intrusive_factory
     {
+    public:
         HPX_NON_COPYABLE(polymorphic_intrusive_factory);
 
+    private:
         typedef void* (*ctor_type) ();
         typedef std::unordered_map<std::string,
             ctor_type, hpx::util::jenkins_hash> ctor_map_type;

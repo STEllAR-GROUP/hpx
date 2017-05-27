@@ -695,6 +695,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
+        public:
             HPX_NON_COPYABLE(id_type_impl);
 
         private:
