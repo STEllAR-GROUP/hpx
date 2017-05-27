@@ -283,8 +283,7 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(bound);
-            HPX_DELETE_MOVE_ASSIGN(bound);
+            bound& operator=(bound const&) = delete;
 
             template <typename ...Us>
             HPX_HOST_DEVICE inline

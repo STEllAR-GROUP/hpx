@@ -99,11 +99,6 @@ namespace hpx { namespace components
             return pinned_ptr(lva, id<Component>());
         }
 
-#if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
-        HPX_DELETE_COPY_CTOR(pinned_ptr);
-        HPX_DELETE_COPY_ASSIGN(pinned_ptr);
-#endif
-
     private:
         template <typename Component>
         pinned_ptr(naming::address::address_type lva, id<Component>)

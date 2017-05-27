@@ -74,8 +74,7 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(deferred);
-            HPX_DELETE_MOVE_ASSIGN(deferred);
+            deferred& operator=(deferred const&) = delete;
 
             HPX_HOST_DEVICE HPX_FORCEINLINE
             typename deferred_result_of<F(Ts...)>::type

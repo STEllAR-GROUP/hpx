@@ -69,8 +69,7 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(count_iteration);
-            HPX_DELETE_MOVE_ASSIGN(count_iteration);
+            count_iteration& operator=(count_iteration const&) = delete;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE

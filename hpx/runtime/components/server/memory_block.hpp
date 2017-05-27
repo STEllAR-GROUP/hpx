@@ -44,8 +44,6 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///        a block of memory managed by a server#memory_block component.
     class memory_block_header //-V690
     {
-        HPX_DELETE_COPY_CTOR(memory_block_header);
-
     public:
         /// This constructor is called on the locality where there memory_block
         /// is hosted
@@ -78,6 +76,8 @@ namespace hpx { namespace components { namespace server { namespace detail
             HPX_ASSERT(act.construct());
             act.construct()(this->get_ptr(), size);
         }
+
+        memory_block_header(memory_block_header const&) = delete;
 
         ~memory_block_header()
         {

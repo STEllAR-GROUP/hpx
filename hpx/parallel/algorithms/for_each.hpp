@@ -120,8 +120,7 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(for_each_iteration);
-            HPX_DELETE_MOVE_ASSIGN(for_each_iteration);
+            for_each_iteration& operator=(for_each_iteration const&) = delete;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
