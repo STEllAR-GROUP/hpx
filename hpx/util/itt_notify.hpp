@@ -326,23 +326,23 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct string_handle
     {
-        string_handle() HPX_NOEXCEPT
+        string_handle() noexcept
           : handle_(0)
         {}
         string_handle(char const* s)
           : handle_(s == nullptr ? 0 : HPX_ITT_STRING_HANDLE_CREATE(s))
         {}
-        string_handle(___itt_string_handle* h) HPX_NOEXCEPT
+        string_handle(___itt_string_handle* h) noexcept
           : handle_(h)
         {}
 
-        string_handle& operator=(___itt_string_handle* h) HPX_NOEXCEPT
+        string_handle& operator=(___itt_string_handle* h) noexcept
         {
             handle_ = h;
             return *this;
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return handle_ != 0;
         }

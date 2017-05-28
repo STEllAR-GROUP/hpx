@@ -23,7 +23,6 @@
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
@@ -40,7 +39,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // transform
@@ -80,8 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             transform_iteration(transform_iteration const&) = default;
             transform_iteration(transform_iteration&&) = default;
 #else
@@ -262,14 +260,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj, InIter>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj, InIter>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -344,8 +338,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj2_(std::forward<Proj2_>(proj2))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             transform_binary_iteration(transform_binary_iteration const&) = default;
             transform_binary_iteration(transform_binary_iteration&&) = default;
 #else
@@ -549,15 +542,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj1, InIter1>,
                 traits::projected<Proj2, InIter2>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
@@ -763,16 +752,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj2, InIter2>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
                 traits::projected<Proj1, InIter1>,
                 traits::projected<Proj2, InIter2>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<
             ExPolicy,
             hpx::util::tagged_tuple<
@@ -820,7 +805,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_address<
                     typename hpx::util::decay<F>::type
@@ -834,7 +819,7 @@ namespace hpx { namespace traits
     {
         static char const* call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_annotation<
                     typename hpx::util::decay<F>::type

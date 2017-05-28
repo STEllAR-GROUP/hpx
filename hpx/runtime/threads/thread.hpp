@@ -36,7 +36,7 @@ namespace hpx
         class id;
         typedef threads::thread_id_type native_handle_type;
 
-        thread() HPX_NOEXCEPT;
+        thread() noexcept;
 
         template <typename F>
         explicit thread(F&& f)
@@ -57,11 +57,11 @@ namespace hpx
         HPX_MOVABLE_ONLY(thread);
 
     public:
-        thread(thread&&) HPX_NOEXCEPT;
-        thread& operator=(thread&&) HPX_NOEXCEPT;
+        thread(thread&&) noexcept;
+        thread& operator=(thread&&) noexcept;
 
-        void swap(thread&) HPX_NOEXCEPT;
-        bool joinable() const HPX_NOEXCEPT
+        void swap(thread&) noexcept;
+        bool joinable() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return joinable_locked();
@@ -74,7 +74,7 @@ namespace hpx
             detach_locked();
         }
 
-        id get_id() const HPX_NOEXCEPT;
+        id get_id() const noexcept;
 
         native_handle_type native_handle() const //-V659
         {
@@ -82,7 +82,7 @@ namespace hpx
             return id_;
         }
 
-        static std::size_t hardware_concurrency() HPX_NOEXCEPT;
+        static std::size_t hardware_concurrency() noexcept;
 
         // extensions
         void interrupt(bool flag = true);
@@ -96,7 +96,7 @@ namespace hpx
         std::size_t set_thread_data(std::size_t);
 
     private:
-        bool joinable_locked() const HPX_NOEXCEPT
+        bool joinable_locked() const noexcept
         {
             return threads::invalid_thread_id != id_;
         }
@@ -112,7 +112,7 @@ namespace hpx
         threads::thread_id_type id_;
     };
 
-    inline void swap(thread& x, thread& y) HPX_NOEXCEPT
+    inline void swap(thread& x, thread& y) noexcept
     {
         x.swap(y);
     }
@@ -123,12 +123,12 @@ namespace hpx
     private:
         threads::thread_id_type id_;
 
-        friend bool operator== (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
-        friend bool operator!= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
-        friend bool operator< (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
-        friend bool operator> (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
-        friend bool operator<= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
-        friend bool operator>= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT;
+        friend bool operator== (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator!= (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator< (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator> (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator<= (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator>= (thread::id const& x, thread::id const& y) noexcept;
 
         template <typename Char, typename Traits>
         friend std::basic_ostream<Char, Traits>&
@@ -137,43 +137,43 @@ namespace hpx
         friend class thread;
 
     public:
-        id() HPX_NOEXCEPT : id_(threads::invalid_thread_id) {}
-        explicit id(threads::thread_id_type const& i) HPX_NOEXCEPT
+        id() noexcept : id_(threads::invalid_thread_id) {}
+        explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
         {}
-        explicit id(threads::thread_id_type && i) HPX_NOEXCEPT
+        explicit id(threads::thread_id_type && i) noexcept
           : id_(std::move(i))
         {}
 
         threads::thread_id_type const& native_handle() const { return id_; }
     };
 
-    inline bool operator== (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator== (thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_.get() == y.id_.get();
     }
 
-    inline bool operator!= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator!= (thread::id const& x, thread::id const& y) noexcept
     {
         return !(x == y);
     }
 
-    inline bool operator< (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator< (thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_.get() < y.id_.get();
     }
 
-    inline bool operator> (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator> (thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_.get() > y.id_.get();
     }
 
-    inline bool operator<= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator<= (thread::id const& x, thread::id const& y) noexcept
     {
         return !(x.id_.get() > y.id_.get());
     }
 
-    inline bool operator>= (thread::id const& x, thread::id const& y) HPX_NOEXCEPT
+    inline bool operator>= (thread::id const& x, thread::id const& y) noexcept
     {
         return !(x.id_.get() < y.id_.get());
     }
@@ -192,10 +192,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
-        HPX_API_EXPORT thread::id get_id() HPX_NOEXCEPT;
+        HPX_API_EXPORT thread::id get_id() noexcept;
 
-        HPX_API_EXPORT void yield() HPX_NOEXCEPT;
-        HPX_API_EXPORT void yield_to(thread::id) HPX_NOEXCEPT;
+        HPX_API_EXPORT void yield() noexcept;
+        HPX_API_EXPORT void yield_to(thread::id) noexcept;
 
         // extensions
         HPX_API_EXPORT threads::thread_priority get_priority();

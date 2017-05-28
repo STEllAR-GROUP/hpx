@@ -132,7 +132,7 @@ namespace hpx
     /// from.
     ///
     /// \throws nothing
-    error exception::get_error() const HPX_NOEXCEPT
+    error exception::get_error() const noexcept
     {
         return static_cast<error>(
             this->boost::system::system_error::code().value());
@@ -146,7 +146,7 @@ namespace hpx
     ///               \a hpx_category (if mode is \a plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a rethrow).
-    error_code exception::get_error_code(throwmode mode) const HPX_NOEXCEPT
+    error_code exception::get_error_code(throwmode mode) const noexcept
     {
         (void)mode;
         return error_code(this->boost::system::system_error::code().value(),

@@ -20,7 +20,6 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -37,7 +36,7 @@ namespace hpx { namespace threads
         std::size_t thread_num);
 }}
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

@@ -31,7 +31,7 @@ namespace hpx { namespace compat
         using base_type = boost::mutex;
 
     public:
-        mutex() HPX_NOEXCEPT
+        mutex() noexcept
           : base_type()
         {}
 
@@ -45,7 +45,7 @@ namespace hpx { namespace compat
         using base_type = boost::recursive_mutex;
 
     public:
-        recursive_mutex() HPX_NOEXCEPT
+        recursive_mutex() noexcept
           : base_type()
         {}
 
@@ -56,7 +56,7 @@ namespace hpx { namespace compat
 
     struct once_flag : boost::once_flag
     {
-        HPX_CONSTEXPR once_flag() HPX_NOEXCEPT
+        HPX_CONSTEXPR once_flag() noexcept
           : boost::once_flag(BOOST_ONCE_INIT)
         {}
     };

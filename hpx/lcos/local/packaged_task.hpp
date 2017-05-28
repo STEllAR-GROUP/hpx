@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
-        void swap(packaged_task& rhs) HPX_NOEXCEPT
+        void swap(packaged_task& rhs) noexcept
         {
             function_.swap(rhs.function_);
             promise_.swap(rhs.promise_);
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
             return promise_.get_future();
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !function_.empty() && promise_.valid();
         }

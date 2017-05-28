@@ -52,7 +52,7 @@ namespace hpx { namespace compat
                     std::adopt_lock);
             }
 
-            boost::unique_lock<boost::mutex>& get() HPX_NOEXCEPT
+            boost::unique_lock<boost::mutex>& get() noexcept
             {
                 return boost_lock;
             }

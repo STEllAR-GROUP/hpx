@@ -8,9 +8,6 @@
 #if !defined(HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM)
 #define HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM
 
-// sadly, MSVC12 is not able to cope with split_future
-#if !defined(HPX_MSVC) || HPX_MSVC >= 1900
-
 #if defined(DOXYGEN)
 namespace hpx
 {
@@ -367,6 +364,5 @@ namespace hpx
     using lcos::split_future;
 }
 
-#endif
 #endif
 #endif

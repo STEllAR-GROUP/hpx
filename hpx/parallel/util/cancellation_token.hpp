@@ -38,12 +38,12 @@ namespace hpx { namespace parallel { namespace util
           : was_cancelled_(std::make_shared<flag_type>(data))
         {}
 
-        bool was_cancelled(T data) const HPX_NOEXCEPT
+        bool was_cancelled(T data) const noexcept
         {
             return Pred()(was_cancelled_->load(boost::memory_order_relaxed), data);
         }
 
-        void cancel(T data) HPX_NOEXCEPT
+        void cancel(T data) noexcept
         {
             T old_data = was_cancelled_->load(boost::memory_order_relaxed);
 
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { namespace util
                 boost::memory_order_relaxed));
         }
 
-        T get_data() const HPX_NOEXCEPT
+        T get_data() const noexcept
         {
             return was_cancelled_->load(boost::memory_order_relaxed);
         }
@@ -75,12 +75,12 @@ namespace hpx { namespace parallel { namespace util
           : was_cancelled_(std::make_shared<flag_type>(false))
         {}
 
-        bool was_cancelled() const HPX_NOEXCEPT
+        bool was_cancelled() const noexcept
         {
             return was_cancelled_->load(boost::memory_order_relaxed);
         }
 
-        void cancel() HPX_NOEXCEPT
+        void cancel() noexcept
         {
             was_cancelled_->store(true, boost::memory_order_relaxed);
         }

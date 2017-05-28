@@ -34,11 +34,11 @@ namespace hpx { namespace lcos { namespace detail
     {
         bool is_ready_;
 
-        explicit suspend_if(bool cond) HPX_NOEXCEPT : is_ready_(!cond) {}
+        explicit suspend_if(bool cond) noexcept : is_ready_(!cond) {}
 
-        bool await_ready() HPX_NOEXCEPT { return is_ready_; }
-        void await_suspend(std::experimental::coroutine_handle<>) HPX_NOEXCEPT {}
-        void await_resume() HPX_NOEXCEPT {}
+        bool await_ready() noexcept { return is_ready_; }
+        void await_suspend(std::experimental::coroutine_handle<>) noexcept {}
+        void await_resume() noexcept {}
     };
 
     ///////////////////////////////////////////////////////////////////////////

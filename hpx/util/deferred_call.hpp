@@ -65,8 +65,7 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
             HPX_HOST_DEVICE deferred(deferred&& other)
@@ -149,7 +148,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::deferred<Sig> >
     {
         static std::size_t
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -161,7 +160,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::deferred<Sig> >
     {
         static char const*
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }

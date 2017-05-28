@@ -132,17 +132,17 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(distribution_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_;
         }
 
-        bool operator!=(distribution_policy_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(distribution_policy_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        distribution_policy_executor const& context() const HPX_NOEXCEPT
+        distribution_policy_executor const& context() const noexcept
         {
             return *this;
         }
@@ -210,12 +210,11 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     /// \cond NOINTERNAL
 

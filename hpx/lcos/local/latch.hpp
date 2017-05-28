@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         /// \throws Nothing.
         ///
-        bool is_ready() const HPX_NOEXCEPT
+        bool is_ready() const noexcept
         {
             std::unique_lock<mutex_type> l(mtx_);
             return counter_ == 0;

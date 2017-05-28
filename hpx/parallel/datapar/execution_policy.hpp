@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/executors/executor_parameters.hpp>
@@ -25,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class dataseq_task_policy is an execution
@@ -1343,7 +1342,7 @@ namespace hpx { namespace parallel { namespace execution
 #if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     using dataseq_task_execution_policy = execution::dataseq_task_policy;

@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_EXECUTOR_PARAMETER_TRAITS_JUL_30_2015_0914PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
@@ -22,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     // Placeholder type to use predefined executor parameters

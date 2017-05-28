@@ -63,7 +63,7 @@ struct HPX_EXPORT sed_transform
         std::string const& input
         ) const;
 
-    explicit operator bool() const HPX_NOEXCEPT
+    explicit operator bool() const noexcept
     {
         // avoid compiler warning about conversion to bool
         return command_.get() ? true : false;

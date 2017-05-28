@@ -12,7 +12,6 @@
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information_fwd.hpp>
 
@@ -28,7 +27,7 @@ namespace hpx { namespace threads
         std::size_t thread_num);
 }}
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3) { namespace detail
+namespace hpx { namespace parallel { inline namespace v3 { namespace detail
 {
         /// \cond NOINTERNAL
         template <typename Parameters>

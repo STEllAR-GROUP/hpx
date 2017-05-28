@@ -15,7 +15,7 @@
 #include <string>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT noexcept
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ namespace hpx
                 return "";
             }
 
-            std::string message(int) const HPX_NOEXCEPT
+            std::string message(int) const noexcept
             {
                 return "";
             }

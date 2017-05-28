@@ -24,7 +24,6 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -39,7 +38,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // for_each_n
@@ -106,8 +105,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               , proj_(std::forward<Proj_>(proj))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             for_each_iteration(for_each_iteration const&) = default;
             for_each_iteration(for_each_iteration&&) = default;
 #else
@@ -487,7 +485,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_address<
                     typename hpx::util::decay<F>::type
@@ -501,7 +499,7 @@ namespace hpx { namespace traits
     {
         static char const* call(
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_annotation<
                     typename hpx::util::decay<F>::type
