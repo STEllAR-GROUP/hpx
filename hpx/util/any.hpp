@@ -1009,6 +1009,7 @@ namespace hpx { namespace util
             bool flush(void* dst, std::size_t dst_count,
                 std::size_t& written)
             {
+                written = dst_count;
                 return true;
             }
 

@@ -120,7 +120,8 @@ namespace hpx { namespace serialization
                 binary_filter* filter = nullptr)
           : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
-                typename detail::access_data<Container>::preprocessing_only()))
+                typename traits::serialization_access_data<Container>::
+                    preprocessing_only()))
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
