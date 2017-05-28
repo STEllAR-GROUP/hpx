@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : is_heap_until::algorithm("is_heap_until")
             {}
 
-            template <typename ExPolicy, typename RandIter, typename Comp>
+            template <typename ExPolicy, typename Comp>
             static RandIter
             sequential(ExPolicy && policy, RandIter first, RandIter last,
                 Comp && comp)
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return std::is_heap_until(first, last, std::forward<Comp>(comp));
             }
 
-            template <typename ExPolicy, typename RandIter, typename Comp>
+            template <typename ExPolicy, typename Comp>
             static typename util::detail::algorithm_result<
                 ExPolicy, RandIter
             >::type

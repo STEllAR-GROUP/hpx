@@ -75,7 +75,7 @@ void test_is_heap_until(ExPolicy policy, IteratorTag, DataType = DataType())
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<DataType>::iterator base_iterator;
+    typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
@@ -100,7 +100,7 @@ void test_is_heap_until(ExPolicy policy, IteratorTag, DataType, Pred pred)
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<DataType>::iterator base_iterator;
+    typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
@@ -125,7 +125,7 @@ void test_is_heap_until_async(ExPolicy policy, IteratorTag, DataType = DataType(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<DataType>::iterator base_iterator;
+    typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
