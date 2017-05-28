@@ -72,6 +72,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_reduction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/if_heap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"

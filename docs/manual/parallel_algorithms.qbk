@@ -271,6 +271,13 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_set_operations.hpp>`]]
 ]
 
+[table Heap operations (In Header: <hpx/include/parallel_algorithm.hpp>)
+    [[Name]     [Description]   [In Header]]
+    [[ [algoref is_heap_until] ]
+     [Returns the first element that breaks a max heap.]
+     [`<hpx/include/is_heap_until.hpp>`]]
+]
+
 [table Minimum/maximum operations (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref max_element] ]
