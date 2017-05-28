@@ -62,6 +62,7 @@ set(tests
     for_loop_strided
     generate
     generaten
+    if_heap_until
     includes
     inclusive_scan
     inclusive_scan_executors_v1
