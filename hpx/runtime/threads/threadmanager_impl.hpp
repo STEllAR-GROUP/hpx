@@ -65,7 +65,7 @@ namespace hpx { namespace threads
 
         ~threadmanager_impl();
 
-        void init(policies::init_affinity_data const& data);
+        void init();
 
         //! FIXME keep this?
         void print_pools();

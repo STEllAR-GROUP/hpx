@@ -44,7 +44,9 @@ namespace hpx { namespace threads { namespace detail
         hpx::state get_state() const;
         hpx::state get_state(std::size_t num_thread) const;
         bool has_reached_state(hpx::state s) const;
-        void init(std::size_t num_threads, policies::init_affinity_data const& data);
+        void init(std::size_t num_threads, std::size_t threads_offset);
+        void init(std::size_t num_threads, std::size_t threads_offset,
+                          policies::init_affinity_data const& data);
 
         std::size_t get_pu_num(std::size_t num_thread) const;
 
@@ -78,7 +80,7 @@ namespace hpx { namespace threads { namespace detail
         void reset_thread_distribution();
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode);
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads, std::size_t thread_offset);
 
         //! used to be templated over the lock. Now not bc can't have templated virtual functions ...
         void stop_locked(std::unique_lock<lcos::local::no_mutex>& l, bool blocking = true);

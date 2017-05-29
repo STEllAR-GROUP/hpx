@@ -18,10 +18,10 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp> //! FIXME remove
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>

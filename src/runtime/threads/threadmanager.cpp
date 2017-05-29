@@ -608,14 +608,16 @@ namespace hpx {
         }
     }
 
-    void threadmanager_impl::init(
-        policies::init_affinity_data const& data)
+    void threadmanager_impl::init()
     {
         auto& rp = hpx::get_resource_partitioner();
+        std::size_t threads_offset = 0;
 
         // initialize all pools
-        for(auto& pool_iter : pools_){
-            pool_iter.first->init(rp.get_num_threads(pool_iter.first->get_pool_name()), data);
+        for(std::size_t i(0); i<pools_.size(); i++){
+            std::size_t num_threads_in_pool = rp.get_num_threads(pools_[i].first->get_pool_name());
+            pools_[i].first->init(num_threads_in_pool, threads_offset);
+            threads_offset += num_threads_in_pool;
         }
     }
 
@@ -1769,25 +1771,18 @@ namespace hpx {
         LTM_(info) << "run: running timer pool";
         timer_pool_.run(false);
 
-/*        // run each thread pool
-        if (default_pool()->get_os_thread_count() != 0 ||
-                default_pool()->has_reached_state(state_running))
-        {
-            return true;    // do nothing if already running
-        }
-        if (!default_pool()->run(lk, rp.get_num_threads(default_pool()->get_pool_name())))
-        {
-            timer_pool_.stop();
-            return false;
-        }*/
+        std::size_t thread_offset = 0;
         for(auto& pool_iter : pools_) {
+            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter.first->get_pool_name());
             if (pool_iter.first->get_os_thread_count() != 0 ||
                 pool_iter.first->has_reached_state(state_running))
             {
+                thread_offset += num_threads_in_pool;
                 return true;    // do nothing if already running
             }
-            if (!pool_iter.first->run(lk, rp.get_num_threads(pool_iter.first->get_pool_name())))
+            if (!pool_iter.first->run(lk, num_threads_in_pool, thread_offset))
             {
+                thread_offset += num_threads_in_pool;
                 timer_pool_.stop();
                 return false;
             }

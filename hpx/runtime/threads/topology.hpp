@@ -222,6 +222,14 @@ namespace hpx { namespace threads
         parse_affinity_options(spec, affinities, 1, 1, affinities.size(),
             num_pus, ec);
     }
+
+    HPX_API_EXPORT void parse_affinity_options_from_resource_partitioner(
+            std::vector<mask_type>& affinities,
+            std::size_t used_cores,
+            std::size_t max_cores,
+            std::vector<std::size_t>& num_pus,
+            error_code& ec = throws);
+
 #endif
 
     /// \endcond

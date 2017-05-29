@@ -54,7 +54,7 @@ namespace hpx {
 
     ////////////////////////////////////////////////////////////////////////
 
-    init_pool_data::init_pool_data(std::string name, scheduling_policy sched)
+    init_pool_data::init_pool_data(std::string const& name, scheduling_policy sched)
         : pool_name_(name),
           scheduling_policy_(sched),
           assigned_pus_(0),
@@ -146,7 +146,8 @@ namespace hpx {
 
     resource_partitioner::resource_partitioner(std::size_t num_special_pools_)
             : thread_manager_(nullptr),
-              topology_(threads::create_topology())
+              topology_(threads::create_topology()),
+              set_affinity_from_resource_partitioner_(false)
     {
         // Reserve the appropriate size of initial thread pools
         initial_thread_pools_.reserve(num_special_pools_ + 1);
@@ -159,25 +160,29 @@ namespace hpx {
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
     }
 
-    void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling cfg)
+    void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling const& cfg)
     {
         // Setup the initial affinity data
         std::size_t pu_offset = hpx::detail::get_pu_offset(cfg);
         std::size_t pu_step = hpx::detail::get_pu_step(cfg);
         std::string affinity_domain = hpx::detail::get_affinity_domain(cfg);
+
+        // if the binding should be set from the user's instructions in int main()
         std::string affinity_desc;
-        std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg, affinity_desc);
+        if(set_affinity_from_resource_partitioner_){
+            affinity_desc = "affinity-from-resource-partitioner";
+        } else {
+            std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg, affinity_desc);
+        }
 
         init_affinity_data_ = threads::policies::init_affinity_data(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
     }
 
     // this function is called in hpx_init, even before the instantiation of the runtime
-    // if a default thread pool has not been created by the user, it does so now
-    // and attributes to it as possible resources all resources that have not been
+    // attributes to default pool all resources that have not been
     // attributed to any other pool.
     // well, in the meantime, this functions does much more:
-    // -1 sets up a default pool
     // -2 checks whether there are oversubscribed PUs
     // -3 sets data member "desired_number_threads" for each pool
     //! FIXME rename this function
@@ -207,12 +212,7 @@ namespace hpx {
 
         // make sure the sum of the number of desired threads is strictly smaller
         // than the total number of OS-threads that will be created (specified by --hpx:threads)
-        //! FIXME should we check whether it's an exact match?
-        if(num_threads_desired_total >= affinity_data_.get_num_threads()){
-            //! FIXME add allow-empty-default-pool policy
-            /*if(allow-empty-pool-policy){
-                if(num_threads_desired_total > )
-                    throw ;*/
+        if(num_threads_desired_total > affinity_data_.get_num_threads()){
             throw std::invalid_argument("The desired number of threads is greater than the number of threads provided in the command line. \n");
             //! FIXME give indication: --hpx:threads N >= (num_threads_desired_total+1)
         }
@@ -221,26 +221,27 @@ namespace hpx {
         // set its number of threads (all that's left over from the number specified in
         // command line.
         //! FIXME is this right, or should we add all free resources to the default pool,
-        //! even though the user has not assigned these to the default pool himself?
+        //! FIXME even though the user has not assigned these to the default pool himself?
         if(threads::any(get_default_pool()->get_pus())) {
-            get_default_pool()->set_thread_num(affinity_data_.get_num_threads() - num_threads_desired_total);
             return;
         }
 
-        // take all resources that have not been assigned to any thread pool yet
-        // and give them to the default pool
-        //! get a mask of all used PUs by doing a bitwise or on all the masks
+        // Get a mask of all used PUs by doing a bitwise or on all the masks
         std::size_t num_pus = topology_.get_number_of_pus();
         threads::mask_type cummulated_pu_usage = threads::mask_type(0);
         for(auto itp : initial_thread_pools_) {
             cummulated_pu_usage = cummulated_pu_usage | itp.get_pus();
         }
 
+        // If the user did not assign any resources to the default pool
+        //! FIXME should I do this even if the user did assign some resources, but there still are some left?
+        // take all resources that have not been assigned to any thread pool yet
+        // and give them to the default pool
         threads::mask_type default_mask = threads::not_(cummulated_pu_usage);
         //! cut off the bits that are above hardware concurrency ...
         default_mask &= threads::mask_type((1<<topology_.get_number_of_pus()) - 1);
 
-        // make sure mask for the default pool has resources in it
+        // make sure the mask for the default pool has resources in it
         //! FIXME add allow-empty-default-pool policy
         if(!threads::any(default_mask))
             throw std::invalid_argument("No processing units left over for the default pool. If you want to allow an empty pool, use allow-empty-default-pool policy");
@@ -273,7 +274,7 @@ namespace hpx {
 
     }
 
-    void resource_partitioner::set_default_schedulers(std::string queueing) {
+    void resource_partitioner::set_default_schedulers(std::string const& queueing) {
 
         // select the default scheduler
         scheduling_policy default_scheduler;
@@ -366,7 +367,7 @@ namespace hpx {
     }
 
     // create a new thread_pool, add it to the RP and return a pointer to it
-    void resource_partitioner::create_thread_pool(std::string name, scheduling_policy sched)
+    void resource_partitioner::create_thread_pool(std::string const& name, scheduling_policy sched)
     {
         if(name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
@@ -384,15 +385,17 @@ namespace hpx {
         initial_thread_pools_.push_back(init_pool_data(name, sched));
     }
 
-    void resource_partitioner::add_resource(std::size_t resource, std::string pool_name){
+    void resource_partitioner::add_resource(std::size_t resource, std::string const& pool_name){
         get_pool(pool_name)->add_resource(resource);
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource_to_default(std::size_t resource){
         add_resource(resource, "default");
+        set_affinity_from_resource_partitioner_ = true;
     }
 
-    void resource_partitioner::set_scheduler(scheduling_policy sched, std::string pool_name){
+    void resource_partitioner::set_scheduler(scheduling_policy sched, std::string const& pool_name){
         get_pool(pool_name)->set_scheduler(sched);
     }
 
@@ -408,7 +411,7 @@ namespace hpx {
 
     // this function is called in the constructor of thread_pool
     // returns a scheduler (moved) that thread pool should have as a data member
-    scheduling_policy resource_partitioner::which_scheduler(std::string pool_name) {
+    scheduling_policy resource_partitioner::which_scheduler(std::string const& pool_name) {
         // look up which scheduler is needed
         scheduling_policy sched_type = get_pool(pool_name)->get_scheduling_policy();
         if(sched_type == unspecified)
@@ -435,10 +438,22 @@ namespace hpx {
         return initial_thread_pools_.size();
     }
 
-    size_t resource_partitioner::get_num_threads(std::string pool_name)
+    size_t resource_partitioner::get_num_threads(std::string const& pool_name)
     {
         return get_pool(pool_name)->get_num_threads();
     }
+
+    init_pool_data* resource_partitioner::get_pool(std::size_t pool_index){
+
+        if(pool_index >= initial_thread_pools_.size()){
+            throw std::invalid_argument(
+                    "Pool index too large: the resource partitioner owns only ... thread pools.\n");
+            //! FIXME Add number of available pools
+        }
+
+        return &(initial_thread_pools_[pool_index]);
+    }
+
 
     std::string resource_partitioner::get_pool_name(size_t index) const {
         if(index >= initial_thread_pools_.size())
@@ -450,9 +465,15 @@ namespace hpx {
         return initial_thread_pools_[index].get_name();
     }
 
+    threads::mask_cref_type resource_partitioner::get_pu_mask(std::size_t num_thread, bool numa_sensitive) const
+    {
+        return affinity_data_.get_pu_mask(num_thread, numa_sensitive, topology_);
+    }
+
+
     ////////////////////////////////////////////////////////////////////////
 
-    std::size_t resource_partitioner::get_pool_index(std::string pool_name) const {
+    std::size_t resource_partitioner::get_pool_index(std::string const& pool_name) const {
         std::size_t N = initial_thread_pools_.size();
         for(size_t i(0); i<N; i++) {
             if (initial_thread_pools_[i].get_name() == pool_name) {
@@ -467,7 +488,7 @@ namespace hpx {
 
     // has to be private bc pointers become invalid after data member thread_pools_ is resized
     // we don't want to allow the user to use it
-    init_pool_data* resource_partitioner::get_pool(std::string pool_name) {
+    init_pool_data* resource_partitioner::get_pool(std::string const& pool_name) {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [&pool_name](init_pool_data itp) -> bool {return (itp.get_name() == pool_name);}

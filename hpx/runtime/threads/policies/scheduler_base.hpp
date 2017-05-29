@@ -11,10 +11,8 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>

@@ -10,6 +10,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>
@@ -959,6 +960,56 @@ namespace hpx { namespace threads
                 }
             }
             break;
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////
+    void parse_affinity_options_from_resource_partitioner(
+        std::vector<mask_type>& affinities,
+        std::size_t used_cores, std::size_t max_cores,
+        std::vector<std::size_t>& num_pus, error_code& ec)
+    {
+        // We need to instantiate a new topology object as the runtime has not
+        // been initialized yet
+        threads::hwloc_topology_info& t = threads::create_topology();
+
+        std::size_t num_threads = affinities.size();
+        num_pus.resize(num_threads);
+
+        // loop on the custom thread-pools to set their thread affinity
+        auto& rpart = hpx::get_resource_partitioner();
+        std::size_t num_pools = rpart.get_num_pools();
+        std::size_t num_threads_offset = 0;
+
+        for (std::size_t num_pool(0); num_pool < num_pools ; num_pool++ ) {
+
+            resource::init_pool_data* init_pool_data_ = rpart.get_pool(num_pool);
+            std::size_t num_threads_in_pool = init_pool_data_->get_num_threads();
+            mask_type pus = init_pool_data_->get_pus();
+
+            for (std::size_t num_thread = 0; num_thread < num_threads_in_pool; num_thread++){
+
+                std::size_t num_thread_glob = num_threads_offset + num_thread;
+
+                if (any(affinities[num_thread_glob]))
+                {
+                    HPX_THROWS_IF(ec, bad_parameter,
+                                  "parse_affinity_options_from_resource_partitioner",
+                                  boost::str(boost::format(
+                                          "affinity mask for thread %1% has "
+                                                  "already been set"
+                                  ) % num_thread));
+                    return;
+                }
+
+                std::size_t num_pu = threads::find_first(pus);
+                threads::unset(pus, num_pu);
+                affinities[num_thread_glob] = t.init_thread_affinity_mask(num_pu);
+                num_pus[num_thread_glob] = num_thread_glob;
+
+            }
+
+            num_threads_offset += num_threads_in_pool;
+
         }
     }
 }}

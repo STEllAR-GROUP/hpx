@@ -47,7 +47,7 @@ namespace hpx {
     class init_pool_data {
     public:
 
-        init_pool_data(std::string name, scheduling_policy = scheduling_policy::unspecified);
+        init_pool_data(std::string const& name, scheduling_policy = scheduling_policy::unspecified);
 
         // set functions
         void set_scheduler(scheduling_policy sched);
@@ -84,21 +84,21 @@ namespace hpx {
         void print_init_pool_data() const;
 
         // create a new thread_pool, add it to the RP and return a pointer to it
-        void create_thread_pool(std::string name, scheduling_policy sched = scheduling_policy::unspecified);
+        void create_thread_pool(std::string const& name, scheduling_policy sched = scheduling_policy::unspecified);
 
         // called in hpx_init run_or_start
-        void set_init_affinity_data(hpx::util::command_line_handling cfg);
+        void set_init_affinity_data(hpx::util::command_line_handling const& cfg);
         void set_default_pool(std::size_t num_threads);
-        void set_default_schedulers(std::string queueing);
+        void set_default_schedulers(std::string const& queueing);
         bool check_oversubscription() const;
         bool check_empty_pools() const;
 
         // setup stuff related to pools
-        void add_resource(std::size_t resource, std::string pool_name);
+        void add_resource(std::size_t resource, std::string const& pool_name);
         void add_resource_to_default(std::size_t resource);
 
         // stuff that has to be done during hpx_init ...
-        void set_scheduler(scheduling_policy sched, std::string pool_name);
+        void set_scheduler(scheduling_policy sched, std::string const& pool_name);
         void set_threadmanager(threads::threadmanager_base* thrd_manag);
         threads::threadmanager_base* get_thread_manager() const;
 
@@ -116,31 +116,33 @@ namespace hpx {
         void init_rp();
 
         // called in runtime::assign_cores()
-        size_t init(threads::policies::init_affinity_data data){
+        size_t init(threads::policies::init_affinity_data const& data){
             std::size_t ret = affinity_data_.init(data, topology_);
-            thread_manager_->init(data);
+            thread_manager_->init();
             return ret;
         }
 
         ////////////////////////////////////////////////////////////////////////
 
-        scheduling_policy which_scheduler(std::string pool_name);
+        scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology& get_topology() const;
         threads::policies::init_affinity_data get_init_affinity_data() const;
         size_t get_num_pools() const;
-        size_t get_num_threads(std::string pool_name);
+        size_t get_num_threads(std::string const& pool_name);
+        init_pool_data* get_pool(std::size_t pool_index);
         std::string get_pool_name(size_t index) const;
+        threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
 
     private:
 
         ////////////////////////////////////////////////////////////////////////
 
         //! this is ugly, I should probably delete it
-        uint64_t get_pool_index(std::string pool_name) const;
+        uint64_t get_pool_index(std::string const& pool_name) const;
 
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
-        init_pool_data* get_pool(std::string pool_name);
+        init_pool_data* get_pool(std::string const& pool_name);
         init_pool_data* get_default_pool();
 
         ////////////////////////////////////////////////////////////////////////
@@ -155,12 +157,13 @@ namespace hpx {
         // pointer to the threadmanager instance
         hpx::threads::threadmanager_base* thread_manager_;
 
-        // reference to the topology
+        // reference to the topology and affinity data
         threads::hwloc_topology_info& topology_;
-
-        // reference to affinity data
         hpx::threads::policies::init_affinity_data init_affinity_data_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
+
+        // flag set by add_resource
+        bool set_affinity_from_resource_partitioner_;
     };
 
     } // namespace resource

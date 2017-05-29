@@ -71,7 +71,8 @@ int main(int argc, char* argv[])
 
     rp.add_resource(1, "first_pool");
     rp.add_resource(0, "second_pool");
-//    rp.add_resource_to_default(2);
+    rp.add_resource_to_default(1);
+    rp.add_resource_to_default(3);
 
     std::cout << "[main] " << "resources added to thread_pools \n";
     std::cout << "[main] " << "Calling hpx::init... \n";

@@ -93,7 +93,25 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
         else if (data.affinity_desc_ == "affinity-from-resource-partitioner")
         {
-            //! TODO
+            affinity_masks_.clear();
+            affinity_masks_.resize(num_threads_, 0);
+
+            for (std::size_t i = 0; i != num_threads_; ++i) {
+                threads::resize(affinity_masks_[i], num_system_pus);
+            }
+
+            parse_affinity_options_from_resource_partitioner(
+                    affinity_masks_, data.used_cores_, max_cores, pu_nums_);
+
+            std::size_t num_initialized = count_initialized(affinity_masks_);
+            if (num_initialized != num_threads_) {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                                    "affinity_data::affinity_data",
+                                    boost::str(
+                                            boost::format("The number of OS threads requested "
+                                                                  "(%1%) does not match the number of threads to "
+                                                                  "bind (%2%)") % num_threads_ % num_initialized));
+            }
         }
         else if (!data.affinity_desc_.empty())
         {
@@ -180,8 +198,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return m;
     }
 
-    mask_cref_type affinity_data::get_pu_mask(topology const& topology,
-        std::size_t num_thread, bool numa_sensitive) const
+    mask_cref_type affinity_data::get_pu_mask(std::size_t num_thread, bool numa_sensitive) const
+    {
+        topology const& topology = get_topology();
+        return get_pu_mask(num_thread, numa_sensitive, topology);
+    }
+
+
+    mask_cref_type affinity_data::get_pu_mask(std::size_t num_thread, bool numa_sensitive, topology const& topology) const
     {
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, num_thread))

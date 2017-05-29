@@ -105,16 +105,26 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    void thread_pool_impl<Scheduler>::init(
-            std::size_t num_threads,
-            policies::init_affinity_data const& data)
+    void thread_pool_impl<Scheduler>::init(std::size_t num_threads,
+        std::size_t threads_offset)
     {
-        topology const& topology_ = get_topology(); //! FIXME this should go ...
-
         resize(used_processing_units_, threads::hardware_concurrency());
         for (std::size_t i = 0; i != num_threads; ++i)
-            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, i, sched_.numa_sensitive());
+            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(threads_offset+i, sched_.numa_sensitive());
+    }
 
+    template <typename Scheduler>
+    void thread_pool_impl<Scheduler>::init(std::size_t num_threads,
+        std::size_t threads_offset, policies::init_affinity_data const& data)
+    {
+        resize(used_processing_units_, threads::hardware_concurrency());
+        for (std::size_t i = 0; i != num_threads; ++i) {
+            //! FIXME this is called in cstr of thread_pool_os_executor
+            //! how should data actually be used?
+//            used_processing_units_ |= data.get_pu_mask(threads_offset+i, sched_.numa_sensitive());
+            used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(threads_offset + i,
+                                                                                                  sched_.numa_sensitive());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,12 +134,12 @@ namespace hpx { namespace threads { namespace detail
         return get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
     }
 
-        template <typename Scheduler>
-        mask_cref_type thread_pool_impl<Scheduler>::get_pu_mask(
-                topology const& topology, std::size_t num_thread) const
-        {
-            return get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, sched_.numa_sensitive());
-        }
+    template <typename Scheduler>
+    mask_cref_type thread_pool_impl<Scheduler>::get_pu_mask(
+            topology const& topology, std::size_t num_thread) const
+    {
+        return get_resource_partitioner().get_affinity_data()->get_pu_mask(num_thread, sched_.numa_sensitive());
+    }
 
 
         template <typename Scheduler>
@@ -238,7 +248,7 @@ namespace hpx { namespace threads { namespace detail
         ///////////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
         bool thread_pool_impl<Scheduler>::run(std::unique_lock<compat::mutex>& l,
-                                         std::size_t num_threads)
+                                         std::size_t num_threads, std::size_t thread_offset)
         {
             HPX_ASSERT(l.owns_lock());
 
@@ -346,14 +356,15 @@ namespace hpx { namespace threads { namespace detail
 
                 topology const& topology_ = get_topology();
 
-                std::size_t thread_num = num_threads;
-                while (thread_num-- != 0) {
+                for(std::size_t thread_num_(0); thread_num_ < num_threads; thread_num_++)
+                {
+                    std::size_t thread_num = thread_offset + thread_num_;
                     threads::mask_cref_type mask =
-                            get_resource_partitioner().get_affinity_data()->get_pu_mask(topology_, thread_num, sched_.numa_sensitive());
+                            get_resource_partitioner().get_affinity_data()->get_pu_mask(thread_num, sched_.numa_sensitive());
 
                     LTM_(info) //-V128
                             << "thread_pool::run: " << id_.name_
-                            << " create OS thread " << thread_num //-V128
+                            << " create OS thread " << thread_num //-V128 //! BOTH?
                             << ": will run on processing units within this mask: "
                             #if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
@@ -539,8 +550,7 @@ namespace hpx { namespace threads { namespace detail
                                                  topology const& topology, compat::barrier& startup)
         {
             // Set the affinity for the current thread.
-            threads::mask_cref_type mask =
-                    get_resource_partitioner().get_affinity_data()->get_pu_mask(topology, num_thread, sched_.numa_sensitive());
+            threads::mask_cref_type mask = get_resource_partitioner().get_pu_mask(num_thread, sched_.numa_sensitive());
 
             if (LHPX_ENABLED(debug))
                 topology.write_to_log();

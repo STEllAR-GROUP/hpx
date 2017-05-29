@@ -60,7 +60,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       : scheduler_(num_punits),
         executor_name_(get_unique_name()),
         notifier_(get_notification_policy(executor_name_.c_str())),
-        //! FIXME the "index" data member of thread-pool is just set to 0
+        //! FIXME the "index" data member of thread-pool is just set to 0... should it do something different?
+        //! eg querry RP for available thread num?
         pool_(new hpx::threads::detail::thread_pool_impl<Scheduler>(scheduler_, notifier_, 0, executor_name_.c_str())),
         num_threads_(num_punits)
     {
@@ -77,9 +78,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // initialize the affinity configuration for this scheduler
         threads::policies::init_affinity_data data("pu", affinity_desc);
-        pool_->init(num_threads_, data);
+        pool_->init(num_threads_, 0, data);
 
-        if (!pool_->run(lk, num_threads_))
+        if (!pool_->run(lk, num_threads_, 0))
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",

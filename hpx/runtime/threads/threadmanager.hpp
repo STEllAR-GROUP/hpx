@@ -61,7 +61,7 @@ namespace threads
 
         virtual ~threadmanager_base() {}
 
-        virtual void init(policies::init_affinity_data const& data) = 0;
+        virtual void init() = 0;
 
         //! FIXME keep this?
         virtual void print_pools() = 0;
