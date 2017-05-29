@@ -210,6 +210,10 @@ namespace resource
                 pu_offset, pu_step, affinity_domain, affinity_desc);
     }
 
+    void resource_partitioner::set_affinity_data(std::size_t num_threads) {
+        affinity_data_.set_num_threads(num_threads);
+    }
+
     void resource_partitioner::fill_topology_vectors()
     {
         std::size_t pid = 0;
@@ -240,14 +244,13 @@ namespace resource
         }
     }
 
-    // this function is called in hpx_init, even before the instantiation of the runtime
-    // attributes to default pool all resources that have not been
-    // attributed to any other pool.
-    // well, in the meantime, this functions does much more:
+    // This function is called in hpx_init, before the instantiation of the runtime
+    // it takes care of all the initialization of the initial pool data held by the resource partitioner
+    // -1 checks whether there are empty pools
     // -2 checks whether there are oversubscribed PUs
-    // -3 sets data member "desired_number_threads" for each pool
-    //! FIXME rename this function
-    void resource_partitioner::set_default_pool(std::size_t num_threads) {
+    // -3 sets data member thread_num for each pool
+    // -4 sets up the default pool
+    void resource_partitioner::setup_pools(std::size_t num_threads) {
 
         // check whether any of the pools defined up to now are empty
         // note: does not check "default", this one is allowed not to be given resources by the user
@@ -508,13 +511,11 @@ namespace resource
         get_pool(pool_name)->set_scheduler(sched);
     }
 
-    void resource_partitioner::init_rp(){
-
-        //! FIXME
-        //! copy all the little setups done in hpx_init
-        //! and stick the here
-        //! (this should be private)
-
+    void resource_partitioner::init_resources(util::command_line_handling cfg){
+        set_init_affinity_data(cfg);
+        set_affinity_data(cfg.num_threads_);
+        setup_pools(cfg.num_threads_);
+        set_default_schedulers(cfg.queuing_);
     }
 
     ////////////////////////////////////////////////////////////////////////

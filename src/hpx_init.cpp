@@ -629,11 +629,7 @@ namespace hpx
 
                 // Setup all parameters of the resource_partitioner
                 auto &rp = hpx::get_resource_partitioner();
-                rp.set_init_affinity_data(cfg);
-                rp.set_affinity_data(cfg.num_threads_);
-                rp.set_default_pool(cfg.num_threads_);
-                rp.set_default_schedulers(cfg.queuing_);
-                //! FIXME when I'm done, move all the above to rp.init_rp();
+                rp.init_resources(cfg);
 
                 // initialize logging
                 util::detail::init_logging(cfg.rtcfg_,

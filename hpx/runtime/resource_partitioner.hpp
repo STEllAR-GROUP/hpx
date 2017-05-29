@@ -110,13 +110,6 @@ namespace resource
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(const std::string &name, scheduling_policy sched = scheduling_policy::unspecified);
 
-        // called in hpx_init run_or_start
-        void set_init_affinity_data(hpx::util::command_line_handling const& cfg);
-        void set_default_pool(std::size_t num_threads);
-        void set_default_schedulers(const std::string &queueing);
-        bool check_oversubscription() const;
-        bool check_empty_pools() const;
-
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
         void add_resource(const hpx::resource::pu &p,
@@ -140,18 +133,14 @@ namespace resource
         void set_threadmanager(threads::threadmanager_base* thrd_manag);
         threads::threadmanager_base* get_thread_manager() const;
 
-        // called in hpx_init
-        void set_affinity_data(std::size_t num_threads) {
-            affinity_data_.set_num_threads(num_threads);
-        }
-
         // called by constructor of scheduler_base
         threads::policies::detail::affinity_data* get_affinity_data() {
             return &affinity_data_;
         }
 
+        // Does initialization of all resources and internal data of the resource partitioner
         // called in hpx_init
-        void init_rp();
+        void init_resources(util::command_line_handling cfg);
 
         // called in runtime::assign_cores()
         size_t init(threads::policies::init_affinity_data data) {
@@ -178,6 +167,17 @@ namespace resource
         ////////////////////////////////////////////////////////////////////////
 
         void fill_topology_vectors();
+
+        ////////////////////////////////////////////////////////////////////////
+
+        // called in hpx_init run_or_start
+        void set_init_affinity_data(hpx::util::command_line_handling const& cfg);
+        void set_affinity_data(std::size_t num_threads);
+        void setup_pools(std::size_t num_threads);
+        void set_default_schedulers(const std::string &queueing);
+        bool check_oversubscription() const;
+        bool check_empty_pools() const;
+
 
         //! this is ugly, I should probably delete it
         uint64_t get_pool_index(const std::string &pool_name) const;
