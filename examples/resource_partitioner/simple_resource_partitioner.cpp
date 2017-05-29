@@ -46,19 +46,21 @@ int hpx_main(int argc, char* argv[])
     print_system_characteristics();
 
     // get executors
+    hpx::threads::executors::customized_pool_executor my_exec_single("single_thread");
+    std::cout << "\n\n[hpx_main] got customized executor " << "\n";
+
+/*    // get executors
     hpx::threads::executors::customized_pool_executor my_exec1("first_core");
     std::cout << "\n\n[hpx_main] got customized executor " << "\n";
 
     // get executors
     hpx::threads::executors::customized_pool_executor my_exec2("last_core");
-    std::cout << "\n\n[hpx_main] got customized executor " << "\n";
+    std::cout << "\n\n[hpx_main] got customized executor " << "\n"; */
 
     // use these executors to schedule work
-    my_exec1.add(std::bind(&do_stuff, 16));
+    hpx::future<void> future_1 = hpx::async(my_exec_single, &do_stuff, 32);
 
-    hpx::future<void> future_1 = hpx::async(my_exec1, &do_stuff, 32);
-
-    auto future_2 = future_1.then(my_exec2, [](hpx::future<void> &&f) {
+    auto future_2 = future_1.then(my_exec_single, [](hpx::future<void> &&f) {
         do_stuff(64);
     });
 
@@ -75,14 +77,13 @@ int main(int argc, char* argv[])
     auto &topo = rp.get_topology();
     std::cout << "[main] " << "obtained reference to the resource_partitioner\n";
 
-    rp.create_thread_pool("first_core");
-    rp.create_thread_pool("last_core", hpx::resource::abp_priority);
+//    rp.create_thread_pool("first_core");
+//    rp.create_thread_pool("last_core", hpx::resource::abp_priority);
     rp.create_thread_pool("single_thread");
     std::cout << "[main] " << "thread_pools created \n";
 
-    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "first_core");
-    rp.add_resource(rp.get_numa_domains().back().cores_.back().pus_,  "last_core");
-    //
+//    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "first_core");
+//    rp.add_resource(rp.get_numa_domains().back().cores_.back().pus_,  "last_core");
     for (const hpx::resource::numa_domain &d : rp.get_numa_domains()) {
         for (const hpx::resource::core &c : d.cores_) {
             for (const hpx::resource::pu &p : c.pus_) {

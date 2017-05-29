@@ -150,20 +150,6 @@ namespace resource
         num_threads_ = num_threads;
     }
 
-    //! FIXME this isn't needed any more, right??
-    void print_vector(std::vector<size_t> const& v){
-        std::size_t s = v.size();
-        if(s==0) {
-            std::cout << "(empty)\n";
-            return;
-        }
-        std::cout << v[0] ;
-        for(size_t i(1); i<s ;i++){
-            std::cout << ", " << v[i];
-        }
-        std::cout << "\n";
-    }
-
     void init_pool_data::print_pool() const {
         std::cout << "[pool \"" << pool_name_ << "\"] with scheduler " ;
         std::string sched;
@@ -182,7 +168,6 @@ namespace resource
         std::cout << "\"" << sched << "\"\n"
                   << "is running on PUs : ";
         std::cout << bitset_type(assigned_pus_) << "\n";
-        //! FIXME how can I have hpx::threads::hardware_concurrency(); as template param of bitset, s.t. correct length is printed?
     }
 
 
