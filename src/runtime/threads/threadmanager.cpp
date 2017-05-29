@@ -646,7 +646,8 @@ namespace hpx {
         }
 
         auto pool = std::find_if(
-                pools_.begin(), pools_.end(), //! FIXME don't start at begin() since the first one is the default, start one further
+                // don't start at begin() since the first one is the default, start one further
+                ++pools_.begin(), pools_.end(),
                 [&pool_name](std::pair<pool_type,scheduler_type> itp) -> bool {
                     return (itp.first->get_pool_name() == pool_name);}
         );
@@ -669,7 +670,8 @@ namespace hpx {
         }
 
         auto pool = std::find_if(
-                pools_.begin(), pools_.end(), //! FIXME don't start at begin() since the first one is the default, start one further
+                // don't start at begin() since the first one is the default, start one further
+                ++pools_.begin(), pools_.end(),
                 [&pool_name](std::pair<pool_type,scheduler_type> itp) -> bool {
                     return (itp.first->get_pool_name() == pool_name);}
         );

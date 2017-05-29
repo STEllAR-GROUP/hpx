@@ -645,6 +645,7 @@ namespace hpx
                 std::unique_ptr<hpx::runtime> rt(
                         new runtime_type(cfg.rtcfg_, cfg, cfg.mode_, cfg.num_threads_));
                 //! FIXME give only the parts of cfg that are needed for the initialization of the scheduler
+                //! FIXME who should own cfg? RT or RP?
 
                 result = run_or_start(blocking, std::move(rt), cfg,
                                     std::move(startup), std::move(shutdown));

@@ -67,7 +67,7 @@ namespace hpx { namespace threads
 
         void init();
 
-        //! FIXME keep this?
+        //! FIXME move to private and add --hpx:printpools cmd line option
         void print_pools();
 
         // Get functions

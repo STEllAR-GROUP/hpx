@@ -85,7 +85,6 @@ namespace resource
 
         // mechanism for adding resources
         // index is zero-based
-        //! FIXME overloads to add cores, sockets etc.
         void add_resource(std::size_t pu_index);
 
         void print_pool() const;
@@ -105,7 +104,6 @@ namespace resource
         resource_partitioner(std::size_t num_special_pools_ = 0);
 
         void print_init_pool_data() const;
-
 
         // create a new thread_pool, add it to the RP and return a pointer to it
         void create_thread_pool(const std::string &name, scheduling_policy sched = scheduling_policy::unspecified);

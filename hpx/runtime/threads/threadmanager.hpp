@@ -63,7 +63,7 @@ namespace threads
 
         virtual void init() = 0;
 
-        //! FIXME keep this?
+        //! FIXME put in private and add --hpx:print_pools command-line option
         virtual void print_pools() = 0;
 
         // Get functions
@@ -163,18 +163,12 @@ namespace threads
             bool run_now = true, error_code& ec = throws) = 0;
 
         /// \brief  Run the thread manager's work queue. This function
-        ///         instantiates the specified number of OS threads. All OS
-        ///         threads are started to execute the function \a tfunc.
-        ///
-        /// \param num_threads
-        ///               [in] The initial number of threads to be started by
-        ///               this thread manager instance. This parameter is
-        ///               optional and defaults to 1 (one).
+        ///         lets all threadpools instantiate their OS threads. All OS
+        ///         threads are started to execute the function \a thread_func.
         ///
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns
         ///               \a false.
-        //! FIXME parameter is commentary is obsolete
         virtual bool run() = 0;
 
         /// \brief Forcefully stop the thread-manager
