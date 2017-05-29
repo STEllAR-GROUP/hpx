@@ -34,15 +34,20 @@ void test_is_heap_until()
     test_is_heap_until(execution::par, IteratorTag(), user_defined_type());
     test_is_heap_until(execution::par_unseq, IteratorTag(), user_defined_type());
 
-    test_is_heap_until(execution::seq, IteratorTag(), int(), std::greater<int>());
-    test_is_heap_until(execution::par, IteratorTag(), int(), std::less<int>());
-    test_is_heap_until(execution::par_unseq, IteratorTag(), int(), std::greater_equal<int>());
+    test_is_heap_until(execution::seq, IteratorTag(), int(),
+        std::greater<int>());
+    test_is_heap_until(execution::par, IteratorTag(), int(),
+        std::less<int>());
+    test_is_heap_until(execution::par_unseq, IteratorTag(), int(),
+        std::greater_equal<int>());
 
     test_is_heap_until_async(execution::seq(execution::task), IteratorTag());
     test_is_heap_until_async(execution::par(execution::task), IteratorTag());
 
-    test_is_heap_until_async(execution::seq(execution::task), IteratorTag(), user_defined_type());
-    test_is_heap_until_async(execution::par(execution::task), IteratorTag(), user_defined_type());
+    test_is_heap_until_async(execution::seq(execution::task), IteratorTag(),
+        user_defined_type());
+    test_is_heap_until_async(execution::par(execution::task), IteratorTag(),
+        user_defined_type());
 }
 
 void is_heap_until_test()

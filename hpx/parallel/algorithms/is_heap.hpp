@@ -33,6 +33,7 @@
 #include <cstddef>
 #include <iterator>
 #include <list>
+#include <vector>
 #include <type_traits>
 #include <utility>
 
@@ -76,11 +77,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel(i);
                                 });
                         },
-                        [tok, second](std::vector<hpx::future<void> > &&) mutable -> RandIter
+                        [tok, second](std::vector<hpx::future<void> > &&) mutable
+                            -> RandIter
                         {
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
-                            
+
                             std::advance(second, find_res);
 
                             return std::move(second);
@@ -124,8 +126,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Returns the upper bound of the largest range beginning at first 
-    /// which is a max heap. That is, the last iterator it for 
+    /// Returns the upper bound of the largest range beginning at first
+    /// which is a max heap. That is, the last iterator it for
     /// which range [first, it) is a max heap. The function
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
@@ -173,8 +175,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a is_heap_until algorithm returns a \a hpx::future<RandIter>
     ///           if the execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a RandIter otherwise.
-    ///           The \a is_heap_until algorithm returns the upper bound 
-    ///           of the largest range beginning at first which is a max heap. 
+    ///           The \a is_heap_until algorithm returns the upper bound
+    ///           of the largest range beginning at first which is a max heap.
     ///           That is, the last iterator it for which range [first, it) is a max heap.
     ///
     template <typename ExPolicy, typename RandIter, typename Comp = detail::less,

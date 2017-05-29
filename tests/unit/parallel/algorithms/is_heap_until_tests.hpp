@@ -36,7 +36,7 @@ struct throw_bad_alloc
     {
         throw std::bad_alloc();
     }
-}; 
+};
 
 struct user_defined_type
 {
