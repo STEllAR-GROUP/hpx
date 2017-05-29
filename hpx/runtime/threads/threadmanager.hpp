@@ -70,7 +70,6 @@ namespace threads
         typedef detail::thread_pool* pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
         virtual pool_type get_pool(std::string pool_name) const = 0;
-        virtual scheduler_type get_scheduler(std::string pool_name) const = 0;
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;

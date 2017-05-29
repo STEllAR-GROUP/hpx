@@ -14,6 +14,10 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+//
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -48,9 +52,16 @@ namespace resource
         std::vector<core> cores_;
     };
 
+    using scheduler_function = std::function<
+        hpx::threads::detail::thread_pool*(
+            hpx::threads::policies::callback_notifier &notifier,
+            std::size_t index, char const* name,
+            hpx::threads::policies::scheduler_mode m)>;
+
     // scheduler assigned to thread_pool
     // choose same names as in command-line options except with _ instead of -
     enum scheduling_policy {
+        user_defined = -2,
         unspecified = -1,
         local = 0,
         local_priority_fifo = 1,
@@ -71,6 +82,9 @@ namespace resource
         init_pool_data(const std::string &name,
             scheduling_policy = scheduling_policy::unspecified);
 
+        init_pool_data(const std::string &name,
+            scheduler_function create_func);
+
         // set functions
         void set_scheduler(scheduling_policy sched);
         void set_mask(threads::mask_type mask);
@@ -89,11 +103,14 @@ namespace resource
 
         void print_pool() const;
 
+        friend class resource_partitioner;
+
     private:
-        std::string pool_name_;
-        scheduling_policy scheduling_policy_;
-        threads::mask_type assigned_pus_; //! PUs this pool is allowed to run on
-        std::size_t num_threads_;
+        std::string         pool_name_;
+        scheduling_policy   scheduling_policy_;
+        threads::mask_type  assigned_pus_; //! PUs this pool is allowed to run on
+        std::size_t         num_threads_;
+        scheduler_function  create_function_;
     };
 
     class HPX_EXPORT resource_partitioner{
@@ -105,8 +122,13 @@ namespace resource
 
         void print_init_pool_data() const;
 
-        // create a new thread_pool, add it to the RP and return a pointer to it
-        void create_thread_pool(const std::string &name, scheduling_policy sched = scheduling_policy::unspecified);
+        // create a thread_pool
+        void create_thread_pool(const std::string &name,
+            scheduling_policy sched = scheduling_policy::unspecified);
+
+        // create a thread_pool with a callback function for creating a custom scheduler
+        void create_thread_pool(const std::string &name,
+            scheduler_function scheduler_creation);
 
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
@@ -155,6 +177,8 @@ namespace resource
         size_t get_num_pools() const;
         size_t get_num_threads(const std::string &pool_name);
         const std::string &get_pool_name(size_t index) const;
+
+        const scheduler_function &get_pool_creator(size_t index) const;
 
         const std::vector<numa_domain> &get_numa_domains() {
             return numa_domains_;

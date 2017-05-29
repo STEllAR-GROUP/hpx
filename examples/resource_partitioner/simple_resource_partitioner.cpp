@@ -10,13 +10,37 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
 //
+// we should not need this
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_impl.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+//
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
 //
 #include <cmath>
 //
+#include "shared_priority_scheduler.hpp"
 #include "system_characteristics.h"
 
+namespace resource {
+namespace pools
+{
+    enum ids {
+        DEFAULT = 0,
+        MPI = 1,
+        GPU = 2,
+        MATRIX = 3,
+};
+}}
+
+template class hpx::threads::detail::thread_pool_impl<
+    hpx::threads::policies::shared_priority_scheduler<
+           hpx::compat::mutex,
+           hpx::threads::policies::lockfree_fifo,
+           hpx::threads::policies::lockfree_fifo,
+           hpx::threads::policies::lockfree_lifo>
+    >;
 
 void do_stuff(std::size_t n){
     std::cout << "[do stuff] " << n << "\n";
@@ -25,7 +49,6 @@ void do_stuff(std::size_t n){
     }
     std::cout << "\n";
 }
-
 
 int hpx_main(int argc, char* argv[])
 {
@@ -46,7 +69,7 @@ int hpx_main(int argc, char* argv[])
     print_system_characteristics();
 
     // get executors
-    hpx::threads::executors::customized_pool_executor my_exec_single("single_thread");
+    hpx::threads::executors::customized_pool_executor my_exec_single("mpi");
     std::cout << "\n\n[hpx_main] got customized executor " << "\n";
 
 /*    // get executors
@@ -55,7 +78,8 @@ int hpx_main(int argc, char* argv[])
 
     // get executors
     hpx::threads::executors::customized_pool_executor my_exec2("last_core");
-    std::cout << "\n\n[hpx_main] got customized executor " << "\n"; */
+    std::cout << "\n\n[hpx_main] got customized executor " << "\n";
+*/
 
     // use these executors to schedule work
     hpx::future<void> future_1 = hpx::async(my_exec_single, &do_stuff, 32);
@@ -69,6 +93,7 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
+
 int main(int argc, char* argv[])
 {
     std::cout << "[main] " << "Starting program... \n";
@@ -76,30 +101,57 @@ int main(int argc, char* argv[])
     auto &rp = hpx::get_resource_partitioner();
     auto &topo = rp.get_topology();
     std::cout << "[main] " << "obtained reference to the resource_partitioner\n";
+    //
 
-//    rp.create_thread_pool("first_core");
-//    rp.create_thread_pool("last_core", hpx::resource::abp_priority);
-    rp.create_thread_pool("single_thread");
+    using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<
+        hpx::compat::mutex,
+        hpx::threads::policies::lockfree_fifo,
+        hpx::threads::policies::lockfree_fifo,
+        hpx::threads::policies::lockfree_lifo>;
+    //hpx::threads::detail::thread_pool_impl<high_priority_sched> *temp = nullptr;
+
+    // resource::pools::ids::MPI
+    rp.create_thread_pool("default", [](
+        hpx::threads::policies::callback_notifier &notifier,
+        std::size_t index, char const* name,
+        hpx::threads::policies::scheduler_mode m)
+    {
+        std::cout << "User defined scheduler creation callback " << std::endl;
+        high_priority_sched::init_parameter_type init(
+                    hpx::get_resource_partitioner().get_num_threads(name),
+                    "shared-priority-scheduler");
+        high_priority_sched* scheduler = new high_priority_sched(init);
+        return new hpx::threads::detail::thread_pool_impl<high_priority_sched>(
+            scheduler, notifier, index, name, m);
+
+    });
+
+    // Create a thread pool with a single core that we will use for all
+    // communication related tasks
+    rp.create_thread_pool("mpi");
     std::cout << "[main] " << "thread_pools created \n";
 
-//    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "first_core");
-//    rp.add_resource(rp.get_numa_domains().back().cores_.back().pus_,  "last_core");
+    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "mpi");
+    std::cout << "[main] " << "resources added to thread_pools \n";
+
+
+/*
     for (const hpx::resource::numa_domain &d : rp.get_numa_domains()) {
         for (const hpx::resource::core &c : d.cores_) {
             for (const hpx::resource::pu &p : c.pus_) {
                 if (p.id_ == rp.get_topology().get_number_of_pus()/2) {
                     rp.add_resource(p, "single_thread");
                 }
-/*
+
                 std::cout << "[PU] number : " << p << " is on ... \n"
                           << "socket    : " << topo.get_socket_number(p) << "\n"
                           << "numa-node : " << topo.get_numa_node_number(p) << "\n"
                           << "core      : " << topo.get_core_number(p) << hpx::flush << "\n";
-*/
+
             }
         }
     }
-    std::cout << "[main] " << "resources added to thread_pools \n";
+*/
 
     std::cout << "[main] " << "Calling hpx::init... \n";
     return hpx::init(argc, argv);

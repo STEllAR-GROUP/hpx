@@ -55,7 +55,7 @@ namespace hpx { namespace threads
         typedef threads::policies::callback_notifier notification_policy_type;
         typedef detail::thread_pool* pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
-        typedef std::vector<std::pair<pool_type, scheduler_type> > pool_and_sched_type;
+        typedef std::vector<pool_type> pool_vector;
 
         threadmanager_impl(
                 util::io_service_pool& timer_pool,
@@ -75,7 +75,6 @@ namespace hpx { namespace threads
         scheduler_type default_scheduler() const;
         pool_type get_pool(std::string pool_name) const;
         pool_type get_pool(detail::pool_id_type pool_id) const;
-        scheduler_type get_scheduler(std::string pool_name) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -167,9 +166,9 @@ namespace hpx { namespace threads
             hpx::state result(last_valid_runtime_state);
 
             typedef boost::atomic<hpx::state> state_type;
-            for (auto& pools_iter : pools_)
+            for (auto& pool_iter : pools_)
             {
-                hpx::state s = pools_iter.first->get_state();
+                hpx::state s = pool_iter->get_state();
                 result = (std::min)(result, s);
             }
 
@@ -209,7 +208,7 @@ namespace hpx { namespace threads
             std::lock_guard<mutex_type> lk(mtx_);
             std::size_t total;
             for(auto& pool_iter : pools_){
-                total += pool_iter.first->get_os_thread_count();
+                total += pool_iter->get_os_thread_count();
             }
             return total;
         }
@@ -246,8 +245,8 @@ namespace hpx { namespace threads
         {
             // propagate the error reporting to all pools, which in turn
             // will propagate to schedulers
-            for(auto& pools_iter : pools_){
-                pools_iter.first->report_error(num_thread, e);
+            for(auto& pool_iter : pools_){
+                pool_iter->report_error(num_thread, e);
             }
         }
 
@@ -328,7 +327,7 @@ namespace hpx { namespace threads
             threads::resize(total_used_processing_punits, hardware_concurrency());
 
             for(auto& pool_iter : pools_) {
-                total_used_processing_punits |= pool_iter.first->get_used_processing_units();
+                total_used_processing_punits |= pool_iter->get_used_processing_units();
             }
 
             return total_used_processing_punits;
@@ -337,14 +336,14 @@ namespace hpx { namespace threads
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
             for(auto& pool_iter : pools_){
-                pool_iter.first->set_scheduler_mode(mode);
+                pool_iter->set_scheduler_mode(mode);
             }
         }
 
         void reset_thread_distribution()
         {
             for(auto& pool_iter : pools_){
-                pool_iter.first->reset_thread_distribution();;
+                pool_iter->reset_thread_distribution();;
             }
         }
 
@@ -399,7 +398,7 @@ namespace hpx { namespace threads
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        pool_and_sched_type pools_;
+        pool_vector pools_;
 
         notification_policy_type& notifier_;
     };

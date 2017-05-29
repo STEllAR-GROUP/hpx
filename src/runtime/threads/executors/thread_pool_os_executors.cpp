@@ -57,12 +57,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     thread_pool_os_executor<Scheduler>::thread_pool_os_executor(
             std::size_t num_punits, std::string const& affinity_desc)
-      : scheduler_(num_punits),
+      : scheduler_(nullptr),
         executor_name_(get_unique_name()),
         notifier_(get_notification_policy(executor_name_.c_str())),
-        //! FIXME the "index" data member of thread-pool is just set to 0... should it do something different?
-        //! eg querry RP for available thread num?
-        pool_(new hpx::threads::detail::thread_pool_impl<Scheduler>(scheduler_, notifier_, 0, executor_name_.c_str())),
+        pool_(nullptr),
         num_threads_(num_punits)
     {
         if (num_punits > hpx::threads::hardware_concurrency())
@@ -73,6 +71,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 "OS-threads");
             return;
         }
+        scheduler_ = new Scheduler(num_punits);
+        pool_.reset(new threads::detail::thread_pool_impl<Scheduler>(
+            scheduler_, notifier_, 0, executor_name_.c_str()));
 
         std::unique_lock<mutex_type> lk(mtx_);
 
@@ -93,7 +94,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        while (!scheduler_.has_reached_state(state_running))
+        while (!scheduler_->has_reached_state(state_running))
             this_thread::suspend();
 
         // inform the scheduler to stop the core
@@ -107,7 +108,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // been initialized)
         for (std::size_t i = 0; i != num_threads_; ++i)
         {
-            hpx::state s = scheduler_.get_state(i).load();
+            hpx::state s = scheduler_->get_state(i).load();
             HPX_ASSERT(s == state_initialized || s == state_stopped);
         }
 //

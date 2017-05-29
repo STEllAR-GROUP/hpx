@@ -291,25 +291,38 @@ namespace hpx {
         // fill the thread-lookup table
         //! bring this down in loop
         for (auto& pool_iter : pools_) {
-            size_t nt = rp.get_num_threads(pool_iter.first->get_pool_name());
+            size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
             for (size_t i(0); i < nt; i++) {
-                threads_lookup_.push_back(pool_iter.first->get_pool_id());
+                threads_lookup_.push_back(pool_iter->get_pool_id());
             }
         }
 
         // instantiate the pools
-        for(size_t i(0); i<num_pools; i++) {
+        for (size_t i(0); i<num_pools; i++) {
 
             name = rp.get_pool_name(i);
             resource::scheduling_policy sched_type = rp.which_scheduler(name);
 
             // make sure the first thread-pool that gets instantiated is the default one
-            if(i == 0){
-                if(name != "default")
-                    throw std::invalid_argument("Trying to instantiate pool " + name + " as first thread pool, but the first thread pool has to be named default");
+            if (i == 0){
+                if (name != "default")
+                    throw std::invalid_argument("Trying to instantiate pool " + name +
+                    " as first thread pool, but first thread pool must be named default");
             }
 
             switch (sched_type) {
+                case -2 : //! user supplied
+                {
+                    const auto &pool_func = rp.get_pool_creator(i);
+                    detail::thread_pool* pool = pool_func(
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(
+                            policies::do_background_work | policies::reduce_thread_priority |
+                            policies::delay_exit)
+                    );
+
+                    pools_.push_back(pool);
+                }
                 case -1 : //! unspecified = -1
                 {
                     throw std::invalid_argument("cannot instantiate a threadmanager if the thread-pool"
@@ -336,7 +349,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 #else
                     throw detail::command_line_error("Command line option "
                         "--hpx:queuing=local "
@@ -368,7 +381,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
                     break;
                 }
@@ -395,7 +408,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
                     break;
                 }
@@ -423,7 +436,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 #else
                     throw detail::command_line_error("Command line option "
                         "--hpx:queuing=static "
@@ -458,7 +471,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
 #else
                     throw detail::command_line_error("Command line option "
@@ -492,7 +505,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
 #else
                     throw detail::command_line_error("Command line option "
@@ -526,7 +539,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
 #else
                     throw detail::command_line_error("Command line option "
@@ -557,7 +570,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
                     break;
                 }
@@ -585,7 +598,7 @@ namespace hpx {
                             policies::scheduler_mode(
                                     policies::do_background_work | policies::reduce_thread_priority |
                                     policies::delay_exit));
-                    pools_.push_back(std::make_pair(pool, sched));
+                    pools_.push_back(pool);
 
 #else
                     throw hpx::detail::command_line_error("Command line option "
@@ -601,10 +614,8 @@ namespace hpx {
 
     threadmanager_impl::~threadmanager_impl()
     {
-        for (pool_and_sched_type::iterator i = pools_.begin();
-             i != pools_.end(); ++i) {
-            delete i->first;
-            delete i->second;
+        for(auto& pool_iter : pools_){
+            delete pool_iter;
         }
     }
 
@@ -614,9 +625,9 @@ namespace hpx {
         std::size_t threads_offset = 0;
 
         // initialize all pools
-        for(std::size_t i(0); i<pools_.size(); i++){
-            std::size_t num_threads_in_pool = rp.get_num_threads(pools_[i].first->get_pool_name());
-            pools_[i].first->init(num_threads_in_pool, threads_offset);
+        for(auto& pool_iter : pools_) {
+            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter->get_pool_name());
+            pool_iter->init(num_threads_in_pool, threads_offset);
             threads_offset += num_threads_in_pool;
         }
     }
@@ -625,19 +636,17 @@ namespace hpx {
     {
         std::cout << "The threadmanager owns "
                   << pools_.size() << " pool(s) : \n";
-        for(auto itp : pools_){
-            itp.first->print_pool();
+        for(auto pool_iter : pools_){
+            pool_iter->print_pool();
         }
     }
 
     threadmanager_impl::pool_type threadmanager_impl::default_pool() const
     {
-        return pools_[0].first;
+        return pools_[0];
     }
-    threadmanager_impl::scheduler_type threadmanager_impl::default_scheduler() const
-    {
-        return pools_[0].second;
-    }
+
+/*
     threadmanager_impl::scheduler_type threadmanager_impl::get_scheduler(std::string pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
@@ -662,6 +671,7 @@ namespace hpx {
                 + pool_name + "\". \n");
         //! FIXME Add names of available pools?
     }
+*/
     threadmanager_impl::pool_type threadmanager_impl::get_pool(std::string pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
@@ -672,13 +682,12 @@ namespace hpx {
         auto pool = std::find_if(
                 // don't start at begin() since the first one is the default, start one further
                 ++pools_.begin(), pools_.end(),
-                [&pool_name](std::pair<pool_type,scheduler_type> itp) -> bool {
-                    return (itp.first->get_pool_name() == pool_name);}
+                [&pool_name](pool_type itp) -> bool {
+                    return (itp->get_pool_name() == pool_name);}
         );
 
         if(pool != pools_.end()){
-            pool_type ret((&(*pool))->first); //! FIXME this is ugly
-            return ret;
+            return *pool;
         }
 
         throw std::invalid_argument(
@@ -701,7 +710,7 @@ namespace hpx {
         std::lock_guard<mutex_type> lk(mtx_);
 
         for(auto& pool_iter : pools_){
-            total_count += pool_iter.first->get_thread_count(state, priority, num_thread, reset);
+            total_count += pool_iter->get_thread_count(state, priority, num_thread, reset);
         }
 
         return total_count;
@@ -717,7 +726,7 @@ namespace hpx {
         bool result = true;
 
         for(auto& pool_iter : pools_){
-            result = result && pool_iter.first->enumerate_threads(f, state);
+            result = result && pool_iter->enumerate_threads(f, state);
         }
 
         return result;
@@ -731,7 +740,7 @@ namespace hpx {
     {
         std::lock_guard<mutex_type> lk(mtx_);
         for(auto& pool_iter : pools_) {
-            pool_iter.first->abort_all_suspended_threads();
+            pool_iter->abort_all_suspended_threads();
         }
     }
 
@@ -746,7 +755,7 @@ namespace hpx {
         bool result = true;
 
         for(auto& pool_iter : pools_) {
-            result = result && pool_iter.first->cleanup_terminated(delete_all);
+            result = result && pool_iter->cleanup_terminated(delete_all);
         }
 
         return result;
@@ -1775,14 +1784,14 @@ namespace hpx {
 
         std::size_t thread_offset = 0;
         for(auto& pool_iter : pools_) {
-            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter.first->get_pool_name());
-            if (pool_iter.first->get_os_thread_count() != 0 ||
-                pool_iter.first->has_reached_state(state_running))
+            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter->get_pool_name());
+            if (pool_iter->get_os_thread_count() != 0 ||
+                pool_iter->has_reached_state(state_running))
             {
                 thread_offset += num_threads_in_pool;
                 return true;    // do nothing if already running
             }
-            if (!pool_iter.first->run(lk, num_threads_in_pool, thread_offset))
+            if (!pool_iter->run(lk, num_threads_in_pool, thread_offset))
             {
                 thread_offset += num_threads_in_pool;
                 timer_pool_.stop();
@@ -1800,7 +1809,7 @@ namespace hpx {
 
         std::unique_lock<mutex_type> lk(mtx_);
         for(auto& pool_iter : pools_) {
-            pool_iter.first->stop(lk, blocking);
+            pool_iter->stop(lk, blocking);
         }
 
         LTM_(info) << "stop: stopping timer pool";
@@ -1818,7 +1827,7 @@ namespace hpx {
         std::int64_t result = 0;
 
         for(auto& pool_iter : pools_) {
-            result += pool_iter.first->get_executed_threads(num, reset);
+            result += pool_iter->get_executed_threads(num, reset);
         }
 
         return result;
@@ -1830,7 +1839,7 @@ namespace hpx {
         std::int64_t result = 0;
 
         for(auto& pool_iter : pools_) {
-            result += pool_iter.first->get_executed_thread_phases(num, reset);
+            result += pool_iter->get_executed_thread_phases(num, reset);
         }
 
         return result;
@@ -1880,7 +1889,7 @@ namespace hpx {
     {
         std::int64_t result = 0;
         for(auto& pool_iter : pools_) {
-            result += pool_iter.first->get_cumulative_duration(num, reset);
+            result += pool_iter->get_cumulative_duration(num, reset);
         }
         return result;
     }

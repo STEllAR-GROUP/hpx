@@ -68,7 +68,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
-    class thread_pool
+    class HPX_EXPORT thread_pool
     {
     public:
         thread_pool(
@@ -112,10 +112,12 @@ namespace hpx { namespace threads { namespace detail
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
-        std::string get_pool_name() const
+        const std::string &get_pool_name() const
         {
             return id_.name_;
         }
+
+        virtual policies::scheduler_base *get_scheduler() const = 0;
 
         virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
         virtual mask_cref_type get_pu_mask(topology const& topology,

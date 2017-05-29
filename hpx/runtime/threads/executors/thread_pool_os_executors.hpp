@@ -93,10 +93,10 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             // the scheduler used by this executor
-            Scheduler scheduler_;
+            Scheduler *scheduler_;
             std::string executor_name_;
             threads::policies::callback_notifier notifier_;
-            threads::detail::thread_pool_impl<Scheduler>* pool_;
+            std::unique_ptr<threads::detail::thread_pool_impl<Scheduler>> pool_;
 
             std::size_t num_threads_;
 

@@ -104,10 +104,25 @@ namespace resource
           assigned_pus_(0),
           num_threads_(0)
     {
-        if(name.empty())
-            throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
+        if (name.empty())
+            throw std::invalid_argument(
+                "cannot instantiate a thread_pool with empty string as a name.");
+        // @TODO, remove unnecessary checks
         threads::resize(assigned_pus_, hpx::threads::hardware_concurrency());
-    };
+    }
+
+    init_pool_data::init_pool_data(const std::string &name,
+        scheduler_function create_func)
+        : pool_name_(name)
+        , scheduling_policy_(user_defined)
+        , assigned_pus_(0)
+        , num_threads_(0)
+        , create_function_(create_func)
+    {
+        if (name.empty())
+            throw std::invalid_argument(
+                "cannot instantiate a thread pool with empty string as a name.");
+    }
 
     const std::string &init_pool_data::get_name() const {
         return pool_name_;
@@ -155,6 +170,7 @@ namespace resource
         std::string sched;
         switch(scheduling_policy_) {
             case -1 : sched = "unspecified";        break;
+            case -2 : sched = "user supplied";      break;
             case 0 : sched = "local";               break;
             case 1 : sched = "local_priority_fifo"; break;
             case 2 : sched = "local_priority_lifo"; break;
@@ -238,7 +254,6 @@ namespace resource
                     p.id_   = pid;
                     p.core_ = &c;
                     pid++;
-                    std::cout << "domain " << nd.id_ << " core " << c.id_ << " pu_id " << p.id_ << "\n";
                 }
             }
         }
@@ -430,14 +445,16 @@ namespace resource
         thread_manager_ = thrd_manag;
     }
 
-    // create a new thread_pool, add it to the RP and return a pointer to it
+    // create a new thread_pool
     void resource_partitioner::create_thread_pool(const std::string &name, scheduling_policy sched)
     {
         if(name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
 
-        if(name == "default")
-            throw std::invalid_argument("cannot instantiate a initial_thread_pool named \"default\". The default pool is instantiated automatically by the resource-partitioner");
+        if (name == "default") {
+            initial_thread_pools_[0] = init_pool_data("default", sched);
+            return;
+        }
 
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
@@ -447,6 +464,27 @@ namespace resource
         }
 
         initial_thread_pools_.push_back(init_pool_data(name, sched));
+    }
+
+    // create a new thread_pool
+    void resource_partitioner::create_thread_pool(const std::string &name, scheduler_function scheduler_creation)
+    {
+        if(name.empty())
+            throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
+
+        if (name == "default") {
+            initial_thread_pools_[0] = init_pool_data("default", scheduler_creation);
+            return;
+        }
+
+        //! if there already exists a pool with this name
+        std::size_t num_thread_pools = initial_thread_pools_.size();
+        for(size_t i(1); i<num_thread_pools; i++) {
+            if(name == initial_thread_pools_[i].get_name())
+                throw std::invalid_argument("there already exists a pool named " + name + ".\n");
+        }
+
+        initial_thread_pools_.push_back(init_pool_data(name, scheduler_creation));
     }
 
     // ----------------------------------------------------------------------
@@ -568,6 +606,13 @@ namespace resource
         return affinity_data_.get_pu_mask(num_thread, numa_sensitive, topology_);
     }
 
+
+    const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {
+        if (index >= initial_thread_pools_.size()) {
+            throw std::invalid_argument("pool requested out of bounds.");
+        }
+        return initial_thread_pools_[index].create_function_;
+    }
 
     ////////////////////////////////////////////////////////////////////////
 
