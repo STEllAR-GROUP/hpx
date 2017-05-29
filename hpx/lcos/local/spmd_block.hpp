@@ -10,6 +10,7 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
+#include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -22,29 +23,6 @@
 
 namespace hpx { namespace lcos { namespace local
 {
-    namespace detail
-    {
-        template <typename T>
-        struct extract_first_parameter
-        {};
-
-        // Specialization for lambdas
-        template <typename ClassType, typename ReturnType>
-        struct extract_first_parameter<ReturnType(ClassType::*)() const>
-        {
-            using type = std::false_type;
-        };
-
-        // Specialization for lambdas
-        template <typename ClassType,
-            typename ReturnType, typename Arg0, typename... Args>
-        struct extract_first_parameter<
-            ReturnType(ClassType::*)(Arg0, Args...) const>
-        {
-            using type = typename std::decay<Arg0>::type;
-        };
-    }
-
     /// The class spmd_block defines an interface for launching
     /// multiple images while giving handles to each image to interact with
     /// the remaining images. The \a define_spmd_block function templates create
@@ -124,15 +102,14 @@ namespace hpx { namespace lcos { namespace local
         using ftype = typename std::decay<F>::type;
 
         using first_type =
-            typename hpx::lcos::local::detail::extract_first_parameter<
-                        decltype(&ftype::operator())>::type;
+            typename hpx::util::first_argument<ftype>::type;
 
         using executor_type =
             typename hpx::util::decay<ExPolicy>::type::executor_type;
 
         static_assert(std::is_same<spmd_block, first_type>::value,
-            "define_spmd_block() needs a lambda that " \
-            "has at least a spmd_block as 1st argument");
+            "define_spmd_block() needs a function or lambda that " \
+            "has at least a local spmd_block as 1st argument");
 
         std::shared_ptr<hpx::lcos::local::barrier> barrier
             = std::make_shared<hpx::lcos::local::barrier>(num_images);
@@ -165,8 +142,7 @@ namespace hpx { namespace lcos { namespace local
         using ftype = typename std::decay<F>::type;
 
         using first_type =
-            typename hpx::lcos::local::detail::extract_first_parameter<
-                        decltype(&ftype::operator())>::type;
+            typename hpx::util::first_argument<ftype>::type;
 
         using executor_type =
             typename hpx::util::decay<ExPolicy>::type::executor_type;

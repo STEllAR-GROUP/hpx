@@ -16,6 +16,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -28,25 +29,6 @@
 
 namespace hpx { namespace lcos
 {
-    namespace detail
-    {
-        template <typename T>
-        struct extract_first_parameter
-        {};
-
-        template <>
-        struct extract_first_parameter< hpx::util::tuple<> >
-        {
-            using type = std::false_type;
-        };
-
-        template <typename Arg0, typename... Args>
-        struct extract_first_parameter< hpx::util::tuple<Arg0, Args...> >
-        {
-            using type = typename std::decay<Arg0>::type;
-        };
-    }
-
     /// The class spmd_block defines an interface for launching
     /// multiple images while giving handles to each image to interact with
     /// the remaining images. The \a define_spmd_block function templates create
@@ -127,8 +109,7 @@ namespace hpx { namespace lcos
             void operator()(std::size_t image_id, Ts && ... ts) const
             {
                 using first_type =
-                    typename hpx::lcos::detail::extract_first_parameter<
-                                typename F::arguments_type>::type;
+                    typename hpx::util::first_argument<F>::type;
 
                 static_assert(std::is_same<hpx::lcos::spmd_block,
                     first_type>::value,
