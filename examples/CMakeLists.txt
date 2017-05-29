@@ -20,7 +20,6 @@ set(subdirs
     jacobi_smp
     nqueen
     performance_counters
-    queue
     quickstart
     qt
     random_mem_access
@@ -31,6 +30,12 @@ set(subdirs
     tuplespace
     transpose
    )
+
+if(HPX_WITH_QUEUE_COMPATIBILITY)
+  set(subdirs ${subdirs}
+      queue
+     )
+endif()
 
 if(HPX_WITH_FORTRAN)
   set(subdirs ${subdirs}
