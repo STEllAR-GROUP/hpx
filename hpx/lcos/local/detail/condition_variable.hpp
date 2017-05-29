@@ -25,6 +25,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 {
     class condition_variable
     {
+    public:
         HPX_NON_COPYABLE(condition_variable);
 
     private:

@@ -695,7 +695,8 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
-            HPX_MOVABLE_ONLY(id_type_impl);
+        public:
+            HPX_NON_COPYABLE(id_type_impl);
 
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);

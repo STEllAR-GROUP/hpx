@@ -52,9 +52,6 @@ namespace hpx { namespace lcos
         template <typename Future, typename F>
         struct wait_each
         {
-        private:
-            HPX_MOVABLE_ONLY(wait_each);
-
         protected:
             void on_future_ready_(threads::thread_id_type const& id)
             {

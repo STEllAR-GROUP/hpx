@@ -195,11 +195,8 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
-    class compose_cb_impl
+    struct compose_cb_impl
     {
-        HPX_MOVABLE_ONLY(compose_cb_impl);
-
-    public:
         template <typename A1, typename A2>
         compose_cb_impl(A1 && f1, A2 && f2)
           : f1_(std::forward<A1>(f1))

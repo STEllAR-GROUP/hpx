@@ -30,6 +30,7 @@ namespace hpx { namespace parcelset { namespace detail
 {
     class HPX_EXPORT per_action_data_counter_registry
     {
+    public:
         HPX_NON_COPYABLE(per_action_data_counter_registry);
 
     public:

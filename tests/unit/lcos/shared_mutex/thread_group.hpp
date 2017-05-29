@@ -32,12 +32,13 @@ namespace test
     class thread_group
     {
     private:
-        HPX_MOVABLE_ONLY(thread_group);
-
         typedef hpx::lcos::local::shared_mutex mutex_type;
 
     public:
         thread_group() {}
+
+        thread_group(thread_group const&) = delete;
+        thread_group& operator=(thread_group const&) = delete;
 
         ~thread_group()
         {

@@ -45,8 +45,7 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(protected_bind);
-            HPX_DELETE_MOVE_ASSIGN(protected_bind);
+            protected_bind& operator=(protected_bind const&) = delete;
         };
     }
 

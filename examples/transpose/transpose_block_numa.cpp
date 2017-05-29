@@ -126,8 +126,6 @@ struct sub_block
     std::uint64_t size_;
     double * data_;
     mode mode_;
-
-    HPX_MOVABLE_ONLY(sub_block);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

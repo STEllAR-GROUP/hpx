@@ -36,7 +36,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:
@@ -94,7 +94,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:

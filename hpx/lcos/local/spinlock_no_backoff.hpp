@@ -39,7 +39,7 @@ namespace hpx { namespace lcos { namespace local
     /// boost::mutex-compatible spinlock class
     struct spinlock_no_backoff
     {
-    private:
+    public:
         HPX_NON_COPYABLE(spinlock_no_backoff);
 
     private:

@@ -30,8 +30,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R, typename ...Ts>
     class packaged_task<R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(packaged_task);
-
         typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:

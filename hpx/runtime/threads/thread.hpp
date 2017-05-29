@@ -54,8 +54,6 @@ namespace hpx
 
         ~thread();
 
-        HPX_MOVABLE_ONLY(thread);
-
     public:
         thread(thread&&) noexcept;
         thread& operator=(thread&&) noexcept;

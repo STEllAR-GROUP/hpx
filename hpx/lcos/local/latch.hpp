@@ -38,6 +38,7 @@ namespace hpx { namespace lcos { namespace local
     ///         synchronize a given number of \a threads.
     class latch
     {
+    public:
         HPX_NON_COPYABLE(latch);
 
     private:

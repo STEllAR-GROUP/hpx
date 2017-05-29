@@ -94,8 +94,7 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(transform_iteration);
-            HPX_DELETE_MOVE_ASSIGN(transform_iteration);
+            transform_iteration& operator=(transform_iteration const&) = delete;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -357,8 +356,8 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(transform_binary_iteration);
-            HPX_DELETE_MOVE_ASSIGN(transform_binary_iteration);
+            transform_binary_iteration& operator=(
+                transform_binary_iteration const&) = delete;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE

@@ -66,6 +66,7 @@ namespace hpx { namespace components { namespace detail
     template<typename T, typename Allocator, typename Mutex = hpx::lcos::local::spinlock>
     class wrapper_heap
     {
+    public:
         HPX_NON_COPYABLE(wrapper_heap);
 
     public:
