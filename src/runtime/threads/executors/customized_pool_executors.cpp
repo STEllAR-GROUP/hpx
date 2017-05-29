@@ -5,22 +5,7 @@
 
 
 #include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
-
-#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
-
-#include <boost/atomic.hpp>
-
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <mutex>
-#include <string>
-#include <utility>
-
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {

@@ -6,28 +6,17 @@
 #ifndef HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 #define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 
-#include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 
-#include <boost/atomic.hpp>
-
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-//! FIXME go over includes ... ??
 
 namespace hpx { namespace threads { namespace executors
 {
