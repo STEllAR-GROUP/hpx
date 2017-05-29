@@ -22,7 +22,8 @@ namespace hpx { namespace parcelset { namespace detail {
     template <typename Parcel, typename Handler, typename Derived>
     struct parcel_await_base : std::enable_shared_from_this<Derived>
     {
-        typedef hpx::util::unique_function_nonser<void(Parcel&&, Handler&&)> put_parcel_type;
+        typedef hpx::util::unique_function_nonser<void(Parcel&&, Handler&&)>
+            put_parcel_type;
 
         parcel_await_base(Parcel&& parcel, Handler&& handler, int archive_flags,
             put_parcel_type pp)
@@ -86,9 +87,11 @@ namespace hpx { namespace parcelset { namespace detail {
     };
 
     struct parcels_await
-      : parcel_await_base<std::vector<parcel>, std::vector<write_handler_type>, parcels_await>
+      : parcel_await_base<std::vector<parcel>, std::vector<write_handler_type>,
+            parcels_await>
     {
-        typedef parcel_await_base<std::vector<parcel>, std::vector<write_handler_type>, parcels_await>
+        typedef parcel_await_base<std::vector<parcel>,
+            std::vector<write_handler_type>, parcels_await>
             base_type;
 
         parcels_await(std::vector<parcel>&& p, std::vector<write_handler_type>&& f,

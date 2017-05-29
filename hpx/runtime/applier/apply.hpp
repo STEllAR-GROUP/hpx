@@ -403,7 +403,8 @@ namespace hpx
                     action_type_(), priority
                 );
 
-            parcelset::detail::parcel_await(std::move(p), parcelset::write_handler_type(), 0,
+            parcelset::detail::parcel_await(std::move(p),
+                parcelset::write_handler_type(), 0,
                 [](parcelset::parcel&& p, parcelset::write_handler_type&&)
                 {
                     hpx::get_runtime().get_parcel_handler()
