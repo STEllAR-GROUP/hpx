@@ -453,6 +453,7 @@ namespace resource
         const std::string &pool_name)
     {
         get_pool(pool_name)->add_resource(p.id_);
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource(const std::vector<pu> &pv,
@@ -461,12 +462,14 @@ namespace resource
         for (const pu &p : pv) {
             add_resource(p, pool_name);
         }
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource(const core &c,
         const std::string &pool_name)
     {
         add_resource(c.pus_, pool_name);
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource(const std::vector<core> &cv,
@@ -475,12 +478,14 @@ namespace resource
         for (const core &c : cv) {
             add_resource(c.pus_, pool_name);
         }
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource(const numa_domain &nd,
         const std::string &pool_name)
     {
         add_resource(nd.cores_, pool_name);
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource(const std::vector<numa_domain> &ndv, const std::string &pool_name)
@@ -488,6 +493,7 @@ namespace resource
         for (const numa_domain &d : ndv) {
             add_resource(d, pool_name);
         }
+        set_affinity_from_resource_partitioner_ = true;
     }
 
     void resource_partitioner::add_resource_to_default(pu resource){
@@ -507,6 +513,7 @@ namespace resource
         //! FIXME
         //! copy all the little setups done in hpx_init
         //! and stick the here
+        //! (this should be private)
 
     }
 
