@@ -394,7 +394,7 @@
 // reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
 // reached, which will clean up the terminated threads for _all_ thread queues.
 #if !defined(HPX_MAX_TERMINATED_THREADS)
-#  define HPX_MAX_TERMINATED_THREADS 1000
+#  define HPX_MAX_TERMINATED_THREADS 25
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
