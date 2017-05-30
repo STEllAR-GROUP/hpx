@@ -6,9 +6,9 @@
 #ifndef HPX_COMPAT_EXCEPTION_HPP
 #define HPX_COMPAT_EXCEPTION_HPP
 
-// hpxinspect:nodeprecatedinclude:boost/exception.hpp
+// hpxinspect:nodeprecatedinclude:boost/exception_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::exception_ptr
-// hpxinspect:nodeprecatedname:boost::make_exception_ptr
+// hpxinspect:nodeprecatedname:boost::copy_exception
 // hpxinspect:nodeprecatedname:boost::current_exception
 // hpxinspect:nodeprecatedname:boost::rethrow_exception
 

@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

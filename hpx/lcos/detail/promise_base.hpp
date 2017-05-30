@@ -9,6 +9,7 @@
 #define HPX_LCOS_DETAIL_PROMISE_BASE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/lcos/local/promise.hpp>

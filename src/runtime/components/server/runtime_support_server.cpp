@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>

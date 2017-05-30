@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_ENCODE_PARCEL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

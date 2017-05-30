@@ -8,6 +8,7 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>

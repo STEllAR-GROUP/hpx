@@ -7,6 +7,7 @@
 #define HPX_ASYNC_APR_16_20012_0225PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>

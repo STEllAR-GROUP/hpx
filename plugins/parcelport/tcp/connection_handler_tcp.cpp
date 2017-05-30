@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>

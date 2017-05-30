@@ -7,6 +7,7 @@
 #define HPX_COMPUTE_HOST_BLOCK_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>

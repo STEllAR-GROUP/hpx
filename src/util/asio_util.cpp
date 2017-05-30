@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
 

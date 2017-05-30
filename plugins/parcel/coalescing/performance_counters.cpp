@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/compat/exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>

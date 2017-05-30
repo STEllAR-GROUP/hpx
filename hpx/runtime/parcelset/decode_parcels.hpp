@@ -8,6 +8,7 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>

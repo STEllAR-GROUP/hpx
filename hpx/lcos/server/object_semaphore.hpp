@@ -8,6 +8,7 @@
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
