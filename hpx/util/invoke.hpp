@@ -127,6 +127,22 @@ namespace hpx { namespace util
         };
     }
 
+    /// Invokes the given callable object f with the content of
+    /// the argument pack vs
+    ///
+    /// \param f Requires to be a callable object.
+    ///          If f is a member function pointer, the first argument in
+    ///          the pack will be treated as the callee (this object).
+    ///
+    /// \param vs An arbitrary pack of arguments
+    ///
+    /// \returns The result of the callable object when it's called with
+    ///          the given argument types.
+    ///
+    /// \throws std::exception like objects thrown by call to object f
+    ///         with the argument types vs.
+    ///
+    /// \note This function is similar to `std::invoke` (C++17)
     template <typename F, typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::result_of<F&&(Ts&&...)>::type
@@ -138,6 +154,10 @@ namespace hpx { namespace util
             std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
+    /// \copydoc invoke
+    ///
+    /// \tparam R The result type of the function when it's called
+    ///           with the content of the given argument types vs.
     template <typename R, typename F, typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     R invoke_r(F&& f, Ts&&... vs)
@@ -147,6 +167,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
     namespace functional
     {
         struct invoke
@@ -175,6 +196,7 @@ namespace hpx { namespace util
             }
         };
     }
+    /// \endcond
 }}
 
 #endif
