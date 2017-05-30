@@ -10,8 +10,12 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
 
-#include <stdexcept>
+#include <cstddef>
+#include <iostream>
 #include <fstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 struct file_wrapper
 {
