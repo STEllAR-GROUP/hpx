@@ -70,7 +70,7 @@ double run_is_heap_until_benchmark_std(int test_count,
 double run_is_heap_until_benchmark_seq(int test_count,
     std::vector<int> const& v)
 {
-    std::cout << "--- run_is_heap_until_benchmark_par ---" << std::endl;
+    std::cout << "--- run_is_heap_until_benchmark_seq ---" << std::endl;
     decltype(std::begin(v)) result;
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 

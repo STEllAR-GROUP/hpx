@@ -47,7 +47,7 @@ struct user_defined_type
     {
         if (this->name < t.name)
             return true;
-        else if (this->name < t.name)
+        else if (this->name > t.name)
             return false;
         else
             return this->val < t.val;
@@ -87,15 +87,15 @@ void test_is_heap(ExPolicy policy, IteratorTag, DataType = DataType(),
 
     if (test_for_is_heap)
     {
-        auto result = hpx::parallel::is_heap(policy,
+        bool result = hpx::parallel::is_heap(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
-        auto solution = std::is_heap(std::begin(c), std::end(c));
+        bool solution = std::is_heap(std::begin(c), std::end(c));
 
         HPX_TEST(result == solution);
     }
     else
     {
-        auto result = hpx::parallel::is_heap_until(policy,
+        iterator result = hpx::parallel::is_heap_until(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
@@ -122,15 +122,15 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
 
     if (test_for_is_heap)
     {
-        auto result = hpx::parallel::is_heap(policy,
+        bool result = hpx::parallel::is_heap(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), pred);
-        auto solution = std::is_heap(std::begin(c), std::end(c), pred);
+        bool solution = std::is_heap(std::begin(c), std::end(c), pred);
 
         HPX_TEST(result == solution);
     }
     else
     {
-        auto result = hpx::parallel::is_heap_until(policy,
+        iterator result = hpx::parallel::is_heap_until(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)), pred);
         auto solution = std::is_heap_until(std::begin(c), std::end(c), pred);
 
@@ -159,8 +159,8 @@ void test_is_heap_async(ExPolicy policy, IteratorTag, DataType = DataType(),
     {
         auto f = hpx::parallel::is_heap(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
-        auto result = f.get();
-        auto solution = std::is_heap(std::begin(c), std::end(c));
+        bool result = f.get();
+        bool solution = std::is_heap(std::begin(c), std::end(c));
 
         HPX_TEST(result == solution);
     }
@@ -168,7 +168,7 @@ void test_is_heap_async(ExPolicy policy, IteratorTag, DataType = DataType(),
     {
         auto f = hpx::parallel::is_heap_until(policy,
             iterator(boost::begin(c)), iterator(boost::end(c)));
-        auto result = f.get();
+        iterator result = f.get();
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
         HPX_TEST(result.base() == solution);
