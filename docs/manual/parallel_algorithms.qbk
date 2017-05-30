@@ -118,7 +118,7 @@ __exception_list__ object.
 
 __hpx__ provides implementations of the following parallel algorithms:
 
-[table Non-modifying Parallel Algorithms (In Header: [headerref hpx/include/parallel_algorithm.hpp])
+[table Non-modifying Parallel Algorithms (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref all_of] ]
      [Checks if a predicate is `true` for all of the elements in a range.]
@@ -223,7 +223,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Modifying Parallel Algorithms (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Modifying Parallel Algorithms (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref copy] ]
      [Copies a range of elements to a new location.]
@@ -332,7 +332,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Set operations on sorted sequences (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Set operations on sorted sequences (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref includes] ]
      [Returns true if one set is a subset of another.]
@@ -361,7 +361,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Minimum/maximum operations (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Minimum/maximum operations (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref max_element] ]
      [Returns the largest element in a range.]
@@ -380,7 +380,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Sorting Operations (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Sorting Operations (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref is_sorted] ]
      [Returns `true` if each element in a range is sorted]
@@ -408,7 +408,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
+[table Numeric Parallel Algorithms (In Header: `<hpx/include/parallel_numeric.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref adjacent_difference] ]
      [Calculates the difference between each element in an input range and the preceding element.]
@@ -446,7 +446,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Dynamic Memory Management (In Header: <hpx/include/parallel_memory.hpp>)
+[table Dynamic Memory Management (In Header: `<hpx/include/parallel_memory.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref uninitialized_copy] ]
      [Copies a range of objects to an uninitialized area of memory.]
@@ -470,7 +470,7 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Index-based for-loops (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Index-based for-loops (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header]]
     [[ [algorefv2 for_loop] ]
      [Implements loop functionality over a range specified by integral or iterator bounds.]
