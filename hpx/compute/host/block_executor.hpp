@@ -182,7 +182,7 @@ namespace hpx { namespace compute { namespace host
             }
             catch (...) {
                 boost::throw_exception(
-                    exception_list(boost::current_exception())
+                    exception_list(compat::current_exception())
                 );
             }
         }
@@ -232,7 +232,7 @@ namespace hpx { namespace compute { namespace host
             }
             catch (...) {
                 boost::throw_exception(
-                    exception_list(boost::current_exception())
+                    exception_list(compat::current_exception())
                 );
             }
         }

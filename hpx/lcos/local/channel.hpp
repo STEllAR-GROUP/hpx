@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_CHANNEL_JUL_23_2016_0707PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos { namespace local
                 if (buffer_.empty())
                     return;
 
-                boost::exception_ptr e;
+                compat::exception_ptr e;
 
                 {
                     util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
@@ -303,7 +303,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Lock>
-            void cancel(boost::exception_ptr const& e, Lock& l)
+            void cancel(compat::exception_ptr const& e, Lock& l)
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 if (pop_active_)
@@ -472,10 +472,10 @@ namespace hpx { namespace lcos { namespace local
 
                 // all pending requests which can't be satisfied have to be
                 // canceled at this point
-                boost::exception_ptr e;
+                compat::exception_ptr e;
                 {
                     util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
-                    e = boost::exception_ptr(
+                    e = compat::exception_ptr(
                         HPX_GET_EXCEPTION(hpx::future_cancelled,
                             "hpx::lcos::local::close",
                             "canceled waiting on this entry"));
@@ -483,7 +483,7 @@ namespace hpx { namespace lcos { namespace local
                 buffer_.cancel(std::move(e), l);
             }
 
-            void set_exception(boost::exception_ptr e)
+            void set_exception(compat::exception_ptr e)
             {
                 std::unique_lock<mutex_type> l(mtx_);
                 closed_ = true;

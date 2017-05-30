@@ -8,12 +8,14 @@
 #define HPX_PARALLEL_UTIL_SCAN_PARTITIONER_DEC_30_2014_0227PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -23,9 +25,7 @@
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/util/unused.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/range/functions.hpp>
 
 #include <algorithm>
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<boost::exception_ptr> errors;
+                std::list<compat::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                        compat::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception());
+                        compat::current_exception());
                 }
             }
         };
@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<boost::exception_ptr> errors;
+                std::list<compat::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -245,10 +245,10 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
+                        compat::current_exception());
                 }
                 catch (...) {
-                    errors.push_back(boost::current_exception());
+                    errors.push_back(compat::current_exception());
                 }
 
                 // wait for all tasks to finish

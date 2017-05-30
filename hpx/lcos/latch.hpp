@@ -7,11 +7,10 @@
 #define HPX_LCOS_LATCH_APR_19_2015_1002AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/server/latch.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -136,12 +135,12 @@ namespace hpx { namespace lcos
             return hpx::async(act, get_id());
         }
 
-        hpx::future<void> set_exception_async(boost::exception_ptr const& e)
+        hpx::future<void> set_exception_async(compat::exception_ptr const& e)
         {
             lcos::server::latch::set_exception_action act;
              return hpx::async(act, get_id(), e);
         }
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(compat::exception_ptr const& e)
         {
             set_exception_async(e).get();
         }

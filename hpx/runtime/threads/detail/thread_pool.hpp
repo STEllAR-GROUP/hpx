@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <cstddef>
@@ -158,13 +158,13 @@ namespace hpx { namespace threads { namespace detail
 
         void do_some_work(std::size_t num_thread);
 
-        void report_error(std::size_t num, boost::exception_ptr const& e);
+        void report_error(std::size_t num, compat::exception_ptr const& e);
 
         Scheduler& get_sched() const
         {
             return sched_;
         }
- 
+
     protected:
         friend struct init_tss_helper<Scheduler>;
 

@@ -6,6 +6,7 @@
 
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -24,8 +25,6 @@
 #include <cstdint>
 #include <string>
 #include <utility>
-
-#include <boost/exception_ptr.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -285,7 +284,7 @@ namespace hpx { namespace parcelset
     {
         if (ec) {
             // all errors during early parcel handling are fatal
-            boost::exception_ptr exception =
+            compat::exception_ptr exception =
                 HPX_GET_EXCEPTION(ec,
                     "early_pending_parcel_handler",
                     "error while handling early parcel: " +

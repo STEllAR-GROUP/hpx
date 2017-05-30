@@ -6,6 +6,7 @@
 
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 
+#include <hpx/compat/exception.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #include <cstddef>
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     }
                     else
                     {
-                        boost::rethrow_exception(
+                        compat::rethrow_exception(
                             hpx::detail::access_exception(local_ec));
                     }
                     return;

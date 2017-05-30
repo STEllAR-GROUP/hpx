@@ -9,6 +9,7 @@
 #if defined(HPX_HAVE_AWAIT)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/future_access.hpp>
 
@@ -18,7 +19,6 @@
 #include <experimental/coroutine>
 #endif
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <exception>
@@ -153,11 +153,11 @@ namespace hpx { namespace lcos { namespace detail
                 std::rethrow_exception(std::move(e));
             }
             catch (...) {
-                this->base_type::set_exception(boost::current_exception());
+                this->base_type::set_exception(compat::current_exception());
             }
         }
 
-        void set_exception(boost::exception_ptr e)
+        void set_exception(compat::exception_ptr e)
         {
             this->base_type::set_exception(std::move(e));
         }

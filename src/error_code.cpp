@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <stdexcept>
@@ -156,7 +156,7 @@ namespace hpx
         exception_ = get_exception_ptr(e);
     }
 
-    error_code::error_code(boost::exception_ptr const& e)
+    error_code::error_code(compat::exception_ptr const& e)
       : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
         exception_(e)
     {}
@@ -166,7 +166,7 @@ namespace hpx
     {
         if (exception_) {
             try {
-                boost::rethrow_exception(exception_);
+                compat::rethrow_exception(exception_);
             }
             catch (boost::exception const& be) {
                 return dynamic_cast<std::exception const*>(&be)->what();

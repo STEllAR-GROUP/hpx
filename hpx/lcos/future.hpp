@@ -8,6 +8,7 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -42,7 +43,6 @@
     #include <hpx/lcos/detail/future_await_traits.hpp>
 #endif
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <iterator>
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace detail
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
-            boost::exception_ptr exception;
+            compat::exception_ptr exception;
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
@@ -113,7 +113,7 @@ namespace hpx { namespace lcos { namespace detail
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
-            boost::exception_ptr exception;
+            compat::exception_ptr exception;
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace detail
             ar << state << value; //-V128
         } else if (f.has_exception()) {
             state = future_state::has_exception;
-            boost::exception_ptr exception = f.get_exception_ptr();
+            compat::exception_ptr exception = f.get_exception_ptr();
             ar << state << exception;
         } else {
             state = future_state::invalid;
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos { namespace detail
         else if (f.has_exception())
         {
             state = future_state::has_exception;
-            boost::exception_ptr exception = f.get_exception_ptr();
+            compat::exception_ptr exception = f.get_exception_ptr();
             ar << state << exception;
         }
         else
@@ -487,7 +487,7 @@ namespace hpx { namespace lcos { namespace detail
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
         //          pointer otherwise.
-        boost::exception_ptr get_exception_ptr() const
+        compat::exception_ptr get_exception_ptr() const
         {
             if (!shared_state_)
             {
@@ -503,7 +503,7 @@ namespace hpx { namespace lcos { namespace detail
             if (!ec)
             {
                 HPX_ASSERT(!has_exception());
-                return boost::exception_ptr();
+                return compat::exception_ptr();
             }
             return hpx::detail::access_exception(ec);
         }
@@ -1372,7 +1372,7 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object which holds the
     // given error
     template <typename T>
-    future<T> make_exceptional_future(boost::exception_ptr const& e)
+    future<T> make_exceptional_future(compat::exception_ptr const& e)
     {
         typedef lcos::detail::future_data<T> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
@@ -1390,7 +1390,7 @@ namespace hpx { namespace lcos
         {
             boost::throw_exception(e);
         } catch (...) {
-            return lcos::make_exceptional_future<T>(boost::current_exception());
+            return lcos::make_exceptional_future<T>(compat::current_exception());
         }
 
         return future<T>();

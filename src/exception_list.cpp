@@ -4,12 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <mutex>
 #include <set>
@@ -55,7 +55,7 @@ namespace hpx
       : hpx::exception(hpx::success)
     {}
 
-    exception_list::exception_list(boost::exception_ptr const& e)
+    exception_list::exception_list(compat::exception_ptr const& e)
       : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
     {
         add(e);
@@ -128,7 +128,7 @@ namespace hpx
         return result;
     }
 
-    void exception_list::add(boost::exception_ptr const& e)
+    void exception_list::add(compat::exception_ptr const& e)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (exceptions_.empty())

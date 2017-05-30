@@ -9,8 +9,7 @@
 #define HPX_RUNTIME_REPORT_ERROR_HPP
 
 #include <hpx/config.hpp>
-
-#include <boost/exception_ptr.hpp>
+#include <hpx/compat/exception.hpp>
 
 #include <cstddef>
 
@@ -18,10 +17,10 @@ namespace hpx
 {
     /// The function report_error reports the given exception to the console
     HPX_API_EXPORT void report_error(std::size_t num_thread,
-        boost::exception_ptr const& e);
+        compat::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
+    HPX_API_EXPORT void report_error(compat::exception_ptr const& e);
 }
 
 #endif

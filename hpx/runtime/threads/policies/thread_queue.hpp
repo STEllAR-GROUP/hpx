@@ -8,6 +8,7 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
@@ -27,7 +28,6 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <cstddef>
@@ -1071,7 +1071,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) {}
         void on_stop_thread(std::size_t num_thread) {}
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
+        void on_error(std::size_t num_thread, compat::exception_ptr const& e) {}
 
     private:
         mutable mutex_type mtx_;                    ///< mutex protecting the members

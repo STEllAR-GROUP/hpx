@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_ALGORITHM_SORT_OCT_2015
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
@@ -26,8 +27,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -157,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     if (left.has_exception() || right.has_exception())
                     {
-                        std::list<boost::exception_ptr> errors;
+                        std::list<compat::exception_ptr> errors;
                         if (left.has_exception())
                             errors.push_back(left.get_exception_ptr());
                         if (right.has_exception())
@@ -206,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
             catch (...) {
                 return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    boost::current_exception());
+                    compat::current_exception());
             }
 
             if (result.has_exception())

@@ -39,6 +39,7 @@
  * be big.
  */
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 
 // This needs to be first for building on Macs
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
@@ -49,7 +50,6 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -270,7 +270,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     return true;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    compat::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
@@ -338,7 +338,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     return;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    compat::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
@@ -580,7 +580,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
             HPX_ASSERT(m_apex_data == 0ull);
 #endif
-            m_type_info = boost::exception_ptr();
+            m_type_info = compat::exception_ptr();
         }
 
         // Cause the coroutine to exit if
@@ -594,7 +594,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        void do_return(context_exit_status status, boost::exception_ptr && info)
+        void do_return(context_exit_status status, compat::exception_ptr && info)
             noexcept
         {
             HPX_ASSERT(status != ctx_not_exited);
@@ -660,7 +660,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
 
         // This is used to generate a meaningful exception trace.
-        boost::exception_ptr m_type_info;
+        compat::exception_ptr m_type_info;
         thread_id_repr_type m_thread_id;
 
         std::size_t continuation_recursion_count_;

@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_MINMAX_JAN_24_2016_0800PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -15,8 +16,6 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -210,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         ->  SegIter
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<compat::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
@@ -504,7 +503,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         ->  result_type
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<compat::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);

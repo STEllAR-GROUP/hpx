@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
                         std::move(hpx::util::get<I>(*result)));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(compat::current_exception());
                 }
             }
 
@@ -221,7 +221,7 @@ namespace hpx { namespace lcos
                     this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(compat::current_exception());
                 }
             }
 

@@ -10,11 +10,11 @@
 #define HPX_THROW_EXCEPTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/error.hpp>
 #include <hpx/exception_fwd.hpp>
 
 #include <boost/current_function.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <string>
@@ -37,20 +37,20 @@ namespace hpx { namespace detail
         exception const& e, std::string const& func);
 
     template <typename Exception>
-    HPX_EXPORT boost::exception_ptr get_exception(Exception const& e,
+    HPX_EXPORT compat::exception_ptr get_exception(Exception const& e,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",
             long line = -1,
             std::string const& auxinfo = "");
 
-    HPX_EXPORT boost::exception_ptr get_exception(
+    HPX_EXPORT compat::exception_ptr get_exception(
             error errcode, std::string const& msg, throwmode mode,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",
             long line = -1,
             std::string const& auxinfo = "");
 
-    HPX_EXPORT boost::exception_ptr get_exception(
+    HPX_EXPORT compat::exception_ptr get_exception(
             boost::system::error_code ec, std::string const& msg, throwmode mode,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",

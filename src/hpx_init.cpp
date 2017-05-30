@@ -10,6 +10,7 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -32,7 +33,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -294,7 +294,7 @@ namespace hpx { namespace detail
             qc->start();
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(boost::current_exception())
+            std::cerr << hpx::diagnostic_information(compat::current_exception())
                 << std::flush;
             hpx::terminate();
         }

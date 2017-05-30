@@ -8,14 +8,13 @@
 #define HPX_LCOS_LOCAL_RECEIVE_BUFFER_MAY_08_2014_1102AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <map>
@@ -55,7 +54,7 @@ namespace hpx { namespace lcos { namespace local
                 promise_.set_value(std::forward<Val>(val));
             }
 
-            bool cancel(boost::exception_ptr const& e)
+            bool cancel(compat::exception_ptr const& e)
             {
                 HPX_ASSERT(can_be_deleted_);
                 if (!value_set_)
@@ -199,7 +198,7 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(boost::exception_ptr const& e)
+        void cancel_waiting(compat::exception_ptr const& e)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -268,7 +267,7 @@ namespace hpx { namespace lcos { namespace local
                 promise_.set_value();
             }
 
-            bool cancel(boost::exception_ptr const& e)
+            bool cancel(compat::exception_ptr const& e)
             {
                 HPX_ASSERT(can_be_deleted_);
                 if (!value_set_)
@@ -412,7 +411,7 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(boost::exception_ptr const& e)
+        void cancel_waiting(compat::exception_ptr const& e)
         {
             std::lock_guard<mutex_type> l(mtx_);
 

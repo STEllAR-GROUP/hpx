@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/compat/exception.hpp>
 #include <hpx/traits/plugin_config_data.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -35,7 +36,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/archive/basic_archive.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -228,7 +228,7 @@ namespace hpx { namespace parcelset
             {
                 if (ec) {
                     // all errors during early parcel handling are fatal
-                    boost::exception_ptr exception =
+                    compat::exception_ptr exception =
                         hpx::detail::get_exception(hpx::exception(ec),
                             "mpi::early_write_handler", __FILE__, __LINE__,
                             "error while handling early parcel: " +

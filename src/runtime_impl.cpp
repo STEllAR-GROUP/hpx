@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
@@ -28,8 +29,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -517,7 +516,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        std::size_t num_thread, boost::exception_ptr const& e)
+        std::size_t num_thread, compat::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
@@ -562,7 +561,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        boost::exception_ptr const& e)
+        compat::exception_ptr const& e)
     {
         return report_error(hpx::get_worker_thread_num(), e);
     }
@@ -575,9 +574,9 @@ namespace hpx {
             std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
-                boost::exception_ptr e = exception_;
-                exception_ = boost::exception_ptr();
-                boost::rethrow_exception(e);
+                compat::exception_ptr e = exception_;
+                exception_ = compat::exception_ptr();
+                compat::rethrow_exception(e);
             }
         }
     }
@@ -634,7 +633,7 @@ namespace hpx {
         get_notification_policy(char const* prefix)
     {
         typedef void (runtime_impl::*report_error_t)(
-            std::size_t, boost::exception_ptr const&);
+            std::size_t, compat::exception_ptr const&);
 
         using util::placeholders::_1;
         using util::placeholders::_2;

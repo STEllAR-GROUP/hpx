@@ -59,7 +59,7 @@ namespace lcos {
                 }
                 catch (...)
                 {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(compat::current_exception());
                 }
             }
 

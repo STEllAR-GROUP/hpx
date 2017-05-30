@@ -186,7 +186,7 @@ struct object_semaphore
 
             catch (...)
             {
-                applier::trigger_error(id, boost::current_exception());
+                applier::trigger_error(id, compat::current_exception());
             }
         }
 

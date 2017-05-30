@@ -10,11 +10,12 @@
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/error.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/exception/error_info.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/throw_exception.hpp>
@@ -361,7 +362,7 @@ namespace hpx
 
         // construct an exception, internal helper
         template <typename Exception>
-        HPX_EXPORT boost::exception_ptr
+        HPX_EXPORT compat::exception_ptr
             construct_exception(Exception const& e,
                 std::string const& func, std::string const& file, long line,
                 std::string const& back_trace = "", std::uint32_t node = 0,
@@ -372,7 +373,7 @@ namespace hpx
                 std::string const& state = "", std::string const& auxinfo = "");
 
         template <typename Exception>
-        HPX_EXPORT boost::exception_ptr
+        HPX_EXPORT compat::exception_ptr
             construct_lightweight_exception(Exception const& e);
 
         // HPX_ASSERT handler
@@ -397,13 +398,13 @@ namespace hpx
 
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
-        HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_terminate(compat::exception_ptr const&);
         HPX_EXPORT void report_exception_and_terminate(hpx::exception const&);
 
         // Report an early or late exception and locally exit execution. There
         // isn't anything more we could do. The exception will be re-thrown
         // from hpx::init
-        HPX_EXPORT void report_exception_and_continue(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_continue(compat::exception_ptr const&);
         HPX_EXPORT void report_exception_and_continue(hpx::exception const&);
     }
     /// \endcond
@@ -449,7 +450,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
-    HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
+    HPX_EXPORT std::string diagnostic_information(compat::exception_ptr const& e);
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -467,7 +468,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \returns    The error message stored in the exception
     ///             If the exception instance does not hold
@@ -490,7 +491,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_what(boost::exception const& e);
-    HPX_EXPORT std::string get_error_what(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_what(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the locality id where the exception was thrown.
@@ -504,7 +505,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \returns    The locality id of the locality where the exception was
     ///             thrown. If the exception instance does not hold
@@ -529,7 +530,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::uint32_t get_error_locality_id(boost::exception const& e);
-    HPX_EXPORT std::uint32_t get_error_locality_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::uint32_t get_error_locality_id(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the locality id where the exception was thrown.
@@ -542,7 +543,7 @@ namespace hpx
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
-    ///             \a hpx::error_code, or \a boost::exception_ptr.
+    ///             \a hpx::error_code, or \a compat::exception_ptr.
     ///
     /// \returns    The error value code of the locality where the exception was
     ///             thrown. If the exception instance does not hold
@@ -566,7 +567,7 @@ namespace hpx
     HPX_EXPORT error get_error(hpx::error_code const& e);
 
     /// \cond NOINTERNAL
-    HPX_EXPORT error get_error(boost::exception_ptr const& e);
+    HPX_EXPORT error get_error(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the hostname of the locality where the exception was
@@ -581,7 +582,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \returns    The hostname of the locality where the exception was
     ///             thrown. If the exception instance does not hold
@@ -605,7 +606,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_host_name(boost::exception const& e);
-    HPX_EXPORT std::string get_error_host_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_host_name(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the (operating system) process id of the locality where
@@ -624,7 +625,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     nothing
     ///
@@ -644,7 +645,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::int64_t get_error_process_id(boost::exception const& e);
-    HPX_EXPORT std::int64_t get_error_process_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::int64_t get_error_process_id(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the environment of the OS-process at the point the
@@ -663,7 +664,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -683,7 +684,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_env(boost::exception const& e);
-    HPX_EXPORT std::string get_error_env(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_env(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the function name from which the exception was thrown.
@@ -701,7 +702,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -721,7 +722,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_function_name(boost::exception const& e);
-    HPX_EXPORT std::string get_error_function_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_function_name(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the stack backtrace from the point the exception was thrown.
@@ -739,7 +740,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -759,7 +760,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_backtrace(boost::exception const& e);
-    HPX_EXPORT std::string get_error_backtrace(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_backtrace(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the (source code) file name of the function from which
@@ -779,7 +780,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -799,7 +800,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_file_name(boost::exception const& e);
-    HPX_EXPORT std::string get_error_file_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_file_name(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the line number in the (source code) file of the function
@@ -818,7 +819,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     nothing
     ///
@@ -838,7 +839,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT int get_error_line_number(boost::exception const& e);
-    HPX_EXPORT int get_error_line_number(boost::exception_ptr const& e);
+    HPX_EXPORT int get_error_line_number(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the sequence number of the OS-thread used to execute
@@ -858,7 +859,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     nothing
     ///
@@ -878,7 +879,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_error_os_thread(boost::exception const& e);
-    HPX_EXPORT std::size_t get_error_os_thread(boost::exception_ptr const& e);
+    HPX_EXPORT std::size_t get_error_os_thread(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the unique thread id of the HPX-thread from which the
@@ -898,7 +899,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     nothing
     ///
@@ -918,7 +919,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::size_t get_error_thread_id(boost::exception const& e);
-    HPX_EXPORT std::size_t get_error_thread_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::size_t get_error_thread_id(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return any additionally available thread description of the
@@ -938,7 +939,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -957,7 +958,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_thread_description(boost::exception const& e);
-    HPX_EXPORT std::string get_error_thread_description(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_thread_description(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the HPX configuration information point from which the
@@ -977,7 +978,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -996,7 +997,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_config(boost::exception const& e);
-    HPX_EXPORT std::string get_error_config(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_config(compat::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the HPX runtime state information at which the exception
@@ -1016,7 +1017,7 @@ namespace hpx
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception,
     ///             \a hpx::error_code, \a boost::exception, or
-    ///             \a boost::exception_ptr.
+    ///             \a compat::exception_ptr.
     ///
     /// \throws     std#bad_alloc (if one of the required allocations fails)
     ///
@@ -1035,12 +1036,12 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_EXPORT std::string get_error_state(boost::exception const& e);
-    HPX_EXPORT std::string get_error_state(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_error_state(compat::exception_ptr const& e);
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     // \cond NOINTERNAL
-    HPX_EXPORT boost::exception_ptr get_exception_ptr(hpx::exception const& e);
+    HPX_EXPORT compat::exception_ptr get_exception_ptr(hpx::exception const& e);
 
     // forwarder for HPX_ASSERT handler
     HPX_ATTRIBUTE_NORETURN HPX_EXPORT

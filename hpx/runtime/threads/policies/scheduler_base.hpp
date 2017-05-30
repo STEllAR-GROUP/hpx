@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -21,8 +22,6 @@
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
-
-#include <boost/exception_ptr.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -287,7 +286,7 @@ namespace hpx { namespace threads { namespace policies
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            compat::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual std::int64_t get_average_thread_wait_time(

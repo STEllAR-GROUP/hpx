@@ -16,8 +16,6 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 

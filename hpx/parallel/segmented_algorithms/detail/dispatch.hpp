@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -17,8 +18,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <list>
 #include <type_traits>
@@ -296,7 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         // handle any remote exceptions
         if (f.has_exception())
         {
-            std::list<boost::exception_ptr> errors;
+            std::list<compat::exception_ptr> errors;
             parallel::util::detail::handle_remote_exceptions<
                     ExPolicy
                 >::call(f.get_exception_ptr(), errors);

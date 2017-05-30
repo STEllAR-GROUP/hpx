@@ -22,7 +22,7 @@ int main()
         //promise.set_value(42);
         throw hpx::bad_parameter;
     } catch(...) {
-        promise.set_exception(boost::current_exception());
+        promise.set_exception(hpx::compat::current_exception());
     }
     HPX_TEST(future.has_exception());
 

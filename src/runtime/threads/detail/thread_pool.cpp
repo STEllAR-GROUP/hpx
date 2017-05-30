@@ -6,6 +6,7 @@
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
 #include <hpx/compat/barrier.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
@@ -30,7 +31,6 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/system/system_error.hpp>
 
 #include <algorithm>
@@ -159,7 +159,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::report_error(std::size_t num,
-        boost::exception_ptr const& e)
+        compat::exception_ptr const& e)
     {
         sched_.set_all_states(state_terminating);
         notifier_.on_error(num, e);
@@ -661,7 +661,7 @@ namespace hpx { namespace threads { namespace detail
                         << " : caught hpx::exception: "
                         << e.what() << ", aborted thread execution";
 
-                    report_error(num_thread, boost::current_exception());
+                    report_error(num_thread, compat::current_exception());
                     return;
                 }
                 catch (boost::system::system_error const& e) {
@@ -671,7 +671,7 @@ namespace hpx { namespace threads { namespace detail
                         << " : caught boost::system::system_error: "
                         << e.what() << ", aborted thread execution";
 
-                    report_error(num_thread, boost::current_exception());
+                    report_error(num_thread, compat::current_exception());
                     return;
                 }
                 catch (std::exception const& e) {
@@ -687,7 +687,7 @@ namespace hpx { namespace threads { namespace detail
                     << " : caught unexpected " //-V128
                        "exception, aborted thread execution";
 
-                report_error(num_thread, boost::current_exception());
+                report_error(num_thread, compat::current_exception());
                 return;
             }
 

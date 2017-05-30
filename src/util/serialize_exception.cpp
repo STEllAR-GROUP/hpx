@@ -4,11 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/exception.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/get_error_info.hpp>
 #include <boost/version.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +24,7 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     template <typename Archive>
-    void save(Archive& ar, boost::exception_ptr const& ep, unsigned int)
+    void save(Archive& ar, compat::exception_ptr const& ep, unsigned int)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -46,7 +48,7 @@ namespace hpx { namespace serialization
 
         // retrieve information related to boost::exception
         try {
-            boost::rethrow_exception(ep);
+            compat::rethrow_exception(ep);
         }
         catch (boost::exception const& e) {
             char const* const* func =
@@ -136,7 +138,7 @@ namespace hpx { namespace serialization
 
         // figure out concrete underlying exception type
         try {
-            boost::rethrow_exception(ep);
+            compat::rethrow_exception(ep);
         }
         catch (hpx::thread_interrupted const&) {
             type = hpx::util::hpx_thread_interrupted_exception;
@@ -215,7 +217,7 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     template <typename Archive>
-    void load(Archive& ar, boost::exception_ptr& e, unsigned int)
+    void load(Archive& ar, compat::exception_ptr& e, unsigned int)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -376,11 +378,11 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
     template HPX_EXPORT void
-    save(hpx::serialization::output_archive&, boost::exception_ptr const&,
+    save(hpx::serialization::output_archive&, compat::exception_ptr const&,
         unsigned int);
 
     template HPX_EXPORT void
-    load(hpx::serialization::input_archive&, boost::exception_ptr&,
+    load(hpx::serialization::input_archive&, compat::exception_ptr&,
         unsigned int);
 }}
 

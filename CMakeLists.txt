@@ -1090,6 +1090,18 @@ endif()
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
+# HPX_WITH_EXCEPTION_PTR_COMPATIBILITY
+hpx_option(HPX_WITH_EXCEPTION_PTR_COMPATIBILITY BOOL
+    "Use a compatibility implementation of std::exception_ptr, i.e. fall back to Boost.Exception (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_EXCEPTION_PTR_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EXCEPTION_PTR_COMPATIBILITY)
+else()
+  if(NOT HPX_WITH_CXX11_EXCEPTION_PTR)
+    hpx_error("HPX needs support for C++11 std::exception_ptr which is not available on this platform. Please enable HPX_WITH_EXCEPTION_PTR_COMPATIBILITY to use Boost.Exception instead.")
+  endif()
+endif()
+
 # HPX_WITH_THREAD_COMPATIBILITY
 hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL
     "Use a compatibility implementation of std::thread, i.e. fall back to Boost.Thread (default: OFF)"

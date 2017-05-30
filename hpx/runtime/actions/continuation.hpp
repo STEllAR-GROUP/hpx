@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
 #include <type_traits>
@@ -58,8 +58,8 @@ namespace hpx { namespace actions
         continuation& operator=(continuation&& o);
 
         //
-        void trigger_error(boost::exception_ptr const& e);
-        void trigger_error(boost::exception_ptr && e);
+        void trigger_error(compat::exception_ptr const& e);
+        void trigger_error(compat::exception_ptr && e);
 
         // serialization support
         void serialize(hpx::serialization::input_archive& ar, unsigned);

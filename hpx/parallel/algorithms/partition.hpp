@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_ALGORITHM_PARTITION_SEP_24_2016_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -24,8 +25,6 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -83,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             if (left.has_exception() || right.has_exception())
                             {
-                                std::list<boost::exception_ptr> errors;
+                                std::list<compat::exception_ptr> errors;
                                 if(left.has_exception())
                                     hpx::parallel::util::detail::
                                     handle_local_exceptions<ExPolicy>::call(
@@ -175,7 +174,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
                 catch (...) {
                     result = hpx::make_exceptional_future<RandIter>(
-                        boost::current_exception());
+                        compat::current_exception());
                 }
 
                 if (result.has_exception())

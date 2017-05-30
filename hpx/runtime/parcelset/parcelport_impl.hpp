@@ -29,7 +29,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/detail/endian.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>

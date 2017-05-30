@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
@@ -15,8 +16,6 @@
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -131,7 +130,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // extension
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(compat::exception_ptr const& e)
         {
             promise_.set_exception(e);
         }
@@ -145,7 +144,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 promise_.set_value(function_(std::forward<Vs>(vs)...));
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(compat::current_exception());
             }
         }
 
@@ -157,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
                 function_(std::forward<Ts>(vs)...);
                 promise_.set_value();
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(compat::current_exception());
             }
         }
 

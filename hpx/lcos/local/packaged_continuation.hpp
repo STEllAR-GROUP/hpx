@@ -46,7 +46,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(src.get());
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(compat::current_exception());
             }
         }
 
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(util::unused);
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(compat::current_exception());
             }
         }
 
@@ -82,7 +82,7 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(func(std::move(future)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(compat::current_exception());
         }
     }
 
@@ -95,7 +95,7 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(util::unused);
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(compat::current_exception());
         }
     }
 
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace detail
                     std::move(inner_state), std::move(cont_)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(compat::current_exception());
         }
      }
 
@@ -494,7 +494,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             catch (...) {
                 this->started_ = true;
-                this->set_exception(boost::current_exception());
+                this->set_exception(compat::current_exception());
                 throw;
             }
         }
@@ -742,7 +742,7 @@ namespace hpx { namespace lcos { namespace detail
                 transfer_result<Inner>()(std::move(inner_state), this);
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(compat::current_exception());
             }
         }
 
@@ -787,7 +787,7 @@ namespace hpx { namespace lcos { namespace detail
                         std::move(inner_state)));
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(compat::current_exception());
             }
         }
 

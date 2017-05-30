@@ -19,8 +19,6 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <string>

@@ -7,13 +7,13 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
@@ -316,7 +316,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(compat::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }
@@ -412,7 +412,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(compat::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }
@@ -510,7 +510,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(compat::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }

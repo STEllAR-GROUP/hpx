@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -20,8 +21,6 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -169,7 +168,7 @@ namespace hpx { namespace threads
         /// raised. The exception will be routed through the notifier and the
         /// scheduler (which will result in it being passed to the runtime
         /// object, which in turn will report it to the console, etc.).
-        virtual void report_error(std::size_t, boost::exception_ptr const&) = 0;
+        virtual void report_error(std::size_t, compat::exception_ptr const&) = 0;
 
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this

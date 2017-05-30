@@ -182,7 +182,7 @@ namespace hpx { namespace applier { namespace detail
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the
                     // client
-                    cont.trigger_error(boost::current_exception());
+                    cont.trigger_error(compat::current_exception());
                 }
             }
             else

@@ -7,11 +7,13 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_WITH_CLEANUP_OCT_03_2014_0221PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -21,9 +23,6 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/util/unused.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -62,7 +61,7 @@ namespace hpx { namespace parallel { namespace util
                     policy.parameters());
 
                 std::vector<hpx::future<Result> > inititems;
-                std::list<boost::exception_ptr> errors;
+                std::list<compat::exception_ptr> errors;
 
                 try {
                     // estimate a chunk size based on number of cores used
@@ -85,7 +84,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                        compat::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
@@ -102,7 +101,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception());
+                        compat::current_exception());
                 }
             }
         };
@@ -132,7 +131,7 @@ namespace hpx { namespace parallel { namespace util
                         >(policy.parameters()));
 
                 std::vector<hpx::future<Result> > inititems;
-                std::list<boost::exception_ptr> errors;
+                std::list<compat::exception_ptr> errors;
 
                 try {
                     // estimate a chunk size based on number of cores used
@@ -155,10 +154,10 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
+                        compat::current_exception());
                 }
                 catch (...) {
-                    errors.push_back(boost::current_exception());
+                    errors.push_back(compat::current_exception());
                 }
 
                 // wait for all tasks to finish

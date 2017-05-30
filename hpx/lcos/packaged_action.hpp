@@ -8,6 +8,7 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
@@ -20,8 +21,6 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <utility>
 
@@ -77,7 +76,7 @@ namespace lcos {
             // any error in the parcel layer will be stored in the future object
             if (ec)
             {
-                boost::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                compat::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                     "packaged_action::parcel_write_handler",
                     parcelset::dump_parcel(p));
                 shared_state->set_exception(exception);
@@ -92,7 +91,7 @@ namespace lcos {
             // any error in the parcel layer will be stored in the future object
             if (ec)
             {
-                boost::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                compat::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                     "packaged_action::parcel_write_handler",
                     parcelset::dump_parcel(p));
                 shared_state->set_exception(exception);

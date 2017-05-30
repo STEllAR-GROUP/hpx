@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/exception.hpp>
@@ -22,8 +23,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <boost/utility/addressof.hpp>      // boost::addressof
 #include <memory>                           // std::addressof
@@ -42,14 +41,14 @@ namespace hpx { namespace parallel { inline namespace v2
         void handle_task_block_exceptions(parallel::exception_list& errors)
         {
             try {
-                boost::rethrow_exception(boost::current_exception());
+                compat::rethrow_exception(compat::current_exception());
             }
             catch (parallel::exception_list const& el) {
-                for (boost::exception_ptr const& e: el)
+                for (compat::exception_ptr const& e: el)
                     errors.add(e);
             }
             catch (...) {
-                errors.add(boost::current_exception());
+                errors.add(compat::current_exception());
             }
         }
         /// \endcond

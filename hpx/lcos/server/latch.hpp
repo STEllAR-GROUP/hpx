@@ -7,6 +7,7 @@
 #define HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/latch.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -15,7 +16,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/exception/diagnostic_information.hpp>
 
 #include <cstddef>
 
@@ -96,11 +97,11 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(compat::exception_ptr const& e)
         {
             try {
                 latch_.abort_all();
-                boost::rethrow_exception(e);
+                compat::rethrow_exception(e);
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics

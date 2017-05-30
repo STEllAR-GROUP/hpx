@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/applier/apply.hpp>
@@ -15,14 +16,12 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     // Stub function which applies the console_error_sink action.
     void console_error_sink(naming::id_type const& dst,
-        boost::exception_ptr const& e)
+        compat::exception_ptr const& e)
     {
         // Report the error only if the thread-manager is up.
         if (threads::threadmanager_is(state_running))
@@ -42,7 +41,7 @@ namespace hpx { namespace components
     /// Stub function which applies the console_error_sink action.
     ///
     /// \note Must be called from a HPX-thread.
-    void console_error_sink(boost::exception_ptr const& e)
+    void console_error_sink(compat::exception_ptr const& e)
     {
         if (HPX_UNLIKELY(!threads::get_self_ptr()))
             HPX_THROW_EXCEPTION(null_thread_id

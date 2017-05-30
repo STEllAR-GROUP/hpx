@@ -8,10 +8,11 @@
 #if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
+#include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <cstddef>
@@ -36,7 +37,7 @@ namespace hpx
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        typedef std::list<boost::exception_ptr> exception_list_type;
+        typedef std::list<compat::exception_ptr> exception_list_type;
         exception_list_type exceptions_;
         mutable mutex_type mtx_;
 
@@ -49,7 +50,7 @@ namespace hpx
         ~exception_list() throw() {}
 
         exception_list();
-        explicit exception_list(boost::exception_ptr const& e);
+        explicit exception_list(compat::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
 
         exception_list(exception_list const& l);
@@ -59,7 +60,7 @@ namespace hpx
         exception_list& operator=(exception_list && l);
 
         ///
-        void add(boost::exception_ptr const& e);
+        void add(compat::exception_ptr const& e);
         /// \endcond
 
         /// The number of exception_ptr objects contained within the

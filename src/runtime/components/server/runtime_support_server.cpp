@@ -1360,7 +1360,7 @@ namespace hpx { namespace components { namespace server
                     f();
                 }
                 catch (...) {
-                    rt.report_error(boost::current_exception());
+                    rt.report_error(compat::current_exception());
                 }
             }
         }
@@ -1372,7 +1372,7 @@ namespace hpx { namespace components { namespace server
                     f();
                 }
                 catch (...) {
-                    rt.report_error(boost::current_exception());
+                    rt.report_error(compat::current_exception());
                 }
             }
             lcos::barrier::get_global_barrier().detach();

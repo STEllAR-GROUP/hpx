@@ -10,10 +10,10 @@
 #define HPX_ERROR_CODE_MAR_24_2008_0929AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/exception.hpp>
 #include <hpx/error.hpp>
 #include <hpx/exception_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <stdexcept>
@@ -25,7 +25,7 @@ namespace hpx
     /// \cond NODETAIL
     namespace detail
     {
-        HPX_EXPORT boost::exception_ptr access_exception(error_code const&);
+        HPX_EXPORT compat::exception_ptr access_exception(error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
         struct command_line_error : std::logic_error
@@ -212,7 +212,7 @@ namespace hpx
         void clear()
         {
             this->boost::system::error_code::assign(success, get_hpx_category());
-            exception_ = boost::exception_ptr();
+            exception_ = compat::exception_ptr();
         }
 
         /// Assignment operator for error_code
@@ -222,14 +222,14 @@ namespace hpx
         HPX_EXPORT error_code& operator=(error_code const& rhs);
 
     private:
-        friend boost::exception_ptr detail::access_exception(error_code const&);
+        friend compat::exception_ptr detail::access_exception(error_code const&);
         friend class exception;
-        friend error_code make_error_code(boost::exception_ptr const&);
+        friend error_code make_error_code(compat::exception_ptr const&);
 
         HPX_EXPORT error_code(int err, hpx::exception const& e);
-        HPX_EXPORT explicit error_code(boost::exception_ptr const& e);
+        HPX_EXPORT explicit error_code(compat::exception_ptr const& e);
 
-        boost::exception_ptr exception_;
+        compat::exception_ptr exception_;
     };
 
     /// @{
@@ -272,7 +272,7 @@ namespace hpx
         return error_code(e, msg, func, file, line, mode);
     }
     inline error_code
-    make_error_code(boost::exception_ptr const& e)
+    make_error_code(compat::exception_ptr const& e)
     {
         return error_code(e);
     }
