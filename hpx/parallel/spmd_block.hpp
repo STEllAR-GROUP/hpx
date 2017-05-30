@@ -21,10 +21,11 @@ namespace hpx { namespace parallel { inline namespace v2
     /// The class spmd_block defines an interface for launching
     /// multiple images while giving handles to each image to interact with
     /// the remaining images. The \a define_spmd_block function templates create
-    /// multiple images of a user-defined lambda and launches them in a possibly
-    /// separate thread. A temporary spmd block object is created and diffused
-    /// to each image. The constraint for the lambda given to the
-    /// define_spmd_block function is to accept a spmd_block as first parameter.
+    /// multiple images of a user-defined function (or lambda) and launches them
+    /// in a possibly separate thread. A temporary spmd block object is created
+    /// and diffused to each image. The constraint for the function (or lambda)
+    /// given to the define_spmd_block function is to accept a spmd_block as
+    /// first parameter.
     using spmd_block = hpx::lcos::local::spmd_block;
 
     // Asynchronous version
