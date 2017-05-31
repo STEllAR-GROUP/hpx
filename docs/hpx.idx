@@ -1,4 +1,4 @@
-#   Copyright (c) 2001-2016 Hartmut Kaiser
+#   Copyright (c) 2001-2017 Hartmut Kaiser
 #
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -330,6 +330,10 @@ parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\
 # hpx/parallel/algorithms/uninitialized_fill.hpp
 parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
 parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+
+# hpx/parallel/algorithms/uninitialized_move.hpp
+parallel::uninitialized_move          "uninitialized_move" "hpx\.parallel\.v1\.uninitialized_move$"
+parallel::uninitialized_move_n        "uninitialized_move_n" "hpx\.parallel\.v1\.uninitialized_move_n.*"
 
 # hpx/runtime/components/colocating_distribution_policy.hpp
 colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"

@@ -176,7 +176,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
     /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
-    /// thrown during the move operation, the function has no effects.
+    /// thrown during the initialization, some objects in [first, last) are
+    /// left in a valid but unspecified state.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first move operations.
     ///
@@ -307,8 +308,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
     /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest. If an exception is thrown during the move operation, the
-    /// function has no effects.
+    /// at dest. If an exception is
+    /// thrown during the initialization, some objects in [first, first + count)
+    /// are left in a valid but unspecified state.
     ///
     /// \note   Complexity: Performs exactly \a count movements, if
     ///         count > 0, no move operations otherwise.
