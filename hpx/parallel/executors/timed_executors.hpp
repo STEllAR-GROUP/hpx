@@ -380,17 +380,17 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(timed_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(timed_executor const& rhs) const noexcept
         {
             return exec_ == rhs.exec_ && execute_at_ == rhs.execute_at_;
         }
 
-        bool operator!=(timed_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(timed_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        timed_executor const& context() const HPX_NOEXCEPT
+        timed_executor const& context() const noexcept
         {
             return *this;
         }

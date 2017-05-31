@@ -40,6 +40,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <utility>
 
@@ -48,9 +49,6 @@ namespace hpx { namespace threads { namespace coroutines
     /////////////////////////////////////////////////////////////////////////////
     class coroutine
     {
-    private:
-        HPX_MOVABLE_ONLY(coroutine);
-
     public:
         friend struct detail::coroutine_accessor;
 
@@ -208,7 +206,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         impl_ptr m_pimpl;
 
-        std::size_t count() const
+        std::uint64_t count() const
         {
             return m_pimpl->count();
         }

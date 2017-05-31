@@ -108,10 +108,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             return value_;
         }
-
-#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
-        HPX_MOVABLE_ONLY(tss_data_node);
-#endif
     };
 
     //////////////////////////////////////////////////////////////////////////

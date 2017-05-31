@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     /// Reverses the order of the elements in the range [first, last).
     /// Behaves as if applying std::iter_swap to every pair of iterators

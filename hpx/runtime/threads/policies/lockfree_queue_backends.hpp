@@ -135,6 +135,8 @@ struct lockfree_abp_fifo
 
 ///////////////////////////////////////////////////////////////////////////////
 // LIFO + stealing at opposite end.
+// E.g. ABP (Arora, Blumofe and Plaxton) queuing
+// http://dl.acm.org/citation.cfm?id=277678
 template <typename T>
 struct lockfree_abp_lifo_backend
 {

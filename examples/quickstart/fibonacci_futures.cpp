@@ -428,7 +428,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt =
-            "fibonacci_future_all(%1%) == %2%,elapsed time,%3%,[s]\n";
+            "fibonacci_future_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;

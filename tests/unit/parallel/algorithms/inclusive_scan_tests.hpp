@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

@@ -111,7 +111,6 @@ namespace hpx { namespace parcelset
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;
-        HPX_MOVABLE_ONLY(parcel_buffer);
     };
 }}
 

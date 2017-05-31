@@ -19,9 +19,6 @@
 template <typename T>
 struct safe_object
 {
-private:
-    HPX_MOVABLE_ONLY(safe_object);
-
 public:
     safe_object()
       : data_(hpx::get_os_thread_count())

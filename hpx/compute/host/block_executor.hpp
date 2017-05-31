@@ -90,18 +90,18 @@ namespace hpx { namespace compute { namespace host
         }
 
         /// \cond NOINTERNAL
-        bool operator==(block_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(block_executor const& rhs) const noexcept
         {
             return std::equal(targets_.begin(), targets_.end(),
                 rhs.targets_.begin());
         }
 
-        bool operator!=(block_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(block_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        std::vector<host::target> const& context() const HPX_NOEXCEPT
+        std::vector<host::target> const& context() const noexcept
         {
             return targets_;
         }

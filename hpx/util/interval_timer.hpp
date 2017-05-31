@@ -96,7 +96,8 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT interval_timer
     {
-        HPX_MOVABLE_ONLY(interval_timer);
+    public:
+        HPX_NON_COPYABLE(interval_timer);
 
     public:
         interval_timer();

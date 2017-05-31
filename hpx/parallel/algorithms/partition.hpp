@@ -16,9 +16,9 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -34,7 +34,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // stable_partition
@@ -156,17 +156,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         result = hpx::make_ready_future(std::move(last));
                     }
 
-                    typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                        executor_type;
                     typedef typename
                         hpx::util::decay<ExPolicy>::type::executor_parameters_type
                         parameters_type;
 
                     typedef executor_parameter_traits<parameters_type> traits;
-                    typedef executor_information_traits<executor_type> info_traits;
 
                     std::size_t const cores =
-                        info_traits::processing_units_count(policy.executor(),
+                        execution::processing_units_count(policy.executor(),
                                 policy.parameters());
                     std::size_t max_chunks = traits::maximal_number_of_chunks(
                         policy.parameters(), policy.executor(), cores, size);
@@ -267,14 +264,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<BidirIter>::value &&
-        traits::is_projected<Proj, BidirIter>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
-  , HPX_CONCEPT_REQUIRES_(
+        traits::is_projected<Proj, BidirIter>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, BidirIter>
-        >::value)
-#endif
-    >
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
     stable_partition(ExPolicy && policy, BidirIter first, BidirIter last,
         F && f, Proj && proj = Proj())

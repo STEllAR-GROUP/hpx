@@ -164,7 +164,7 @@ namespace hpx { namespace serialization { namespace detail
             return cont.has_gid(gid);
         }
 
-        HPX_CONSTEXPR static void
+        static void
         write(preprocess& cont, std::size_t count,
             std::size_t current, void const* address)
         {

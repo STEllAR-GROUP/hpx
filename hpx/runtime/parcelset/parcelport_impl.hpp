@@ -268,8 +268,6 @@ namespace hpx { namespace parcelset
                 return *this;
             }
 
-            HPX_MOVABLE_ONLY(parcel_await_handlers);
-
             void operator()(parcel&& p)
             {
                 parcels_.push_back(std::move(p));

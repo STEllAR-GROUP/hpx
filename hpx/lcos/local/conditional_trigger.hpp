@@ -21,9 +21,6 @@ namespace hpx { namespace lcos { namespace local
     ///////////////////////////////////////////////////////////////////////////
     struct conditional_trigger
     {
-    private:
-        HPX_MOVABLE_ONLY(conditional_trigger);
-
     public:
         conditional_trigger()
         {

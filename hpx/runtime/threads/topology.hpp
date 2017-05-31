@@ -15,6 +15,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -30,7 +31,7 @@
 
 namespace hpx { namespace threads
 {
-    struct HPX_EXPORT topology
+    struct topology
     {
         virtual ~topology() {}
 

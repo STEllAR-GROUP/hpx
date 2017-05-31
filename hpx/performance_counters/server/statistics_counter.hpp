@@ -15,6 +15,7 @@
 
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -58,7 +59,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
-            std::uint64_t parameter1, std::uint64_t parameter2);
+            std::size_t parameter1, std::size_t parameter2);
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value
@@ -105,7 +106,7 @@ namespace hpx { namespace performance_counters { namespace server
         boost::scoped_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;
 
-        std::uint64_t parameter1_, parameter2_;
+        std::size_t parameter1_, parameter2_;
     };
 }}}
 

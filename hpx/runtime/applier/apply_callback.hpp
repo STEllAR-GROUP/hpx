@@ -380,9 +380,6 @@ namespace hpx
         template <typename Action, typename Callback, typename ...Ts>
         struct apply_c_p_cb_impl
         {
-        private:
-            HPX_MOVABLE_ONLY(apply_c_p_cb_impl);
-
         public:
             typedef util::tuple<Ts...> tuple_type;
 

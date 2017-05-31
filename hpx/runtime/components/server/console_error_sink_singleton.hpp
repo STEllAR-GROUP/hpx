@@ -21,6 +21,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     class console_error_dispatcher
     {
+    public:
         HPX_NON_COPYABLE(console_error_dispatcher);
 
     public:

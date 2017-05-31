@@ -25,7 +25,7 @@ namespace hpx { namespace util
     {
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        void operator,(T const&) const HPX_NOEXCEPT
+        void operator,(T const&) const noexcept
         {}
     };
 }}

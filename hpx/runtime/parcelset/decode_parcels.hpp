@@ -52,7 +52,10 @@ namespace hpx { namespace parcelset
             for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                std::uint64_t first = c.first, second = c.second;
+                std::size_t first = static_cast<std::size_t>(
+                    static_cast<std::uint64_t>(c.first));
+                std::size_t second = static_cast<std::size_t>(
+                    static_cast<std::uint64_t>(c.second));
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
 
@@ -66,7 +69,10 @@ namespace hpx { namespace parcelset
                  ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                std::uint64_t first = c.first, second = c.second;
+                std::size_t first = static_cast<std::size_t>(
+                    static_cast<std::uint64_t>(c.first));
+                std::size_t second = static_cast<std::size_t>(
+                    static_cast<std::uint64_t>(c.second));
 
                 // find next free entry
                 while (chunks[index].size_ != 0)
@@ -100,7 +106,8 @@ namespace hpx { namespace parcelset
       , std::size_t num_thread = -1
     )
     {
-        std::uint64_t inbound_data_size = buffer.data_size_;
+        std::size_t inbound_data_size = static_cast<std::size_t>(
+            static_cast<std::uint64_t>(buffer.data_size_));
 
         // protect from un-handled exceptions bubbling up
         try {

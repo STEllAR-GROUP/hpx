@@ -22,7 +22,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 
@@ -44,7 +43,7 @@
 #include <boost/optional.hpp>
 #endif
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     HPX_STATIC_CONSTEXPR parallel::execution::task_policy_tag task{};

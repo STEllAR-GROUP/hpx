@@ -21,6 +21,7 @@
 #include <boost/regex.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -667,7 +668,7 @@ namespace hpx { namespace performance_counters
     ///        (milliseconds).
     counter_status registry::create_statistics_counter(
         counter_info const& info, std::string const& base_counter_name,
-        std::vector<std::int64_t> const& parameters,
+        std::vector<std::size_t> const& parameters,
         naming::gid_type& gid, error_code& ec)
     {
         // create canonical type name
@@ -705,7 +706,7 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             // extract parameters
-            std::uint64_t sample_interval = 1000;   // default sampling interval
+            std::size_t sample_interval = 1000;   // default sampling interval
             if (!parameters.empty())
                 sample_interval = parameters[0];
 
@@ -732,7 +733,7 @@ namespace hpx { namespace performance_counters
                         boost::accumulators::tag::rolling_mean>
                 > counter_t;
 
-                std::uint64_t window_size = 10;   // default rolling window size
+                std::size_t window_size = 10;   // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 

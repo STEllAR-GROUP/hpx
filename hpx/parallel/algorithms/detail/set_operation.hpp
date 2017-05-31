@@ -9,9 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/executor_information_traits.hpp>
+#include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -22,7 +21,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     /// \cond NOINTERNAL
 
@@ -88,9 +87,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
 
-        typedef typename ExPolicy::executor_type executor_type;
-        std::size_t cores = executor_information_traits<executor_type>::
-            processing_units_count(policy.executor(), policy.parameters());
+        std::size_t cores = execution::processing_units_count(
+            policy.executor(), policy.parameters());
 
         std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);

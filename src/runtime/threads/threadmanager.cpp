@@ -1409,11 +1409,6 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::static_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
-template class HPX_EXPORT hpx::threads::threadmanager_impl<
-    hpx::threads::policies::throttle_queue_scheduler<> >;
-#endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
@@ -1449,4 +1444,13 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
+    hpx::threads::policies::throttling_scheduler<> >;
+#endif
+
+
+
 

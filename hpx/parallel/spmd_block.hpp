@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     namespace detail
     {

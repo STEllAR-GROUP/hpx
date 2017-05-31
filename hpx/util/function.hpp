@@ -42,11 +42,11 @@ namespace hpx { namespace util
     public:
         typedef typename base_type::result_type result_type;
 
-        function() HPX_NOEXCEPT
+        function() noexcept
           : base_type()
         {}
 
-        function(std::nullptr_t) HPX_NOEXCEPT
+        function(std::nullptr_t) noexcept
           : base_type()
         {}
 
@@ -64,7 +64,7 @@ namespace hpx { namespace util
             }
         }
 
-        function(function&& other) HPX_NOEXCEPT
+        function(function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
         {}
 
@@ -100,7 +100,7 @@ namespace hpx { namespace util
             return *this;
         }
 
-        function& operator=(function&& other) HPX_NOEXCEPT
+        function& operator=(function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -130,7 +130,7 @@ namespace hpx { namespace util
 
     template <typename Sig, bool Serializable>
     static bool is_empty_function(
-        function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        function<Sig, Serializable> const& f) noexcept
     {
         return f.empty();
     }
@@ -143,7 +143,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::function<Sig, Serializable> >
     {
         static std::size_t
-            call(util::function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -154,7 +154,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::function<Sig, Serializable> >
     {
         static char const*
-            call(util::function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }

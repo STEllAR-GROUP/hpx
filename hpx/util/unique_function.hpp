@@ -39,20 +39,18 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable<R(Ts...)> vtable;
         typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_ONLY(unique_function);
-
     public:
         typedef typename base_type::result_type result_type;
 
-        unique_function() HPX_NOEXCEPT
+        unique_function() noexcept
           : base_type()
         {}
 
-        unique_function(std::nullptr_t) HPX_NOEXCEPT
+        unique_function(std::nullptr_t) noexcept
           : base_type()
         {}
 
-        unique_function(unique_function&& other) HPX_NOEXCEPT
+        unique_function(unique_function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
         {}
 
@@ -67,7 +65,7 @@ namespace hpx { namespace util
             assign(std::forward<F>(f));
         }
 
-        unique_function& operator=(unique_function&& other) HPX_NOEXCEPT
+        unique_function& operator=(unique_function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -94,7 +92,7 @@ namespace hpx { namespace util
 
     template <typename Sig, bool Serializable>
     static bool is_empty_function(
-        unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        unique_function<Sig, Serializable> const& f) noexcept
     {
         return f.empty();
     }
@@ -107,7 +105,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::unique_function<Sig, Serializable> >
     {
         static std::size_t
-            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -118,7 +116,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::unique_function<Sig, Serializable> >
     {
         static char const*
-            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }

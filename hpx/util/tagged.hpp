@@ -115,7 +115,7 @@ namespace hpx { namespace util
         template <typename Other,
         HPX_CONCEPT_REQUIRES_(
             std::is_convertible<Other, Base>::value)>
-        tagged(tagged<Other, Tags...> && rhs) HPX_NOEXCEPT
+        tagged(tagged<Other, Tags...> && rhs) noexcept
           : Base(static_cast<Other&&>(rhs))
         {}
 
@@ -168,14 +168,14 @@ namespace hpx { namespace util
         //         and other.
         // Throws: Nothing unless the call to swap on the Base sub-objects
         //         throws.
-        HPX_FORCEINLINE void swap(tagged &other) HPX_NOEXCEPT
+        HPX_FORCEINLINE void swap(tagged &other) noexcept
         {
             std::swap(static_cast<Base &>(*this), static_cast<Base &>(other));
         }
 
         // Effects: x.swap(y).
         // Throws: Nothing unless the call to x.swap(y) throws.
-        friend HPX_FORCEINLINE void swap(tagged &x, tagged &y) HPX_NOEXCEPT
+        friend HPX_FORCEINLINE void swap(tagged &x, tagged &y) noexcept
         {
             x.swap(y);
         }

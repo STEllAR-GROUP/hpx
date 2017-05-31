@@ -268,8 +268,7 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
@@ -284,8 +283,7 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(bound);
-            HPX_DELETE_MOVE_ASSIGN(bound);
+            bound& operator=(bound const&) = delete;
 
             template <typename ...Us>
             HPX_HOST_DEVICE inline
@@ -480,7 +478,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::bound<Sig> >
     {
         static std::size_t
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -490,7 +488,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::one_shot_wrapper<F> >
     {
         static std::size_t
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -502,7 +500,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::bound<Sig> >
     {
         static char const*
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -512,7 +510,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::one_shot_wrapper<F> >
     {
         static char const*
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }

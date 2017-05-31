@@ -37,7 +37,7 @@ namespace hpx { namespace compat
         using base_type::native_handle_type;
 
         // construct/copy/destroy:
-        thread() HPX_NOEXCEPT
+        thread() noexcept
           : base_type()
         {}
 

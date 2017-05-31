@@ -28,7 +28,7 @@ namespace hpx { namespace compute { namespace cuda
 
     public:
 
-        value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
+        value_proxy(T *p, cuda::target & tgt) noexcept
           : p_(p)
           , target_(&tgt)
         {}
@@ -69,12 +69,12 @@ namespace hpx { namespace compute { namespace cuda
             return p_;
         }
 
-        T* device_ptr() const HPX_NOEXCEPT
+        T* device_ptr() const noexcept
         {
             return p_;
         }
 
-        cuda::target& target() const HPX_NOEXCEPT
+        cuda::target& target() const noexcept
         {
             return *target_;
         }
@@ -93,7 +93,7 @@ namespace hpx { namespace compute { namespace cuda
     public:
         typedef T const proxy_type;
 
-        value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
+        value_proxy(T *p, cuda::target & tgt) noexcept
           : p_(p)
           , target_(tgt)
         {}
@@ -108,12 +108,12 @@ namespace hpx { namespace compute { namespace cuda
             return access_target::read(target_, p_);
         }
 
-        T* device_ptr() const HPX_NOEXCEPT
+        T* device_ptr() const noexcept
         {
             return p_;
         }
 
-        cuda::target& target() const HPX_NOEXCEPT
+        cuda::target& target() const noexcept
         {
             return target_;
         }

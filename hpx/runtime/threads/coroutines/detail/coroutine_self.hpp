@@ -45,8 +45,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     class coroutine_self
     {
+    public:
         HPX_NON_COPYABLE(coroutine_self);
 
+    private:
         // store the current this and write it to the TSS on exit
         struct reset_self_on_exit
         {
