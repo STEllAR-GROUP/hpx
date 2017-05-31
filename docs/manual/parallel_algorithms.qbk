@@ -361,7 +361,21 @@ __hpx__ provides implementations of the following parallel algorithms:
     ]
 ]
 
-[table Minimum/maximum operations (In Header: `<hpx/include/parallel_algorithm.hpp>`)
+[table Heap operations (In Header: <hpx/include/parallel_algorithm.hpp>)
+    [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
+    [[ [algoref is_heap] ]
+     [Returns `true` if the range is max heap.]
+     [`<hpx/include/is_heap.hpp>`]
+     [[cpprefalgodocs is_heap]]
+    ]
+    [[ [algoref is_heap_until] ]
+     [Returns the first element that breaks a max heap.]
+     [`<hpx/include/is_heap.hpp>`]
+     [[cpprefalgodocs is_heap_until]]
+    ]
+]
+
+[table Minimum/maximum operations (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
     [[ [algoref max_element] ]
      [Returns the largest element in a range.]
