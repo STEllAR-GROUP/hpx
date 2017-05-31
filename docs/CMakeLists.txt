@@ -72,7 +72,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_reduction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/if_heap.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_heap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
@@ -114,8 +114,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_traits.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_parameter_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_information_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_parameter_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
@@ -124,6 +125,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
@@ -172,9 +174,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp")
 
 
 foreach(doxygen_input ${doxygen_dependencies})

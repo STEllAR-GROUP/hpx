@@ -593,7 +593,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return result::get(std::make_pair(keys_output, values_output));
         }
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::reduce_by_key<OutIter,OutIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,

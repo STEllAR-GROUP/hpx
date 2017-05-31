@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { inline namespace v1
         {
 
             typedef std::integral_constant<bool,
-                parallel::execution::is_sequential_execution_policy<
+                parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
@@ -287,7 +287,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
 

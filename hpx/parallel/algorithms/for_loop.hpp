@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { inline namespace v2
             // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
@@ -292,7 +292,7 @@ namespace hpx { namespace parallel { inline namespace v2
             // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
