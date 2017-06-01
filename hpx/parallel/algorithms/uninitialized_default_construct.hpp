@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
                     [](FwdIter it) {
-                        ::new (sstatic_cast<void*>(std::addressof(*it)))
+                        ::new (static_cast<void*>(std::addressof(*it)))
                             value_type;
                     },
                     [](FwdIter it) {

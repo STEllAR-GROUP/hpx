@@ -26,6 +26,15 @@ void test_uninitialized_default_construct()
     test_uninitialized_default_construct_async(execution::par(execution::task),
         IteratorTag());
 
+    test_uninitialized_default_construct2(execution::seq, IteratorTag());
+    test_uninitialized_default_construct2(execution::par, IteratorTag());
+    test_uninitialized_default_construct2(execution::par_unseq, IteratorTag());
+
+    test_uninitialized_default_construct_async2(execution::seq(execution::task),
+        IteratorTag());
+    test_uninitialized_default_construct_async2(execution::par(execution::task),
+        IteratorTag());
+
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_uninitialized_default_construct(execution_policy(execution::seq),
         IteratorTag());

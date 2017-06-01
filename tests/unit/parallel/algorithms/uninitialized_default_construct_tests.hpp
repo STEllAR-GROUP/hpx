@@ -16,6 +16,7 @@
 #include <boost/range/functions.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <numeric>
@@ -27,7 +28,12 @@
 struct default_constructable
 {
     default_constructable() : value_(42) {}
-    int value_;
+    std::int32_t value_;
+};
+
+struct value_constructable
+{
+    std::int32_t value_;
 };
 
 std::size_t const data_size = 10007;
@@ -84,6 +90,64 @@ void test_uninitialized_default_construct_async(ExPolicy && policy, IteratorTag)
         [&count](default_constructable v1)
         {
             HPX_TEST_EQ(v1.value_, 42);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
+
+    std::free(p);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_default_construct2(ExPolicy && policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef value_constructable* base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    value_constructable* p = (value_constructable*)std::malloc(
+        data_size * sizeof(value_constructable));
+    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+
+    hpx::parallel::uninitialized_default_construct(
+        std::forward<ExPolicy>(policy),
+        iterator(p), iterator(p + data_size));
+
+    std::size_t count = 0;
+    std::for_each(p, p + data_size,
+        [&count](value_constructable v1)
+        {
+            HPX_TEST_EQ(v1.value_, (std::int32_t)0xcdcdcdcd);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
+
+    std::free(p);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_default_construct_async2(ExPolicy && policy, IteratorTag)
+{
+    typedef value_constructable* base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    value_constructable* p = (value_constructable*)std::malloc(
+        data_size * sizeof(value_constructable));
+    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+
+    auto f =
+        hpx::parallel::uninitialized_default_construct(
+            std::forward<ExPolicy>(policy),
+            iterator(p), iterator(p + data_size));
+    f.wait();
+
+    std::size_t count = 0;
+    std::for_each(p, p + data_size,
+        [&count](value_constructable v1)
+        {
+            HPX_TEST_EQ(v1.value_, (std::int32_t)0xcdcdcdcd);
             ++count;
         });
     HPX_TEST_EQ(count, data_size);
