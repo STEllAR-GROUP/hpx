@@ -17,7 +17,6 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
@@ -31,29 +30,13 @@
 
 namespace hpx { namespace detail
 {
-    // Defer the evaluation of result_of during the SFINAE checks below
-#if defined(__clang__)
-    template <typename F, typename Result =
-        typename util::detail::deferred_result_of<F>::type>
-    struct create_future
-    {
-        typedef lcos::future<Result> type;
-    };
-#else
-    template <typename F, typename ResultOf = util::detail::deferred_result_of<F> >
-    struct create_future
-    {
-        typedef lcos::future<typename ResultOf::type> type;
-    };
-#endif
-
     template <typename F>
     HPX_FORCEINLINE
-    typename util::lazy_enable_if<
+    typename std::enable_if<
         std::is_reference<
             typename util::detail::invoke_deferred_result<F>::type
         >::value
-      , detail::create_future<F&&()>
+      , lcos::future<typename util::detail::invoke_deferred_result<F>::type>
     >::type
     call_sync(F&& f, std::false_type)
     {
@@ -69,11 +52,11 @@ namespace hpx { namespace detail
 
     template <typename F>
     HPX_FORCEINLINE
-    typename util::lazy_enable_if<
+    typename std::enable_if<
        !std::is_reference<
             typename util::detail::invoke_deferred_result<F>::type
         >::value
-      , detail::create_future<F()>
+      , lcos::future<typename util::detail::invoke_deferred_result<F>::type>
     >::type
     call_sync(F&& f, std::false_type) //-V659
     {
@@ -88,7 +71,8 @@ namespace hpx { namespace detail
     }
 
     template <typename F>
-    HPX_FORCEINLINE typename detail::create_future<F()>::type
+    HPX_FORCEINLINE
+    lcos::future<typename util::detail::invoke_deferred_result<F>::type>
     call_sync(F&& f, std::true_type)
     {
         try
