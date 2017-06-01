@@ -34,6 +34,7 @@ set(tests
     future_then
     future_then_executor
     future_wait
+    global_spmd_block
     local_latch
     local_barrier
     local_dataflow
