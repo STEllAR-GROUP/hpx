@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -71,7 +72,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
                     [](Iter it, FwdIter dest) {
-                        ::new (&*dest) value_type(*it);
+                        ::new (static_cast<void*>(std::addressof(*dest)))
+                            value_type(*it);
                     },
                     [](FwdIter dest) {
                         (*dest).~value_type();
