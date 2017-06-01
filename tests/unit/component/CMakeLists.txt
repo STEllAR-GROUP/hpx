@@ -35,6 +35,9 @@ set(tests
     partitioned_vector_fill
     partitioned_vector_inclusive_scan
     partitioned_vector_exclusive_scan
+    partitioned_vector_view
+    partitioned_vector_view_iterator
+    partitioned_vector_subview
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
@@ -130,10 +133,19 @@ set(partitioned_vector_inclusive_scan_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)
 
-set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_exclusive_scan_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_exclusive_scan_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_view_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_view_iterator_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
