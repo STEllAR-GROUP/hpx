@@ -11,6 +11,7 @@
 #include <hpx/traits/serialization_access_data.hpp>
 
 #include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -20,40 +21,54 @@
 struct file_wrapper
 {
     file_wrapper(std::string const& name, std::ios_base::openmode mode)
-      : stream_(name.c_str(), mode), size_(0)
+      : stream_(name.c_str(), mode), mode_(mode)
     {
         if (!stream_.is_open())
             throw std::runtime_error("Couldn't open file: " + name);
 
         std::fstream::pos_type fsize = stream_.tellg();
         stream_.seekg(0, std::ios::end);
-        size_ = stream_.tellg();
+        data_.resize(stream_.tellg() - fsize);
         stream_.seekg(fsize, std::ios::beg);
+
+        if (mode & std::ios_base::in)
+        {
+            stream_.read(data_.data(), data_.size());
+        }
     }
 
-    std::istream& read(char* s, std::streamsize count) const
+    ~file_wrapper()
     {
-        return stream_.read(s, count);
+        if (mode_ & std::ios_base::out)
+        {
+            stream_.write(data_.data(), data_.size());
+        }
     }
 
-    std::ostream& write(char const* s, std::streamsize count)
+    void read(void* address, std::size_t count, std::size_t current) const
     {
-        return stream_.write(s, count);
+        std::memcpy(address, &data_[current], count);
+    }
+
+    void write(void const* address, std::size_t count, std::size_t current)
+    {
+        std::memcpy(&data_[current], address, count);
     }
 
     std::size_t size() const
     {
-        return size_;
+        return data_.size();
     }
 
     void resize(std::size_t count)
     {
-        size_ += count;
+        data_.resize(data_.size() + count);
     }
 
 private:
-    mutable std::fstream stream_;
-    std::size_t size_;
+    std::vector<char> data_;
+    std::fstream stream_;
+    std::ios_base::openmode mode_;
 };
 
 namespace hpx { namespace traits
@@ -69,20 +84,20 @@ namespace hpx { namespace traits
 
         static void resize(file_wrapper& cont, std::size_t count)
         {
-            return cont.resize(cont.size() + count);
+            return cont.resize(count);
         }
 
         static void write(file_wrapper& cont, std::size_t count,
             std::size_t current, void const* address)
         {
-            cont.write(reinterpret_cast<char const*>(address), count);
+            cont.write(address, count, current);
         }
 
         // functions related to input operations
         static void read(file_wrapper const& cont, std::size_t count,
             std::size_t current, void* address)
         {
-            cont.read(reinterpret_cast<char*>(address), count);
+            cont.read(address, count, current);
         }
     };
 }}
