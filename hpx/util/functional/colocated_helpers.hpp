@@ -80,11 +80,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
@@ -138,11 +138,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply(lco, std::forward<T>(t));
@@ -221,11 +221,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
@@ -280,11 +280,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(lco, lco, std::forward<T>(t));

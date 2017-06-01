@@ -615,7 +615,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -645,7 +645,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -679,7 +679,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type

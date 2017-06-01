@@ -29,12 +29,12 @@ namespace hpx
         template <typename Action, typename Cont>
         struct result_of_async_continue
             : traits::action_remote_result<
-                typename util::result_of<typename util::decay<Cont>::type(
+                typename util::invoke_result<typename util::decay<Cont>::type,
                     naming::id_type,
                     typename hpx::traits::extract_action<
                         Action
                     >::remote_result_type
-                )>::type
+                >::type
             >
         {};
 

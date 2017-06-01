@@ -154,7 +154,7 @@ namespace test
         {
             typedef typename std::iterator_traits<Iterator>::reference
                 element_type;
-            typedef typename hpx::util::result_of<F(element_type)>::type
+            typedef typename hpx::util::invoke_result<F, element_type>::type
                 value_type;
 
             typedef hpx::util::tuple<value_type, element_type, value_type> type;

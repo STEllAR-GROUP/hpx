@@ -194,14 +194,14 @@ namespace hpx { namespace parallel { namespace execution
             template <typename OneWayExecutor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE static
-            hpx::lcos::future<typename hpx::util::detail::deferred_result_of<
-                F(Future, Ts...)
+            hpx::lcos::future<typename hpx::util::detail::invoke_deferred_result<
+                F, Future, Ts...
             >::type>
             call(OneWayExecutor && exec, F && f, Future& predecessor,
                 Ts &&... ts)
             {
-                typedef typename hpx::util::detail::deferred_result_of<
-                        F(Future, Ts...)
+                typedef typename hpx::util::detail::invoke_deferred_result<
+                        F, Future, Ts...
                     >::type result_type;
 
                 auto func = hpx::util::bind(
@@ -363,8 +363,8 @@ namespace hpx { namespace parallel { namespace execution
                 ))
             {
                 try {
-                    typedef typename hpx::util::detail::deferred_result_of<
-                            F(Ts...)
+                    typedef typename hpx::util::detail::invoke_deferred_result<
+                            F, Ts...
                         >::type result_type;
 
                     // older versions of gcc are not able to capture parameter
@@ -430,8 +430,8 @@ namespace hpx { namespace parallel { namespace execution
                 ))
             {
                 typedef typename std::is_void<
-                        typename hpx::util::detail::deferred_result_of<
-                            F(Ts...)
+                        typename hpx::util::detail::invoke_deferred_result<
+                            F, Ts...
                         >::type
                     >::type is_void;
 
@@ -502,16 +502,16 @@ namespace hpx { namespace parallel { namespace execution
             template <typename TwoWayExecutor, typename F, typename Future,
                 typename ... Ts>
             static hpx::lcos::future<
-                typename hpx::util::detail::deferred_result_of<
-                    F(Future, Ts...)
+                typename hpx::util::detail::invoke_deferred_result<
+                    F, Future, Ts...
                 >::type
             >
             call_impl(hpx::traits::detail::wrap_int,
                     TwoWayExecutor && exec, F && f, Future& predecessor,
                     Ts &&... ts)
             {
-                typedef typename hpx::util::detail::deferred_result_of<
-                        F(Future, Ts...)
+                typedef typename hpx::util::detail::invoke_deferred_result<
+                        F, Future, Ts...
                     >::type result_type;
 
                 auto func = hpx::util::bind(
@@ -760,8 +760,8 @@ namespace hpx { namespace parallel { namespace execution
                     std::iterator_traits<iterator_type>::value_type
                 value_type;
             typedef typename
-                    hpx::util::detail::deferred_result_of<
-                        F(value_type, Ts...)
+                    hpx::util::detail::invoke_deferred_result<
+                        F, value_type, Ts...
                     >::type
                 type;
         };
@@ -1268,8 +1268,8 @@ namespace hpx { namespace parallel { namespace execution
                     std::iterator_traits<iterator_type>::value_type
                 value_type;
             typedef typename
-                    hpx::util::detail::deferred_result_of<
-                        F(value_type, Future, Ts...)
+                    hpx::util::detail::invoke_deferred_result<
+                        F, value_type, Future, Ts...
                     >::type
                 type;
         };

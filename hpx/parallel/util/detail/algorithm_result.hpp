@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_invocable<Conv, U>::value)>
-    typename hpx::util::result_of<Conv(U)>::type
+    typename hpx::util::invoke_result<Conv, U>::type
     convert_to_result(U && val, Conv && conv)
     {
         return hpx::util::invoke(conv, val);
@@ -255,10 +255,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_invocable<Conv, U>::value)>
-    hpx::future<typename hpx::util::result_of<Conv(U)>::type>
+    hpx::future<typename hpx::util::invoke_result<Conv, U>::type>
     convert_to_result(hpx::future<U> && f, Conv && conv)
     {
-        typedef typename hpx::util::result_of<Conv(U)>::type result_type;
+        typedef typename hpx::util::invoke_result<Conv, U>::type result_type;
 
         return lcos::make_future<result_type>(
                 std::move(f), std::forward<Conv>(conv)

@@ -245,11 +245,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<InIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
@@ -275,11 +275,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<InIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type

@@ -398,7 +398,7 @@ namespace hpx { namespace parallel { namespace execution
 
         // OneWayExecutor interface
         template <typename F, typename ... Ts>
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
             return detail::call_sync_execute_at(exec_, execute_at_,
@@ -408,7 +408,7 @@ namespace hpx { namespace parallel { namespace execution
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts)
         {

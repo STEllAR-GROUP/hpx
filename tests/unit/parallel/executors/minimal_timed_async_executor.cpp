@@ -167,7 +167,7 @@ struct test_async_executor1
 
     template <typename F, typename ... Ts>
     static hpx::future<
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >
     async_execute(F && f, Ts &&... ts)
     {
@@ -181,7 +181,7 @@ struct test_timed_async_executor1 : test_async_executor1
 {
     template <typename F, typename ... Ts>
     static hpx::future<
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >
     async_execute_at(hpx::util::steady_time_point const& abs_time, F && f,
         Ts &&... ts)
@@ -209,7 +209,7 @@ namespace hpx { namespace traits
 struct test_timed_async_executor2 : test_async_executor1
 {
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute(F && f, Ts &&... ts)
     {
         ++count_sync;
@@ -221,7 +221,7 @@ struct test_timed_async_executor2 : test_async_executor1
 struct test_timed_async_executor3 : test_timed_async_executor2
 {
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {

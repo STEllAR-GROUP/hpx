@@ -59,6 +59,14 @@ namespace hpx { namespace util
             >
         {};
 
+        template <typename F, typename ...Ts>
+        struct invoke_deferred_result
+          : util::invoke_result<
+                typename util::decay_unwrap<F>::type,
+                typename util::decay_unwrap<Ts>::type...
+            >
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         class deferred;
@@ -86,7 +94,7 @@ namespace hpx { namespace util
             deferred& operator=(deferred const&) = delete;
 
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename deferred_result_of<F(Ts...)>::type
+            typename invoke_deferred_result<F, Ts...>::type
             operator()()
             {
                 return util::invoke_fused(std::move(_f), std::move(_args));

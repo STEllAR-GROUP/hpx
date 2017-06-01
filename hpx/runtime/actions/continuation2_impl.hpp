@@ -39,12 +39,11 @@ namespace hpx { namespace actions {
         virtual ~continuation2_impl() {}
 
         template <typename T>
-        typename util::result_of<
-            function_type(
-                hpx::naming::id_type,
-                typename util::result_of<
-                    cont_type(hpx::naming::id_type, T)
-                >::type)
+        typename util::invoke_result<function_type,
+            hpx::naming::id_type,
+            typename util::invoke_result<
+                cont_type, hpx::naming::id_type, T
+            >::type
         >::type operator()(hpx::naming::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
@@ -53,12 +52,11 @@ namespace hpx { namespace actions {
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.
-            typedef typename util::result_of<
-                function_type(
-                    hpx::naming::id_type,
-                    typename util::result_of<
-                        cont_type(hpx::naming::id_type, T)
-                    >::type)
+            typedef typename util::invoke_result<function_type,
+                hpx::naming::id_type,
+                typename util::invoke_result<
+                    cont_type, hpx::naming::id_type, T
+                >::type
             >::type result_type;
             return result_type();
         }

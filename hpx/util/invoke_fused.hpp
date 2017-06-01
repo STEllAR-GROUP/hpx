@@ -56,6 +56,11 @@ namespace hpx { namespace util
           : fused_result_of_impl<F, Tuple&&, typename fused_index_pack<Tuple>::type>
         {};
 
+        template <typename F, typename Tuple>
+        struct invoke_fused_result
+          : fused_result_of_impl<F, Tuple&&, typename fused_index_pack<Tuple>::type>
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         template <typename R, typename F, typename Tuple, std::size_t ...Is>
         HPX_HOST_DEVICE
@@ -87,10 +92,10 @@ namespace hpx { namespace util
     /// \note This function is similar to `std::apply` (C++17)
     template <typename F, typename Tuple>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename detail::fused_result_of<F&&(Tuple&&)>::type
+    typename detail::invoke_fused_result<F, Tuple>::type
     invoke_fused(F&& f, Tuple&& t)
     {
-        typedef typename detail::fused_result_of<F&&(Tuple&&)>::type R;
+        typedef typename detail::invoke_fused_result<F, Tuple>::type R;
 
         return detail::invoke_fused_impl<R>(
             std::forward<F>(f), std::forward<Tuple>(t),
@@ -117,10 +122,10 @@ namespace hpx { namespace util
         {
             template <typename F, typename Tuple>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename util::detail::fused_result_of<F&&(Tuple&&)>::type
+            typename util::detail::invoke_fused_result<F, Tuple>::type
             operator()(F&& f, Tuple&& args)
             {
-                typedef typename util::detail::fused_result_of<F&&(Tuple&&)>::type R;
+                typedef typename util::detail::invoke_fused_result<F, Tuple>::type R;
 
                 return hpx::util::void_guard<R>(), util::invoke_fused(
                     std::forward<F>(f),

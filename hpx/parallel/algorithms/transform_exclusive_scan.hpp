@@ -283,11 +283,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<InIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Op,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
@@ -326,11 +326,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<InIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Op,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type

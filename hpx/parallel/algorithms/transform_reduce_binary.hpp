@@ -407,13 +407,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<InIter2>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
