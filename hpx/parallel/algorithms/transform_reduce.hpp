@@ -241,17 +241,16 @@ namespace hpx { namespace parallel { inline namespace v1
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        hpx::traits::is_callable<
-                Convert(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Convert,
+                typename std::iterator_traits<InIter>::value_type
             >::value &&
-        hpx::traits::is_callable<
-            Reduce(
+        hpx::traits::is_invocable<Reduce,
                 typename hpx::util::result_of<
                     Convert(typename std::iterator_traits<InIter>::value_type)
                 >::type,
                 typename hpx::util::result_of<
                     Convert(typename std::iterator_traits<InIter>::value_type)
-                >::type)
+                >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy && policy, InIter first, InIter last,
@@ -272,17 +271,16 @@ namespace hpx { namespace parallel { inline namespace v1
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
-        hpx::traits::is_callable<
-                Convert(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Convert,
+                typename std::iterator_traits<InIter>::value_type
             >::value &&
-        hpx::traits::is_callable<
-            Reduce(
+        hpx::traits::is_invocable<Reduce,
                 typename hpx::util::result_of<
                     Convert(typename std::iterator_traits<InIter>::value_type)
                 >::type,
                 typename hpx::util::result_of<
                     Convert(typename std::iterator_traits<InIter>::value_type)
-                >::type)
+                >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy && policy, InIter first, InIter last,

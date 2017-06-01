@@ -47,6 +47,17 @@ namespace hpx { namespace traits
     struct is_callable<F(Ts...), R>
       : detail::is_callable_impl<F(Ts...), R>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    struct is_invocable
+      : detail::is_callable_impl<F&&(Ts&&...), void>
+    {};
+
+    template <typename R, typename F, typename ...Ts>
+    struct is_invocable_r
+      : detail::is_callable_impl<F&&(Ts&&...), R>
+    {};
 }}
 
 #endif

@@ -71,7 +71,7 @@ namespace hpx { namespace util
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         function(F&& f)
           : base_type()
@@ -109,7 +109,7 @@ namespace hpx { namespace util
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         function& operator=(F&& f)
         {

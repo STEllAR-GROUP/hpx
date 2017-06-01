@@ -32,6 +32,15 @@ namespace hpx { namespace traits { namespace detail
                 typename util::decay_unwrap<Ts>::type...)
         >
     {};
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_invocable
+      : is_invocable<
+            typename util::decay_unwrap<F>::type,
+            typename util::decay_unwrap<Ts>::type...
+        >
+    {};
+
 }}}
 
 namespace hpx { namespace util

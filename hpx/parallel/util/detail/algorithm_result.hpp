@@ -245,7 +245,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U)>::value)>
+        hpx::traits::is_invocable<Conv, U>::value)>
     typename hpx::util::result_of<Conv(U)>::type
     convert_to_result(U && val, Conv && conv)
     {
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
     template <typename U, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        hpx::traits::is_callable<Conv(U)>::value)>
+        hpx::traits::is_invocable<Conv, U>::value)>
     hpx::future<typename hpx::util::result_of<Conv(U)>::type>
     convert_to_result(hpx::future<U> && f, Conv && conv)
     {

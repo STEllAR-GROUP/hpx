@@ -110,7 +110,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -145,7 +145,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -163,7 +163,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -183,7 +183,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -205,7 +205,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -230,7 +230,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -252,7 +252,7 @@ namespace hpx { namespace detail
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -282,7 +282,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
@@ -306,7 +306,7 @@ namespace hpx { namespace detail
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<
                 typename util::detail::deferred_result_of<F&&(Ts&&...)>::type
             >
