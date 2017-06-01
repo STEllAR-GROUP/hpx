@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -46,7 +47,8 @@ namespace hpx { namespace parallel { inline namespace v1
             FwdIter s_first = first;
             try {
                 for (/* */; first != last; ++first) {
-                    ::new (static_cast<void*>(std::addressof(*first))) value_type;
+                    ::new (static_cast<void*>(std::addressof(*first)))
+                        value_type;
                 }
             }
             catch (...) {
@@ -70,7 +72,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
                     [](FwdIter it) {
-                        ::new (&*it) value_type;
+                        ::new (sstatic_cast<void*>(std::addressof(*it)))
+                            value_type;
                     },
                     [](FwdIter it) {
                         (*it).~value_type();
