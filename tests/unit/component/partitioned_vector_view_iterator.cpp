@@ -49,7 +49,7 @@ void bulk_test( hpx::lcos::spmd_block block,
         for (auto && v : my_view)
         {
             // It's a Put operation
-            v = std::vector<double>(4,idx++);
+            v = std::vector<double>(elt_size,idx++);
         }
     }
 

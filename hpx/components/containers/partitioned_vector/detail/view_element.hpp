@@ -75,9 +75,6 @@ namespace hpx { namespace detail
         }
 
     private:
-        template<typename, typename>
-        friend class partitioned_vector_local_view_iterator;
-
         bool is_data_here() const
         {
             return is_data_here_;
@@ -93,6 +90,7 @@ namespace hpx { namespace detail
                 return this->get_copied_data(hpx::launch::sync) ;
         }
 
+    public:
         Data & data()
         {
             return this->get_ptr()->get_data();
@@ -108,7 +106,6 @@ namespace hpx { namespace detail
             return is_owned_by_current_thread_;
         }
 
-    public:
         // Note: Put operation. Race condition may occur, be sure that
         // operator=() is called by only one thread at a time.
         void operator=(Data && other)
