@@ -482,6 +482,16 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_uninitialized_fill.hpp>`]
      [[cpprefmemdocs uninitialized_fill_n]]
     ]
+    [[ [algoref uninitialized_value_construct] ]
+     [Constructs objects in an uninitialized area of memory.]
+     [`<hpx/include/parallel_uninitialized_value_construct.hpp>`]
+     [[cpprefmemdocs uninitialized_value_construct]]
+    ]
+    [[ [algoref uninitialized_value_construct_n] ]
+     [Constructs objects in an uninitialized area of memory.]
+     [`<hpx/include/uninitialized_value_construct.hpp>`]
+     [[cpprefmemdocs uninitialized_value_construct_n]]
+    ]
 ]
 
 [table Index-based for-loops (In Header: `<hpx/include/parallel_algorithm.hpp>`)
