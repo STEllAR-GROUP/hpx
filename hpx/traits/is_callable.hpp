@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:is_callable
+// hpxinspect:nodeprecatedname:util::result_of
+
 #ifndef HPX_TRAITS_IS_CALLABLE_HPP
 #define HPX_TRAITS_IS_CALLABLE_HPP
 
