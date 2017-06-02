@@ -15,6 +15,7 @@
 #include <boost/iterator/iterator_facade.hpp>
 
 #include <array>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 

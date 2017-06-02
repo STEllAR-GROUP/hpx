@@ -15,10 +15,13 @@
 #include <hpx/lcos/spmd_block.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 
+#include <array>
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <type_traits>
 #include <vector>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL

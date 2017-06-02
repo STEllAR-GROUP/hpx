@@ -11,6 +11,8 @@
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
+#include <utility>
+
 namespace hpx {
 
     template <typename DataType, typename BaseIter>

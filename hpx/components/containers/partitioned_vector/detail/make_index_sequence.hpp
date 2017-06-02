@@ -8,6 +8,8 @@
 #ifndef HPX_PARTITIONED_VECTOR_DETAIL_MAKE_INDEX_SEQUENCE_HPP
 #define HPX_PARTITIONED_VECTOR_DETAIL_MAKE_INDEX_SEQUENCE_HPP
 
+#include <cstddef>
+
 namespace hpx {  namespace detail {
 
     // Unrolled recursive version of make_index_sequence

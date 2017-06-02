@@ -9,6 +9,7 @@
 #define HPX_PARTITIONED_VECTOR_DETAIL_VIEW_ELEMENT_HPP
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/lcos/spmd_block.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -16,7 +17,7 @@
 
 #include <utility>
 #include <cstdint>
-#include <cstdio>
+#include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
