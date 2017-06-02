@@ -7,6 +7,8 @@
 #define HPX_UTIL_COMMAND_LINE_HANDLING_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/manage_config.hpp>
@@ -14,6 +16,7 @@
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <boost/format.hpp>
 
 #include <cstddef>
 #include <string>
@@ -28,7 +31,7 @@ namespace hpx { namespace util
     {
         command_line_handling(char const* argv0)
           : rtcfg_(argv0),
-            ini_config_(std::vector<std::string>),
+            ini_config_(hpx_startup::user_main_config(std::vector<std::string>(0))),
             hpx_main_f_(static_cast<hpx_main_type>(::hpx_main)),
             node_(std::size_t(-1)),
             num_threads_(1),
