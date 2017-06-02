@@ -27,7 +27,7 @@ namespace hpx { namespace threads { namespace executors
                 : public threads::detail::scheduled_executor_base
         {
         public:
-            customized_pool_executor(std::string pool_name);
+            customized_pool_executor(const std::string &pool_name);
             ~customized_pool_executor();
 
             // Schedule the specified function for execution in this executor.
@@ -87,7 +87,7 @@ namespace hpx { namespace threads { namespace executors
 
     struct HPX_EXPORT customized_pool_executor : public scheduled_executor
     {
-        customized_pool_executor(std::string pool_name);
+        customized_pool_executor(const std::string &pool_name);
     };
 
 }}}
