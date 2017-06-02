@@ -322,6 +322,7 @@ namespace hpx {
                     );
 
                     pools_.push_back(pool);
+                    break;
                 }
                 case -1 : //! unspecified = -1
                 {
