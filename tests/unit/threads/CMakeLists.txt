@@ -22,7 +22,7 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
 else()
   set(lockfree_fifo_FLAGS NOLIBS)
