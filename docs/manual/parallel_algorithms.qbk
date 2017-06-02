@@ -462,6 +462,16 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [table Dynamic Memory Management (In Header: `<hpx/include/parallel_memory.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
+    [[ [algoref destroy] ]
+     [Destroys a range of objects.]
+     [`<hpx/include/parallel_destroy.hpp>`]
+     [[cpprefmemdocs destroy]]
+    ]
+    [[ [algoref destroy_n] ]
+     [Destroys a range of objects.]
+     [`<hpx/include/parallel_destroy.hpp>`]
+     [[cpprefmemdocs destroy_n]]
+    ]
     [[ [algoref uninitialized_copy] ]
      [Copies a range of objects to an uninitialized area of memory.]
      [`<hpx/include/parallel_uninitialized_copy.hpp>`]

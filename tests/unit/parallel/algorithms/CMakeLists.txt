@@ -24,6 +24,8 @@ set(tests
     copyn
     count
     countif
+    destroy
+    destroyn
     equal
     equal_binary
     exclusive_scan
