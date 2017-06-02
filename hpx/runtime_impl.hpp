@@ -64,12 +64,7 @@ namespace hpx
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        /// \param num_threads    [in] The initial number of threads to be started
-        ///                       by the thread-manager.
-        explicit runtime_impl(util::runtime_configuration & rtcfg,
-            util::command_line_handling cfg,
-            runtime_mode locality_mode = runtime_mode_console,
-            std::size_t num_threads = 1);
+        explicit runtime_impl(util::runtime_configuration & rtcfg);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -369,7 +364,6 @@ namespace hpx
         util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
-        std::size_t num_threads_;
         util::io_service_pool main_pool_;
         util::io_service_pool io_pool_;
         util::io_service_pool timer_pool_;

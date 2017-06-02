@@ -6,6 +6,7 @@
 #if !defined(HPX_RESOURCE_PARTITIONER)
 #define HPX_RESOURCE_PARTITIONER
 
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
@@ -26,7 +27,24 @@
 #include <stdexcept>
 #include <algorithm>
 
+
 namespace hpx {
+
+    namespace resource {
+        class resource_partitioner;
+    }
+
+    // if the resource partitioner is accessed before the HPX runtime has started
+    // then on first access, this function should be used, to ensure that command line
+    // affinity binding options are honoured. Use this function signature only once
+    // and thereafter use the parameter free version.
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            int argc, char **argv);
+
+    // may be used anywhere in code and returns a reference to the
+    // single, global resource partitioner
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner();
+
 namespace resource
 {
 
@@ -120,6 +138,17 @@ namespace resource
         // but rather get_resource_partitioner
         resource_partitioner(std::size_t num_special_pools_ = 0);
 
+        void set_hpx_init_options(
+                hpx::runtime_mode mode,
+                util::function_nonser<
+                        int(boost::program_options::variables_map& vm)
+                > const& f,
+                std::vector<std::string> && ini_config);
+
+        int call_cmd_line_options(
+                boost::program_options::options_description const& desc_cmdline,
+                int argc, char** argv);
+
         void print_init_pool_data() const;
 
         // create a thread_pool
@@ -160,7 +189,7 @@ namespace resource
 
         // Does initialization of all resources and internal data of the resource partitioner
         // called in hpx_init
-        void init_resources(util::command_line_handling cfg);
+        void configure_pools();
 
         // called in runtime::assign_cores()
         size_t init(threads::policies::init_affinity_data data) {
@@ -173,7 +202,9 @@ namespace resource
 
         scheduling_policy which_scheduler(const std::string &pool_name);
         threads::topology& get_topology() const;
-        threads::policies::init_affinity_data get_init_affinity_data() const;
+        util::command_line_handling& get_command_line_switches();
+        std::size_t get_num_threads() const;
+        threads::policies::init_affinity_data const& get_init_affinity_data() const;
         size_t get_num_pools() const;
         size_t get_num_threads(const std::string &pool_name);
         const std::string &get_pool_name(size_t index) const;
@@ -183,6 +214,9 @@ namespace resource
         const std::vector<numa_domain> &get_numa_domains() {
             return numa_domains_;
         }
+
+        // allow this free function access so that it can perform command line parsing
+        friend resource_partitioner &hpx::get_resource_partitioner(int argc, char **argv);
 
     private:
 
@@ -214,6 +248,9 @@ namespace resource
         // counter for instance numbers
         static boost::atomic<int> instance_number_counter_;
 
+        // holds all of the command line switches
+        util::command_line_handling cfg_;
+
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
         std::vector<init_pool_data> initial_thread_pools_;
@@ -233,14 +270,6 @@ namespace resource
     };
 
     } // namespace resource
-
-    static resource::resource_partitioner & get_resource_partitioner()
-    {
-        util::static_<resource::resource_partitioner, std::false_type> rp;
-        return rp.get();
-    }
-
-
 } // namespace hpx
 
 

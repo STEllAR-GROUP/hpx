@@ -17,6 +17,21 @@
 
 namespace hpx {
 
+    resource::resource_partitioner & get_resource_partitioner()
+    {
+        util::static_<resource::resource_partitioner, std::false_type> rp;
+        return rp.get();
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(int argc, char **argv)
+    {
+        using namespace boost::program_options;
+        resource::resource_partitioner & rp = get_resource_partitioner();
+        //! FIXME if cfg has already been set, then throw exception? or skip next?
+        rp.cfg_ = util::command_line_handling(argv[0]);
+        return rp;
+    }
+
     namespace detail {
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
@@ -205,6 +220,25 @@ namespace resource
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
 
         fill_topology_vectors();
+    }
+
+    void resource_partitioner::set_hpx_init_options(
+            hpx::runtime_mode mode,
+            util::function_nonser<
+                    int(boost::program_options::variables_map& vm)
+            > const& f,
+            std::vector<std::string> && ini_config)
+    {
+        cfg_.rtcfg_.mode_ = mode;
+        cfg_.hpx_main_f_ = f;
+        cfg_.ini_config_ = ini_config;
+    }
+
+    int resource_partitioner::call_cmd_line_options(
+            boost::program_options::options_description const& desc_cmdline,
+            int argc, char** argv)
+    {
+        return cfg_.call(desc_cmdline, argc, argv);
     }
 
     void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling const& cfg)
@@ -549,11 +583,11 @@ namespace resource
         get_pool(pool_name)->set_scheduler(sched);
     }
 
-    void resource_partitioner::init_resources(util::command_line_handling cfg){
-        set_init_affinity_data(cfg);
-        set_affinity_data(cfg.num_threads_);
-        setup_pools(cfg.num_threads_);
-        set_default_schedulers(cfg.queuing_);
+    void resource_partitioner::configure_pools(){
+        set_init_affinity_data(cfg_);
+        set_affinity_data(cfg_.num_threads_);
+        setup_pools(cfg_.num_threads_);
+        set_default_schedulers(cfg_.queuing_);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -574,10 +608,20 @@ namespace resource
         return topology_;
     }
 
+    util::command_line_handling& resource_partitioner::get_command_line_switches()
+    {
+        return cfg_;
+    }
+
+    std::size_t resource_partitioner::get_num_threads() const
+    {
+        return cfg_.num_threads_;
+    }
+
     //! used in the constructor of runtime.
     //! but rt probs shouldn't even own one ...
     //! FIXME
-    threads::policies::init_affinity_data resource_partitioner::get_init_affinity_data() const
+    threads::policies::init_affinity_data const& resource_partitioner::get_init_affinity_data() const
     { //! should this return a pointer instead of a copy?
         return init_affinity_data_;
     }

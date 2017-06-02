@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
@@ -145,6 +146,9 @@ namespace hpx { namespace util
             std::vector<std::string> const& cmdline_ini_defs);
 
         void reconfigure();
+
+    public:
+        runtime_mode mode_;
 
     private:
         mutable std::uint32_t num_localities;

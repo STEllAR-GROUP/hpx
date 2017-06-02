@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, i);
         }
-        else if (data.affinity_desc_ == "affinity-from-resource-partitioner")
+        else if (data.affinity_desc_ == "affinity-from-resource-partitioner") //! FIXME shouldn't be essentially different from next
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_, 0);

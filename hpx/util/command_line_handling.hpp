@@ -26,16 +26,19 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
-        command_line_handling(hpx::runtime_mode mode,
-                util::function_nonser<
-                    int(boost::program_options::variables_map& vm)
-                > const& f,
-                std::vector<std::string> && ini_config,
-                char const* argv0)
+        command_line_handling(char const* argv0)
           : rtcfg_(argv0),
-            mode_(mode),
-            ini_config_(std::move(ini_config)),
-            hpx_main_f_(f),
+            node_(std::size_t(-1)),
+            num_threads_(1),
+            num_cores_(1),
+            num_localities_(1),
+            pu_step_(1),
+            pu_offset_(std::size_t(-1)),
+            numa_sensitive_(0)
+        {}
+
+        command_line_handling()
+          : rtcfg_(nullptr),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
@@ -51,7 +54,6 @@ namespace hpx { namespace util
         boost::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;
 
-        hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
         util::function_nonser<
             int(boost::program_options::variables_map& vm)

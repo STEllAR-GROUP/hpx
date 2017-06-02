@@ -612,11 +612,11 @@ namespace hpx { namespace util
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
-        if (hpx::runtime_mode_default == mode_) {
+        if (hpx::runtime_mode_default == rtcfg_.mode_) {
 #if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
-            mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode_console;
             if (vm.count("hpx:console") + vm.count("hpx:worker") +
                 vm.count("hpx:connect") > 1)
             {
@@ -629,7 +629,7 @@ namespace hpx { namespace util
             // In these cases we default to executing with an empty
             // hpx_main, except if specified otherwise.
             if (vm.count("hpx:worker")) {
-                mode_ = hpx::runtime_mode_worker;
+                rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
@@ -642,17 +642,17 @@ namespace hpx { namespace util
 #endif
             }
             else if (vm.count("hpx:connect")) {
-                mode_ = hpx::runtime_mode_connect;
+                rtcfg_.mode_ = hpx::runtime_mode_connect;
             }
 #else
-            mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode_console;
 #endif
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
-        if (mode_ == hpx::runtime_mode_connect) {
+        if (rtcfg_.mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
             hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
                 boost::lexical_cast<std::uint16_t>(
@@ -684,7 +684,7 @@ namespace hpx { namespace util
                 if (env.agas_node() == node) {
                     // console node, by default runs AGAS
                     run_agas_server = true;
-                    mode_ = hpx::runtime_mode_console;
+                    rtcfg_.mode_ = hpx::runtime_mode_console;
                 }
                 else {
                     // don't use port zero for non-console localities
@@ -693,7 +693,7 @@ namespace hpx { namespace util
 
                     // each node gets an unique port
                     hpx_port = static_cast<std::uint16_t>(hpx_port + node);
-                    mode_ = hpx::runtime_mode_worker;
+                    rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                     // do not execute any explicit hpx_main except if asked
@@ -727,7 +727,7 @@ namespace hpx { namespace util
             }
         }
 
-        if ((vm.count("hpx:connect") || mode_ == hpx::runtime_mode_connect) &&
+        if ((vm.count("hpx:connect") || rtcfg_.mode_ == hpx::runtime_mode_connect) &&
             hpx_host == "127.0.0.1")
         {
             hpx_host = hpx::util::resolve_public_ip_address();
@@ -778,14 +778,14 @@ namespace hpx { namespace util
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         if (hpx_host == agas_host && hpx_port == agas_port) {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
-            run_agas_server = mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
         }
         else if (run_agas_server) {
             // otherwise, if the user instructed us to run the AGAS server,
@@ -799,7 +799,7 @@ namespace hpx { namespace util
         else if (env.found_batch_environment()) {
             // in batch mode, if the network addresses are different and we
             // should not run the AGAS server we assume to be in worker mode
-            mode_ = hpx::runtime_mode_worker;
+            rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
@@ -823,7 +823,7 @@ namespace hpx { namespace util
         }
 
         // we can't run the AGAS server while connecting
-        if (run_agas_server && mode_ == runtime_mode_connect) {
+        if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect) {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
@@ -904,7 +904,7 @@ namespace hpx { namespace util
         //        service only and requests to use 'priority_local' as the
         //        scheduler, switch to the 'local' scheduler instead.
         ini_config += std::string("hpx.runtime_mode=") +
-            get_runtime_mode_name(mode_);
+            get_runtime_mode_name(rtcfg_.mode_);
 
         bool noshutdown_evaluate = false;
         if (vm.count("hpx:print-counter-at")) {
@@ -1171,7 +1171,7 @@ namespace hpx { namespace util
             boost::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argc,
                     argv, prevm, std::size_t(-1), util::allow_unregistered,
-                    mode_))
+                    rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1221,7 +1221,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node_, util::allow_unregistered, mode_,
+                argc, argv, vm_, node_, util::allow_unregistered, rtcfg_.mode_,
                 &help, &unregistered_options))
         {
             return -1;

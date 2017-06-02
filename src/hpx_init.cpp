@@ -558,12 +558,12 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown)
         {
             if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_,
+                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
                     std::move(startup), std::move(shutdown));
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, std::move(startup),
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
             rt.release();          // pointer to runtime is stored in TLS
@@ -615,11 +615,14 @@ namespace hpx
                     return -1;
                 }
 
-                // handle all common command line switches
-                util::command_line_handling cfg(
-                    mode, f, std::move(ini_config), argv[0]);
+                // Construct resource partitioner if this has not been done yet
+                // and get a handle to it
+                auto &rp = hpx::get_resource_partitioner(argc, argv);
+                rp.set_hpx_init_options(mode, f, std::move(ini_config));
 
-                result = cfg.call(desc_cmdline, argc, argv);
+                // check if you have to exit blahblah
+                //! FIXME better comment
+                result = rp.call_cmd_line_options(desc_cmdline, argc, argv);
 
                 if (result != 0) {
                     if (result > 0)
@@ -627,13 +630,12 @@ namespace hpx
                     return result;
                 }
 
-                // Setup all parameters of the resource_partitioner
-                auto &rp = hpx::get_resource_partitioner();
-                rp.init_resources(cfg);
+                // Setup all internal parameters of the resource_partitioner
+                rp.configure_pools();
 
                 // initialize logging
-                util::detail::init_logging(cfg.rtcfg_,
-                    cfg.mode_ == runtime_mode_console);
+                util::detail::init_logging(rp.get_command_line_switches().rtcfg_,
+                                           rp.get_command_line_switches().rtcfg_.mode_ == runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 
@@ -643,11 +645,9 @@ namespace hpx
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
                 std::unique_ptr<hpx::runtime> rt(
-                        new runtime_type(cfg.rtcfg_, cfg, cfg.mode_, cfg.num_threads_));
-                //! FIXME give only the parts of cfg that are needed for the initialization of the scheduler
-                //! FIXME who should own cfg? RT or RP?
+                        new runtime_type(rp.get_command_line_switches().rtcfg_));
 
-                result = run_or_start(blocking, std::move(rt), cfg,
+                result = run_or_start(blocking, std::move(rt), rp.get_command_line_switches(),
                                     std::move(startup), std::move(shutdown));
             }
             catch (detail::command_line_error const& e) {

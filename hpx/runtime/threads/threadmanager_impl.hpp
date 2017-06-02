@@ -57,11 +57,8 @@ namespace hpx { namespace threads
         typedef threads::policies::scheduler_base* scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 
-        threadmanager_impl(
-                util::io_service_pool& timer_pool,
-                notification_policy_type& notifier,
-                std::size_t num_threads,
-                util::command_line_handling cfg);
+        threadmanager_impl(util::io_service_pool& timer_pool,
+                notification_policy_type& notifier);
 
         ~threadmanager_impl();
 

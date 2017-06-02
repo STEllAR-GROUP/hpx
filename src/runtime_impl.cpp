@@ -127,12 +127,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_impl::runtime_impl(
-            util::runtime_configuration & rtcfg,
-            util::command_line_handling cfg,
-            runtime_mode locality_mode, std::size_t num_threads)
-      : runtime(rtcfg),
-        mode_(locality_mode), result_(0), num_threads_(num_threads),
+    runtime_impl::runtime_impl(util::runtime_configuration & rtcfg)
+      : runtime(rtcfg), mode_(rtcfg.mode_), result_(0),
         main_pool_(1,
             util::bind(&runtime_impl::init_tss, This(), "main-thread",
                 util::placeholders::_1, util::placeholders::_2, false),
@@ -146,14 +142,13 @@ namespace hpx {
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         notifier_(runtime_impl::get_notification_policy("worker-thread")),
-        thread_manager_(
-            new hpx::threads::threadmanager_impl(
-                timer_pool_, notifier_, num_threads, cfg)),
+        thread_manager_(new hpx::threads::threadmanager_impl(
+                timer_pool_, notifier_)),
         parcel_handler_(rtcfg, thread_manager_.get(),
             util::bind(&runtime_impl::init_tss, This(), "parcel-thread",
                 util::placeholders::_1, util::placeholders::_2, true),
             util::bind(&runtime_impl::deinit_tss, This())),
-        agas_client_(parcel_handler_, ini_, mode_),
+        agas_client_(parcel_handler_, ini_, rtcfg.mode_),
         applier_(parcel_handler_, *thread_manager_)
     {
         LPROGRESS_;
@@ -295,9 +290,7 @@ namespace hpx {
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
-        lbt_ << "(1st stage) runtime_impl::start: booting locality " //-V128
-                   << here() << " on " << num_threads_ << " OS-thread"
-                   << ((num_threads_ == 1) ? "" : "s");
+        lbt_ << "(1st stage) runtime_impl::start: booting locality " << here();
 
         // start runtime_support services
         runtime_support_->run();

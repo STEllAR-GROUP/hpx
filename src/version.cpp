@@ -292,7 +292,7 @@ namespace hpx
         std::ostringstream strm;
 
         // runtime mode
-        strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
+        strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
 
         if (cfg.num_localities_ != 1)
             strm << "  {localities}: " << cfg.num_localities_ << "\n";

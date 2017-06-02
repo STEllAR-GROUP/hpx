@@ -273,10 +273,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     threadmanager_impl::threadmanager_impl(
             util::io_service_pool& timer_pool,
-            notification_policy_type& notifier,
-            std::size_t num_threads,
-            util::command_line_handling cfg_)
-      : num_threads_(num_threads),
+            notification_policy_type& notifier)
+      : num_threads_(hpx::get_resource_partitioner().get_num_threads()),
         timer_pool_(timer_pool),
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
@@ -286,10 +284,11 @@ namespace hpx {
         auto &rp = hpx::get_resource_partitioner();
         rp.set_threadmanager(this);
         size_t num_pools = rp.get_num_pools();
+        util::command_line_handling cfg_ = rp.get_command_line_switches();
         std::string name;
 
         // fill the thread-lookup table
-        //! bring this down in loop
+        //! FIXME bring this down in loop
         for (auto& pool_iter : pools_) {
             size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
             for (size_t i(0); i < nt; i++) {
@@ -311,7 +310,7 @@ namespace hpx {
             }
 
             switch (sched_type) {
-                case -2 : //! user supplied
+                case -2 : // user supplied
                 {
                     const auto &pool_func = rp.get_pool_creator(i);
                     detail::thread_pool* pool = pool_func(
@@ -324,12 +323,12 @@ namespace hpx {
                     pools_.push_back(pool);
                     break;
                 }
-                case -1 : //! unspecified = -1
+                case -1 : // unspecified = -1
                 {
                     throw std::invalid_argument("cannot instantiate a threadmanager if the thread-pool"
                                                 + name + " has an unspecified scheduler type");
                 }
-                case 0 : //! local = 0
+                case 0 : // local = 0
                 {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
                     hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
@@ -360,7 +359,7 @@ namespace hpx {
                     break;
                 }
 
-                case 1 : //! local_priority_fifo = 1
+                case 1 : // local_priority_fifo = 1
                 {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
@@ -387,7 +386,7 @@ namespace hpx {
                     break;
                 }
 
-                case 2 : //! local_priority_lifo = 2
+                case 2 : // local_priority_lifo = 2
                 {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     std::size_t num_high_priority_queues =
@@ -415,7 +414,7 @@ namespace hpx {
                 }
 
 
-                case 3 : //! static_ = 3
+                case 3 : // static_ = 3
                 {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
                     hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
@@ -448,7 +447,7 @@ namespace hpx {
                 }
 
 
-                case 4 : //! static_priority = 4
+                case 4 : // static_priority = 4
                 {
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
@@ -484,7 +483,7 @@ namespace hpx {
                 }
 
 
-                case 5 : //! abp_priority = 5
+                case 5 : // abp_priority = 5
                 {
 #if defined(HPX_HAVE_ABP_SCHEDULER)
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
@@ -518,7 +517,7 @@ namespace hpx {
                 }
 
 
-                case 6 : //! hierarchy = 6
+                case 6 : // hierarchy = 6
                 {
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
                     hpx::detail::ensure_high_priority_compatibility(
@@ -552,7 +551,7 @@ namespace hpx {
                 }
 
 
-                case 7 : //! periodic_priority = 7
+                case 7 : // periodic_priority = 7
                 {
                     hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
                     hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
@@ -577,7 +576,7 @@ namespace hpx {
                 }
 
 
-                case 8 : //! throttle = 8
+                case 8 : // throttle = 8
                 {
 #if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
                     hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
