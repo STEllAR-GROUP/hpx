@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 {
     std::cout << "[main] " << "Starting program... \n";
 
-    auto &rp = hpx::get_resource_partitioner();
+    auto &rp = hpx::get_resource_partitioner(argc, argv);
     auto &topo = rp.get_topology();
     std::cout << "[main] " << "obtained reference to the resource_partitioner\n";
     //

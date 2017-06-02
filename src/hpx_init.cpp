@@ -617,7 +617,7 @@ namespace hpx
 
                 // Construct resource partitioner if this has not been done yet
                 // and get a handle to it
-                auto &rp = hpx::get_resource_partitioner(argc, argv);
+                auto &rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv);
                 rp.set_hpx_init_options(mode, f, std::move(ini_config));
 
                 // check if you have to exit blahblah

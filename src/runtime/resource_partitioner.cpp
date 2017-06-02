@@ -25,11 +25,25 @@ namespace hpx {
 
     resource::resource_partitioner & get_resource_partitioner(int argc, char **argv)
     {
-        using namespace boost::program_options;
+        using boost::program_options::options_description;
+
+        options_description desc_cmdline(
+                std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        return get_resource_partitioner(desc_cmdline, argc, argv);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline, int argc, char **argv)
+    {
         resource::resource_partitioner & rp = get_resource_partitioner();
-        //! FIXME if cfg has already been set, then throw exception? or skip next?
-        rp.cfg_ = util::command_line_handling(argv[0]);
-        return rp;
+        if(rp.cfg_.num_threads_ == 0){
+            rp.cfg_ = util::command_line_handling(argv[0]);
+            rp.cfg_.call(desc_cmdline, argc, argv);
+            return rp;
+        }
+        throw std::invalid_argument("After hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) has been called already, you should call hpx::get_resource_partitioner()");
+        //! FIXME pas beau
     }
 
     namespace detail {
@@ -219,6 +233,8 @@ namespace resource
         if(instance_number_counter_++ >= 0)
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
 
+        set_init_affinity_data();
+        cores_needed_ = affinity_data_.init(cfg_.num_threads_, init_affinity_data_, topology_);
         fill_topology_vectors();
     }
 
@@ -241,27 +257,23 @@ namespace resource
         return cfg_.call(desc_cmdline, argc, argv);
     }
 
-    void resource_partitioner::set_init_affinity_data(hpx::util::command_line_handling const& cfg)
+    void resource_partitioner::set_init_affinity_data()
     {
         // Setup the initial affinity data
-        std::size_t pu_offset = hpx::detail::get_pu_offset(cfg);
-        std::size_t pu_step = hpx::detail::get_pu_step(cfg);
-        std::string affinity_domain = hpx::detail::get_affinity_domain(cfg);
+        std::size_t pu_offset = hpx::detail::get_pu_offset(cfg_);
+        std::size_t pu_step = hpx::detail::get_pu_step(cfg_);
+        std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
 
         // if the binding should be set from the user's instructions in int main()
         std::string affinity_desc;
         if(set_affinity_from_resource_partitioner_){
             affinity_desc = "affinity-from-resource-partitioner";
         } else {
-            std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg_, affinity_desc);
         }
 
         init_affinity_data_ = threads::policies::init_affinity_data(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
-    }
-
-    void resource_partitioner::set_affinity_data(std::size_t num_threads) {
-        affinity_data_.set_num_threads(num_threads);
     }
 
     void resource_partitioner::fill_topology_vectors()
@@ -299,7 +311,7 @@ namespace resource
     // -2 checks whether there are oversubscribed PUs
     // -3 sets data member thread_num for each pool
     // -4 sets up the default pool
-    void resource_partitioner::setup_pools(std::size_t num_threads) {
+    void resource_partitioner::setup_pools() {
 
         // check whether any of the pools defined up to now are empty
         // note: does not check "default", this one is allowed not to be given resources by the user
@@ -387,44 +399,44 @@ namespace resource
 
     }
 
-    void resource_partitioner::set_default_schedulers(const std::string &queueing) {
+    void resource_partitioner::set_default_schedulers() {
 
         // select the default scheduler
         scheduling_policy default_scheduler;
 
-        if (0 == std::string("local").find(queueing))
+        if (0 == std::string("local").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::local;
         }
-        else if (0 == std::string("local-priority-fifo").find(queueing))
+        else if (0 == std::string("local-priority-fifo").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::local_priority_fifo ;
         }
-        else if (0 == std::string("local-priority-lifo").find(queueing))
+        else if (0 == std::string("local-priority-lifo").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::local_priority_lifo;
         }
-        else if (0 == std::string("static").find(queueing))
+        else if (0 == std::string("static").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::static_;
         }
-        else if (0 == std::string("static-priority").find(queueing))
+        else if (0 == std::string("static-priority").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::static_priority;
         }
-        else if (0 == std::string("abp-priority").find(queueing))
+        else if (0 == std::string("abp-priority").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::abp_priority;
         }
-        else if (0 == std::string("hierarchy").find(queueing))
+        else if (0 == std::string("hierarchy").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::hierarchy;
         }
-        else if (0 == std::string("periodic-priority").find(queueing))
+        else if (0 == std::string("periodic-priority").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::periodic_priority;
         }
-        else if (0 == std::string("throttle").find(queueing)) {
+        else if (0 == std::string("throttle").find(cfg_.queuing_)) {
             default_scheduler = scheduling_policy::throttle;
         }
         else {
@@ -584,10 +596,8 @@ namespace resource
     }
 
     void resource_partitioner::configure_pools(){
-        set_init_affinity_data(cfg_);
-        set_affinity_data(cfg_.num_threads_);
-        setup_pools(cfg_.num_threads_);
-        set_default_schedulers(cfg_.queuing_);
+        setup_pools();
+        set_default_schedulers();
     }
 
     ////////////////////////////////////////////////////////////////////////

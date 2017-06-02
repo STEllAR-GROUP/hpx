@@ -28,6 +28,8 @@ namespace hpx { namespace util
     {
         command_line_handling(char const* argv0)
           : rtcfg_(argv0),
+            ini_config_(std::vector<std::string>),
+            hpx_main_f_(static_cast<hpx_main_type>(::hpx_main)),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
@@ -40,7 +42,7 @@ namespace hpx { namespace util
         command_line_handling()
           : rtcfg_(nullptr),
             node_(std::size_t(-1)),
-            num_threads_(1),
+            num_threads_(0),
             num_cores_(1),
             num_localities_(1),
             pu_step_(1),

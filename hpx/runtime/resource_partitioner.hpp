@@ -21,6 +21,7 @@
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/format.hpp>
 
 #include <vector>
 #include <string>
@@ -40,6 +41,9 @@ namespace hpx {
     // and thereafter use the parameter free version.
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             int argc, char **argv);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline, int argc, char **argv);
+
 
     // may be used anywhere in code and returns a reference to the
     // single, global resource partitioner
@@ -192,10 +196,9 @@ namespace resource
         void configure_pools();
 
         // called in runtime::assign_cores()
-        size_t init(threads::policies::init_affinity_data data) {
-            std::size_t ret = affinity_data_.init(data, topology_);
+        size_t init() {
             thread_manager_->init();
-            return ret;
+            return cores_needed_;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -216,7 +219,10 @@ namespace resource
         }
 
         // allow this free function access so that it can perform command line parsing
-        friend resource_partitioner &hpx::get_resource_partitioner(int argc, char **argv);
+        friend resource_partitioner& hpx::get_resource_partitioner(int argc, char **argv);
+        friend resource_partitioner& hpx::get_resource_partitioner(
+                boost::program_options::options_description desc_cmdline, int argc, char **argv);
+
 
     private:
 
@@ -227,10 +233,9 @@ namespace resource
         ////////////////////////////////////////////////////////////////////////
 
         // called in hpx_init run_or_start
-        void set_init_affinity_data(hpx::util::command_line_handling const& cfg);
-        void set_affinity_data(std::size_t num_threads);
-        void setup_pools(std::size_t num_threads);
-        void set_default_schedulers(const std::string &queueing);
+        void set_init_affinity_data();
+        void setup_pools();
+        void set_default_schedulers();
         bool check_oversubscription() const;
         bool check_empty_pools() const;
 
@@ -250,6 +255,7 @@ namespace resource
 
         // holds all of the command line switches
         util::command_line_handling cfg_;
+        std::size_t cores_needed_;
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime

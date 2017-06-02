@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         affinity_data();
 
-        std::size_t init(init_affinity_data const& data,
+        std::size_t init(std::size_t num_threads, init_affinity_data const& data,
                 topology const& toplogy);
 
         void set_num_threads(size_t num_threads){

@@ -56,9 +56,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
     }
 
-    std::size_t affinity_data::init(init_affinity_data const& data,
+    std::size_t affinity_data::init(std::size_t num_threads, init_affinity_data const& data,
         topology const & topology)
     {
+        num_threads_ = num_threads;
         std::size_t num_system_pus = hardware_concurrency();
 
         // initialize from command line
