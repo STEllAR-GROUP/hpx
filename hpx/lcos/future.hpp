@@ -89,7 +89,9 @@ namespace hpx { namespace lcos { namespace detail
         } else if (state == future_state::invalid) {
             f = Future();
         } else {
-            HPX_ASSERT(false);
+            HPX_THROW_EXCEPTION(invalid_status,
+                "serialize_future_load",
+                "attempting to deserialize a future with an unknown state");
         }
     }
 
@@ -120,7 +122,9 @@ namespace hpx { namespace lcos { namespace detail
         } else if (state == future_state::invalid) {
             f = Future();
         } else {
-            HPX_ASSERT(false);
+            HPX_THROW_EXCEPTION(invalid_status,
+                "serialize_future_load",
+                "attempting to deserialize a future with an unknown state");
         }
     }
 
@@ -132,9 +136,9 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename hpx::traits::future_traits<Future>::result_type value_type;
 
         int state = future_state::invalid;
-        if(ar.is_preprocessing())
+        if (f.valid() && !f.is_ready())
         {
-            if(!f.is_ready())
+            if (ar.is_preprocessing())
             {
                 typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
                     = hpx::traits::future_access<Future>::get_shared_state(f);
@@ -145,34 +149,12 @@ namespace hpx { namespace lcos { namespace detail
             }
             else
             {
-                if(f.is_ready())
-                {
-                    if (f.has_value())
-                    {
-                        value_type const & value =
-                            *hpx::traits::future_access<Future>::
-                                get_shared_state(f)->get_result();
-                        state = future_state::has_value;
-                        ar << state << value; //-V128
-                    } else if (f.has_exception()) {
-                        state = future_state::has_exception;
-                        boost::exception_ptr exception = f.get_exception_ptr();
-                        ar << state << exception;
-                    } else {
-                        state = future_state::invalid;
-                        ar << state;
-                    }
-                }
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "serialize_future_save",
+                    "future must be ready in order for it to be serialized");
             }
             return;
         }
-
-#if defined(HPX_DEBUG)
-        if (f.valid())
-        {
-            HPX_ASSERT(f.is_ready());
-        }
-#endif
 
         if (f.has_value())
         {
@@ -197,9 +179,9 @@ namespace hpx { namespace lcos { namespace detail
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
         int state = future_state::invalid;
-        if(ar.is_preprocessing())
+        if (f.valid() && !f.is_ready())
         {
-            if(!f.is_ready())
+            if (ar.is_preprocessing())
             {
                 typename
                     hpx::traits::detail::shared_state_ptr_for<Future>::type state
@@ -211,32 +193,12 @@ namespace hpx { namespace lcos { namespace detail
             }
             else
             {
-                if (f.has_value())
-                {
-                    state = future_state::has_value;
-                    ar << state;
-                }
-                else if (f.has_exception())
-                {
-                    state = future_state::has_exception;
-                    boost::exception_ptr exception = f.get_exception_ptr();
-                    ar << state << exception;
-                }
-                else
-                {
-                    state = future_state::invalid;
-                    ar << state;
-                }
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "serialize_future_save",
+                    "future must be ready in order for it to be serialized");
             }
             return;
         }
-
-#if defined(HPX_DEBUG)
-        if (f.valid())
-        {
-            HPX_ASSERT(f.is_ready());
-        }
-#endif
 
         if (f.has_value())
         {
