@@ -7,6 +7,8 @@
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
@@ -133,5 +135,6 @@ namespace hpx { namespace lcos
     };
 }}
 
+#endif
 #endif
 

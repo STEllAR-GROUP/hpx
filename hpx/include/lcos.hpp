@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,9 @@
 #include <hpx/lcos/channel.hpp>
 #include <hpx/lcos/gather.hpp>
 #include <hpx/lcos/latch.hpp>
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/lcos/queue.hpp>
+#endif
 #include <hpx/lcos/reduce.hpp>
 
 #include <hpx/include/async.hpp>

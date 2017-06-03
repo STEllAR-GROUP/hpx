@@ -24,17 +24,20 @@ particular order):
 * The parameter sequence for the `hpx::parallel::transform_inclusive_scan` overload
   taking one iterator range has changed (again) to match the changes this algorithm
   has undergone while being moved to C++17. The old overloads can be still enabled
-  at configure time by specifying `-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On`
+  at configure time by passing `-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On`
   to __cmake__.
 * The parameter sequence for the `hpx::parallel::inclusive_scan` overload
   taking one iterator range has changed to match the changes this algorithm
   has undergone while being moved to C++17. The old overloads can be still enabled
-  at configure time by specifying `-DHPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY=On`
+  at configure time by passing `-DHPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY=On`
   to __cmake__.
 * Added a helper facility `hpx::local_new` which is equivalent to `hpx::new_`
   except that it creates components locally only. As a consequence, the used
   component constructor may accept non-serializable argument types and/or
   non-const references or pointers.
+* Removed the (broken) component type `hpx::lcos::queue<T>`. The old type is
+  still available at configure time by passing
+  `-DHPX_WITH_QUEUE_COMPATIBILITY=On` to __cmake__.
 
 [heading Breaking Changes]
 

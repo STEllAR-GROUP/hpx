@@ -176,8 +176,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp")
-
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")

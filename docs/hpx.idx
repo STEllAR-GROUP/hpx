@@ -515,6 +515,10 @@ invoke_r                              "" "header\.hpx\.util\.invoke_r.*"
 invoke_fused                          "" "header\.hpx\.util\.invoke_fused.*"
 invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
 
+# hpx/util/unwrapped.hpp
+unwrapped                             "" "header\.hpx\.util\.unwrapped.*"
+unwrapped2                            "" "header\.hpx\.util\.unwrapped2.*"
+
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"
 terminate                             "" "hpx\.terminate.*"
