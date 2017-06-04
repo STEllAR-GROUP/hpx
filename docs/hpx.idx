@@ -173,7 +173,7 @@ parallel::copy_if                     "copy_if" "hpx\.parallel\.v1\.copy_if.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
 # hpx/parallel/algorithms/count.hpp
-parallel::count                       "count" "hpx\.parallel\.v1\.count$.*"
+parallel::count                       "count" "hpx\.parallel\.v1\.count$"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
 # hpx/parallel/algorithms/equal.hpp
@@ -520,16 +520,16 @@ unwrapped                             "" "header\.hpx\.util\.unwrapped.*"
 unwrapped2                            "" "header\.hpx\.util\.unwrapped2.*"
 
 # hpx/hpx_finalize.hpp
-finalize                              "" "hpx\.finalize.*"
-terminate                             "" "hpx\.terminate.*"
-disconnect                            "" "hpx\.disconnect.*"
-stop                                  "" "hpx\.stop.*"
+finalize                              "" "hpx\.finalize_id.*"
+terminate                             "" "hpx\.terminate$"
+disconnect                            "" "hpx\.disconnect_id.*"
+stop                                  "" "hpx\.stop$"
 
 # hpx/hpx_init.hpp
-init                                  "" "hpx\.init.*"
+init                                  "" "hpx\.init_id.*"
 
 # hpx/hpx_start.hpp
-start                                 "" "hpx\.start.*"
+start                                 "" "hpx\.start_id.*"
 
 # hpx/performance_counters/manage_counter_type.hpp
 install_counter_type                  "" "hpx\.performance_counters\.install_counter_type.*"
