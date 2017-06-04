@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(PkgConfig)
+find_package(PkgConfig QUIET)
 # look for cray pmi...
 pkg_check_modules(PC_PMI_CRAY QUIET cray-pmi)
 # look for the rest if we couldn't find the cray package
