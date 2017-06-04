@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<InIter1>::value ||
                !hpx::traits::is_random_access_iterator<InIter2>::value ||
                !hpx::traits::is_random_access_iterator<OutIter>::value

@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { inline namespace v1
         generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
