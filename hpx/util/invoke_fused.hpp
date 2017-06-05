@@ -68,6 +68,23 @@ namespace hpx { namespace util
         }
     }
 
+    /// Invokes the given callable object f with the content of
+    /// the sequenced type t (tuples, pairs)
+    ///
+    /// \param f Must be a callable object. If f is a member function pointer,
+    ///          the first argument in the sequenced type will be treated as
+    ///          the callee (this object).
+    ///
+    /// \param t A type which is content accessible through a call
+    ///          to hpx#util#get.
+    ///
+    /// \returns The result of the callable object when it's called with
+    ///          the content of the given sequenced type.
+    ///
+    /// \throws std::exception like objects thrown by call to object f
+    ///         with the arguments contained in the sequenceable type t.
+    ///
+    /// \note This function is similar to `std::apply` (C++17)
     template <typename F, typename Tuple>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename detail::fused_result_of<F&&(Tuple&&)>::type
@@ -80,6 +97,10 @@ namespace hpx { namespace util
             typename detail::fused_index_pack<Tuple>::type());
     }
 
+    /// \copydoc invoke_fused
+    ///
+    /// \tparam R The result type of the function when it's called
+    ///           with the content of the given sequenced type.
     template <typename R, typename F, typename Tuple>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     R invoke_fused_r(F&& f, Tuple&& t)
@@ -89,6 +110,7 @@ namespace hpx { namespace util
             typename detail::fused_index_pack<Tuple>::type());
     }
     ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
     namespace functional
     {
         struct invoke_fused
@@ -119,6 +141,7 @@ namespace hpx { namespace util
             }
         };
     }
+    /// \endcond
 }}
 
 #endif

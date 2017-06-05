@@ -297,11 +297,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
         typename hpx::util::always_void<
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 needs special help
-            typename Iterator::iterator_category
-#else
             typename std::iterator_traits<Iterator>::value_type
-#endif
         >::type>
     {
         typedef
@@ -450,7 +446,7 @@ namespace hpx { namespace lcos { namespace detail
             > shared_state_type;
 
     public:
-        future_base() HPX_NOEXCEPT
+        future_base() noexcept
           : shared_state_()
         {}
 
@@ -468,7 +464,7 @@ namespace hpx { namespace lcos { namespace detail
           : shared_state_(other.shared_state_)
         {}
 
-        future_base(future_base && other) HPX_NOEXCEPT
+        future_base(future_base && other) noexcept
           : shared_state_(std::move(other.shared_state_))
         {
             other.shared_state_ = nullptr;
@@ -488,7 +484,7 @@ namespace hpx { namespace lcos { namespace detail
             return *this;
         }
 
-        future_base& operator=(future_base && other) HPX_NOEXCEPT
+        future_base& operator=(future_base && other) noexcept
         {
             if (this != &other)
             {
@@ -499,27 +495,27 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return shared_state_ != nullptr;
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
-        bool is_ready() const HPX_NOEXCEPT
+        bool is_ready() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
-        bool has_value() const HPX_NOEXCEPT
+        bool has_value() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
-        bool has_exception() const HPX_NOEXCEPT
+        bool has_exception() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_exception();
         }
@@ -799,8 +795,6 @@ namespace hpx { namespace lcos
     template <typename R>
     class future : public detail::future_base<future<R>, R>
     {
-        HPX_MOVABLE_ONLY(future);
-
         typedef detail::future_base<future<R>, R> base_type;
 
     public:
@@ -849,7 +843,7 @@ namespace hpx { namespace lcos
         // Effects: constructs an empty future object that does not refer to
         //          an shared state.
         // Postcondition: valid() == false.
-        future() HPX_NOEXCEPT
+        future() noexcept
           : base_type()
         {}
 
@@ -859,7 +853,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future && other) HPX_NOEXCEPT
+        future(future && other) noexcept
           : base_type(std::move(other))
         {}
 
@@ -869,7 +863,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future<future> && other) HPX_NOEXCEPT
+        future(future<future> && other) noexcept
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : nullptr)
         {}
 
@@ -879,7 +873,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future<shared_future<R> > && other) HPX_NOEXCEPT
+        future(future<shared_future<R> > && other) noexcept
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : nullptr)
         {}
 
@@ -917,7 +911,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        future& operator=(future && other) HPX_NOEXCEPT
+        future& operator=(future && other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -1178,7 +1172,7 @@ namespace hpx { namespace lcos
         // Effects: constructs an empty future object that does not refer to
         //          an shared state.
         // Postcondition: valid() == false.
-        shared_future() HPX_NOEXCEPT
+        shared_future() noexcept
           : base_type()
         {}
 
@@ -1195,11 +1189,11 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        shared_future(shared_future && other) HPX_NOEXCEPT
+        shared_future(shared_future && other) noexcept
           : base_type(std::move(other))
         {}
 
-        shared_future(future<R> && other) HPX_NOEXCEPT
+        shared_future(future<R> && other) noexcept
           : base_type(hpx::traits::detail::get_shared_state(other))
         {
             other = future<R>();
@@ -1211,7 +1205,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        shared_future(future<shared_future> && other) HPX_NOEXCEPT
+        shared_future(future<shared_future> && other) noexcept
           : base_type(other.valid() ? detail::unwrap(other.share()) : nullptr)
         {}
 
@@ -1252,7 +1246,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        shared_future& operator=(shared_future && other) HPX_NOEXCEPT
+        shared_future& operator=(shared_future && other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;

@@ -11,7 +11,6 @@
 
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -27,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_count
@@ -191,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >is_seq;
 
@@ -399,7 +398,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 

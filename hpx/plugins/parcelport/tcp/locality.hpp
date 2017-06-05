@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset
                 return "tcp";
             }
 
-            explicit operator bool() const HPX_NOEXCEPT
+            explicit operator bool() const noexcept
             {
                 return port_ != std::uint16_t(-1);
             }

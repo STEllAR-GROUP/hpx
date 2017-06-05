@@ -185,6 +185,7 @@ namespace hpx { namespace threads { namespace coroutines
         class fibers_context_impl
           : public fibers_context_impl_base
         {
+        public:
             HPX_NON_COPYABLE(fibers_context_impl);
 
         public:

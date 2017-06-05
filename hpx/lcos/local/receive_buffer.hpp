@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct entry_data
         {
-        private:
+        public:
             HPX_NON_COPYABLE(entry_data);
 
         public:
@@ -89,9 +89,6 @@ namespace hpx { namespace lcos { namespace local
             buffer_map_type& buffer_map_;
             iterator it_;
         };
-
-    private:
-        HPX_MOVABLE_ONLY(receive_buffer);
 
     public:
         receive_buffer() {}
@@ -252,7 +249,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct entry_data
         {
-        private:
+        public:
             HPX_NON_COPYABLE(entry_data);
 
         public:
@@ -305,9 +302,6 @@ namespace hpx { namespace lcos { namespace local
             buffer_map_type& buffer_map_;
             iterator it_;
         };
-
-    private:
-        HPX_MOVABLE_ONLY(receive_buffer);
 
     public:
         receive_buffer() {}

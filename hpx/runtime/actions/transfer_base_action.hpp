@@ -37,16 +37,11 @@
 
 namespace hpx { namespace actions
 {
-#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
-// for MSVC 12 disable: warning C4520: '...' : multiple default constructors specified
-#pragma warning(push)
-#pragma warning(disable: 4520)
-#endif
-
     template <typename Action>
     struct transfer_base_action : base_action
     {
-        HPX_MOVABLE_ONLY(transfer_base_action);
+    public:
+        HPX_NON_COPYABLE(transfer_base_action);
 
     public:
         typedef typename Action::component_type component_type;
@@ -109,7 +104,7 @@ namespace hpx { namespace actions
         {}
 
         //
-        virtual ~transfer_base_action() HPX_NOEXCEPT
+        virtual ~transfer_base_action() noexcept
         {
             detail::register_action<derived_type>::instance.instantiate();
         }
@@ -321,10 +316,6 @@ namespace hpx { namespace actions
             ++invocation_count_;
         }
     };
-
-#if defined(HPX_MSVC_WARNING_PRAGMA) && HPX_MSVC < 1900
-#pragma warning(pop)
-#endif
 
     template <typename Action>
     boost::atomic<std::int64_t>

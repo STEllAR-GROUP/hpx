@@ -52,13 +52,13 @@ namespace hpx { namespace util
         HPX_EXPORT void init_from_alternative_name(char const* altname);
 
     public:
-        thread_description() HPX_NOEXCEPT
+        thread_description() noexcept
           : type_(data_type_description)
         {
             data_.desc_ = "<unknown>";
         }
 
-        thread_description(char const* desc) HPX_NOEXCEPT
+        thread_description(char const* desc) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = desc ? desc : "<unknown>";
@@ -66,7 +66,7 @@ namespace hpx { namespace util
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         thread_description(char const* desc,
-                util::itt::string_handle const& sh) HPX_NOEXCEPT
+                util::itt::string_handle const& sh) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = desc ? desc : "<unknown>";
@@ -80,7 +80,7 @@ namespace hpx { namespace util
                 !traits::is_action<F>::value
             >::type>
         explicit thread_description(F const& f,
-                char const* altname = nullptr) HPX_NOEXCEPT
+                char const* altname = nullptr) noexcept
           : type_(data_type_description)
         {
             char const* name = traits::get_function_annotation<F>::call(f);
@@ -119,7 +119,7 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-                char const* altname = nullptr) HPX_NOEXCEPT
+                char const* altname = nullptr) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
@@ -128,19 +128,19 @@ namespace hpx { namespace util
 #endif
         }
 
-        data_type kind() const HPX_NOEXCEPT
+        data_type kind() const noexcept
         {
             return type_;
         }
 
-        char const* get_description() const HPX_NOEXCEPT
+        char const* get_description() const noexcept
         {
             HPX_ASSERT(type_ == data_type_description);
             return data_.desc_;
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
+        util::itt::string_handle get_description_itt() const noexcept
         {
             HPX_ASSERT(type_ == data_type_description);
             return desc_itt_ ? desc_itt_ :
@@ -148,18 +148,18 @@ namespace hpx { namespace util
         }
 #endif
 
-        std::size_t get_address() const HPX_NOEXCEPT
+        std::size_t get_address() const noexcept
         {
             HPX_ASSERT(type_ == data_type_address);
             return data_.addr_;
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return valid();
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             if (type_ == data_type_description)
                 return nullptr != data_.desc_;
@@ -184,11 +184,11 @@ namespace hpx { namespace util
         HPX_EXPORT void init_from_alternative_name(char const* altname);
 
     public:
-        thread_description() HPX_NOEXCEPT
+        thread_description() noexcept
         {
         }
 
-        thread_description(char const* desc) HPX_NOEXCEPT
+        thread_description(char const* desc) noexcept
         {
         }
 
@@ -198,7 +198,7 @@ namespace hpx { namespace util
                 !traits::is_action<F>::value
             >::type>
         explicit thread_description(F const& f,
-            char const* altname = nullptr) HPX_NOEXCEPT
+            char const* altname = nullptr) noexcept
         {
         }
 
@@ -207,39 +207,39 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-            char const* altname = nullptr) HPX_NOEXCEPT
+            char const* altname = nullptr) noexcept
         {
         }
 
-        data_type kind() const HPX_NOEXCEPT
+        data_type kind() const noexcept
         {
             return data_type_description;
         }
 
-        char const* get_description() const HPX_NOEXCEPT
+        char const* get_description() const noexcept
         {
             return "<unknown>";
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        util::itt::string_handle get_description_itt() const HPX_NOEXCEPT
+        util::itt::string_handle get_description_itt() const noexcept
         {
             HPX_ASSERT(type_ == data_type_description);
             return util::itt::string_handle(get_description());
         }
 #endif
 
-        std::size_t get_address() const HPX_NOEXCEPT
+        std::size_t get_address() const noexcept
         {
             return 0;
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return valid();
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return true;
         }

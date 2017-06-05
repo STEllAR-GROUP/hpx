@@ -34,7 +34,7 @@
 #endif
 /// \endcond
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // reduce_by_key
@@ -563,7 +563,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             hpx::traits::is_iterator<OutIter2>::value
         )
     >
-    /// \cond NOINTERNAL
     typename util::detail::algorithm_result<
         ExPolicy, std::pair<OutIter, OutIter2>
     >::type
@@ -594,7 +593,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(std::make_pair(keys_output, values_output));
         }
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::reduce_by_key<OutIter,OutIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,
@@ -602,7 +601,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<Compare>(comp),
             std::forward<Func>(func));
     }
-    /// \endcond
 }}}
 
 #endif

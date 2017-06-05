@@ -7,7 +7,7 @@ set(tools)
 set(subdirs inspect)
 
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(tools ${tools} cpu_features)
   set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
 endif()

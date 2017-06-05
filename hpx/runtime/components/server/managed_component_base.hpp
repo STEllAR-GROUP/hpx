@@ -161,6 +161,7 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag
     {
+    public:
         HPX_NON_COPYABLE(managed_component_base);
 
     private:
@@ -351,6 +352,7 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component
     {
+    public:
         HPX_NON_COPYABLE(managed_component);
 
     public:

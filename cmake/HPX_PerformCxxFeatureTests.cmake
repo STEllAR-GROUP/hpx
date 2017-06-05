@@ -28,7 +28,7 @@ macro(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
 
   hpx_check_for_cxx11_defaulted_functions(
-    DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+    REQUIRED "HPX needs support for C++11 defaulted functions")
 
   hpx_check_for_cxx11_deleted_functions(
     REQUIRED "HPX needs support for C++11 deleted functions")
@@ -46,13 +46,13 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
   hpx_check_for_cxx11_inline_namespaces(
-    DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+    REQUIRED "HPX needs support for C++11 inline namespaces")
 
   hpx_check_for_cxx11_lambdas(
     REQUIRED "HPX needs support for C++11 lambdas")
 
   hpx_check_for_cxx11_noexcept(
-    DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+    REQUIRED "HPX needs support for C++11 noexcept")
 
   hpx_check_for_cxx11_nullptr(
     REQUIRED "HPX needs support for C++11 nullptr")

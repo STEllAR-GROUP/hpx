@@ -230,12 +230,12 @@ public:
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
 
-  pointer_allocator() HPX_NOEXCEPT
+  pointer_allocator() noexcept
     : pointer_(nullptr), size_(0)
   {
   }
 
-  pointer_allocator(pointer p, size_type size) HPX_NOEXCEPT
+  pointer_allocator(pointer p, size_type size) noexcept
     : pointer_(p), size_(size)
   {
   }

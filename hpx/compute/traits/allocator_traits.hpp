@@ -187,7 +187,7 @@ namespace hpx { namespace compute { namespace traits
             HPX_HOST_DEVICE
             static void call(hpx::traits::detail::wrap_int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count)
-                HPX_NOEXCEPT
+                noexcept
             {
                 typedef typename Allocator::pointer pointer;
                 pointer end = p + count;
@@ -201,7 +201,7 @@ namespace hpx { namespace compute { namespace traits
             HPX_HOST_DEVICE
             static auto call(int, Allocator& alloc,
                 typename Allocator::pointer p, typename Allocator::size_type count)
-                    HPX_NOEXCEPT
+                    noexcept
             ->  decltype(alloc.bulk_destroy(p, count))
             {
                 alloc.bulk_destroy(p, count);
@@ -211,7 +211,7 @@ namespace hpx { namespace compute { namespace traits
         template <typename Allocator>
         HPX_HOST_DEVICE
         void call_bulk_destroy(Allocator& alloc, typename Allocator::pointer p,
-            typename Allocator::size_type count) HPX_NOEXCEPT
+            typename Allocator::size_type count) noexcept
         {
             bulk_destroy::call(0, alloc, p, count);
         }
@@ -294,7 +294,7 @@ namespace hpx { namespace compute { namespace traits
 
         HPX_HOST_DEVICE
         static void bulk_destroy(Allocator& alloc, pointer p,
-            size_type count) HPX_NOEXCEPT
+            size_type count) noexcept
         {
             if (p != nullptr) detail::call_bulk_destroy(alloc, p, count);
         }

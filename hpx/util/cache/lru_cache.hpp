@@ -40,7 +40,6 @@ namespace hpx { namespace util { namespace cache
     >
     class lru_cache
     {
-        HPX_MOVABLE_ONLY(lru_cache);
     public:
         typedef Key key_type;
         typedef Entry entry_type;

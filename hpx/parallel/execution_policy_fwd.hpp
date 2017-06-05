@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_FWD_JUL_31_2015_0837PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
 #endif

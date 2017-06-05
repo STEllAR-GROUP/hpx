@@ -12,7 +12,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -20,7 +19,7 @@
 
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     namespace detail
     {

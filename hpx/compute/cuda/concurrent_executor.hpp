@@ -94,19 +94,19 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         /// \cond NOINTERNAL
-        bool operator==(concurrent_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(concurrent_executor const& rhs) const noexcept
         {
             return host_executor_ == rhs.host_executor_ &&
                 std::equal(cuda_executors_.begin(), cuda_executors_.end(),
                     rhs.cuda_executors_.begin());
         }
 
-        bool operator!=(concurrent_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(concurrent_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        host::target const& context() const HPX_NOEXCEPT
+        host::target const& context() const noexcept
         {
             return host_executor_.context();
         }

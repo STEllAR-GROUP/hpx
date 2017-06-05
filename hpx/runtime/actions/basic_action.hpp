@@ -69,8 +69,6 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_ONLY(continuation_thread_function);
-
         public:
             typedef typename Action::continuation_type
                 continuation_type;

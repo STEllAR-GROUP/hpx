@@ -78,7 +78,7 @@ namespace hpx { namespace compute { namespace cuda
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        pointer address(reference x) const HPX_NOEXCEPT
+        pointer address(reference x) const noexcept
         {
 #if defined(__CUDA_ARCH__)
             return &x;
@@ -87,7 +87,7 @@ namespace hpx { namespace compute { namespace cuda
 #endif
         }
 
-        const_pointer address(const_reference x) const HPX_NOEXCEPT
+        const_pointer address(const_reference x) const noexcept
         {
 #if defined(__CUDA_ARCH__)
             return &x;
@@ -147,7 +147,7 @@ namespace hpx { namespace compute { namespace cuda
         // Returns the maximum theoretically possible value of n, for which the
         // call allocate(n, 0) could succeed. In most implementations, this
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-        size_type max_size() const HPX_NOEXCEPT
+        size_type max_size() const noexcept
         {
             detail::scoped_active_target active(target_);
             std::size_t free = 0;
@@ -231,11 +231,11 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         // Access the underlying target (device)
-        target_type& target() HPX_NOEXCEPT
+        target_type& target() noexcept
         {
             return target_;
         }
-        target_type const& target() const HPX_NOEXCEPT
+        target_type const& target() const noexcept
         {
             return target_;
         }

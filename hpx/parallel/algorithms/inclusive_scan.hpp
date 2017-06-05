@@ -16,7 +16,6 @@
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -32,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // inclusive_scan
@@ -172,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             T const& init, Op && op, std::false_type) {
 
             typedef std::integral_constant<bool,
-                    parallel::execution::is_sequential_execution_policy<
+                    parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value ||

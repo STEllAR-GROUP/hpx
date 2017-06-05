@@ -18,7 +18,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
@@ -34,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     namespace detail
     {
@@ -62,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() HPX_NOEXCEPT
+        task_canceled_exception() noexcept
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };

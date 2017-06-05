@@ -44,6 +44,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename T, typename Tag, std::size_t N>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
+    public:
         HPX_NON_COPYABLE(reinitializable_static);
 
     public:

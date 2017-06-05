@@ -22,7 +22,6 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/manual_profiling.hpp>
-#include <hpx/config/noexcept.hpp>
 #include <hpx/config/version.hpp>
 
 #include <boost/version.hpp>
@@ -374,11 +373,6 @@
 #  else
 #    define HPX_APPLICATION_STRING "unknown HPX application"
 #  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_WINDOWS) && defined(HPX_MSVC) && HPX_MSVC < 1900
-#  define snprintf _snprintf
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

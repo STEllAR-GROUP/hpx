@@ -34,6 +34,7 @@ namespace hpx { namespace applier
     /// remote a parcel will be sent.
     class HPX_EXPORT applier
     {
+    public:
         HPX_NON_COPYABLE(applier);
 
     public:

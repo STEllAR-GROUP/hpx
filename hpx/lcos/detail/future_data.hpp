@@ -195,11 +195,8 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
-    class compose_cb_impl
+    struct compose_cb_impl
     {
-        HPX_MOVABLE_ONLY(compose_cb_impl);
-
-    public:
         template <typename A1, typename A2>
         compose_cb_impl(A1 && f1, A2 && f2)
           : f1_(std::forward<A1>(f1))
@@ -281,7 +278,7 @@ namespace detail
         typedef util::unused_type result_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
-        virtual ~future_data() HPX_NOEXCEPT {}
+        virtual ~future_data() noexcept {}
         virtual void execute_deferred(error_code& = throws) = 0;
         virtual bool cancelable() const = 0;
         virtual void cancel() = 0;
@@ -378,7 +375,7 @@ namespace detail
             state_ = exception;
         }
 
-        virtual ~future_data() HPX_NOEXCEPT
+        virtual ~future_data() noexcept
         {
             reset();
         }

@@ -46,7 +46,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag, std::size_t N>
     struct HPX_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
-    private:
+    public:
         HPX_NON_COPYABLE(reinitializable_static);
 
     public:

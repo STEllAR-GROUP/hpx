@@ -63,8 +63,6 @@ namespace lcos {
       : public detail::promise_base<
             Result, RemoteResult, detail::promise_data<Result> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 Result, RemoteResult, detail::promise_data<Result>
            > base_type;
@@ -87,7 +85,7 @@ namespace lcos {
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT : base_type(std::move(other))
+        promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
         // Effects: Abandons any shared state
@@ -98,7 +96,7 @@ namespace lcos {
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -108,7 +106,7 @@ namespace lcos {
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
@@ -153,8 +151,6 @@ namespace lcos {
       : public detail::promise_base<
             void, hpx::util::unused_type, detail::promise_data<void> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 void, hpx::util::unused_type, detail::promise_data<void>
             > base_type;
@@ -177,7 +173,7 @@ namespace lcos {
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT : base_type(std::move(other))
+        promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
         // Effects: Abandons any shared state
@@ -187,7 +183,7 @@ namespace lcos {
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -197,7 +193,7 @@ namespace lcos {
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
@@ -244,7 +240,7 @@ namespace lcos {
 
     template <typename Result, typename RemoteResult>
     void swap(promise<Result, RemoteResult>& x,
-        promise<Result, RemoteResult>&       y) HPX_NOEXCEPT
+        promise<Result, RemoteResult>&       y) noexcept
     {
         x.swap(y);
     }

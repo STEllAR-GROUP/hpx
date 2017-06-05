@@ -44,7 +44,6 @@ namespace hpx { namespace parcelset
 
                 return *this;
             }
-            HPX_MOVABLE_ONLY(call_for_each);
 
             void operator()(boost::system::error_code const& e) const
             {

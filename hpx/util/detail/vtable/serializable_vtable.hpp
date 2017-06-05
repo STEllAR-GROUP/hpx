@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace detail
         void (*load_object)(void**, serialization::input_archive&, unsigned);
 
         template <typename T>
-        HPX_CONSTEXPR serializable_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR serializable_vtable(construct_vtable<T>) noexcept
           : save_object(&serializable_vtable::template _save_object<T>)
           , load_object(&serializable_vtable::template _load_object<T>)
         {}

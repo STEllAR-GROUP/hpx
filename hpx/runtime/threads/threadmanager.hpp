@@ -42,7 +42,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     struct threadmanager_base
     {
-    private:
+    public:
         HPX_NON_COPYABLE(threadmanager_base);
 
     public:

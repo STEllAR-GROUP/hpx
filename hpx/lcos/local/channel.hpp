@@ -90,6 +90,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
+        public:
             HPX_NON_COPYABLE(unlimited_channel);
 
         public:
@@ -228,8 +229,10 @@ namespace hpx { namespace lcos { namespace local
         template <typename T>
         class one_element_queue_async
         {
+        public:
             HPX_NON_COPYABLE(one_element_queue_async);
 
+        private:
             template <typename T1>
             void set(T1 && val)
             {
@@ -368,6 +371,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
+        public:
             HPX_NON_COPYABLE(one_element_channel);
 
         public:

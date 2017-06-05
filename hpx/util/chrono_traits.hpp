@@ -21,7 +21,7 @@ namespace hpx { namespace util
         typedef typename Clock::duration duration_type;
         typedef typename Clock::time_point time_type;
 
-        static time_type now() HPX_NOEXCEPT
+        static time_type now() noexcept
         {
             return Clock::now();
         }

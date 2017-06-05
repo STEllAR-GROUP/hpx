@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
-        virtual ~base_lco_with_value() HPX_NOEXCEPT {}
+        virtual ~base_lco_with_value() noexcept {}
 
         virtual void set_event()
         {

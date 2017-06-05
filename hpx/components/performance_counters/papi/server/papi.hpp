@@ -126,6 +126,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     ///////////////////////////////////////////////////////////////////////////
     class papi_counter_base
     {
+    public:
         HPX_NON_COPYABLE(papi_counter_base);
 
     public:
