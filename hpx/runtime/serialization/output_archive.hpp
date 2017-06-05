@@ -106,10 +106,7 @@ namespace hpx { namespace serialization
         static std::uint32_t make_flags(std::uint32_t flags,
             std::vector<serialization_chunk>* chunks)
         {
-            return flags |
-                (chunks == nullptr ?
-                    archive_flags::disable_data_chunking :
-                    archive_flags::no_archive_flags);
+            return flags;
         }
 
     public:
