@@ -44,7 +44,7 @@ namespace libfabric
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;
 
-        typedef serialization::serialization_chunk chunk_struct;
+        typedef serialization::serialization_chunk chunktype;
         typedef hpx::util::function_nonser<void(rma_receiver*)> completion_handler;
 
         rma_receiver(
@@ -116,7 +116,7 @@ namespace libfabric
         region_type                *chunk_region_;
         region_type                *message_region_;
         header_type                *header_;
-        std::vector<chunk_struct>   chunks_;
+        std::vector<chunktype>      chunks_;
         zero_copy_vector            rma_regions_;
         memory_pool_type           *memory_pool_;
         fi_addr_t                   src_addr_;

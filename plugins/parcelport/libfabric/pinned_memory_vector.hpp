@@ -177,12 +177,17 @@ namespace libfabric
                 << "array " << hexpointer(m_array_)
                 << "region " << hexpointer(m_region_)
                 << "alloc " << hexpointer(m_alloc_)
-                << "resizing from " << m_size_ << " to " << s);
+                << "resizing from " << hexlength(m_size_)
+                    << " to " << hexlength(s));
 
             if (m_region_) {
+                LOG_DEBUG_MSG("Region in resize " << *m_region_);
+
                 if (s > m_region_->get_size()) {
                     LOG_ERROR_MSG(
-                        "Resizing from " << m_region_->get_size() << " to " << s);
+                        "Resizing from " << hexlength(m_region_->get_size())
+                        << " to " << hexlength(s)
+                        << *m_region_);
                     throw std::runtime_error(
                         "pinned_memory_vector should never be resized once an "
                         "allocation has been assigned");

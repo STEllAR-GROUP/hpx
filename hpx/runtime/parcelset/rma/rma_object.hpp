@@ -13,11 +13,13 @@
 #include <hpx/runtime/parcelset/rma/memory_pool.hpp>
 //
 #include <memory>
+#include <vector>
 #include <type_traits>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/traits/is_rma_eligible.hpp>
+#include <hpx/runtime/parcelset/rma/rma_vector.hpp>
 
 using namespace hpx::parcelset;
 
@@ -25,6 +27,10 @@ namespace hpx {
 namespace parcelset {
 namespace rma
 {
+
+    template <typename T>
+    using rma_vector = rma::rmavector<T, hpx::parcelset::rma::allocator<T>>;
+
     // ---------------------------------------------------------------------------
     // rma object definition
     template <typename T>
@@ -90,20 +96,9 @@ namespace rma
         friend rma_object<T2>
             make_rma_object_impl(T2*, Args&&... args);
 
-        template <typename T2, typename... Args>
-        friend rma_object<std::vector<T2, rma::allocator<T2>>>
-            make_rma_object_impl(std::vector<T2, rma::allocator<T2>>*,
-                                 Args&&... args);
-
         // default empty constructor
         rma_object<T>() : region_(nullptr) {}
-/*
-        template <typename Archive>
-        void serialize(Archive & ar, unsigned)
-        {
-            ar & *obj_;
-        }
-*/
+
     private:
         // Create an rma object with a memory region
         rma_object<T>(T *obj, memory_region *region, parcelport *pp)
@@ -114,14 +109,7 @@ namespace rma
         memory_region *region_;
         parcelport    *pp_;
     };
-/*
-    template <typename T>
-    std::ostream& operator<<(std::ostream& os, rma::rma_object<T> const& c)
-    {
-        os << *c.obj_;
-        return os;
-    }
-*/
+
     // ---------------------------------------------------------------------------
     // default rma object creator function.
     //
@@ -147,53 +135,12 @@ namespace rma
     }
 
     // ---------------------------------------------------------------------------
-    // overloaded vector rma object creator
-
-    template <typename T, typename... Args>
-    rma_object<std::vector<T, rma::allocator<T>>>
-    make_rma_object_impl(std::vector<T, rma::allocator<T>>*, Args&&... args)
-    {
-        using vec_type = std::vector<T, rma::allocator<T>>;
-        //
-        parcelset::parcelhandler &ph =
-            hpx::get_runtime().get_parcel_handler();
-        auto pp = ph.get_default_parcelport();
-
-        rma::allocator<char> *allocator = pp->get_allocator();
-        typedef typename
-            std::allocator_traits<rma::allocator<char>>::template rebind_alloc<T>
-            T_allocator;
-        //
-        T_allocator alloc(allocator->get_memory_pool());
-
-        // get a memory region big enough to hold an object of type T
-        memory_region *region = pp->allocate_region(sizeof(T));
-        // construct a T in the memory held by the region
-        void *address = region->get_address();
-
-        vec_type *obj = new (address) vec_type(std::forward<Args>(args)..., alloc);
-        // construct an rma object using the region
-        return rma_object<vec_type>(obj, region, pp.get());
-    }
-
-    template <typename T>
-    using rma_vector = std::vector<T, hpx::parcelset::rma::allocator<T>>;
-
-    // ---------------------------------------------------------------------------
     // main entry point for making rma objects
     template <typename T, typename... Args>
     rma_object<T> make_rma_object(Args&&... args)
     {
         return make_rma_object_impl(static_cast<T*>(nullptr), args...);
     }
-
-    // convenience function for making rma vectors
-    template <typename T, typename... Args>
-    rma_vector<T> make_rma_vector(Args&&... args)
-    {
-        return make_rma_object_impl(static_cast<std::vector<T,rma::allocator<T>>*>(nullptr), args...);
-    }
-
 }}}
 
 #endif

@@ -9,6 +9,7 @@
 #include <hpx/config/parcelport_defines.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
+#include <hpx/runtime/parcelset/rma/memory_region.hpp>
 #include <hpx/runtime/parcelset/rma/detail/memory_region_impl.hpp>
 #include <hpx/runtime/parcelset/rma/detail/memory_region_allocator.hpp>
 #include <hpx/runtime/parcelset/rma/memory_pool.hpp>
@@ -59,21 +60,14 @@ namespace rma {
                 << hexpointer(pool_));
         }
 
-        // polymorphic destructor
+        // polymorphic destructor, the allocator does not 'own' the pool,
+        // so it does not delete it on destruction
         virtual ~allocator() {}
 
-        // @TODO: remove virtaul interface
-        // virtual allocate so that a concrete instance
-        virtual value_type* allocate(std::size_t const n)
+        virtual void deallocate_region(memory_region *region)
         {
-            LOG_DEVEL_MSG("STL allocate " << hexlength(n*sizeof(value_type)));
-            return static_cast<value_type*>(pool_->allocate(n*sizeof(value_type)));
-        }
-
-        virtual void deallocate(value_type* const p, std::size_t const n)
-        {
-            LOG_DEVEL_MSG("STL deallocate " << hexlength(n*sizeof(value_type)));
-            pool_->deallocate(p, n);
+            //LOG_DEVEL_MSG("STL deallocate " << hexlength(n*sizeof(value_type)));
+            pool_->release_region(region);
         }
 
         template <class U, class ...A>
@@ -97,12 +91,9 @@ namespace rma {
         }
 
         // ---------------------------------------------------------------------------
-        // retrieve a memory region handle from the address (presumed to have been
-        // supplied by the allocator previously)
-        memory_region *get_memory_region(void const * addr) const {
-            memory_region *region = pool_->region_from_address(addr);
-            LOG_DEVEL_MSG("STL region_from_address " << *region);
-            return region;
+        // allocate memory via a region object
+        memory_region *allocate_region(std::size_t len) const {
+            return pool_->get_region(len);;
         }
 
     protected:

@@ -166,6 +166,7 @@ namespace hpx { namespace serialization
 
         std::size_t bytes_written() const
         {
+            LOG_DEVEL_MSG("archive bytes_written " << hexlength(size_));
             return size_;
         }
 
@@ -384,7 +385,8 @@ namespace hpx { namespace serialization
                 buffer_->save_binary(address, count);
             }
             else {
-                size += buffer_->save_rma_chunk(address, count, region);
+                // the size might grow if optimizations are not used
+                size_ += buffer_->save_rma_chunk(address, count, region);
             }
         }
 

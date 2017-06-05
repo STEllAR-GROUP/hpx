@@ -17,8 +17,12 @@ namespace hpx { namespace  parcelset { namespace rma
     template <typename T>
     struct allocator;
 
+    template <typename T, typename Allocator>
+    class rmavector;
+
     template <typename T>
-    using rma_vector = std::vector<T, hpx::parcelset::rma::allocator<T>>;
+    using rma_vector = rmavector<T, hpx::parcelset::rma::allocator<T>>;
+
 }}}
 
 namespace hpx { namespace serialization

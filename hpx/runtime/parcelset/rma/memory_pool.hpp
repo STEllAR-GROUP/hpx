@@ -39,8 +39,8 @@
 
 #define RDMA_POOL_MAX_1K_CHUNKS     1024
 #define RDMA_POOL_MAX_SMALL_CHUNKS  2048
-#define RDMA_POOL_MAX_MEDIUM_CHUNKS 128
-#define RDMA_POOL_MAX_LARGE_CHUNKS  16
+#define RDMA_POOL_MAX_MEDIUM_CHUNKS 256
+#define RDMA_POOL_MAX_LARGE_CHUNKS  256
 
 // if the HPX configuration has set a different value, use it
 #if defined(HPX_PARCELPORT_LIBFABRIC_MEMORY_CHUNK_SIZE)
@@ -68,23 +68,11 @@ namespace rma
         virtual ~memory_pool_base() {}
 
         //----------------------------------------------------------------------------
-        virtual char *allocate(size_t length) = 0;
-
-        //----------------------------------------------------------------------------
-        virtual void deallocate(void *address, size_t size) = 0;
-
-        //----------------------------------------------------------------------------
-        virtual memory_region *region_from_address(void const * addr) = 0;
-
-        //----------------------------------------------------------------------------
         // release a region back to the pool
         virtual void release_region(memory_region *region) = 0;
 
         //----------------------------------------------------------------------------
-        memory_region *get_region(size_t length)
-        {
-            return region_from_address(allocate(length));
-        }
+        virtual memory_region *get_region(size_t length) = 0;
     };
 
     // ---------------------------------------------------------------------------
@@ -142,7 +130,7 @@ namespace rma
         // query the pool for a chunk of a given size to see if one is available
         // this function is 'unsafe' because it is not thread safe and another
         // thread may push/pop a block after/during this call and invalidate the result.
-        inline bool can_allocate_unsafe(size_t length) const
+        bool can_allocate_unsafe(size_t length) const
         {
             if (length<=tiny_.chunk_size()) {
                 return !tiny_.free_list_.empty();
@@ -161,7 +149,7 @@ namespace rma
 
         //----------------------------------------------------------------------------
         // allocate a region, if size=0 a tiny region is returned
-        inline region_type *allocate_region(size_t length)
+        region_type *allocate_region(size_t length)
         {
             region_type *region = nullptr;
             //
@@ -181,7 +169,7 @@ namespace rma
             if (region==nullptr) {
                 region = allocate_temporary_region(length);
             }
-
+/*
             LOG_TRACE_MSG("Popping Block "
                 << *region
                 << tiny_.status()
@@ -190,13 +178,13 @@ namespace rma
                 << large_.status()
                 << large_.status()
                 << "temp regions " << decnumber(temp_regions));
-            //
+*/
             return region;
         }
 
         //----------------------------------------------------------------------------
         // release a region back to the pool
-        inline void deallocate(region_type *region)
+        void deallocate(region_type *region)
         {
             // if this region was registered on the fly, then don't return it to the pool
             if (region->get_temp_region() || region->get_user_region()) {
@@ -229,7 +217,7 @@ namespace rma
             else if (region->get_size()<=large_.chunk_size()) {
                 large_.push(region);
             }
-
+/*
             LOG_TRACE_MSG("Pushing Block "
                 << *region
                 << tiny_.status()
@@ -237,6 +225,7 @@ namespace rma
                 << medium_.status()
                 << large_.status()
                 << "temp regions " << decnumber(temp_regions));
+*/
         }
 
         //----------------------------------------------------------------------------
@@ -254,44 +243,36 @@ namespace rma
             return region;
         }
 
-        //----------------------------------------------------------------------------
-        // STL compatible allocate/deallocate
-        //----------------------------------------------------------------------------
-        // allocate a region, returning a memory block address -
-        // this is compatible with STL like allocators but should be avoided
-        // if the allocate_region method can be used instead, as allocation requires
-        // a map insert and deallocation requires a map lookup of the address to
-        // find it's block/region
-        char *allocate(size_t length) override
+        void release_region(memory_region *region) override
         {
-            region_type *region = allocate_region(length);
-            region_alloc_pointer_map_.insert(
-                std::make_pair(region->get_address(),region));
-            return region->get_address();
+            deallocate(dynamic_cast<region_type*>(region));
         }
 
         //----------------------------------------------------------------------------
-        // deallocate a region using its memory address as handle
-        // this involves a map lookup to find the region and is therefore
-        // less efficient than releasing memory via the region pointer
-        void deallocate(void *address, size_t size=0) override
-        {
-            region_type *region = region_from_address(address);
-            deallocate(region);
-        }
-
-        void release_region(memory_region *region) {
-            deallocate(region);
+        // provide only to allow base class to return a region, without making main
+        // region allocate virtual for normal use
+        memory_region *get_region(size_t length) {
+            return allocate_region(length);
         }
 
         //----------------------------------------------------------------------------
-        // find an verbs_memory_region* from the memory address it wraps
+        // find a memory_region* from the memory address it wraps
+        // DEPRECATED : Left for posible reuse
         // this is only valid for regions allocated sing the STL allocate method
-        // and if you are cling this, then you probably should have allocated
+        // and if you are using this, then you probably should have allocated
         // a region instead in the first place
-        inline region_type *region_from_address(void const * addr)
+        memory_region *region_from_address(void const * addr)
         {
-            return region_alloc_pointer_map_[addr];
+            LOG_DEVEL_MSG("Expensive region_from_address");
+            auto present = region_alloc_pointer_map_.is_in_map(addr);
+            if (present.second) {
+                LOG_DEVEL_MSG("Found region in alloc map " << hexpointer(addr)
+                    << *(present.first->second));
+                return (present.first->second);
+            }
+            LOG_ERROR_MSG("returning nullptr from region_from_address "
+                << hexpointer(addr));
+            return nullptr;
         }
 
         //----------------------------------------------------------------------------

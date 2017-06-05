@@ -57,12 +57,12 @@ namespace detail
     struct memory_pool_stack
     {
         typedef typename RegionProvider::provider_domain domain_type;
-        typedef memory_region_impl<RegionProvider>        region_type;
+        typedef memory_region_impl<RegionProvider>       region_type;
         typedef std::shared_ptr<region_type>             region_ptr;
 
         // ------------------------------------------------------------------------
         memory_pool_stack(domain_type *pd) :
-            accesses_(0), in_use_(0), pd_(pd)
+            accesses_(0), in_use_(MaxChunks), pd_(pd)
         {
         }
 
@@ -99,7 +99,7 @@ namespace detail
                 push(&region_list_[i]);
                 offset += ChunkSize;
             }
-            in_use_ = 0;
+            HPX_ASSERT(in_use_ == 0);
             return true;
         }
 

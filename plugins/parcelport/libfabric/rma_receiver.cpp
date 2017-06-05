@@ -129,7 +129,7 @@ namespace libfabric
         rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
 
         int zc_chunks =
-            std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
+            std::count_if(chunks_.begin(), chunks_.end(), [](chunktype &c) {
                 return c.type_ == serialization::chunk_type_pointer ||
                        c.type_ == serialization::chunk_type_rma;
             });
@@ -159,7 +159,7 @@ namespace libfabric
         HPX_ASSERT(chunk_data);
 
         size_t chunkbytes =
-            chunks_.size() * sizeof(chunk_struct);
+            chunks_.size() * sizeof(chunktype);
 
         std::memcpy(chunks_.data(), chunk_data, chunkbytes);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
@@ -167,7 +167,7 @@ namespace libfabric
             << decnumber(chunkbytes));
 
         LOG_EXCLUSIVE(
-        for (const chunk_struct &c : chunks_)
+        for (const chunktype &c : chunks_)
         {
             LOG_DEBUG_MSG("receiver " << hexpointer(this)
                 << "recv : chunk : size " << hexnumber(c.size_)
@@ -200,8 +200,6 @@ namespace libfabric
         chunk_region_->set_message_length(cb.size_);
         uint64_t          rkey1 = cb.rkey_;
         const void *remoteAddr1 = cb.data_.cpos_;
-        // add it to the list of rma regions to fetch
-        rma_regions_.push_back(chunk_region_);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "Fetching chunk region with size " << decnumber(cb.size_));
         rma_count_ = 1;
@@ -214,8 +212,6 @@ namespace libfabric
             message_region_->set_message_length(mc.size_);
             uint64_t          rkey2 = mc.rkey_;
             const void *remoteAddr2 = mc.data_.cpos_;
-            // add it to the list of rma regions to fetch
-            rma_regions_.push_back(message_region_);
             LOG_DEBUG_MSG("receiver " << hexpointer(this)
                 << "Fetching message region with size " << decnumber(mc.size_));
             ++rma_count_;
@@ -237,57 +233,63 @@ namespace libfabric
         HPX_ASSERT(chunk_data);
         //
         uint64_t chunkbytes = chunk_region_->get_message_length();
-        uint64_t num_chunks = chunkbytes/sizeof(chunk_struct);
+        uint64_t num_chunks = chunkbytes/sizeof(chunktype);
         chunks_.resize(num_chunks);
         std::memcpy(chunks_.data(), chunk_data, chunkbytes);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "Copied chunk data from chunk_region: size " << decnumber(chunkbytes)
             << "with num chunks " << decnumber(num_chunks));
         //
-        rma_regions_.clear();
+        HPX_ASSERT(rma_regions_.size() == 0);
+        //
         chunk_fetch_ = false;
         // for each zerocopy chunk, schedule a read operation
         uint64_t zc_count =
-            std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
+            std::count_if(chunks_.begin(), chunks_.end(), [](chunktype &c) {
                 return c.type_ == serialization::chunk_type_pointer ||
                        c.type_ == serialization::chunk_type_rma;
             });
+        // this is the number of rma-completions we must wait for
+        rma_count_ = zc_count;
+        //
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
-            << "Restarting RMA reads with " << decnumber(rma_count_) << "chunks");
-        rma_count_  = zc_count;
-        // perform an rma read for each zero copy chunk
-        read_chunk_list();
+            << "Restarting RMA reads with " << decnumber(zc_count) << "rma chunks");
         // do not return rma_count_ as it might already have decremented! (racey)
-        HPX_ASSERT(rma_regions_.size() == zc_count );
-        return rma_regions_.size();
+        read_chunk_list();
+        return zc_count;
     }
 
     // --------------------------------------------------------------------
     void rma_receiver::read_chunk_list()
     {
-        for (chunk_struct &c : chunks_)
+        for (chunktype &c : chunks_)
         {
             if (c.type_ == serialization::chunk_type_pointer ||
                 c.type_ == serialization::chunk_type_rma)
             {
-                if (c.type_ == serialization::chunk_type_rma) {
-                    LOG_DEBUG_MSG("Reading an rma chunk");
-                }
-
                 region_type *get_region =
                     memory_pool_->allocate_region(c.size_);
+                // Set the used space limit to the incoming buffer size
+                get_region->set_message_length(c.size_);
+
                 LOG_TRACE_MSG(
                     CRC32_MEM(get_region->get_address(), c.size_,
                         "(RDMA GET region (new))"));
 
-                rma_regions_.push_back(get_region);
-                get_region->set_message_length(c.size_);
-
+                if (c.type_ == serialization::chunk_type_rma) {
+                    // rma object/vector chunks are not deleted
+                    // so do not add them to the rma_regions list for cleanup
+                    LOG_DEVEL_MSG("Reading an rma chunk with no deletion setup");
+                }
+                else {
+                    rma_regions_.push_back(get_region);
+                }
                 // overwrite the serialization chunk data pointer because the chunk
                 // info sent contains the pointer to the remote data and when we
                 // deocde the parcel we want the chunk to point to the local copy of it
                 const void *remoteAddr = c.data_.cpos_;
                 c.data_.cpos_ = get_region->get_address();
+
                 // call the rma read function for the chunk
                 read_one_chunk(src_addr_, get_region, remoteAddr, c.rkey_);
             }
@@ -323,7 +325,7 @@ namespace libfabric
                     std::fill(buffer, buffer + get_region->get_size()/4,
                        0xDEADC0DE);
                     LOG_TRACE_MSG(
-                        CRC32_MEM(get_region->get_address(), get_region->get_size(),
+                        CRC32_MEM(get_region->get_address(), get_region->get_message_length(),
                                   "(RDMA GET region (pre-fi_read))"));
                     );
 
@@ -451,7 +453,7 @@ namespace libfabric
         rcv_buffer_type buffer(std::move(wrapped_pointer), nullptr);
 
         LOG_EXCLUSIVE(
-            for (chunk_struct &c : chunks_) {
+            for (chunktype &c : chunks_) {
                 LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
                     << " type " << decnumber((uint64_t)c.type_)
                     << " rkey " << hexpointer(c.rkey_)
@@ -460,7 +462,7 @@ namespace libfabric
         });
 
         int zc_chunks =
-            std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct &c) {
+            std::count_if(chunks_.begin(), chunks_.end(), [](chunktype &c) {
                 return c.type_ == serialization::chunk_type_pointer ||
                        c.type_ == serialization::chunk_type_rma;
             });

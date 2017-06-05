@@ -12,10 +12,9 @@
 #include <hpx/traits/is_bitwise_serializable.hpp>
 //
 #include <hpx/traits/is_rma_eligible.hpp>
+#include <hpx/runtime/parcelset/rma/memory_region.hpp>
 #include <hpx/runtime/parcelset/rma/allocator.hpp>
 #include <hpx/runtime/parcelset/rma/rma_object.hpp>
-//
-#include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <type_traits>
 #include <vector>
@@ -68,9 +67,11 @@ namespace hpx { namespace serialization
                     ar.load_binary(v.data(), size);
                 }
                 else {
+                    parcelset::rma::memory_region *region = v.get_region();
+                    region->set_message_length(v.size() * sizeof(T));
+
                     // bitwise (zero-copy) load with rma overload...
-                    ar.load_rma_chunk(v.data(), v.size() * sizeof(T),
-                        v.get_allocator().get_memory_region(v.data()));
+                    ar.load_rma_chunk(v.data(), v.size() * sizeof(T), region);
                 }
             }
         }
@@ -112,9 +113,10 @@ namespace hpx { namespace serialization
                 ar.save_binary(v.data(), v.size() * sizeof(T));
             }
             else {
+                parcelset::rma::memory_region *region = v.get_region();
+                region->set_message_length(v.size() * sizeof(T));
                 // bitwise (zero-copy) save with rma overload...
-                ar.save_rma_chunk(v.data(), v.size() * sizeof(T),
-                    v.get_allocator().get_memory_region(v.data()));
+                ar.save_rma_chunk(v.data(), v.size() * sizeof(T), region);
             }
         }
     }

@@ -372,15 +372,11 @@ namespace libfabric
             if (!chunks) {
                 throw std::runtime_error("num_zero_copy_chunks without chunk data");
             }
-            uint32_t num=0;
-            for (uint32_t i=0; i<message_header.num_chunks; ++i) {
-                if (chunks[i].type_ == serialization::chunk_type::chunk_type_pointer ||
-                    chunks[i].type_ == serialization::chunk_type::chunk_type_rma)
-                {
-                    ++num;
-                }
-            }
-            return num;
+            return std::count_if(&chunks[0], &chunks[message_header.num_chunks],
+                [](chunktype &c) {
+                    return c.type_ == serialization::chunk_type_pointer ||
+                           c.type_ == serialization::chunk_type_rma;
+            });
         }
 
         std::uint32_t num_index_chunks()
@@ -389,15 +385,11 @@ namespace libfabric
             if (!chunks) {
                 throw std::runtime_error("num_index_chunks without chunk data");
             }
-            uint32_t num=0;
-            for (uint32_t i=0; i<message_header.num_chunks; ++i) {
-                if (chunks[i].type_ == serialization::chunk_type::chunk_type_index) {
-                    ++num;
-                }
-            }
-            return num;
+            return std::count_if(&chunks[0], &chunks[message_header.num_chunks],
+                [](chunktype &c) {
+                    return c.type_ == serialization::chunk_type_index;
+            });
         }
-
     };
 
 }}}}

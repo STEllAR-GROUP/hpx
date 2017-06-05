@@ -233,9 +233,9 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT(count != 0);
 
-            // make sure there is a current serialization_chunk descriptor
-            // available
-            if (chunker_.get_chunk_type() == chunk_type_pointer ||
+            // make sure there is a current (unfinished) serialization_chunk descriptor
+            // available, it must be an index type when appending data directly
+            if (chunker_.get_chunk_type() != chunk_type_index ||
                 chunker_.get_chunk_size() != 0)
             {
                 // add a new serialization_chunk,
@@ -288,6 +288,8 @@ namespace hpx { namespace serialization
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
+                LOG_DEVEL_MSG("save_rma_chunk too small, calling save_binary"
+                    << hexlength(count));
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
                 // the container has grown by count bytes
@@ -298,18 +300,20 @@ namespace hpx { namespace serialization
                     chunker_.get_chunk_type() == chunk_type_index ||
                     chunker_.get_chunk_size() != 0);
 
-                // complement current serialization_chunk by setting its length
+                // if the last chunk created was an index type one, then
+                // complete current serialization_chunk by setting its length
                 if (chunker_.get_chunk_type() == chunk_type_index)
                 {
+                    // it should not have been 'finished' yet
                     HPX_ASSERT(chunker_.get_chunk_size() == 0);
-
                     chunker_.set_chunk_size(
                         current_ - chunker_.get_chunk_data_index());
                 }
 
                 // add a new serialization_chunk referring to the external
                 // buffer and including the rma key
-                chunker_.push_back(create_rma_chunk(address, count, region->get_remote_key()));
+                chunker_.push_back(
+                    create_rma_chunk(address, count, region->get_remote_key()));
                 // the container did not grow
                 return 0;
             }
