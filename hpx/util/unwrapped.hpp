@@ -272,8 +272,8 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename std::enable_if<traits::is_future<TD>::value>::type
-        > : util::detail::fused_result_of<
-                F(typename unwrap_impl<util::tuple<TD> >::type)
+        > : util::detail::invoke_fused_result<
+                F, typename unwrap_impl<util::tuple<TD> >::type
             >
         {};
 
@@ -283,11 +283,11 @@ namespace hpx { namespace util
             typename std::enable_if<traits::is_future_range<TD>::value>::type
         > : std::conditional<
                 unwrap_impl<TD>::is_void::value
-              , util::detail::fused_result_of<
-                    F(util::tuple<>)
+              , util::detail::invoke_fused_result<
+                    F, util::tuple<>
                 >
-              , util::detail::fused_result_of<
-                    F(util::tuple<typename unwrap_impl<TD>::type>)
+              , util::detail::invoke_fused_result<
+                    F, util::tuple<typename unwrap_impl<TD>::type>
                 >
             >::type
         {};
@@ -296,8 +296,8 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename std::enable_if<traits::is_future_tuple<TD>::value>::type
-        > : util::detail::fused_result_of<
-                F(typename unwrap_impl<TD>::type)
+        > : util::detail::invoke_fused_result<
+                F, typename unwrap_impl<TD>::type
             >
         {};
 
@@ -334,7 +334,7 @@ namespace hpx { namespace util
 
             template <typename Delayed = unwrapped_impl>
             HPX_FORCEINLINE
-            typename util::result_of<Delayed()>::type
+            typename util::invoke_result<Delayed>::type
             operator()()
             {
                 return util::invoke_fused(f_,

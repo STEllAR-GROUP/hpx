@@ -32,9 +32,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename F, typename ... Ts>
         struct distribution_policy_execute_result_impl<F, false, Ts...>
         {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Ts...)
-                >::type type;
+            typedef typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
+                type;
         };
 
         template <typename Action, typename ... Ts>

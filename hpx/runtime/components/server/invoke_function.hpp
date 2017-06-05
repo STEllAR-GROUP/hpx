@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
         template <typename F, typename ...Ts>
         struct invoke_function
         {
-            static typename util::result_of<F(Ts...)>::type
+            static typename util::invoke_result<F, Ts...>::type
             call (F f, Ts... ts)
             {
                 return f(std::move(ts)...);
@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace server
     template <typename F, typename ...Ts>
     struct invoke_function_action
       : ::hpx::actions::action<
-            typename util::result_of<F(Ts...)>::type(*)(F, Ts...),
+            typename util::invoke_result<F, Ts...>::type(*)(F, Ts...),
             &detail::invoke_function<F, Ts...>::call,
             invoke_function_action<F, Ts...> >
     {};

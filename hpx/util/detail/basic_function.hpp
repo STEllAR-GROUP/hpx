@@ -164,7 +164,7 @@ namespace hpx { namespace util { namespace detail
             typedef typename std::remove_cv<T>::type target_type;
 
             static_assert(
-                traits::is_callable<target_type&(Ts...), R>::value
+                traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
             VTable const* f_vptr = get_vtable<target_type>();
@@ -180,7 +180,7 @@ namespace hpx { namespace util { namespace detail
             typedef typename std::remove_cv<T>::type target_type;
 
             static_assert(
-                traits::is_callable<target_type&(Ts...), R>::value
+                traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
             VTable const* f_vptr = get_vtable<target_type>();

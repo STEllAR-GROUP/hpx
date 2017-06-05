@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:is_callable
+// hpxinspect:nodeprecatedname:util::result_of
+
 #ifndef HPX_UTIL_DEFERRED_CALL_HPP
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
@@ -32,6 +35,15 @@ namespace hpx { namespace traits { namespace detail
                 typename util::decay_unwrap<Ts>::type...)
         >
     {};
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_invocable
+      : is_invocable<
+            typename util::decay_unwrap<F>::type,
+            typename util::decay_unwrap<Ts>::type...
+        >
+    {};
+
 }}}
 
 namespace hpx { namespace util
@@ -47,6 +59,14 @@ namespace hpx { namespace util
           : util::result_of<
                 typename util::decay_unwrap<F>::type(
                     typename util::decay_unwrap<Ts>::type...)
+            >
+        {};
+
+        template <typename F, typename ...Ts>
+        struct invoke_deferred_result
+          : util::invoke_result<
+                typename util::decay_unwrap<F>::type,
+                typename util::decay_unwrap<Ts>::type...
             >
         {};
 
@@ -77,7 +97,7 @@ namespace hpx { namespace util
             deferred& operator=(deferred const&) = delete;
 
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename deferred_result_of<F(Ts...)>::type
+            typename invoke_deferred_result<F, Ts...>::type
             operator()()
             {
                 return util::invoke_fused(std::move(_f), std::move(_args));

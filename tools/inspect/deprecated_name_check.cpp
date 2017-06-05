@@ -25,6 +25,7 @@ namespace boost
   {
     deprecated_names const names[] =
     {
+      // boost::xyz
       { "(\\bboost\\s*::\\s*move\\b)", "std::move" },
       { "(\\bboost\\s*::\\s*forward\\b)", "std::forward" },
       { "(\\bboost\\s*::\\s*noncopyable\\b)", "HPX_NON_COPYABLE" },
@@ -73,6 +74,9 @@ namespace boost
       { "(\\bboost\\s*::\\s*cv_status\\b)", "hpx::compat::cv_status" },
       { "(\\bboost\\s*::\\s*condition_variable\\b)", "hpx::compat::condition_variable" },
       { "(\\bboost\\s*::\\s*barrier\\b)", "hpx::compat::barrier" },
+      /////////////////////////////////////////////////////////////////////////
+      { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
+      { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
       { "(\\bNULL\\b)", "nullptr" },
       { nullptr, nullptr }
     };
