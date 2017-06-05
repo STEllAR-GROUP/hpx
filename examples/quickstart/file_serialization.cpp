@@ -84,7 +84,7 @@ namespace hpx { namespace traits
 
         static void resize(file_wrapper& cont, std::size_t count)
         {
-            return cont.resize(count);
+            cont.resize(count);
         }
 
         static void write(file_wrapper& cont, std::size_t count,
