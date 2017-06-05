@@ -7,7 +7,6 @@
 #define HPX_COMPUTE_HOST_BLOCK_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
@@ -24,6 +23,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -183,7 +183,7 @@ namespace hpx { namespace compute { namespace host
             }
             catch (...) {
                 boost::throw_exception(
-                    exception_list(compat::current_exception())
+                    exception_list(std::current_exception())
                 );
             }
         }
@@ -233,7 +233,7 @@ namespace hpx { namespace compute { namespace host
             }
             catch (...) {
                 boost::throw_exception(
-                    exception_list(compat::current_exception())
+                    exception_list(std::current_exception())
                 );
             }
         }

@@ -9,7 +9,6 @@
 #define HPX_LCOS_DETAIL_PROMISE_BASE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/lcos/local/promise.hpp>
@@ -24,6 +23,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <memory>
 #include <utility>
 
@@ -60,7 +60,7 @@ namespace lcos {
                 }
                 catch (...)
                 {
-                    this->set_exception(compat::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 

@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
 
@@ -20,6 +19,7 @@
 
 #include <cstdint>
 #include <ctime>
+#include <exception>
 #include <sstream>
 #include <string>
 
@@ -86,7 +86,7 @@ namespace hpx { namespace util
                 return ep;
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -102,7 +102,7 @@ namespace hpx { namespace util
             return *it;
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -133,7 +133,7 @@ namespace hpx { namespace util
             return endpoint.address().to_string();
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -241,7 +241,7 @@ namespace hpx { namespace util
             }
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -257,7 +257,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -292,7 +292,7 @@ namespace hpx { namespace util
             }
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -304,7 +304,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not a host name either, create a custom iterator allowing to
@@ -318,7 +318,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(compat::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors

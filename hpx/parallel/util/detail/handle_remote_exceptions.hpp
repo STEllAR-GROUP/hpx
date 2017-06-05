@@ -7,12 +7,12 @@
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
+#include <exception>
 #include <list>
 #include <utility>
 #include <vector>
@@ -25,17 +25,17 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct handle_remote_exceptions
     {
         // std::bad_alloc has to be handled separately
-        static void call(compat::exception_ptr const& e,
-            std::list<compat::exception_ptr>& errors)
+        static void call(std::exception_ptr const& e,
+            std::list<std::exception_ptr>& errors)
         {
             try {
-                compat::rethrow_exception(e);
+                std::rethrow_exception(e);
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
             }
             catch (exception_list const& el) {
-                for (compat::exception_ptr const& ex: el)
+                for (std::exception_ptr const& ex: el)
                     errors.push_back(ex);
             }
             catch (...) {
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<compat::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<compat::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {
@@ -76,14 +76,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct handle_remote_exceptions<execution::parallel_unsequenced_policy>
     {
         HPX_ATTRIBUTE_NORETURN static void call(
-            compat::exception_ptr const&, std::list<compat::exception_ptr>&)
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             hpx::terminate();
         }
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<compat::exception_ptr>&)
+            std::list<std::exception_ptr>&)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<compat::exception_ptr>&)
+            std::list<std::exception_ptr>&)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {

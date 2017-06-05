@@ -11,7 +11,6 @@
 #define HPX_PARCELSET_ENCODE_PARCEL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -26,6 +25,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <vector>
@@ -219,7 +219,7 @@ namespace hpx
                         << "encode_parcels: "
                            "caught hpx::exception: "
                         << e.what();
-                    hpx::report_error(compat::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::system::system_error const& e) {
@@ -227,14 +227,14 @@ namespace hpx
                         << "encode_parcels: "
                            "caught boost::system::error: "
                         << e.what();
-                    hpx::report_error(compat::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::exception const&) {
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught boost::exception";
-                    hpx::report_error(compat::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (std::exception const& e) {
@@ -250,7 +250,7 @@ namespace hpx
                 LPT_(fatal)
                         << "encode_parcels: "
                        "caught unknown exception";
-                hpx::report_error(compat::current_exception());
+                hpx::report_error(std::current_exception());
                     return 0;
             }
 

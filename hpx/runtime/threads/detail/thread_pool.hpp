@@ -7,7 +7,6 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
@@ -27,6 +26,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -158,7 +158,7 @@ namespace hpx { namespace threads { namespace detail
 
         void do_some_work(std::size_t num_thread);
 
-        void report_error(std::size_t num, compat::exception_ptr const& e);
+        void report_error(std::size_t num, std::exception_ptr const& e);
 
         Scheduler& get_sched() const
         {

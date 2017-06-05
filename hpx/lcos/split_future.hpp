@@ -45,7 +45,6 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
@@ -65,6 +64,7 @@ namespace hpx
 #include <array>
 #endif
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -92,7 +92,7 @@ namespace hpx { namespace lcos
                         std::move(hpx::util::get<I>(*result)));
                 }
                 catch (...) {
-                    this->base_type::set_exception(compat::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 
@@ -222,7 +222,7 @@ namespace hpx { namespace lcos
                     this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
-                    this->base_type::set_exception(compat::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 

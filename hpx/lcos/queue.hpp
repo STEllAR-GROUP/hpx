@@ -9,10 +9,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
             typedef lcos::base_lco::set_exception_action action_type;
 
             HPX_ASSERT(this->get_id());
-            compat::exception_ptr exception =
+            std::exception_ptr exception =
                 HPX_GET_EXCEPTION(hpx::no_success, "queue::abort_pending", "");
             return hpx::async<action_type>(this->get_id(), exception);
         }

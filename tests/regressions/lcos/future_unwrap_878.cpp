@@ -8,10 +8,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <exception>
 #include <utility>
 
 int main()
@@ -23,7 +23,7 @@ int main()
         //promise.set_value(42);
         throw hpx::bad_parameter;
     } catch(...) {
-        promise.set_exception(hpx::compat::current_exception());
+        promise.set_exception(std::current_exception());
     }
     HPX_TEST(future.has_exception());
 

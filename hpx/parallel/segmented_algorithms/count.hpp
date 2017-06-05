@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COUNT_DEC_25_2014_0207PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/algorithms/count.hpp>
@@ -18,6 +17,7 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -375,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [=](std::vector<shared_future<value_type> > && r) -> value_type
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<compat::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);

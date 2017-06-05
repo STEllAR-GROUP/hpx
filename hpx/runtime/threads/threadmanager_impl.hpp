@@ -9,7 +9,6 @@
 #define HPX_THREADMANAGER_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
@@ -28,6 +27,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -208,7 +208,7 @@ namespace hpx { namespace threads
         }
 
         /// API functions forwarding to notification policy
-        void report_error(std::size_t num_thread, compat::exception_ptr const& e)
+        void report_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             pool_.report_error(num_thread, e);
         }

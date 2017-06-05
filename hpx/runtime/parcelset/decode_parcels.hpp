@@ -8,7 +8,6 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -22,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <functional>
 #include <sstream>
 #include <utility>
@@ -234,18 +234,18 @@ namespace hpx { namespace parcelset
                 LPT_(error)
                     << "decode_message: caught hpx::exception: "
                     << e.what();
-                hpx::report_error(compat::current_exception());
+                hpx::report_error(std::current_exception());
             }
             catch (boost::system::system_error const& e) {
                 LPT_(error)
                     << "decode_message: caught boost::system::error: "
                     << e.what();
-                hpx::report_error(compat::current_exception());
+                hpx::report_error(std::current_exception());
             }
             catch (boost::exception const&) {
                 LPT_(error)
                     << "decode_message: caught boost::exception.";
-                hpx::report_error(compat::current_exception());
+                hpx::report_error(std::current_exception());
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -258,7 +258,7 @@ namespace hpx { namespace parcelset
         catch (...) {
             LPT_(error)
                 << "decode_message: caught unknown exception.";
-            hpx::report_error(compat::current_exception());
+            hpx::report_error(std::current_exception());
         }
     }
 

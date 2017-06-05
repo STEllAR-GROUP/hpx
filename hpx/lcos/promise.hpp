@@ -9,9 +9,9 @@
 #define HPX_LCOS_PROMISE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/promise_base.hpp>
 
+#include <exception>
 #include <memory>
 #include <utility>
 #include <type_traits>

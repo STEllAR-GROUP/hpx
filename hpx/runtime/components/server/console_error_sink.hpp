@@ -7,10 +7,10 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
+#include <exception>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,10 +18,10 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
-    void console_error_sink(compat::exception_ptr const&);
+    void console_error_sink(std::exception_ptr const&);
 
     typedef actions::action<
-        void (*)(compat::exception_ptr const&), console_error_sink
+        void (*)(std::exception_ptr const&), console_error_sink
     > console_error_sink_action;
 }}}
 

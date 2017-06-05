@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_FILL_MAY_30_2016
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -15,6 +14,7 @@
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>

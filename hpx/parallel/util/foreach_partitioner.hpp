@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_UTIL_FOREACH_PARTITIONER_OCT_03_2014_0112PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -28,6 +27,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <list>
 #include <memory>
 #include <utility>
@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter last = parallel::v1::detail::next(first, count);
 
                 std::vector<hpx::future<Result> > inititems, workitems;
-                std::list<compat::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // estimates a chunk size based on number of cores used
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
-                        compat::current_exception(), errors);
+                        std::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions<ExPolicy>::call(
-                        compat::current_exception());
+                        std::current_exception());
                 }
             }
         };
@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter last = parallel::v1::detail::next(first, count);
 
                 std::vector<hpx::future<Result> > inititems, workitems;
-                std::list<compat::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // estimates a chunk size based on number of cores used
@@ -148,10 +148,10 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
                 catch (...) {
-                    errors.push_back(compat::current_exception());
+                    errors.push_back(std::current_exception());
                 }
 
                 // wait for all tasks to finish

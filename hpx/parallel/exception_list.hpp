@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_EXCEPTION_LIST_JUN_25_2014_1055PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
@@ -17,6 +16,7 @@
 
 #include <boost/throw_exception.hpp>
 
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1
@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
                 catch (...) {
                     boost::throw_exception(
-                        hpx::exception_list(compat::current_exception())
+                        hpx::exception_list(std::current_exception())
                     );
                 }
             }
@@ -52,15 +52,15 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::move(f);
             }
 
-            static hpx::future<Result> call(compat::exception_ptr const& e)
+            static hpx::future<Result> call(std::exception_ptr const& e)
             {
                 try {
-                    compat::rethrow_exception(e);
+                    std::rethrow_exception(e);
                 }
                 catch (std::bad_alloc const&) {
                     // rethrow bad_alloc
                     return hpx::make_exceptional_future<Result>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
                 catch (...) {
                     // package up everything else as an exception_list
@@ -87,13 +87,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     }
                     catch (...) {
                         boost::throw_exception(
-                            hpx::exception_list(compat::current_exception())
+                            hpx::exception_list(std::current_exception())
                         );
                     }
                 }
                 catch (...) {
                     return hpx::make_exceptional_future<Result>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
             }
 
@@ -104,15 +104,15 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::move(f);
             }
 
-            static future<Result> call(compat::exception_ptr const& e)
+            static future<Result> call(std::exception_ptr const& e)
             {
                 try {
-                    compat::rethrow_exception(e);
+                    std::rethrow_exception(e);
                 }
                 catch (std::bad_alloc const&) {
                     // rethrow bad_alloc
                     return hpx::make_exceptional_future<Result>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
                 catch (...) {
                     // package up everything else as an exception_list
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             HPX_ATTRIBUTE_NORETURN
-            static hpx::future<Result> call(compat::exception_ptr const&)
+            static hpx::future<Result> call(std::exception_ptr const&)
             {
                 hpx::terminate();
             }

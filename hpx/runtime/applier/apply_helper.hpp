@@ -8,7 +8,6 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/util/decay.hpp>
 
 #include <chrono>
+#include <exception>
 #include <memory>
 #include <utility>
 
@@ -183,7 +183,7 @@ namespace hpx { namespace applier { namespace detail
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the
                     // client
-                    cont.trigger_error(compat::current_exception());
+                    cont.trigger_error(std::current_exception());
                 }
             }
             else

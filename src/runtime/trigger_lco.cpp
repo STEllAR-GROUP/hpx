@@ -4,12 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/apply.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
+#include <exception>
 #include <utility>
 
 namespace hpx
@@ -65,7 +65,7 @@ namespace hpx
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr,
-        compat::exception_ptr const& e, bool move_credits)
+        std::exception_ptr const& e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
@@ -85,7 +85,7 @@ namespace hpx
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
-        compat::exception_ptr && e, bool move_credits)
+        std::exception_ptr && e, bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
@@ -107,7 +107,7 @@ namespace hpx
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr,
-        compat::exception_ptr const& e, naming::id_type const& cont,
+        std::exception_ptr const& e, naming::id_type const& cont,
         bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;
@@ -138,7 +138,7 @@ namespace hpx
     }
 
     void set_lco_error(naming::id_type const& id, naming::address && addr, //-V659
-        compat::exception_ptr && e, naming::id_type const& cont,
+        std::exception_ptr && e, naming::id_type const& cont,
         bool move_credits)
     {
         typedef lcos::base_lco::set_exception_action set_action;

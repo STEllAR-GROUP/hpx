@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
-#include <hpx/compat/exception.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(compat::exception_ptr const& /*e*/)
+        void set_exception(std::exception_ptr const& /*e*/)
         {
             std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));

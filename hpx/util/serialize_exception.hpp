@@ -7,9 +7,10 @@
 #define HPX_UTIL_SERIALIZE_EXCEPTION_JAN_23_2009_0108PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+
+#include <exception>
 
 namespace hpx { namespace util
 {
@@ -46,13 +47,13 @@ namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void save(Archive& ar, compat::exception_ptr const& e, unsigned int);
+    void save(Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void load(Archive& ar, compat::exception_ptr& e, unsigned int);
+    void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
-    HPX_SERIALIZATION_SPLIT_FREE(compat::exception_ptr);
+    HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr);
 }}
 
 #endif

@@ -5,7 +5,6 @@
 
 #include <hpx/runtime/threads/thread.hpp>
 
-#include <hpx/compat/exception.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/throw_exception.hpp>
@@ -25,6 +24,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <mutex>
 #include <utility>
 
@@ -44,7 +44,7 @@ namespace hpx
             HPX_THROW_EXCEPTION(invalid_status, function, reason);
         }
         catch(...) {
-            hpx::report_error(compat::current_exception());
+            hpx::report_error(std::current_exception());
             /* nothing else we can do */;
         }
     }

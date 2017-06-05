@@ -7,7 +7,6 @@
 #define HPX_LCOS_LOCAL_FUTURES_FACTORY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -22,6 +21,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(f_());
                 }
                 catch(...) {
-                    this->set_exception(compat::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(result_type());
                 }
                 catch(...) {
-                    this->set_exception(compat::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -404,7 +404,7 @@ namespace hpx { namespace lcos { namespace local
             return !!task_;
         }
 
-        void set_exception(compat::exception_ptr const& e)
+        void set_exception(std::exception_ptr const& e)
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,

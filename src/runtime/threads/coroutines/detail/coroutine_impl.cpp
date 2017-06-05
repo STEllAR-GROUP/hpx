@@ -28,7 +28,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
@@ -40,6 +39,7 @@
 #include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
@@ -80,7 +80,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // loop as long this coroutine has been rebound
         do
         {
-            compat::exception_ptr tinfo;
+            std::exception_ptr tinfo;
             try
             {
                 this->check_exit_state();
@@ -105,22 +105,22 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
             catch (exit_exception const&) {
                 status = super_type::ctx_exited_exit;
-                tinfo = compat::current_exception();
+                tinfo = std::current_exception();
                 this->reset();            // reset functor
             }
             catch (boost::exception const&) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = compat::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
             catch (std::exception const&) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = compat::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
             catch (...) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = compat::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
 

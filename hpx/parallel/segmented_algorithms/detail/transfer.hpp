@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
@@ -18,6 +17,7 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         ->  std::pair<SegIter, SegOutIter>
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<compat::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);

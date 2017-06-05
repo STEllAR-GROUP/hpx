@@ -7,7 +7,6 @@
 #define HPX_LCOS_SERVER_CHANNEL_JUL_23_731PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/channel.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/traits/promise_remote_result.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         // Close the channel
-        void set_exception(compat::exception_ptr const& /*e*/)
+        void set_exception(std::exception_ptr const& /*e*/)
         {
             channel_.close();
         }

@@ -10,7 +10,6 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -46,6 +45,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -294,7 +294,7 @@ namespace hpx { namespace detail
             qc->start();
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(compat::current_exception())
+            std::cerr << hpx::diagnostic_information(std::current_exception())
                 << std::flush;
             hpx::terminate();
         }

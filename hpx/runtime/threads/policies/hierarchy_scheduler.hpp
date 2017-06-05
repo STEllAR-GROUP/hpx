@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -25,6 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -787,7 +787,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(num_thread < tree.at(0).size());
             tree.at(0).at(num_thread)->on_stop_thread(num_thread);
         }
-        void on_error(std::size_t num_thread, compat::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());

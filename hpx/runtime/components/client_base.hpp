@@ -7,7 +7,6 @@
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -26,6 +25,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -469,7 +469,7 @@ namespace hpx { namespace components
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
         //          pointer otherwise.
-        compat::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const
         {
             if (!shared_state_)
             {
@@ -480,7 +480,7 @@ namespace hpx { namespace components
 
             error_code ec(lightweight);
             this->shared_state_->get_result(ec);
-            if (!ec) return compat::exception_ptr();
+            if (!ec) return std::exception_ptr();
             return hpx::detail::access_exception(ec);
         }
 

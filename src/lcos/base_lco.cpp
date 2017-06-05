@@ -6,20 +6,20 @@
 
 #include <hpx/lcos/base_lco.hpp>
 
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <cstddef>
+#include <exception>
 
 namespace hpx { namespace lcos
 {
-    void base_lco::set_exception(compat::exception_ptr const& e)
+    void base_lco::set_exception(std::exception_ptr const& e)
     {
         // just rethrow the exception
-        compat::rethrow_exception(e);
+        std::rethrow_exception(e);
     }
 
     void base_lco::connect(naming::id_type const &)
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
         set_event();
     }
 
-    void base_lco::set_exception_nonvirt (compat::exception_ptr const& e)
+    void base_lco::set_exception_nonvirt (std::exception_ptr const& e)
     {
         set_exception(e);
     }

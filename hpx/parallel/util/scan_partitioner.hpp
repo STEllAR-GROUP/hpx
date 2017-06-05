@@ -8,7 +8,6 @@
 #define HPX_PARALLEL_UTIL_SCAN_PARTITIONER_DEC_30_2014_0227PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -30,6 +29,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <list>
 #include <memory>
 #include <utility>
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<compat::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
-                        compat::current_exception(), errors);
+                        std::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions<ExPolicy>::call(
-                        compat::current_exception());
+                        std::current_exception());
                 }
             }
         };
@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<compat::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -245,10 +245,10 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
                 catch (...) {
-                    errors.push_back(compat::current_exception());
+                    errors.push_back(std::current_exception());
                 }
 
                 // wait for all tasks to finish

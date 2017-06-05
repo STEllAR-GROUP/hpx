@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { inline namespace v3
                 }
                 catch (...) {
                     boost::throw_exception(
-                        exception_list(compat::current_exception())
+                        exception_list(std::current_exception())
                     );
                 }
             }
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { inline namespace v3
                 }
                 catch (...) {
                     boost::throw_exception(
-                        exception_list(compat::current_exception())
+                        exception_list(std::current_exception())
                     );
                 }
             }

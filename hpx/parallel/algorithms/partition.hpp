@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_ALGORITHM_PARTITION_SEP_24_2016_1055AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -28,6 +27,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             if (left.has_exception() || right.has_exception())
                             {
-                                std::list<compat::exception_ptr> errors;
+                                std::list<std::exception_ptr> errors;
                                 if(left.has_exception())
                                     hpx::parallel::util::detail::
                                     handle_local_exceptions<ExPolicy>::call(
@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
                 catch (...) {
                     result = hpx::make_exceptional_future<RandIter>(
-                        compat::current_exception());
+                        std::current_exception());
                 }
 
                 if (result.has_exception())

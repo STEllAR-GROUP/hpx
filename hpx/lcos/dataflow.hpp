@@ -10,7 +10,6 @@
 #define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
@@ -46,6 +45,7 @@
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(std::move(res));
             }
             catch(...) {
-                this->set_exception(compat::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(util::unused_type());
             }
             catch(...) {
-                this->set_exception(compat::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 

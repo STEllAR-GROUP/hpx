@@ -8,7 +8,6 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
@@ -31,6 +30,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -208,9 +208,9 @@ namespace hpx
         virtual std::uint64_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread,
-            compat::exception_ptr const& e) = 0;
+            std::exception_ptr const& e) = 0;
 
-        virtual void report_error(compat::exception_ptr const& e) = 0;
+        virtual void report_error(std::exception_ptr const& e) = 0;
 
         virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 

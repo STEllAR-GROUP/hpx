@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
@@ -67,6 +66,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -1361,7 +1361,7 @@ namespace hpx { namespace components { namespace server
                     f();
                 }
                 catch (...) {
-                    rt.report_error(compat::current_exception());
+                    rt.report_error(std::current_exception());
                 }
             }
         }
@@ -1373,7 +1373,7 @@ namespace hpx { namespace components { namespace server
                     f();
                 }
                 catch (...) {
-                    rt.report_error(compat::current_exception());
+                    rt.report_error(std::current_exception());
                 }
             }
             lcos::barrier::get_global_barrier().detach();

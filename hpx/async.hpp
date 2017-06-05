@@ -7,7 +7,6 @@
 #define HPX_ASYNC_APR_16_20012_0225PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
@@ -25,6 +24,7 @@
 #endif
 #include <hpx/parallel/executors/execution.hpp>
 
+#include <exception>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -47,7 +47,7 @@ namespace hpx { namespace detail
             return lcos::make_ready_future(std::ref(f()));
         } catch (...) {
             return lcos::make_exceptional_future<result_type>
-                (compat::current_exception());
+                (std::current_exception());
         }
     }
 
@@ -67,7 +67,7 @@ namespace hpx { namespace detail
             return lcos::make_ready_future(f());
         } catch (...) {
             return lcos::make_exceptional_future<result_type>
-                (compat::current_exception());
+                (std::current_exception());
         }
     }
 
@@ -81,7 +81,7 @@ namespace hpx { namespace detail
             f();
             return lcos::make_ready_future();
         } catch (...) {
-            return lcos::make_exceptional_future<void>(compat::current_exception());
+            return lcos::make_exceptional_future<void>(std::current_exception());
         }
     }
 

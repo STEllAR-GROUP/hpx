@@ -8,19 +8,20 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0621PM
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+
+#include <exception>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     // Stub function which applies the console_error_sink action.
     HPX_EXPORT void console_error_sink(naming::id_type const& dst,
-        compat::exception_ptr const& e);
+        std::exception_ptr const& e);
 
     // Stub function which applies the console_error_sink action.
-    HPX_EXPORT void console_error_sink(compat::exception_ptr const& e);
+    HPX_EXPORT void console_error_sink(std::exception_ptr const& e);
 }}
 
 #endif

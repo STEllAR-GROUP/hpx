@@ -7,7 +7,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/asio.hpp>
@@ -48,6 +47,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -714,7 +714,7 @@ namespace hpx { namespace parcelset
             }
 
             // all unhandled exceptions terminate the whole application
-            compat::exception_ptr exception =
+            std::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));

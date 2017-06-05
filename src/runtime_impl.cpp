@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compat/condition_variable.hpp>
-#include <hpx/compat/exception.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
@@ -33,6 +32,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -516,7 +516,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        std::size_t num_thread, compat::exception_ptr const& e)
+        std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
@@ -561,7 +561,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        compat::exception_ptr const& e)
+        std::exception_ptr const& e)
     {
         return report_error(hpx::get_worker_thread_num(), e);
     }
@@ -574,9 +574,9 @@ namespace hpx {
             std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
-                compat::exception_ptr e = exception_;
-                exception_ = compat::exception_ptr();
-                compat::rethrow_exception(e);
+                std::exception_ptr e = exception_;
+                exception_ = std::exception_ptr();
+                std::rethrow_exception(e);
             }
         }
     }
@@ -633,7 +633,7 @@ namespace hpx {
         get_notification_policy(char const* prefix)
     {
         typedef void (runtime_impl::*report_error_t)(
-            std::size_t, compat::exception_ptr const&);
+            std::size_t, std::exception_ptr const&);
 
         using util::placeholders::_1;
         using util::placeholders::_2;
