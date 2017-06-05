@@ -265,14 +265,17 @@ namespace hpx { namespace serialization
         }
 
         void load_rma_chunk(void * address, std::size_t count,
-            hpx::parcelset::rma::memory_region *region)
+            hpx::parcelset::rma::memory_region *& region)
         {
-            if(count == 0) return;
+            if (count == 0) return;
             size_ += count;
-            if(disable_data_chunking())
-              buffer_->load_binary(address, count);
-            else
-              buffer_->load_rma_chunk(address, count, region);
+            if (disable_data_chunking() || count<HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                buffer_->load_binary(address, count);
+            }
+            else {
+                buffer_->load_rma_chunk(address, count, region);
+                HPX_ASSERT(region != nullptr);
+            }
         }
 
         // make functions visible through adl

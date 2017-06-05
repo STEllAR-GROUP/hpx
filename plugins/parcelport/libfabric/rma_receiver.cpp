@@ -171,10 +171,10 @@ namespace libfabric
         {
             LOG_DEBUG_MSG("receiver " << hexpointer(this)
                 << "recv : chunk : size " << hexnumber(c.size_)
-                << " type " << decnumber((uint64_t)c.type_)
-                << " rkey " << hexpointer(c.rkey_)
-                << " cpos " << hexpointer(c.data_.cpos_)
-                << " index " << decnumber(c.data_.index_));
+                << "type "   << decnumber((uint64_t)c.type_)
+                << "rma "    << hexpointer(c.rma_)
+                << "cpos "   << hexpointer(c.data_.cpos_)
+                << "index "  << decnumber(c.data_.index_));
         });
 
         rma_regions_.reserve(rma_count_);
@@ -191,14 +191,14 @@ namespace libfabric
         auto &cb = header_->chunk_header_ptr()->chunk_rma;
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "Fetching RMA chunk chunk data with "
-            << "size " << decnumber(cb.size_)
-            << "rkey " << hexpointer(cb.rkey_)
-            << "addr " << hexpointer(cb.data_.cpos_));
+            << "size "   << decnumber(cb.size_)
+            << "rma "    << hexpointer(cb.rma_)
+            << "addr "   << hexpointer(cb.data_.cpos_));
 
         // we need a local memory region to read the chunks into
         chunk_region_ = memory_pool_->allocate_region(cb.size_);
         chunk_region_->set_message_length(cb.size_);
-        uint64_t          rkey1 = cb.rkey_;
+        uint64_t rkey1 = cb.rma_;
         const void *remoteAddr1 = cb.data_.cpos_;
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "Fetching chunk region with size " << decnumber(cb.size_));
@@ -210,7 +210,7 @@ namespace libfabric
             auto &mc = header_->message_chunk_ptr()->message_rma;
             message_region_ = memory_pool_->allocate_region(mc.size_);
             message_region_->set_message_length(mc.size_);
-            uint64_t          rkey2 = mc.rkey_;
+            uint64_t rkey2 = mc.rma_;
             const void *remoteAddr2 = mc.data_.cpos_;
             LOG_DEBUG_MSG("receiver " << hexpointer(this)
                 << "Fetching message region with size " << decnumber(mc.size_));
@@ -276,22 +276,26 @@ namespace libfabric
                     CRC32_MEM(get_region->get_address(), c.size_,
                         "(RDMA GET region (new))"));
 
+                // store the remote key in case we overwrite it
+                std::uint64_t remote_key = c.rma_;
+
                 if (c.type_ == serialization::chunk_type_rma) {
                     // rma object/vector chunks are not deleted
                     // so do not add them to the rma_regions list for cleanup
-                    LOG_DEVEL_MSG("Reading an rma chunk with no deletion setup");
+                    LOG_DEVEL_MSG("Passing rma region to chunk structure");
+                    c.rma_ = std::uintptr_t(get_region);
                 }
                 else {
                     rma_regions_.push_back(get_region);
                 }
                 // overwrite the serialization chunk data pointer because the chunk
                 // info sent contains the pointer to the remote data and when we
-                // deocde the parcel we want the chunk to point to the local copy of it
+                // decode the parcel we want the chunk to point to the local copy of it
                 const void *remoteAddr = c.data_.cpos_;
                 c.data_.cpos_ = get_region->get_address();
 
                 // call the rma read function for the chunk
-                read_one_chunk(src_addr_, get_region, remoteAddr, c.rkey_);
+                read_one_chunk(src_addr_, get_region, remoteAddr, remote_key);
             }
         }
     }
@@ -455,10 +459,10 @@ namespace libfabric
         LOG_EXCLUSIVE(
             for (chunktype &c : chunks_) {
                 LOG_DEBUG_MSG("get : chunk : size " << hexnumber(c.size_)
-                    << " type " << decnumber((uint64_t)c.type_)
-                    << " rkey " << hexpointer(c.rkey_)
-                    << " cpos " << hexpointer(c.data_.cpos_)
-                    << " index " << decnumber(c.data_.index_));
+                    << "type "   << decnumber((uint64_t)c.type_)
+                    << "rma "    << hexpointer(c.rma_)
+                    << "cpos "   << hexpointer(c.data_.cpos_)
+                    << "index "  << decnumber(c.data_.index_));
         });
 
         int zc_chunks =

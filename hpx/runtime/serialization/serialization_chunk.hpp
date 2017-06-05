@@ -37,11 +37,10 @@ namespace hpx { namespace serialization
 
     struct serialization_chunk
     {
-        chunk_data    data_; // index or pointer
-        std::size_t   size_; // size of the serialization_chunk starting index_/pos_
-        std::uint64_t rkey_; // optional RDMA remote key for parcelport put/get
-                             // operations
-        std::uint8_t  type_; // chunk_type
+        chunk_data      data_; // index or pointer
+        std::size_t     size_; // size of the serialization_chunk starting index_/pos_
+        std::uintptr_t  rma_;  // RMA remote key, or region for parcelport put/get
+        std::uint8_t    type_; // chunk_type
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -55,20 +54,20 @@ namespace hpx { namespace serialization
     }
 
     inline serialization_chunk create_pointer_chunk(
-        void const* pos, std::size_t size, std::uint64_t rkey=0)
+        void const* pos, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, rkey, static_cast<std::uint8_t>(chunk_type_pointer)
+            { 0 }, size, 0, static_cast<std::uint8_t>(chunk_type_pointer)
         };
         retval.data_.cpos_ = pos;
         return retval;
     }
 
     inline serialization_chunk create_rma_chunk(
-        void const* pos, std::size_t size, std::uint64_t rkey)
+        void const* pos, std::size_t size, std::uintptr_t rma)
     {
         serialization_chunk retval = {
-            { 0 }, size, rkey, static_cast<std::uint8_t>(chunk_type_rma)
+            { 0 }, size, rma, static_cast<std::uint8_t>(chunk_type_rma)
         };
         retval.data_.cpos_ = pos;
         return retval;

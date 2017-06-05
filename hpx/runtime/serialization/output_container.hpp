@@ -288,8 +288,6 @@ namespace hpx { namespace serialization
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
-                LOG_DEVEL_MSG("save_rma_chunk too small, calling save_binary"
-                    << hexlength(count));
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
                 // the container has grown by count bytes

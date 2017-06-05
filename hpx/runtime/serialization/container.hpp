@@ -51,7 +51,7 @@ namespace hpx { namespace serialization
         virtual void load_binary(void * address, std::size_t count) = 0;
         virtual void load_binary_chunk(void * address, std::size_t count) = 0;
         virtual void load_rma_chunk(void * address, std::size_t count,
-            parcelset::rma::memory_region *) = 0;
+            parcelset::rma::memory_region *& region) = 0;
     };
 }}
 

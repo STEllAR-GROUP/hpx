@@ -166,7 +166,6 @@ namespace hpx { namespace serialization
 
         std::size_t bytes_written() const
         {
-            LOG_DEVEL_MSG("archive bytes_written " << hexlength(size_));
             return size_;
         }
 

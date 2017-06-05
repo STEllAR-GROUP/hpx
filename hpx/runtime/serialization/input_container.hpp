@@ -44,6 +44,16 @@ namespace hpx { namespace serialization
             return (*chunks_)[chunk].data_;
         }
 
+        void *get_chunk_rma_region_pointer(std::size_t chunk) const
+        {
+            return (void*)((*chunks_)[chunk].rma_);
+        }
+
+        uint64_t get_chunk_rma_remote_key(std::size_t chunk) const
+        {
+            return uint64_t((*chunks_)[chunk].rma_);
+        }
+
         std::size_t get_num_chunks() const
         {
             return chunks_->size();
@@ -164,12 +174,13 @@ namespace hpx { namespace serialization
         }
 
         void load_rma_chunk(void* address, std::size_t count,
-            parcelset::rma::memory_region *) // override
+            parcelset::rma::memory_region *& region) // override
         {
             HPX_ASSERT((std::int64_t)count >= 0);
 
             if (filter_.get() || chunks_ == nullptr ||
                 count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                region = nullptr;
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);
             }
@@ -180,12 +191,15 @@ namespace hpx { namespace serialization
                 if (get_chunk_size(current_chunk_) != count)
                 {
                     HPX_THROW_EXCEPTION(serialization_error
-                      , "input_container::load_binary_chunk"
+                      , "input_container::load_rma_chunk"
                       , "archive data bstream data chunk size mismatch");
                     return;
                 }
                 // the parcelport will have transferred data into the memory buffer
-                // using RMA, so we need to do nothing here
+                // using RMA, so we need to do nothing here other than pass the region
+                // pointer into the callers ownership
+                region = static_cast<parcelset::rma::memory_region*>
+                    (get_chunk_rma_region_pointer(current_chunk_));
                 ++current_chunk_;
             }
         }

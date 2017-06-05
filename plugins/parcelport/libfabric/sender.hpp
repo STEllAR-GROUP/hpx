@@ -12,7 +12,6 @@
 #include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
 #include <plugins/parcelport/libfabric/rma_base.hpp>
 #include <plugins/parcelport/performance_counter.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 

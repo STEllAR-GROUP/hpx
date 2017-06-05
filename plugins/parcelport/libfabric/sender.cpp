@@ -8,7 +8,6 @@
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
 //
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
@@ -49,10 +48,10 @@ namespace libfabric
         {
             // Debug only, dump out the chunk info
             LOG_DEBUG_MSG("write : chunk : size " << hexnumber(c.size_)
-                    << " type " << decnumber((uint64_t)c.type_)
-                    << " rkey " << hexpointer(c.rkey_)
-                    << " cpos " << hexpointer(c.data_.cpos_)
-                    << " index " << decnumber(c.data_.index_));
+                    << "type "   << decnumber((uint64_t)c.type_)
+                    << "rma "    << hexpointer(c.rma_)
+                    << "cpos "   << hexpointer(c.data_.cpos_)
+                    << "index "  << decnumber(c.data_.index_));
             if (c.type_ == serialization::chunk_type_pointer)
             {
                 LOG_EXCLUSIVE(util::high_resolution_timer regtimer);
@@ -64,12 +63,12 @@ namespace libfabric
                 rma_regions_.push_back(zero_copy_region);
 
                 // set the region remote access key in the chunk space
-                c.rkey_  = zero_copy_region->get_remote_key();
+                c.rma_  = zero_copy_region->get_remote_key();
                 LOG_DEBUG_MSG("Time to register memory (ns) "
                     << decnumber(regtimer.elapsed_nanoseconds()));
                 LOG_DEBUG_MSG("Created zero-copy rdma Get region "
                     << decnumber(index) << *zero_copy_region
-                    << "for rkey " << hexpointer(c.rkey_));
+                    << "for rma " << hexpointer(c.rma_));
 
                 LOG_TRACE_MSG(
                     CRC32_MEM(zero_copy_region->get_address(),
@@ -136,12 +135,12 @@ namespace libfabric
             auto &cb = header_->chunk_header_ptr()->chunk_rma;
             chunk_region_  = memory_pool_->allocate_region(cb.size_);
             cb.data_.pos_  = chunk_region_->get_address();
-            cb.rkey_       = chunk_region_->get_remote_key();
+            cb.rma_        = chunk_region_->get_remote_key();
             std::memcpy(cb.data_.pos_, buffer_.chunks_.data(), cb.size_);
             LOG_DEBUG_MSG("Set up header-chunk rma data with "
-                << "size " << decnumber(cb.size_)
-                << "rkey " << hexpointer(cb.rkey_)
-                << "addr " << hexpointer(cb.data_.cpos_));
+                << "size "   << decnumber(cb.size_)
+                << "rma "    << hexpointer(cb.rma_)
+                << "addr "   << hexpointer(cb.data_.cpos_));
         }
 
         if (header_->message_piggy_back())

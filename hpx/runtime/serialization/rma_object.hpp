@@ -47,31 +47,32 @@ namespace hpx { namespace serialization
         template <typename T>
         void load_impl(input_archive & ar, rma::rma_vector<T> & v, std::true_type)
         {
-            if(ar.disable_array_optimization())
+            // if array optimization is disabled, read each element one by one
+            if (ar.disable_array_optimization())
             {
                 load_impl(ar, v, std::false_type());
             }
             else
             {
-                // bitwise load ...
+                // read the vector size first
                 typedef typename rma::rma_vector<T>::size_type size_type;
                 size_type size;
                 ar >> size; //-V128
                 if (size == 0) {
                     return;
                 }
-                //
-                v.resize(size/sizeof(T));
-                //
-                if (size < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                // if reading chunks is disabled, we must use a normal binary read
+                if (size < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ||
+                    ar.disable_data_chunking())
+                {
+                    v.resize(size/sizeof(T));
                     ar.load_binary(v.data(), size);
                 }
                 else {
-                    parcelset::rma::memory_region *region = v.get_region();
-                    region->set_message_length(v.size() * sizeof(T));
-
                     // bitwise (zero-copy) load with rma overload...
-                    ar.load_rma_chunk(v.data(), v.size() * sizeof(T), region);
+                    rma::memory_region *region;
+                    ar.load_rma_chunk(nullptr, size*sizeof(T), region);
+                    v.set_memory_region(region, size);
                 }
             }
         }
@@ -107,16 +108,17 @@ namespace hpx { namespace serialization
         void save_impl(
             output_archive & ar, const rma::rma_vector<T> & v, std::true_type)
         {
-            if (v.size() < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            const std::size_t bytes = v.size()*sizeof(T);
+            if (bytes < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
                 // fall back to serialization_chunk-less archive
-                ar.save_binary(v.data(), v.size() * sizeof(T));
+                ar.save_binary(v.data(), bytes);
             }
             else {
                 parcelset::rma::memory_region *region = v.get_region();
-                region->set_message_length(v.size() * sizeof(T));
+                region->set_message_length(bytes);
                 // bitwise (zero-copy) save with rma overload...
-                ar.save_rma_chunk(v.data(), v.size() * sizeof(T), region);
+                ar.save_rma_chunk(v.data(), bytes, region);
             }
         }
     }

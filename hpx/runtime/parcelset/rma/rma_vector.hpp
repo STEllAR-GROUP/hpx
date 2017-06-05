@@ -65,7 +65,7 @@ namespace rma
         using memory_info      = std::shared_ptr<detail::memory_info<T>>;
         // internal vars
         memory_info            m_data_;
-        std::size_t            m_size_;
+        size_type              m_size_;
         deleter_callback       m_cb_;
         allocator_type        *m_alloc_;
 
@@ -83,7 +83,7 @@ namespace rma
         }
 /*
         // construct from existing memory chunk, provide allocator, deleter etc
-        rmavector(T* p, std::size_t s, deleter_callback cb,
+        rmavector(T* p, size_type s, deleter_callback cb,
             allocator_type* alloc, region_type *r) :
                 m_size_(s), m_cb_(cb), m_alloc_(alloc)
         {
@@ -200,17 +200,17 @@ namespace rma
             return iterator(&m_data_->data_[m_size_]);
         }
 
-        reference operator[](std::size_t index) {
+        reference operator[](size_type index) {
             return m_data_->data_[index];
         }
-        const_reference operator[](std::size_t index) const {
+        const_reference operator[](size_type index) const {
             return m_data_->data_[index];
         }
 
         void push_back(const T &_Val) {
         }
 
-        std::size_t capacity() {
+        size_type capacity() {
             return m_data_->region_ ? m_data_->region_->get_size() : 0;
         }
 
@@ -229,7 +229,7 @@ namespace rma
             // if higher size is requested
             if (s > m_size_)
             {
-                //default construct the remainder of the new uninitialized memory
+                // default construct the remainder of the new uninitialized memory
                 for (size_type i= m_size_; i<s; ++i) {
                     new(&m_data_->data_[i]) T{};
                 }
@@ -241,24 +241,27 @@ namespace rma
                     m_data_->data_[i].~T();
                 }
             }
-            m_size_ = s;  //change container size.
+            m_size_ = s;  // change container size.
         }
 
         void reserve(size_type s)
         {
             create_allocator();
+            //
+            const size_type bytes = s * sizeof(T);
 
             // if new size is greater than current region space
-            if ((s>0) && (!m_data_ || (s>m_data_->region_->get_size())))
+            if ((bytes>0) && (!m_data_ || (bytes>m_data_->region_->get_size())))
             {
-                print_debug("reserving", s);
+                print_debug("reserving (bytes)", bytes);
 
                 // allocate a new region
-                memory_region *region_ = m_alloc_->allocate_region(s);
+                memory_region *region_ = m_alloc_->allocate_region(bytes);
                 T *array_ = static_cast<T*>(region_->get_address());
 
-                // move all previous data. nb. if m_size_==0, skips loop entirely
+                // move all previous data. (if m_size_==0, skips loop entirely)
                 for (size_type i=0; i<m_size_; ++i) {
+                    // call move constructor on new item
                     new(&array_[i]) T(std::move(m_data_->data_[i]));
 
                     // call the destructor on the moved item
@@ -269,29 +272,53 @@ namespace rma
                 m_data_  = nullptr;
 
                 // set shared data to point to our memory/region
-                m_data_ = std::shared_ptr<detail::memory_info<T>>(
-                    new detail::memory_info<T>(
-                        region_, array_, m_alloc_->get_memory_pool()),
-                    [this](detail::memory_info<T> *mp)
-                {
-                    LOG_DEVEL_MSG("rmavector deleter callback");
-                    if (mp->region_) {
-                        LOG_DEVEL_MSG("rmavector shared array destructor "
-                              << "this "   << hexpointer(this)
-                              << "region "   << hexpointer(mp->region_)
-                              << "array "    << hexpointer(mp->data_));
-                        HPX_ASSERT(mp->data_ == mp->region_->get_address());
-                        mp->pool_->release_region(mp->region_);
-                        delete mp;
-                    }
-                    else {
-                        LOG_DEVEL_MSG("shared array 2 destructor "
-                            << "this " << hexpointer(this));
-                    }
-                });
+                // do not pass a size param as we do not want to change the size
+                set_memory_region(region_);
 
-                print_debug("reserved", s);
+                print_debug("reserved", bytes);
             }
+        }
+
+        // only to be used for direct manipulation of internal data
+        // such as during serialization
+        void set_memory_region(memory_region *region, size_type size=0)
+        {
+            // release anything we might be holding
+            m_data_ = nullptr;
+            // make sure an allocator is present
+            create_allocator();
+            // get the memory pointer from the region
+            T *array_ = static_cast<T*>(region->get_address());
+            // if requested, set the size of our array
+            if (size>0) {
+                m_size_ = size;
+                // check all is as expected
+                HPX_ASSERT(size == region->get_message_length()/sizeof(T));
+            }
+
+            // set shared data to point to our memory/region
+            m_data_ = std::shared_ptr<detail::memory_info<T>>(
+                new detail::memory_info<T>(
+                    region, array_, m_alloc_->get_memory_pool()),
+                [this](detail::memory_info<T> *mp)
+            {
+                LOG_DEVEL_MSG("rmavector deleter callback");
+                if (mp->region_) {
+                    LOG_DEVEL_MSG("rmavector shared array destructor "
+                          << "this "   << hexpointer(this)
+                          << "region "   << hexpointer(mp->region_)
+                          << "array "    << hexpointer(mp->data_));
+                    HPX_ASSERT(mp->data_ == mp->region_->get_address());
+                    mp->pool_->release_region(mp->region_);
+                    delete mp;
+                }
+                else {
+                    LOG_ERROR_MSG("shared array 2 destructor "
+                        << "this " << hexpointer(this));
+                }
+            });
+            //
+            print_debug("memory region assigned", size);
         }
 
         allocator_type get_allocator() const {
