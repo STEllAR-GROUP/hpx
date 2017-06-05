@@ -159,8 +159,8 @@ namespace resource
             case 7 : sched = "periodic_priority";   break;
             case 8 : sched = "throttle";            break;
         }
-        std::cout << "\"" << sched << "\"\n"
-                  << "is running on PUs : ";
+        std::cout << "\"" << sched << "\" "
+                  << "is running on PUs : \n";
         for(size_t i(0); i<assigned_pus_.size(); i++)
             std::cout << bitset_type(assigned_pus_[i]) << "\n";
     }
@@ -446,7 +446,7 @@ namespace resource
     // ----------------------------------------------------------------------
     // Add processing units to pools via pu/core/domain api
     // ----------------------------------------------------------------------
-    void resource_partitioner::add_resource(pu &p,
+    void resource_partitioner::add_resource(const pu &p,
         const std::string &pool_name, std::size_t num_threads)
     {
         //! FIXME except if policy allow_extra_thread_creation is activated
@@ -477,37 +477,38 @@ namespace resource
         }
     }
 
-    void resource_partitioner::add_resource(std::vector<pu> &pv,
+    void resource_partitioner::add_resource(const std::vector<pu> &pv,
         const std::string &pool_name)
     {
-        for (pu &p : pv) {
+        for (const pu &p : pv) {
             add_resource(p, pool_name);
         }
     }
 
-    void resource_partitioner::add_resource(core &c,
+    void resource_partitioner::add_resource(const core &c,
         const std::string &pool_name)
     {
         add_resource(c.pus_, pool_name);
     }
 
-    void resource_partitioner::add_resource(std::vector<core> &cv,
+    void resource_partitioner::add_resource(const std::vector<core> &cv,
         const std::string &pool_name)
     {
-        for (core &c : cv) {
+        for (const core &c : cv) {
             add_resource(c.pus_, pool_name);
         }
     }
 
-    void resource_partitioner::add_resource(numa_domain &nd,
+    void resource_partitioner::add_resource(const numa_domain &nd,
         const std::string &pool_name)
     {
         add_resource(nd.cores_, pool_name);
     }
 
-    void resource_partitioner::add_resource(std::vector<numa_domain> &ndv, const std::string &pool_name)
+    void resource_partitioner::add_resource(const std::vector<numa_domain> &ndv,
+        const std::string &pool_name)
     {
-        for (numa_domain &d : ndv) {
+        for (const numa_domain &d : ndv) {
             add_resource(d, pool_name);
         }
     }

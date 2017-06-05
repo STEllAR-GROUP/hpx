@@ -71,7 +71,7 @@ namespace detail
             std::cout << "[pool \"" << id_.name_ << "\", #" << id_.index_
                       << "] with scheduler " << sched_->get_scheduler_name()
                       << "\n"
-                      << "is running on PUs : ";
+                      << "is running on PUs : \n";
             std::cout << bitset_type(used_processing_units_) << "\n";
         }
 

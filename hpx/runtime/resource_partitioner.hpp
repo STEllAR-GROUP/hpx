@@ -65,8 +65,10 @@ namespace resource
                         //  0: this PU is not exposed by the affinity bindings
                         //  1: normal occupancy
                         // >1: oversubscription
-        std::size_t     thread_occupancy_count_;
+        mutable std::size_t     thread_occupancy_count_;
                         // counts number of threads bound to this PU
+        friend struct core;
+        friend struct numa_domain;
     };
 
     struct core {
@@ -74,7 +76,10 @@ namespace resource
         numa_domain      *domain_;
         std::vector<pu>   pus_;
         std::vector<core> cores_sharing_numa_domain();
-        std::vector<pu> pus() const {
+        friend struct pu;
+        friend struct numa_domain;
+    public:
+        const std::vector<pu> &pus() const {
             return pus_;
         }
     };
@@ -82,7 +87,10 @@ namespace resource
     struct numa_domain {
         std::size_t       id_;
         std::vector<core> cores_;
-        std::vector<core> cores() const {
+        friend struct pu;
+        friend struct core;
+    public:
+        const std::vector<core> &cores() const {
             return cores_;
         }
     };
@@ -170,17 +178,17 @@ namespace resource
 
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
-        void add_resource(hpx::resource::pu &p,
+        void add_resource(const hpx::resource::pu &p,
             const std::string &pool_name, std::size_t num_threads = 1);
-        void add_resource(std::vector<hpx::resource::pu> &pv,
+        void add_resource(const std::vector<hpx::resource::pu> &pv,
             const std::string &pool_name);
-        void add_resource(hpx::resource::core &c,
+        void add_resource(const hpx::resource::core &c,
             const std::string &pool_name);
-        void add_resource(std::vector<hpx::resource::core> &cv,
+        void add_resource(const std::vector<hpx::resource::core> &cv,
             const std::string &pool_name);
-        void add_resource(hpx::resource::numa_domain &nd,
+        void add_resource(const hpx::resource::numa_domain &nd,
             const std::string &pool_name);
-        void add_resource(std::vector<hpx::resource::numa_domain> &ndv,
+        void add_resource(const std::vector<hpx::resource::numa_domain> &ndv,
             const std::string &pool_name);
 
         // stuff that has to be done during hpx_init ...
