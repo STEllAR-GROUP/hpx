@@ -15,31 +15,33 @@
 namespace hpx { namespace parcelset { namespace detail {
 
     parcel_await::parcel_await(parcel&& p, int archive_flags,
-        parcel_await::put_parcel_type pp)
+            parcel_await::put_parcel_type pp)
       : put_parcel_(std::move(pp)),
-        archive_(preprocess_, archive_flags),
-        overhead_(archive_.bytes_written()),
+        archive_flags_(archive_flags),
         idx_(0)
     {
         parcels_.push_back(std::move(p));
     }
 
     parcel_await::parcel_await(std::vector<parcel>&& parcels, int archive_flags,
-        parcel_await::put_parcel_type pp)
+            parcel_await::put_parcel_type pp)
       : put_parcel_(std::move(pp)),
         parcels_(std::move(parcels)),
-        archive_(preprocess_, archive_flags),
-        overhead_(archive_.bytes_written()),
+        archive_flags_(archive_flags),
         idx_(0)
-    {
-    }
+    {}
 
     void parcel_await::apply()
     {
         for (/*idx_*/; idx_ != parcels_.size(); ++idx_)
         {
-            archive_.reset();
-            archive_ << parcels_[idx_];
+            // collect the necessary size the serialization operation
+            hpx::serialization::detail::preprocess preprocess;
+            hpx::serialization::output_archive archive(preprocess, archive_flags_);
+            std::size_t overhead = archive.bytes_written();
+
+            archive.reset();
+            archive << parcels_[idx_];
 
             // We are doing a fixed point iteration until we are sure that the
             // serialization process requires nothing more to wait on ...
@@ -48,16 +50,18 @@ namespace hpx { namespace parcelset { namespace detail {
             //      need to do another await round for the id splitting
             //  - id_type: we need to await, if and only if, the credit of the
             //      needs to split.
-            if(preprocess_.has_futures())
+            if(preprocess.has_futures())
             {
                 auto this_ = this->shared_from_this();
-                preprocess_([this_](){ this_->apply(); });
+                preprocess([this_](){ this_->apply(); });
                 return;
             }
-            archive_.flush();
-            parcels_[idx_].size() = preprocess_.size() + overhead_;
-            parcels_[idx_].num_chunks() = archive_.get_num_chunks();
-            parcels_[idx_].set_split_gids(std::move(preprocess_.split_gids_));
+            archive.flush();
+
+            parcels_[idx_].size() = preprocess.size() + overhead;
+            parcels_[idx_].num_chunks() = archive.get_num_chunks();
+            parcels_[idx_].set_split_gids(std::move(preprocess.split_gids_));
+
             put_parcel_(std::move(parcels_[idx_]));
         }
     }
