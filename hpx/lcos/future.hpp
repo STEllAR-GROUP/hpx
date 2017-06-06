@@ -24,6 +24,7 @@
 #include <hpx/traits/is_executor_v1.hpp>
 #endif
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
@@ -885,7 +886,9 @@ namespace hpx { namespace lcos
         //   - other.valid() == false.
         template <typename T>
         future(future<T>&& other,
-            typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
+            typename std::enable_if<
+                std::is_void<R>::value && !traits::is_future<T>::value, T
+            >::type* = nullptr
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, false) : nullptr)
         {
@@ -1216,7 +1219,9 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         template <typename T>
         shared_future(shared_future<T> const& other,
-            typename std::enable_if<std::is_void<R>::value, T>::type* = nullptr
+            typename std::enable_if<
+                std::is_void<R>::value && !traits::is_future<T>::value, T
+            >::type* = nullptr
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, true) : nullptr)
         {}
