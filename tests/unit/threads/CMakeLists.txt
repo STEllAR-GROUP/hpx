@@ -28,6 +28,8 @@ else()
   set(lockfree_fifo_FLAGS NOLIBS)
 endif()
 
+set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
+
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
