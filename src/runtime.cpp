@@ -759,35 +759,33 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     std::string get_config_entry(std::string const& key, std::string const& dflt)
-    {
-        if (nullptr == get_runtime_ptr())
-            return dflt;
-        return get_runtime().get_config().get_entry(key, dflt);
+    { //! FIXME runtime_configuration should probs be a member of hpx::runtime only, not command_line_handling
+        //! FIXME change functions in this section accordingly
+        if (get_runtime_ptr() != nullptr)
+            return get_runtime().get_config().get_entry(key, dflt);
+        return get_resource_partitioner().get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return std::to_string(dflt);
-        return get_runtime().get_config().get_entry(key, dflt);
+        if (get_runtime_ptr() != nullptr)
+            return get_runtime().get_config().get_entry(key, dflt);
+        return get_resource_partitioner().get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     // set entries
     void set_config_entry(std::string const& key, std::string const& value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, value);
+        if (get_runtime_ptr() != nullptr)
+            return get_runtime_ptr()->get_config().add_entry(key, value);
+        return get_resource_partitioner().get_command_line_switches().rtcfg_.add_entry(key, value);
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, std::to_string(value));
+        if (get_runtime_ptr() != nullptr)
+            return get_runtime_ptr()->get_config().add_entry(key, std::to_string(value));
+        return get_resource_partitioner().get_command_line_switches().rtcfg_.add_entry(key, std::to_string(value));
     }
 
     void set_config_entry_callback(std::string const& key,
@@ -795,10 +793,9 @@ namespace hpx
             void(std::string const&, std::string const&)
         > const& callback)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_notification_callback(key, callback);
+        if (get_runtime_ptr() != nullptr)
+            return get_runtime_ptr()->get_config().add_notification_callback(key, callback);
+        return get_resource_partitioner().get_command_line_switches().rtcfg_.add_notification_callback(key, callback);
     }
 
     ///////////////////////////////////////////////////////////////////////////

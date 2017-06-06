@@ -20,6 +20,14 @@ namespace hpx {
     resource::resource_partitioner & get_resource_partitioner()
     {
         util::static_<resource::resource_partitioner, std::false_type> rp;
+
+        if(rp.get().cmd_line_parsed() == false){
+            // if the resource partitioner is not accessed for the first time
+            // if the command-line parsing has not yet been done
+            throw std::invalid_argument("hpx::get_resource_partitioner() can be called only after the resource partitioner has been allowed to parse the command line options. Please call hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) instead");
+            //! FIXME pas beau
+        }
+
         return rp.get();
     }
 
@@ -36,12 +44,14 @@ namespace hpx {
     resource::resource_partitioner & get_resource_partitioner(
             boost::program_options::options_description desc_cmdline, int argc, char **argv)
     {
-        resource::resource_partitioner & rp = get_resource_partitioner();
-        if(rp.cfg_.num_threads_ == 0){
-            rp.cfg_ = util::command_line_handling(argv[0]);
-            rp.cfg_.call(desc_cmdline, argc, argv);
+        util::static_<resource::resource_partitioner, std::false_type> rp_;
+        auto& rp = rp_.get();
+
+        if(rp.cmd_line_parsed() == false){ //! FIXME chnge to true and switch pos of instructions
+            rp.parse(desc_cmdline, argc, argv);
             return rp;
         }
+
         throw std::invalid_argument("After hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) has been called already, you should call hpx::get_resource_partitioner()");
         //! FIXME pas beau
     }
@@ -233,8 +243,6 @@ namespace resource
         if(instance_number_counter_++ >= 0)
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
 
-        set_init_affinity_data();
-        cores_needed_ = affinity_data_.init(cfg_.num_threads_, init_affinity_data_, topology_);
         fill_topology_vectors();
     }
 
@@ -266,7 +274,7 @@ namespace resource
 
         // if the binding should be set from the user's instructions in int main()
         std::string affinity_desc;
-        if(set_affinity_from_resource_partitioner_){
+        if(set_affinity_from_resource_partitioner_){ //! FIXME this will have to change
             affinity_desc = "affinity-from-resource-partitioner";
         } else {
             std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg_, affinity_desc);
@@ -660,6 +668,24 @@ namespace resource
         return affinity_data_.get_pu_mask(num_thread, numa_sensitive, topology_);
     }
 
+    bool resource_partitioner::cmd_line_parsed() const
+    {
+        return (cfg_.parsed_ == true);
+    }
+
+    void resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv)
+    {
+        // set internal parameters of runtime configuration
+        cfg_.rtcfg_ = util::runtime_configuration(argv[0]);
+
+        // parse command line and set options
+        cfg_.call(desc_cmdline, argc, argv);
+
+        // set all parameters related to affinity data
+        //! FIXME maybe this init_affinity_data isn't needed any more ??
+        set_init_affinity_data();
+        cores_needed_ = affinity_data_.init(cfg_.num_threads_, init_affinity_data_, topology_);
+    }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {
         if (index >= initial_thread_pools_.size()) {

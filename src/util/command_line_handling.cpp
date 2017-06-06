@@ -1151,6 +1151,9 @@ namespace hpx { namespace util
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv)
     {
+        // set the flag signaling that command line parsing has been done
+        parsed_ = true;
+
         util::manage_config cfgmap(ini_config_);
 
         std::vector<std::shared_ptr<plugins::plugin_registry_base> >

@@ -211,17 +211,16 @@ namespace resource
         size_t get_num_pools() const;
         size_t get_num_threads(const std::string &pool_name);
         const std::string &get_pool_name(size_t index) const;
+        init_pool_data* get_pool(std::size_t pool_index) const;
+        threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
+        bool cmd_line_parsed() const;
+        void parse(boost::program_options::options_description desc_cmdline, int argc, char **argv);
 
         const scheduler_function &get_pool_creator(size_t index) const;
 
         const std::vector<numa_domain> &get_numa_domains() {
             return numa_domains_;
         }
-
-        // allow this free function access so that it can perform command line parsing
-        friend resource_partitioner& hpx::get_resource_partitioner(int argc, char **argv);
-        friend resource_partitioner& hpx::get_resource_partitioner(
-                boost::program_options::options_description desc_cmdline, int argc, char **argv);
 
 
     private:

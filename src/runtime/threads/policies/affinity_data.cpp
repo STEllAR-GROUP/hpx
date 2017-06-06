@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         affinity_domain_ = data.affinity_domain_;
         pu_nums_.clear();
 
-        const std::size_t used_cores = data.used_cores_;
+        const std::size_t used_cores = data.used_cores_; //! FIXME remove this as data member, let it be just a local variable in here
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", used_cores),

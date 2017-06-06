@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/manage_config.hpp>
@@ -29,28 +28,16 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
-        command_line_handling(char const* argv0)
-          : rtcfg_(argv0),
-            ini_config_(hpx_startup::user_main_config(std::vector<std::string>(0))),
-            hpx_main_f_(static_cast<hpx_main_type>(::hpx_main)),
+        command_line_handling()
+          : rtcfg_(nullptr),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
             num_localities_(1),
             pu_step_(1),
             pu_offset_(std::size_t(-1)),
-            numa_sensitive_(0)
-        {}
-
-        command_line_handling()
-          : rtcfg_(nullptr),
-            node_(std::size_t(-1)),
-            num_threads_(0),
-            num_cores_(1),
-            num_localities_(1),
-            pu_step_(1),
-            pu_offset_(std::size_t(-1)),
-            numa_sensitive_(0)
+            numa_sensitive_(0),
+            parsed_(false)
         {}
 
         int call(boost::program_options::options_description const& desc_cmdline,
@@ -74,6 +61,7 @@ namespace hpx { namespace util
         std::string affinity_domain_;
         std::string affinity_bind_;
         std::size_t numa_sensitive_;
+        bool parsed_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,
