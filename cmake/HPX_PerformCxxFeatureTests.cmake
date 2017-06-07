@@ -118,9 +118,6 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_to_string(
     REQUIRED "HPX needs support for C++11 std::to_string")
 
-  hpx_check_for_cxx11_std_tuple(
-    DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
-
   hpx_check_for_cxx11_std_unique_lock(
     REQUIRED "HPX needs support for C++11 std::unique_lock")
 
