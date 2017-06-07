@@ -5,6 +5,7 @@
 
 set(tests
     is_callable
+    is_tuple_like
    )
 
 foreach(test ${tests})
