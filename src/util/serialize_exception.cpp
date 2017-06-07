@@ -4,12 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>
-#include <boost/exception/get_error_info.hpp>
 #include <boost/version.hpp>
 
 #include <cstddef>
@@ -47,92 +47,93 @@ namespace hpx { namespace serialization
         std::string throw_state_;
         std::string throw_auxinfo_;
 
-        // retrieve information related to boost::exception
-        try {
-            std::rethrow_exception(ep);
-        }
-        catch (boost::exception const& e) {
-            char const* const* func =
-                boost::get_error_info<boost::throw_function>(e);
+        // retrieve information related to exception_info
+        if (exception_info const* xi = get_exception_info(ep)) {
+            char const* func = xi->function_name();
             if (func) {
                 throw_function_ = *func;
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::detail::throw_function>(e);
+                    xi->get<hpx::detail::throw_function>();
                 if (s)
                     throw_function_ = *s;
             }
 
-            char const* const* file =
-                boost::get_error_info<boost::throw_file>(e);
+            char const* file = xi->file_name();
             if (file) {
                 throw_file_ = *file;
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::detail::throw_file>(e);
+                    xi->get<hpx::detail::throw_file>();
                 if (s)
                     throw_file_ = *s;
             }
 
-            int const* line =
-                boost::get_error_info<boost::throw_line>(e);
-            if (line)
-                throw_line_ = *line;
+            int line = xi->line();
+            if (line) {
+                throw_line_ = line;
+            }
+            else {
+                long const* l =
+                    xi->get<hpx::detail::throw_line>();
+                if (l)
+                    throw_line_ = *l;
+            }
 
             std::uint32_t const* locality =
-                boost::get_error_info<hpx::detail::throw_locality>(e);
+                xi->get<hpx::detail::throw_locality>();
             if (locality)
                 throw_locality_ = *locality;
 
             std::string const* hostname_ =
-                boost::get_error_info<hpx::detail::throw_hostname>(e);
+                xi->get<hpx::detail::throw_hostname>();
             if (hostname_)
                 throw_hostname_ = *hostname_;
 
             std::int64_t const* pid_ =
-                boost::get_error_info<hpx::detail::throw_pid>(e);
+                xi->get<hpx::detail::throw_pid>();
             if (pid_)
                 throw_pid_ = *pid_;
 
             std::size_t const* shepherd =
-                boost::get_error_info<hpx::detail::throw_shepherd>(e);
+                xi->get<hpx::detail::throw_shepherd>();
             if (shepherd)
                 throw_shepherd_ = *shepherd;
 
             std::size_t const* thread_id =
-                boost::get_error_info<hpx::detail::throw_thread_id>(e);
+                xi->get<hpx::detail::throw_thread_id>();
             if (thread_id)
                 throw_thread_id_ = *thread_id;
 
             std::string const* thread_name =
-                boost::get_error_info<hpx::detail::throw_thread_name>(e);
+                xi->get<hpx::detail::throw_thread_name>();
             if (thread_name)
                 throw_thread_name_ = *thread_name;
 
             std::string const* back_trace =
-                boost::get_error_info<hpx::detail::throw_stacktrace>(e);
+                xi->get<hpx::detail::throw_stacktrace>();
             if (back_trace)
                 throw_back_trace_ = *back_trace;
 
             std::string const* env_ =
-                boost::get_error_info<hpx::detail::throw_env>(e);
+                xi->get<hpx::detail::throw_env>();
             if (env_)
                 throw_env_ = *env_;
 
             std::string const* config_ =
-                boost::get_error_info<hpx::detail::throw_config>(e);
+                xi->get<hpx::detail::throw_config>();
             if (config_)
                 throw_config_ = *config_;
 
             std::string const* state_ =
-                boost::get_error_info<hpx::detail::throw_state>(e);
+                xi->get<hpx::detail::throw_state>();
             if (state_)
                 throw_state_ = *state_;
 
             std::string const* auxinfo_ =
-                boost::get_error_info<hpx::detail::throw_auxinfo>(e);
+                xi->get<hpx::detail::throw_auxinfo>();
             if (auxinfo_)
                 throw_auxinfo_ = *auxinfo_;
         }
