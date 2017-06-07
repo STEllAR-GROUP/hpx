@@ -620,13 +620,11 @@ namespace hpx
                 auto &rp = hpx::get_resource_partitioner();
 
                 // give the command_line_handling object the options the user may have passed as arguments of hpx_init(...)
-                //! to write
+                rp.set_hpx_init_options(mode, f, std::move(ini_config));
 
                 // if the command-line parsing has not yet been done, do it now
                 if(!rp.cmd_line_parsed())
                     rp.parse(desc_cmdline, argc, argv);
-
-                rp.set_hpx_init_options(mode, f, std::move(ini_config));
 
                 // check if you have to exit blahblah
                 //! FIXME better comment

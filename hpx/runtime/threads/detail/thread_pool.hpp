@@ -84,12 +84,12 @@ namespace hpx { namespace threads { namespace detail
 
         virtual void init(std::size_t num_threads, std::size_t threads_offset) = 0;
         virtual void init(std::size_t num_threads, std::size_t threads_offset,
-                          policies::init_affinity_data const& data) = 0;
+                          policies::detail::affinity_data const& data) = 0;
 
         virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads, std::size_t thread_offset) = 0;
         void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
 
-        //! used to be templated over the lock. Now not bc can't have templated virtual functions ...
+        //! FIXME used to be templated over the lock. Now not bc can't have templated virtual functions ...
         virtual void stop_locked(std::unique_lock<lcos::local::no_mutex>& l, bool blocking = true) = 0;
         virtual void stop_locked(std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 

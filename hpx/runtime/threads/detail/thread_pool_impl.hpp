@@ -118,15 +118,11 @@ namespace detail
         }
 
         void init(std::size_t num_threads,
-            std::size_t threads_offset, policies::init_affinity_data const& data)
+            std::size_t threads_offset, policies::detail::affinity_data const& data)
         {
             resize(used_processing_units_, threads::hardware_concurrency());
             for (std::size_t i = 0; i != num_threads; ++i) {
-                //! FIXME this is called in cstr of thread_pool_os_executor
-                //! how should data actually be used?
-    //            used_processing_units_ |= data.get_pu_mask(threads_offset+i, sched_.numa_sensitive());
-                used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(threads_offset + i,
-                                                                                                      sched_->numa_sensitive());
+                used_processing_units_ |= data.get_pu_mask(threads_offset+i, sched_->numa_sensitive());
             }
         }
 

@@ -56,47 +56,6 @@ namespace hpx {
         //! FIXME pas beau
     }
 
-    namespace detail {
-
-        std::size_t get_pu_offset(util::command_line_handling const& cfg)
-        {
-            std::size_t pu_offset = std::size_t(-1);
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.pu_offset_ != std::size_t(-1))
-            {
-                pu_offset = cfg.pu_offset_;
-                if (pu_offset >= hpx::threads::hardware_concurrency())
-                {
-                    throw detail::command_line_error(
-                            "Invalid command line option "
-                                    "--hpx:pu-offset, value must be smaller than number of "
-                                    "available processing units.");
-                }
-            }
-#endif
-            return pu_offset;
-        }
-
-        std::size_t get_pu_step(util::command_line_handling const& cfg)
-        {
-            std::size_t pu_step = 1;
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.pu_step_ != 1) {
-                pu_step = cfg.pu_step_;
-                if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
-                {
-                    throw detail::command_line_error(
-                            "Invalid command line option "
-                                    "--hpx:pu-step, value must be non-zero and smaller than "
-                                    "number of available processing units.");
-                }
-            }
-#endif
-            return pu_step;
-        }
-
-    } // namespace detail
-
 namespace resource
 {
 
@@ -255,7 +214,7 @@ namespace resource
     {
         cfg_.rtcfg_.mode_ = mode;
         cfg_.hpx_main_f_ = f;
-        cfg_.ini_config_ = ini_config;
+        cfg_.ini_config_ = std::move(ini_config);
     }
 
     int resource_partitioner::call_cmd_line_options(
@@ -263,25 +222,6 @@ namespace resource
             int argc, char** argv)
     {
         return cfg_.call(desc_cmdline, argc, argv);
-    }
-
-    void resource_partitioner::set_init_affinity_data()
-    {
-        // Setup the initial affinity data
-        std::size_t pu_offset = hpx::detail::get_pu_offset(cfg_);
-        std::size_t pu_step = hpx::detail::get_pu_step(cfg_);
-        std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
-
-        // if the binding should be set from the user's instructions in int main()
-        std::string affinity_desc;
-        if(set_affinity_from_resource_partitioner_){ //! FIXME this will have to change
-            affinity_desc = "affinity-from-resource-partitioner";
-        } else {
-            std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg_, affinity_desc);
-        }
-
-        init_affinity_data_ = threads::policies::init_affinity_data(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
     }
 
     void resource_partitioner::fill_topology_vectors()
@@ -360,7 +300,7 @@ namespace resource
         }
 
         // Get a mask of all used PUs by doing a bitwise or on all the masks
-        std::size_t num_pus = topology_.get_number_of_pus();
+        std::size_t num_pus = topology_.get_number_of_pus(); //! FIXME unused variable?
         threads::mask_type cummulated_pu_usage = threads::mask_type(0);
         for(auto itp : initial_thread_pools_) {
             cummulated_pu_usage = cummulated_pu_usage | itp.get_pus();
@@ -466,6 +406,7 @@ namespace resource
     bool resource_partitioner::check_oversubscription() const
     {
         threads::mask_type pus_in_common((1<<(topology_.get_number_of_pus()))-1);
+        //! FIXME unused variable?
 
         for(auto& itp : initial_thread_pools_){
             for(auto& itp_comp : initial_thread_pools_){
@@ -636,14 +577,6 @@ namespace resource
         return cfg_.num_threads_;
     }
 
-    //! used in the constructor of runtime.
-    //! but rt probs shouldn't even own one ...
-    //! FIXME
-    threads::policies::init_affinity_data const& resource_partitioner::get_init_affinity_data() const
-    { //! should this return a pointer instead of a copy?
-        return init_affinity_data_;
-    }
-
     size_t resource_partitioner::get_num_pools() const{
         return initial_thread_pools_.size();
     }
@@ -682,9 +615,8 @@ namespace resource
         cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
-        //! FIXME maybe this init_affinity_data isn't needed any more ??
-        set_init_affinity_data();
-        cores_needed_ = affinity_data_.init(cfg_.num_threads_, init_affinity_data_, topology_);
+        cores_needed_ = affinity_data_.init(cfg_);
+        //! FIXME what is this?? Change name ...
     }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {

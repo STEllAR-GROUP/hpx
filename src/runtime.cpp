@@ -236,7 +236,6 @@ namespace hpx
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
         resource_partitioner_(&get_resource_partitioner()),
-        affinity_init_(resource_partitioner_->get_init_affinity_data()),
         topology_(resource_partitioner_->get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
@@ -661,13 +660,6 @@ namespace hpx
 
     std::uint32_t runtime::assign_cores()
     {
-        // initialize thread affinity settings in the scheduler
-        if (affinity_init_.used_cores_ == 0) {
-            // correct used_cores from config data if appropriate
-            affinity_init_.used_cores_ = std::size_t(
-                this->get_config().get_first_used_core());
-        }
-
         return static_cast<std::uint32_t>(
             hpx::get_resource_partitioner().init());
     }

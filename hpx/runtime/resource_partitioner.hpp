@@ -207,7 +207,6 @@ namespace resource
         threads::topology& get_topology() const;
         util::command_line_handling& get_command_line_switches();
         std::size_t get_num_threads() const;
-        threads::policies::init_affinity_data const& get_init_affinity_data() const;
         size_t get_num_pools() const;
         size_t get_num_threads(const std::string &pool_name);
         const std::string &get_pool_name(size_t index) const;
@@ -265,7 +264,6 @@ namespace resource
 
         // reference to the topology and affinity data
         threads::hwloc_topology_info& topology_;
-        hpx::threads::policies::init_affinity_data init_affinity_data_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
 
         // flag set by add_resource

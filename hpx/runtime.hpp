@@ -342,7 +342,6 @@ namespace hpx
         resource::resource_partitioner* resource_partitioner_;
 
         // topology and affinity data
-        threads::policies::init_affinity_data affinity_init_;
         threads::topology& topology_;
 
         // locality basename -> used cores

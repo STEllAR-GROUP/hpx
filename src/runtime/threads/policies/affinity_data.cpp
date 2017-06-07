@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-
+#include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
@@ -19,8 +19,47 @@
 #include <string>
 #include <vector>
 
+
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
+
+    std::size_t get_pu_offset(util::command_line_handling const& cfg)
+    {
+        std::size_t pu_offset = std::size_t(-1);
+#if defined(HPX_HAVE_HWLOC)
+        if (cfg.pu_offset_ != std::size_t(-1))
+        {
+            pu_offset = cfg.pu_offset_;
+            if (pu_offset >= hpx::threads::hardware_concurrency())
+            {
+                throw hpx::detail::command_line_error(
+                        "Invalid command line option "
+                                "--hpx:pu-offset, value must be smaller than number of "
+                                "available processing units.");
+            }
+        }
+#endif
+        return pu_offset;
+    }
+
+    std::size_t get_pu_step(util::command_line_handling const& cfg)
+    {
+        std::size_t pu_step = 1;
+#if defined(HPX_HAVE_HWLOC)
+        if (cfg.pu_step_ != 1) {
+            pu_step = cfg.pu_step_;
+            if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
+            {
+                throw hpx::detail::command_line_error(
+                        "Invalid command line option "
+                                "--hpx:pu-step, value must be non-zero and smaller than "
+                                "number of available processing units.");
+            }
+        }
+#endif
+        return pu_step;
+    }
+
     inline std::size_t count_initialized(std::vector<mask_type> const& masks)
     {
         std::size_t count = 0;
@@ -32,8 +71,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return count;
     }
 
-    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency,
-        topology const & topology)
+    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency)
     {
         if(pu_nums_.empty())
         {
@@ -46,7 +84,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     }
 
     affinity_data::affinity_data()
-      : num_threads_(0), pu_offset_(std::size_t(-1)), pu_step_(1),
+      : num_threads_(0), pu_offset_(std::size_t(-1)), pu_step_(1), used_cores_(0),
         affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
         no_affinity_()
     {
@@ -56,43 +94,46 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
     }
 
-    std::size_t affinity_data::init(std::size_t num_threads, init_affinity_data const& data,
-        topology const & topology)
+    std::size_t affinity_data::init(util::command_line_handling const& cfg_)
     {
-        num_threads_ = num_threads;
+        num_threads_ = cfg_.num_threads_;
         std::size_t num_system_pus = hardware_concurrency();
+        auto& topo = get_resource_partitioner().get_topology();
 
         // initialize from command line
-        if (data.pu_offset_ == std::size_t(-1))
+        std::size_t pu_offset = get_pu_offset(cfg_);
+        if (pu_offset == std::size_t(-1))
         {
             pu_offset_ = 0;
         }
         else
         {
-            pu_offset_ = data.pu_offset_;
+            pu_offset_ = pu_offset;
         }
 
         if(num_system_pus > 1)
-            pu_step_ = data.pu_step_ % num_system_pus;
+            pu_step_ = get_pu_step(cfg_) % num_system_pus;
 
-        affinity_domain_ = data.affinity_domain_;
+        affinity_domain_ = hpx::detail::get_affinity_domain(cfg_);
         pu_nums_.clear();
 
-        const std::size_t used_cores = data.used_cores_; //! FIXME remove this as data member, let it be just a local variable in here
+        const std::size_t used_cores = 0;
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", used_cores),
                 used_cores);
 
 #if defined(HPX_HAVE_HWLOC)
-        if (data.affinity_desc_ == "none")
+        std::string affinity_desc;
+        std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg_, affinity_desc);
+        if (affinity_desc == "none")
         {
             // don't use any affinity for any of the os-threads
             threads::resize(no_affinity_, num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, i);
         }
-        else if (data.affinity_desc_ == "affinity-from-resource-partitioner") //! FIXME shouldn't be essentially different from next
+        else if (affinity_desc == "affinity-from-resource-partitioner") //! FIXME shouldn't be essentially different from next
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_, 0);
@@ -102,7 +143,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             }
 
             parse_affinity_options_from_resource_partitioner(
-                    affinity_masks_, data.used_cores_, max_cores, pu_nums_);
+                    affinity_masks_, used_cores, max_cores, pu_nums_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {
@@ -114,7 +155,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                                                                   "bind (%2%)") % num_threads_ % num_initialized));
             }
         }
-        else if (!data.affinity_desc_.empty())
+        else if (!affinity_desc.empty())
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_, 0);
@@ -122,8 +163,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
-            parse_affinity_options(data.affinity_desc_, affinity_masks_,
-                data.used_cores_, max_cores, num_threads_, pu_nums_);
+            parse_affinity_options(affinity_desc, affinity_masks_,
+                used_cores, max_cores, num_threads_, pu_nums_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {
@@ -135,38 +176,45 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                             "bind (%2%)") % num_threads_ % num_initialized));
             }
         }
-        else if (data.pu_offset_ == std::size_t(-1))
+        else if (pu_offset == std::size_t(-1))
         {
             // calculate the pu offset based on the used cores, but only if its
             // not explicitly specified
-            for(std::size_t num_core = 0; num_core != data.used_cores_; ++num_core)
+            for(std::size_t num_core = 0; num_core != used_cores; ++num_core)
             {
-                pu_offset_ += topology.get_number_of_core_pus(num_core);
+                pu_offset_ += topo.get_number_of_core_pus(num_core);
             }
         }
 #endif
 
+        // correct used_cores from config data if appropriate
+        if (used_cores_ == 0) {
+            used_cores_ = std::size_t(
+                    cfg_.rtcfg_.get_first_used_core());
+        }
+
         pu_offset_ %= num_system_pus;
-        init_cached_pu_nums(num_system_pus, topology);
+        init_cached_pu_nums(num_system_pus);
 
         std::vector<std::size_t> cores;
         cores.reserve(num_threads_);
         for(std::size_t i = 0; i != num_threads_; ++i)
         {
-            cores.push_back(topology.get_core_number(get_pu_num(i)));
+            std::size_t add_me = topo.get_core_number(get_pu_num(i));
+            cores.push_back(add_me);
         }
 
         std::sort(cores.begin(), cores.end());
         std::vector<std::size_t>::iterator it =
             std::unique(cores.begin(), cores.end());
+        cores.erase(it, cores.end());
 
-        std::size_t num_unique_cores = std::distance(cores.begin(), it);
+        std::size_t num_unique_cores = cores.size();
         return (std::max)(num_unique_cores, max_cores);
     }
 
     // means of adding a processing unit after initialization
-    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num,
-        topology const& t)
+    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
     {
         std::size_t num_system_pus = hardware_concurrency();
 
@@ -189,7 +237,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (first_pu != std::size_t(-1))
             pu_offset_ = first_pu;
 
-        init_cached_pu_nums(num_system_pus, t);
+        init_cached_pu_nums(num_system_pus);
     }
 
     static mask_type get_empty_machine_mask()

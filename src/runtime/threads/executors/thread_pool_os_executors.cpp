@@ -77,9 +77,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         std::unique_lock<mutex_type> lk(mtx_);
 
-        // initialize the affinity configuration for this scheduler
-        threads::policies::init_affinity_data data("pu", affinity_desc);
-        pool_->init(num_threads_, 0, data);
+        // initialize the affinity configuration for this executor
+        threads::policies::detail::affinity_data affinity_data_;
+        util::command_line_handling cfg_ = get_resource_partitioner().get_command_line_switches();
+        cfg_.affinity_domain_ = "pu";
+        cfg_.affinity_bind_ = affinity_desc;
+        affinity_data_.init(cfg_);
+
+        pool_->init(num_threads_, 0, affinity_data_);
 
         if (!pool_->run(lk, num_threads_, 0))
         {
