@@ -122,26 +122,6 @@ namespace resource
                 "cannot instantiate a thread pool with empty string as a name.");
     }
 
-    const std::string &init_pool_data::get_name() const {
-        return pool_name_;
-    }
-
-    scheduling_policy init_pool_data::get_scheduling_policy() const {
-        return scheduling_policy_;
-    }
-
-    std::size_t init_pool_data::get_number_used_pus() const {
-        return threads::count(assigned_pus_);
-    }
-
-    std::size_t init_pool_data::get_num_threads() const {
-        return num_threads_;
-    }
-
-    threads::mask_type init_pool_data::get_pus() const {
-        return assigned_pus_;
-    }
-
     // mechanism for adding resources
     void init_pool_data::add_resource(std::size_t pu_index){
         if (pu_index >= hpx::threads::hardware_concurrency()) {
@@ -149,18 +129,6 @@ namespace resource
         }
 
         threads::set(assigned_pus_, pu_index);
-    }
-
-    void init_pool_data::set_scheduler(scheduling_policy sched){
-        scheduling_policy_ = sched;
-    }
-
-    void init_pool_data::set_mask(threads::mask_type mask){
-        assigned_pus_ = mask;
-    }
-
-    void init_pool_data::set_thread_num(std::size_t num_threads){
-        num_threads_ = num_threads;
     }
 
     void init_pool_data::print_pool() const {
@@ -187,14 +155,11 @@ namespace resource
 
     ////////////////////////////////////////////////////////////////////////
 
-    resource_partitioner::resource_partitioner(std::size_t num_special_pools_)
+    resource_partitioner::resource_partitioner()
             : thread_manager_(nullptr),
               topology_(threads::create_topology()),
               set_affinity_from_resource_partitioner_(false)
     {
-        // Reserve the appropriate size of initial thread pools
-        initial_thread_pools_.reserve(num_special_pools_ + 1);
-
         // Create the default pool
         initial_thread_pools_.push_back(init_pool_data("default"));
 
@@ -278,9 +243,9 @@ namespace resource
         std::size_t num_threads_desired_total = 0;
         std::size_t thread_num = 0;
         for(auto& itp : initial_thread_pools_){
-            thread_num = threads::count(itp.get_pus());
+            thread_num = threads::count(itp.assigned_pus_);
             num_threads_desired_total += thread_num;
-            itp.set_thread_num(thread_num);
+            itp.num_threads_ = thread_num;
         }
 
         // make sure the sum of the number of desired threads is strictly smaller
@@ -295,7 +260,7 @@ namespace resource
         // command line.
         //! FIXME is this right, or should we add all free resources to the default pool,
         //! FIXME even though the user has not assigned these to the default pool himself?
-        if(threads::any(get_default_pool()->get_pus())) {
+        if(threads::any(get_default_pool()->assigned_pus_)) {
             return;
         }
 
@@ -303,7 +268,7 @@ namespace resource
         std::size_t num_pus = topology_.get_number_of_pus(); //! FIXME unused variable?
         threads::mask_type cummulated_pu_usage = threads::mask_type(0);
         for(auto itp : initial_thread_pools_) {
-            cummulated_pu_usage = cummulated_pu_usage | itp.get_pus();
+            cummulated_pu_usage = cummulated_pu_usage | itp.assigned_pus_;
         }
 
         // If the user did not assign any resources to the default pool
@@ -320,7 +285,7 @@ namespace resource
             throw std::invalid_argument("No processing units left over for the default pool. If you want to allow an empty pool, use allow-empty-default-pool policy");
 
         // set default mask
-        get_default_pool()->set_mask(default_mask);
+        get_default_pool()->assigned_pus_ = default_mask;
 
         // compute number of threads for default and set it
         std::size_t num_available_threads_for_default = threads::count(default_mask); //! #PUs that the default pool can use
@@ -338,16 +303,16 @@ namespace resource
                 excess_pus--;
             }
             // re-set default mask since it has been modified
-            get_default_pool()->set_mask(default_mask);
+            get_default_pool()->assigned_pus_ = default_mask;
             //! FIXME reduce in a smart way: eg try to take PUs that are close together or something like that
             //! current implementation = just unset the number of bits required in order of appearance in the mask...
         }
 
-        get_default_pool()->set_thread_num(num_threads_default_pool);
+        get_default_pool()->num_threads_ = num_threads_default_pool;
 
     }
 
-    void resource_partitioner::set_default_schedulers() {
+    void resource_partitioner::setup_schedulers() {
 
         // select the default scheduler
         scheduling_policy default_scheduler;
@@ -395,8 +360,8 @@ namespace resource
         // set this scheduler on the pools that do not have a specified scheduler yet
         std::size_t npools(initial_thread_pools_.size());
         for(size_t i(0); i<npools; i++){
-            if(initial_thread_pools_[i].get_scheduling_policy() == unspecified){
-                initial_thread_pools_[i].set_scheduler(default_scheduler);
+            if(initial_thread_pools_[i].scheduling_policy_ == unspecified){
+                initial_thread_pools_[i].scheduling_policy_ = default_scheduler;
             }
         }
     }
@@ -410,8 +375,8 @@ namespace resource
 
         for(auto& itp : initial_thread_pools_){
             for(auto& itp_comp : initial_thread_pools_){
-                if(itp.get_name() != itp_comp.get_name()){
-                    if(threads::any(itp.get_pus() & itp_comp.get_pus())){
+                if(itp.pool_name_ != itp_comp.pool_name_){
+                    if(threads::any(itp.assigned_pus_ & itp_comp.assigned_pus_)){
                         return true;
                     }
                 }
@@ -427,7 +392,7 @@ namespace resource
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++){
-            if(!threads::any(initial_thread_pools_[i].get_pus())){
+            if(!threads::any(initial_thread_pools_[i].assigned_pus_)){
                 return true;
             }
         }
@@ -454,7 +419,7 @@ namespace resource
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++) {
-            if(name == initial_thread_pools_[i].get_name())
+            if(name == initial_thread_pools_[i].pool_name_)
                 throw std::invalid_argument("there already exists a pool named " + name + ".\n");
         }
 
@@ -475,7 +440,7 @@ namespace resource
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++) {
-            if(name == initial_thread_pools_[i].get_name())
+            if(name == initial_thread_pools_[i].pool_name_)
                 throw std::invalid_argument("there already exists a pool named " + name + ".\n");
         }
 
@@ -541,12 +506,12 @@ namespace resource
     //
     // ----------------------------------------------------------------------
     void resource_partitioner::set_scheduler(scheduling_policy sched, const std::string &pool_name){
-        get_pool(pool_name)->set_scheduler(sched);
+        get_pool(pool_name)->scheduling_policy_ = sched;
     }
 
     void resource_partitioner::configure_pools(){
         setup_pools();
-        set_default_schedulers();
+        setup_schedulers();
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -555,7 +520,7 @@ namespace resource
     // returns a scheduler (moved) that thread pool should have as a data member
     scheduling_policy resource_partitioner::which_scheduler(const std::string &pool_name) {
         // look up which scheduler is needed
-        scheduling_policy sched_type = get_pool(pool_name)->get_scheduling_policy();
+        scheduling_policy sched_type = get_pool(pool_name)->scheduling_policy_;
         if(sched_type == unspecified)
             throw std::invalid_argument("Thread pool " + pool_name + " cannot be instantiated with unspecified scheduler type.");
 
@@ -583,7 +548,7 @@ namespace resource
 
     size_t resource_partitioner::get_num_threads(const std::string &pool_name)
     {
-        return get_pool(pool_name)->get_num_threads();
+        return get_pool(pool_name)->num_threads_;
     }
 
     const std::string &resource_partitioner::get_pool_name(size_t index) const {
@@ -593,7 +558,7 @@ namespace resource
                     /*"pool " + i + " (zero-based index) requested out of bounds. "
                     "The resource_partitioner owns only " + initial_thread_pools_.size()
                     + " pools\n");*/
-        return initial_thread_pools_[index].get_name();
+        return initial_thread_pools_[index].pool_name_;
     }
 
     threads::mask_cref_type resource_partitioner::get_pu_mask(std::size_t num_thread, bool numa_sensitive) const
@@ -631,7 +596,7 @@ namespace resource
     std::size_t resource_partitioner::get_pool_index(const std::string &pool_name) const {
         std::size_t N = initial_thread_pools_.size();
         for(size_t i(0); i<N; i++) {
-            if (initial_thread_pools_[i].get_name() == pool_name) {
+            if (initial_thread_pools_[i].pool_name_ == pool_name) {
                 return i;
             }
         }
@@ -646,7 +611,7 @@ namespace resource
     init_pool_data* resource_partitioner::get_pool(const std::string &pool_name) {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
-                [&pool_name](init_pool_data itp) -> bool {return (itp.get_name() == pool_name);}
+                [&pool_name](init_pool_data itp) -> bool {return (itp.pool_name_ == pool_name);}
         );
 
         if(pool != initial_thread_pools_.end()){
@@ -662,7 +627,7 @@ namespace resource
     init_pool_data* resource_partitioner::get_default_pool() {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
-                [](init_pool_data itp) -> bool {return (itp.get_name() == "default");}
+                [](init_pool_data itp) -> bool {return (itp.pool_name_ == "default");}
         );
 
         if(pool != initial_thread_pools_.end()){

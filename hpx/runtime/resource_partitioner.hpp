@@ -44,7 +44,6 @@ namespace hpx {
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             boost::program_options::options_description desc_cmdline, int argc, char **argv);
 
-
     // may be used anywhere in code and returns a reference to the
     // single, global resource partitioner
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner();
@@ -107,20 +106,12 @@ namespace resource
         init_pool_data(const std::string &name,
             scheduler_function create_func);
 
-        // set functions
-        void set_scheduler(scheduling_policy sched);
-        void set_mask(threads::mask_type mask);
-        void set_thread_num(std::size_t num_threads);
+        // get
+        //! FIXME removeif these aren't used by parse_affinity_options_from_resource_partitioner anymore
+        std::size_t get_num_threads(){return num_threads_;}
+        threads::mask_type get_mask(){return assigned_pus_;}
 
-        // get functions
-        const std::string &get_name() const;
-        scheduling_policy get_scheduling_policy() const;
-        std::size_t get_number_used_pus() const;
-        std::size_t get_num_threads() const;
-        threads::mask_type get_pus() const;
-
-        // mechanism for adding resources
-        // index is zero-based
+        // mechanism for adding resources (zero-based index)
         void add_resource(std::size_t pu_index);
 
         void print_pool() const;
@@ -130,7 +121,7 @@ namespace resource
     private:
         std::string         pool_name_;
         scheduling_policy   scheduling_policy_;
-        threads::mask_type  assigned_pus_; //! PUs this pool is allowed to run on
+        threads::mask_type  assigned_pus_; // PUs this pool is allowed to run on
         std::size_t         num_threads_;
         scheduler_function  create_function_;
     };
@@ -140,7 +131,7 @@ namespace resource
 
         // constructor: users shouldn't use the constructor
         // but rather get_resource_partitioner
-        resource_partitioner(std::size_t num_special_pools_ = 0);
+        resource_partitioner();
 
         void set_hpx_init_options(
                 hpx::runtime_mode mode,
@@ -233,7 +224,7 @@ namespace resource
         // called in hpx_init run_or_start
         void set_init_affinity_data();
         void setup_pools();
-        void set_default_schedulers();
+        void setup_schedulers();
         bool check_oversubscription() const;
         bool check_empty_pools() const;
 
