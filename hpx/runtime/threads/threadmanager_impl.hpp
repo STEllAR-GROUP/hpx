@@ -210,7 +210,7 @@ namespace hpx { namespace threads
             return total;
         }
 
-        //! overload which takes id instead of string, and use "default" by default?
+        //! FIXME should I write an overload which takes id instead of string, and use "default" by default?
         compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);
@@ -313,7 +313,8 @@ namespace hpx { namespace threads
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
         {//! FIXME pool::get_pu_mask could be called via RP rather than via TP -> sched
-            return default_pool()->get_pu_mask(topology, num_thread);
+            pool_type corresponding_pool = get_pool(threads_lookup_[num_thread]);
+            return corresponding_pool->get_pu_mask(num_thread);
         }
 
         /// Returns the mask identifying all processing units used by this

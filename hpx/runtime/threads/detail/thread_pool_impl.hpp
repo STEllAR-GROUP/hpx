@@ -134,8 +134,8 @@ namespace detail
                 ->get_pu_num(num_thread);
         }
 
-        mask_cref_type get_pu_mask(
-            topology const &topology, std::size_t num_thread) const
+        // input: num_thread in global indexing
+        mask_cref_type get_pu_mask(std::size_t num_thread) const
         {
             return get_resource_partitioner().get_affinity_data()->get_pu_mask(num_thread, sched_->numa_sensitive());
         }

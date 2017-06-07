@@ -287,15 +287,6 @@ namespace hpx {
         util::command_line_handling cfg_ = rp.get_command_line_switches();
         std::string name;
 
-        // fill the thread-lookup table
-        //! FIXME bring this down in loop
-        for (auto& pool_iter : pools_) {
-            size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
-            for (size_t i(0); i < nt; i++) {
-                threads_lookup_.push_back(pool_iter->get_pool_id());
-            }
-        }
-
         // instantiate the pools
         for (size_t i(0); i<num_pools; i++) {
 
@@ -610,6 +601,16 @@ namespace hpx {
                 }
             }
         }
+
+        // fill the thread-lookup table
+        //! FIXME bring this up in loop
+        for (auto& pool_iter : pools_) {
+            size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
+            for (size_t i(0); i < nt; i++) {
+                threads_lookup_.push_back(pool_iter->get_pool_id());
+            }
+        }
+
     }
 
     threadmanager_impl::~threadmanager_impl()
