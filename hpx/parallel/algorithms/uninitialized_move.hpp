@@ -73,7 +73,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
                     [](Iter it, FwdIter dest) {
-                        ::new (&*dest) value_type(std::move(*it));
+                        ::new (static_cast<void*>(std::addressof(*dest)))
+                            value_type(std::move(*it));
                     },
                     [](FwdIter dest) {
                         (*dest).~value_type();
