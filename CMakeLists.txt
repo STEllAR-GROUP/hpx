@@ -114,9 +114,13 @@ endif()
 
 # Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
+  set(_with_vcpkg_default OFF)
+  if(VCPKG_TOOLCHAIN)
+    set(_with_vcpkg_default ON)
+  endif()
   hpx_option(HPX_WITH_VCPKG BOOL
     "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    OFF ADVANCED)
+    ${_with_vcpkg_default} ADVANCED)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
