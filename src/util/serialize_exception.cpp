@@ -8,6 +8,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/exception.hpp>
 #include <boost/exception/get_error_info.hpp>
 #include <boost/version.hpp>
 

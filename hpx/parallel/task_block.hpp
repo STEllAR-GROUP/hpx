@@ -165,7 +165,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                boost::throw_exception(errors);
+                throw errors;
         }
 
         // return future representing the execution of all tasks

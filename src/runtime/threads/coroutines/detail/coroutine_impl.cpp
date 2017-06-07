@@ -36,6 +36,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <boost/exception/exception.hpp>
 #include <boost/lockfree/stack.hpp>
 
 #include <cstddef>

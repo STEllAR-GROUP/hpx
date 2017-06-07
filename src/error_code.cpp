@@ -8,6 +8,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 
+#include <boost/exception/exception.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <exception>

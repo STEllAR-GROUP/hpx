@@ -301,7 +301,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 >::call(f.get_exception_ptr(), errors);
 
             HPX_ASSERT(errors.empty());
-            boost::throw_exception(exception_list(std::move(errors)));
+            throw exception_list(std::move(errors));
         }
         return f.get();
     }

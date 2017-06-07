@@ -94,8 +94,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                                 if (!errors.empty())
                                 {
-                                    boost::throw_exception(
-                                        exception_list(std::move(errors)));
+                                    throw exception_list(std::move(errors));
                                 }
                             }
                             RandIter first = left.get();

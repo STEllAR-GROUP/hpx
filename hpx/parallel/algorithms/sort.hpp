@@ -162,8 +162,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         if (right.has_exception())
                             errors.push_back(right.get_exception_ptr());
 
-                        boost::throw_exception(
-                            exception_list(std::move(errors)));
+                        throw exception_list(std::move(errors));
                     }
                     return last;
                 },

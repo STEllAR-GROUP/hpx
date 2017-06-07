@@ -675,8 +675,8 @@ namespace hpx { namespace threads { namespace detail
                 }
                 catch (std::exception const& e) {
                     // Repackage exceptions to avoid slicing.
-                    boost::throw_exception(boost::enable_error_info(
-                        hpx::exception(unhandled_exception, e.what())));
+                    throw boost::enable_error_info(
+                        hpx::exception(unhandled_exception, e.what()));
                 }
             }
             catch (...) {

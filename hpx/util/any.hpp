@@ -24,7 +24,6 @@
 
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -966,7 +965,7 @@ namespace hpx { namespace util
 
         nonref* result = any_cast<nonref>(&operand);
         if(!result)
-            boost::throw_exception(bad_any_cast(operand.type(), BOOST_SP_TYPEID(T)));
+            throw bad_any_cast(operand.type(), BOOST_SP_TYPEID(T));
         return static_cast<T>(*result);
     }
 

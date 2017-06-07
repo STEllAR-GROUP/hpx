@@ -10,7 +10,6 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/system/error_code.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <exception>
 #include <string>
@@ -86,6 +85,6 @@ namespace hpx { namespace detail
 
     HPX_ATTRIBUTE_NORETURN void throw_thread_interrupted_exception()
     {
-        boost::throw_exception(hpx::thread_interrupted());
+        throw hpx::thread_interrupted();
     }
 }}

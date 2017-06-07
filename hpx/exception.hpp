@@ -15,9 +15,9 @@
 #include <hpx/exception_fwd.hpp>
 
 #include <boost/exception/error_info.hpp>
+#include <boost/exception/exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -16,6 +16,7 @@
 #include <hpx/throw_exception.hpp>
 
 #include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/exception.hpp>
 
 #include <cstddef>
 #include <exception>

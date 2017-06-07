@@ -19,6 +19,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/exception/exception.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -251,8 +253,8 @@ namespace hpx { namespace parcelset
                 // We have to repackage all exceptions thrown by the
                 // serialization library as otherwise we will loose the
                 // e.what() description of the problem, due to slicing.
-                boost::throw_exception(boost::enable_error_info(
-                    hpx::exception(serialization_error, e.what())));
+                throw boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what()));
             }
         }
         catch (...) {

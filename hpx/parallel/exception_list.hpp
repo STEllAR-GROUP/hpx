@@ -14,8 +14,6 @@
 
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
-#include <boost/throw_exception.hpp>
-
 #include <exception>
 #include <utility>
 
@@ -35,12 +33,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     throw; //-V667
                 }
                 catch(std::bad_alloc const& e) {
-                    boost::throw_exception(e);
+                    throw e;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        hpx::exception_list(std::current_exception())
-                    );
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -83,12 +79,10 @@ namespace hpx { namespace parallel { inline namespace v1
                         throw; //-V667
                     }
                     catch(std::bad_alloc const& e) {
-                        boost::throw_exception(e);
+                        throw e;
                     }
                     catch (...) {
-                        boost::throw_exception(
-                            hpx::exception_list(std::current_exception())
-                        );
+                        throw hpx::exception_list(std::current_exception());
                     }
                 }
                 catch (...) {

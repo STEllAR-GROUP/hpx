@@ -333,7 +333,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             if (m_exit_status || m_state == ctx_waiting)
             {
                 if (m_state == ctx_waiting)
-                    boost::throw_exception(coroutines::waiting());
+                    throw coroutines::waiting();
                 if (m_exit_status == ctx_exited_return)
                     return;
                 if (m_exit_status == ctx_exited_abnormally)
@@ -345,7 +345,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     //      typeid(unknown_exception_tag));
                 }
                 else if (m_exit_status == ctx_exited_exit)
-                    boost::throw_exception(coroutine_exited());
+                    throw coroutine_exited();
                 else {
                     HPX_ASSERT(0 && "unknown exit status");
                 }
@@ -435,7 +435,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(!pending());
             HPX_ASSERT(running());
             m_exit_state = ctx_exit_pending;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.
@@ -590,7 +590,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             HPX_ASSERT(running());
             if (!m_exit_state) return;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.

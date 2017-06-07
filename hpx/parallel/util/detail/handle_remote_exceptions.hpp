@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 std::rethrow_exception(e);
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (exception_list const& el) {
                 for (std::exception_ptr const& ex: el)
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
 
             if (!errors.empty())
-                boost::throw_exception(exception_list(std::move(errors)));
+                throw exception_list(std::move(errors));
         }
 
         template <typename T>
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
 
             if (!errors.empty())
-                boost::throw_exception(exception_list(std::move(errors)));
+                throw exception_list(std::move(errors));
         }
     };
 

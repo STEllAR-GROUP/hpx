@@ -31,6 +31,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/exception/enable_error_info.hpp>
+#include <boost/exception/exception.hpp>
 #include <boost/exception/get_error_info.hpp>
 #include <boost/exception/info.hpp>
 #include <boost/format.hpp>
@@ -289,7 +290,7 @@ namespace hpx { namespace detail
         // create a std::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
         try {
-            boost::throw_exception(e);
+            throw e;
         }
         catch (...) {
             return std::current_exception();
