@@ -17,7 +17,6 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -33,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // transform_exclusive_scan
@@ -280,16 +279,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        hpx::traits::is_callable<
-                Conv(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Conv,
+                typename std::iterator_traits<InIter>::value_type
             >::value &&
-        hpx::traits::is_callable<
-            Op(typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Op,
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
-                >::type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
+                >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
@@ -304,7 +303,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
@@ -323,16 +322,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        hpx::traits::is_callable<
-                Conv(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Conv,
+                typename std::iterator_traits<InIter>::value_type
             >::value &&
-        hpx::traits::is_callable<
-            Op(typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Op,
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Conv(typename std::iterator_traits<InIter>::value_type)
-                >::type)
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<InIter>::value_type
+                >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     transform_exclusive_scan(ExPolicy && policy, InIter first, InIter last,
@@ -347,7 +346,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;

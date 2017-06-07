@@ -92,8 +92,6 @@ namespace hpx { namespace actions
     struct typed_continuation<Result, Result> : continuation
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef util::unique_function<
                 void(naming::id_type, Result)
             > function_type;
@@ -215,8 +213,6 @@ namespace hpx { namespace actions
     struct typed_continuation : typed_continuation<RemoteResult>
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef typed_continuation<RemoteResult> base_type;
         typedef util::unique_function<
                 void(naming::id_type, RemoteResult)
@@ -327,8 +323,6 @@ namespace hpx { namespace actions
     struct typed_continuation<void, util::unused_type> : continuation
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef util::unique_function<void(naming::id_type)> function_type;
 
     public:

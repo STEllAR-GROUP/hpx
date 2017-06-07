@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     /// Finds the smallest element in the range [first, last) using the given
     /// comparison function \a f.

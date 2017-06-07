@@ -41,6 +41,7 @@
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
@@ -64,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -95,7 +96,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -127,7 +128,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag(aggregating_type_tag)>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -158,7 +159,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t parameter2)
+            counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
@@ -192,7 +193,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -223,7 +224,7 @@ namespace hpx { namespace performance_counters { namespace server
                 double, boost::accumulators::stats<aggregating_tag>
             > accumulator_type;
 
-            counter_type_from_statistic(std::uint64_t /*parameter2*/)
+            counter_type_from_statistic(std::size_t /*parameter2*/)
             {}
 
             double get_value()
@@ -250,13 +251,14 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::uint64_t parameter1, std::uint64_t parameter2)
+            std::size_t parameter1, std::size_t parameter2)
       : base_type_holder(info),
         timer_(util::bind(&statistics_counter::evaluate, this_()),
             util::bind(&statistics_counter::on_terminate, this_()),
             1000 * parameter1, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(new detail::counter_type_from_statistic<Statistic>(parameter2)),
+        has_prev_value_(false),
         parameter1_(parameter1), parameter2_(parameter2)
     {
         if (parameter1 == 0) {
@@ -287,6 +289,8 @@ namespace hpx { namespace performance_counters { namespace server
         prev_value_.status_ = status_new_data;
         prev_value_.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
+        has_prev_value_ = true;
+
         value = prev_value_;                              // return value
 
         if (reset || value_->need_reset())
@@ -344,9 +348,10 @@ namespace hpx { namespace performance_counters { namespace server
                 util::unlock_guard<std::unique_lock<mutex_type> > unlock(l);
                 base_counter_id = get_counter(base_counter_name_, ec);
             }
+
             // After reacquiring the lock, we need to check again if base_counter_id_
             // hasn't been set yet
-            if(!base_counter_id_)
+            if (!base_counter_id_)
             {
                 base_counter_id_ = base_counter_id;
             }
@@ -382,6 +387,13 @@ namespace hpx { namespace performance_counters { namespace server
 
         value = stubs::performance_counter::get_value(
             launch::sync, base_counter_id_);
+
+        if (!has_prev_value_)
+        {
+            has_prev_value_ = true;
+            prev_value_ = value;
+        }
+
         return true;
     }
 
@@ -561,7 +573,7 @@ namespace hpx { namespace performance_counters { namespace detail
                 get_counter_name(paths.parentinstancename_, base_name, ec);
                 if (ec) return naming::invalid_gid;
 
-                std::vector<std::int64_t> parameters;
+                std::vector<std::size_t> parameters;
                 if (!paths.parameters_.empty()) {
                     // try to interpret the additional parameter as interval
                     // time (ms)

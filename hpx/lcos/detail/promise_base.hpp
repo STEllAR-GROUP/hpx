@@ -161,8 +161,6 @@ namespace lcos {
         class promise_base
           : public hpx::lcos::local::detail::promise_base<Result, SharedState>
         {
-            HPX_MOVABLE_ONLY(promise_base);
-
             typedef hpx::lcos::local::detail::promise_base<
                     Result, SharedState
                 > base_type;
@@ -191,7 +189,7 @@ namespace lcos {
                 init_shared_state();
             }
 
-            promise_base(promise_base&& other) HPX_NOEXCEPT
+            promise_base(promise_base&& other) noexcept
                 : base_type(std::move(other)),
                   id_retrieved_(other.id_retrieved_),
                   id_(std::move(other.id_)),
@@ -209,7 +207,7 @@ namespace lcos {
                 this->shared_state_.reset();
             }
 
-            promise_base& operator=(promise_base&& other) HPX_NOEXCEPT
+            promise_base& operator=(promise_base&& other) noexcept
             {
                 base_type::operator=(std::move(other));
                 id_retrieved_ = other.id_retrieved_;

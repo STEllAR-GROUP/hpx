@@ -30,6 +30,9 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
         util::unique_function_nonser<void(void*)> const& ctor);
+
+    template <typename Component, typename ...Ts>
+    naming::gid_type create_with_args(Ts&&... ts);
 }}}
 
 #endif

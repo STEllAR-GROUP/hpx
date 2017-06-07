@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_MSVC)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
 #include <hpx/util/set_thread_name.hpp>
 

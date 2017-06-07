@@ -49,24 +49,24 @@ public:
         typedef test_allocator<U> other;
     };
 
-    test_allocator() HPX_NOEXCEPT
+    test_allocator() noexcept
       : data_(-1)
     {}
 
-    explicit test_allocator(int i) HPX_NOEXCEPT
+    explicit test_allocator(int i) noexcept
       : data_(i)
     {}
 
-    test_allocator(test_allocator const& a) HPX_NOEXCEPT
+    test_allocator(test_allocator const& a) noexcept
       : data_(a.data_)
     {}
 
     template <typename U>
-    test_allocator(test_allocator<U> const& a) HPX_NOEXCEPT
+    test_allocator(test_allocator<U> const& a) noexcept
       : data_(a.data_)
     {}
 
-    ~test_allocator() HPX_NOEXCEPT
+    ~test_allocator() noexcept
     {
         data_ = 0;
     }
@@ -88,7 +88,7 @@ public:
         std::free(p);
     }
 
-    size_type max_size() const HPX_NOEXCEPT
+    size_type max_size() const noexcept
     {
         return UINT_MAX / sizeof(T);
     }
@@ -134,24 +134,24 @@ public:
         typedef test_allocator<U> other;
     };
 
-    test_allocator() HPX_NOEXCEPT
+    test_allocator() noexcept
       : data_(-1)
     {}
 
-    explicit test_allocator(int i) HPX_NOEXCEPT
+    explicit test_allocator(int i) noexcept
       : data_(i)
     {}
 
-    test_allocator(test_allocator const& a) HPX_NOEXCEPT
+    test_allocator(test_allocator const& a) noexcept
       : data_(a.data_)
     {}
 
     template <typename U>
-    test_allocator(test_allocator<U> const& a) HPX_NOEXCEPT
+    test_allocator(test_allocator<U> const& a) noexcept
       : data_(a.data_)
     {}
 
-    ~test_allocator() HPX_NOEXCEPT
+    ~test_allocator() noexcept
     {
         data_ = 0;
     }

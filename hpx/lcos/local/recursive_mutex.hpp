@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace local
 
             static thread_id_type call()
             {
-#if defined(HPX_MSVC) || defined(HPX_INTEL_WIN)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
                 return (thread_id_type)GetCurrentThreadId();
 #else
                 return (thread_id_type)pthread_self();
@@ -60,6 +60,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Mutex = local::spinlock>
         struct recursive_mutex_impl
         {
+        public:
             HPX_NON_COPYABLE(recursive_mutex_impl);
 
         private:

@@ -89,6 +89,7 @@ namespace hpx { namespace serialization { namespace detail
 
     class polymorphic_nonintrusive_factory
     {
+    public:
         HPX_NON_COPYABLE(polymorphic_nonintrusive_factory);
 
     public:

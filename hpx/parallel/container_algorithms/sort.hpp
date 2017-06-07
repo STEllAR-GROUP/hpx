@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     /// Sorts the elements in the range \a rng  in ascending order. The
     /// order of equal elements is not guaranteed to be preserved. The function

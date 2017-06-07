@@ -14,6 +14,8 @@
 #include <rdma/rdma_cma.h>
 #include <infiniband/verbs.h>
 //
+#include <sstream>
+#include <iostream>
 #include <iomanip>
 #include <atomic>
 #include <cstddef>
@@ -178,16 +180,40 @@ namespace verbs
         inline uint64_t post_send_xN(verbs_memory_region *region[], int N, bool signaled,
             bool withImmediate, uint32_t immediateData)
         {
+
             // Build scatter/gather element for outbound data.
             struct ibv_sge send_sge[4]; // caution, don't use more than this
             int total_length = 0;
+            LOG_EXCLUSIVE(
+                int x = 0;
+                std::stringstream temp;
+                temp << "Send Buffer : \n";
+                for (int s=0; s<N; s++) {
+                    temp << "sge length "
+                         << decnumber(region[s]->get_message_length()) << ",";
+                    temp << "sge addr "
+                         << hexpointer(region[s]->get_address()) << ",";
+                }
+                temp << "\n";
+            )
             for (int i=0; i<N; i++) {
-                send_sge[i].addr   = (uint64_t)region[i]->get_address();
+                send_sge[i].addr   = (intptr_t)region[i]->get_address();
                 send_sge[i].length = region[i]->get_message_length();
                 send_sge[i].lkey   = region[i]->get_local_key();
                 total_length      += send_sge[i].length;
+                LOG_EXCLUSIVE(
+                    int P = send_sge[i].length;
+                    uintptr_t *ptr = reinterpret_cast<uintptr_t*>(send_sge[i].addr);
+                    for(int j=0; j<P/8; ++j) {
+                        temp << dec4(x++) << " " << hexuint64(ptr[j]) << "\n";
+                    }
+                )
             }
 
+            LOG_EXCLUSIVE(
+                temp << std::endl;
+                std::cout << temp.str().c_str();
+            )
             // Build a send work request.
             struct ibv_send_wr send_wr;
             memset(&send_wr, 0, sizeof(send_wr));

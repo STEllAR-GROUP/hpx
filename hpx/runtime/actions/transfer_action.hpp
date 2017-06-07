@@ -27,18 +27,12 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-// MSVC12 reports: warning C4520: 'hpx::actions::transfer_action<Action>' :
-// multiple default constructors specified
-#if defined(HPX_MSVC) && HPX_MSVC < 1900
-#pragma warning(push)
-#pragma warning (disable: 4520)
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct transfer_action : transfer_base_action<Action>
     {
-        HPX_MOVABLE_ONLY(transfer_action);
+    public:
+        HPX_NON_COPYABLE(transfer_action);
 
         typedef transfer_base_action<Action> base_type;
 
@@ -186,10 +180,6 @@ namespace hpx { namespace actions
         // keep track of number of invocations
         this->increment_invocation_count();
     }
-
-#if defined(HPX_MSVC) && HPX_MSVC < 1900
-#pragma warning(pop)
-#endif
 
     template <typename Action>
     void transfer_action<Action>::load(hpx::serialization::input_archive & ar)

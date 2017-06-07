@@ -137,8 +137,8 @@ namespace hpx { namespace util
             >::type
         >
         {
-            typedef typename util::detail::fused_result_of<
-                T&(Us&&)
+            typedef typename util::detail::invoke_fused_result<
+                T&, Us
             >::type type;
 
             static HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -176,45 +176,45 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Us>
-        struct bound_result_of_impl;
+        struct invoke_bound_result_impl;
 
         template <typename F, typename ...Ts, typename Us>
-        struct bound_result_of_impl<F, util::tuple<Ts...>, Us>
-          : util::result_of<
-                F&(typename bind_eval_impl<F, Ts, Us>::type&&...)
+        struct invoke_bound_result_impl<F, util::tuple<Ts...>, Us>
+          : util::invoke_result<
+                F&, typename bind_eval_impl<F, Ts, Us>::type...
             >
         {};
 
         template <typename F, typename Ts>
-        struct bound_result_of_simple_impl;
+        struct invoke_bound_result_simple_impl;
 
         template <typename F, typename ...Ts>
-        struct bound_result_of_simple_impl<F, util::tuple<Ts...> >
-          : util::result_of<F&(Ts&...)>
+        struct invoke_bound_result_simple_impl<F, util::tuple<Ts...> >
+          : util::invoke_result<F&, Ts&...>
         {};
 
         template <typename F, typename ...Ts>
-        struct bound_result_of_simple_impl<one_shot_wrapper<F>, util::tuple<Ts...> >
-          : util::result_of<F&&(Ts&&...)>
+        struct invoke_bound_result_simple_impl<one_shot_wrapper<F>, util::tuple<Ts...> >
+          : util::invoke_result<F&&, Ts&&...>
         {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Us>
-        struct bound_result_of
+        struct invoke_bound_result
           : std::conditional<
                 !detail::is_simple_bind<Ts>::value,
-                bound_result_of_impl<F, Ts, Us>,
-                bound_result_of_simple_impl<F, Ts>
+                invoke_bound_result_impl<F, Ts, Us>,
+                invoke_bound_result_simple_impl<F, Ts>
             >::type
         {};
 
         template <typename F, typename ...Ts, typename Us>
-        struct bound_result_of<F, util::tuple<Ts...> const, Us>
-          : bound_result_of<F, util::tuple<Ts const...>, Us>
+        struct invoke_bound_result<F, util::tuple<Ts...> const, Us>
+          : invoke_bound_result<F, util::tuple<Ts const...>, Us>
         {};
 
         template <typename F, typename ...Ts, typename Us>
-        struct bound_result_of<
+        struct invoke_bound_result<
             one_shot_wrapper<F> const, util::tuple<Ts...> const, Us>
         {}; // one-shot wrapper is not const callable
 
@@ -223,7 +223,7 @@ namespace hpx { namespace util
         HPX_HOST_DEVICE
         typename std::enable_if<
             !detail::is_simple_bind<Ts>::value,
-            typename bound_result_of<F, Ts, Us>::type
+            typename invoke_bound_result<F, Ts, Us>::type
         >::type bound_impl(F& f, Ts& bound, Us&& unbound,
             pack_c<std::size_t, Is...>)
         {
@@ -236,7 +236,7 @@ namespace hpx { namespace util
         HPX_HOST_DEVICE
         typename std::enable_if<
             detail::is_simple_bind<Ts>::value,
-            typename bound_result_of<F, Ts, Us>::type
+            typename invoke_bound_result<F, Ts, Us>::type
         >::type bound_impl(F& f, Ts& bound, Us&& /*unbound*/,
             pack_c<std::size_t, Is...>)
         {
@@ -247,7 +247,7 @@ namespace hpx { namespace util
         HPX_HOST_DEVICE
         typename std::enable_if<
             detail::is_simple_bind<Ts>::value,
-            typename bound_result_of<one_shot_wrapper<F>, Ts, Us>::type
+            typename invoke_bound_result<one_shot_wrapper<F>, Ts, Us>::type
         >::type bound_impl(one_shot_wrapper<F>& f, Ts& bound, Us&& /*unbound*/,
             pack_c<std::size_t, Is...>)
         {
@@ -268,8 +268,7 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
@@ -284,12 +283,11 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(bound);
-            HPX_DELETE_MOVE_ASSIGN(bound);
+            bound& operator=(bound const&) = delete;
 
             template <typename ...Us>
             HPX_HOST_DEVICE inline
-            typename bound_result_of<
+            typename invoke_bound_result<
                 typename std::decay<F>::type,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
                 util::tuple<Us&&...>
@@ -302,7 +300,7 @@ namespace hpx { namespace util
 
             template <typename ...Us>
             HPX_HOST_DEVICE inline
-            typename bound_result_of<
+            typename invoke_bound_result<
                 typename std::decay<F>::type const,
                 util::tuple<typename util::decay_unwrap<Ts>::type...> const,
                 util::tuple<Us&&...>
@@ -413,7 +411,7 @@ namespace hpx { namespace util
 
             template <typename ...Ts>
             HPX_HOST_DEVICE inline
-            typename util::result_of<F&&(Ts&&...)>::type
+            typename util::invoke_result<F, Ts...>::type
             operator()(Ts&&... vs)
             {
                 check_call();
@@ -480,7 +478,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::bound<Sig> >
     {
         static std::size_t
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -490,7 +488,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::one_shot_wrapper<F> >
     {
         static std::size_t
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -502,7 +500,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::bound<Sig> >
     {
         static char const*
-            call(util::detail::bound<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -512,7 +510,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::one_shot_wrapper<F> >
     {
         static char const*
-            call(util::detail::one_shot_wrapper<F> const& f) HPX_NOEXCEPT
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }

@@ -19,6 +19,7 @@ namespace hpx { namespace lcos { namespace local
     ///////////////////////////////////////////////////////////////////////////
     class mutex
     {
+    public:
         HPX_NON_COPYABLE(mutex);
 
     protected:
@@ -54,6 +55,7 @@ namespace hpx { namespace lcos { namespace local
     ///////////////////////////////////////////////////////////////////////////
     class timed_mutex : private mutex
     {
+    public:
         HPX_NON_COPYABLE(timed_mutex);
 
     public:

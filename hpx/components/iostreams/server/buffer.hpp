@@ -30,24 +30,26 @@ namespace hpx { namespace iostreams { namespace detail
 
     public:
         buffer()
-          : data_(new std::vector<char>)
+          : data_(new std::vector<char>),
+            mtx_(new mutex_type)
         {}
 
         buffer(buffer const& rhs)
           : data_(rhs.data_)
+          , mtx_(rhs.mtx_)
         {}
 
         buffer(buffer && rhs)
-          : data_(rhs.data_)
-        {
-            rhs.data_.reset();
-        }
+          : data_(std::move(rhs.data_))
+          , mtx_(std::move(rhs.mtx_))
+        {}
 
         buffer& operator=(buffer const& rhs)
         {
             if (this != &rhs)
             {
                 data_ = rhs.data_;
+                mtx_ = rhs.mtx_;
             }
             return *this;
         }
@@ -57,13 +59,14 @@ namespace hpx { namespace iostreams { namespace detail
             if (this != &rhs)
             {
                 data_ = std::move(rhs.data_);
+                mtx_ = std::move(rhs.mtx_);
             }
             return *this;
         }
 
         bool empty() const
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(*mtx_);
             return empty_locked();
         }
 
@@ -74,7 +77,7 @@ namespace hpx { namespace iostreams { namespace detail
 
         buffer init()
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(*mtx_);
             return init_locked();
         }
 
@@ -88,7 +91,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Char>
         std::streamsize write(Char const* s, std::streamsize n)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> l(*mtx_);
             std::copy(s, s + n, std::back_inserter(*data_));
             return n;
         }
@@ -96,7 +99,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Mutex>
         void write(write_function_type const& f, Mutex& mtx)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(*mtx_);
             if (data_.get() && !data_->empty())
             {
                 std::shared_ptr<std::vector<char> > data(data_);
@@ -111,6 +114,9 @@ namespace hpx { namespace iostreams { namespace detail
     private:
         std::shared_ptr<std::vector<char> > data_;
 
+    protected:
+        std::shared_ptr<mutex_type> mtx_;
+
     private:
         friend class hpx::serialization::access;
 
@@ -120,9 +126,6 @@ namespace hpx { namespace iostreams { namespace detail
             serialization::input_archive& ar, unsigned);
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
-
-    protected:
-        mutable mutex_type mtx_;
     };
 }}}
 

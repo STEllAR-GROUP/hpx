@@ -30,7 +30,7 @@
 #ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
 #endif
@@ -57,6 +57,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     class coroutine_impl
       : public context_base
     {
+    public:
         HPX_NON_COPYABLE(coroutine_impl);
 
     public:
@@ -189,7 +190,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     };
 }}}}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

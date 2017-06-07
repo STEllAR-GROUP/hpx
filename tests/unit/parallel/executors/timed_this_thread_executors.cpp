@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,42 +27,35 @@ hpx::thread::id test(int passed_through)
 template <typename Executor>
 void test_timed_sync(Executor& exec)
 {
-    typedef hpx::parallel::timed_executor_traits<Executor> traits;
-
     HPX_TEST(
-        traits::execute_after(
+        hpx::parallel::execution::sync_execute_after(
             exec, milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 
     HPX_TEST(
-        traits::execute_at(
-            exec, steady_clock::now()+milliseconds(1), &test, 42
+        hpx::parallel::execution::sync_execute_at(
+            exec, steady_clock::now() + milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 }
 
 template <typename Executor>
 void test_timed_async(Executor& exec)
 {
-    typedef hpx::parallel::timed_executor_traits<Executor> traits;
-
     HPX_TEST(
-        traits::async_execute_after(
+        hpx::parallel::execution::async_execute_after(
             exec, milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
-
     HPX_TEST(
-        traits::async_execute_at(
-            exec, steady_clock::now()+milliseconds(1), &test, 42
+        hpx::parallel::execution::async_execute_at(
+            exec, steady_clock::now() + milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
 }
 
 template <typename Executor>
 void test_timed_apply(Executor& exec)
 {
-    typedef hpx::parallel::timed_executor_traits<Executor> traits;
-
-    traits::apply_execute_after(exec, milliseconds(1), &test, 42);
-    traits::apply_execute_at(
+    hpx::parallel::execution::post_after(exec, milliseconds(1), &test, 42);
+    hpx::parallel::execution::post_at(
         exec, steady_clock::now() + milliseconds(1), &test, 42);
 }
 
@@ -82,14 +75,14 @@ int hpx_main(int argc, char* argv[])
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
-        hpx::parallel::this_thread_static_queue_executor exec;
+        hpx::parallel::execution::this_thread_static_queue_executor exec;
         test_timed_this_thread_executor(exec);
     }
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     {
-        hpx::parallel::this_thread_static_priority_queue_executor exec;
+        hpx::parallel::execution::this_thread_static_priority_queue_executor exec;
         test_timed_this_thread_executor(exec);
     }
 #endif

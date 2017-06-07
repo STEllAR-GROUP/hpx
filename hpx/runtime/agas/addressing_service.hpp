@@ -54,7 +54,7 @@ HPX_EXPORT void destroy_big_boot_barrier();
 
 struct HPX_EXPORT addressing_service
 {
-private:
+public:
     HPX_NON_COPYABLE(addressing_service);
 
 public:

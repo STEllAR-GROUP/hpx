@@ -161,6 +161,7 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag
     {
+    public:
         HPX_NON_COPYABLE(managed_component_base);
 
     private:
@@ -351,6 +352,7 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component
     {
+    public:
         HPX_NON_COPYABLE(managed_component);
 
     public:
@@ -619,6 +621,9 @@ namespace hpx { namespace components
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
             util::unique_function_nonser<void(void*)> const& ctor);
+
+        template <typename Component_, typename ...Ts>
+        friend naming::gid_type server::create_with_args(Ts&&... ts);
 #endif
 
         naming::gid_type get_base_gid(

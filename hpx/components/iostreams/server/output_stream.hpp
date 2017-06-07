@@ -40,9 +40,9 @@ namespace hpx { namespace iostreams { namespace server
         // Executed in an io_pool thread to prevent io from blocking an HPX
         // shepherd thread.
         void call_write_async(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer in);
+            detail::buffer const& in);
         void call_write_sync(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer in, threads::thread_id_type caller);
+            detail::buffer const& in, threads::thread_id_type caller);
 
     public:
         explicit output_stream(write_function_type write_f_ = write_function_type())
@@ -65,9 +65,9 @@ namespace hpx { namespace iostreams { namespace server
         {}
 
         void write_async(std::uint32_t locality_id,
-            std::uint64_t count, detail::buffer in);
+            std::uint64_t count, detail::buffer const& in);
         void write_sync(std::uint32_t locality_id,
-            std::uint64_t count, detail::buffer in);
+            std::uint64_t count, detail::buffer const& in);
 
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async);
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync);

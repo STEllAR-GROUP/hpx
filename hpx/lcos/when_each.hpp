@@ -253,8 +253,8 @@ namespace hpx { namespace lcos
 
                     dispatch::call(std::forward<F>(f_), count_++,
                         std::move(*next),
-                        typename traits::is_callable<
-                            F(std::size_t, future_type)
+                        typename traits::is_invocable<
+                            F, std::size_t, future_type
                         >::type()
                     );
 
@@ -319,8 +319,8 @@ namespace hpx { namespace lcos
                 }
 
                 dispatch::call(std::forward<F>(f_), count_++, std::move(fut),
-                    typename traits::is_callable<
-                        F(std::size_t, future_type)
+                    typename traits::is_invocable<
+                        F, std::size_t, future_type
                     >::type()
                 );
 

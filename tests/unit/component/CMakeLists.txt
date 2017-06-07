@@ -18,6 +18,7 @@ set(tests
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
     launch_process
+    local_new
     migrate_component
     migrate_component_to_storage
     new_

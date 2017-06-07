@@ -9,8 +9,6 @@
 #define HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
@@ -21,7 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces and then assigned to threads.

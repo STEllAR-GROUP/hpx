@@ -21,8 +21,9 @@
 # pragma once
 #endif
 
-#if defined(HPX_MSVC)
-#pragma warning ( disable : 4355)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(push)
+#pragma warning(disable: 4355)
 #endif
 
 #include <hpx/config.hpp>
@@ -233,6 +234,10 @@ template<class convert_dest = do_convert_destination > struct rolling_file_t
 typedef rolling_file_t<> rolling_file;
 
 }}}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #endif
 

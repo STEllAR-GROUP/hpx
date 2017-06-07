@@ -119,7 +119,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return impl_ ? impl_->valid(): false;
         }

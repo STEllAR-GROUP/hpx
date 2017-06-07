@@ -82,7 +82,8 @@ namespace hpx { namespace threads
                 "setpriority returned an error");
             return false;
         }
-#elif defined(HPX_MSVC)
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
             HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",

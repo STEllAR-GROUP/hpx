@@ -87,7 +87,7 @@ namespace hpx
         /// from.
         ///
         /// \throws nothing
-        error get_error() const HPX_NOEXCEPT;
+        error get_error() const noexcept;
 
         /// The function \a get_error_code() returns a hpx::error_code which
         /// represents the same error condition as this hpx::exception instance.
@@ -97,7 +97,7 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode mode = plain) const HPX_NOEXCEPT;
+        error_code get_error_code(throwmode mode = plain) const noexcept;
     };
 
     ///////////////////////////////////////////////////////////////////////////

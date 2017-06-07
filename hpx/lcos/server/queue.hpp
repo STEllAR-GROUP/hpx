@@ -7,6 +7,8 @@
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -196,5 +198,6 @@ namespace hpx { namespace lcos { namespace server
         BOOST_PP_STRINGIZE(BOOST_PP_CAT(__base_lco_with_value_queue_, name))) \
 /**/
 
+#endif
 #endif
 

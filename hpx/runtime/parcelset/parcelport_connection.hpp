@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset {
           typedef BufferType buffer_type;
           typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
-    private:
+    public:
         HPX_NON_COPYABLE(parcelport_connection);
 
     public:

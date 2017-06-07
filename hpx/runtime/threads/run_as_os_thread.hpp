@@ -21,7 +21,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ... Ts>
-    hpx::future<typename util::result_of<F&&(Ts&&...)>::type>
+    hpx::future<typename util::invoke_result<F, Ts...>::type>
     run_as_os_thread(F && f, Ts &&... vs)
     {
         HPX_ASSERT(get_self_ptr() != nullptr);

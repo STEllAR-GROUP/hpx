@@ -134,6 +134,10 @@ namespace hpx { namespace threads { namespace policies
 
             if (!deferred_initialization)
             {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
                 BOOST_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
                     queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
@@ -144,6 +148,9 @@ namespace hpx { namespace threads { namespace policies
                     high_priority_queues_[i] =
                         new thread_queue_type(init.max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
         }
 
@@ -975,6 +982,10 @@ namespace hpx { namespace threads { namespace policies
         {
             if (nullptr == queues_[num_thread])
             {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
                 queues_[num_thread] =
                     new thread_queue_type(max_queue_thread_count_);
 
@@ -983,6 +994,9 @@ namespace hpx { namespace threads { namespace policies
                     high_priority_queues_[num_thread] =
                         new thread_queue_type(max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
 
             // forward this call to all queues etc.

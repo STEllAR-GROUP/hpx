@@ -79,8 +79,6 @@ public:
 private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
-
-    HPX_MOVABLE_ONLY(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)

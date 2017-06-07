@@ -188,13 +188,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
-        void count_down() HPX_NOEXCEPT
+        void count_down() noexcept
         {
             HPX_ASSERT(m_operation_counter);
             --m_operation_counter;
         }
 
-        void count_up() HPX_NOEXCEPT
+        void count_up() noexcept
         {
             ++m_operation_counter;
         }
@@ -227,7 +227,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
          * returns 'is_ready()'.
          * Nothrow.
          */
-        bool signal() HPX_NOEXCEPT
+        bool signal() noexcept
         {
             HPX_ASSERT(!running() && !exited());
             HPX_ASSERT(m_wait_counter);
@@ -418,7 +418,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // Cannot be called if there are pending operations.
         // It follows that cannot be called from 'this'.
         // Nothrow.
-        void exit() HPX_NOEXCEPT
+        void exit() noexcept
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(is_ready());
@@ -439,7 +439,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
         // Nothrow.
-        ~context_base() HPX_NOEXCEPT
+        ~context_base() noexcept
         {
             HPX_ASSERT(!running());
             try {
@@ -595,7 +595,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         // Nothrow.
         void do_return(context_exit_status status, boost::exception_ptr && info)
-            HPX_NOEXCEPT
+            noexcept
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
@@ -608,7 +608,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     protected:
 
         // Nothrow.
-        void do_yield() HPX_NOEXCEPT
+        void do_yield() noexcept
         {
             swap_context(*this, m_caller, detail::yield_hint());
         }

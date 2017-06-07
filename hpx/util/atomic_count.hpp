@@ -15,12 +15,19 @@ namespace hpx { namespace util
 {
     class atomic_count
     {
+    public:
         HPX_NON_COPYABLE(atomic_count);
 
     public:
         explicit atomic_count(long value)
           : value_(value)
         {}
+
+        atomic_count& operator=(long value)
+        {
+            value_.store(value, boost::memory_order_relaxed);
+            return *this;
+        }
 
         long operator++()
         {
@@ -30,6 +37,18 @@ namespace hpx { namespace util
         long operator--()
         {
             return value_.fetch_sub(1, boost::memory_order_acq_rel) - 1;
+        }
+
+        atomic_count& operator+=(long n)
+        {
+            value_.fetch_add(n, boost::memory_order_acq_rel);
+            return *this;
+        }
+
+        atomic_count& operator-=(long n)
+        {
+            value_.fetch_sub(n, boost::memory_order_acq_rel);
+            return *this;
         }
 
         operator long() const

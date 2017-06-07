@@ -3,6 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+EXTRACT_ALL = YES
 EXPAND_ONLY_PREDEF = YES
 GENERATE_HTML = NO
 GENERATE_XML = YES
@@ -12,4 +13,5 @@ XML_OUTPUT = @doxygen_output_file@
 OUTPUT_DIRECTORY = @doxygen_output_dir@
 GENERATE_LATEX = NO
 INPUT = @doxygen_inputs@
+EXCLUDE_SYMBOLS = detail
 

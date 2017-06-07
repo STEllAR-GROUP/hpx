@@ -33,20 +33,94 @@
 
 namespace hpx { namespace serialization
 {
+    namespace detail
+    {
+        template <typename Container>
+        inline std::unique_ptr<erased_output_container>
+        create_output_container(Container& buffer,
+            std::vector<serialization_chunk>* chunks,
+            binary_filter* filter, std::false_type)
+        {
+            std::unique_ptr<erased_output_container> res;
+            if (filter == nullptr)
+            {
+                if (chunks == nullptr)
+                {
+                    res.reset(new output_container<Container, basic_chunker>(
+                        buffer));
+                }
+                else
+                {
+                    res.reset(new output_container<Container, vector_chunker>(
+                        buffer, chunks));
+                }
+            }
+            else
+            {
+                if (chunks == nullptr)
+                {
+                    res.reset(
+                        new filtered_output_container<Container, basic_chunker>(
+                            buffer));
+                }
+                else
+                {
+                    res.reset(
+                        new filtered_output_container<Container, vector_chunker>(
+                            buffer, chunks));
+                }
+            }
+            return res;
+        }
+
+        template <typename Container>
+        inline std::unique_ptr<erased_output_container>
+        create_output_container(Container& buffer,
+            std::vector<serialization_chunk>* chunks,
+            binary_filter* filter, std::true_type)
+        {
+            std::unique_ptr<erased_output_container> res;
+            if (filter == nullptr)
+            {
+                res.reset(new output_container<Container, counting_chunker>(
+                    buffer, chunks));
+            }
+            else
+            {
+                res.reset(
+                    new filtered_output_container<Container, counting_chunker>(
+                        buffer, chunks));
+            }
+            return res;
+        }
+    }
+
     struct HPX_EXPORT output_archive
       : basic_archive<output_archive>
     {
+    private:
+        static std::uint32_t make_flags(std::uint32_t flags,
+            std::vector<serialization_chunk>* chunks)
+        {
+            return flags |
+                (chunks == nullptr ?
+                    archive_flags::disable_data_chunking :
+                    archive_flags::no_archive_flags);
+        }
+
+    public:
         typedef basic_archive<output_archive> base_type;
 
         typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_type;
 
         template <typename Container>
         output_archive(Container & buffer,
-            std::uint32_t flags = 0U,
-            std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr)
-            : base_type(flags)
-            , buffer_(new output_container<Container>(buffer, chunks, filter))
+                std::uint32_t flags = 0U,
+                std::vector<serialization_chunk>* chunks = nullptr,
+                binary_filter* filter = nullptr)
+          : base_type(make_flags(flags, chunks))
+          , buffer_(detail::create_output_container(buffer, chunks, filter,
+                typename detail::access_data<Container>::preprocessing_only()))
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -57,7 +131,7 @@ namespace hpx { namespace serialization
 
             // send flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
-            save(flags);
+            save(this->flags_);
 
             bool has_filter = filter != nullptr;
             save(has_filter);
@@ -123,6 +197,7 @@ namespace hpx { namespace serialization
 
     private:
         friend struct basic_archive<output_archive>;
+
         template <class T>
         friend class array;
 
@@ -283,11 +358,14 @@ namespace hpx { namespace serialization
         void save_binary_chunk(void const * address, std::size_t count)
         {
             if(count == 0) return;
-            size_ += count;
-            if(disable_data_chunking())
-              buffer_->save_binary(address, count);
-            else
-              buffer_->save_binary_chunk(address, count);
+            if (disable_data_chunking()) {
+                size_ += count;
+                buffer_->save_binary(address, count);
+            }
+            else {
+                // the size might grow if optimizations are not used
+                size_ += buffer_->save_binary_chunk(address, count);
+            }
         }
 
         typedef std::map<const void *, std::uint64_t> pointer_tracker;

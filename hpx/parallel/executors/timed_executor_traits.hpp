@@ -9,9 +9,10 @@
 #define HPX_PARALLEL_TIMED_EXECUTOR_TRAITS_AUG_04_2015_0525PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
@@ -24,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     namespace detail
     {
@@ -563,4 +564,5 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     struct is_timed_executor;   // defined in hpx/traits/is_timed_executor.hpp
 }}}
 
+#endif
 #endif

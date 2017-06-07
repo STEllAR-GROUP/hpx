@@ -33,6 +33,8 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       created_executor_v1
       minimal_async_executor_v1
       minimal_sync_executor_v1
+      minimal_timed_async_executor_v1
+      minimal_timed_sync_executor_v1
       parallel_executor_v1
       parallel_fork_executor_v1
       sequential_executor_v1
@@ -42,6 +44,9 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       thread_pool_attached_executors_v1
       thread_pool_executors_v1
       thread_pool_os_executors_v1
+      timed_parallel_executor_v1
+      timed_this_thread_executors_v1
+      timed_thread_pool_executors_v1
      )
 endif()
 

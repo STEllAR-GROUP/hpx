@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest.

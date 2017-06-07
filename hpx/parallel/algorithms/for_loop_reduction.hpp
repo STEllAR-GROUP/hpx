@@ -15,7 +15,6 @@
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -25,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     namespace detail
     {
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 return data_[hpx::get_worker_thread_num()];
             }
 
-            void next_iteration() HPX_NOEXCEPT {}
+            void next_iteration() noexcept {}
 
             void exit_iteration(std::size_t /*index*/)
             {

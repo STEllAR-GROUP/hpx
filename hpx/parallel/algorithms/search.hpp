@@ -14,7 +14,6 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -29,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx {namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // search
@@ -207,7 +206,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::search<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -391,7 +390,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::search_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

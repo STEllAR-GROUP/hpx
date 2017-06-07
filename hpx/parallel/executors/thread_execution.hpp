@@ -41,7 +41,7 @@ namespace hpx { namespace threads
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::lcos::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
     >::type
     async_execute(Executor && exec, F && f, Ts &&... ts)
@@ -56,7 +56,7 @@ namespace hpx { namespace threads
     HPX_FORCEINLINE
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >::type
     sync_execute(Executor && exec, F && f, Ts &&... ts)
     {
@@ -71,15 +71,15 @@ namespace hpx { namespace threads
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::lcos::future<
-            typename hpx::util::detail::deferred_result_of<
-                F(Future, Ts...)
+            typename hpx::util::detail::invoke_deferred_result<
+                F, Future, Ts...
             >::type
         >
     >::type
     then_execute(Executor && exec, F && f, Future& predecessor, Ts &&... ts)
     {
-        typedef typename hpx::util::detail::deferred_result_of<
-                F(Future, Ts...)
+        typedef typename hpx::util::detail::invoke_deferred_result<
+                F, Future, Ts...
             >::type result_type;
 
         auto func = hpx::util::bind(

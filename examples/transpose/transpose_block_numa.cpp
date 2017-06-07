@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -125,8 +126,6 @@ struct sub_block
     std::uint64_t size_;
     double * data_;
     mode mode_;
-
-    HPX_MOVABLE_ONLY(sub_block);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

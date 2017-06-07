@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,45 +27,42 @@ hpx::thread::id test(int passed_through)
 
 void test_timed_sync()
 {
-    typedef hpx::parallel::parallel_executor executor;
-    typedef hpx::parallel::timed_executor_traits<executor> traits;
+    typedef hpx::parallel::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(
-        traits::execute_after(
+        hpx::parallel::execution::sync_execute_after(
             exec, milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 
     HPX_TEST(
-        traits::execute_at(
+        hpx::parallel::execution::sync_execute_at(
             exec, steady_clock::now() + milliseconds(1), &test, 42
         ) != hpx::this_thread::get_id());
 }
 
 void test_timed_async()
 {
-    typedef hpx::parallel::parallel_executor executor;
-    typedef hpx::parallel::timed_executor_traits<executor> traits;
+    typedef hpx::parallel::execution::parallel_executor executor;
 
     executor exec;
     HPX_TEST(
-        traits::async_execute_after(
+        hpx::parallel::execution::async_execute_after(
             exec, milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
     HPX_TEST(
-        traits::async_execute_at(
+        hpx::parallel::execution::async_execute_at(
             exec, steady_clock::now() + milliseconds(1), &test, 42
         ).get() != hpx::this_thread::get_id());
 }
 
 void test_timed_apply()
 {
-    typedef hpx::parallel::parallel_executor executor;
-    typedef hpx::parallel::timed_executor_traits<executor> traits;
+    typedef hpx::parallel::execution::parallel_executor executor;
 
     executor exec;
-    traits::apply_execute_after(exec, milliseconds(1), &test, 42);
-    traits::apply_execute_at(
+    hpx::parallel::execution::post_after(exec, milliseconds(1), &test, 42);
+    hpx::parallel::execution::post_at(
         exec, steady_clock::now() + milliseconds(1), &test, 42);
 }
 

@@ -19,6 +19,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -206,90 +207,32 @@ namespace hpx { namespace parcelset
         }
 
     public:
-        // this is the handler used by put_parcel - it deals with a single parcel
-        // at a time
-        struct parcel_await_handler
-        {
-            parcelport_impl& this_;
-            locality dest_;
-            write_handler_type f_;
-
-            void operator()(parcel&& p)
-            {
-                if (connection_handler_traits<ConnectionHandler>::
-                        send_immediate_parcels::value &&
-                    this_.can_send_immediate_impl<ConnectionHandler>())
-                {
-                    this_.send_parcel_immediate(dest_, std::move(p), std::move(f_));
-                }
-                else
-                {
-                    // enqueue the outgoing parcel ...
-                    this_.enqueue_parcel(dest_, std::move(p), std::move(f_));
-
-                    this_.get_connection_and_send_parcels(dest_);
-                }
-            }
-        };
-
-        // this is the handler used by put_parcels - this version handles a vector
-        // of parcels rather than just a single one
-        struct parcel_await_handlers
-        {
-            parcelport_impl* this_;
-            locality dest_;
-            std::vector<write_handler_type> handler_;
-            std::vector<parcel> parcels_;
-
-            parcel_await_handlers(
-                parcelport_impl& pp,
-                locality dest,
-                std::vector<write_handler_type>&& handler)
-              : this_(&pp),
-                dest_(std::move(dest)),
-                handler_(std::move(handler))
-            {}
-
-            parcel_await_handlers(parcel_await_handlers&& other)
-              : this_(other.this_),
-                dest_(std::move(other.dest_)),
-                handler_(std::move(other.handler_)),
-                parcels_(std::move(other.parcels_))
-            {}
-
-            parcel_await_handlers& operator=(parcel_await_handlers&& other)
-            {
-                this_ = other.this_;
-                dest_ = std::move(other.dest_);
-                handler_ = std::move(other.handler_);
-                parcels_ = std::move(other.parcels_);
-                return *this;
-            }
-
-            HPX_MOVABLE_ONLY(parcel_await_handlers);
-
-            void operator()(parcel&& p)
-            {
-                parcels_.push_back(std::move(p));
-                // enqueue the outgoing parcels ...
-
-                if (parcels_.size() == handler_.size())
-                {
-                    this_->enqueue_parcels(
-                        dest_, std::move(parcels_), std::move(handler_));
-
-                    this_->get_connection_and_send_parcels(dest_);
-                }
-            }
-        };
-
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
         {
             HPX_ASSERT(dest.type() == type());
 
-            std::make_shared<detail::parcel_await>(
-                std::move(p), archive_flags_,
-                parcel_await_handler{*this, dest, std::move(f)})->apply();
+            // We create a shared pointer of the parcels_await object since it
+            // needs to be kept alive as long as there are futures not ready
+            // or GIDs to be split. This is necessary to preserve the identiy
+            // of the this pointer.
+            std::make_shared<detail::parcel_await>(std::move(p), std::move(f),
+                archive_flags_, [this, dest](parcel&& p, write_handler_type&& f)
+                {
+                    if (connection_handler_traits<ConnectionHandler>::
+                        send_immediate_parcels::value &&
+                        can_send_immediate_impl<ConnectionHandler>())
+                    {
+                        send_immediate_impl<ConnectionHandler>(
+                            *this, dest, &f, &p, 1);
+                    }
+                    else
+                    {
+                        // enqueue the outgoing parcel ...
+                        enqueue_parcel(dest, std::move(p), std::move(f));
+
+                        get_connection_and_send_parcels(dest);
+                    }
+                })->apply();
         }
 
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
@@ -311,16 +254,31 @@ namespace hpx { namespace parcelset
                     parcels[i].destination_locality());
             }
 #endif
-            parcel_await_handlers handler(
-                *this, dest, std::move(handlers));
-            if (!connection_handler_traits<ConnectionHandler>::
-                    send_immediate_parcels::value)
-            {
-                handler.parcels_.reserve(parcels.size());
-            }
+            // We create a shared pointer of the parcels_await object since it
+            // needs to be kept alive as long as there are futures not ready
+            // or GIDs to be split. This is necessary to preserve the identiy
+            // of the this pointer.
+            std::make_shared<detail::parcels_await>(std::move(parcels),
+                std::move(handlers), archive_flags_,
+                [this, dest](std::vector<parcel>&& parcels,
+                    std::vector<write_handler_type>&& handlers)
+                {
+                    if (connection_handler_traits<ConnectionHandler>::
+                        send_immediate_parcels::value &&
+                        can_send_immediate_impl<ConnectionHandler>())
+                    {
+                        send_immediate_impl<ConnectionHandler>(
+                            *this, dest, handlers.data(), parcels.data(),
+                            parcels.size());
+                    }
+                    else
+                    {
+                        enqueue_parcels(
+                            dest, std::move(parcels), std::move(handlers));
 
-            std::make_shared<detail::parcel_await>(
-                std::move(parcels), archive_flags_, std::move(handler))->apply();
+                        get_connection_and_send_parcels(dest);
+                    }
+                })->apply();
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -337,11 +295,7 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            if (!connection_handler_traits<ConnectionHandler>::
-                    send_immediate_parcels::value)
-            {
-                trigger_pending_work();
-            }
+            trigger_pending_work();
             return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
@@ -525,6 +479,101 @@ namespace hpx { namespace parcelset
             return false;
         }
 
+    protected:
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            void
+        >::type
+        send_immediate_impl(
+            parcelport_impl &this_, locality const&dest_,
+            write_handler_type *fs, parcel *ps, std::size_t num_parcels)
+        {
+            std::uint64_t addr;
+            error_code ec;
+            // First try to get a connection ...
+            connection *sender = this_.connection_handler().get_connection(dest_, addr);
+
+            // If we couldn't get one ... enqueue the parcel and move on
+            std::size_t encoded_parcels = 0;
+            std::vector<parcel> parcels;
+            std::vector<write_handler_type> handlers;
+            if (sender != nullptr)
+            {
+                if (fs == nullptr)
+                {
+                    HPX_ASSERT(ps == nullptr);
+                    HPX_ASSERT(num_parcels == 0u);
+
+                    if(!dequeue_parcels(dest_, parcels, handlers))
+                    {
+                        // Give this connection back to the connection handler as
+                        // we couldn't dequeue parcels.
+                        this_.connection_handler().reclaim_connection(sender);
+
+                        return;
+                    }
+
+                    ps = parcels.data();
+                    fs = handlers.data();
+                    num_parcels = parcels.size();
+                    HPX_ASSERT(parcels.size() == handlers.size());
+                }
+
+                auto encoded_buffer = sender->get_new_buffer();
+                // encode the parcels
+                encoded_parcels = encode_parcels(this_, ps, num_parcels,
+                    encoded_buffer,
+                    this_.archive_flags_,
+                    this_.get_max_outbound_message_size());
+
+                typedef detail::call_for_each handler_type;
+
+                if (sender->parcelport_->async_write(
+                    handler_type(
+                        handler_type::handlers_type(
+                            std::make_move_iterator(fs),
+                            std::make_move_iterator(fs + encoded_parcels)),
+                        handler_type::parcels_type(
+                            std::make_move_iterator(ps),
+                            std::make_move_iterator(ps + encoded_parcels))
+                    ),
+                    sender, addr,
+                    encoded_buffer))
+                {
+                    // we don't propagate errors for now
+                }
+            }
+            if (num_parcels != encoded_parcels && fs != nullptr)
+            {
+                std::vector<parcel> overflow_parcels(
+                    std::make_move_iterator(ps + encoded_parcels),
+                    std::make_move_iterator(ps + num_parcels));
+                std::vector<write_handler_type> overflow_handlers(
+                    std::make_move_iterator(fs + encoded_parcels),
+                    std::make_move_iterator(fs + num_parcels));
+                enqueue_parcels(dest_, std::move(overflow_parcels),
+                    std::move(overflow_handlers));
+            }
+        }
+
+        template <typename ConnectionHandler_>
+        typename std::enable_if<
+            !connection_handler_traits<
+                ConnectionHandler_
+            >::send_immediate_parcels::value,
+            void
+        >::type
+        send_immediate_impl(
+            parcelport_impl &this_, locality const&dest_,
+            write_handler_type *fs, parcel *ps, std::size_t num_parcels)
+        {
+            HPX_ASSERT(false);
+        }
+
+    private:
         ///////////////////////////////////////////////////////////////////////
         std::shared_ptr<connection> get_connection(
             locality const& l, bool force, error_code& ec)
@@ -694,6 +743,42 @@ namespace hpx { namespace parcelset
             }
         }
 
+    protected:
+        bool dequeue_parcel(locality& dest, parcel& p, write_handler_type& handler)
+        {
+            {
+                std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
+
+                if (!l) return false;
+
+                for (auto &pending: pending_parcels_)
+                {
+                    auto &parcels = util::get<0>(pending.second);
+                    if (!parcels.empty())
+                    {
+                        auto& handlers = util::get<1>(pending.second);
+                        dest = pending.first;
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
+                        p = std::move(parcels->back());
+                        parcels->pop_back();
+#else
+                        p = std::move(parcels.back());
+                        parcels.pop_back();
+#endif
+                        handler = std::move(handlers.back());
+                        handlers.pop_back();
+
+                        if (parcels.empty())
+                        {
+                            pending_parcels_.erase(dest);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         bool trigger_pending_work()
         {
             if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
@@ -726,55 +811,17 @@ namespace hpx { namespace parcelset
             return true;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        void send_parcel_immediate(locality const& locality_id, parcel p,
-            write_handler_type handler)
-        {
-            error_code ec;
-            std::shared_ptr<connection> sender_connection =
-                connection_handler().create_connection(locality_id, ec);
-
-#if defined(HPX_DEBUG)
-            // verify the connection points to the right destination
-            HPX_ASSERT(locality_id == sender_connection->destination());
-            sender_connection->verify(locality_id);
-#endif
-
-#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_send_pending);
-#endif
-            // encode the parcels
-            std::size_t num_parcels = encode_parcels(*this, &p, 1,
-                    sender_connection->buffer_,
-                    archive_flags_,
-                    this->get_max_outbound_message_size());
-
-            using hpx::util::placeholders::_1;
-            using hpx::util::placeholders::_2;
-            using hpx::util::placeholders::_3;
-            HPX_ASSERT(num_parcels == 1);
-            {
-                ++operations_in_flight_;
-
-                // send the parcel
-                sender_connection->async_write(
-                    util::bind(util::one_shot(handler),
-                        _1,  std::move(p)),
-                    util::bind(&parcelport_impl::immediate_send_done,
-                        this, _1, _2, _3));
-            }
-        }
-
+    private:
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
             locality const& locality_id, bool background = false)
         {
-            // repeat until no more parcels are to be sent
-            std::vector<parcel> parcels;
-            std::vector<write_handler_type> handlers;
 
-            if(!dequeue_parcels(locality_id, parcels, handlers))
+            if (connection_handler_traits<ConnectionHandler>::
+                    send_immediate_parcels::value)
             {
+                this->send_immediate_impl<ConnectionHandler>(
+                    *this, locality_id, nullptr, nullptr, 0);
                 return;
             }
 
@@ -788,14 +835,23 @@ namespace hpx { namespace parcelset
 
             if (!sender_connection)
             {
-                // give the parcels back to the queues for later
-                enqueue_parcels(locality_id, std::move(parcels),
-                    std::move(handlers));
-
                 // We can safely return if no connection is available
                 // at this point. As soon as a connection becomes
                 // available it checks for pending parcels and sends
                 // those out.
+                return;
+            }
+
+            // repeat until no more parcels are to be sent
+            std::vector<parcel> parcels;
+            std::vector<write_handler_type> handlers;
+
+            if(!dequeue_parcels(locality_id, parcels, handlers))
+            {
+                // Give this connection back to the cache as we couldn't dequeue
+                // parcels.
+                connection_cache_.reclaim(locality_id, sender_connection);
+
                 return;
             }
 
@@ -810,19 +866,6 @@ namespace hpx { namespace parcelset
             // leads to a more effective parcel buffering
 //                 if (hpx::threads::get_self_ptr())
 //                     hpx::this_thread::yield();
-        }
-
-        void immediate_send_done(
-            boost::system::error_code const& ec,
-            locality const& locality_id,
-            std::shared_ptr<connection> sender_connection)
-        {
-            HPX_ASSERT(operations_in_flight_ != 0);
-            --operations_in_flight_;
-
-#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
-#endif
         }
 
 
@@ -851,7 +894,7 @@ namespace hpx { namespace parcelset
             {
                 std::lock_guard<lcos::local::spinlock> l(mtx_);
 
-                HPX_ASSERT(locality_id == sender_connection->destination());
+//                HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                 if (it == pending_parcels_.end() ||
@@ -879,7 +922,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_DEBUG)
             // verify the connection points to the right destination
-            HPX_ASSERT(parcel_locality_id == sender_connection->destination());
+//            HPX_ASSERT(parcel_locality_id == sender_connection->destination());
             sender_connection->verify(parcel_locality_id);
 #endif
             // encode the parcels

@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
@@ -96,7 +96,8 @@ namespace hpx { namespace util
 {
     class HPX_EXPORT interval_timer
     {
-        HPX_MOVABLE_ONLY(interval_timer);
+    public:
+        HPX_NON_COPYABLE(interval_timer);
 
     public:
         interval_timer();
@@ -154,7 +155,7 @@ namespace hpx { namespace util
     };
 }}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

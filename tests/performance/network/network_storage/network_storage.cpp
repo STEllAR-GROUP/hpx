@@ -92,7 +92,7 @@
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
-#define MAX_RANKS 1024
+#define MAX_RANKS 16384
 
 //----------------------------------------------------------------------------
 // Define this to make memory access asynchronous and return a future
@@ -230,12 +230,12 @@ public:
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
 
-  pointer_allocator() HPX_NOEXCEPT
+  pointer_allocator() noexcept
     : pointer_(nullptr), size_(0)
   {
   }
 
-  pointer_allocator(pointer p, size_type size) HPX_NOEXCEPT
+  pointer_allocator(pointer p, size_type size) noexcept
     : pointer_(p), size_(size)
   {
   }
@@ -501,8 +501,17 @@ void test_write(
     hpx::util::simple_profiler level1("Write function", rank==0 && !options.warmup);
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
+    if (rank==0) std::cout << "Iteration ";
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
         hpx::util::simple_profiler iteration(level1, "Iteration");
+        if (rank==0) {
+            if (i%10==0)  {
+                std::cout << "x" << std::flush;
+            }
+            else {
+                std::cout << "." << std::flush;
+            }
+        }
 
         DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
 
@@ -643,6 +652,7 @@ void test_write(
         DEBUG_OUTPUT(3, "Future wait, rank " << rank << " waiting on " << numwait);
         fwait.done();
     }
+    if (rank==0) std::cout << std::endl;
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
@@ -714,8 +724,18 @@ void test_read(
     //
     hpx::util::high_resolution_timer timerRead;
     //
+    if (rank==0) std::cout << "Iteration ";
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
+        if (rank==0) {
+            if (i%10==0)  {
+                std::cout << "x" << std::flush;
+            }
+            else {
+                std::cout << "." << std::flush;
+            }
+        }
+
         DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
 #ifdef USE_CLEANING_THREAD
         //
@@ -852,6 +872,8 @@ void test_read(
         );
     }
     hpx::lcos::barrier::synchronize();
+    //
+    if (rank==0) std::cout << std::endl;
     //
     uint64_t active_ranks = options.all2all ? nranks : 1;
     double readMB   = static_cast<double>

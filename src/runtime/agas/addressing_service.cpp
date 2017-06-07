@@ -184,7 +184,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
     {
         launch_hosted();
         get_big_boot_barrier().wait_hosted(
-            pp->get_locality_name(),
+            pp ? pp->get_locality_name() : "<console>",
             primary_ns_.ptr(), symbol_ns_.ptr());
     }
 #else
@@ -310,13 +310,21 @@ bool addressing_service::register_locality(
             locality_ns_->allocate(endpoints, 0, num_threads, prefix));
 
         {
-            std::lock_guard<mutex_type> l(resolved_localities_mtx_);
+            std::unique_lock<mutex_type> l(resolved_localities_mtx_);
             std::pair<resolved_localities_type::iterator, bool> res
                 = resolved_localities_.insert(std::make_pair(
                     prefix
                   , endpoints
                 ));
-            HPX_ASSERT(res.second);
+
+            if (!res.second)
+            {
+                l.unlock();
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "addressing_service::register_locality",
+                    "locality insertion failed because of a duplicate");
+                return false;
+            }
         }
 
         return true;
@@ -380,6 +388,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 std::stringstream strm;
                 strm << "couldn't resolve the given target locality ("
                      << gid << ")";
+                l.unlock();
+
                 HPX_THROWS_IF(ec, bad_parameter,
                     "addressing_service::resolve_locality",
                     strm.str());
@@ -1846,7 +1856,7 @@ void addressing_service::update_cache_entry(
         const gva_cache_key key(gid, count);
 
         {
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<mutex_type> lock(gva_cache_mtx_);
             if (!gva_cache_->update_if(key, g, check_for_collisions))
             {
                 if (LAGAS_ENABLED(warning))
@@ -1858,6 +1868,7 @@ void addressing_service::update_cache_entry(
                     if (!gva_cache_->get_entry(key, idbase, e))
                     {
                         // This is impossible under sane conditions.
+                        lock.unlock();
                         HPX_THROWS_IF(ec, invalid_data
                           , "addressing_service::update_cache_entry"
                           , "data corruption or lock error occurred in cache");

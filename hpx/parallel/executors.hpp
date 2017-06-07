@@ -6,14 +6,20 @@
 #if !defined(HPX_PARALLEL_EXECUTORS_MAY_11_2015_0728PM)
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0728PM
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/executor_information_traits.hpp>
+#endif
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
 #endif
 
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/thread_executor_information_traits.hpp>
+#endif
 #include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
@@ -29,5 +35,6 @@
 #include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_os_executors.hpp>
+#include <hpx/parallel/executors/timed_executors.hpp>
 
 #endif
