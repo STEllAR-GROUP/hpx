@@ -603,7 +603,7 @@ namespace hpx {
         }
 
         // fill the thread-lookup table
-        //! FIXME bring this up in loop
+        //! FIXME bring this up in loop for + efficiency
         for (auto& pool_iter : pools_) {
             size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
             for (size_t i(0); i < nt; i++) {

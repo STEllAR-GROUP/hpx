@@ -598,7 +598,7 @@ namespace resource
 
     threads::mask_cref_type resource_partitioner::get_pu_mask(std::size_t num_thread, bool numa_sensitive) const
     {
-        return affinity_data_.get_pu_mask(num_thread, numa_sensitive, topology_);
+        return affinity_data_.get_pu_mask(num_thread, numa_sensitive);
     }
 
     bool resource_partitioner::cmd_line_parsed() const
