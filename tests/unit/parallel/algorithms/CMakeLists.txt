@@ -116,8 +116,12 @@ set(tests
     uninitialized_copy
     uninitialized_copy_executors_v1
     uninitialized_copyn
+    uninitialized_default_construct
+    uninitialized_default_constructn
     uninitialized_fill
     uninitialized_filln
+    uninitialized_value_construct
+    uninitialized_value_constructn
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)

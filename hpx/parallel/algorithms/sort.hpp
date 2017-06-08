@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::sort<RandomIt>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

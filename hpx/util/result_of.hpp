@@ -182,6 +182,12 @@ namespace hpx { namespace util
     struct result_of<F(Ts...)>
       : detail::result_of_impl<typename std::decay<F>::type, F(Ts...)>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    struct invoke_result
+      : detail::result_of_impl<typename std::decay<F>::type, F&&(Ts&&...)>
+    {};
 }}
 
 #endif

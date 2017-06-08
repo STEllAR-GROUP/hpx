@@ -105,6 +105,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         boost::scoped_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;
+        bool has_prev_value_;
 
         std::size_t parameter1_, parameter2_;
     };

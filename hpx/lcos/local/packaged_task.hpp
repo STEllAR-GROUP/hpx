@@ -43,7 +43,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(F&& f)
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)

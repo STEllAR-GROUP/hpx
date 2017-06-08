@@ -145,10 +145,10 @@ namespace hpx { namespace util
     /// \note This function is similar to `std::invoke` (C++17)
     template <typename F, typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename util::result_of<F&&(Ts&&...)>::type
+    typename util::invoke_result<F, Ts...>::type
     invoke(F&& f, Ts&&... vs)
     {
-        typedef typename util::result_of<F&&(Ts&&...)>::type R;
+        typedef typename util::invoke_result<F, Ts...>::type R;
 
         return detail::invoke_impl<R,typename std::decay<F>::type>()(
             std::forward<F>(f), std::forward<Ts>(vs)...);
@@ -174,10 +174,10 @@ namespace hpx { namespace util
         {
             template <typename F, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename util::result_of<F&&(Ts &&...)>::type
+            typename util::invoke_result<F, Ts...>::type
             operator()(F && f, Ts &&... vs)
             {
-                typedef typename util::result_of<F&&(Ts&&...)>::type R;
+                typedef typename util::invoke_result<F, Ts...>::type R;
 
                 return hpx::util::void_guard<R>(), util::invoke(std::forward<F>(f),
                     std::forward<Ts>(vs)...);

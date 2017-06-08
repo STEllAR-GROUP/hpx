@@ -125,7 +125,7 @@ namespace hpx { namespace util
 
         public:
             template <typename ... Ts>
-            typename deferred_result_of<F(Ts...)>::type
+            typename invoke_deferred_result<F, Ts...>::type
             operator()(Ts && ... ts)
             {
                 annotate_function func(name_);

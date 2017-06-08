@@ -306,7 +306,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;
@@ -402,20 +402,19 @@ namespace hpx { namespace parallel { inline namespace v1
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter1>::value &&
         hpx::traits::is_iterator<InIter2>::value &&
-        hpx::traits::is_callable<
-                Convert(typename std::iterator_traits<InIter1>::value_type,
-                    typename std::iterator_traits<InIter2>::value_type)
+        hpx::traits::is_invocable<Convert,
+                typename std::iterator_traits<InIter1>::value_type,
+                typename std::iterator_traits<InIter2>::value_type
             >::value &&
-        hpx::traits::is_callable<
-            Reduce(
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type)
+        hpx::traits::is_invocable<Reduce,
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
                 >::type,
-                typename hpx::util::result_of<
-                    Convert(typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type)
-                >::type)
+                typename hpx::util::invoke_result<Convert,
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
+                >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
@@ -429,7 +428,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
+                is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter1>::value ||
                !hpx::traits::is_forward_iterator<InIter2>::value
             > is_seq;

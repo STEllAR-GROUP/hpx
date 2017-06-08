@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { inline namespace v1
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >is_seq;
 
@@ -398,7 +398,7 @@ namespace hpx { namespace parallel { inline namespace v1
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 

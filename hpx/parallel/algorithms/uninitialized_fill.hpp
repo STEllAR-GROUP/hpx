@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -69,7 +70,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
                     [&value](FwdIter it) {
-                        ::new (&*it) value_type(value);
+                        ::new (static_cast<void*>(std::addressof(*it)))
+                            value_type(value);
                     },
                     [](FwdIter it) {
                         (*it).~value_type();
@@ -203,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Required at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -332,7 +334,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return util::detail::algorithm_result<ExPolicy>::get();
         }
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill_n().call(
             std::forward<ExPolicy>(policy), is_seq(),

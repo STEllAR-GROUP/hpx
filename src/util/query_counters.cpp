@@ -108,6 +108,7 @@ namespace hpx { namespace util
     void query_counters::stop_evaluating_counters()
     {
         timer_.stop();
+        counters_.stop(launch::sync);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -411,7 +412,7 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ != performance_counters::counter_raw)
+            if (infos[i].type_ == performance_counters::counter_histogram)
                 continue;
             indicies.push_back(i);
         }

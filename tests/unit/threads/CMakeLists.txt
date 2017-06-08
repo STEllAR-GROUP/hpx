@@ -22,11 +22,13 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
 else()
   set(lockfree_fifo_FLAGS NOLIBS)
 endif()
+
+set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
