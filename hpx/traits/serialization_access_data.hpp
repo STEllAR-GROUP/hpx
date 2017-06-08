@@ -169,6 +169,11 @@ namespace hpx { namespace traits
                 decompressed_size);
         }
     };
+
+    template <typename Container>
+    struct serialization_access_data<Container const>
+      : serialization_access_data<Container>
+    {};
 }}
 
 #endif
