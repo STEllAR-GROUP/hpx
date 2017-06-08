@@ -726,8 +726,7 @@ namespace hpx { namespace util
             }
         }
 
-        if ((vm.count("hpx:connect") || mode_ == hpx::runtime_mode_connect) &&
-            hpx_host == "127.0.0.1")
+        if (hpx_host == "127.0.0.1" || hpx_host == "localhost")
         {
             hpx_host = hpx::util::resolve_public_ip_address();
         }
