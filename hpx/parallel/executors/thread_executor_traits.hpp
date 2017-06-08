@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { inline namespace v3
         ///
         template <typename Executor_, typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(Executor_ && sched, F && f, Ts &&... ts)
         {
@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \returns f(ts...)'s result through a future
         ///
         template <typename Executor_, typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute(Executor_ && sched, F && f, Ts &&... ts)
         {
             return hpx::async(std::forward<Executor_>(sched),

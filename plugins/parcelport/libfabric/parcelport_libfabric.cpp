@@ -180,6 +180,7 @@ namespace libfabric
                 {
                     --senders_in_use_;
                     senders_.push(s);
+                    trigger_pending_work();
                 };
            senders_.push(snd);
         }
@@ -227,6 +228,12 @@ namespace libfabric
         // if no senders are available shutdown
         FUNC_END_DEBUG_MSG;
         return nullptr;
+    }
+
+    void parcelport::reclaim_connection(sender* s)
+    {
+        --senders_in_use_;
+        senders_.push(s);
     }
 
     // --------------------------------------------------------------------

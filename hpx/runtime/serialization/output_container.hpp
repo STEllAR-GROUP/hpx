@@ -315,12 +315,14 @@ namespace hpx { namespace serialization
             current_ = new_current;
         }
 
-        void save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
+                // the container has grown by count bytes
+                return count;
             }
             else {
                 HPX_ASSERT(
@@ -339,6 +341,8 @@ namespace hpx { namespace serialization
                 // add a new serialization_chunk referring to the external
                 // buffer
                 chunker_.push_back(create_pointer_chunk(address, count));
+                // the container did not grow
+                return 0;
             }
         }
 
@@ -408,7 +412,7 @@ namespace hpx { namespace serialization
             this->current_ += count;
         }
 
-        void save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
@@ -416,9 +420,10 @@ namespace hpx { namespace serialization
                 HPX_ASSERT(count != 0);
                 filter_->save(address, count);
                 this->current_ += count;
+                return count;
             }
             else {
-                this->base_type::save_binary_chunk(address, count);
+                return this->base_type::save_binary_chunk(address, count);
             }
         }
 

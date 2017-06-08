@@ -457,7 +457,7 @@
 #      if defined(__powerpc__) || defined(__INTEL_COMPILER)
 #         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #      else
-#         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#         define HPX_SMALL_STACK_SIZE  0x10000        // 64kByte
 #      endif
 #    endif
 #  endif

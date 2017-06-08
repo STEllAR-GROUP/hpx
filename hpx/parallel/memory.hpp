@@ -12,8 +12,10 @@
 #include <memory>
 
 #include <hpx/parallel/algorithms/uninitialized_copy.hpp>
+#include <hpx/parallel/algorithms/uninitialized_default_construct.hpp>
 #include <hpx/parallel/algorithms/uninitialized_fill.hpp>
 #include <hpx/parallel/algorithms/uninitialized_move.hpp>
+#include <hpx/parallel/algorithms/uninitialized_value_construct.hpp>
 
 #endif
 

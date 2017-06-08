@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(boost_library_dependencies ${Boost_LIBRARIES})
 endif()
 

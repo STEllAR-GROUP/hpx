@@ -76,50 +76,60 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct count_instances
+    template <typename T>
+    struct count_instances_v
     {
-        count_instances()
-          : value_(std::size_t(-1))
+        count_instances_v()
         {
             ++instance_count;
+            ++max_instance_count;
         }
-        count_instances(int value)
+        count_instances_v(T value)
           : value_(value)
         {
             ++instance_count;
+            ++max_instance_count;
         }
-        count_instances(count_instances const& rhs)
+
+        count_instances_v(count_instances_v const& rhs)
           : value_(rhs.value_)
         {
             ++instance_count;
         }
-        count_instances(count_instances && rhs)
+        count_instances_v(count_instances_v && rhs)
           : value_(rhs.value_)
         {
             ++instance_count;
         }
 
-        count_instances& operator=(count_instances const& rhs)
+        count_instances_v& operator=(count_instances_v const& rhs)
         {
             value_ = rhs.value_;
             return *this;
         }
-        count_instances& operator=(count_instances && rhs)
+        count_instances_v& operator=(count_instances_v && rhs)
         {
             value_ = rhs.value_;
             return *this;
         }
 
-        ~count_instances()
+        ~count_instances_v()
         {
             --instance_count;
         }
 
-        std::size_t value_;
+        T value_;
         static boost::atomic<std::size_t> instance_count;
+        static boost::atomic<std::size_t> max_instance_count;
     };
 
-    boost::atomic<std::size_t> count_instances::instance_count(0);
+    template <typename T>
+    boost::atomic<std::size_t> count_instances_v<T>::instance_count(0);
+
+    template <typename T>
+    boost::atomic<std::size_t> count_instances_v<T>::max_instance_count(0);
+
+    using count_instances = count_instances_v<std::size_t>;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>

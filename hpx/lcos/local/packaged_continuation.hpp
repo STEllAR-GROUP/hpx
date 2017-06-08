@@ -102,12 +102,12 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Func, typename Future, typename Continuation>
     typename std::enable_if<
         !traits::detail::is_unique_future<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         typedef std::is_void<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         > is_void;
 
         hpx::util::annotate_function annotate(func);
@@ -118,13 +118,13 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Func, typename Future, typename Continuation>
     typename std::enable_if<
         traits::detail::is_unique_future<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         try {
             typedef
-                typename util::result_of<Func(Future)>::type
+                typename util::invoke_result<Func, Future>::type
                 inner_future;
             typedef
                 typename traits::detail::shared_state_ptr_for<inner_future>::type
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
 
             typedef std::is_void<
-                    typename util::result_of<F(Future)>::type
+                    typename util::invoke_result<F, Future>::type
                 > is_void;
             invoke_continuation(f_, future, *this, is_void());
 

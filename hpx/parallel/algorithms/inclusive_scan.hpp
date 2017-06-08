@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1
             T const& init, Op && op, std::false_type) {
 
             typedef std::integral_constant<bool,
-                    parallel::execution::is_sequential_execution_policy<
+                    parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value ||
@@ -276,9 +276,9 @@ namespace hpx { namespace parallel { inline namespace v1
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        hpx::traits::is_callable<
-                Op(typename std::iterator_traits<InIter>::value_type,
-                    typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Op,
+                typename std::iterator_traits<InIter>::value_type,
+                typename std::iterator_traits<InIter>::value_type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
@@ -308,9 +308,9 @@ namespace hpx { namespace parallel { inline namespace v1
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        hpx::traits::is_callable<
-                Op(typename std::iterator_traits<InIter>::value_type,
-                    typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Op,
+                typename std::iterator_traits<InIter>::value_type,
+                typename std::iterator_traits<InIter>::value_type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
@@ -397,9 +397,9 @@ namespace hpx { namespace parallel { inline namespace v1
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-       !hpx::traits::is_callable<
-                T(typename std::iterator_traits<InIter>::value_type,
-                    typename std::iterator_traits<InIter>::value_type)
+       !hpx::traits::is_invocable<T,
+                typename std::iterator_traits<InIter>::value_type,
+                typename std::iterator_traits<InIter>::value_type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
@@ -500,9 +500,9 @@ namespace hpx { namespace parallel { inline namespace v1
         is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        hpx::traits::is_callable<
-                Op(typename std::iterator_traits<InIter>::value_type,
-                    typename std::iterator_traits<InIter>::value_type)
+        hpx::traits::is_invocable<Op,
+                typename std::iterator_traits<InIter>::value_type,
+                typename std::iterator_traits<InIter>::value_type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,

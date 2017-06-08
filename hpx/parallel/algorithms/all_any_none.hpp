@@ -169,7 +169,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -464,7 +464,7 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 

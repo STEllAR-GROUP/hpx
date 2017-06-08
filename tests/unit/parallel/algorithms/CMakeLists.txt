@@ -61,6 +61,8 @@ set(tests
     for_loop_strided
     generate
     generaten
+    is_heap
+    is_heap_until
     includes
     inclusive_scan
     is_partitioned
@@ -108,10 +110,14 @@ set(tests
     transform_reduce_binary_bad_alloc
     uninitialized_copy
     uninitialized_copyn
+    uninitialized_default_construct
+    uninitialized_default_constructn
     uninitialized_fill
     uninitialized_filln
     uninitialized_move
     uninitialized_moven
+    uninitialized_value_construct
+    uninitialized_value_constructn
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)

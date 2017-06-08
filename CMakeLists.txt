@@ -114,9 +114,13 @@ endif()
 
 # Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
+  set(_with_vcpkg_default OFF)
+  if(VCPKG_TOOLCHAIN)
+    set(_with_vcpkg_default ON)
+  endif()
   hpx_option(HPX_WITH_VCPKG BOOL
     "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    OFF ADVANCED)
+    ${_with_vcpkg_default} ADVANCED)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
@@ -380,9 +384,8 @@ hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
   OFF
   ADVANCED)
-
 if(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-  add_definitions(-DHPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
+  hpx_add_config_define(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
 endif()
 
 ## Thread Manager related build options
@@ -543,7 +546,6 @@ hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
-
 
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
@@ -845,6 +847,14 @@ hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
     OFF ADVANCED)
 if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+endif()
+
+# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
+    "Enable old style queue components in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_QUEUE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
 endif()
 
 # BADBAD: This enables an overload of swap which is necessary to work around the

@@ -1209,23 +1209,23 @@ namespace hpx { namespace parallel { namespace execution
     {
         /// \cond NOINTERNAL
         template <>
-        struct is_sequential_execution_policy<dataseq_policy>
+        struct is_sequenced_execution_policy<dataseq_policy>
           : std::true_type
         {};
 
         template <>
-        struct is_sequential_execution_policy<dataseq_task_policy>
+        struct is_sequenced_execution_policy<dataseq_task_policy>
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_sequential_execution_policy<
+        struct is_sequenced_execution_policy<
                 dataseq_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_sequential_execution_policy<
+        struct is_sequenced_execution_policy<
                 dataseq_task_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
