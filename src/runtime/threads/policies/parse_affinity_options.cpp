@@ -984,7 +984,7 @@ namespace hpx { namespace threads
 
             resource::init_pool_data* init_pool_data_ = rpart.get_pool(num_pool);
             std::size_t num_threads_in_pool = init_pool_data_->get_num_threads();
-            mask_type pus = init_pool_data_->get_mask();
+            mask_type pus = init_pool_data_->get_mask(); //! FIXME behavior is a little arbitrary now.
 
             for (std::size_t num_thread = 0; num_thread < num_threads_in_pool; num_thread++){
 

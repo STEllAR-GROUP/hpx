@@ -245,6 +245,30 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topology.get_machine_affinity_mask();
     }
 
+    mask_cref_type affinity_data::get_used_pus_mask() const
+    {
+        mask_cref_type ret(0);
+
+        for(auto pu_mask : affinity_masks_)
+            ret |= pu_mask;
+
+        return ret;
+    }
+
+    std::size_t affinity_data::get_thread_occupancy(std::size_t pid) const
+    {
+        std::size_t count = 0;
+        mask_type pu_mask = 0;
+        threads::set(pu_mask, pid);
+
+        for(auto affinity_mask : affinity_masks_){
+            if(pu_mask & affinity_mask)
+                count ++;
+        }
+
+        return count;
+    }
+
     // means of adding a processing unit after initialization
     void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
     {

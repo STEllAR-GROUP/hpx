@@ -96,24 +96,23 @@ namespace resource
 
     ////////////////////////////////////////////////////////////////////////
 
+    std::size_t init_pool_data::num_threads_overall = 0;
+
     init_pool_data::init_pool_data(const std::string &name, scheduling_policy sched)
         : pool_name_(name),
           scheduling_policy_(sched),
-          assigned_pus_(0),
           num_threads_(0)
     {
         if (name.empty())
             throw std::invalid_argument(
                 "cannot instantiate a thread_pool with empty string as a name.");
         // @TODO, remove unnecessary checks
-        threads::resize(assigned_pus_, hpx::threads::hardware_concurrency());
     }
 
     init_pool_data::init_pool_data(const std::string &name,
         scheduler_function create_func)
         : pool_name_(name)
         , scheduling_policy_(user_defined)
-        , assigned_pus_(0)
         , num_threads_(0)
         , create_function_(create_func)
     {
@@ -123,12 +122,23 @@ namespace resource
     }
 
     // mechanism for adding resources
-    void init_pool_data::add_resource(std::size_t pu_index){
+    // num threads = number of threads desired on a PU. defaults to 1.
+    // note: if num_threads > 1 => oversubscription
+    void init_pool_data::add_resource(std::size_t pu_index, std::size_t num_threads){
+
         if (pu_index >= hpx::threads::hardware_concurrency()) {
-            throw std::invalid_argument("Processing unit index out of bounds."); //! FIXME give actual number of PUs
+            throw std::invalid_argument("Processing unit index out of bounds.");
+            //! FIXME give actual number of PUs
         }
 
-        threads::set(assigned_pus_, pu_index);
+        // Increment thread_num count (for pool-count and global count)
+        num_threads_ += num_threads;
+        num_threads_overall += num_threads;
+
+        // Add pu mask to internal data structure
+        threads::mask_type pu_mask = 0;
+        threads::set(pu_mask, pu_index);
+        assigned_pus_.push_back(pu_mask);
     }
 
     void init_pool_data::print_pool() const {
@@ -149,7 +159,8 @@ namespace resource
         }
         std::cout << "\"" << sched << "\"\n"
                   << "is running on PUs : ";
-        std::cout << bitset_type(assigned_pus_) << "\n";
+        for(size_t i(0); i<assigned_pus_.size(); i++)
+            std::cout << bitset_type(assigned_pus_[i]) << "\n";
     }
 
 
@@ -157,8 +168,7 @@ namespace resource
 
     resource_partitioner::resource_partitioner()
             : thread_manager_(nullptr),
-              topology_(threads::create_topology()),
-              set_affinity_from_resource_partitioner_(false)
+              topology_(threads::create_topology())
     {
         // Create the default pool
         initial_thread_pools_.push_back(init_pool_data("default"));
@@ -166,8 +176,6 @@ namespace resource
         // allow only one resource_partitioner instance
         if(instance_number_counter_++ >= 0)
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
-
-        fill_topology_vectors();
     }
 
     void resource_partitioner::set_hpx_init_options(
@@ -189,32 +197,71 @@ namespace resource
         return cfg_.call(desc_cmdline, argc, argv);
     }
 
+    bool resource_partitioner::pu_exposed(std::size_t pid)
+    {
+        threads::mask_type pu_mask(0);
+        threads::set(pu_mask, pid);
+        threads::mask_type comp = affinity_data_.get_used_pus_mask();
+        return (comp & pu_mask);
+    }
+
     void resource_partitioner::fill_topology_vectors()
     {
         std::size_t pid = 0;
         std::size_t N = topology_.get_number_of_numa_nodes();
         if (N==0) N= topology_.get_number_of_sockets();
         numa_domains_.reserve(N);
-        //
+
+        // loop on the numa-domains
         for (std::size_t i=0; i<N; ++i) {
-            numa_domains_.push_back(numa_domain());
-            numa_domain &nd = numa_domains_.back();
-            nd.id_          = i;
+            numa_domains_.push_back(numa_domain()); // add a numa domain
+            numa_domain &nd = numa_domains_.back(); // get a handle to the numa-domain just added
+            nd.id_          = i;                    // set its index
             nd.cores_.reserve(topology_.get_number_of_numa_node_cores(i));
+
+            bool numa_domain_contains_exposed_cores = false;
+
+            // loop on the cores
             for (std::size_t j=0; j<topology_.get_number_of_numa_node_cores(i); ++j) {
                 nd.cores_.push_back(core());
                 core &c   = nd.cores_.back();
                 c.id_     = j;
                 c.domain_ = &nd;
                 c.pus_.reserve(topology_.get_number_of_core_pus(j));
+
+                bool core_contains_exposed_pus = false;
+
+                // loop on the processing units
                 for (std::size_t k=0; k<topology_.get_number_of_core_pus(j); ++k) {
-                    c.pus_.push_back(pu());
-                    pu &p   = c.pus_.back();
-                    p.id_   = pid;
-                    p.core_ = &c;
+                    if(pu_exposed(pid)){
+                        c.pus_.push_back(pu());
+                        pu &p   = c.pus_.back();
+
+                        p.id_   = pid;
+                        p.core_ = &c;
+
+                        p.thread_occupancy_ = affinity_data_.get_thread_occupancy(pid);
+                        if(p.thread_occupancy_ == 0)
+                            throw std::runtime_error("PU #" + std::to_string(pid) + " has thread occupancy 0");
+                        p.thread_occupancy_count = p.thread_occupancy_;
+                        core_contains_exposed_pus = true;
+                    }
+
                     pid++;
+
                 }
+
+                if(core_contains_exposed_pus){
+                    numa_domain_contains_exposed_cores = true;
+                } else {
+                    nd.cores_.pop_back();
+                }
+
             }
+
+            if(!numa_domain_contains_exposed_cores)
+                nd.cores_.pop_back();
+
         }
     }
 
@@ -224,91 +271,30 @@ namespace resource
     // -2 checks whether there are oversubscribed PUs
     // -3 sets data member thread_num for each pool
     // -4 sets up the default pool
+    //! FIXME update these comments
     void resource_partitioner::setup_pools() {
 
         // check whether any of the pools defined up to now are empty
         // note: does not check "default", this one is allowed not to be given resources by the user
-        if(check_empty_pools())
+        if(check_empty_pools()) {
             throw std::invalid_argument("Pools empty of resources are not allowed. Please re-run this program with allow-empty-pool-policy (not implemented yet)");
+        }
         //! FIXME add allow-empty-pools policy. Wait, does this even make sense??
 
-        // check whether any of the PUs are oversubscribed
-        if(check_oversubscription())
-            throw std::invalid_argument("Oversubscription of hardware processing units is not allowed. If you want to oversubscribe, please use the policy allow-oversubscription (not implemented yet)");
-        //! FIXME add allow-oversubscription policy
-
-        // assign the desired number of threads to each pool
-        // and calculate the total number of OS-threads to be instantiated
-        // by thread_pool_impl in run()
-        std::size_t num_threads_desired_total = 0;
-        std::size_t thread_num = 0;
-        for(auto& itp : initial_thread_pools_){
-            thread_num = threads::count(itp.assigned_pus_);
-            num_threads_desired_total += thread_num;
-            itp.num_threads_ = thread_num;
+        // Assign all free resources to the default pool
+        for (hpx::resource::numa_domain &d : numa_domains_) {
+            for (hpx::resource::core &c : d.cores_) {
+                for (hpx::resource::pu &p : c.pus_) {
+                    std::size_t threads_to_add = p.thread_occupancy_ - p.thread_occupancy_count;
+                    if (threads_to_add > 0) {
+                        add_resource(p, "default", threads_to_add);
+                    }
+                }
+            }
         }
-
-        // make sure the sum of the number of desired threads is strictly smaller
-        // than the total number of OS-threads that will be created (specified by --hpx:threads)
-        if(num_threads_desired_total > affinity_data_.get_num_threads()){
-            throw std::invalid_argument("The desired number of threads is greater than the number of threads provided in the command line. \n");
-            //! FIXME give indication: --hpx:threads N >= (num_threads_desired_total+1)
-        }
-
-        // If the default pool already has resources assigned to it (by the user),
-        // set its number of threads (all that's left over from the number specified in
-        // command line.
-        //! FIXME is this right, or should we add all free resources to the default pool,
-        //! FIXME even though the user has not assigned these to the default pool himself?
-        if(threads::any(get_default_pool()->assigned_pus_)) {
-            return;
-        }
-
-        // Get a mask of all used PUs by doing a bitwise or on all the masks
-        std::size_t num_pus = topology_.get_number_of_pus(); //! FIXME unused variable?
-        threads::mask_type cummulated_pu_usage = threads::mask_type(0);
-        for(auto itp : initial_thread_pools_) {
-            cummulated_pu_usage = cummulated_pu_usage | itp.assigned_pus_;
-        }
-
-        // If the user did not assign any resources to the default pool
-        //! FIXME should I do this even if the user did assign some resources, but there still are some left?
-        // take all resources that have not been assigned to any thread pool yet
-        // and give them to the default pool
-        threads::mask_type default_mask = threads::not_(cummulated_pu_usage);
-        //! cut off the bits that are above hardware concurrency ...
-        default_mask &= threads::mask_type((1<<topology_.get_number_of_pus()) - 1);
 
         // make sure the mask for the default pool has resources in it
         //! FIXME add allow-empty-default-pool policy
-        if(!threads::any(default_mask))
-            throw std::invalid_argument("No processing units left over for the default pool. If you want to allow an empty pool, use allow-empty-default-pool policy");
-
-        // set default mask
-        get_default_pool()->assigned_pus_ = default_mask;
-
-        // compute number of threads for default and set it
-        std::size_t num_available_threads_for_default = threads::count(default_mask); //! #PUs that the default pool can use
-        std::size_t num_threads_default_pool = affinity_data_.get_num_threads() - num_threads_desired_total; //! hpx:threads - (threads used for other pools)
-
-        if(num_threads_default_pool > num_available_threads_for_default){
-            //! throw oversubscription exception except if policy blahblah
-        } else if (num_threads_default_pool == num_available_threads_for_default){
-            //! it's all fine :) just set that number :)
-        } else { //! num_threads_default_pool < num_available_threads_for_default
-            //! reduce the mask to the first available resources #bits
-            std::size_t excess_pus = num_available_threads_for_default - num_threads_default_pool;
-            while(excess_pus > 0){
-                threads::unset(default_mask, threads::find_first(default_mask));
-                excess_pus--;
-            }
-            // re-set default mask since it has been modified
-            get_default_pool()->assigned_pus_ = default_mask;
-            //! FIXME reduce in a smart way: eg try to take PUs that are close together or something like that
-            //! current implementation = just unset the number of bits required in order of appearance in the mask...
-        }
-
-        get_default_pool()->num_threads_ = num_threads_default_pool;
 
     }
 
@@ -366,34 +352,16 @@ namespace resource
         }
     }
 
-    // Returns true if any processing unit has been assigned to two different thread-pools
-    // called in set_default_pool()
-    bool resource_partitioner::check_oversubscription() const
-    {
-        threads::mask_type pus_in_common((1<<(topology_.get_number_of_pus()))-1);
-        //! FIXME unused variable?
-
-        for(auto& itp : initial_thread_pools_){
-            for(auto& itp_comp : initial_thread_pools_){
-                if(itp.pool_name_ != itp_comp.pool_name_){
-                    if(threads::any(itp.assigned_pus_ & itp_comp.assigned_pus_)){
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     // Returns true if any of the pools defined by the user is empty of resources
     // called in set_default_pool()
     bool resource_partitioner::check_empty_pools() const
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++){
-            if(!threads::any(initial_thread_pools_[i].assigned_pus_)){
-                return true;
+            for(auto assigned_pus : initial_thread_pools_[i].assigned_pus_){
+                if(!threads::any(assigned_pus)) {
+                    return true;
+                }
             }
         }
 
@@ -450,56 +418,70 @@ namespace resource
     // ----------------------------------------------------------------------
     // Add processing units to pools via pu/core/domain api
     // ----------------------------------------------------------------------
-    void resource_partitioner::add_resource(const pu &p,
-        const std::string &pool_name)
+    void resource_partitioner::add_resource(pu &p,
+        const std::string &pool_name, std::size_t num_threads)
     {
-        get_pool(pool_name)->add_resource(p.id_);
-        set_affinity_from_resource_partitioner_ = true;
+        //! FIXME except if policy allow_extra_thread_creation is activated
+        //! then I don't have to check the occupancy count ...
+        // check occupancy counter and decrement it
+        if (p.thread_occupancy_count > 0){
+            p.thread_occupancy_count--;
+            get_pool(pool_name)->add_resource(p.id_, num_threads);
+
+            // Make sure the total number of requested threads does not exceed the number of threads
+            // requested on the command line
+            //! FIXME except if policy allow_extra_thread_creation is activated
+            if(init_pool_data::num_threads_overall >= cfg_.num_threads_){
+                //! FIXME add allow_empty_default_pool policy
+/*                if(rp-policy == allow_empty_default_pool
+                    && init_pool_data::num_threads_overall == cfg_.num_threads_){
+                    // then it's all fine
+                } else {*/
+                    throw std::runtime_error("Creation of " +
+                        std::to_string(init_pool_data::num_threads_overall) + " threads requested by " +
+                        "the resource partitioner, but only " + std::to_string(cfg_.num_threads_) +
+                        " provided in the command-line.");
+//                }
+            }
+        } else {
+            throw std::runtime_error("PU #" + std::to_string(p.id_) + " can be assigned only " +
+            std::to_string(p.thread_occupancy_) + " threads according to affinity bindings.");
+        }
     }
 
-    void resource_partitioner::add_resource(const std::vector<pu> &pv,
+    void resource_partitioner::add_resource(std::vector<pu> &pv,
         const std::string &pool_name)
     {
-        for (const pu &p : pv) {
+        for (pu &p : pv) {
             add_resource(p, pool_name);
         }
-        set_affinity_from_resource_partitioner_ = true;
     }
 
-    void resource_partitioner::add_resource(const core &c,
+    void resource_partitioner::add_resource(core &c,
         const std::string &pool_name)
     {
         add_resource(c.pus_, pool_name);
-        set_affinity_from_resource_partitioner_ = true;
     }
 
-    void resource_partitioner::add_resource(const std::vector<core> &cv,
+    void resource_partitioner::add_resource(std::vector<core> &cv,
         const std::string &pool_name)
     {
-        for (const core &c : cv) {
+        for (core &c : cv) {
             add_resource(c.pus_, pool_name);
         }
-        set_affinity_from_resource_partitioner_ = true;
     }
 
-    void resource_partitioner::add_resource(const numa_domain &nd,
+    void resource_partitioner::add_resource(numa_domain &nd,
         const std::string &pool_name)
     {
         add_resource(nd.cores_, pool_name);
-        set_affinity_from_resource_partitioner_ = true;
     }
 
-    void resource_partitioner::add_resource(const std::vector<numa_domain> &ndv, const std::string &pool_name)
+    void resource_partitioner::add_resource(std::vector<numa_domain> &ndv, const std::string &pool_name)
     {
-        for (const numa_domain &d : ndv) {
+        for (numa_domain &d : ndv) {
             add_resource(d, pool_name);
         }
-        set_affinity_from_resource_partitioner_ = true;
-    }
-
-    void resource_partitioner::add_resource_to_default(pu resource){
-        add_resource(resource, "default");
-        set_affinity_from_resource_partitioner_ = true;
     }
 
     // ----------------------------------------------------------------------
@@ -582,6 +564,9 @@ namespace resource
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
         //! FIXME what is this?? Change name ...
+
+        // set data describing internal topology backend
+        fill_topology_vectors();
     }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {

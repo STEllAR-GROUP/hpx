@@ -59,6 +59,14 @@ namespace resource
         core           *core_;
         std::vector<pu> pus_sharing_core();
         std::vector<pu> pus_sharing_numa_domain();
+                        //! FIXME do i need this or is the counter below enough?
+        std::size_t     thread_occupancy_;
+                        // indicates the number of threads that should run on this PU
+                        //  0: this PU is not exposed by the affinity bindings
+                        //  1: normal occupancy
+                        // >1: oversubscription
+        std::size_t     thread_occupancy_count;
+                        // counts number of threads bound to this PU
     };
 
     struct core {
@@ -100,29 +108,31 @@ namespace resource
     class init_pool_data {
     public:
 
+        //! FIXME shouldn't the constructors be private, actually?
         init_pool_data(const std::string &name,
             scheduling_policy = scheduling_policy::unspecified);
 
         init_pool_data(const std::string &name,
             scheduler_function create_func);
 
-        // get
-        //! FIXME removeif these aren't used by parse_affinity_options_from_resource_partitioner anymore
+        //! FIXME remove if these aren't used by parse_affinity_options_from_resource_partitioner anymore
         std::size_t get_num_threads(){return num_threads_;}
-        threads::mask_type get_mask(){return assigned_pus_;}
+        threads::mask_type get_mask(){return assigned_pus_[0];}
 
         // mechanism for adding resources (zero-based index)
-        void add_resource(std::size_t pu_index);
+        void add_resource(std::size_t pu_index, std::size_t num_threads);
 
         void print_pool() const;
 
         friend class resource_partitioner;
 
+        static std::size_t  num_threads_overall;        // counter ... overall, in all the thread pools
+
     private:
         std::string         pool_name_;
         scheduling_policy   scheduling_policy_;
-        threads::mask_type  assigned_pus_; // PUs this pool is allowed to run on
-        std::size_t         num_threads_;
+        std::vector<threads::mask_type>  assigned_pus_; // PUs this pool is allowed to run on
+        std::size_t         num_threads_;               // counter for number of threads bound to this pool
         scheduler_function  create_function_;
     };
 
@@ -144,6 +154,8 @@ namespace resource
                 boost::program_options::options_description const& desc_cmdline,
                 int argc, char** argv);
 
+        bool pu_exposed(std::size_t pid);
+
         void print_init_pool_data() const;
 
         // create a thread_pool
@@ -156,21 +168,18 @@ namespace resource
 
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
-        void add_resource(const hpx::resource::pu &p,
+        void add_resource(hpx::resource::pu &p,
+            const std::string &pool_name, std::size_t num_threads = 1);
+        void add_resource(std::vector<hpx::resource::pu> &pv,
             const std::string &pool_name);
-        void add_resource(const std::vector<hpx::resource::pu> &pv,
+        void add_resource(hpx::resource::core &c,
             const std::string &pool_name);
-        void add_resource(const hpx::resource::core &c,
+        void add_resource(std::vector<hpx::resource::core> &cv,
             const std::string &pool_name);
-        void add_resource(const std::vector<hpx::resource::core> &cv,
+        void add_resource(hpx::resource::numa_domain &nd,
             const std::string &pool_name);
-        void add_resource(const hpx::resource::numa_domain &nd,
+        void add_resource(std::vector<hpx::resource::numa_domain> &ndv,
             const std::string &pool_name);
-        void add_resource(const std::vector<hpx::resource::numa_domain> &ndv,
-            const std::string &pool_name);
-
-        // not sure we need this
-        void add_resource_to_default(hpx::resource::pu resource);
 
         // stuff that has to be done during hpx_init ...
         void set_scheduler(scheduling_policy sched, const std::string &pool_name);
@@ -225,7 +234,6 @@ namespace resource
         void set_init_affinity_data();
         void setup_pools();
         void setup_schedulers();
-        bool check_oversubscription() const;
         bool check_empty_pools() const;
 
 
@@ -257,8 +265,7 @@ namespace resource
         threads::hwloc_topology_info& topology_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
 
-        // flag set by add_resource
-        bool set_affinity_from_resource_partitioner_;
+        // contains the internal topology backend used to add resources to initial_thread_pools
         std::vector<numa_domain> numa_domains_;
 
     };
