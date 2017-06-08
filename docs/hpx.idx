@@ -324,6 +324,10 @@ parallel::uninitialized_copy          "uninitialized_copy" "hpx\.parallel\.v1\.u
 parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
 
 # hpx/parallel/algorithms/uninitialized_fill.hpp
+parallel::uninitialized_default_construct   "uninitialized_default_construct" "hpx\.parallel\.v1\.uninitialized_def_id.*"
+parallel::uninitialized_default_construct_n "uninitialized_default_construct_n" "hpx\.parallel\.v1\.uninitialized_def_id.*"
+
+# hpx/parallel/algorithms/uninitialized_fill.hpp
 parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
 parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
 

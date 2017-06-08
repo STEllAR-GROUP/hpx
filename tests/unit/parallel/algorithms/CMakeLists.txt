@@ -114,6 +114,8 @@ set(tests
     uninitialized_copy
     uninitialized_copy_executors_v1
     uninitialized_copyn
+    uninitialized_default_construct
+    uninitialized_default_constructn
     uninitialized_fill
     uninitialized_filln
    )
