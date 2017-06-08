@@ -312,7 +312,7 @@ namespace hpx { namespace serialization
             do {
                 bool flushed = access_traits::flush(
                     filter_, this->cont_, this->current_,
-                    this->cont_.size()-this->current_, written);
+                    access_traits::size(this->cont_)-this->current_, written);
 
                 this->current_ += written;
                 if (flushed)
