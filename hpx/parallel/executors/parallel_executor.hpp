@@ -59,19 +59,19 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(parallel_executor const& rhs) const noexcept
         {
             return l_ == rhs.l_ &&
                 num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 
-        bool operator!=(parallel_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(parallel_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        parallel_executor const& context() const HPX_NOEXCEPT
+        parallel_executor const& context() const noexcept
         {
             return *this;
         }
@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { namespace execution
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F&&(Ts&&...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts) const
         {
@@ -224,10 +224,9 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     /// \cond NOINTERNAL
 

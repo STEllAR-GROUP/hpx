@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -21,7 +20,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Specialization for executor_traits for types which conform to

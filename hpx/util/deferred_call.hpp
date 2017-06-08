@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:is_callable
+// hpxinspect:nodeprecatedname:util::result_of
+
 #ifndef HPX_UTIL_DEFERRED_CALL_HPP
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
@@ -32,6 +35,15 @@ namespace hpx { namespace traits { namespace detail
                 typename util::decay_unwrap<Ts>::type...)
         >
     {};
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_invocable
+      : is_invocable<
+            typename util::decay_unwrap<F>::type,
+            typename util::decay_unwrap<Ts>::type...
+        >
+    {};
+
 }}}
 
 namespace hpx { namespace util
@@ -50,6 +62,14 @@ namespace hpx { namespace util
             >
         {};
 
+        template <typename F, typename ...Ts>
+        struct invoke_deferred_result
+          : util::invoke_result<
+                typename util::decay_unwrap<F>::type,
+                typename util::decay_unwrap<Ts>::type...
+            >
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         class deferred;
@@ -65,8 +85,7 @@ namespace hpx { namespace util
               , _args(std::forward<Ts>(vs)...)
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
             HPX_HOST_DEVICE deferred(deferred&& other)
@@ -75,11 +94,10 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(deferred);
-            HPX_DELETE_MOVE_ASSIGN(deferred);
+            deferred& operator=(deferred const&) = delete;
 
             HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename deferred_result_of<F(Ts...)>::type
+            typename invoke_deferred_result<F, Ts...>::type
             operator()()
             {
                 return util::invoke_fused(std::move(_f), std::move(_args));
@@ -149,7 +167,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::deferred<Sig> >
     {
         static std::size_t
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -161,7 +179,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::deferred<Sig> >
     {
         static char const*
-            call(util::detail::deferred<Sig> const& f) HPX_NOEXCEPT
+            call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
         }

@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -22,7 +21,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     /// \cond NOINTERNAL
 

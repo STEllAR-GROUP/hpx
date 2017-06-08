@@ -14,6 +14,7 @@
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
@@ -30,7 +31,7 @@ namespace hpx { namespace parallel { namespace util
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
        !execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        typename std::result_of<F&&(Iters...)>::type
+        typename hpx::util::invoke_result<F, Iters...>::type
     >::type
     loop_step(VecOnly, F && f, Iters& ... its)
     {

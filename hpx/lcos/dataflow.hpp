@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename F, typename Args>
     struct dataflow_return<F, Args,
         typename std::enable_if<!traits::is_action<F>::value>::type
-    > : util::detail::fused_result_of<F(Args &&)>
+    > : util::detail::invoke_fused_result<F, Args>
     {};
 
     template <typename Action, typename Args>

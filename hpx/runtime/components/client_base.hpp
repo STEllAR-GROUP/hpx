@@ -243,25 +243,25 @@ namespace hpx { namespace components
             shared_state_->set_value(std::move(id));
         }
 
-        explicit client_base(shared_future<id_type> const& f) HPX_NOEXCEPT
+        explicit client_base(shared_future<id_type> const& f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::
                     get_shared_state(f))
         {}
-        explicit client_base(shared_future<id_type> && f) HPX_NOEXCEPT
+        explicit client_base(shared_future<id_type> && f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::
                     get_shared_state(std::move(f)))
         {}
-        explicit client_base(future<id_type> && f) HPX_NOEXCEPT
+        explicit client_base(future<id_type> && f) noexcept
           : shared_state_(hpx::traits::future_access<future_type>::
                     get_shared_state(std::move(f)))
         {}
 
-        client_base(client_base const& rhs) HPX_NOEXCEPT
+        client_base(client_base const& rhs) noexcept
           : shared_state_(rhs.shared_state_)
         {}
-        client_base(client_base && rhs) HPX_NOEXCEPT
+        client_base(client_base && rhs) noexcept
           : registered_name_(std::move(rhs.registered_name_)),
             shared_state_(std::move(rhs.shared_state_))
         {
@@ -334,13 +334,13 @@ namespace hpx { namespace components
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return shared_state_ != nullptr;
         }
 
         // check whether the embedded shared state is valid
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return valid();
         }
@@ -434,21 +434,21 @@ namespace hpx { namespace components
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
-        bool is_ready() const HPX_NOEXCEPT
+        bool is_ready() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
-        bool has_value() const HPX_NOEXCEPT
+        bool has_value() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
-        bool has_exception() const HPX_NOEXCEPT
+        bool has_exception() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_exception();
         }
@@ -510,7 +510,7 @@ namespace hpx { namespace components
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type

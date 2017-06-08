@@ -54,14 +54,14 @@ namespace hpx { namespace threads
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
     >::type
     async_execute_at(Executor && exec,
         hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
     {
-        typedef typename hpx::util::detail::deferred_result_of<
-                F(Ts...)
+        typedef typename hpx::util::detail::invoke_deferred_result<
+                F, Ts...
             >::type result_type;
 
         lcos::local::packaged_task<
@@ -82,14 +82,14 @@ namespace hpx { namespace threads
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
     >::type
     async_execute_after(Executor && exec,
         hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
     {
-        typedef typename hpx::util::detail::deferred_result_of<
-                F(Ts...)
+        typedef typename hpx::util::detail::invoke_deferred_result<
+                F, Ts...
             >::type result_type;
 
         lcos::local::packaged_task<result_type(Ts...)>
@@ -109,7 +109,7 @@ namespace hpx { namespace threads
     template <typename Executor, typename F, typename ... Ts>
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >::type
     sync_execute_at(Executor && exec,
         hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
@@ -121,7 +121,7 @@ namespace hpx { namespace threads
     template <typename Executor, typename F, typename ... Ts>
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >::type
     sync_execute_after(Executor && exec,
         hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)

@@ -295,9 +295,6 @@ namespace hpx { namespace lcos { namespace local
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
-    private:
-        HPX_MOVABLE_ONLY(futures_factory);
-
     public:
         // construction and destruction
         futures_factory()
@@ -402,7 +399,7 @@ namespace hpx { namespace lcos { namespace local
             return future_access<future<Result> >::create(std::move(task_));
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !!task_;
         }

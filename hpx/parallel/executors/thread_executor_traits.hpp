@@ -15,7 +15,6 @@
 #include <hpx/async.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -29,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Specialization for executor_traits for types which conform to
@@ -95,7 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         template <typename Executor_, typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(Executor_ && sched, F && f, Ts &&... ts)
         {
@@ -119,7 +118,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f(ts...)'s result through a future
         ///
         template <typename Executor_, typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute(Executor_ && sched, F && f, Ts &&... ts)
         {
             return hpx::async(std::forward<Executor_>(sched),

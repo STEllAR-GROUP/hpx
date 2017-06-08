@@ -428,7 +428,7 @@ namespace hpx { namespace util
     {
     public:
         // constructors
-        basic_any() HPX_NOEXCEPT
+        basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
             object(nullptr)
@@ -459,7 +459,7 @@ namespace hpx { namespace util
         }
 
         // Move constructor
-        basic_any(basic_any&& x) HPX_NOEXCEPT
+        basic_any(basic_any&& x) noexcept
           : table(x.table),
             object(x.object)
         {
@@ -522,7 +522,7 @@ namespace hpx { namespace util
         }
 
         // move assignement
-        basic_any& operator=(basic_any&& rhs) HPX_NOEXCEPT
+        basic_any& operator=(basic_any&& rhs) noexcept
         {
             rhs.swap(*this);
             basic_any().swap(rhs);
@@ -580,7 +580,7 @@ namespace hpx { namespace util
         }
 
         // utility functions
-        basic_any& swap(basic_any& x) HPX_NOEXCEPT
+        basic_any& swap(basic_any& x) noexcept
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -610,7 +610,7 @@ namespace hpx { namespace util
         operator T const& () const { return cast<T>(); }
 #endif // implicit casting
 
-        bool empty() const HPX_NOEXCEPT
+        bool empty() const noexcept
         {
             return table == detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>();
@@ -681,7 +681,7 @@ namespace hpx { namespace util
 
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) HPX_NOEXCEPT;
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) noexcept;
 
         // fields
         detail::any::fxn_ptr_table<IArchive, OArchive, Char>* table;
@@ -711,7 +711,7 @@ namespace hpx { namespace util
     {
     public:
         // constructors
-        basic_any() HPX_NOEXCEPT
+        basic_any() noexcept
           : table(detail::any::get_table<
                 detail::any::empty>::template get<void, void, Char>()),
             object(nullptr)
@@ -742,7 +742,7 @@ namespace hpx { namespace util
         }
 
         // Move constructor
-        basic_any(basic_any&& x) HPX_NOEXCEPT
+        basic_any(basic_any&& x) noexcept
           : table(x.table),
             object(x.object)
         {
@@ -861,7 +861,7 @@ namespace hpx { namespace util
         }
 
         // utility functions
-        basic_any& swap(basic_any& x) HPX_NOEXCEPT
+        basic_any& swap(basic_any& x) noexcept
         {
             std::swap(table, x.table);
             std::swap(object, x.object);
@@ -891,7 +891,7 @@ namespace hpx { namespace util
         operator T const& () const { return cast<T>(); }
 #endif // implicit casting
 
-        bool empty() const HPX_NOEXCEPT
+        bool empty() const noexcept
         {
             return table ==
                 detail::any::get_table<detail::any::empty>::
@@ -925,7 +925,7 @@ namespace hpx { namespace util
 
     private: // types
         template <typename T, typename IArchive_, typename OArchive_, typename Char_>
-        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) HPX_NOEXCEPT;
+        friend T* any_cast(basic_any<IArchive_, OArchive_, Char_> *) noexcept;
 
         // fields
         detail::any::fxn_ptr_table<void, void, Char>* table;
@@ -935,14 +935,14 @@ namespace hpx { namespace util
 
     template <typename IArchive, typename OArchive, typename Char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
-        basic_any<IArchive, OArchive, Char>& rhs) HPX_NOEXCEPT
+        basic_any<IArchive, OArchive, Char>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
 
     // boost::any-like casting
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    inline T* any_cast (basic_any<IArchive, OArchive, Char>* operand) HPX_NOEXCEPT
+    inline T* any_cast (basic_any<IArchive, OArchive, Char>* operand) noexcept
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
             return hpx::util::detail::any::get_table<T>::is_small::value ?
@@ -954,7 +954,7 @@ namespace hpx { namespace util
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
     inline T const* any_cast(basic_any<IArchive, OArchive,
-        Char> const* operand) HPX_NOEXCEPT
+        Char> const* operand) noexcept
     {
         return any_cast<T>(const_cast<basic_any<IArchive, OArchive, Char>*>(operand));
     }

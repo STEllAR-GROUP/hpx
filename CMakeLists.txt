@@ -114,9 +114,13 @@ endif()
 
 # Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
+  set(_with_vcpkg_default OFF)
+  if(VCPKG_TOOLCHAIN)
+    set(_with_vcpkg_default ON)
+  endif()
   hpx_option(HPX_WITH_VCPKG BOOL
     "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    OFF ADVANCED)
+    ${_with_vcpkg_default} ADVANCED)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
@@ -380,9 +384,8 @@ hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
   OFF
   ADVANCED)
-
 if(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-  add_definitions(-DHPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
+  hpx_add_config_define(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
 endif()
 
 ## Thread Manager related build options
@@ -543,6 +546,7 @@ hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
+
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 
@@ -576,13 +580,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  # The throttle scheduler is not supported neither on Windows nor on Mac
-  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLE" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
-      set(HPX_WITH_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
-    endif()
-  endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -590,6 +587,13 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  # The throttling scheduler has not been tested neither on Windows nor on Mac
+  if(NOT WIN32 AND NOT APPLE)
+    if(_scheduler STREQUAL "THROTTLLING" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
+      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
+    endif()
   endif()
   unset(_all)
 endforeach()
@@ -845,6 +849,14 @@ if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 endif()
 
+# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
+    "Enable old style queue components in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_QUEUE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
+endif()
+
 # BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -918,8 +930,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC11 OR MSVC12 OR MSVC14))
-    hpx_error("MSVC x64 2012 or higher is required.")
+  if(NOT (MSVC14))
+    hpx_error("MSVC x64 2015 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
   endif()
@@ -1156,15 +1168,13 @@ if(WIN32)
     # VS2013 and above know how to do link time constant data segment folding
     # VS2013 update 2 and above know how to remove debug information for
     #     non-referenced functions and data (-Zc:inline)
-    if(MSVC12 OR MSVC14)
-      hpx_add_target_compile_option(-Zc:inline)
-      hpx_add_target_compile_option(-Gw
-        CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-      hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
-      if(HPX_WITH_DATAPAR_VC)
-        hpx_add_target_compile_option(-std:c++latest)
-        hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
-      endif()
+    hpx_add_target_compile_option(-Zc:inline)
+    hpx_add_target_compile_option(-Gw
+      CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+    hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+    if(HPX_WITH_DATAPAR_VC)
+      hpx_add_target_compile_option(-std:c++latest)
+      hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
 
     # Exceptions

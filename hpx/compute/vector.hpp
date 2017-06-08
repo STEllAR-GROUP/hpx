@@ -203,7 +203,7 @@ namespace hpx { namespace compute
         // TODO: implement assign
 
         /// Returns the allocator associated with the container
-        allocator_type get_allocator() const HPX_NOEXCEPT
+        allocator_type get_allocator() const noexcept
         {
             return alloc_;
         }
@@ -237,20 +237,20 @@ namespace hpx { namespace compute
         /// The pointer is such that range [data(); data() + size()) is always
         /// a valid range, even if the container is empty (data() is not
         /// dereferenceable in that case).
-        pointer data() HPX_NOEXCEPT
+        pointer data() noexcept
         {
             return data_;
         }
 
         /// \copydoc data()
-        const_pointer data() const HPX_NOEXCEPT
+        const_pointer data() const noexcept
         {
             return data_;
         }
 
         /// Returns a raw pointer corresponding to the address of the data
         /// allocated on the device.
-        T* device_data() const HPX_NOEXCEPT
+        T* device_data() const noexcept
         {
 #if defined(__NVCC__) || defined(__CUDACC__)
             return data_.device_ptr();
@@ -260,18 +260,18 @@ namespace hpx { namespace compute
         }
 
         //
-        std::size_t size() const HPX_NOEXCEPT
+        std::size_t size() const noexcept
         {
             return size_;
         }
 
-        std::size_t capacity() const HPX_NOEXCEPT
+        std::size_t capacity() const noexcept
         {
             return capacity_;
         }
 
         /// Returns: size() == 0
-        bool empty() const HPX_NOEXCEPT
+        bool empty() const noexcept
         {
             return size_ == 0;
         }
@@ -307,32 +307,32 @@ namespace hpx { namespace compute
         // Iterators
         // TODO: implement cbegin, cend, rbegin, crbegin, rend, crend
         // TODO: debug support
-        iterator begin() HPX_NOEXCEPT
+        iterator begin() noexcept
         {
             return iterator(data_, 0, alloc_traits::target(alloc_));
         }
 
-        iterator end() HPX_NOEXCEPT
+        iterator end() noexcept
         {
             return iterator(data_, size_, alloc_traits::target(alloc_));
         }
 
-        const_iterator cbegin() const HPX_NOEXCEPT
+        const_iterator cbegin() const noexcept
         {
             return const_iterator(data_, 0, alloc_traits::target(alloc_));
         }
 
-        const_iterator cend() const HPX_NOEXCEPT
+        const_iterator cend() const noexcept
         {
             return const_iterator(data_, size_, alloc_traits::target(alloc_));
         }
 
-        const_iterator begin() const HPX_NOEXCEPT
+        const_iterator begin() const noexcept
         {
             return const_iterator(data_, 0, alloc_traits::target(alloc_));
         }
 
-        const_iterator end() const HPX_NOEXCEPT
+        const_iterator end() const noexcept
         {
             return const_iterator(data_, size_, alloc_traits::target(alloc_));
         }
@@ -358,7 +358,7 @@ namespace hpx { namespace compute
         ///
         /// Complexity: Linear.
         ///
-        void clear() HPX_NOEXCEPT
+        void clear() noexcept
         {
             alloc_traits::bulk_destroy(alloc_, data_, size_);
             size_ = 0;

@@ -30,8 +30,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R, typename ...Ts>
     class packaged_task<R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(packaged_task);
-
         typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
@@ -45,7 +43,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(F&& f)
@@ -58,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
@@ -81,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
-        void swap(packaged_task& rhs) HPX_NOEXCEPT
+        void swap(packaged_task& rhs) noexcept
         {
             function_.swap(rhs.function_);
             promise_.swap(rhs.promise_);
@@ -115,7 +113,7 @@ namespace hpx { namespace lcos { namespace local
             return promise_.get_future();
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !function_.empty() && promise_.valid();
         }

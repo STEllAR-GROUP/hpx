@@ -198,6 +198,7 @@ namespace hpx { namespace threads { namespace coroutines
         class ucontext_context_impl
           : public ucontext_context_impl_base
         {
+        public:
             HPX_NON_COPYABLE(ucontext_context_impl);
 
         public:

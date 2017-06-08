@@ -66,7 +66,7 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base
     {
-    private:
+    public:
         HPX_NON_COPYABLE(scheduler_base);
 
     public:

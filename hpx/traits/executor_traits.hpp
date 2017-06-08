@@ -9,13 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detected.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     struct static_chunk_size;
 }}}

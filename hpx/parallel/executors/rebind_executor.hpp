@@ -11,14 +11,13 @@
 #include <hpx/traits/is_launch_policy.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents

@@ -60,6 +60,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Mutex = local::spinlock>
         struct recursive_mutex_impl
         {
+        public:
             HPX_NON_COPYABLE(recursive_mutex_impl);
 
         private:

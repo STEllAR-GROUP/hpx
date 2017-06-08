@@ -22,7 +22,6 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/manual_profiling.hpp>
-#include <hpx/config/noexcept.hpp>
 #include <hpx/config/version.hpp>
 
 #include <boost/version.hpp>
@@ -377,11 +376,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_WINDOWS) && defined(HPX_MSVC) && HPX_MSVC < 1900
-#  define snprintf _snprintf
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no HPX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 200000
@@ -463,7 +457,7 @@
 #      if defined(__powerpc__) || defined(__INTEL_COMPILER)
 #         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #      else
-#         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#         define HPX_SMALL_STACK_SIZE  0x10000        // 64kByte
 #      endif
 #    endif
 #  endif

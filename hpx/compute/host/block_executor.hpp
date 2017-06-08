@@ -90,18 +90,18 @@ namespace hpx { namespace compute { namespace host
         }
 
         /// \cond NOINTERNAL
-        bool operator==(block_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(block_executor const& rhs) const noexcept
         {
             return std::equal(targets_.begin(), targets_.end(),
                 rhs.targets_.begin());
         }
 
-        bool operator!=(block_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(block_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        std::vector<host::target> const& context() const HPX_NOEXCEPT
+        std::vector<host::target> const& context() const noexcept
         {
             return targets_;
         }
@@ -116,7 +116,7 @@ namespace hpx { namespace compute { namespace host
 
         template <typename F, typename ... Ts>
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
@@ -125,7 +125,7 @@ namespace hpx { namespace compute { namespace host
         }
 
         template <typename F, typename ... Ts>
-        typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % executors_.size();

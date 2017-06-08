@@ -42,7 +42,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
         call(F&& f, Ts&&... ts)
@@ -65,7 +65,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
         call(Executor& sched, F&& f, Ts&&... ts)
@@ -88,7 +88,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
         call(Executor& exec, F&& f, Ts&&... ts)
@@ -111,7 +111,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
         call(Executor& exec, F && f, Ts &&... ts)

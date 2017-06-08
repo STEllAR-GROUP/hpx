@@ -9,7 +9,6 @@
 #define HPX_PARALLEL_THREAD_EXECUTOR_PARAMETER_TRAITS_AUG_26_2015_1204PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
@@ -20,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Parameters>

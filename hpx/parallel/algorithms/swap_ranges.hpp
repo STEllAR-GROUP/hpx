@@ -13,7 +13,6 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -24,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
@@ -137,7 +136,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<ForwardIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::swap_ranges<ForwardIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(),

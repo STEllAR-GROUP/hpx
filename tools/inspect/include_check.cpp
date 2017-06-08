@@ -31,6 +31,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*((map)|(set))\\b)", "std::\\2", "\\2" },
       { "(\\bstd\\s*::\\s*(multi((map)|(set)))\\b)", "std::\\2", "\\3" },
       { "(\\bstd\\s*::\\s*((shared|unique)_ptr)\\b)", "std::\\2", "memory" },
+      { "(\\bstd\\s*::\\s*addressof\\b)", "std::addressof", "memory" },
       { "(\\bstd\\s*::\\s*(unordered_((map|set)))\\b)", "std::\\2", "unordered_\\3" },
       { "(\\bstd\\s*::\\s*(unordered_multi((map)|(set)))\\b)", "std::\\2", "unordered_\\3" },
       { "(\\bstd\\s*::\\s*list\\b)", "std::list", "list" },

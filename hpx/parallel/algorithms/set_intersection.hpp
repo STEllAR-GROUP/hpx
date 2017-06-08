@@ -15,7 +15,6 @@
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -25,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // set_intersection
@@ -195,7 +194,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<InIter1>::value ||
                !hpx::traits::is_random_access_iterator<InIter2>::value ||
                !hpx::traits::is_random_access_iterator<OutIter>::value

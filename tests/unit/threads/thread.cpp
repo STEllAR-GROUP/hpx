@@ -215,16 +215,16 @@ void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class non_copyable_functor
+struct non_copyable_callable
 {
-    HPX_NON_COPYABLE(non_copyable_functor);
-
-public:
     unsigned value;
 
-    non_copyable_functor()
+    non_copyable_callable()
       : value(0)
     {}
+
+    non_copyable_callable(non_copyable_callable const&) = delete;
+    non_copyable_callable& operator=(non_copyable_callable const&) = delete;
 
     void operator()()
     {
@@ -234,7 +234,7 @@ public:
 
 void do_test_creation_through_reference_wrapper()
 {
-    non_copyable_functor f;
+    non_copyable_callable f;
 
     hpx::thread thrd(std::ref(f));
     thrd.join();

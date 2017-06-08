@@ -111,7 +111,7 @@ namespace hpx { namespace util
         template <typename F>
         struct annotated_function
         {
-            annotated_function() HPX_NOEXCEPT
+            annotated_function() noexcept
               : name_(nullptr)
             {}
 
@@ -125,7 +125,7 @@ namespace hpx { namespace util
 
         public:
             template <typename ... Ts>
-            typename deferred_result_of<F(Ts...)>::type
+            typename invoke_deferred_result<F, Ts...>::type
             operator()(Ts && ... ts)
             {
                 annotate_function func(name_);
@@ -145,7 +145,7 @@ namespace hpx { namespace util
                     >::call(f_);
             }
 
-            char const* get_function_annotation() const HPX_NOEXCEPT
+            char const* get_function_annotation() const noexcept
             {
                 return name_ ? name_ : typeid(f_).name();
             }
@@ -189,7 +189,7 @@ namespace hpx { namespace traits
     struct get_function_address<util::detail::annotated_function<F> >
     {
         static std::size_t
-        call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
+        call(util::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_address();
         }
@@ -199,7 +199,7 @@ namespace hpx { namespace traits
     struct get_function_annotation<util::detail::annotated_function<F> >
     {
         static char const*
-        call(util::detail::annotated_function<F> const& f) HPX_NOEXCEPT
+        call(util::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }

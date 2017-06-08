@@ -13,7 +13,6 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -29,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // reduce
@@ -166,7 +165,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -240,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 
@@ -319,7 +318,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<InIter>::value
             > is_seq;
 

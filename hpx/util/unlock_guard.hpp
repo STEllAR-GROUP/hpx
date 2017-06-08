@@ -18,6 +18,7 @@ namespace hpx { namespace util
     template <typename Mutex>
     class unlock_guard
     {
+    public:
         HPX_NON_COPYABLE(unlock_guard);
 
     public:
@@ -41,6 +42,7 @@ namespace hpx { namespace util
     template <typename Mutex>
     class unlock_guard_try
     {
+    public:
         HPX_NON_COPYABLE(unlock_guard_try);
 
     public:

@@ -30,9 +30,9 @@ namespace hpx { namespace serialization { namespace detail
     class preprocess
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_map;
 
     public:
+        typedef std::map<const naming::gid_type*, naming::gid_type> split_gids_map;
         preprocess()
           : size_(0)
           , done_(false)
@@ -110,16 +110,19 @@ namespace hpx { namespace serialization { namespace detail
         template <typename F>
         void operator()(F f)
         {
+            bool set_promise = false;
             {
                 std::lock_guard<mutex_type> l(mtx_);
                 done_ = true;
                 if (num_futures_ == triggered_futures_)
-                {
-                    promise_.set_value();
-                }
+                    set_promise = true;
             }
 
+            if (set_promise)
+                promise_.set_value();
+
             hpx::future<void> fut = promise_.get_future();
+            // we don't call f directly to avoid possible stack overflow.
             auto shared_state_ = hpx::traits::future_access<hpx::future<void> >::
                 get_shared_state(fut);
             shared_state_->set_on_completed(std::move(f));

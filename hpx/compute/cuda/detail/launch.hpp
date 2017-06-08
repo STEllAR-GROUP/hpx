@@ -61,8 +61,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
           , args_(std::move(rhs.args_))
         {}
 
-        HPX_DELETE_COPY_ASSIGN(closure);
-        HPX_DELETE_MOVE_ASSIGN(closure);
+        closure& operator=(closure const&) = delete;
 
         HPX_DEVICE void operator()()
         {

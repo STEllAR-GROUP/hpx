@@ -380,17 +380,17 @@ namespace hpx { namespace parallel { namespace execution
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(timed_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(timed_executor const& rhs) const noexcept
         {
             return exec_ == rhs.exec_ && execute_at_ == rhs.execute_at_;
         }
 
-        bool operator!=(timed_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(timed_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        timed_executor const& context() const HPX_NOEXCEPT
+        timed_executor const& context() const noexcept
         {
             return *this;
         }
@@ -398,7 +398,7 @@ namespace hpx { namespace parallel { namespace execution
 
         // OneWayExecutor interface
         template <typename F, typename ... Ts>
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
             return detail::call_sync_execute_at(exec_, execute_at_,
@@ -408,7 +408,7 @@ namespace hpx { namespace parallel { namespace execution
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts)
         {

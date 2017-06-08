@@ -229,7 +229,7 @@ struct multiply_step
     multiply_step(T factor) : factor_(factor) {}
 
     // FIXME : call operator of multiply_step is momentarily defined with
-    //         a generic parameter to allow the host_side result_of<>
+    //         a generic parameter to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
     template<typename U>
@@ -245,7 +245,7 @@ template <typename T>
 struct add_step
 {
     // FIXME : call operator of add_step is momentarily defined with
-    //         generic parameters to allow the host_side result_of<>
+    //         generic parameters to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
     template<typename U>
@@ -261,7 +261,7 @@ struct triad_step
     triad_step(T factor) : factor_(factor) {}
 
     // FIXME : call operator of triad_step is momentarily defined with
-    //         generic parameters to allow the host_side result_of<>
+    //         generic parameters to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
     template<typename U>

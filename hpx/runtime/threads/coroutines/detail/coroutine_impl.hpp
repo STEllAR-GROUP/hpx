@@ -57,6 +57,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     class coroutine_impl
       : public context_base
     {
+    public:
         HPX_NON_COPYABLE(coroutine_impl);
 
     public:

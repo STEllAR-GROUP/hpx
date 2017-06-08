@@ -40,7 +40,7 @@ struct notification_header;
 
 struct HPX_EXPORT big_boot_barrier
 {
-private:
+public:
     HPX_NON_COPYABLE(big_boot_barrier);
 
 private:
@@ -119,11 +119,12 @@ public:
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-        auto f = [this, dest](parcelset::parcel&& p)
+
+        parcelset::detail::parcel_await(std::move(p), parcelset::write_handler_type(), 0,
+            [this, dest](parcelset::parcel&& p, parcelset::write_handler_type&&)
             {
                 pp->send_early_parcel(dest, std::move(p));
-            };
-        parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
+            }).apply();
     } // }}}
 
     template <typename Action, typename... Args>
