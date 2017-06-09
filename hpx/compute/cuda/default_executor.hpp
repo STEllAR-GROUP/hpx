@@ -188,12 +188,6 @@ namespace hpx { namespace compute { namespace cuda
             target_.synchronize();
         }
 
-        template <typename F, typename ... Ts>
-        void execute(F && f, Ts &&... ts) const
-        {
-            sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-
         template <typename F, typename Shape, typename ... Ts>
         void bulk_launch(F && f, Shape const& shape, Ts &&... ts) const
         {

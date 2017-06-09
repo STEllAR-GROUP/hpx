@@ -40,7 +40,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::util::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
-            executor.execute([] HPX_DEVICE (){});
+            executor.sync_execute([] HPX_DEVICE (){});
         }
         double elapsed = timer.elapsed();
         std::cout << "executor.execute([](){}):                            "
