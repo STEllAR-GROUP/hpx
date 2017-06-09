@@ -114,17 +114,6 @@ namespace resource
     class init_pool_data {
     public:
 
-        //! FIXME shouldn't the constructors be private, actually?
-        init_pool_data(const std::string &name,
-            scheduling_policy = scheduling_policy::unspecified);
-
-        init_pool_data(const std::string &name,
-            scheduler_function create_func);
-
-        //! FIXME remove if these aren't used by parse_affinity_options_from_resource_partitioner anymore
-        std::size_t get_num_threads(){return num_threads_;}
-        threads::mask_type get_mask(){return assigned_pus_[0];}
-
         // mechanism for adding resources (zero-based index)
         void add_resource(std::size_t pu_index, std::size_t num_threads);
 
@@ -135,6 +124,13 @@ namespace resource
         static std::size_t  num_threads_overall;        // counter ... overall, in all the thread pools
 
     private:
+
+        init_pool_data(const std::string &name,
+                       scheduling_policy = scheduling_policy::unspecified);
+
+        init_pool_data(const std::string &name,
+                       scheduler_function create_func);
+
         std::string         pool_name_;
         scheduling_policy   scheduling_policy_;
         std::vector<threads::mask_type>  assigned_pus_; // PUs this pool is allowed to run on
@@ -219,7 +215,7 @@ namespace resource
         init_pool_data* get_pool(std::size_t pool_index) const;
         threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
         bool cmd_line_parsed() const;
-        void parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
+        int parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
             bool fill_internal_topology = true);
 
         const scheduler_function &get_pool_creator(size_t index) const;

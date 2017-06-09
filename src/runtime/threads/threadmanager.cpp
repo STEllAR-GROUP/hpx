@@ -603,7 +603,6 @@ namespace hpx {
         }
 
         // fill the thread-lookup table
-        //! FIXME bring this up in loop for + efficiency
         for (auto& pool_iter : pools_) {
             size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
             for (size_t i(0); i < nt; i++) {
@@ -663,14 +662,13 @@ namespace hpx {
         );
 
         if(pool != pools_.end()){
-            scheduler_type ret((&(*pool))->second); //! FIXME this is ugly
+            scheduler_type ret((&(*pool))->second);
             return ret;
         }
 
         throw std::invalid_argument(
                 "the resource partitioner does not own a thread pool named \""
                 + pool_name + "\". \n");
-        //! FIXME Add names of available pools?
     }
 */
     threadmanager_impl::pool_type threadmanager_impl::get_pool(std::string pool_name) const

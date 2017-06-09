@@ -25,7 +25,6 @@ namespace hpx {
             // if the resource partitioner is not accessed for the first time
             // if the command-line parsing has not yet been done
             throw std::invalid_argument("hpx::get_resource_partitioner() can be called only after the resource partitioner has been allowed to parse the command line options. Please call hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) instead");
-            //! FIXME pas beau
         }
 
         return rp.get();
@@ -47,13 +46,13 @@ namespace hpx {
         util::static_<resource::resource_partitioner, std::false_type> rp_;
         auto& rp = rp_.get();
 
-        if(rp.cmd_line_parsed() == false){ //! FIXME chnge to true and switch pos of instructions
-            rp.parse(desc_cmdline, argc, argv);
-            return rp;
+        if(rp.cmd_line_parsed() == true){
+            throw std::invalid_argument("After hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) has been called, the command line has been parsed by the resource partitioner. Please call hpx::get_resource_partitioner()");
         }
 
-        throw std::invalid_argument("After hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) has been called already, you should call hpx::get_resource_partitioner()");
-        //! FIXME pas beau
+        rp.parse(desc_cmdline, argc, argv);
+        return rp;
+
     }
 
 namespace resource
@@ -269,20 +268,11 @@ namespace resource
     }
 
     // This function is called in hpx_init, before the instantiation of the runtime
-    // it takes care of all the initialization of the initial pool data held by the resource partitioner
-    // -1 checks whether there are empty pools
-    // -2 checks whether there are oversubscribed PUs
-    // -3 sets data member thread_num for each pool
-    // -4 sets up the default pool
-    //! FIXME update these comments
+    // It takes care of configuring some internal parameters of the resource partitioner
+    // related to the pools
+    // -1 assigns all free resources to the default pool
+    // -2 checks whether there are empty pools
     void resource_partitioner::setup_pools() {
-
-        // check whether any of the pools defined up to now are empty
-        // note: does not check "default", this one is allowed not to be given resources by the user
-        if(check_empty_pools()) {
-            throw std::invalid_argument("Pools empty of resources are not allowed. Please re-run this program with allow-empty-pool-policy (not implemented yet)");
-        }
-        //! FIXME add allow-empty-pools policy. Wait, does this even make sense??
 
         // Assign all free resources to the default pool
         for (hpx::resource::numa_domain &d : numa_domains_) {
@@ -296,11 +286,17 @@ namespace resource
             }
         }
 
-        // make sure the mask for the default pool has resources in it
-        //! FIXME add allow-empty-default-pool policy
+        // Check whether any of the pools defined up to now are empty
+        if(check_empty_pools()) {
+            throw std::invalid_argument("Pools empty of resources are not allowed. Please re-run this application with allow-empty-pool-policy (not implemented yet)");
+        }
+        //! FIXME add allow-empty-pools policy. Wait, does this even make sense??
 
     }
 
+    // This function is called in hpx_init, before the instantiation of the runtime
+    // It takes care of configuring some internal parameters of the resource partitioner
+    // related to the pools' schedulers
     void resource_partitioner::setup_schedulers() {
 
         // select the default scheduler
@@ -355,6 +351,10 @@ namespace resource
         }
     }
 
+    // This function is called in hpx_init, before the instantiation of the runtime
+    // It takes care of configuring some internal parameters of the resource partitioner
+    // related to the affinity bindings
+    //
     // If we use the resource partitioner, OS-thread numbering gets slightly complicated:
     // The affinity_masks_ data member of affinity_data considers OS-threads to be numbered
     // in order of occupation of the consecutive processing units, while the thread manager will
@@ -382,7 +382,7 @@ namespace resource
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
 
-        for(size_t i(1); i<num_thread_pools; i++){
+        for(size_t i(0); i<num_thread_pools; i++){
             if(initial_thread_pools_[i].assigned_pus_.size() == 0){
                 return false;
             }
@@ -562,13 +562,20 @@ namespace resource
         return get_pool(pool_name)->num_threads_;
     }
 
+    init_pool_data* resource_partitioner::get_pool(std::size_t pool_index){
+
+        if(pool_index >= initial_thread_pools_.size()){
+            throw std::invalid_argument(
+                    "Pool index " + std::to_string(pool_index) + " too large: the resource partitioner owns only " +
+                            std::to_string(initial_thread_pools_.size()) + " thread pools.\n");
+        }
+
+        return &(initial_thread_pools_[pool_index]);
+    }
     const std::string &resource_partitioner::get_pool_name(size_t index) const {
         if(index >= initial_thread_pools_.size())
-            throw std::invalid_argument("pool requested out of bounds.");
-                    //! FIXME more detailed error message:
-                    /*"pool " + i + " (zero-based index) requested out of bounds. "
-                    "The resource_partitioner owns only " + initial_thread_pools_.size()
-                    + " pools\n");*/
+            throw std::invalid_argument("pool " + std::to_string(index) + " (zero-based index) requested out of bounds. The resource_partitioner owns only "
+                                        + std::to_string(initial_thread_pools_.size()) + " pools\n");
         return initial_thread_pools_[index].pool_name_;
     }
 
@@ -582,7 +589,7 @@ namespace resource
         return (cfg_.parsed_ == true);
     }
 
-    void resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
+    int resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
         bool fill_internal_topology)
     {
         // set internal parameters of runtime configuration
@@ -606,6 +613,8 @@ namespace resource
             // set data describing internal topology backend
             fill_topology_vectors();
         }
+
+        return result;
     }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {
@@ -639,13 +648,12 @@ namespace resource
         );
 
         if(pool != initial_thread_pools_.end()){
-            init_pool_data* ret(&(*pool)); //! FIXME
+            init_pool_data* ret(&(*pool));
             return ret;
         }
 
         throw std::invalid_argument(
                 "the resource partitioner does not own a thread pool named \"" + pool_name + "\". \n");
-        //! FIXME Add names of available pools?
     }
 
     init_pool_data* resource_partitioner::get_default_pool() {
@@ -655,7 +663,7 @@ namespace resource
         );
 
         if(pool != initial_thread_pools_.end()){
-            init_pool_data* ret(&(*pool)); //! FIXME yuck
+            init_pool_data* ret(&(*pool));
             return ret;
         }
 

@@ -123,28 +123,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, i);
         }
-        else if (affinity_desc == "affinity-from-resource-partitioner") //! FIXME shouldn't be essentially different from next
-        {
-            affinity_masks_.clear();
-            affinity_masks_.resize(num_threads_, 0);
-
-            for (std::size_t i = 0; i != num_threads_; ++i) {
-                threads::resize(affinity_masks_[i], num_system_pus);
-            }
-
-            parse_affinity_options_from_resource_partitioner(
-                    affinity_masks_, used_cores, max_cores, pu_nums_);
-
-            std::size_t num_initialized = count_initialized(affinity_masks_);
-            if (num_initialized != num_threads_) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                                    "affinity_data::affinity_data",
-                                    boost::str(
-                                            boost::format("The number of OS threads requested "
-                                                                  "(%1%) does not match the number of threads to "
-                                                                  "bind (%2%)") % num_threads_ % num_initialized));
-            }
-        }
         else if (!affinity_desc.empty())
         {
             affinity_masks_.clear();

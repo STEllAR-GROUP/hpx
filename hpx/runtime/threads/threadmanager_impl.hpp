@@ -135,18 +135,13 @@ namespace hpx { namespace threads
             bool run_now = true, error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function
-        ///         instantiates the specified number of OS threads. All OS
-        ///         threads are started to execute the function \a tfunc.
-        ///
-        /// \param num_threads
-        ///               [in] The initial number of threads to be started by
-        ///               this thread manager instance. This parameter is
-        ///               optional and defaults to 1 (one).
+        ///         instantiates the specified number of OS threads in each
+        ///         pool. All OS threads are started to execute the function
+        ///         \a tfunc.
         ///
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns
         ///               \a false.
-        //! FIXME parameter in commentary is obsolete
         bool run();
 
         /// \brief Forcefully stop the thread-manager
