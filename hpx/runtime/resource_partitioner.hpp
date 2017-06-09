@@ -65,7 +65,7 @@ namespace resource
                         //  0: this PU is not exposed by the affinity bindings
                         //  1: normal occupancy
                         // >1: oversubscription
-        std::size_t     thread_occupancy_count;
+        std::size_t     thread_occupancy_count_;
                         // counts number of threads bound to this PU
     };
 
@@ -74,11 +74,17 @@ namespace resource
         numa_domain      *domain_;
         std::vector<pu>   pus_;
         std::vector<core> cores_sharing_numa_domain();
+        std::vector<pu> pus() const {
+            return pus_;
+        }
     };
 
     struct numa_domain {
         std::size_t       id_;
         std::vector<core> cores_;
+        std::vector<core> cores() const {
+            return cores_;
+        }
     };
 
     using scheduler_function = std::function<
@@ -213,11 +219,12 @@ namespace resource
         init_pool_data* get_pool(std::size_t pool_index) const;
         threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
         bool cmd_line_parsed() const;
-        void parse(boost::program_options::options_description desc_cmdline, int argc, char **argv);
+        void parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
+            bool fill_internal_topology = true);
 
         const scheduler_function &get_pool_creator(size_t index) const;
 
-        const std::vector<numa_domain> &get_numa_domains() {
+        std::vector<numa_domain> &numa_domains() {
             return numa_domains_;
         }
 

@@ -127,8 +127,8 @@ namespace resource
     void init_pool_data::add_resource(std::size_t pu_index, std::size_t num_threads){
 
         if (pu_index >= hpx::threads::hardware_concurrency()) {
-            throw std::invalid_argument("Processing unit index out of bounds.");
-            //! FIXME give actual number of PUs
+            throw std::invalid_argument("Processing unit index out of bounds. The total number of processing units on this machine is " +
+            std::to_string(hpx::threads::hardware_concurrency()));
         }
 
         // Increment thread_num count (for pool-count and global count)
@@ -138,7 +138,10 @@ namespace resource
         // Add pu mask to internal data structure
         threads::mask_type pu_mask = 0;
         threads::set(pu_mask, pu_index);
-        assigned_pus_.push_back(pu_mask);
+
+        // Add one mask for each OS-thread
+        for(std::size_t i(0); i<num_threads; i++)
+            assigned_pus_.push_back(pu_mask);
     }
 
     void init_pool_data::print_pool() const {
@@ -243,7 +246,7 @@ namespace resource
                         p.thread_occupancy_ = affinity_data_.get_thread_occupancy(pid);
                         if(p.thread_occupancy_ == 0)
                             throw std::runtime_error("PU #" + std::to_string(pid) + " has thread occupancy 0");
-                        p.thread_occupancy_count = p.thread_occupancy_;
+                        p.thread_occupancy_count_ = p.thread_occupancy_;
                         core_contains_exposed_pus = true;
                     }
 
@@ -285,7 +288,7 @@ namespace resource
         for (hpx::resource::numa_domain &d : numa_domains_) {
             for (hpx::resource::core &c : d.cores_) {
                 for (hpx::resource::pu &p : c.pus_) {
-                    std::size_t threads_to_add = p.thread_occupancy_ - p.thread_occupancy_count;
+                    std::size_t threads_to_add = p.thread_occupancy_count_;
                     if (threads_to_add > 0) {
                         add_resource(p, "default", threads_to_add);
                     }
@@ -357,7 +360,11 @@ namespace resource
     bool resource_partitioner::check_empty_pools() const
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
+
         for(size_t i(1); i<num_thread_pools; i++){
+            if(initial_thread_pools_[i].assigned_pus_.size() == 0){
+                return false;
+            }
             for(auto assigned_pus : initial_thread_pools_[i].assigned_pus_){
                 if(!threads::any(assigned_pus)) {
                     return true;
@@ -424,14 +431,14 @@ namespace resource
         //! FIXME except if policy allow_extra_thread_creation is activated
         //! then I don't have to check the occupancy count ...
         // check occupancy counter and decrement it
-        if (p.thread_occupancy_count > 0){
-            p.thread_occupancy_count--;
+        if (p.thread_occupancy_count_ > 0){
+            p.thread_occupancy_count_--;
             get_pool(pool_name)->add_resource(p.id_, num_threads);
 
             // Make sure the total number of requested threads does not exceed the number of threads
             // requested on the command line
             //! FIXME except if policy allow_extra_thread_creation is activated
-            if(init_pool_data::num_threads_overall >= cfg_.num_threads_){
+            if(init_pool_data::num_threads_overall > cfg_.num_threads_){
                 //! FIXME add allow_empty_default_pool policy
 /*                if(rp-policy == allow_empty_default_pool
                     && init_pool_data::num_threads_overall == cfg_.num_threads_){
@@ -553,7 +560,8 @@ namespace resource
         return (cfg_.parsed_ == true);
     }
 
-    void resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv)
+    void resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
+        bool fill_internal_topology)
     {
         // set internal parameters of runtime configuration
         cfg_.rtcfg_ = util::runtime_configuration(argv[0]);
@@ -565,8 +573,10 @@ namespace resource
         cores_needed_ = affinity_data_.init(cfg_);
         //! FIXME what is this?? Change name ...
 
-        // set data describing internal topology backend
-        fill_topology_vectors();
+        if(fill_internal_topology){
+            // set data describing internal topology backend
+            fill_topology_vectors();
+        }
     }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {

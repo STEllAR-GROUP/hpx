@@ -624,7 +624,7 @@ namespace hpx
 
                 // if the command-line parsing has not yet been done, do it now
                 if(!rp.cmd_line_parsed())
-                    rp.parse(desc_cmdline, argc, argv);
+                    rp.parse(desc_cmdline, argc, argv, false);
 
                 // check if you have to exit blahblah
                 //! FIXME better comment

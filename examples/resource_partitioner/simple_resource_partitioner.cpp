@@ -68,18 +68,18 @@ int hpx_main(int argc, char* argv[])
     // print system characteristics
     print_system_characteristics();
 
-    // get executors
+/*    // get executors
     hpx::threads::executors::customized_pool_executor my_exec_single("mpi");
     std::cout << "\n\n[hpx_main] got customized executor " << "\n";
 
-/*    // get executors
+    // get executors
     hpx::threads::executors::customized_pool_executor my_exec1("first_core");
     std::cout << "\n\n[hpx_main] got customized executor " << "\n";
 
     // get executors
     hpx::threads::executors::customized_pool_executor my_exec2("last_core");
     std::cout << "\n\n[hpx_main] got customized executor " << "\n";
-*/
+
 
     // use these executors to schedule work
     hpx::future<void> future_1 = hpx::async(my_exec_single, &do_stuff, 32);
@@ -89,7 +89,7 @@ int hpx_main(int argc, char* argv[])
     });
 
     future_2.get();
-
+*/
     return hpx::finalize();
 }
 
@@ -128,30 +128,32 @@ int main(int argc, char* argv[])
 
     // Create a thread pool with a single core that we will use for all
     // communication related tasks
-    rp.create_thread_pool("mpi");
+//    rp.create_thread_pool("mpi");
+    rp.create_thread_pool("single_thread");
     std::cout << "[main] " << "thread_pools created \n";
 
-    rp.add_resource(rp.get_numa_domains().front().cores_.front().pus_, "mpi");
+    rp.add_resource(rp.numa_domains().front().cores_.front().pus_.front(), "single_thread");
     std::cout << "[main] " << "resources added to thread_pools \n";
 
 
-/*
-    for (const hpx::resource::numa_domain &d : rp.get_numa_domains()) {
-        for (const hpx::resource::core &c : d.cores_) {
-            for (const hpx::resource::pu &p : c.pus_) {
-                if (p.id_ == rp.get_topology().get_number_of_pus()/2) {
-                    rp.add_resource(p, "single_thread");
-                }
 
-                std::cout << "[PU] number : " << p << " is on ... \n"
-                          << "socket    : " << topo.get_socket_number(p) << "\n"
-                          << "numa-node : " << topo.get_numa_node_number(p) << "\n"
-                          << "core      : " << topo.get_core_number(p) << hpx::flush << "\n";
+    for (const hpx::resource::numa_domain &d : rp.numa_domains()) {
+        for (const hpx::resource::core &c : d.cores()) {
+            for (const hpx::resource::pu &p : c.pus()) {
+/*                if (p.id_ == 2 /* rp.get_topology().get_number_of_pus()/2) {
+                    rp.add_resource(p, "single_thread");
+                }*/
+
+                std::cout << "[PU] number : " << p.id_ << " is on ... \n"
+                          << "socket    : " << topo.get_socket_number(p.id_) << "\n"
+                          << "numa-node : " << topo.get_numa_node_number(p.id_) << ", " << d.id_ << "\n"
+                          << "core      : " << topo.get_core_number(p.id_) << ", " << c.id_ << hpx::flush << "\n"
+                          << "and has occupancy      : " << p.thread_occupancy_ << hpx::flush << "\n";
 
             }
         }
     }
-*/
+
 
     std::cout << "[main] " << "Calling hpx::init... \n";
     return hpx::init(argc, argv);
