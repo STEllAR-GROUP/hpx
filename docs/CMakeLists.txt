@@ -103,6 +103,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_default_construct.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_move.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_value_construct.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
