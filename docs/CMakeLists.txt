@@ -63,6 +63,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/all_any_none.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/destroy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"

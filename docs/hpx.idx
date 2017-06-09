@@ -176,6 +176,10 @@ parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 parallel::count                       "count" "hpx\.parallel\.v1\.count$"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
+# hpx/parallel/algorithms/destroy.hpp
+parallel::destroy                       "destroy" "hpx\.parallel\.v1\.destroy$.*"
+parallel::destroy_n                     "destroy_n" "hpx\.parallel\.v1\.destroy_n.*"
+
 # hpx/parallel/algorithms/equal.hpp
 parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
 
