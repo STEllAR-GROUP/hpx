@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     rp.create_thread_pool("single_thread");
     std::cout << "[main] " << "thread_pools created \n";
 
-    rp.add_resource(rp.numa_domains().front().cores_.front().pus_.front(), "single_thread");
+    rp.add_resource(rp.numa_domains().front().cores_.back().pus_.front(), "single_thread");
     std::cout << "[main] " << "resources added to thread_pools \n";
 
 

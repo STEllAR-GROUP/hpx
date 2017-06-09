@@ -342,7 +342,12 @@ namespace detail
                 {
                     std::size_t thread_num = thread_offset + thread_num_;
                     threads::mask_cref_type mask =
-                            get_resource_partitioner().get_affinity_data()->get_pu_mask(thread_num, sched_->numa_sensitive());
+                            get_resource_partitioner().get_pu_mask(thread_num, sched_->numa_sensitive());
+                    // thread_num ordering: 1. threads of default pool
+                    //                      2. threads of first special pool
+                    //                      3. etc.
+                    // get_pu_mask expects index according to ordering of masks in affinity_data::affinity_masks_
+                    // which is in order of occupied PU
 
                     LTM_(info) //-V128
                             << "thread_pool::run: " << id_.name_

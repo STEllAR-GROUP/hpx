@@ -31,6 +31,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             num_threads_ = num_threads;
         }
 
+        void set_affinity_masks(std::vector<threads::mask_type> const& affinity_masks){
+            affinity_masks_ = affinity_masks;
+        }
+
         std::size_t get_num_threads() const{
             return num_threads_;
         }

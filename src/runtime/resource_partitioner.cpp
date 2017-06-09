@@ -355,6 +355,27 @@ namespace resource
         }
     }
 
+    // If we use the resource partitioner, OS-thread numbering gets slightly complicated:
+    // The affinity_masks_ data member of affinity_data considers OS-threads to be numbered
+    // in order of occupation of the consecutive processing units, while the thread manager will
+    // consider them to be ordered according to their assignment to pools
+    // (first all threads belonging to the default pool,
+    // then all threads belonging to the first pool created, etc.)
+    // and instantiate them according to this system.
+    // We need to re-write affinity_data_ with the masks in the correct order at this stage.
+    void resource_partitioner::reconfigure_affinities()
+    {
+        std::vector<threads::mask_type> new_affinity_masks;
+
+        for(auto& itp : initial_thread_pools_){
+            for(auto& mask : itp.assigned_pus_){
+                new_affinity_masks.push_back(mask);
+            }
+        }
+
+        affinity_data_.set_affinity_masks(new_affinity_masks);
+    }
+
     // Returns true if any of the pools defined by the user is empty of resources
     // called in set_default_pool()
     bool resource_partitioner::check_empty_pools() const
@@ -501,6 +522,7 @@ namespace resource
     void resource_partitioner::configure_pools(){
         setup_pools();
         setup_schedulers();
+        reconfigure_affinities();
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -567,7 +589,14 @@ namespace resource
         cfg_.rtcfg_ = util::runtime_configuration(argv[0]);
 
         // parse command line and set options
-        cfg_.call(desc_cmdline, argc, argv);
+        int result = cfg_.call(desc_cmdline, argc, argv);
+
+        /*if (result != 0) { // exit if --hpx:help or others was called
+            if (result > 0)
+                result = 0;     // --hpx:help
+            return result;
+        }*/
+        //! FIXME how to do this??
 
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
