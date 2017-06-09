@@ -50,7 +50,7 @@ namespace hpx { namespace traits
         {
         }
 
-        HPX_CONSTEXPR static bool flush(serialization::binary_filter* filter,
+        static bool flush(serialization::binary_filter* filter,
             Container& cont, std::size_t current, std::size_t size,
             std::size_t& written)
         {
