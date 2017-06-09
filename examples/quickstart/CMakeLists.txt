@@ -25,6 +25,7 @@ set(example_programs
     fibonacci_one
     fibonacci_futures
     fibonacci_futures_distributed
+    file_serialization
     fractals
     fractals_struct
     hello_world

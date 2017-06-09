@@ -12,6 +12,7 @@
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/serialization_access_data.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
@@ -23,9 +24,11 @@
 namespace hpx { namespace serialization
 {
     template <typename Container>
-    struct input_container: erased_input_container
+    struct input_container : erased_input_container
     {
     private:
+        typedef traits::serialization_access_data<Container> access_traits;
+
         std::size_t get_chunk_size(std::size_t chunk) const
         {
             return (*chunks_)[chunk].size_;
@@ -73,8 +76,8 @@ namespace hpx { namespace serialization
         {
             filter_.reset(filter);
             if (filter) {
-                current_ = filter->init_data(&cont_[current_],
-                    cont_.size()-current_, decompressed_size_);
+                current_ = access_traits::init_data(cont_, filter_.get(),
+                    current_, decompressed_size_);
 
                 if (decompressed_size_ < current_)
                 {
@@ -93,7 +96,7 @@ namespace hpx { namespace serialization
             }
             else {
                 std::size_t new_current = current_ + count;
-                if (new_current > cont_.size())
+                if (new_current > access_traits::size(cont_))
                 {
                     HPX_THROW_EXCEPTION(serialization_error
                       , "input_container::load_binary"
@@ -101,39 +104,15 @@ namespace hpx { namespace serialization
                     return;
                 }
 
-                void const* src = &cont_[current_];
-                switch (count)
-                {
-                case 8:
-                    *static_cast<std::uint64_t*>(address) =
-                        *static_cast<std::uint64_t const*>(src);
-                    break;
-
-                case 4:
-                    *static_cast<std::uint32_t*>(address) =
-                        *static_cast<std::uint32_t const*>(src);
-                    break;
-
-                case 2:
-                    *static_cast<std::uint16_t*>(address) =
-                        *static_cast<std::uint16_t const*>(src);
-                    break;
-
-                case 1:
-                    *static_cast<std::uint8_t*>(address) =
-                        *static_cast<std::uint8_t const*>(src);
-                    break;
-
-                default:
-                    std::memcpy(address, src, count);
-                    break;
-                }
+                access_traits::read(cont_, count, current_, address);
 
                 current_ = new_current;
 
                 if (chunks_) {
                     current_chunk_size_ += count;
-                    // make sure we switch to the next serialization_chunk if necessary
+
+                    // make sure we switch to the next serialization_chunk if
+                    // necessary
                     std::size_t current_chunk_size = get_chunk_size(current_chunk_);
                     if (current_chunk_size != 0 && current_chunk_size_ >=
                         current_chunk_size)
