@@ -388,6 +388,13 @@ macro(hpx_check_for_cxx11_std_shared_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_shuffle)
+  add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
+    SOURCE cmake/tests/cxx11_std_shuffle.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_thread)
   add_hpx_config_test(HPX_WITH_CXX11_THREAD
     SOURCE cmake/tests/cxx11_std_thread.cpp
@@ -476,6 +483,13 @@ endmacro()
 macro(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/libfun_std_experimental_optional.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx17_fold_expressions)
+  add_hpx_config_test(HPX_WITH_CXX17_FOLD_EXPRESSIONS
+    SOURCE cmake/tests/cxx17_fold_expressions.cpp
     FILE ${ARGN})
 endmacro()
 
