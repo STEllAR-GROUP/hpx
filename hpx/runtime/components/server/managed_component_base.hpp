@@ -295,9 +295,10 @@ namespace hpx { namespace components
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
-                util::reinitializable_static<
-                    heap_type, wrapper_heap_tag
-                > heap(components::get_component_type<Component>());
+                static components::component_type t =
+                    components::get_component_type<Component>();
+
+                util::reinitializable_static<heap_type, wrapper_heap_tag> heap(t);
                 return heap.get();
             }
 
