@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detected.hpp>
 
-
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -25,6 +24,83 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_execution_tag;
     struct parallel_execution_tag;
     struct unsequenced_execution_tag;
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(post);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(sync_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(async_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(then_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_sync_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_async_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_then_execute);
+    }
+
+    template <typename T, typename Enable = void>
+    struct has_post_member
+      : detail::has_post<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_sync_execute_member
+      : detail::has_sync_execute<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_async_execute_member
+      : detail::has_async_execute<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_then_execute_member
+      : detail::has_then_execute<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_sync_execute_member
+      : detail::has_bulk_sync_execute<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_async_execute_member
+      : detail::has_bulk_async_execute<typename std::decay<T>::type>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_then_execute_member
+      : detail::has_bulk_then_execute<typename std::decay<T>::type>
+    {};
+
+#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+    template <typename T>
+    constexpr bool has_post_member_v =
+        has_post_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_sync_execute_member_v =
+        has_sync_execute_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_async_execute_member_v =
+        has_async_execute_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_then_execute_member_v =
+        has_then_execute_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_bulk_sync_execute_member_v =
+        has_bulk_sync_execute_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_bulk_async_execute_member_v =
+        has_bulk_async_execute_member<T>::value;
+
+    template <typename T>
+    constexpr bool has_bulk_then_execute_member_v =
+        has_bulk_then_execute_member<T>::value;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor>
@@ -98,6 +174,43 @@ namespace hpx { namespace parallel { namespace execution
 
 namespace hpx { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct has_post_member
+      : parallel::execution::has_post_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_sync_execute_member
+      : parallel::execution::has_sync_execute_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_async_execute_member
+      : parallel::execution::has_async_execute_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_then_execute_member
+      : parallel::execution::has_then_execute_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_sync_execute_member
+      : parallel::execution::has_bulk_sync_execute_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_async_execute_member
+      : parallel::execution::has_bulk_async_execute_member<T>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct has_bulk_then_execute_member
+      : parallel::execution::has_bulk_then_execute_member<T>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Enable = void>
     struct executor_context
       : parallel::execution::executor_context<Executor>

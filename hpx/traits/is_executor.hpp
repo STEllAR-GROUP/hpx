@@ -79,25 +79,27 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_bulk_two_way_executor<typename std::decay<T>::type>
     {};
 
-//     template <typename T>
-//     constexpr bool is_one_way_executor_v =
-//         is_one_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_never_blocking_one_way_executor_v =
-//         is_never_blocking_one_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_bulk_one_way_executor_v =
-//         is_bulk_one_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_two_way_executor_v =
-//         is_two_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_bulk_two_way_executor_v =
-//         is_bulk_two_way_executor<T>::value;
+#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+    template <typename T>
+    constexpr bool is_one_way_executor_v =
+        is_one_way_executor<T>::value;
+
+    template <typename T>
+    constexpr bool is_never_blocking_one_way_executor_v =
+        is_never_blocking_one_way_executor<T>::value;
+
+    template <typename T>
+    constexpr bool is_bulk_one_way_executor_v =
+        is_bulk_one_way_executor<T>::value;
+
+    template <typename T>
+    constexpr bool is_two_way_executor_v =
+        is_two_way_executor<T>::value;
+
+    template <typename T>
+    constexpr bool is_bulk_two_way_executor_v =
+        is_bulk_two_way_executor<T>::value;
+#endif
 }}}
 
 namespace hpx { namespace traits
