@@ -156,11 +156,6 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        void set_exception(std::exception_ptr e)
-        {
-            this->base_type::set_exception(std::move(e));
-        }
-
         void destroy()
         {
             std::experimental::coroutine_handle<Derived>::
