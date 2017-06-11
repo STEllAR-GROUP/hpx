@@ -59,13 +59,13 @@ namespace hpx { namespace compute { namespace host
 
         template <typename F, typename Shape, typename ... Ts>
         static std::vector<hpx::future<void> >
-        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             return std::vector<hpx::future<void> >();
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        static void sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        static void bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
         {
         }
 

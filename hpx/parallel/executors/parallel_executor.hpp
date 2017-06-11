@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { namespace execution
         std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type
         > >
-        async_bulk_execute(F && f, S const& shape, Ts &&... ts) const
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts) const
         {
             // lazily initialize once
             static std::size_t global_num_tasks =
@@ -248,7 +248,7 @@ namespace hpx { namespace parallel { inline namespace v3
         bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
             using base_type = parallel::execution::parallel_executor;
-            return base_type::async_bulk_execute(std::forward<F>(f), shape,
+            return base_type::bulk_async_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...);
         }
     };

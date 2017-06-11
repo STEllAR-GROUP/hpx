@@ -88,9 +88,9 @@ void test_bulk_sync()
     using hpx::util::placeholders::_2;
 
     executor exec;
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &bulk_test, v, tid, 42);
 }
 
@@ -108,11 +108,11 @@ void test_bulk_async()
 
     executor exec;
     std::vector<hpx::shared_future<void> > futs =
-        hpx::parallel::execution::async_bulk_execute(exec,
+        hpx::parallel::execution::bulk_async_execute(exec,
             hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::when_all(futs).get();
 
-    futs = hpx::parallel::execution::async_bulk_execute(exec,
+    futs = hpx::parallel::execution::bulk_async_execute(exec,
         &bulk_test, v, tid, 42);
     hpx::when_all(futs).get();
 }

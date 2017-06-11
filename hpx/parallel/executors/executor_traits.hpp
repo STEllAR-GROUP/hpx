@@ -653,7 +653,7 @@ namespace hpx { namespace parallel { inline namespace v3
             std::forward<Ts>(ts)...);
     }
 
-    // async_bulk_execute()
+    // bulk_async_execute()
     template <typename Executor, typename F, typename Shape, typename ... Ts>
     typename std::enable_if<
         hpx::traits::is_executor<Executor>::value,
@@ -663,7 +663,7 @@ namespace hpx { namespace parallel { inline namespace v3
             >::type
         > >
     >::type
-    async_bulk_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
     {
         typedef typename std::decay<Executor>::type executor_type;
         return executor_traits<executor_type>::bulk_async_execute(

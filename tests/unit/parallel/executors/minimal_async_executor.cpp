@@ -84,9 +84,9 @@ void test_bulk_sync(Executor& exec)
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::parallel::execution::sync_bulk_execute(exec,
+    hpx::parallel::execution::bulk_sync_execute(exec,
         hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &async_bulk_test, v, tid, 42);
 }
 
@@ -102,11 +102,11 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_2;
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &async_bulk_test, v, tid, 42)
     ).get();
 }
@@ -200,7 +200,7 @@ struct test_async_executor3 : test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename Shape, typename ... Ts>
-    static void sync_bulk_execute(F f, Shape const& shape, Ts &&... ts)
+    static void bulk_sync_execute(F f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_sync;
         std::vector<hpx::future<void> > results;
@@ -226,7 +226,7 @@ struct test_async_executor4 : test_async_executor1
 
     template <typename F, typename Shape, typename ... Ts>
     static std::vector<hpx::future<void> >
-    async_bulk_execute(F f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(F f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_async;
         std::vector<hpx::future<void> > results;

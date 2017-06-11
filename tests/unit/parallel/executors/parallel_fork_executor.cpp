@@ -85,9 +85,9 @@ void test_bulk_sync()
     using hpx::util::placeholders::_2;
 
     executor exec(hpx::launch::fork);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &bulk_test, v, tid, 42);
 }
 
@@ -104,10 +104,10 @@ void test_bulk_async()
     using hpx::util::placeholders::_2;
 
     executor exec(hpx::launch::fork);
-    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42)
     ).get();
-    hpx::when_all(hpx::parallel::execution::async_bulk_execute(
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
         exec, &bulk_test, v, tid, 42)
     ).get();
 }
@@ -140,10 +140,10 @@ void test_bulk_then()
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executor exec(hpx::launch::fork);
-    hpx::parallel::execution::then_bulk_execute(
+    hpx::parallel::execution::bulk_then_execute(
         exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42
     ).get();
-    hpx::parallel::execution::then_bulk_execute(
+    hpx::parallel::execution::bulk_then_execute(
         exec, &bulk_test_f, v, f, tid, 42
     ).get();
 }

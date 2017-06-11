@@ -197,7 +197,7 @@ namespace hpx { namespace compute { namespace cuda
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<void> >
-        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
@@ -207,7 +207,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        void sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts) const
+        void bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts) const
         {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
             target_.synchronize();

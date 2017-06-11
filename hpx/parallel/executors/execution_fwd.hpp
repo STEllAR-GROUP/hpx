@@ -49,9 +49,9 @@ namespace hpx { namespace parallel { namespace execution
         struct sync_execute_tag {};
         struct async_execute_tag {};
         struct then_execute_tag {};
-        struct sync_bulk_execute_tag {};
-        struct async_bulk_execute_tag {};
-        struct then_bulk_execute_tag {};
+        struct bulk_sync_execute_tag {};
+        struct bulk_async_execute_tag {};
+        struct bulk_then_execute_tag {};
 
         template <typename Executor, typename ... Ts>
         struct undefined_customization_point;
@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct customization_point<sync_bulk_execute_tag>
+        struct customization_point<bulk_sync_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename ... Ts>
@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct customization_point<async_bulk_execute_tag>
+        struct customization_point<bulk_async_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename ... Ts>
@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct customization_point<then_bulk_execute_tag>
+        struct customization_point<bulk_then_execute_tag>
         {
             template <typename Executor, typename F, typename Shape,
                 typename Future, typename ... Ts>
@@ -258,13 +258,13 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // BulkTwoWayExecutor customization points:
-        // execution::async_bulk_execute, execution::sync_bulk_execute,
-        // execution::then_bulk_execute
+        // execution::bulk_async_execute, execution::bulk_sync_execute,
+        // execution::bulk_then_execute
 
         /// Bulk form of synchronous execution agent creation.
         ///
         /// \note This is deliberately different from the bulk_sync_execute
-        ///       customization points specified in P0443.The sync_bulk_execute
+        ///       customization points specified in P0443.The bulk_sync_execute
         ///       customization point defined here is more generic and is used
         ///       as the workhorse for implementing the specified APIs.
         ///
@@ -286,24 +286,24 @@ namespace hpx { namespace parallel { namespace execution
         ///              boundaries for the arguments to be passed to \a f.
         /// \param ts    [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns The return type of \a executor_type::sync_bulk_execute
+        /// \returns The return type of \a executor_type::bulk_sync_execute
         ///          if defined by \a executor_type. Otherwise a vector holding
         ///          the returned values of each invocation of \a f except when
         ///          \a f returns void, which case void is returned.
         ///
-        /// \note This calls exec.sync_bulk_execute(f, shape, ts...) if it
+        /// \note This calls exec.bulk_sync_execute(f, shape, ts...) if it
         ///       exists; otherwise it executes sync_execute(f, shape, ts...)
         ///       as often as needed.
         ///
-        constexpr detail::customization_point<detail::sync_bulk_execute_tag> const&
-            sync_bulk_execute = detail::static_const<
-                    detail::customization_point<detail::sync_bulk_execute_tag>
+        constexpr detail::customization_point<detail::bulk_sync_execute_tag> const&
+            bulk_sync_execute = detail::static_const<
+                    detail::customization_point<detail::bulk_sync_execute_tag>
                 >::value;
 
         /// Bulk form of asynchronous execution agent creation.
         ///
         /// \note This is deliberately different from the bulk_async_execute
-        ///       customization points specified in P0443.The async_bulk_execute
+        ///       customization points specified in P0443.The bulk_async_execute
         ///       customization point defined here is more generic and is used
         ///       as the workhorse for implementing the specified APIs.
         ///
@@ -324,24 +324,24 @@ namespace hpx { namespace parallel { namespace execution
         ///              boundaries for the arguments to be passed to \a f.
         /// \param ts    [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns The return type of \a executor_type::async_bulk_execute if
+        /// \returns The return type of \a executor_type::bulk_async_execute if
         ///          defined by \a executor_type. Otherwise a vector
         ///          of futures holding the returned values of each invocation
         ///          of \a f.
         ///
-        /// \note This calls exec.async_bulk_execute(f, shape, ts...) if it
+        /// \note This calls exec.bulk_async_execute(f, shape, ts...) if it
         ///       exists; otherwise it executes async_execute(f, shape, ts...)
         ///       as often as needed.
         ///
-        constexpr detail::customization_point<detail::async_bulk_execute_tag> const&
-            async_bulk_execute = detail::static_const<
-                    detail::customization_point<detail::async_bulk_execute_tag>
+        constexpr detail::customization_point<detail::bulk_async_execute_tag> const&
+            bulk_async_execute = detail::static_const<
+                    detail::customization_point<detail::bulk_async_execute_tag>
                 >::value;
 
         /// Bulk form of execution agent creation depending on a given future.
         ///
         /// \note This is deliberately different from the then_sync_execute
-        ///       customization points specified in P0443.The then_bulk_execute
+        ///       customization points specified in P0443.The bulk_then_execute
         ///       customization point defined here is more generic and is used
         ///       as the workhorse for implementing the specified APIs.
         ///
@@ -364,20 +364,20 @@ namespace hpx { namespace parallel { namespace execution
         ///             given function depends on.
         /// \param ts    [in] Additional arguments to use to invoke \a f.
         ///
-        /// \returns The return type of \a executor_type::then_bulk_execute
+        /// \returns The return type of \a executor_type::bulk_then_execute
         ///          if defined by \a executor_type. Otherwise a vector holding
         ///          the returned values of each invocation of \a f.
         ///
-        /// \note This calls exec.then_bulk_execute(f, shape, pred, ts...) if it
+        /// \note This calls exec.bulk_then_execute(f, shape, pred, ts...) if it
         ///       exists; otherwise it executes
         ///       sync_execute(f, shape, pred.share(), ts...) (if this executor
         ///       is also an OneWayExecutor), or
         ///       async_execute(f, shape, pred.share(), ts...) (if this executor
         ///       is also a TwoWayExecutor) - as often as needed.
         ///
-        constexpr detail::customization_point<detail::then_bulk_execute_tag> const&
-            then_bulk_execute = detail::static_const<
-                    detail::customization_point<detail::then_bulk_execute_tag>
+        constexpr detail::customization_point<detail::bulk_then_execute_tag> const&
+            bulk_then_execute = detail::static_const<
+                    detail::customization_point<detail::bulk_then_execute_tag>
                 >::value;
     }
 }}}

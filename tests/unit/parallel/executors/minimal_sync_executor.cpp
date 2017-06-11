@@ -135,23 +135,23 @@ void test_bulk_sync(Executor& exec)
     using hpx::util::placeholders::_2;
 
     std::vector<hpx::thread::id> ids =
-        hpx::parallel::execution::sync_bulk_execute(
+        hpx::parallel::execution::bulk_sync_execute(
             exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42);
     for (auto const& id : ids)
     {
         HPX_TEST(id == hpx::this_thread::get_id());
     }
 
-    ids = hpx::parallel::execution::sync_bulk_execute(
+    ids = hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test, v, tid, 42);
     for (auto const& id : ids)
     {
         HPX_TEST(id == hpx::this_thread::get_id());
     }
 
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test_void, v, tid, 42);
 }
 
@@ -167,20 +167,20 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_2;
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &sync_bulk_test, v, tid, 42)
     ).get();
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &sync_bulk_test_void, v, tid, 42)
     ).get();
 }
@@ -197,7 +197,7 @@ void test_bulk_then(Executor& exec)
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     std::vector<hpx::thread::id> tids =
-        hpx::parallel::execution::then_bulk_execute(
+        hpx::parallel::execution::bulk_then_execute(
             exec, &then_bulk_test, v, f, tid, 42).get();
 
     for (auto const& tid : tids)
@@ -205,7 +205,7 @@ void test_bulk_then(Executor& exec)
         HPX_TEST(tid == hpx::this_thread::get_id());
     }
 
-    hpx::parallel::execution::then_bulk_execute(
+    hpx::parallel::execution::bulk_then_execute(
         exec, &then_bulk_test_void, v, f, tid, 42).get();
 }
 
@@ -300,7 +300,7 @@ struct test_sync_executor2 : test_sync_executor1
     static typename hpx::parallel::execution::detail::bulk_execute_result<
         F, Shape, Ts...
     >::type
-    sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+    bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_sync;
 
