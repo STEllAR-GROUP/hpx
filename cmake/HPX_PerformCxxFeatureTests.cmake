@@ -153,12 +153,10 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx14_std_result_of_sfinae(
       DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
-  endif()
 
-  # check for experimental facilities
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
-    # check for Library Fundamentals TS v2's experimental/optional only if in
-    # C++1y or C++14 mode.
+    # check for experimental facilities
+
+    # check for Library Fundamentals TS v2's experimental/optional
     hpx_check_for_libfun_std_experimental_optional(
       DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
   endif()
@@ -167,6 +165,9 @@ macro(hpx_perform_cxx_feature_tests)
     # Check the availability of certain C++17 language features
     hpx_check_for_cxx17_fold_expressions(
         DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
+
+    hpx_check_for_cxx17_variable_templates(
+      DEFINITIONS HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
   endif()
 endmacro()
 
