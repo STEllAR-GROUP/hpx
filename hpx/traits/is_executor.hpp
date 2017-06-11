@@ -22,12 +22,7 @@ namespace hpx { namespace parallel { namespace execution
         {};
 
         template <typename T>
-        struct is_host_based_one_way_executor
-          : std::false_type
-        {};
-
-        template <typename T>
-        struct is_non_blocking_one_way_executor
+        struct is_never_blocking_one_way_executor
           : std::false_type
         {};
 
@@ -38,11 +33,6 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename T>
         struct is_two_way_executor
-          : std::false_type
-        {};
-
-        template <typename T>
-        struct is_non_blocking_two_way_executor
           : std::false_type
         {};
 
@@ -61,18 +51,11 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_one_way_executor<typename std::decay<T>::type>
     {};
 
-    // Condition: T meets the syntactic requirements for HostBasedOneWayExecutor
-    // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
-    struct is_host_based_one_way_executor
-      : detail::is_host_based_one_way_executor<typename std::decay<T>::type>
-    {};
-
     // Condition: T meets the syntactic requirements for NonBlockingOneWayExecutor
     // Precondition: T is a complete type
     template <typename T, typename Enable = void>
-    struct is_non_blocking_one_way_executor
-      : detail::is_non_blocking_one_way_executor<typename std::decay<T>::type>
+    struct is_never_blocking_one_way_executor
+      : detail::is_never_blocking_one_way_executor<typename std::decay<T>::type>
     {};
 
     // Condition: T meets the syntactic requirements for BulkOneWayExecutor
@@ -89,11 +72,6 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_two_way_executor<typename std::decay<T>::type>
     {};
 
-    template <typename T, typename Enable = void>
-    struct is_non_blocking_two_way_executor
-      : detail::is_non_blocking_two_way_executor<typename std::decay<T>::type>
-    {};
-
     // Condition: T meets the syntactic requirements for BulkTwoWayExecutor
     // Precondition: T is a complete type
     template <typename T, typename Enable = void>
@@ -106,12 +84,8 @@ namespace hpx { namespace parallel { namespace execution
 //         is_one_way_executor<T>::value;
 //
 //     template <typename T>
-//     constexpr bool is_host_based_one_way_executor_v =
-//         is_host_based_one_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_non_blocking_one_way_executor_v =
-//         is_non_blocking_one_way_executor<T>::value;
+//     constexpr bool is_never_blocking_one_way_executor_v =
+//         is_never_blocking_one_way_executor<T>::value;
 //
 //     template <typename T>
 //     constexpr bool is_bulk_one_way_executor_v =
@@ -120,10 +94,6 @@ namespace hpx { namespace parallel { namespace execution
 //     template <typename T>
 //     constexpr bool is_two_way_executor_v =
 //         is_two_way_executor<T>::value;
-//
-//     template <typename T>
-//     constexpr bool is_non_blocking_two_way_executor_v =
-//         is_non_blocking_two_way_executor<T>::value;
 //
 //     template <typename T>
 //     constexpr bool is_bulk_two_way_executor_v =
@@ -139,13 +109,8 @@ namespace hpx { namespace traits
     {};
 
     template <typename T, typename Enable = void>
-    struct is_host_based_one_way_executor
-      : parallel::execution::is_host_based_one_way_executor<T>
-    {};
-
-    template <typename T, typename Enable = void>
-    struct is_non_blocking_one_way_executor
-      : parallel::execution::is_non_blocking_one_way_executor<T>
+    struct is_never_blocking_one_way_executor
+      : parallel::execution::is_never_blocking_one_way_executor<T>
     {};
 
     template <typename T, typename Enable = void>
@@ -159,11 +124,6 @@ namespace hpx { namespace traits
     {};
 
     template <typename T, typename Enable = void>
-    struct is_non_blocking_two_way_executor
-      : parallel::execution::is_non_blocking_two_way_executor<T>
-    {};
-
-    template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : parallel::execution::is_bulk_two_way_executor<T>
     {};
@@ -173,11 +133,9 @@ namespace hpx { namespace traits
     struct is_executor_any
       : util::detail::any_of<
             is_one_way_executor<T>,
-            is_host_based_one_way_executor<T>,
-            is_non_blocking_one_way_executor<T>,
+            is_never_blocking_one_way_executor<T>,
             is_bulk_one_way_executor<T>,
             is_two_way_executor<T>,
-            is_non_blocking_two_way_executor<T>,
             is_bulk_two_way_executor<T>
         >
     {};

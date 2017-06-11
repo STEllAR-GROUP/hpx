@@ -454,9 +454,9 @@ namespace hpx { namespace traits
     {};
 
     template <typename BaseExecutor>
-    struct is_non_blocking_one_way_executor<
+    struct is_never_blocking_one_way_executor<
             parallel::execution::timed_executor<BaseExecutor> >
-      : is_non_blocking_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_never_blocking_one_way_executor<typename std::decay<BaseExecutor>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

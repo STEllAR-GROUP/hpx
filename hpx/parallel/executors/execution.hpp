@@ -225,7 +225,7 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<
                 hpx::traits::is_one_way_executor<Executor>::value &&
                !hpx::traits::is_two_way_executor<Executor>::value &&
-               !hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+               !hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename OneWayExecutor, typename F, typename ... Ts>
@@ -588,7 +588,7 @@ namespace hpx { namespace parallel { namespace execution
         struct post_fn_helper<Executor,
             typename std::enable_if<
                 hpx::traits::is_two_way_executor<Executor>::value &&
-               !hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+               !hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename TwoWayExecutor, typename F, typename ... Ts>
@@ -663,7 +663,7 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Executor>
         struct post_fn_helper<Executor,
             typename std::enable_if<
-                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename NonBlockingOneWayExecutor, typename F,
