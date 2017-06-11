@@ -34,10 +34,10 @@
 #include <hpx/version.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -622,7 +622,7 @@ namespace hpx
         rt->unregister_thread();
     }
 
-    void report_error(std::size_t num_thread, boost::exception_ptr const& e)
+    void report_error(std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))
@@ -638,7 +638,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    void report_error(boost::exception_ptr const& e)
+    void report_error(std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))

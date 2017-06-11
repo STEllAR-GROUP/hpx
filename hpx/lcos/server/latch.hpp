@@ -15,9 +15,11 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/exception.hpp>
 
 #include <cstddef>
+#include <exception>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
@@ -96,11 +98,11 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(std::exception_ptr const& e)
         {
             try {
                 latch_.abort_all();
-                boost::rethrow_exception(e);
+                std::rethrow_exception(e);
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics

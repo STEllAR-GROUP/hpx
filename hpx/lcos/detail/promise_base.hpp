@@ -23,6 +23,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <memory>
 #include <utility>
 
@@ -59,7 +60,7 @@ namespace lcos {
                 }
                 catch (...)
                 {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 

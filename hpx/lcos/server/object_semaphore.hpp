@@ -20,6 +20,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -186,7 +187,7 @@ struct object_semaphore
 
             catch (...)
             {
-                applier::trigger_error(id, boost::current_exception());
+                applier::trigger_error(id, std::current_exception());
             }
         }
 

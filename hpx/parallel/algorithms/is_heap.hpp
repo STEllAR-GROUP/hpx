@@ -26,8 +26,6 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <iterator>

@@ -40,12 +40,12 @@
 #include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(std::move(res));
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(util::unused_type());
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 

@@ -25,10 +25,9 @@
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -83,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             if (left.has_exception() || right.has_exception())
                             {
-                                std::list<boost::exception_ptr> errors;
+                                std::list<std::exception_ptr> errors;
                                 if(left.has_exception())
                                     hpx::parallel::util::detail::
                                     handle_local_exceptions<ExPolicy>::call(
@@ -95,8 +94,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                                 if (!errors.empty())
                                 {
-                                    boost::throw_exception(
-                                        exception_list(std::move(errors)));
+                                    throw exception_list(std::move(errors));
                                 }
                             }
                             RandIter first = left.get();
@@ -175,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
                 catch (...) {
                     result = hpx::make_exceptional_future<RandIter>(
-                        boost::current_exception());
+                        std::current_exception());
                 }
 
                 if (result.has_exception())

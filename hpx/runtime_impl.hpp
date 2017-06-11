@@ -27,10 +27,9 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <sstream>
 #include <string>
 
@@ -154,7 +153,7 @@ namespace hpx
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
         void report_error(std::size_t num_thread,
-            boost::exception_ptr const& e);
+            std::exception_ptr const& e);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -164,7 +163,7 @@ namespace hpx
         /// \note This function will retrieve the number of the current
         ///       shepherd thread and forward to the report_error function
         ///       above.
-        void report_error(boost::exception_ptr const& e);
+        void report_error(std::exception_ptr const& e);
 
         /// \brief Run the HPX runtime system, use the given function for the
         ///        main \a thread and block waiting for all threads to
@@ -389,7 +388,7 @@ namespace hpx
         boost::signals2::scoped_connection default_error_sink_;
 
         compat::mutex mtx_;
-        boost::exception_ptr exception_;
+        std::exception_ptr exception_;
     };
 }
 

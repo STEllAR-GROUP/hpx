@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -178,12 +179,10 @@ namespace hpx { namespace compute { namespace host
                 return results;
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 
@@ -228,12 +227,10 @@ namespace hpx { namespace compute { namespace host
                 return results;
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 

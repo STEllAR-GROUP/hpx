@@ -20,8 +20,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -94,7 +93,7 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(boost::exception_ptr const& /*e*/)
+        void set_exception(std::exception_ptr const& /*e*/)
         {
             std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));

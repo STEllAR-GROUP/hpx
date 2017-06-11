@@ -88,6 +88,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_cstdint(
     REQUIRED "HPX needs support for C++11 std::[u]intX_t")
 
+  hpx_check_for_cxx11_std_exception_ptr(
+    REQUIRED "HPX needs support for C++11 std::exception_ptr")
+
   hpx_check_for_cxx11_std_initializer_list(
     REQUIRED "HPX needs support for C++11 std::initializer_list")
 

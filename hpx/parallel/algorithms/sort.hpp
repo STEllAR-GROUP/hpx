@@ -27,10 +27,9 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <list>
@@ -157,14 +156,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     if (left.has_exception() || right.has_exception())
                     {
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         if (left.has_exception())
                             errors.push_back(left.get_exception_ptr());
                         if (right.has_exception())
                             errors.push_back(right.get_exception_ptr());
 
-                        boost::throw_exception(
-                            exception_list(std::move(errors)));
+                        throw exception_list(std::move(errors));
                     }
                     return last;
                 },
@@ -206,7 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
             catch (...) {
                 return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    boost::current_exception());
+                    std::current_exception());
             }
 
             if (result.has_exception())

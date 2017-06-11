@@ -46,7 +46,6 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
@@ -247,7 +246,7 @@ namespace hpx { namespace actions
                         << Derived::get_action_name(lva) << ": " << e.what();
 
                     // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                 }
                 catch (...) {
                     LTM_(error)
@@ -255,7 +254,7 @@ namespace hpx { namespace actions
                         << Derived::get_action_name(lva);
 
                     // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                 }
 
                 // Verify that there are no more registered locks for this

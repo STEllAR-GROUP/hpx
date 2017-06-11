@@ -64,12 +64,10 @@ namespace hpx { namespace parallel { namespace execution
                 return hpx::util::invoke(f, std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 
@@ -111,12 +109,10 @@ namespace hpx { namespace parallel { namespace execution
                 }
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
 
             return std::move(results);

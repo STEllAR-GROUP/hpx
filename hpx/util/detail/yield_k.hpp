@@ -16,6 +16,10 @@
 #include <chrono>
 #include <cstddef>
 
+#if defined (HPX_WINDOWS)
+#include <windows.h>
+#endif
+
 namespace hpx { namespace util { namespace detail
 {
     inline void yield_k(std::size_t k, const char *thread_name,

@@ -27,9 +27,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -58,8 +58,8 @@ namespace hpx { namespace actions
         continuation& operator=(continuation&& o);
 
         //
-        void trigger_error(boost::exception_ptr const& e);
-        void trigger_error(boost::exception_ptr && e);
+        void trigger_error(std::exception_ptr const& e);
+        void trigger_error(std::exception_ptr && e);
 
         // serialization support
         void serialize(hpx::serialization::input_archive& ar, unsigned);

@@ -36,10 +36,11 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/exception/exception.hpp>
 #include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
@@ -80,7 +81,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // loop as long this coroutine has been rebound
         do
         {
-            boost::exception_ptr tinfo;
+            std::exception_ptr tinfo;
             try
             {
                 this->check_exit_state();
@@ -105,22 +106,22 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
             catch (exit_exception const&) {
                 status = super_type::ctx_exited_exit;
-                tinfo = boost::current_exception();
+                tinfo = std::current_exception();
                 this->reset();            // reset functor
             }
             catch (boost::exception const&) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = boost::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
             catch (std::exception const&) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = boost::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
             catch (...) {
                 status = super_type::ctx_exited_abnormally;
-                tinfo = boost::current_exception();
+                tinfo = std::current_exception();
                 this->reset();
             }
 

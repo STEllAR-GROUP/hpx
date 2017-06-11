@@ -339,6 +339,13 @@ macro(hpx_check_for_cxx11_std_cstdint)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_exception_ptr)
+  add_hpx_config_test(HPX_WITH_CXX11_EXCEPTION_PTR
+    SOURCE cmake/tests/cxx11_std_exception_ptr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_initializer_list)
   add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp

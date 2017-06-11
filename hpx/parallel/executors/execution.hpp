@@ -38,7 +38,6 @@
 
 #include <boost/range/const_iterator.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/throw_exception.hpp>
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>
@@ -401,12 +400,10 @@ namespace hpx { namespace parallel { namespace execution
                     return std::move(*out);
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        hpx::exception_list(boost::current_exception())
-                    );
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -986,12 +983,10 @@ namespace hpx { namespace parallel { namespace execution
                     return results;
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1009,12 +1004,10 @@ namespace hpx { namespace parallel { namespace execution
                     }
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1103,12 +1096,10 @@ namespace hpx { namespace parallel { namespace execution
                     return hpx::util::unwrapped(results);
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1147,12 +1138,10 @@ namespace hpx { namespace parallel { namespace execution
                     hpx::lcos::wait_all(std::move(results));
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 

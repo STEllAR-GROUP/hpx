@@ -42,12 +42,12 @@
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/detail/endian.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -714,7 +714,7 @@ namespace hpx { namespace parcelset
             }
 
             // all unhandled exceptions terminate the whole application
-            boost::exception_ptr exception =
+            std::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));

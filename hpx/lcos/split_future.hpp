@@ -64,6 +64,7 @@ namespace hpx
 #include <array>
 #endif
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -91,7 +92,7 @@ namespace hpx { namespace lcos
                         std::move(hpx::util::get<I>(*result)));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 
@@ -221,7 +222,7 @@ namespace hpx { namespace lcos
                     this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 

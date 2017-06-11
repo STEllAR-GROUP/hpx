@@ -18,7 +18,6 @@
 #include <experimental/coroutine>
 #endif
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <exception>
@@ -153,11 +152,11 @@ namespace hpx { namespace lcos { namespace detail
                 std::rethrow_exception(std::move(e));
             }
             catch (...) {
-                this->base_type::set_exception(boost::current_exception());
+                this->base_type::set_exception(std::current_exception());
             }
         }
 
-        void set_exception(boost::exception_ptr e)
+        void set_exception(std::exception_ptr e)
         {
             this->base_type::set_exception(std::move(e));
         }

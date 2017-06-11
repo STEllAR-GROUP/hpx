@@ -23,11 +23,10 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <boost/utility/addressof.hpp>      // boost::addressof
 #include <memory>                           // std::addressof
 
+#include <exception>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -42,14 +41,14 @@ namespace hpx { namespace parallel { inline namespace v2
         void handle_task_block_exceptions(parallel::exception_list& errors)
         {
             try {
-                boost::rethrow_exception(boost::current_exception());
+                std::rethrow_exception(std::current_exception());
             }
             catch (parallel::exception_list const& el) {
-                for (boost::exception_ptr const& e: el)
+                for (std::exception_ptr const& e: el)
                     errors.add(e);
             }
             catch (...) {
-                errors.add(boost::current_exception());
+                errors.add(std::current_exception());
             }
         }
         /// \endcond
@@ -166,7 +165,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                boost::throw_exception(errors);
+                throw errors;
         }
 
         // return future representing the execution of all tasks

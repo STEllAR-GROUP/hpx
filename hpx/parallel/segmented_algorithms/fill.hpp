@@ -13,9 +13,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>

@@ -10,8 +10,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,10 +18,10 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
-    void console_error_sink(boost::exception_ptr const&);
+    void console_error_sink(std::exception_ptr const&);
 
     typedef actions::action<
-        void (*)(boost::exception_ptr const&), console_error_sink
+        void (*)(std::exception_ptr const&), console_error_sink
     > console_error_sink_action;
 }}}
 

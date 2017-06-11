@@ -23,8 +23,11 @@
 #include <hpx/util/integer/endian.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/exception/exception.hpp>
+
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <vector>
@@ -218,7 +221,7 @@ namespace hpx
                         << "encode_parcels: "
                            "caught hpx::exception: "
                         << e.what();
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::system::system_error const& e) {
@@ -226,22 +229,22 @@ namespace hpx
                         << "encode_parcels: "
                            "caught boost::system::error: "
                         << e.what();
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::exception const&) {
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught boost::exception";
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (std::exception const& e) {
                     // We have to repackage all exceptions thrown by the
                     // serialization library as otherwise we will loose the
                     // e.what() description of the problem, due to slicing.
-                    boost::throw_exception(boost::enable_error_info(
-                        hpx::exception(serialization_error, e.what())));
+                    throw boost::enable_error_info(
+                        hpx::exception(serialization_error, e.what()));
                     return 0;
                 }
             }
@@ -249,7 +252,7 @@ namespace hpx
                 LPT_(fatal)
                         << "encode_parcels: "
                        "caught unknown exception";
-                hpx::report_error(boost::current_exception());
+                hpx::report_error(std::current_exception());
                     return 0;
             }
 
