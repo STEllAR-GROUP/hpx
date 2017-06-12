@@ -145,7 +145,7 @@ namespace detail
             sched_->Scheduler::do_some_work(num_thread);
         }
 
-        void report_error(std::size_t num, boost::exception_ptr const &e)
+        void report_error(std::size_t num, std::exception_ptr const &e)
         {
             sched_->set_all_states(state_terminating);
             notifier_.on_error(num, e);
@@ -609,7 +609,7 @@ namespace detail
                             << ", aborted thread execution";
 
                         report_error(
-                            num_thread, boost::current_exception());
+                            num_thread, std::current_exception());
                         return;
                     }
                     catch (boost::system::system_error const &e) {
@@ -620,7 +620,7 @@ namespace detail
                             << e.what() << ", aborted thread execution";
 
                         report_error(
-                            num_thread, boost::current_exception());
+                            num_thread, std::current_exception());
                         return;
                     }
                     catch (std::exception const &e) {
@@ -636,7 +636,7 @@ namespace detail
                         << " : caught unexpected "         //-V128
                            "exception, aborted thread execution";
 
-                    report_error(num_thread, boost::current_exception());
+                    report_error(num_thread, std::current_exception());
                     return;
                 }
 

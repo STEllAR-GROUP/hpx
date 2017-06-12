@@ -219,6 +219,7 @@ namespace resource
         std::size_t get_num_threads() const;
         size_t get_num_pools() const;
         size_t get_num_threads(const std::string &pool_name);
+        init_pool_data* get_pool(std::size_t pool_index);
         const std::string &get_pool_name(size_t index) const;
         init_pool_data* get_pool(std::size_t pool_index) const;
         threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;

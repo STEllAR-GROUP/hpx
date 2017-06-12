@@ -1102,7 +1102,7 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_stop_thread(num_thread);
         }
 
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             if (num_thread < high_priority_queues_.size())
                 high_priority_queues_[num_thread]->on_error(num_thread, e);

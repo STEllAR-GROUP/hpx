@@ -86,6 +86,8 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
+        char const* get_description() const { return description_; }
+
         void idle_callback(std::size_t /*num_thread*/)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
