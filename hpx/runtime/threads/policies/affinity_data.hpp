@@ -41,7 +41,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
 
-        mask_cref_type get_used_pus_mask() const;
+        mask_type get_used_pus_mask() const;
         std::size_t get_thread_occupancy(std::size_t pid) const;
 
         std::size_t get_pu_num(std::size_t num_thread) const

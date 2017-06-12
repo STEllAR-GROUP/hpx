@@ -223,9 +223,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topology.get_machine_affinity_mask();
     }
 
-    mask_cref_type affinity_data::get_used_pus_mask() const
+    mask_type affinity_data::get_used_pus_mask() const
     {
-        mask_cref_type ret(0);
+        mask_type ret(0);
 
         for(auto pu_mask : affinity_masks_)
             ret |= pu_mask;
@@ -240,7 +240,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         threads::set(pu_mask, pid);
 
         for(auto affinity_mask : affinity_masks_){
-            if(pu_mask & affinity_mask)
+            if (threads::any(pu_mask & affinity_mask))
                 count ++;
         }
 

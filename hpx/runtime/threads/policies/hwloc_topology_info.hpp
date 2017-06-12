@@ -189,8 +189,8 @@ namespace hpx { namespace threads
         void deallocate(void* addr, std::size_t len) const;
 
         //! FIXME shoshijak: for developping purposes. To be deleted
-        void print_vector(std::vector<mask_type> const& v) const;
-        void print_mask_vector(std::vector<size_t> const& v) const;
+        void print_vector(std::vector<std::size_t> const& v) const;
+        void print_mask_vector(std::vector<mask_type> const& v) const;
         void print_hwloc() const;
 
     private:

@@ -1131,7 +1131,7 @@ namespace hpx { namespace threads
         }
         std::cout << "\n";
     }
-    void hwloc_topology_info::print_vector(std::vector<size_t> const& v) const
+    void hwloc_topology_info::print_vector(std::vector<std::size_t> const& v) const
     {
         std::size_t s = v.size();
         if(s==0) {

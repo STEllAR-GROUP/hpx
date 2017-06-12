@@ -204,7 +204,7 @@ namespace resource
         threads::mask_type pu_mask(0);
         threads::set(pu_mask, pid);
         threads::mask_type comp = affinity_data_.get_used_pus_mask();
-        return (comp & pu_mask);
+        return threads::any(comp & pu_mask);
     }
 
     void resource_partitioner::fill_topology_vectors()

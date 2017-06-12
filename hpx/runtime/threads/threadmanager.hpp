@@ -225,7 +225,7 @@ namespace threads
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
-        virtual mask_cref_type get_used_processing_units() const = 0;
+        virtual mask_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         virtual std::size_t get_worker_thread_num(

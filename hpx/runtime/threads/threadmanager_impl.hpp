@@ -314,9 +314,9 @@ namespace hpx { namespace threads
 
         /// Returns the mask identifying all processing units used by this
         /// thread manager.
-        mask_cref_type get_used_processing_units() const
+        mask_type get_used_processing_units() const
         {
-            mask_cref_type total_used_processing_punits = mask_cref_type();
+            mask_type total_used_processing_punits = mask_type();
             threads::resize(total_used_processing_punits, hardware_concurrency());
 
             for(auto& pool_iter : pools_) {
