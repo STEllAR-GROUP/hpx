@@ -109,7 +109,7 @@ namespace hpx { namespace compute { namespace host
         /// \endcond
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
             parallel::execution::post(executors_[current_],
                 std::forward<F>(f), std::forward<Ts>(ts)...);

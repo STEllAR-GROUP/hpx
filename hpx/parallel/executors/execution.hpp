@@ -243,12 +243,12 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE static auto
             call_impl(int,
                     OneWayExecutor && exec, F && f, Ts &&... ts)
-            ->  decltype(exec.apply_execute(
+            ->  decltype(exec.post(
                     std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
             {
-                // use apply_execute, if exposed
-                return exec.apply_execute(std::forward<F>(f),
+                // use post, if exposed
+                return exec.post(std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
 
@@ -605,12 +605,12 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE static auto
             call_impl(int,
                     TwoWayExecutor && exec, F && f, Ts &&... ts)
-            ->  decltype(exec.apply_execute(
+            ->  decltype(exec.post(
                     std::forward<F>(f), std::forward<Ts>(ts)...
                 ))
             {
-                // use apply_execute, if exposed
-                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+                // use post, if exposed
+                exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
             }
 
             template <typename TwoWayExecutor, typename F, typename ... Ts>
@@ -653,10 +653,10 @@ namespace hpx { namespace parallel { namespace execution
         post_dispatch(int,
                 NonBlockingOneWayExecutor && exec, F && f, Ts &&... ts)
         ->  decltype(
-                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
+                exec.post(std::forward<F>(f), std::forward<Ts>(ts)...)
             )
         {
-            return exec.apply_execute(std::forward<F>(f),
+            return exec.post(std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
 

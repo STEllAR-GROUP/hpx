@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { namespace execution
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        static void apply_execute(F && f, Ts &&... ts)
+        static void post(F && f, Ts &&... ts)
         {
             sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }

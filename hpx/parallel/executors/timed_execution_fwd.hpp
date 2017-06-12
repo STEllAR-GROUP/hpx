@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { namespace execution
         ///             given executor.
         /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \note This calls exec.apply_execute_at(abs_time, f, ts...), if
+        /// \note This calls exec.post_at(abs_time, f, ts...), if
         ///       available, otherwise it emulates timed scheduling by delaying
         ///       calling execution::post() on the underlying non-time-scheduled
         ///       execution agent.
@@ -143,7 +143,7 @@ namespace hpx { namespace parallel { namespace execution
         ///             given executor.
         /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \note This calls exec.apply_execute_after(rel_time, f, ts...), if
+        /// \note This calls exec.post_after(rel_time, f, ts...), if
         ///       available, otherwise it emulates timed scheduling by delaying
         ///       calling execution::post() on the underlying non-time-scheduled
         ///       execution agent.

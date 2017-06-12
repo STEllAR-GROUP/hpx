@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
         /// \note This is valid for two way executors (calls
-        ///       exec.apply_execute(f, ts...), if available, otherwise
+        ///       exec.post(f, ts...), if available, otherwise
         ///       it calls exec.async_execute(f, ts...) while discarding the
         ///       returned future), and for non-blocking two way executors
         ///       (calls exec.post(f, ts...) if it exists).

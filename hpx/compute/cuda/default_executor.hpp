@@ -168,7 +168,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts) const
+        void post(F && f, Ts &&... ts) const
         {
             detail::launch(target_, 1, 1,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -177,14 +177,14 @@ namespace hpx { namespace compute { namespace cuda
         template <typename F, typename ... Ts>
         hpx::future<void> async_execute(F && f, Ts &&... ts) const
         {
-            apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+            post(std::forward<F>(f), std::forward<Ts>(ts)...);
             return target_.get_future();
         }
 
         template <typename F, typename ... Ts>
         void sync_execute(F && f, Ts &&... ts) const
         {
-            apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+            post(std::forward<F>(f), std::forward<Ts>(ts)...);
             target_.synchronize();
         }
 

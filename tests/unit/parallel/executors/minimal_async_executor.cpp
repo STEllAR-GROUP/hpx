@@ -256,7 +256,7 @@ struct test_async_executor5 : test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static void apply_execute(F && f, Ts &&... ts)
+    static void post(F && f, Ts &&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);

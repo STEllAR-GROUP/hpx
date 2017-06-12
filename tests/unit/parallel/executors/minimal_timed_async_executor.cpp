@@ -248,7 +248,7 @@ namespace hpx { namespace traits
 struct test_timed_async_executor4 : test_async_executor1
 {
     template <typename F, typename ... Ts>
-    static void apply_execute(F && f, Ts &&... ts)
+    static void post(F && f, Ts &&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -258,7 +258,7 @@ struct test_timed_async_executor4 : test_async_executor1
 struct test_timed_async_executor5 : test_timed_async_executor4
 {
     template <typename F, typename ... Ts>
-    static void apply_execute_at(hpx::util::steady_time_point const& abs_time,
+    static void post_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {
         ++count_apply_at;

@@ -195,7 +195,7 @@ struct test_sync_executor5 : test_sync_executor1  // derive from sync execute
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    void apply_execute(F && f, Ts &&... ts)
+    void post(F && f, Ts &&... ts)
     {
         this->execute(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

@@ -118,7 +118,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
             parallel::execution::post(
