@@ -41,19 +41,33 @@ particular order):
 
 [heading Breaking Changes]
 
+* We have dropped support for the gcc compiler version V4.8. The
+  minimal gcc version we now test on is gcc V4.9.
+* We have dropped support for the Visual Studio 2013 compiler version. The
+  minimal Visual Studio version we now test on is Visual Studio 2015.5.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    2687] - Add an is_tuple_like trait for sequenceable type detection
+* [pr    2683] - Replace boost::exception_ptr with std::exception_ptr
+* [pr    2681] - Attempt to fix problem in managed_component_base
 * [pr    2680] - Fix bad size during archive creation
 * [pr    2677] - Adding include check for std::addressof
+* [pr    2676] - Adding parallel::destroy and destroy_n
 * [pr    2675] - Making sure statistics counters work as expected
 * [pr    2674] - Turning assertions into exceptions
 * [pr    2673] - Inhibit direct conversion from future<future<T>> --> future<void>
 * [pr    2672] - C++17 invoke forms
+* [pr    2671] - Adding uninitialized_value_construct and
+                 uninitialized_value_construct_n
+* [pr    2669] - Adding uninitialized_default_construct and
+                 uninitialized_default_construct_n
 * [pr    2668] - Fixing documentation index
 * [issue 2667] - Ambiguity of nested hpx::future<void>'s
 * [issue 2666] - Statistics Performance counter is not working
+* [pr    2664] - Adding uninitialized_move and uninitialized_move_n
 * [issue 2663] - Seg fault in managed_component::get_base_gid, possibly cause
                  by util::reinitializable_static
 * [issue 2662] - Crash in managed_component::get_base_gid due to problem with
@@ -61,6 +75,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2665] - Hide the `detail` namespace in doxygen per default
 * [pr    2660] - Add documentation to hpx::util::unwrapped and hpx::util::unwrapped2
 * [pr    2659] - Improve integration with vcpkg
+* [pr    2658] - Unify access_data trait for use in both, serialization and
+                 de-serialization
 * [pr    2657] - Removing hpx::lcos::queue<T>
 * [pr    2655] - Mainteinance for emulate-deleted macros
 * [pr    2654] - Implement parallel is_heap and is_heap_until
@@ -83,6 +99,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2627] - Fix serialization
 * [pr    2626] - Generate `cmake_variables.qbk` and `cmake_toolchains.qbk` outside
                  of the source tree
+* [pr    2625] - Supporting -std=c++17 flag
 * [pr    2624] - Fixing a smalll cmake typo
 * [pr    2622] - Update CMake minimum required version to 3.0.2 (closes #2621)
 * [issue 2621] - Compiling hpx master fails with /usr/bin/ld: final link failed:

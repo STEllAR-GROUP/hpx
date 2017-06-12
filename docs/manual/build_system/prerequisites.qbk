@@ -55,7 +55,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[[*Compilers]]]
-    [[__gcc__                    ][4.9 or newer     ][4.8             ]]
+    [[__gcc__                    ][4.9 or newer     ][4.9             ]]
     [[__icpc__                   ][2014 or newer    ][2014            ]]
     [[__clang__                  ][3.4 or newer     ][3.3             ]]
 
