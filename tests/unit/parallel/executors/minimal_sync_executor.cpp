@@ -328,9 +328,44 @@ namespace hpx { namespace traits
     {};
 }}
 
+template <typename Executor, typename B1, typename B2>
+constexpr void static_check_executor(B1, B2)
+{
+    using namespace hpx::traits;
+
+    static_assert(
+        has_sync_execute_member<Executor>::value == B1::value,
+        "check has_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_sync_execute_member<Executor>::value == B2::value,
+        "check has_bulk_sync_execute_member<Executor>::value");
+
+    static_assert(
+        !has_async_execute_member<Executor>::value,
+        "!has_async_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_async_execute_member<Executor>::value,
+        "!has_bulk_async_execute_member<Executor>::value");
+    static_assert(
+        !has_then_execute_member<Executor>::value,
+        "!has_then_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<Executor>::value,
+        "!has_bulk_then_execute_member<Executor>::value");
+    static_assert(
+        !has_post_member<Executor>::value,
+        "!has_post_member<Executor>::value");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
+    std::false_type f;
+    std::true_type t;
+
+    static_check_executor<test_sync_executor1>(t, f);
+    static_check_executor<test_sync_executor2>(t, t);
+
     test_executor<test_sync_executor1>({{ 1078, 0 }});
     test_executor<test_sync_executor2>({{ 436, 6 }});
 

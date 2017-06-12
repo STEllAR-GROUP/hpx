@@ -148,9 +148,39 @@ void test_bulk_then()
     ).get();
 }
 
+constexpr void static_check_executor()
+{
+    using namespace hpx::traits;
+    using executor =  hpx::parallel::execution::parallel_executor;
+
+    static_assert(
+        !has_sync_execute_member<executor>::value,
+        "!has_sync_execute_member<executor>::value");
+    static_assert(
+        has_async_execute_member<executor>::value,
+        "has_async_execute_member<executor>::value");
+    static_assert(
+        !has_then_execute_member<executor>::value,
+        "!has_then_execute_member<executor>::value");
+    static_assert(
+        !has_bulk_sync_execute_member<executor>::value,
+        "!has_bulk_sync_execute_member<executor>::value");
+    static_assert(
+        has_bulk_async_execute_member<executor>::value,
+        "has_bulk_async_execute_member<executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<executor>::value,
+        "!has_bulk_then_execute_member<executor>::value");
+    static_assert(
+        has_post_member<executor>::value,
+        "check has_post_member<executor>::value");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
+    static_check_executor();
+
     test_sync();
     test_async();
     test_then();

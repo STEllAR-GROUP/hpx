@@ -271,9 +271,48 @@ namespace hpx { namespace traits
     {};
 }}
 
+template <typename Executor,
+    typename B1, typename B2, typename B3, typename B4, typename B5>
+constexpr void static_check_executor(B1, B2, B3, B4, B5)
+{
+    using namespace hpx::traits;
+
+    static_assert(
+        has_async_execute_member<Executor>::value == B1::value,
+        "check has_async_execute_member<Executor>::value");
+    static_assert(
+        has_sync_execute_member<Executor>::value == B2::value,
+        "check has_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_sync_execute_member<Executor>::value == B3::value,
+        "check has_bulk_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_async_execute_member<Executor>::value == B4::value,
+        "check has_bulk_async_execute_member<Executor>::value");
+    static_assert(
+        has_post_member<Executor>::value == B5::value,
+        "check has_post_member<Executor>::value");
+
+    static_assert(
+        !has_then_execute_member<Executor>::value,
+        "!has_then_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<Executor>::value,
+        "!has_bulk_then_execute_member<Executor>::value");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
+    std::false_type f;
+    std::true_type t;
+
+    static_check_executor<test_async_executor1>(t, f, f, f, f);
+    static_check_executor<test_async_executor2>(t, t, f, f, f);
+    static_check_executor<test_async_executor3>(t, f, t, f, f);
+    static_check_executor<test_async_executor4>(t, f, f, t, f);
+    static_check_executor<test_async_executor5>(t, f, f, f, t);
+
     test_executor<test_async_executor1>({{ 0, 0, 431, 0, 0 }});
     test_executor<test_async_executor2>({{ 0, 1, 430, 0, 0 }});
     test_executor<test_async_executor3>({{ 0, 0, 217, 2, 0 }});
