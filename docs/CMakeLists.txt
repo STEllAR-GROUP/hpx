@@ -120,7 +120,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_information_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_parameter_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
