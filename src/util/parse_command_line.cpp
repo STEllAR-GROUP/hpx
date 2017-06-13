@@ -439,7 +439,7 @@ namespace hpx { namespace util
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
 #endif
-                ("hpx:threads", value<std::string>(),
+                ("hpx:threads", value<std::string>()->default_value("all"),
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
