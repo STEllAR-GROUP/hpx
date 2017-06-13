@@ -24,7 +24,11 @@ namespace hpx {
         if(rp.get().cmd_line_parsed() == false){
             // if the resource partitioner is not accessed for the first time
             // if the command-line parsing has not yet been done
-            throw std::invalid_argument("hpx::get_resource_partitioner() can be called only after the resource partitioner has been allowed to parse the command line options. Please call hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) instead");
+            throw std::invalid_argument(
+            "hpx::get_resource_partitioner() can be called only after the resource " \
+            "partitioner has been allowed to parse the command line options. " \
+            "Please call hpx::get_resource_partitioner(desc_cmdline, argc, argv) " \
+            "or hpx::get_resource_partitioner(argc, argv) instead");
         }
 
         return rp.get();
@@ -41,16 +45,25 @@ namespace hpx {
     }
 
     resource::resource_partitioner & get_resource_partitioner(
-            boost::program_options::options_description desc_cmdline, int argc, char **argv)
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, bool check)
     {
         util::static_<resource::resource_partitioner, std::false_type> rp_;
         auto& rp = rp_.get();
 
-        if(rp.cmd_line_parsed() == true){
-            throw std::invalid_argument("After hpx::get_resource_partitioner(desc_cmdline, argc, argv) or hpx::get_resource_partitioner(argc, argv) has been called, the command line has been parsed by the resource partitioner. Please call hpx::get_resource_partitioner()");
+        if (rp.cmd_line_parsed() == true) {
+            if (check) {
+                throw std::invalid_argument(
+                "After hpx::get_resource_partitioner(desc_cmdline, argc, argv) " \
+                "or hpx::get_resource_partitioner(argc, argv) has been called, " \
+                "the command line has been parsed by the resource partitioner. " \
+                "Please call hpx::get_resource_partitioner()");
+            }
+            // no need to parse a second time
         }
-
-        rp.parse(desc_cmdline, argc, argv);
+        else {
+          rp.parse(desc_cmdline, argc, argv);
+        }
         return rp;
 
     }
@@ -284,6 +297,12 @@ namespace resource
                     }
                 }
             }
+        }
+        // @TODO allow empty pools
+        if (get_pool("default")->num_threads_==0) {
+            throw std::runtime_error("Default pool has no threads assigned" \
+            "Please rerun with --hpx:threads=X " \
+            "and check the pool thread assignment");
         }
 
         // Check whether any of the pools defined up to now are empty

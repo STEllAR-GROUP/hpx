@@ -42,7 +42,8 @@ namespace hpx {
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             int argc, char **argv);
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
-            boost::program_options::options_description desc_cmdline, int argc, char **argv);
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, bool check=true);
 
     // may be used anywhere in code and returns a reference to the
     // single, global resource partitioner
