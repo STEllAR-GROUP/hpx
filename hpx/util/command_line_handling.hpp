@@ -37,7 +37,9 @@ namespace hpx { namespace util
             pu_step_(1),
             pu_offset_(std::size_t(-1)),
             numa_sensitive_(0),
-            parsed_(false)
+            cmd_line_parsed_(false),
+            info_printed_(false),
+            version_printed_(false)
         {}
 
         int call(boost::program_options::options_description const& desc_cmdline,
@@ -61,7 +63,9 @@ namespace hpx { namespace util
         std::string affinity_domain_;
         std::string affinity_bind_;
         std::size_t numa_sensitive_;
-        bool parsed_;
+        bool cmd_line_parsed_;
+        bool info_printed_;
+        bool version_printed_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,

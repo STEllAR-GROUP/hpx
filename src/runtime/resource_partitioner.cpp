@@ -606,7 +606,7 @@ namespace resource
 
     bool resource_partitioner::cmd_line_parsed() const
     {
-        return (cfg_.parsed_ == true);
+        return (cfg_.cmd_line_parsed_ == true);
     }
 
     int resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
@@ -627,7 +627,6 @@ namespace resource
 
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
-        //! FIXME what is this?? Change name ...
 
         if(fill_internal_topology){
             // set data describing internal topology backend

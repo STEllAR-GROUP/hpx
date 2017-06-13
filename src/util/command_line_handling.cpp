@@ -1152,15 +1152,15 @@ namespace hpx { namespace util
         int argc, char** argv)
     {
         // set the flag signaling that command line parsing has been done
-        parsed_ = true;
+        cmd_line_parsed_ = true;
 
-        util::manage_config cfgmap(ini_config_); //! USE ini_config
+        util::manage_config cfgmap(ini_config_);
 
         std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_registries = rtcfg_.load_modules();
 
         // insert the pre-configured ini settings after loading modules
-        for (std::string const& e : ini_config_) //! USE ini_config
+        for (std::string const& e : ini_config_)
             rtcfg_.parse("<user supplied config>", e, true, false);
 
         // Initial analysis of the command line options. This is
@@ -1174,7 +1174,7 @@ namespace hpx { namespace util
             boost::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argc,
                     argv, prevm, std::size_t(-1), util::allow_unregistered,
-                    rtcfg_.mode_)) //! USE mode_ to det. which options are allowed
+                    rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1224,7 +1224,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node_, util::allow_unregistered, rtcfg_.mode_, //! USE mode_
+                argc, argv, vm_, node_, util::allow_unregistered, rtcfg_.mode_,
                 &help, &unregistered_options))
         {
             return -1;
@@ -1234,7 +1234,7 @@ namespace hpx { namespace util
         handle_attach_debugger();
 
         // handle all --hpx:foo and --hpx:*:foo options
-        if (!handle_arguments(cfgmap, vm_, ini_config_, node_)) //! USE ini_config_
+        if (!handle_arguments(cfgmap, vm_, ini_config_, node_))
             return -2;
 
         // store unregistered command line and arguments
@@ -1246,17 +1246,23 @@ namespace hpx { namespace util
             return 1;     // exit application gracefully
 
         // add all remaining ini settings to the global configuration
-        rtcfg_.reconfigure(ini_config_); //! USE ini_config_
+        rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
         if (vm_.count("hpx:version")) {
-            detail::print_version(std::cout);
+            if(!version_printed_){
+                detail::print_version(std::cout);
+                version_printed_ = true;
+            }
             return 1;
         }
 
         // print configuration information (static and dynamic)
         if (vm_.count("hpx:info")) {
-            detail::print_info(std::cout, *this);
+            if(!info_printed_){
+                detail::print_info(std::cout, *this);
+                info_printed_ = true;
+            }
             return 1;
         }
 
