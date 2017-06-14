@@ -41,18 +41,20 @@ namespace detail
     public:
         ///////////////////////////////////////////////////////////////////////////
 
-        //! Constructor used in constructor of threadmanager
+
         thread_pool_impl(Scheduler *sched,
             threads::policies::callback_notifier &notifier,
             std::size_t index, char const *pool_name,
-            policies::scheduler_mode m = policies::scheduler_mode::nothing_special)
+            policies::scheduler_mode m = policies::scheduler_mode::nothing_special,
+            std::size_t thread_offset = 0)
           : thread_pool(notifier, index, pool_name, m)
           , sched_(sched)
+          , thread_offset_(thread_offset)
         {
             timestamp_scale_ = 1.0;
         }
 
-        ~thread_pool_impl()
+        virtual ~thread_pool_impl()
         {
             if (!threads_.empty()) {
                 if (!sched_->has_reached_state(state_suspended)) {
@@ -145,6 +147,11 @@ namespace detail
             sched_->Scheduler::do_some_work(num_thread);
         }
 
+        std::size_t get_thread_offset() const
+        {
+            return thread_offset_;
+        }
+
         void report_error(std::size_t num, std::exception_ptr const &e)
         {
             sched_->set_all_states(state_terminating);
@@ -230,7 +237,7 @@ namespace detail
 
         ///////////////////////////////////////////////////////////////////////////
         bool run(
-            std::unique_lock<compat::mutex>& l, std::size_t num_threads, std::size_t thread_offset)
+            std::unique_lock<compat::mutex>& l, std::size_t num_threads)
         {
             HPX_ASSERT(l.owns_lock());
 
@@ -340,7 +347,7 @@ namespace detail
 
                 for(std::size_t thread_num_(0); thread_num_ < num_threads; thread_num_++)
                 {
-                    std::size_t thread_num = thread_offset + thread_num_;
+                    std::size_t thread_num = thread_offset_ + thread_num_;
                     threads::mask_cref_type mask =
                             get_resource_partitioner().get_pu_mask(thread_num, sched_->numa_sensitive());
                     // thread_num ordering: 1. threads of default pool
@@ -495,8 +502,9 @@ namespace detail
 
         compat::thread &get_os_thread_handle(std::size_t num_thread)
         {
-            HPX_ASSERT(num_thread < threads_.size());
-            return threads_[threads_.size() - num_thread - 1];
+            std::size_t num_thread_local = num_thread - thread_offset_;
+            HPX_ASSERT(num_thread_local < threads_.size());
+            return threads_[num_thread_local];
         }
 
         void thread_func(std::size_t num_thread, topology const &topology,
@@ -589,7 +597,7 @@ namespace detail
 
                         sched_->set_scheduler_mode(mode_);
                         detail::scheduling_loop(
-                            num_thread, *sched_, counters, callbacks);
+                            num_thread - thread_offset_, *sched_, counters, callbacks);
 
                         // the OS thread is allowed to exit only if no more
                         // HPX
@@ -597,8 +605,8 @@ namespace detail
                         // terminated
                         HPX_ASSERT(
                             !sched_->Scheduler::get_thread_count(unknown,
-                                thread_priority_default, num_thread) ||
-                            sched_->get_state(num_thread) ==
+                                thread_priority_default, num_thread - thread_offset_) ||
+                            sched_->get_state(num_thread - thread_offset_) ==
                                 state_terminating);
                     }
                     catch (hpx::exception const &e) {
@@ -793,13 +801,17 @@ namespace detail
         }
 
     protected:
-        std::vector<compat::thread> threads_;    //! vector of OS-threads
+        std::vector<compat::thread> threads_;    // vector of OS-threads
 
         friend struct init_tss_helper<Scheduler>;
 
     private:
         // hold the used scheduler
         Scheduler *sched_;
+        std::size_t thread_offset_; // is equal to the accumulated number of threads in all pools preceding this pool
+                                    // in the thread indexation. That means, that in order to know the global index
+                                    // of a thread it owns, the pool has to compute:
+                                    // global index = thread_offset_ + local index.
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -814,7 +826,7 @@ namespace detail
         {
             pool.notifier_.on_start_thread(thread_num);
             pool.init_tss(thread_num);
-            pool.sched_->Scheduler::on_start_thread(thread_num);
+            pool.sched_->Scheduler::on_start_thread(thread_num - pool.get_thread_offset());
         }
         ~init_tss_helper()
         {

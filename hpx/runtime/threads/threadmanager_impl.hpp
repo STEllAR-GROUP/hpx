@@ -72,6 +72,7 @@ namespace hpx { namespace threads
         scheduler_type default_scheduler() const;
         pool_type get_pool(std::string pool_name) const;
         pool_type get_pool(detail::pool_id_type pool_id) const;
+        pool_type get_pool(std::size_t thread_index) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -204,7 +205,7 @@ namespace hpx { namespace threads
             return total;
         }
 
-        //! FIXME should I write an overload which takes id instead of string, and use "default" by default?
+
         compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
             std::lock_guard<mutex_type> lk(mtx_);

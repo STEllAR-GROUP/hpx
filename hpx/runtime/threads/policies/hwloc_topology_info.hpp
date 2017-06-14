@@ -175,7 +175,7 @@ namespace hpx { namespace threads
             ) const;
 
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-            mask_type const& m) const;
+            mask_type const& m, std::string pool_name) const;
 
         struct hwloc_topology_tag {};
 

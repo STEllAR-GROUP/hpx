@@ -1094,6 +1094,7 @@ namespace hpx { namespace util
                 // print the mask for the current PU
                 threads::mask_cref_type pu_mask =
                     rt.get_thread_manager().get_pu_mask(top, i);
+                std::string pool_name = rt.get_thread_manager().get_pool(i)->get_pool_name();
 
                 if (!threads::any(pu_mask))
                 {
@@ -1102,15 +1103,17 @@ namespace hpx { namespace util
                 }
                 else
                 {
-                    top.print_affinity_mask(strm, i, pu_mask);
+                    top.print_affinity_mask(strm, i, pu_mask, pool_name);
                 }
 
                 // Make sure the mask does not contradict the CPU bindings
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                threads::mask_type boundcpu = top.get_cpubind_mask(
-                    rt.get_thread_manager().get_os_thread_handle(i), ec);
+                compat::thread& blob = rt.get_thread_manager().get_os_thread_handle(i);
+                threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
+/*                threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
 
                 // The masks reported by HPX must be the same as the ones
                 // reported from HWLOC.

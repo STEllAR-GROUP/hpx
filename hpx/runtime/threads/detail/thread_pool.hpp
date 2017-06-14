@@ -74,7 +74,8 @@ namespace hpx { namespace threads { namespace detail
         thread_pool(
             threads::policies::callback_notifier& notifier, std::size_t index,
             char const* pool_name, policies::scheduler_mode m = policies::nothing_special);
-        ~thread_pool();
+
+        virtual ~thread_pool();
 
         virtual void print_pool() = 0;
 
@@ -86,7 +87,7 @@ namespace hpx { namespace threads { namespace detail
         virtual void init(std::size_t num_threads, std::size_t threads_offset,
                           policies::detail::affinity_data const& data) = 0;
 
-        virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads, std::size_t thread_offset) = 0;
+        virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;
         void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
 
         virtual void stop_locked(std::unique_lock<lcos::local::no_mutex>& l, bool blocking = true) = 0;
@@ -196,6 +197,8 @@ namespace hpx { namespace threads { namespace detail
 
         virtual void do_some_work(std::size_t num_thread) = 0;
 
+        virtual std::size_t get_thread_offset() const = 0;
+
         virtual void report_error(std::size_t num, std::exception_ptr const& e) = 0;
 
     protected:
@@ -208,7 +211,7 @@ namespace hpx { namespace threads { namespace detail
 
         double timestamp_scale_;    // scale timestamps to nanoseconds
 
-//! should I leave them here or move them to thread_pool_impl?
+//! FIXME should I leave them here or move them to thread_pool_impl?
 //    private:
         threads::policies::callback_notifier& notifier_;
         pool_id_type id_;

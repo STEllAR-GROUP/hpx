@@ -100,7 +100,8 @@ namespace resource
         hpx::threads::detail::thread_pool*(
             hpx::threads::policies::callback_notifier &notifier,
             std::size_t index, char const* name,
-            hpx::threads::policies::scheduler_mode m)>;
+            hpx::threads::policies::scheduler_mode m,
+            std::size_t thread_offset)>;
 
     // scheduler assigned to thread_pool
     // choose same names as in command-line options except with _ instead of -

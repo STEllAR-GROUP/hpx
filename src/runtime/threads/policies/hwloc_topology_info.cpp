@@ -377,6 +377,7 @@ namespace hpx { namespace threads
 
         int const pu_depth =
             hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+
         for (std::size_t i = 0; i != mask_size(mask); ++i)
         {
             if (test(mask, i))
@@ -771,7 +772,7 @@ namespace hpx { namespace threads
     }
 
     void hwloc_topology_info::print_affinity_mask(std::ostream& os,
-        std::size_t num_thread, mask_type const& m) const
+        std::size_t num_thread, mask_type const& m, std::string pool_name) const
     {
         boost::io::ios_flags_saver ifs(os);
         bool first = true;
@@ -806,6 +807,8 @@ namespace hpx { namespace threads
                 detail::print_info(os, obj->parent, true);
                 obj = obj->parent;
             }
+
+            os << ", on pool \"" << pool_name << "\"";
 
             os << std::endl;
         }
