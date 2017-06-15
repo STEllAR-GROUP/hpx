@@ -122,6 +122,7 @@ namespace hpx { namespace serialization { namespace detail
                 promise_.set_value();
 
             hpx::future<void> fut = promise_.get_future();
+
             // we don't call f directly to avoid possible stack overflow.
             auto shared_state_ = hpx::traits::future_access<hpx::future<void> >::
                 get_shared_state(fut);

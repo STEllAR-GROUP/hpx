@@ -119,12 +119,11 @@ public:
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-
-        parcelset::detail::parcel_await(std::move(p), parcelset::write_handler_type(), 0,
-            [this, dest](parcelset::parcel&& p, parcelset::write_handler_type&&)
+        auto f = [this, dest](parcelset::parcel&& p)
             {
                 pp->send_early_parcel(dest, std::move(p));
-            }).apply();
+            };
+        parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
     } // }}}
 
     template <typename Action, typename... Args>
