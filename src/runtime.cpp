@@ -248,7 +248,7 @@ namespace hpx
         runtime::init_tss();
         util::reinit_construct();       // call only after TLS was initialized
 
-        counters_.reset(new performance_counters::registry());
+        counters_ = std::make_shared<performance_counters::registry>();
     }
 
     runtime::~runtime()
@@ -427,6 +427,19 @@ namespace hpx
               ""
             },
 
+#if BOOST_VERSION >= 105600
+            // rolling stddev counter
+            { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
+              "returns the rolling standard deviation value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_stddev",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+#endif
+
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
@@ -457,6 +470,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling max counter
+            { "/statistics/rolling_max", performance_counters::counter_aggregating,
+              "returns the rolling maximum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_max",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling min counter
+            { "/statistics/rolling_min", performance_counters::counter_aggregating,
+              "returns the rolling minimum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_min",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
               ""
             },
 
