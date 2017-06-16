@@ -618,13 +618,6 @@ namespace resource
         // parse command line and set options
         int result = cfg_.call(desc_cmdline, argc, argv);
 
-        /*if (result != 0) { // exit if --hpx:help or others was called
-            if (result > 0)
-                result = 0;     // --hpx:help
-            return result;
-        }*/
-        //! FIXME how to do this??
-
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
 

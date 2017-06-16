@@ -108,6 +108,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         pu_nums_.clear();
 
         const std::size_t used_cores = 0;
+
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", used_cores),
