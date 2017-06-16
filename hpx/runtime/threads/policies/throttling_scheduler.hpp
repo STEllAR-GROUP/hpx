@@ -65,8 +65,13 @@ namespace hpx { namespace threads { namespace policies
 
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::queues_;
+
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+        using local_queue_scheduler<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::mtx_;
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::cond_;
+#endif
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::curr_queue_;
 
@@ -270,7 +275,10 @@ namespace hpx { namespace threads { namespace policies
     protected:
         typedef hpx::lcos::local::spinlock mutex_type;
         mutex_type throttle_mtx_;
-        mutable std::mutex mtx_;
+#if !defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+        mutable compat::mutex mtx_;
+        compat::condition_variable cond_;
+#endif
         mutable boost::dynamic_bitset<> disabled_os_threads_;
         int num_physical_cores;
         int num_logical_cores;
