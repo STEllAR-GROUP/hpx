@@ -41,12 +41,66 @@ namespace hpx {
         options_description desc_cmdline(
                 std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
 
-        return get_resource_partitioner(desc_cmdline, argc, argv);
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), runtime_mode_default);
     }
 
     resource::resource_partitioner & get_resource_partitioner(
             boost::program_options::options_description desc_cmdline,
-            int argc, char **argv, bool check)
+            int argc, char **argv)
+    {
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), runtime_mode_default);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(int argc, char **argv,
+        std::vector<std::string> ini_config)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_cmdline(
+                std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(int argc, char **argv, runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_cmdline(
+                std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), mode);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, std::vector<std::string> ini_config)
+    {
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, runtime_mode mode)
+    {
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), mode);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(
+            int argc, char **argv, std::vector<std::string> ini_config, runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_cmdline(
+                std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::move(ini_config), mode);
+    }
+
+    resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, std::vector<std::string> ini_config,
+            runtime_mode mode, bool check)
     {
         util::static_<resource::resource_partitioner, std::false_type> rp_;
         auto& rp = rp_.get();
@@ -62,7 +116,7 @@ namespace hpx {
             // no need to parse a second time
         }
         else {
-          rp.parse(desc_cmdline, argc, argv);
+          rp.parse(desc_cmdline, argc, argv, std::move(ini_config), mode);
         }
         return rp;
 
@@ -194,15 +248,11 @@ namespace resource
     }
 
     void resource_partitioner::set_hpx_init_options(
-            hpx::runtime_mode mode,
             util::function_nonser<
                     int(boost::program_options::variables_map& vm)
-            > const& f,
-            std::vector<std::string> && ini_config)
+            > const& f)
     {
-        cfg_.rtcfg_.mode_ = mode;
         cfg_.hpx_main_f_ = f;
-        cfg_.ini_config_ = std::move(ini_config);
     }
 
     int resource_partitioner::call_cmd_line_options(
@@ -609,11 +659,14 @@ namespace resource
         return (cfg_.cmd_line_parsed_ == true);
     }
 
-    int resource_partitioner::parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
-        bool fill_internal_topology)
+    int resource_partitioner::parse(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, std::vector<std::string> ini_config,
+            runtime_mode mode, bool fill_internal_topology)
     {
         // set internal parameters of runtime configuration
-        cfg_.rtcfg_ = util::runtime_configuration(argv[0]);
+        cfg_.rtcfg_ = util::runtime_configuration(argv[0], mode);
+        cfg_.ini_config_ = std::move(ini_config);
 
         // parse command line and set options
         int result = cfg_.call(desc_cmdline, argc, argv);

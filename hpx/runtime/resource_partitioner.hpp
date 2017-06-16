@@ -44,6 +44,26 @@ namespace hpx {
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             boost::program_options::options_description desc_cmdline,
             int argc, char **argv, bool check=true);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            int argc, char **argv, std::vector<std::string> ini_config);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            int argc, char **argv, runtime_mode mode);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, std::vector<std::string> ini_config);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, runtime_mode mode);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            int argc, char **argv, std::vector<std::string> ini_config,
+            runtime_mode mode);
+    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
+            boost::program_options::options_description desc_cmdline,
+            int argc, char **argv, std::vector<std::string> ini_config,
+            runtime_mode mode, bool check = true);
 
     // may be used anywhere in code and returns a reference to the
     // single, global resource partitioner
@@ -156,11 +176,9 @@ namespace resource
         resource_partitioner();
 
         void set_hpx_init_options(
-                hpx::runtime_mode mode,
                 util::function_nonser<
                         int(boost::program_options::variables_map& vm)
-                > const& f,
-                std::vector<std::string> && ini_config);
+                > const& f);
 
         int call_cmd_line_options(
                 boost::program_options::options_description const& desc_cmdline,
@@ -226,8 +244,10 @@ namespace resource
         init_pool_data* get_pool(std::size_t pool_index) const;
         threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
         bool cmd_line_parsed() const;
-        int parse(boost::program_options::options_description desc_cmdline, int argc, char **argv,
-            bool fill_internal_topology = true);
+        int parse(
+                boost::program_options::options_description desc_cmdline,
+                int argc, char **argv, std::vector<std::string> ini_config,
+                runtime_mode mode, bool fill_internal_topology = true);
 
         const scheduler_function &get_pool_creator(size_t index) const;
 

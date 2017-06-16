@@ -37,7 +37,7 @@ namespace hpx { namespace util
 
     public:
         // initialize and load configuration information
-        runtime_configuration(char const* argv0);
+        runtime_configuration(char const* argv0, runtime_mode mode);
 
         // re-initialize all entries based on the additional information from
         // the given configuration file

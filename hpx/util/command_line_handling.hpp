@@ -29,7 +29,7 @@ namespace hpx { namespace util
     struct command_line_handling
     {
         command_line_handling()
-          : rtcfg_(nullptr),
+          : rtcfg_(nullptr, runtime_mode_default),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),

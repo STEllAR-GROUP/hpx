@@ -47,8 +47,8 @@ namespace detail {
         if (cfg.affinity_bind_.empty())
             return cfg.numa_sensitive_;
 
-        if (cfg.pu_offset_ != std::size_t(-1) || cfg.pu_step_ != 1 ||
-            cfg.affinity_domain_ != "pu")
+        if (!(cfg.pu_offset_ == std::size_t(-1) || cfg.pu_offset_ == std::size_t(0)) ||
+                cfg.pu_step_ != 1 || cfg.affinity_domain_ != "pu")
         {
             throw detail::command_line_error(
                     "Command line option --hpx:bind "

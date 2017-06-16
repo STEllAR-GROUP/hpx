@@ -467,8 +467,8 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(char const* argv0_)
-      : mode_(runtime_mode_default),
+    runtime_configuration::runtime_configuration(char const* argv0_, runtime_mode mode)
+      : mode_(mode),
         num_localities(0),
         small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
