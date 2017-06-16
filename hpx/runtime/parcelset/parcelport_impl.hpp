@@ -717,13 +717,17 @@ namespace hpx { namespace parcelset
 #endif
                 {
                     HPX_ASSERT(it->first == locality_id);
+                    HPX_ASSERT(handlers.size() == 0);
                     HPX_ASSERT(handlers.size() == parcels.size());
 #if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                     std::swap(parcels, *util::get<0>(it->second));
+                    HPX_ASSERT(util::get<0>(it->second)->size() == 0);
 #else
                     std::swap(parcels, util::get<0>(it->second));
+                    HPX_ASSERT(util::get<0>(it->second).size() == 0);
 #endif
                     std::swap(handlers, util::get<1>(it->second));
+                    HPX_ASSERT(handlers.size() == parcels.size());
 
                     HPX_ASSERT(!handlers.empty());
                 }
@@ -877,7 +881,7 @@ namespace hpx { namespace parcelset
             --operations_in_flight_;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_scheduled_thread);
+            sender_connection->set_state(connection::state_scheduled_thread);
 #endif
             if (!ec)
             {
@@ -916,7 +920,7 @@ namespace hpx { namespace parcelset
             std::vector<write_handler_type>&& handlers)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-            sender_connection->set_state(parcelport_connection::state_send_pending);
+            sender_connection->set_state(connection::state_send_pending);
 #endif
 
 #if defined(HPX_DEBUG)

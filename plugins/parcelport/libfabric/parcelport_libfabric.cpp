@@ -382,6 +382,7 @@ namespace libfabric
         LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
         snd->dst_addr_ = addr;
         snd->buffer_ = std::move(buffer);
+        HPX_ASSERT(!snd->handler_);
         snd->handler_ = std::forward<Handler>(handler);
         snd->async_write_impl();
         // after a send poll to make progress on the network and
