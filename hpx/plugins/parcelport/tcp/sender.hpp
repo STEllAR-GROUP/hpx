@@ -99,10 +99,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         void async_write(Handler && handler,
             ParcelPostprocess && parcel_postprocess)
         {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            HPX_ASSERT(state_ == state_send_pending);
+#endif
             HPX_ASSERT(!buffer_.data_.empty());
+            HPX_ASSERT(!handler_);
+            HPX_ASSERT(!postprocess_handler_);
 
             handler_ = std::forward<Handler>(handler);
             postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
+            HPX_ASSERT(handler_);
+            HPX_ASSERT(postprocess_handler_);
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_async_write;
@@ -165,10 +172,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #endif
             // just call initial handler
             handler_(e);
+            handler_.reset();
             if (e)
             {
                 // inform post-processing handler of error as well
-                postprocess_handler_(e, there_, shared_from_this());
+                util::unique_function_nonser<
+                    void(
+                        boost::system::error_code const&
+                      , parcelset::locality const&
+                      , std::shared_ptr<sender>
+                    )
+                > postprocess_handler;
+                std::swap(postprocess_handler, postprocess_handler_);
+                postprocess_handler(e, there_, shared_from_this());
                 return;
             }
 
@@ -202,7 +218,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
-            postprocess_handler_(e, there_, shared_from_this());
+            util::unique_function_nonser<
+                void(
+                    boost::system::error_code const&
+                  , parcelset::locality const&
+                  , std::shared_ptr<sender>
+                )
+            > postprocess_handler;
+            std::swap(postprocess_handler, postprocess_handler_);
+            postprocess_handler(e, there_, shared_from_this());
         }
 
         /// Socket for the parcelport_connection.

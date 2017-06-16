@@ -235,6 +235,7 @@ namespace libfabric
 
         error_code ec;
         handler_(ec);
+        handler_.reset();
 
         // cleanup header and message region
         memory_pool_->deallocate(message_region_);
