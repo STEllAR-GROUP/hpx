@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
         rp.create_thread_pool("mpi", hpx::resource::scheduling_policy::local_priority_fifo);
         std::cout << "[main] " << "thread_pools created \n";
 
-        rp.add_resource(rp.numa_domains()[0].cores_[0].pus_, "mpi");
+    rp.add_resource(rp.numa_domains()[0].cores()[0].pus(), "mpi");
         std::cout << "[main] " << "resources added to thread_pools \n";
     }
 

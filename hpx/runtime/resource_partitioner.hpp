@@ -76,11 +76,12 @@ namespace resource
     struct numa_domain;
 
     struct pu {
+
+    private:
         std::size_t     id_;
         core           *core_;
         std::vector<pu> pus_sharing_core();
         std::vector<pu> pus_sharing_numa_domain();
-                        //! FIXME do i need this or is the counter below enough?
         std::size_t     thread_occupancy_;
                         // indicates the number of threads that should run on this PU
                         //  0: this PU is not exposed by the affinity bindings
@@ -90,29 +91,45 @@ namespace resource
                         // counts number of threads bound to this PU
         friend struct core;
         friend struct numa_domain;
+        friend class resource_partitioner;
+
+    public:
+        std::size_t     id() const {
+            return id_;
+        }
     };
 
     struct core {
+    private:
         std::size_t       id_;
         numa_domain      *domain_;
         std::vector<pu>   pus_;
         std::vector<core> cores_sharing_numa_domain();
         friend struct pu;
         friend struct numa_domain;
+        friend class resource_partitioner;
     public:
         const std::vector<pu> &pus() const {
             return pus_;
         }
+        std::size_t     id() const {
+            return id_;
+        }
     };
 
     struct numa_domain {
+    private:
         std::size_t       id_;
         std::vector<core> cores_;
         friend struct pu;
         friend struct core;
+        friend class resource_partitioner;
     public:
         const std::vector<core> &cores() const {
             return cores_;
+        }
+        std::size_t     id() const {
+            return id_;
         }
     };
 
