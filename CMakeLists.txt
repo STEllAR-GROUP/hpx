@@ -995,10 +995,8 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
 # Make sure we compile in proper C++xx mode (MSVC uses it automatically)
-if(NOT MSVC)
-  include(HPX_DetectCppDialect)
-  hpx_detect_cpp_dialect()
-endif()
+include(HPX_DetectCppDialect)
+hpx_detect_cpp_dialect()
 
 ################################################################################
 # CUDA features
