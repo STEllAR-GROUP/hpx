@@ -12,6 +12,18 @@
 #include <cstddef>
 #include <vector>
 
+ // this file requires serializing threads::mask_type
+ #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+             && HPX_HAVE_MAX_CPU_COUNT > 64)
+ #  if defined(HPX_HAVE_MAX_CPU_COUNT)
+ #    include <bitset>
+ #    include <hpx/runtime/serialization/bitset.hpp>
+ #  else
+ #    include <boost/dynamic_bitset.hpp>
+ #    include <hpx/runtime/serialization/dynamic_bitset.hpp>
+ #  endif
+ #endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 typedef hpx::compute::host::block_allocator<int> target_allocator_int;
