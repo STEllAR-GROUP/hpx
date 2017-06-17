@@ -157,7 +157,6 @@ namespace hpx { namespace threads
         {
             hpx::state result(last_valid_runtime_state);
 
-            typedef boost::atomic<hpx::state> state_type;
             for (auto& pool_iter : pools_)
             {
                 hpx::state s = pool_iter->get_state();
