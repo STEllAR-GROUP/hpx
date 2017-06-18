@@ -269,6 +269,9 @@ namespace resource
             return numa_domains_;
         }
 
+        bool terminate_after_parse() {
+            return cfg_.parse_terminate_;
+        }
 
     private:
 

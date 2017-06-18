@@ -669,7 +669,8 @@ namespace resource
         cfg_.ini_config_ = std::move(ini_config);
 
         // parse command line and set options
-        int result = cfg_.call(desc_cmdline, argc, argv);
+        // terminate set if program options contain --hpx:help or --hpx:version ...
+        cfg_.parse_terminate_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
@@ -679,7 +680,7 @@ namespace resource
             fill_topology_vectors();
         }
 
-        return result;
+        return cfg_.parse_terminate_;
     }
 
     const scheduler_function &resource_partitioner::get_pool_creator(size_t index) const {

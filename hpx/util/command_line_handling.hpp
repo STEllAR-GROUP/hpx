@@ -39,7 +39,8 @@ namespace hpx { namespace util
             numa_sensitive_(0),
             cmd_line_parsed_(false),
             info_printed_(false),
-            version_printed_(false)
+            version_printed_(false),
+            parse_terminate_(false)
         {}
 
         int call(boost::program_options::options_description const& desc_cmdline,
@@ -66,6 +67,7 @@ namespace hpx { namespace util
         bool cmd_line_parsed_;
         bool info_printed_;
         bool version_printed_;
+        bool parse_terminate_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,

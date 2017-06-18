@@ -625,9 +625,7 @@ namespace hpx
 
                 // check whether HPX should be exited at this point
                 // (if the program options contain --hpx:help or --hpx:version)
-                result = rp.call_cmd_line_options(desc_cmdline, argc, argv);
-
-                if (result != 0) {
+                if (rp.terminate_after_parse()) {
                     if (result > 0)
                         result = 0;
                     return result;
