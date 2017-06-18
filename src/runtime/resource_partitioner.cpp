@@ -46,9 +46,9 @@ namespace hpx {
 
     resource::resource_partitioner & get_resource_partitioner(
             boost::program_options::options_description desc_cmdline,
-            int argc, char **argv)
+            int argc, char **argv, bool check)
     {
-        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), runtime_mode_default);
+        return get_resource_partitioner(desc_cmdline, argc, argv, std::vector<std::string>(0), runtime_mode_default, check);
     }
 
     resource::resource_partitioner & get_resource_partitioner(int argc, char **argv,

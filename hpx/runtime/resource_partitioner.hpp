@@ -45,9 +45,6 @@ namespace hpx {
             boost::program_options::options_description desc_cmdline,
             int argc, char **argv, bool check=true);
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
-            boost::program_options::options_description desc_cmdline,
-            int argc, char **argv);
-    extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             int argc, char **argv, std::vector<std::string> ini_config);
     extern HPX_EXPORT hpx::resource::resource_partitioner & get_resource_partitioner(
             int argc, char **argv, runtime_mode mode);
