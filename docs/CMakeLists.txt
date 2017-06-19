@@ -180,6 +180,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
