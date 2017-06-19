@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 
