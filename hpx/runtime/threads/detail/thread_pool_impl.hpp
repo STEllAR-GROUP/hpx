@@ -235,9 +235,11 @@ namespace detail
             return sched_->set_scheduler_mode(mode);
         }
 
+
         ///////////////////////////////////////////////////////////////////////////
         bool run(
-            std::unique_lock<compat::mutex>& l, std::size_t num_threads)
+            std::unique_lock<compat::mutex>& l,
+            compat::barrier& startup, std::size_t num_threads)
         {
             HPX_ASSERT(l.owns_lock());
 
@@ -336,11 +338,8 @@ namespace detail
                        << " timestamp_scale: "
                        << timestamp_scale_;    //-V128
 
-            try {
-                HPX_ASSERT(startup_.get() == nullptr);
-                startup_.reset(new compat::barrier(
-                    static_cast<unsigned>(num_threads + 1)));
-
+//! TODO add try ... catch
+//            try {
                 // run threads and wait for initialization to complete
 
                 topology const &topology_ = get_topology();
@@ -371,7 +370,7 @@ namespace detail
                     // create a new thread
                     threads_.push_back(compat::thread(
                         &thread_pool::thread_func, this, thread_num,
-                        std::ref(topology_), std::ref(*startup_)));
+                        std::ref(topology_), std::ref(startup)));
 
                     // set the new threads affinity (on Windows systems)
                     if (any(mask)) {
@@ -396,13 +395,8 @@ namespace detail
                     }
                 }
 
-                // the main thread needs to have a unique thread_num
-                init_tss(num_threads);
-                startup_->wait();
-
-                // The scheduler is now running.
-                sched_->set_all_states(state_running);
-            }
+//! TODO add try ... catch
+/*            }
             catch (std::exception const &e) {
                 LTM_(always) << "thread_pool::run: " << id_.name_
                              << " failed with: " << e.what();
@@ -417,10 +411,19 @@ namespace detail
                 threads_.clear();
 
                 return false;
-            }
+            }*/
 
             LTM_(info) << "thread_pool::run: " << id_.name_ << " running";
             return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads)
+        {
+            compat::barrier startup(num_threads+1);
+            bool ret = run(l, startup, num_threads);
+            startup.wait();
+            return ret;
         }
 
         void stop_locked(std::unique_lock<lcos::local::no_mutex> &l,
@@ -429,7 +432,7 @@ namespace detail
             LTM_(info) << "thread_pool::stop: " << id_.name_ << " blocking("
                        << std::boolalpha << blocking << ")";
 
-            deinit_tss();
+            threads::get_thread_manager().deinit_tss();
 
             if (!threads_.empty()) {
                 // set state to stopping
@@ -466,8 +469,6 @@ namespace detail
         {
             LTM_(info) << "thread_pool::stop: " << id_.name_ << " blocking("
                        << std::boolalpha << blocking << ")";
-
-            deinit_tss();
 
             if (!threads_.empty()) {
                 // set state to stopping
@@ -825,13 +826,13 @@ namespace detail
           , thread_num_(thread_num)
         {
             pool.notifier_.on_start_thread(thread_num);
-            pool.init_tss(thread_num);
+            threads::get_thread_manager().init_tss(thread_num);
             pool.sched_->Scheduler::on_start_thread(thread_num - pool.get_thread_offset());
         }
         ~init_tss_helper()
         {
             pool_.sched_->Scheduler::on_stop_thread(thread_num_);
-            pool_.deinit_tss();
+            threads::get_thread_manager().deinit_tss();
             pool_.notifier_.on_stop_thread(thread_num_);
         }
 

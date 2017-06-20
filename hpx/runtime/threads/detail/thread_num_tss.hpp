@@ -14,7 +14,7 @@
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    class thread_num_tss
+    class HPX_EXPORT thread_num_tss
     {
     public:
         std::size_t set_tss_threadnum(std::size_t num);
@@ -30,7 +30,7 @@ namespace hpx { namespace threads { namespace detail
     };
 
     // the TSS holds the number associated with a given OS thread
-    extern thread_num_tss thread_num_tss_;
+    extern HPX_EXPORT thread_num_tss thread_num_tss_;
 
     ///////////////////////////////////////////////////////////////////////////
     struct reset_tss_helper

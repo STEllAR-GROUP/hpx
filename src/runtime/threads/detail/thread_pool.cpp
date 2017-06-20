@@ -5,7 +5,6 @@
 
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
 
-#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
@@ -38,17 +37,6 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    void thread_pool::init_tss(std::size_t num)
-    {
-        thread_num_tss_.init_tss(num);
-    }
-
-    void thread_pool::deinit_tss()
-    {
-        thread_num_tss_.deinit_tss();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
 
     thread_pool::thread_pool(

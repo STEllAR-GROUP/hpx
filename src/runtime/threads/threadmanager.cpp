@@ -1851,10 +1851,23 @@ namespace hpx {
     }*/
 
     ///////////////////////////////////////////////////////////////////////////
+
     bool threadmanager_impl::run()
     {
         std::unique_lock<mutex_type> lk(mtx_);
         auto& rp = hpx::get_resource_partitioner();
+        std::size_t num_threads(rp.get_num_threads());
+
+        // reset the startup barrier for controlling startup
+        HPX_ASSERT(startup_.get() == nullptr);
+        startup_.reset(new compat::barrier(
+                static_cast<unsigned>(num_threads + 1)));
+
+        // the main thread needs to have a unique thread_num
+
+        // the main thread needs to have a unique thread_num
+        // threads are numbered 0..N-1, so we can use N for this thread
+        init_tss(num_threads);
 
         LTM_(info) << "run: running timer pool";
         timer_pool_.run(false);
@@ -1866,11 +1879,19 @@ namespace hpx {
             {
                 return true;    // do nothing if already running
             }
-            if (!pool_iter->run(lk, num_threads_in_pool))
+            if (!pool_iter->run(lk, std::ref(*startup_), num_threads_in_pool))
             {
                 timer_pool_.stop();
                 return false;
             }
+        }
+
+        // wait for all thread pools to have launched all OS threads
+        startup_->wait();
+
+        // set all states of all schedulers to "running"
+        for(auto& pool_iter : pools_) {
+            pool_iter->get_scheduler()->set_all_states(state_running);
         }
 
         LTM_(info) << "run: running";
@@ -1885,6 +1906,7 @@ namespace hpx {
         for(auto& pool_iter : pools_) {
             pool_iter->stop(lk, blocking);
         }
+        deinit_tss();
 
         LTM_(info) << "stop: stopping timer pool";
         timer_pool_.stop();             // stop timer pool as well

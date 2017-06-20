@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -235,6 +236,11 @@ namespace threads
         virtual void reset_thread_distribution() = 0;
 
         virtual void set_scheduler_mode(threads::policies::scheduler_mode m) = 0;
+
+        ///////////////////////////////////////////////////////////////////////////
+        virtual void init_tss(std::size_t num) = 0;
+        virtual void deinit_tss() = 0;
+
     };
 }}
 
