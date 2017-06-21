@@ -23,6 +23,7 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <algorithm>
@@ -173,10 +174,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename ExPolicy, typename InIter, typename OutIter, typename T,
-            typename Op>
+            typename Op, typename Conv = util::projection_identity>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T const& init, Op && op, std::false_type) {
+            T const& init, Op && op, std::false_type, Conv && conv = Conv()) {
 
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequential_execution_policy<
@@ -193,10 +194,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename OutIter, typename T,
-            typename Op>
+            typename Op, typename Conv = util::projection_identity>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T const& init, Op && op, std::true_type);
+            T const& init, Op && op, std::true_type, Conv && conv = Conv());
         /// \endcond
     }
 

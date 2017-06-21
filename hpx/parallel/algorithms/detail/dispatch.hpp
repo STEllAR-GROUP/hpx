@@ -18,7 +18,7 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-
+#include <hpx/util/tuple.hpp>
 #include <string>
 #include <type_traits>
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
@@ -48,6 +48,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             >::local_raw_iterator type2;
 
         typedef std::pair<type1, type2> type;
+    };
+
+    template <typename Result1, typename Result2, typename Result3>
+    struct local_algorithm_result<hpx::util::tuple<Result1, Result2, Result3> >
+    {
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result1
+            >::local_raw_iterator type1;
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result2
+            >::local_raw_iterator type2;
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Result3
+            >::local_raw_iterator type3;
+
+        typedef hpx::util::tuple<type1, type2, type3> type;
     };
 
     template <>

@@ -51,6 +51,7 @@ set(subdirs
     container_algorithms
     datapar_algorithms
     executors
+    segmented_algorithms
    )
 
 foreach(subdir ${subdirs})
@@ -58,4 +59,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tests.unit.parallel tests.unit.parallel.${subdir})
 endforeach()
-

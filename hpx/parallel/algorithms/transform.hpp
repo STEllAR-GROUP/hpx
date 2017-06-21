@@ -21,6 +21,7 @@
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
@@ -182,6 +183,37 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     >::get(std::make_pair(std::move(first), std::move(dest)));
             }
         };
+
+        /// non_segmented version
+        template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        >::type
+        transform_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            F && f, Proj && proj, std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<OutIter>::value
+                > is_seq;
+
+            return hpx::util::make_tagged_pair<tag::in, tag::out>(
+                detail::transform<std::pair<InIter, OutIter> >().call(
+                    std::forward<ExPolicy>(policy), is_seq(),
+                    first, last, dest, std::forward<F>(f),
+                    std::forward<Proj>(proj)));
+        }
+
+        /// forward declare the segmented version
+        template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        >::type
+        transform_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+            F && f, Proj && proj, std::true_type);
         /// \endcond
     }
 
@@ -263,7 +295,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
+#if defined(HPX_MSVC) && HPX_MSVC <= 1800     // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
@@ -283,18 +315,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::transform<std::pair<InIter, OutIter> >().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, dest, std::forward<F>(f),
-                std::forward<Proj>(proj)));
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        return detail::transform_(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<F>(f), proj, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -427,8 +451,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 if (first1 != last1)
                 {
-                    auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
-                        std::forward<F>(f), std::forward<Proj1>(proj1),
+                    auto f1 = transform_binary_iteration<ExPolicy, F, Proj1,
+                        Proj2>(std::forward<F>(f), std::forward<Proj1>(proj1),
                         std::forward<Proj2>(proj2));
 
                     return get_iter_tuple(
@@ -445,6 +469,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::move(first2), std::move(dest)));
             }
         };
+
+        template <
+            typename ExPolicy, typename InIter1, typename InIter2,
+            typename OutIter, typename F,
+            typename Proj1, typename Proj2>
+        typename util::detail::algorithm_result<
+            ExPolicy,
+            hpx::util::tagged_tuple<
+                tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+            >
+        >::type
+        transform_(ExPolicy && policy,
+            InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
+            Proj1 && proj1, Proj2 && proj2, std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter1>::value ||
+                   !hpx::traits::is_forward_iterator<InIter2>::value ||
+                   !hpx::traits::is_forward_iterator<OutIter>::value
+                > is_seq;
+
+            typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
+
+            return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
+                detail::transform_binary<result_type>().call(
+                    std::forward<ExPolicy>(policy), is_seq(),
+                    first1, last1, first2, dest, std::forward<F>(f),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
+        }
+
+        template <
+            typename ExPolicy, typename InIter1, typename InIter2,
+            typename OutIter, typename F,
+            typename Proj1, typename Proj2>
+        typename util::detail::algorithm_result<
+            ExPolicy,
+            hpx::util::tagged_tuple<
+                tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+            >
+        >::type
+        transform_(ExPolicy && policy,
+            InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
+            Proj1 && proj1, Proj2 && proj2, std::true_type);
         /// \endcond
     }
 
@@ -550,7 +618,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
         traits::is_projected<Proj2, InIter2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 can't pattern match this
+#if defined(HPX_MSVC) && HPX_MSVC <= 1800     // MSVC12 can't pattern match this
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj1, InIter1>,
@@ -579,20 +647,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter1> is_segmented;
 
-        typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
-
-        return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-            detail::transform_binary<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first1, last1, first2, dest, std::forward<F>(f),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
+        return detail::transform_(
+            std::forward<ExPolicy>(policy), first1, last1, first2, dest,
+            std::forward<F>(f), proj1, proj2, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -653,6 +712,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::move(first2), std::move(dest)));
             }
         };
+
+        template <
+            typename ExPolicy, typename InIter1, typename InIter2,
+            typename OutIter, typename F, typename Proj1, typename Proj2>
+        typename util::detail::algorithm_result<
+                ExPolicy,
+                hpx::util::tagged_tuple<
+                    tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+                >
+            >::type
+        transform_(ExPolicy && policy,
+            InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+            OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2, std::false_type)
+            {
+                typedef std::integral_constant<bool,
+                        execution::is_sequential_execution_policy<ExPolicy>::value ||
+                       !hpx::traits::is_forward_iterator<InIter1>::value ||
+                       !hpx::traits::is_forward_iterator<InIter2>::value ||
+                       !hpx::traits::is_forward_iterator<OutIter>::value
+                    > is_seq;
+
+                typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
+
+                return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
+                    detail::transform_binary2<result_type>().call(
+                        std::forward<ExPolicy>(policy), is_seq(),
+                        first1, last1, first2, last2, dest, std::forward<F>(f),
+                        std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
+            }
+        template <
+            typename ExPolicy, typename InIter1, typename InIter2,
+            typename OutIter, typename F, typename Proj1, typename Proj2>
+        typename util::detail::algorithm_result<
+                ExPolicy,
+                hpx::util::tagged_tuple<
+                    tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+                >
+            >::type
+        transform_(ExPolicy && policy,
+            InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+            OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2, std::true_type);
         /// \endcond
     }
 
@@ -794,20 +894,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter1> is_segmented;
 
-        typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
+        return detail::transform_(
+            std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
+            std::forward<F>(f), proj1, proj2, is_segmented());
 
-        return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-            detail::transform_binary2<result_type>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first1, last1, first2, last2, dest, std::forward<F>(f),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
     }
 }}}
 

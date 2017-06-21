@@ -174,6 +174,30 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename OutIter,
+            typename T, typename Op, typename Conv>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        transform_exclusive_scan_(ExPolicy && policy, InIter first, InIter last,
+            OutIter dest, Conv && conv, T init, Op && op, std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<OutIter>::value
+                > is_seq;
+
+            return detail::transform_exclusive_scan<OutIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, dest, std::forward<Conv>(conv), std::move(init),
+                std::forward<Op>(op));
+        }
+
+        template <typename ExPolicy, typename InIter, typename OutIter,
+            typename T, typename Op, typename Conv>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        transform_exclusive_scan_(ExPolicy && policy, InIter first, InIter last,
+            OutIter dest, Conv && conv, T init, Op && op, std::true_type);
         /// \endcond
     }
 
@@ -302,17 +326,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
-
-        typedef std::integral_constant<bool,
-                is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::transform_exclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        return detail::transform_exclusive_scan_(std::forward<ExPolicy>(policy),
             first, last, dest, std::forward<Conv>(conv), std::move(init),
-            std::forward<Op>(op));
+            std::forward<Op>(op), is_segmented());
     }
 
 #if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
@@ -346,16 +363,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 hpx::traits::is_input_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::transform_exclusive_scan<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        return detail::transform_exclusive_scan_(std::forward<ExPolicy>(policy),
             first, last, dest, std::forward<Conv>(conv), std::move(init),
-            std::forward<Op>(op));
+            std::forward<Op>(op), is_segmented());
     }
     /// \endcond
 #endif

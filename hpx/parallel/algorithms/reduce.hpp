@@ -82,6 +82,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
         /// \endcond
+        // Non Segmented Reduce
+        template <typename ExPolicy, typename InIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
+        >::type
+        reduce_(ExPolicy&& policy, InIter first, InIter last
+            , T init, F && f, std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
+
+            return detail::reduce<T>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::move(init), std::forward<F>(f));
+        }
+
+        // Forward Declaration of Segmented Reduce
+        template <typename ExPolicy, typename InIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
+        >::type
+        reduce_(ExPolicy&& policy, InIter first, InIter last
+            , T init, F && f, std::true_type);
     }
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
@@ -165,14 +192,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::move(init), std::forward<F>(f));
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::move(init), std::forward<F>(f), is_segmented());
     }
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -239,14 +263,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::move(init), std::plus<T>());
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::move(init), std::plus<T>(),is_segmented());
     }
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -318,14 +339,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef typename std::iterator_traits<InIter>::value_type value_type;
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::reduce<value_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, value_type(), std::plus<value_type>());
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            value_type(), std::plus<value_type>(), is_segmented());
     }
 }}}
 
