@@ -12,7 +12,7 @@
 #include <boost/range/functions.hpp>
 
 #include <cstddef>
-
+#include <vector>
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
