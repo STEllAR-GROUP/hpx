@@ -6,6 +6,7 @@
 #if !defined(HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414)
 #define HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414
 
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

@@ -63,6 +63,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/all_any_none.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/destroy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
@@ -72,6 +73,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_induction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_loop_reduction.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_heap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
@@ -100,7 +102,10 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce_binary.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_default_construct.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_move.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_value_construct.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
@@ -113,8 +118,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_traits.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_parameter_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_information_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/persistent_auto_chunk_size.hpp"
@@ -123,6 +128,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
@@ -171,8 +177,11 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/traits/is_execution_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
-
 
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
@@ -381,20 +390,22 @@ endif()
 
 # Create links to properly view the docs in the build directory
 set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
-execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
+
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/src"
+                     "${DOCS_OUTPUT_DIR}/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/images"
+                     "${DOCS_OUTPUT_DIR}/images")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/hpx"
+                     "${DOCS_OUTPUT_DIR}/code/hpx")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/src"
+                     "${DOCS_OUTPUT_DIR}/code/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/examples"
+                     "${DOCS_OUTPUT_DIR}/code/examples")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
+                     "${DOCS_OUTPUT_DIR}/code/tests")
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})

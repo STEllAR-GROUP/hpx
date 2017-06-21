@@ -53,8 +53,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound, typename Continuation>
         struct apply_continuation_impl
         {
-            HPX_MOVABLE_ONLY(apply_continuation_impl);
-        public:
+
             typedef typename util::decay<Bound>::type bound_type;
             typedef typename util::decay<Continuation>::type continuation_type;
 
@@ -81,11 +80,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
@@ -117,8 +116,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct apply_continuation_impl<Bound, hpx::util::unused_type>
         {
-            HPX_MOVABLE_ONLY(apply_continuation_impl);
-        public:
+
             typedef typename util::decay<Bound>::type bound_type;
 
             apply_continuation_impl()
@@ -140,11 +138,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply(lco, std::forward<T>(t));
@@ -195,8 +193,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound, typename Continuation>
         struct async_continuation_impl
         {
-            HPX_MOVABLE_ONLY(async_continuation_impl);
-        public:
+
             typedef typename util::decay<Bound>::type bound_type;
             typedef typename util::decay<Continuation>::type continuation_type;
 
@@ -224,11 +221,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
@@ -260,8 +257,7 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct async_continuation_impl<Bound, hpx::util::unused_type>
         {
-            HPX_MOVABLE_ONLY(async_continuation_impl);
-        public:
+
             typedef typename util::decay<Bound>::type bound_type;
 
             async_continuation_impl()
@@ -284,11 +280,11 @@ namespace hpx { namespace util { namespace functional
             }
 
             template <typename T>
-            typename util::result_of<bound_type(naming::id_type, T)>::type
+            typename util::invoke_result<bound_type, naming::id_type, T>::type
             operator()(naming::id_type lco, T && t)
             {
-                typedef typename util::result_of<
-                    bound_type(naming::id_type, T)
+                typedef typename util::invoke_result<
+                    bound_type, naming::id_type, T
                 >::type result_type;
 
                 bound_.apply_c(lco, lco, std::forward<T>(t));

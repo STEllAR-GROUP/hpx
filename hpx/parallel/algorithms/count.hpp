@@ -15,7 +15,6 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/traits/vector_pack_count_bits.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -32,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // count
@@ -57,8 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : op_(std::forward<Op_>(op))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             count_iteration(count_iteration const&) = default;
             count_iteration(count_iteration&&) = default;
 #else
@@ -71,8 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {}
 #endif
 
-            HPX_DELETE_COPY_ASSIGN(count_iteration);
-            HPX_DELETE_MOVE_ASSIGN(count_iteration);
+            count_iteration& operator=(count_iteration const&) = delete;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -166,7 +163,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::execution::is_sequential_execution_policy<
+                    parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
@@ -321,7 +318,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::execution::is_sequential_execution_policy<
+                    parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value

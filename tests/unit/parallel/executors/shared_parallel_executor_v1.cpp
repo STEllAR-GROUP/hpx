@@ -29,7 +29,7 @@ struct shared_parallel_executor
     };
 
     template <typename F, typename ... Ts>
-    hpx::shared_future<typename hpx::util::result_of<F&&(Ts &&...)>::type>
+    hpx::shared_future<typename hpx::util::invoke_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);

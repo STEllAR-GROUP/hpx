@@ -160,7 +160,7 @@ struct test_sync_executor1
     typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     static sync_execute(F && f, Ts &&... ts)
     {
         ++count_sync;
@@ -173,7 +173,7 @@ struct test_timed_sync_executor1 : test_sync_executor1
     typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     static sync_execute_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {

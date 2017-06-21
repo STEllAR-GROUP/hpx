@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // adjacent_find
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least a forward iterator");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::adjacent_find<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

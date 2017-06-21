@@ -11,8 +11,6 @@
 #define HPX_TRAITS_IS_EXECUTOR_PARAMETERS_AUG_01_2015_0709AM
 
 #include <hpx/config.hpp>
-#include <hpx/config/inline_namespace.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <functional>
@@ -20,7 +18,7 @@
 
 #include <boost/ref.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     ///////////////////////////////////////////////////////////////////////////
     struct executor_parameters_tag {};

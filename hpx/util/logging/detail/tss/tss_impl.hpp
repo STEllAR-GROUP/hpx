@@ -32,6 +32,7 @@ namespace detail {
 
 class tss
 {
+public:
     HPX_NON_COPYABLE(tss);
 
 public:
@@ -60,9 +61,12 @@ namespace hpx { namespace util { namespace logging {
 template <typename T>
 class thread_specific_ptr
 {
+public:
     HPX_NON_COPYABLE(thread_specific_ptr);
 
+private:
     detail::tss m_tss;
+
 public:
     thread_specific_ptr() {}
     ~thread_specific_ptr() { reset(); }

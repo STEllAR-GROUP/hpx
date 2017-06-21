@@ -13,8 +13,8 @@
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
-#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
@@ -59,7 +59,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         shutdown_sem_(0),
         current_concurrency_(0), max_current_concurrency_(0),
         tasks_scheduled_(0), tasks_completed_(0),
-        max_punits_(max_punits), min_punits_(min_punits), cookie_(0),
+        max_punits_(max_punits), min_punits_(min_punits), curr_punits_(0),
+        cookie_(0),
         self_(max_punits)
     {
         if (max_punits < min_punits)
@@ -352,7 +353,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, virt_core) ||
-                state == state_terminating);
+                state >= state_terminating);
         }
     }
 
@@ -369,6 +370,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         stats.tasks_completed_ = tasks_completed_.load();
     }
 
+    template <typename Scheduler>
+    char const* thread_pool_executor<Scheduler>::get_description() const
+    {
+        return scheduler_.get_description();
+    }
+
     // Return the requested policy element
     template <typename Scheduler>
     std::size_t thread_pool_executor<Scheduler>::get_policy_element(
@@ -382,9 +389,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return max_punits_;
 
         case threads::detail::current_concurrency:
-            return current_concurrency_ ?
-                static_cast<std::size_t>(current_concurrency_)
-              : min_punits_;
+            return curr_punits_;
 
         default:
             break;
@@ -405,6 +410,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_initialized;
         if (state.compare_exchange_strong(expected, state_starting))
         {
+            ++curr_punits_;
             register_thread_nullary(
                 util::bind(
                     util::one_shot(&thread_pool_executor::run),
@@ -424,8 +430,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // inform the scheduler to stop the virtual core
         boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state oldstate = state.exchange(state_stopped);
-        HPX_ASSERT(oldstate == state_running || oldstate == state_suspended ||
+        HPX_ASSERT(oldstate == state_starting ||
+            oldstate == state_running || oldstate == state_suspended ||
             oldstate == state_stopped);
+        --curr_punits_;
     }
 }}}}
 
@@ -463,21 +471,6 @@ namespace hpx { namespace threads { namespace executors
     {}
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
-    ///////////////////////////////////////////////////////////////////////////
-    throttle_queue_executor::throttle_queue_executor()
-      : scheduled_executor(new detail::thread_pool_executor<
-            policies::throttle_queue_scheduler<> >(
-                get_os_thread_count(), 1))
-    {}
-
-    throttle_queue_executor::throttle_queue_executor(
-            std::size_t max_punits, std::size_t min_punits)
-      : scheduled_executor(new detail::thread_pool_executor<
-            policies::throttle_queue_scheduler<> >(
-                max_punits, min_punits))
-    {}
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()
@@ -508,4 +501,27 @@ namespace hpx { namespace threads { namespace executors
                 max_punits, min_punits, "static_priority_queue_executor"))
     {}
 #endif
+
+
+
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+    ///////////////////////////////////////////////////////////////////////////
+    throttling_executor::throttling_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::throttling_scheduler<> >(
+                get_os_thread_count(), 1))
+    {}
+
+    throttling_executor::throttling_executor(
+            std::size_t max_punits, std::size_t min_punits)
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::throttling_scheduler<> >(
+                max_punits, min_punits))
+    {}
+#endif
+
+
+
+
 }}}

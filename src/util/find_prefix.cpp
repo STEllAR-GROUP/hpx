@@ -128,7 +128,7 @@ namespace hpx { namespace util
         HPX_UNUSED(argv0);
 
         char exe_path[MAX_PATH + 1] = { '\0' };
-        if (!GetModuleFileName(nullptr, exe_path, sizeof(exe_path)))
+        if (!GetModuleFileNameA(nullptr, exe_path, sizeof(exe_path)))
         {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
                 "get_executable_filename",

@@ -63,6 +63,21 @@ void pingpong()
     HPX_TEST_EQ(std::string("passed message"), result);
 }
 
+void pingpong1()
+{
+    hpx::lcos::local::one_element_channel<std::string> pings;
+    hpx::lcos::local::one_element_channel<std::string> pongs;
+
+    for (int i = 0; i != 10; ++i)
+    {
+        ping(pings, "passed message");
+        pong(pings, pongs);
+
+        std::string result = pongs.get(hpx::launch::sync);
+        HPX_TEST_EQ(std::string("passed message"), result);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void ping_void(hpx::lcos::local::send_channel<> pings)
 {
@@ -76,6 +91,8 @@ void pong_void(
 {
     pings.get(hpx::launch::sync);
     pongs.set();
+
+    HPX_TEST(!pingponged);
     pingponged = true;
 }
 
@@ -91,6 +108,23 @@ void pingpong_void()
 
     pongs.get(hpx::launch::sync);
     HPX_TEST(pingponged);
+}
+
+void pingpong_void1()
+{
+    hpx::lcos::local::one_element_channel<> pings;
+    hpx::lcos::local::one_element_channel<> pongs;
+
+    for (int i = 0; i != 10; ++i)
+    {
+        bool pingponged = false;
+
+        ping_void(pings);
+        pong_void(pings, pongs, pingponged);
+
+        pongs.get(hpx::launch::sync);
+        HPX_TEST(pingponged);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,11 +278,62 @@ void closed_channel_set()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void deadlock_test1()
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::local::one_element_channel<int> c;
+        int value = c.get(hpx::launch::sync);
+        HPX_TEST(false);
+        (void)value;
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+void closed_channel_get1()
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::local::one_element_channel<int> c;
+        c.close();
+
+        int value = c.get(hpx::launch::sync);
+        HPX_TEST(false);
+        (void)value;
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+void closed_channel_set1()
+{
+    bool caught_exception = false;
+    try {
+        hpx::lcos::local::one_element_channel<int> c;
+        c.close();
+
+        c.set(42);
+        HPX_TEST(false);
+    }
+    catch(hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     calculate_sum();
     pingpong();
+    pingpong1();
     pingpong_void();
+    pingpong_void1();
     dispatch_work();
     channel_range();
     channel_range_void();
@@ -257,6 +342,10 @@ int main(int argc, char* argv[])
     closed_channel_get();
     closed_channel_get_generation();
     closed_channel_set();
+
+    deadlock_test1();
+    closed_channel_get1();
+    closed_channel_set1();
 
     return hpx::util::report_errors();
 }

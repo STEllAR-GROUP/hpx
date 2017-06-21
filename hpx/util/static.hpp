@@ -11,8 +11,7 @@
 #include <type_traits>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
-    !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
-    (_MSC_FULL_VER < 180021114)         // NovCTP_2013
+    !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
 #include <hpx/compat/mutex.hpp>
 
 #include <memory>   // for placement new
@@ -28,7 +27,7 @@ namespace hpx { namespace util
 {
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) || \
     (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || \
-    (_MSC_FULL_VER >= 180021114)         // NovCTP_2013
+    defined(HPX_MSVC)
 
     //
     // C++11 requires thread-safe initialization of function-scope statics.
@@ -37,7 +36,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:
@@ -95,7 +94,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:

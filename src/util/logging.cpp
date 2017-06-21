@@ -38,6 +38,11 @@
 #include <android/log.h>
 #endif
 
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(push)
+#pragma warning (disable: 4250) // 'class1' : inherits 'class2::member' via dominance
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -1228,6 +1233,10 @@ namespace hpx { namespace util { namespace detail
         init_debuglog_console_log(ini);
     }
 }}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #else  // HPX_HAVE_LOGGING
 

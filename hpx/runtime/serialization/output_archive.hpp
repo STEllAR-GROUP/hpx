@@ -120,7 +120,8 @@ namespace hpx { namespace serialization
                 binary_filter* filter = nullptr)
           : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
-                typename detail::access_data<Container>::preprocessing_only()))
+                typename traits::serialization_access_data<Container>::
+                    preprocessing_only()))
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -197,6 +198,7 @@ namespace hpx { namespace serialization
 
     private:
         friend struct basic_archive<output_archive>;
+
         template <class T>
         friend class array;
 
@@ -357,11 +359,14 @@ namespace hpx { namespace serialization
         void save_binary_chunk(void const * address, std::size_t count)
         {
             if(count == 0) return;
-            size_ += count;
-            if (disable_data_chunking())
+            if (disable_data_chunking()) {
+                size_ += count;
                 buffer_->save_binary(address, count);
-            else
-                buffer_->save_binary_chunk(address, count);
+            }
+            else {
+                // the size might grow if optimizations are not used
+                size_ += buffer_->save_binary_chunk(address, count);
+            }
         }
 
         typedef std::map<const void *, std::uint64_t> pointer_tracker;

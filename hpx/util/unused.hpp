@@ -23,37 +23,37 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct unused_type
     {
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type() HPX_NOEXCEPT
+        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type() noexcept
         {
         }
 
         template <typename T>
-        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type(T const&) HPX_NOEXCEPT
+        HPX_CONSTEXPR HPX_HOST_DEVICE unused_type(T const&) noexcept
         {
         }
 
         template <typename T>
         HPX_CONSTEXPR HPX_HOST_DEVICE unused_type const&
-        operator=(T const&) const HPX_NOEXCEPT
+        operator=(T const&) const noexcept
         {
             return *this;
         }
 
         template <typename T>
         HPX_HOST_DEVICE unused_type&
-        operator=(T const&) HPX_NOEXCEPT
+        operator=(T const&) noexcept
         {
             return *this;
         }
 
         HPX_CONSTEXPR HPX_HOST_DEVICE unused_type const&
-        operator=(unused_type const&) const HPX_NOEXCEPT
+        operator=(unused_type const&) const noexcept
         {
             return *this;
         }
 
         HPX_HOST_DEVICE unused_type&
-        operator=(unused_type const&) HPX_NOEXCEPT
+        operator=(unused_type const&) noexcept
         {
             return *this;
         }

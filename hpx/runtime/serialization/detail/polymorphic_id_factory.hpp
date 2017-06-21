@@ -32,6 +32,7 @@ namespace hpx { namespace serialization {
     {
         class id_registry
         {
+        public:
             HPX_NON_COPYABLE(id_registry);
 
         public:
@@ -78,8 +79,10 @@ namespace hpx { namespace serialization {
 
         class polymorphic_id_factory
         {
+        public:
             HPX_NON_COPYABLE(polymorphic_id_factory);
 
+        private:
             typedef id_registry::ctor_t ctor_t;
             typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
             typedef id_registry::typename_to_id_t typename_to_id_t;

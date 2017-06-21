@@ -43,18 +43,20 @@ namespace hpx { namespace util
         struct scoped_lock
         {
             scoped_lock();
+            scoped_lock(scoped_lock const&) = delete;
+            scoped_lock& operator=(scoped_lock const&) = delete;
             ~scoped_lock();
             void unlock();
-            HPX_MOVABLE_ONLY(scoped_lock);
         };
 
         struct scoped_try_lock
         {
             scoped_try_lock();
+            scoped_try_lock(scoped_try_lock const&) = delete;
+            scoped_try_lock& operator=(scoped_try_lock const&) = delete;
             ~scoped_try_lock();
             void unlock();
             bool locked;
-            HPX_MOVABLE_ONLY(scoped_try_lock);
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;

@@ -13,7 +13,6 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -31,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ////////////////////////////////////////////////////////////////////////////
     // is_sorted
@@ -182,7 +181,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -342,7 +341,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted_until<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

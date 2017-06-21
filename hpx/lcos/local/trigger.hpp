@@ -32,7 +32,6 @@ namespace hpx { namespace lcos { namespace local
         typedef Mutex mutex_type;
 
     private:
-        HPX_MOVABLE_ONLY(base_trigger);
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
@@ -221,7 +220,6 @@ namespace hpx { namespace lcos { namespace local
     struct trigger : public base_trigger<no_mutex>
     {
     private:
-        HPX_MOVABLE_ONLY(trigger);
         typedef base_trigger<no_mutex> base_type;
 
     public:

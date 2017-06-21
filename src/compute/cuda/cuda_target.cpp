@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -183,14 +184,14 @@ namespace hpx { namespace compute { namespace cuda
         reset();
     }
 
-    void target::native_handle_type::reset() HPX_NOEXCEPT
+    void target::native_handle_type::reset() noexcept
     {
         if (stream_)
             cudaStreamDestroy(stream_);     // ignore error
     }
 
     target::native_handle_type::native_handle_type(
-            target::native_handle_type const& rhs) HPX_NOEXCEPT
+            target::native_handle_type const& rhs) noexcept
       : device_(rhs.device_),
         processing_units_(rhs.processing_units_),
         processor_family_(rhs.processor_family_),
@@ -200,7 +201,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type::native_handle_type(
-            target::native_handle_type && rhs) HPX_NOEXCEPT
+            target::native_handle_type && rhs) noexcept
       : device_(rhs.device_),
         processing_units_(rhs.processing_units_),
         processor_family_(rhs.processor_family_),
@@ -211,7 +212,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
-        target::native_handle_type const& rhs) HPX_NOEXCEPT
+        target::native_handle_type const& rhs) noexcept
     {
         if (this == &rhs)
             return *this;
@@ -226,7 +227,7 @@ namespace hpx { namespace compute { namespace cuda
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
-        target::native_handle_type && rhs) HPX_NOEXCEPT
+        target::native_handle_type && rhs) noexcept
     {
         if (this == &rhs)
             return *this;

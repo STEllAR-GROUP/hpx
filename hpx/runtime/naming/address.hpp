@@ -60,7 +60,7 @@ namespace hpx { namespace naming
           : type_(components::component_invalid), address_(a)
         {}
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return !!locality_ &&
                 (components::component_invalid != type_ || 0 != address_);

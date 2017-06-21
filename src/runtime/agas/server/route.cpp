@@ -76,8 +76,6 @@ namespace hpx { namespace agas { namespace server
             addr.address_ = g.lva();
         }
 
-        naming::id_type source = p.source_id();
-
         // either send the parcel on its way or execute actions locally
         if (addr.locality_ == get_locality())
         {
@@ -97,6 +95,8 @@ namespace hpx { namespace agas { namespace server
             naming::gid_type const& id = hpx::util::get<0>(cache_address);
             if (id && naming::detail::store_in_cache(id))
             {
+                naming::id_type source = p.source_id();
+
                 gva const& g = hpx::util::get<1>(cache_address);
                 naming::address addr(g.prefix, g.type, g.lva());
 

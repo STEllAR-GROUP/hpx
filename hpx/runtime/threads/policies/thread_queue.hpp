@@ -27,11 +27,11 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <functional>
 #include <list>
 #include <map>
@@ -1071,7 +1071,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) {}
         void on_stop_thread(std::size_t num_thread) {}
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
+        void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
 
     private:
         mutable mutex_type mtx_;                    ///< mutex protecting the members

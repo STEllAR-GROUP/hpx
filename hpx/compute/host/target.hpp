@@ -37,11 +37,11 @@ namespace hpx { namespace compute { namespace host
               : mask_(mask)
             {}
 
-            hpx::threads::mask_type& get_device() HPX_NOEXCEPT
+            hpx::threads::mask_type& get_device() noexcept
             {
                 return mask_;
             }
-            hpx::threads::mask_type const& get_device() const HPX_NOEXCEPT
+            hpx::threads::mask_type const& get_device() const noexcept
             {
                 return mask_;
             }
@@ -75,16 +75,16 @@ namespace hpx { namespace compute { namespace host
         {
         }
 
-        native_handle_type & native_handle() HPX_NOEXCEPT
+        native_handle_type & native_handle() noexcept
         {
             return handle_;
         }
-        native_handle_type const& native_handle() const HPX_NOEXCEPT
+        native_handle_type const& native_handle() const noexcept
         {
             return handle_;
         }
 
-        hpx::id_type const& get_locality() const HPX_NOEXCEPT
+        hpx::id_type const& get_locality() const noexcept
         {
             return locality_;
         }

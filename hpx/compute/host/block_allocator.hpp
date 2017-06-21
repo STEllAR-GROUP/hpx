@@ -115,12 +115,12 @@ namespace hpx { namespace compute { namespace host
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        pointer address(reference x) const HPX_NOEXCEPT
+        pointer address(reference x) const noexcept
         {
             return &x;
         }
 
-        const_pointer address(const_reference x) const HPX_NOEXCEPT
+        const_pointer address(const_reference x) const noexcept
         {
             return &x;
         }
@@ -148,7 +148,7 @@ namespace hpx { namespace compute { namespace host
         // Returns the maximum theoretically possible value of n, for which the
         // call allocate(n, 0) could succeed. In most implementations, this
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-        size_type max_size() const HPX_NOEXCEPT
+        size_type max_size() const noexcept
         {
             return (std::numeric_limits<size_type>::max)();
         }
@@ -257,7 +257,7 @@ namespace hpx { namespace compute { namespace host
         }
 
         // Access the underlying target (device)
-        target_type const& target() const HPX_NOEXCEPT
+        target_type const& target() const noexcept
         {
             return executor_.targets();
         }

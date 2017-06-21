@@ -49,10 +49,10 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <limits>
 #include <utility>
 
@@ -188,13 +188,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
-        void count_down() HPX_NOEXCEPT
+        void count_down() noexcept
         {
             HPX_ASSERT(m_operation_counter);
             --m_operation_counter;
         }
 
-        void count_up() HPX_NOEXCEPT
+        void count_up() noexcept
         {
             ++m_operation_counter;
         }
@@ -227,7 +227,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
          * returns 'is_ready()'.
          * Nothrow.
          */
-        bool signal() HPX_NOEXCEPT
+        bool signal() noexcept
         {
             HPX_ASSERT(!running() && !exited());
             HPX_ASSERT(m_wait_counter);
@@ -270,7 +270,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     return true;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    std::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
@@ -333,19 +333,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             if (m_exit_status || m_state == ctx_waiting)
             {
                 if (m_state == ctx_waiting)
-                    boost::throw_exception(coroutines::waiting());
+                    throw coroutines::waiting();
                 if (m_exit_status == ctx_exited_return)
                     return;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    std::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
                     //      typeid(unknown_exception_tag));
                 }
                 else if (m_exit_status == ctx_exited_exit)
-                    boost::throw_exception(coroutine_exited());
+                    throw coroutine_exited();
                 else {
                     HPX_ASSERT(0 && "unknown exit status");
                 }
@@ -418,7 +418,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // Cannot be called if there are pending operations.
         // It follows that cannot be called from 'this'.
         // Nothrow.
-        void exit() HPX_NOEXCEPT
+        void exit() noexcept
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(is_ready());
@@ -435,11 +435,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(!pending());
             HPX_ASSERT(running());
             m_exit_state = ctx_exit_pending;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.
-        ~context_base() HPX_NOEXCEPT
+        ~context_base() noexcept
         {
             HPX_ASSERT(!running());
             try {
@@ -580,7 +580,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
             HPX_ASSERT(m_apex_data == 0ull);
 #endif
-            m_type_info = boost::exception_ptr();
+            m_type_info = std::exception_ptr();
         }
 
         // Cause the coroutine to exit if
@@ -590,12 +590,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             HPX_ASSERT(running());
             if (!m_exit_state) return;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.
-        void do_return(context_exit_status status, boost::exception_ptr && info)
-            HPX_NOEXCEPT
+        void do_return(context_exit_status status, std::exception_ptr && info)
+            noexcept
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
@@ -608,7 +608,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     protected:
 
         // Nothrow.
-        void do_yield() HPX_NOEXCEPT
+        void do_yield() noexcept
         {
             swap_context(*this, m_caller, detail::yield_hint());
         }
@@ -660,7 +660,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
 
         // This is used to generate a meaningful exception trace.
-        boost::exception_ptr m_type_info;
+        std::exception_ptr m_type_info;
         thread_id_repr_type m_thread_id;
 
         std::size_t continuation_recursion_count_;

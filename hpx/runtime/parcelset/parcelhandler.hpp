@@ -50,6 +50,7 @@ namespace hpx { namespace parcelset
     /// parcel-handlers may be connected to a single parcelport.
     class HPX_EXPORT parcelhandler
     {
+    public:
         HPX_NON_COPYABLE(parcelhandler);
 
     private:

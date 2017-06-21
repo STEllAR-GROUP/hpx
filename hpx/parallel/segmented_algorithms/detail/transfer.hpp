@@ -11,22 +11,20 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // segmented transfer
@@ -245,7 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         ->  std::pair<SegIter, SegOutIter>
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
@@ -275,7 +273,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     >::get(std::make_pair(last, dest));
             }
 
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
             return segmented_transfer(Algo(),

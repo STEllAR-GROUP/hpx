@@ -15,9 +15,8 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -69,7 +68,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         // Close the channel
-        void set_exception(boost::exception_ptr const& /*e*/)
+        void set_exception(std::exception_ptr const& /*e*/)
         {
             channel_.close();
         }

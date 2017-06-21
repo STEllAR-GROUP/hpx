@@ -35,9 +35,9 @@
 
 #include <boost/atomic.hpp>
 #include <boost/archive/basic_archive.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -228,7 +228,7 @@ namespace hpx { namespace parcelset
             {
                 if (ec) {
                     // all errors during early parcel handling are fatal
-                    boost::exception_ptr exception =
+                    std::exception_ptr exception =
                         hpx::detail::get_exception(hpx::exception(ec),
                             "mpi::early_write_handler", __FILE__, __LINE__,
                             "error while handling early parcel: " +

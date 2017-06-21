@@ -351,8 +351,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, 0) ||
-                state == state_terminating);
+                state >= state_terminating);
         }
+    }
+
+    template <typename Scheduler>
+    char const* this_thread_executor<Scheduler>::get_description() const
+    {
+        return scheduler_.get_description();
     }
 
     // Return statistics collected by this scheduler

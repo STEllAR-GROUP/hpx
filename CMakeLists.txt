@@ -81,6 +81,7 @@ include(HPX_Libraries)
 include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
+include(HPX_CreateSymbolicLink)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
@@ -110,6 +111,21 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_LIBRARY_VERSION)
   unset(HPX_SOVERSION)
 endif()
+
+# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
+if(MSVC)
+  set(_with_vcpkg_default OFF)
+  if(VCPKG_TOOLCHAIN)
+    set(_with_vcpkg_default ON)
+  endif()
+  hpx_option(HPX_WITH_VCPKG BOOL
+    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
+    ${_with_vcpkg_default} ADVANCED)
+  if(HPX_WITH_VCPKG)
+    hpx_add_config_define(HPX_HAVE_VCPKG)
+  endif()
+endif()
+
 ################################################################################
 
 ################################################################################
@@ -368,9 +384,8 @@ hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
   OFF
   ADVANCED)
-
 if(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-  add_definitions(-DHPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
+  hpx_add_config_define(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
 endif()
 
 ## Thread Manager related build options
@@ -531,6 +546,7 @@ hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
 if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
+
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 
@@ -564,13 +580,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  # The throttle scheduler is not supported neither on Windows nor on Mac
-  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLE" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
-      set(HPX_WITH_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
-    endif()
-  endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -578,6 +587,13 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
     set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  # The throttling scheduler has not been tested neither on Windows nor on Mac
+  if(NOT WIN32 AND NOT APPLE)
+    if(_scheduler STREQUAL "THROTTLLING" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
+      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
+    endif()
   endif()
   unset(_all)
 endforeach()
@@ -833,6 +849,14 @@ if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 endif()
 
+# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
+    "Enable old style queue components in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_QUEUE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
+endif()
+
 # BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -906,8 +930,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC11 OR MSVC12 OR MSVC14))
-    hpx_error("MSVC x64 2012 or higher is required.")
+  if(NOT (MSVC14))
+    hpx_error("MSVC x64 2015 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
   endif()
@@ -970,55 +994,9 @@ hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS
 hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
-# Make sure we compile in C++11 mode (MSVC uses it automatically)
-if(NOT MSVC)
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    set(CXX_FLAG -std=c++11)
-  else()
-
-    # Try -std=c++14 first
-    if(HPX_WITH_CXX14 OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-                              AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
-      check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
-    endif()
-
-    if(HPX_WITH_CXX14)
-      set(CXX_FLAG -std=c++14)
-      # The Intel compiler doesn't appear to have a fully functional
-      # implementation of C++14 constexpr. It's fine with our C++14 constexpr
-      # usage in HPX but chokes on Boost.
-      # FIXME: This should be replaced with a version-based check in the future
-      # when the Intel compiler is able to build Boost with -std=c++14.
-      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-        add_definitions(-DBOOST_NO_CXX14_CONSTEXPR)
-      endif()
-    else()
-      # ... otherwise try -std=c++1y
-
-      if(HPX_WITH_CXX1Y OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-                                AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
-        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1y)
-      endif()
-
-      if(HPX_WITH_CXX1Y)
-        set(CXX_FLAG -std=c++1y)
-      else()
-        # ... otherwise try -std=c++11
-        check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-        if(HPX_WITH_CXX11)
-          set(CXX_FLAG -std=c++11)
-        else()
-          # ... otherwise try -std=c++0x
-          check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-          if(HPX_WITH_CXX0X)
-            set(CXX_FLAG -std=c++0x)
-          endif()
-        endif()
-      endif()
-    endif()
-  endif()
-  hpx_add_target_compile_option(${CXX_FLAG})
-endif()
+# Make sure we compile in proper C++xx mode (MSVC uses it automatically)
+include(HPX_DetectCppDialect)
+hpx_detect_cpp_dialect()
 
 ################################################################################
 # CUDA features
@@ -1144,15 +1122,13 @@ if(WIN32)
     # VS2013 and above know how to do link time constant data segment folding
     # VS2013 update 2 and above know how to remove debug information for
     #     non-referenced functions and data (-Zc:inline)
-    if(MSVC12 OR MSVC14)
-      hpx_add_target_compile_option(-Zc:inline)
-      hpx_add_target_compile_option(-Gw
-        CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-      hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
-      if(HPX_WITH_DATAPAR_VC)
-        hpx_add_target_compile_option(-std:c++latest)
-        hpx_add_config_define(_HAS_AUTO_PTR_ETC 1)
-      endif()
+    hpx_add_target_compile_option(-Zc:inline)
+    hpx_add_target_compile_option(-Gw
+      CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+    hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
+    if(HPX_WITH_DATAPAR_VC)
+      hpx_add_target_compile_option(-std:c++latest)
+      hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
 
     # Exceptions
@@ -1168,7 +1144,7 @@ if(WIN32)
 
       # Update 2 requires to set _ENABLE_ATOMIC_ALIGNMENT_FIX for it to compile
       # atomics
-      hpx_add_config_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+      hpx_add_config_cond_define(_ENABLE_ATOMIC_ALIGNMENT_FIX)
 
       # Update 3 allows to flag rvalue misuses and enforces strict string const-
       # qualification conformance
@@ -1191,29 +1167,30 @@ if(WIN32)
   ##############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
-  hpx_add_config_define(_WIN32_WINNT 0x0601)
-  hpx_add_config_define(_SCL_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_CRT_SECURE_NO_WARNINGS)
-  hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
-  hpx_add_config_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_WIN32_WINNT 0x0601)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
+  hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+  hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
 
   ##############################################################################
   # Boost
   ##############################################################################
 
-  hpx_add_config_define(BOOST_USE_WINDOWS_H)
+  hpx_add_config_cond_define(BOOST_USE_WINDOWS_H)
   if (NOT Boost_USE_STATIC_LIBS)
-    hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+    hpx_add_config_cond_define(BOOST_SERIALIZATION_DYN_LINK)
   endif()
   if(NOT CMAKE_CL_64)
-    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+    hpx_add_config_cond_define(BOOST_NO_ALIGNMENT)
   endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
-  hpx_add_config_define(PSAPI_VERSION 1)
+  hpx_add_config_cond_define(PSAPI_VERSION 1)
 endif()
 
 # Configure Warnings
@@ -1235,6 +1212,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # 'int': forcing value to bool 'true' or 'false' (performance warning)
     hpx_add_compile_flag(-wd4800)
+
+    # vcpkg enables the /utf-8 option which causes (benign) warnings in the
+    # Spirit headers
+    if(HPX_WITH_VCPKG)
+      # The file contains a character starting at offset ... that is illegal in
+      # the current source character set
+      hpx_add_compile_flag(-wd4828)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
@@ -1871,9 +1857,8 @@ endif()
 include(HPX_GeneratePackage)
 
 # Create a symlink in share pointing to the latest HPX installation
-execute_process(COMMAND
-  "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/share")
+create_symbolic_link("${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}"
+                     "${CMAKE_BINARY_DIR}/share/hpx")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")

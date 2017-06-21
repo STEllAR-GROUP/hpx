@@ -54,6 +54,7 @@ namespace hpx { namespace lcos { namespace local
         private:
             hpx::lcos::local::spinlock & sp_;
 
+        public:
             HPX_NON_COPYABLE(scoped_lock);
 
         public:

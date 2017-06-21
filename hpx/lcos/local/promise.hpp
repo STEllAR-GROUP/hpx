@@ -13,10 +13,10 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
+#include <exception>
 #include <memory>
 #include <utility>
 #include <type_traits>
@@ -29,8 +29,6 @@ namespace hpx { namespace lcos { namespace local
             typename SharedState = lcos::detail::future_data<R>>
         class promise_base
         {
-            HPX_MOVABLE_ONLY(promise_base);
-
             typedef SharedState shared_state_type;
             typedef typename shared_state_type::init_no_addref init_no_addref;
 
@@ -84,7 +82,7 @@ namespace hpx { namespace lcos { namespace local
 #endif
             }
 
-            promise_base(promise_base&& other) HPX_NOEXCEPT
+            promise_base(promise_base&& other) noexcept
               : shared_state_(std::move(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
             {
@@ -98,7 +96,7 @@ namespace hpx { namespace lcos { namespace local
                     "local::detail::promise_base<R>::~promise_base()");
             }
 
-            promise_base& operator=(promise_base&& other) HPX_NOEXCEPT
+            promise_base& operator=(promise_base&& other) noexcept
             {
                 if (this != &other)
                 {
@@ -114,13 +112,13 @@ namespace hpx { namespace lcos { namespace local
                 return *this;
             }
 
-            void swap(promise_base& other) HPX_NOEXCEPT
+            void swap(promise_base& other) noexcept
             {
                 boost::swap(shared_state_, other.shared_state_);
                 boost::swap(future_retrieved_, other.future_retrieved_);
             }
 
-            bool valid() const HPX_NOEXCEPT
+            bool valid() const noexcept
             {
                 return shared_state_ != nullptr;
             }
@@ -213,8 +211,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise : public detail::promise_base<R>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<R> base_type;
 
     public:
@@ -235,7 +231,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT
+        promise(promise&& other) noexcept
           : base_type(std::move(other))
         {}
 
@@ -246,7 +242,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -256,13 +252,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return base_type::valid();
         }
@@ -320,7 +316,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }
@@ -329,8 +325,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<R&> base_type;
 
     public:
@@ -351,7 +345,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT
+        promise(promise&& other) noexcept
           : base_type(std::move(other))
         {}
 
@@ -362,7 +356,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -372,13 +366,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return base_type::valid();
         }
@@ -418,7 +412,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }
@@ -427,8 +421,6 @@ namespace hpx { namespace lcos { namespace local
     template <>
     class promise<void> : public detail::promise_base<void>
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<void> base_type;
 
     public:
@@ -449,7 +441,7 @@ namespace hpx { namespace lcos { namespace local
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT
+        promise(promise&& other) noexcept
           : base_type(std::move(other))
         {}
 
@@ -460,7 +452,7 @@ namespace hpx { namespace lcos { namespace local
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -470,13 +462,13 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return base_type::valid();
         }
@@ -518,14 +510,14 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
         {
             base_type::set_exception(e, ec);
         }
     };
 
     template <typename R>
-    void swap(promise<R>& x, promise<R>& y) HPX_NOEXCEPT
+    void swap(promise<R>& x, promise<R>& y) noexcept
     {
         x.swap(y);
     }

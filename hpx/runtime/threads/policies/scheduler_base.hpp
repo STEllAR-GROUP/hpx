@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,14 +22,13 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
 
-#include <boost/exception_ptr.hpp>
-
 #include <boost/atomic.hpp>
 
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -66,7 +65,7 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base
     {
-    private:
+    public:
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
@@ -101,6 +100,8 @@ namespace hpx { namespace threads { namespace policies
         {
             return affinity_data_.get_pu_num(num_thread);
         }
+
+        char const* get_description() const { return description_; }
 
         void add_punit(std::size_t virt_core, std::size_t thread_num)
         {
@@ -285,7 +286,7 @@ namespace hpx { namespace threads { namespace policies
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            std::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual std::int64_t get_average_thread_wait_time(

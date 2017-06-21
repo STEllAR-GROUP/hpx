@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-namespace hpx { namespace parallel { namespace execution { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { namespace execution { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     struct dataseq_policy;

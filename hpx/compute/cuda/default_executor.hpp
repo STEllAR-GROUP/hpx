@@ -146,17 +146,17 @@ namespace hpx { namespace compute { namespace cuda
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(default_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(default_executor const& rhs) const noexcept
         {
             return target_ == rhs.target_;
         }
 
-        bool operator!=(default_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(default_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        cuda::target const& context() const HPX_NOEXCEPT
+        cuda::target const& context() const noexcept
         {
             return target_;
         }

@@ -12,7 +12,6 @@
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -20,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     template<typename InputIterator, typename Distance>
     HPX_HOST_DEVICE void advance_impl(InputIterator& i, Distance n,

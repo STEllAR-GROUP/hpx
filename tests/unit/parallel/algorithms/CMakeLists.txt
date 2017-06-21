@@ -24,6 +24,8 @@ set(tests
     copyn
     count
     countif
+    destroy
+    destroyn
     equal
     equal_binary
     exclusive_scan
@@ -44,7 +46,6 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_prefetching_executors_v1
     foreach_projection
     foreachn
     foreachn_exception
@@ -62,12 +63,12 @@ set(tests
     for_loop_strided
     generate
     generaten
+    is_heap
+    is_heap_until
     includes
     inclusive_scan
-    inclusive_scan_executors_v1
     is_partitioned
     is_sorted
-    is_sorted_executors_v1
     is_sorted_until
     lexicographical_compare
     max_element
@@ -110,15 +111,24 @@ set(tests
     transform_reduce_binary_exception
     transform_reduce_binary_bad_alloc
     uninitialized_copy
-    uninitialized_copy_executors_v1
     uninitialized_copyn
+    uninitialized_default_construct
+    uninitialized_default_constructn
     uninitialized_fill
     uninitialized_filln
+    uninitialized_move
+    uninitialized_moven
+    uninitialized_value_construct
+    uninitialized_value_constructn
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
   set(tests ${tests}
       foreach_executors_v1
+      foreach_prefetching_executors_v1
+      inclusive_scan_executors_v1
+      is_sorted_executors_v1
+      uninitialized_copy_executors_v1
      )
 endif()
 

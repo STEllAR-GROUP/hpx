@@ -44,7 +44,7 @@ namespace hpx { namespace parcelset
                 return "mpi";
             }
 
-            explicit operator bool() const HPX_NOEXCEPT
+            explicit operator bool() const noexcept
             {
                 return rank_ != -1;
             }

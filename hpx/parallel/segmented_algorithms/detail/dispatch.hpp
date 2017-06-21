@@ -20,11 +20,12 @@
 #include <hpx/util/tuple.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <exception>
 #include <list>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -370,13 +371,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         // handle any remote exceptions
         if (f.has_exception())
         {
-            std::list<boost::exception_ptr> errors;
+            std::list<std::exception_ptr> errors;
             parallel::util::detail::handle_remote_exceptions<
                     ExPolicy
                 >::call(f.get_exception_ptr(), errors);
 
             HPX_ASSERT(errors.empty());
-            boost::throw_exception(exception_list(std::move(errors)));
+            throw exception_list(std::move(errors));
         }
         return f.get();
     }

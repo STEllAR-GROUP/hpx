@@ -22,16 +22,13 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_decltype(
     REQUIRED "HPX needs support for C++11 decltype")
-  hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
-
-  hpx_check_for_cxx11_decltype_n3276(
-    DEFINITIONS HPX_HAVE_CXX11_DECLTYPE_N3276)
+  hpx_add_config_cond_define(BOOST_RESULT_OF_USE_DECLTYPE)
 
   hpx_check_for_cxx11_sfinae_expression(
     DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
 
   hpx_check_for_cxx11_defaulted_functions(
-    DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+    REQUIRED "HPX needs support for C++11 defaulted functions")
 
   hpx_check_for_cxx11_deleted_functions(
     REQUIRED "HPX needs support for C++11 deleted functions")
@@ -49,13 +46,13 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
   hpx_check_for_cxx11_inline_namespaces(
-    DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+    REQUIRED "HPX needs support for C++11 inline namespaces")
 
   hpx_check_for_cxx11_lambdas(
-    DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+    REQUIRED "HPX needs support for C++11 lambdas")
 
   hpx_check_for_cxx11_noexcept(
-    DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+    REQUIRED "HPX needs support for C++11 noexcept")
 
   hpx_check_for_cxx11_nullptr(
     REQUIRED "HPX needs support for C++11 nullptr")
@@ -91,6 +88,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_cstdint(
     REQUIRED "HPX needs support for C++11 std::[u]intX_t")
 
+  hpx_check_for_cxx11_std_exception_ptr(
+    REQUIRED "HPX needs support for C++11 std::exception_ptr")
+
   hpx_check_for_cxx11_std_initializer_list(
     REQUIRED "HPX needs support for C++11 std::initializer_list")
 
@@ -112,6 +112,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
 
+  hpx_check_for_cxx11_std_shuffle(
+    DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
+
   hpx_check_for_cxx11_std_thread(
     DEFINITIONS HPX_HAVE_CXX11_STD_THREAD)
 
@@ -130,10 +133,7 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
 
-  hpx_check_for_cxx11_std_type_traits(
-    DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
-
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -153,14 +153,21 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx14_std_result_of_sfinae(
       DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
-  endif()
 
-  # check for experimental facilities
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
-    # check for Library Fundamentals TS v2's experimental/optional only if in
-    # C++1y or C++14 mode.
+    # check for experimental facilities
+
+    # check for Library Fundamentals TS v2's experimental/optional
     hpx_check_for_libfun_std_experimental_optional(
       DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
+  endif()
+
+  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+    # Check the availability of certain C++17 language features
+    hpx_check_for_cxx17_fold_expressions(
+        DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
+
+    hpx_check_for_cxx17_variable_templates(
+      DEFINITIONS HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
   endif()
 endmacro()
 

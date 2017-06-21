@@ -18,10 +18,10 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(f_());
                 }
                 catch(...) {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(result_type());
                 }
                 catch(...) {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -295,9 +295,6 @@ namespace hpx { namespace lcos { namespace local
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
-    private:
-        HPX_MOVABLE_ONLY(futures_factory);
-
     public:
         // construction and destruction
         futures_factory()
@@ -402,9 +399,20 @@ namespace hpx { namespace lcos { namespace local
             return future_access<future<Result> >::create(std::move(task_));
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !!task_;
+        }
+
+        void set_exception(std::exception_ptr const& e)
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "futures_factory<Result()>::set_exception",
+                    "futures_factory invalid (has it been moved?)");
+                return;
+            }
+            task_->set_exception(e);
         }
 
     protected:

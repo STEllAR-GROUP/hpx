@@ -8,10 +8,10 @@
 #if !defined(HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE)
 #define HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace applier
@@ -35,7 +35,7 @@ inline void trigger(
 
 inline void trigger_error(
     naming::id_type const& k
-  , boost::exception_ptr const& e
+  , std::exception_ptr const& e
     )
 {
     set_lco_error(k, e);
@@ -43,7 +43,7 @@ inline void trigger_error(
 
 inline void trigger_error(
     naming::id_type const& k
-  , boost::exception_ptr && e
+  , std::exception_ptr && e
     )
 {
     set_lco_error(k, e);

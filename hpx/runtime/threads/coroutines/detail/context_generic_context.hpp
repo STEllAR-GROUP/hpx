@@ -40,10 +40,6 @@
 #include <boost/context/detail/fcontext.hpp>
 #endif
 
-#if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
-#include <boost/throw_exception.hpp>
-#endif
-
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -108,7 +104,7 @@ namespace hpx { namespace threads { namespace coroutines
                 posix::watermark_stack(limit, size);
 #else
                 void* limit = std::calloc(size, sizeof(char));
-                if (!limit) boost::throw_exception(std::bad_alloc());
+                if (!limit) throw std::bad_alloc();
 #endif
                 return static_cast<char*>(limit) + size;
             }
@@ -152,7 +148,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_ASSERT(default_stacksize() <= size);
 
                 void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
-                if (!limit) boost::throw_exception(std::bad_alloc());
+                if (!limit) throw std::bad_alloc();
 
                 int off = 0;
                  __splitstack_block_signals_context(segments_ctx_, &off, 0);
@@ -200,6 +196,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         class fcontext_context_impl
         {
+        public:
             HPX_NON_COPYABLE(fcontext_context_impl);
 
         public:

@@ -63,12 +63,11 @@ namespace hpx { namespace parallel { namespace execution
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Compatibility layer
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     /// \cond NOINTERNAL
     struct service_executor
