@@ -6,8 +6,8 @@
 
 /// \file parallel/algorithms/inclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM)
-#define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM
+#if !defined(HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JUN_21_2017_0136PM)
+#define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JUN_21_2017_0136PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>

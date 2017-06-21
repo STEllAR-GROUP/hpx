@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/for_each.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
-#define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
+#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_JUN_21_2017_0932PM)
+#define HPX_PARALLEL_DETAIL_FOR_EACH_JUN_21_2017_0932PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>

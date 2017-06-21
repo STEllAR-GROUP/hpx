@@ -1,12 +1,12 @@
-//  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2017 Ajai V George
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/segmented_algorithms/transform_inclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_transform_inclusive_scan)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHMS_transform_inclusive_scan
+#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFORM_INCLUSIVE_SCAN)
+#define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFORM_INCLUSIVE_SCAN
 
 #include <hpx/config.hpp>
 
