@@ -31,6 +31,7 @@ namespace boost
       { "(\\bstd\\s*::\\s*((map)|(set))\\b)", "std::\\2", "\\2" },
       { "(\\bstd\\s*::\\s*(multi((map)|(set)))\\b)", "std::\\2", "\\3" },
       { "(\\bstd\\s*::\\s*((shared|unique)_ptr)\\b)", "std::\\2", "memory" },
+      { "(\\bstd\\s*::\\s*addressof\\b)", "std::addressof", "memory" },
       { "(\\bstd\\s*::\\s*(unordered_((map|set)))\\b)", "std::\\2", "unordered_\\3" },
       { "(\\bstd\\s*::\\s*(unordered_multi((map)|(set)))\\b)", "std::\\2", "unordered_\\3" },
       { "(\\bstd\\s*::\\s*list\\b)", "std::list", "list" },
@@ -148,12 +149,13 @@ namespace boost
       { "(\\bstd\\s*::\\s*declval\\b)", "std::declval", "utility" },
       { "(\\bstd\\s*::\\s*pair\\b)", "std::pair", "utility" },
       { "(\\bstd\\s*::\\s*make_pair\\b)", "std::make_pair", "utility" },
+      { "(\\bstd\\s*::\\s*exception_ptr\\b)", "std::exception_ptr", "exception" },
       // algorithm
       { "(\\bstd\\s*::\\s*swap_ranges\\b)", "std::swap_ranges", "algorithm" },
       { "(\\bstd\\s*::\\s*iter_swap\\b)", "std::iter_swap", "algorithm" },
       // boost
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
-      { "(\\bboost\\s*::\\s*(((exception)|(intrusive))_ptr)\\b)", "boost::\\3_ptr", "boost/\\3_ptr.hpp" },
+      { "(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr", "boost/intrusive_ptr.hpp" },
       { nullptr, nullptr, nullptr }
     };
 

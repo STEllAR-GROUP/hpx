@@ -42,7 +42,6 @@
 #include <boost/atomic.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -185,6 +184,7 @@ namespace hpx { namespace threads { namespace coroutines
         class fibers_context_impl
           : public fibers_context_impl_base
         {
+        public:
             HPX_NON_COPYABLE(fibers_context_impl);
 
         public:
@@ -208,12 +208,12 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 if (0 == m_ctx)
                 {
-                    boost::throw_exception(boost::system::system_error(
+                    throw boost::system::system_error(
                         boost::system::error_code(
                             GetLastError(),
                             boost::system::system_category()
                             )
-                        ));
+                        );
                 }
             }
 

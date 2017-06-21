@@ -28,7 +28,7 @@ namespace hpx { namespace util
         {
             typedef typename std::conditional<
                     std::is_void<Reference>::value,
-                    typename util::result_of<Transformer(Iterator)>::type,
+                    typename util::invoke_result<Transformer, Iterator>::type,
                     Reference
                 >::type reference_type;
 

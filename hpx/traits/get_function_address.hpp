@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     template <typename F, typename Enable = void>
     struct get_function_address
     {
-        static std::size_t call(F const& f) HPX_NOEXCEPT
+        static std::size_t call(F const& f) noexcept
         {
             return reinterpret_cast<std::size_t>(std::addressof(f));
         }
@@ -28,7 +28,7 @@ namespace hpx { namespace traits
     template <typename R, typename ... Ts>
     struct get_function_address<R (*)(Ts...)>
     {
-        static std::size_t call(R (*f)(Ts...)) HPX_NOEXCEPT
+        static std::size_t call(R (*f)(Ts...)) noexcept
         {
             return reinterpret_cast<std::size_t>(f);
         }
@@ -53,7 +53,7 @@ namespace hpx { namespace traits
     template <typename R, typename Obj, typename ... Ts>
     struct get_function_address<R (Obj::*)(Ts...)>
     {
-        static std::size_t call(R (Obj::*f)(Ts...)) HPX_NOEXCEPT
+        static std::size_t call(R (Obj::*f)(Ts...)) noexcept
         {
 #if defined(__clang__)
 #  pragma clang diagnostic push
@@ -86,7 +86,7 @@ namespace hpx { namespace traits
     template <typename R, typename Obj, typename ... Ts>
     struct get_function_address<R (Obj::*)(Ts...) const>
     {
-        static std::size_t call(R (Obj::*f)(Ts...) const) HPX_NOEXCEPT
+        static std::size_t call(R (Obj::*f)(Ts...) const) noexcept
         {
 #if defined(__clang__)
 #  pragma clang diagnostic push

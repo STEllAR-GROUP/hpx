@@ -16,8 +16,6 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 
@@ -112,7 +110,7 @@ namespace hpx { namespace threads
 
             // now interrupt this thread
             if (throw_on_interrupt)
-                boost::throw_exception(hpx::thread_interrupted());
+                throw hpx::thread_interrupted();
 
             return true;
         }

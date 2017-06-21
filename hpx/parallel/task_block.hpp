@@ -18,23 +18,21 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <boost/utility/addressof.hpp>      // boost::addressof
 #include <memory>                           // std::addressof
 
+#include <exception>
 #include <mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     namespace detail
     {
@@ -43,14 +41,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         void handle_task_block_exceptions(parallel::exception_list& errors)
         {
             try {
-                boost::rethrow_exception(boost::current_exception());
+                std::rethrow_exception(std::current_exception());
             }
             catch (parallel::exception_list const& el) {
-                for (boost::exception_ptr const& e: el)
+                for (std::exception_ptr const& e: el)
                     errors.add(e);
             }
             catch (...) {
-                errors.add(boost::current_exception());
+                errors.add(std::current_exception());
             }
         }
         /// \endcond
@@ -62,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() HPX_NOEXCEPT
+        task_canceled_exception() noexcept
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };
@@ -167,7 +165,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                boost::throw_exception(errors);
+                throw errors;
         }
 
         // return future representing the execution of all tasks

@@ -22,10 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct X
 {
-private:
-    HPX_MOVABLE_ONLY(X);
-
-public:
     int i;
 
     X()
@@ -62,7 +58,7 @@ struct my_exception
 
 void set_promise_exception_thread(hpx::lcos::local::promise<int>* p)
 {
-    p->set_exception(boost::copy_exception(my_exception()));
+    p->set_exception(std::make_exception_ptr(my_exception()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

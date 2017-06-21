@@ -19,10 +19,10 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detected.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
@@ -38,7 +38,6 @@
 
 #include <boost/range/const_iterator.hpp>
 #include <boost/range/functions.hpp>
-#include <boost/throw_exception.hpp>
 
 #if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
 #include <experimental/optional>
@@ -194,14 +193,14 @@ namespace hpx { namespace parallel { namespace execution
             template <typename OneWayExecutor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE static
-            hpx::lcos::future<typename hpx::util::detail::deferred_result_of<
-                F(Future, Ts...)
+            hpx::lcos::future<typename hpx::util::detail::invoke_deferred_result<
+                F, Future, Ts...
             >::type>
             call(OneWayExecutor && exec, F && f, Future& predecessor,
                 Ts &&... ts)
             {
-                typedef typename hpx::util::detail::deferred_result_of<
-                        F(Future, Ts...)
+                typedef typename hpx::util::detail::invoke_deferred_result<
+                        F, Future, Ts...
                     >::type result_type;
 
                 auto func = hpx::util::bind(
@@ -363,8 +362,8 @@ namespace hpx { namespace parallel { namespace execution
                 ))
             {
                 try {
-                    typedef typename hpx::util::detail::deferred_result_of<
-                            F(Ts...)
+                    typedef typename hpx::util::detail::invoke_deferred_result<
+                            F, Ts...
                         >::type result_type;
 
                     // older versions of gcc are not able to capture parameter
@@ -401,12 +400,10 @@ namespace hpx { namespace parallel { namespace execution
                     return std::move(*out);
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        hpx::exception_list(boost::current_exception())
-                    );
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -430,8 +427,8 @@ namespace hpx { namespace parallel { namespace execution
                 ))
             {
                 typedef typename std::is_void<
-                        typename hpx::util::detail::deferred_result_of<
-                            F(Ts...)
+                        typename hpx::util::detail::invoke_deferred_result<
+                            F, Ts...
                         >::type
                     >::type is_void;
 
@@ -502,16 +499,16 @@ namespace hpx { namespace parallel { namespace execution
             template <typename TwoWayExecutor, typename F, typename Future,
                 typename ... Ts>
             static hpx::lcos::future<
-                typename hpx::util::detail::deferred_result_of<
-                    F(Future, Ts...)
+                typename hpx::util::detail::invoke_deferred_result<
+                    F, Future, Ts...
                 >::type
             >
             call_impl(hpx::traits::detail::wrap_int,
                     TwoWayExecutor && exec, F && f, Future& predecessor,
                     Ts &&... ts)
             {
-                typedef typename hpx::util::detail::deferred_result_of<
-                        F(Future, Ts...)
+                typedef typename hpx::util::detail::invoke_deferred_result<
+                        F, Future, Ts...
                     >::type result_type;
 
                 auto func = hpx::util::bind(
@@ -760,8 +757,8 @@ namespace hpx { namespace parallel { namespace execution
                     std::iterator_traits<iterator_type>::value_type
                 value_type;
             typedef typename
-                    hpx::util::detail::deferred_result_of<
-                        F(value_type, Ts...)
+                    hpx::util::detail::invoke_deferred_result<
+                        F, value_type, Ts...
                     >::type
                 type;
         };
@@ -986,12 +983,10 @@ namespace hpx { namespace parallel { namespace execution
                     return results;
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1009,12 +1004,10 @@ namespace hpx { namespace parallel { namespace execution
                     }
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1103,12 +1096,10 @@ namespace hpx { namespace parallel { namespace execution
                     return hpx::util::unwrapped(results);
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1147,12 +1138,10 @@ namespace hpx { namespace parallel { namespace execution
                     hpx::lcos::wait_all(std::move(results));
                 }
                 catch (std::bad_alloc const& ba) {
-                    boost::throw_exception(ba);
+                    throw ba;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        exception_list(boost::current_exception())
-                    );
+                    throw exception_list(std::current_exception());
                 }
             }
 
@@ -1268,8 +1257,8 @@ namespace hpx { namespace parallel { namespace execution
                     std::iterator_traits<iterator_type>::value_type
                 value_type;
             typedef typename
-                    hpx::util::detail::deferred_result_of<
-                        F(value_type, Future, Ts...)
+                    hpx::util::detail::invoke_deferred_result<
+                        F, value_type, Future, Ts...
                     >::type
                 type;
         };

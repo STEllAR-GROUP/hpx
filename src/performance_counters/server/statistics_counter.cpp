@@ -23,6 +23,12 @@
 #include <boost/accumulators/statistics/max.hpp>
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
+#if BOOST_VERSION >= 105600
+#include <boost/accumulators/statistics/rolling_variance.hpp>
+#endif
+
+#include <hpx/util/rolling_min.hpp>
+#include <hpx/util/rolling_max.hpp>
 
 #if defined(HPX_MSVC)
 #  pragma warning(push)
@@ -184,6 +190,42 @@ namespace hpx { namespace performance_counters { namespace server
             accumulator_type accum_;
         };
 
+#if BOOST_VERSION >= 105600
+        template <>
+        struct counter_type_from_statistic<boost::accumulators::tag::rolling_variance>
+          : counter_type_from_statistic_base
+        {
+            typedef boost::accumulators::tag::rolling_variance aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {}
+
+            double get_value()
+            {
+                return sqrt(boost::accumulators::rolling_variance(accum_));
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
+#endif
+
         template <>
         struct counter_type_from_statistic<boost::accumulators::tag::max>
           : counter_type_from_statistic_base
@@ -245,6 +287,74 @@ namespace hpx { namespace performance_counters { namespace server
         private:
             accumulator_type accum_;
         };
+
+        template <>
+        struct counter_type_from_statistic<hpx::util::tag::rolling_min>
+          : counter_type_from_statistic_base
+        {
+            typedef hpx::util::tag::rolling_min aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {}
+
+            double get_value()
+            {
+                return hpx::util::rolling_min(accum_);
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
+
+        template <>
+        struct counter_type_from_statistic<hpx::util::tag::rolling_max>
+          : counter_type_from_statistic_base
+        {
+            typedef hpx::util::tag::rolling_max aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {}
+
+            double get_value()
+            {
+                return hpx::util::rolling_max(accum_);
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -258,6 +368,7 @@ namespace hpx { namespace performance_counters { namespace server
             1000 * parameter1, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(new detail::counter_type_from_statistic<Statistic>(parameter2)),
+        has_prev_value_(false),
         parameter1_(parameter1), parameter2_(parameter2)
     {
         if (parameter1 == 0) {
@@ -288,6 +399,8 @@ namespace hpx { namespace performance_counters { namespace server
         prev_value_.status_ = status_new_data;
         prev_value_.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
+        has_prev_value_ = true;
+
         value = prev_value_;                              // return value
 
         if (reset || value_->need_reset())
@@ -345,9 +458,10 @@ namespace hpx { namespace performance_counters { namespace server
                 util::unlock_guard<std::unique_lock<mutex_type> > unlock(l);
                 base_counter_id = get_counter(base_counter_name_, ec);
             }
+
             // After reacquiring the lock, we need to check again if base_counter_id_
             // hasn't been set yet
-            if(!base_counter_id_)
+            if (!base_counter_id_)
             {
                 base_counter_id_ = base_counter_id;
             }
@@ -383,6 +497,13 @@ namespace hpx { namespace performance_counters { namespace server
 
         value = stubs::performance_counter::get_value(
             launch::sync, base_counter_id_);
+
+        if (!has_prev_value_)
+        {
+            has_prev_value_ = true;
+            prev_value_ = value;
+        }
+
         return true;
     }
 
@@ -455,6 +576,10 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::mean>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::variance>;
+#if BOOST_VERSION >= 105600
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    boost::accumulators::tag::rolling_variance>;
+#endif
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::median>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
@@ -463,6 +588,10 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::max>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::min>;
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    hpx::util::tag::rolling_min>;
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    hpx::util::tag::rolling_max>;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
@@ -475,6 +604,20 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     average_count_counter_type, average_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
+
+#if BOOST_VERSION >= 105600
+///////////////////////////////////////////////////////////////////////////////
+// Rolling variance
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        boost::accumulators::tag::rolling_variance>
+> rolling_variance_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_variance_count_counter_type, rolling_variance_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_variance_count_counter_type::wrapped_type)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variance
@@ -489,7 +632,7 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-// Rooling average
+// Rolling average
 typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::rolling_mean>
@@ -535,6 +678,30 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     min_count_counter_type, min_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Rolling min
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        hpx::util::tag::rolling_min>
+> rolling_min_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_min_count_counter_type, rolling_min_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_min_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Rolling max
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        hpx::util::tag::rolling_max>
+> rolling_max_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_max_count_counter_type, rolling_max_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail

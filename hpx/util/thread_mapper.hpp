@@ -26,6 +26,7 @@ namespace hpx { namespace util
     // enumerates active OS threads and maintains their metadata
     class HPX_EXPORT thread_mapper
     {
+    public:
         HPX_NON_COPYABLE(thread_mapper);
 
     public:

@@ -290,6 +290,8 @@
 
 [template algoref[name] [funcref hpx::parallel::v1::[name] hpx::parallel::[name]]]
 [template algorefv2[name] [funcref hpx::parallel::v2::[name] hpx::parallel::[name]]]
+[template cpprefalgodocs[name] [@http://en.cppreference.com/w/cpp/algorithm/[name] [name]]]
+[template cpprefmemdocs[name] [@http://en.cppreference.com/w/cpp/memory/[name] [name]]]
 
 [/ CONTENT]
 

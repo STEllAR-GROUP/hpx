@@ -15,10 +15,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct moveonly
 {
-private:
-    HPX_MOVABLE_ONLY(moveonly);
-
-public:
     moveonly() {}
 
     moveonly(moveonly&&) {}

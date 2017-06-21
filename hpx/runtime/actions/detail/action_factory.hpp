@@ -20,6 +20,7 @@ namespace hpx { namespace actions { namespace detail
 {
     struct action_registry
     {
+    public:
         HPX_NON_COPYABLE(action_registry);
 
     public:
@@ -55,6 +56,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action>
     struct register_action
     {
+    public:
         HPX_NON_COPYABLE(register_action);
 
     public:
@@ -97,6 +99,7 @@ namespace hpx { namespace actions { namespace detail
     template <std::uint32_t Id>
     struct add_constant_entry
     {
+    public:
         HPX_NON_COPYABLE(add_constant_entry);
 
     public:

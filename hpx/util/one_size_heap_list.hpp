@@ -77,7 +77,7 @@ namespace hpx { namespace util
             HPX_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
-        ~one_size_heap_list() HPX_NOEXCEPT
+        ~one_size_heap_list() noexcept
         {
 #if defined(HPX_DEBUG)
             LOSH_(info)

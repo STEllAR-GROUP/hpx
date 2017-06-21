@@ -180,6 +180,7 @@ namespace libfabric
                 {
                     --senders_in_use_;
                     senders_.push(s);
+                    trigger_pending_work();
                 };
            senders_.push(snd);
         }
@@ -227,6 +228,12 @@ namespace libfabric
         // if no senders are available shutdown
         FUNC_END_DEBUG_MSG;
         return nullptr;
+    }
+
+    void parcelport::reclaim_connection(sender* s)
+    {
+        --senders_in_use_;
+        senders_.push(s);
     }
 
     // --------------------------------------------------------------------
@@ -375,6 +382,7 @@ namespace libfabric
         LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
         snd->dst_addr_ = addr;
         snd->buffer_ = std::move(buffer);
+        HPX_ASSERT(!snd->handler_);
         snd->handler_ = std::forward<Handler>(handler);
         snd->async_write_impl();
         // after a send poll to make progress on the network and

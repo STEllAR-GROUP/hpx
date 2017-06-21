@@ -36,17 +36,17 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_executor
     {
         /// \cond NOINTERNAL
-        bool operator==(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(sequenced_executor const& rhs) const noexcept
         {
             return true;
         }
 
-        bool operator!=(sequenced_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(sequenced_executor const& rhs) const noexcept
         {
             return false;
         }
 
-        sequenced_executor const& context() const HPX_NOEXCEPT
+        sequenced_executor const& context() const noexcept
         {
             return *this;
         }
@@ -57,26 +57,24 @@ namespace hpx { namespace parallel { namespace execution
 
         // OneWayExecutor interface
         template <typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
             try {
                 return hpx::util::invoke(f, std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts)
         {
@@ -111,12 +109,10 @@ namespace hpx { namespace parallel { namespace execution
                 }
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
 
             return std::move(results);
@@ -175,10 +171,9 @@ namespace hpx { namespace traits
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/is_executor_v1.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { inline namespace v3
 {
     /// \cond NOINTERNAL
 
@@ -190,7 +185,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         using base_type = parallel::execution::sequenced_executor;
 
         template <typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute(F && f, Ts &&... ts)
         {
             return base_type::sync_execute(std::forward<F>(f),

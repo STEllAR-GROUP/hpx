@@ -17,8 +17,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -158,7 +157,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address && addr, boost::exception_ptr const& e,
+        naming::address && addr, std::exception_ptr const& e,
         bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -173,7 +172,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address && addr, boost::exception_ptr && e,
+        naming::address && addr, std::exception_ptr && e,
         bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -186,7 +185,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e, bool move_credits = true)
+        std::exception_ptr const& e, bool move_credits = true)
     {
         set_lco_error(id, naming::address(), e, move_credits);
     }
@@ -201,7 +200,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e, bool move_credits = true)
+        std::exception_ptr && e, bool move_credits = true)
     {
         set_lco_error(id, naming::address(), std::move(e), move_credits);
     }
@@ -219,7 +218,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address && addr, boost::exception_ptr const& e,
+        naming::address && addr, std::exception_ptr const& e,
         naming::id_type const& cont, bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -235,7 +234,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        naming::address && addr, boost::exception_ptr && e,
+        naming::address && addr, std::exception_ptr && e,
         naming::id_type const& cont, bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -249,7 +248,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e, naming::id_type const& cont,
+        std::exception_ptr const& e, naming::id_type const& cont,
         bool move_credits = true)
     {
         set_lco_error(id, naming::address(), e, cont, move_credits);
@@ -266,7 +265,7 @@ namespace hpx
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     inline void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e, naming::id_type const& cont,
+        std::exception_ptr && e, naming::id_type const& cont,
         bool move_credits = true)
     {
         set_lco_error(id, naming::address(), std::move(e), cont, move_credits);

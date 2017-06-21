@@ -161,6 +161,7 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag
     {
+    public:
         HPX_NON_COPYABLE(managed_component_base);
 
     private:
@@ -294,9 +295,10 @@ namespace hpx { namespace components
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
-                util::reinitializable_static<
-                    heap_type, wrapper_heap_tag
-                > heap(components::get_component_type<Component>());
+                static components::component_type t =
+                    components::get_component_type<Component>();
+
+                util::reinitializable_static<heap_type, wrapper_heap_tag> heap(t);
                 return heap.get();
             }
 
@@ -351,6 +353,7 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component
     {
+    public:
         HPX_NON_COPYABLE(managed_component);
 
     public:

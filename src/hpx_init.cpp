@@ -32,7 +32,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -46,6 +45,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -294,7 +294,7 @@ namespace hpx { namespace detail
             qc->start();
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(boost::current_exception())
+            std::cerr << hpx::diagnostic_information(std::current_exception())
                 << std::flush;
             hpx::terminate();
         }
@@ -793,49 +793,6 @@ namespace hpx
 #endif
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // local scheduler (one queue for each OS threads)
-        int run_throttle(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-            ensure_high_priority_compatibility(cfg.vm_);
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::throttle_queue_scheduler<>
-                throttle_queue_policy;
-            throttle_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive,
-                "core-throttle_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_throttle: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<throttle_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=throttle "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle -DHPX_WITH_APEX'.");
-#endif
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // local static scheduler with priority queue (one queue for each OS
@@ -1089,6 +1046,56 @@ namespace hpx
 #endif
         }
 
+
+
+        ///////////////////////////////////////////////////////////////////////
+        // local throttling scheduler (one queue for each OS threads)
+        int run_throttling(startup_function_type startup,
+            shutdown_function_type shutdown,
+            util::command_line_handling& cfg, bool blocking)
+        {
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
+            std::size_t pu_offset = get_pu_offset(cfg);
+            std::size_t pu_step = get_pu_step(cfg);
+            std::string affinity_domain = get_affinity_domain(cfg);
+            std::string affinity_desc;
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
+
+            // scheduling policy
+            typedef hpx::threads::policies::throttling_scheduler<>
+                throttling_policy;
+            throttling_policy::init_parameter_type init(
+                cfg.num_threads_, 1000, numa_sensitive,
+                "core-throttling_scheduler");
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            LPROGRESS_ << "run_throttling: create runtime";
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<throttling_policy> runtime_type;
+            std::unique_ptr<hpx::runtime> rt(
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
+
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
+#else
+            throw detail::command_line_error("Command line option "
+                "--hpx:queuing=throttling "
+                "is not configured in this build. Please rebuild with "
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttling'.");
+#endif
+        }
+
+
+
+
+
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
             util::function_nonser<
@@ -1100,8 +1107,7 @@ namespace hpx
             shutdown_function_type shutdown, hpx::runtime_mode mode,
             bool blocking)
         {
-            int result = 0;
-#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
+#if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
 
@@ -1121,6 +1127,8 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
+
+            int result = 0;
             try {
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
@@ -1210,9 +1218,9 @@ namespace hpx
                     result = run_periodic(std::move(startup),
                         std::move(shutdown), cfg, blocking);
                 }
-                else if (0 == std::string("throttle").find(cfg.queuing_)) {
-                    cfg.queuing_ = "throttle";
-                    result = run_throttle(std::move(startup),
+                else if (0 == std::string("throttling").find(cfg.queuing_)) {
+                    cfg.queuing_ = "throttling";
+                    result = run_throttling(std::move(startup),
                         std::move(shutdown), cfg, blocking);
                 }
                 else {

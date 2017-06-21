@@ -1295,23 +1295,38 @@ system and application performance.
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
     ]
-    [   [`/statistics/stddev`]
-        [Any full performance counter name. The referenced performance counter
-         is queried at fixed time intervals as specified by the first parameter.]
-        [Returns the current standard deviation (stddev) value calculated based
-         on the values queried from the underlying counter (the one specified
-         as the instance name).]
-        [Any parameter will be interpreted as the time interval (in
-         milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the
-         default.]
-    ]
     [   [`/statistics/rolling_average`]
         [Any full performance counter name. The referenced performance counter
          is queried at fixed time intervals as specified by the first parameter.]
         [Returns the current rolling average (mean) value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
+        [Any parameter will be interpreted as a list of two comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`.]
+    ]
+    [   [`/statistics/stddev`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current standard deviation (stddev) value calculated based
+         on the values queried from the underlying counter (the one specified
+         as the instance name). Note that this counter will be available only
+         for Boost V1.56 and newer.]
+        [Any parameter will be interpreted as the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the
+         default.]
+    ]
+    [   [`/statistics/rolling_stddev`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling variance (stddev) value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
         [Any parameter will be interpreted as a list of two comma separated (integer)
          values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
@@ -1340,6 +1355,20 @@ system and application performance.
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
     ]
+    [   [`/statistics/rolling_max`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling maximum value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
+        [Any parameter will be interpreted as a list of two comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`.]
+    ]
     [   [`/statistics/min`]
         [Any full performance counter name. The referenced performance counter
          is queried at fixed time intervals as specified by the first parameter.]
@@ -1349,6 +1378,20 @@ system and application performance.
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
+    ]
+    [   [`/statistics/rolling_min`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling minimum value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
+        [Any parameter will be interpreted as a list of two comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`.]
     ]
 ]
 

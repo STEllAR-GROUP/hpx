@@ -16,8 +16,8 @@
 struct A
 {
     A() = default;
-
-    HPX_NON_COPYABLE(A);
+    A(A const&) = delete;
+    A& operator=(A const&) = delete;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

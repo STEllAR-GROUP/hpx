@@ -159,6 +159,8 @@ namespace libfabric
         // --------------------------------------------------------------------
         sender* get_connection(parcelset::locality const& dest, fi_addr_t &fi_addr);
 
+        void reclaim_connection(sender* s);
+
         // --------------------------------------------------------------------
         // return a sender object back to the parcelport_impl
         // this is for compatibility with non send_immediate operation

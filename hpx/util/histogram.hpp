@@ -10,7 +10,6 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/parameter/keyword.hpp>
-#include <boost/mpl/placeholders.hpp>
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/numeric/functional.hpp>

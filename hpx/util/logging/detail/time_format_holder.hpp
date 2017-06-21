@@ -153,13 +153,8 @@ public:
 
         // ignore value at index 0
         // - it's there so that I don't have to test for an index being -1
-    #ifdef HPX_LOG_USE_WCHAR_T
-        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
-            vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
-    #else
         sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
             vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
-    #endif
     }
 
     void write_time(char_type buffer[], int day, int month, int year,
@@ -175,13 +170,8 @@ public:
 
         // ignore value at index 0
         // - it's there so that I don't have to test for an index being -1
-    #ifdef HPX_LOG_USE_WCHAR_T
-        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
-            vals[4], vals[5], vals[6], vals[7]);
-    #else
         sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
             vals[4], vals[5], vals[6], vals[7] );
-    #endif
     }
 
 private:

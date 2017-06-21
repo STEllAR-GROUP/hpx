@@ -9,10 +9,9 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/tagged.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     HPX_DEFINE_TAG_SPECIFIER(in)        // defines tag::in
     HPX_DEFINE_TAG_SPECIFIER(out)       // defines tag::out

@@ -24,10 +24,10 @@
 #include <hpx/util/spinlock.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -208,7 +208,7 @@ namespace hpx { namespace threads
         }
 
         /// API functions forwarding to notification policy
-        void report_error(std::size_t num_thread, boost::exception_ptr const& e)
+        void report_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             pool_.report_error(num_thread, e);
         }
@@ -295,6 +295,12 @@ namespace hpx { namespace threads
         void reset_thread_distribution()
         {
             pool_.reset_thread_distribution();
+        }
+
+        // Returns the underlying scheduling policy
+        scheduling_policy_type& get_pool_scheduler() const
+        {
+            return pool_.get_sched();
         }
 
     private:

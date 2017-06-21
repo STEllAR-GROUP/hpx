@@ -20,7 +20,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <iostream>
 #include <mutex>

@@ -36,8 +36,9 @@ namespace boost
       { "boost/bind\\.hpp", "hpx/util/bind.hpp" },
       { "boost/(chrono/)?chrono\\.hpp", "chrono" },
       { "boost/(core/)?ref\\.hpp", "functional" },
-      { "boost/cstdint\\.hpp", "cstdint.hpp" },
+      { "boost/cstdint\\.hpp", "cstdint" },
       { "boost/thread/barrier\\.hpp", "hpx/compat/barrier.hpp" },
+      { "boost/exception_ptr\\.hpp", "exception" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { nullptr, nullptr }
     };

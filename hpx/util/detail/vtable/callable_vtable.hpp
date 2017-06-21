@@ -40,7 +40,7 @@ namespace hpx { namespace util { namespace detail
         char const* (*get_function_annotation)(void**);
 
         template <typename T>
-        HPX_CONSTEXPR callable_vtable_base(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR callable_vtable_base(construct_vtable<T>) noexcept
           : get_function_address(
                 &callable_vtable_base::template _get_function_address<T>)
           , get_function_annotation(
@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail
         R (*invoke)(void**, Ts&&...);
 
         template <typename T>
-        HPX_CONSTEXPR callable_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR callable_vtable(construct_vtable<T>) noexcept
           : callable_vtable_base(construct_vtable<T>())
           , invoke(&callable_vtable::template _invoke<T>)
         {}

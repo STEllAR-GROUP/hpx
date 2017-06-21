@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct my_executor : hpx::parallel::parallel_executor {};
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3) { namespace detail
+namespace hpx { namespace parallel { inline namespace v3 { namespace detail
 {
     template <>
     struct is_executor<my_executor>

@@ -18,14 +18,14 @@
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <exception>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     // implementation of this console error sink
-    void console_error_sink(boost::exception_ptr const& e)
+    void console_error_sink(std::exception_ptr const& e)
     {
         // dispatch this error to registered functions
         get_error_dispatcher()(hpx::diagnostic_information(e));

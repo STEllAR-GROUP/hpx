@@ -39,6 +39,7 @@ namespace hpx { namespace detail
     template <typename Result>
     class handle_managed_target
     {
+    public:
         HPX_NON_COPYABLE(handle_managed_target);
 
     public:

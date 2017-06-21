@@ -9,6 +9,7 @@
 
 //  tuple_test_bench.cpp  --------------------------------
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -17,6 +18,10 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 
 // ----------------------------------------------------------------------------
 // helpers
@@ -188,6 +193,11 @@ void element_access_test()
         float> >::type>::value != true));
     HPX_TEST((std::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int,
         float> >::type>::value));
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    HPX_TEST((std::is_same<hpx::util::tuple_element<1,
+                           std::array<float, 4>>::type, float>::value));
+#endif
 
     dummy(i); dummy(i2); dummy(j); dummy(e); // avoid warns for unused variables
 }
@@ -377,6 +387,12 @@ void tuple_length_test()
     HPX_TEST(hpx::util::tuple_size<t1>::value == 3);
     HPX_TEST(hpx::util::tuple_size<t2>::value == 0);
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    {
+        using t3 = std::array<int, 4>;
+        HPX_TEST(hpx::util::tuple_size<t3>::value == 4);
+    }
+#endif
 }
 
 // ----------------------------------------------------------------------------

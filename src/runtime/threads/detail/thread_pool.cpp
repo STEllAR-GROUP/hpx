@@ -30,7 +30,6 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/system/system_error.hpp>
 
 #include <algorithm>
@@ -159,7 +158,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::report_error(std::size_t num,
-        boost::exception_ptr const& e)
+        std::exception_ptr const& e)
     {
         sched_.set_all_states(state_terminating);
         notifier_.on_error(num, e);
@@ -652,7 +651,7 @@ namespace hpx { namespace threads { namespace detail
                     // threads exist or if some other thread has terminated
                     HPX_ASSERT(!sched_.Scheduler::get_thread_count(
                             unknown, thread_priority_default, num_thread) ||
-                        sched_.get_state(num_thread) == state_terminating);
+                        sched_.get_state(num_thread) >= state_terminating);
                 }
                 catch (hpx::exception const& e) {
                     LFATAL_ //-V128
@@ -661,7 +660,7 @@ namespace hpx { namespace threads { namespace detail
                         << " : caught hpx::exception: "
                         << e.what() << ", aborted thread execution";
 
-                    report_error(num_thread, boost::current_exception());
+                    report_error(num_thread, std::current_exception());
                     return;
                 }
                 catch (boost::system::system_error const& e) {
@@ -671,13 +670,13 @@ namespace hpx { namespace threads { namespace detail
                         << " : caught boost::system::system_error: "
                         << e.what() << ", aborted thread execution";
 
-                    report_error(num_thread, boost::current_exception());
+                    report_error(num_thread, std::current_exception());
                     return;
                 }
                 catch (std::exception const& e) {
                     // Repackage exceptions to avoid slicing.
-                    boost::throw_exception(boost::enable_error_info(
-                        hpx::exception(unhandled_exception, e.what())));
+                    throw boost::enable_error_info(
+                        hpx::exception(unhandled_exception, e.what()));
                 }
             }
             catch (...) {
@@ -687,7 +686,7 @@ namespace hpx { namespace threads { namespace detail
                     << " : caught unexpected " //-V128
                        "exception, aborted thread execution";
 
-                report_error(num_thread, boost::current_exception());
+                report_error(num_thread, std::current_exception());
                 return;
             }
 
@@ -1434,12 +1433,6 @@ namespace hpx { namespace threads { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
-template class HPX_EXPORT hpx::threads::detail::thread_pool<
-    hpx::threads::policies::throttle_queue_scheduler<> >;
-#endif
-
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
@@ -1485,5 +1478,11 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::throttling_scheduler<> >;
 #endif
 

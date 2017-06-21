@@ -18,8 +18,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <memory>
 #include <type_traits>
 #include <utility>

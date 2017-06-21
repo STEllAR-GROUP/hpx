@@ -25,17 +25,17 @@ namespace hpx { namespace compute { namespace host
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(default_executor const& rhs) const HPX_NOEXCEPT
+        bool operator==(default_executor const& rhs) const noexcept
         {
             return true;
         }
 
-        bool operator!=(default_executor const& rhs) const HPX_NOEXCEPT
+        bool operator!=(default_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        default_executor const& context() const HPX_NOEXCEPT
+        default_executor const& context() const noexcept
         {
             return *this;
         }

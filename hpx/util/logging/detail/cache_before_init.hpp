@@ -33,6 +33,10 @@
 #include <utility>
 #include <vector>
 
+#if defined (BOOST_HAS_WINTHREADS)
+#include <windows.h>
+#endif
+
 namespace hpx { namespace util { namespace logging { namespace detail {
 
 

@@ -29,6 +29,7 @@ namespace hpx { namespace util
     /// A pool of io_service objects.
     class HPX_EXPORT io_service_pool
     {
+    public:
         HPX_NON_COPYABLE(io_service_pool);
 
     public:

@@ -27,7 +27,6 @@
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -41,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     // for_loop
     namespace detail
@@ -147,8 +146,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             void operator()(B part_begin, std::size_t part_steps,
                 std::size_t part_index)
             {
+#if !defined(__NVCC__) && !defined(__CUDACC__)
                 hpx::util::annotate_function annotate(f_);
                 (void)annotate;     // suppress warning about unused variable
+#endif
                 execute(part_begin, part_steps, part_index);
             }
         };
@@ -255,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
@@ -293,7 +294,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             // execution policy enforces sequential execution or if the
             // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
@@ -1130,7 +1131,7 @@ namespace hpx { namespace traits
     {
         static std::size_t call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_address<
                     typename hpx::util::decay<F>::type
@@ -1144,7 +1145,7 @@ namespace hpx { namespace traits
     {
         static char const* call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
-                HPX_NOEXCEPT
+                noexcept
         {
             return get_function_annotation<
                     typename hpx::util::decay<F>::type

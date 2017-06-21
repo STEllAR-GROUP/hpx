@@ -96,6 +96,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler && handler, ParcelPostprocess && parcel_postprocess)
         {
+            HPX_ASSERT(!handler_);
+            HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
             request_ptr_ = nullptr;
             chunks_idx_ = 0;
@@ -115,6 +117,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
+                HPX_ASSERT(!handler_);
                 error_code ec;
                 parcel_postprocess(ec, there_, shared_from_this());
             }
@@ -259,6 +262,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             error_code ec;
             handler_(ec);
+            handler_.reset();
             buffer_.data_point_.time_ =
                 util::high_resolution_clock::now() - buffer_.data_point_.time_;
             pp_->add_sent_data(buffer_.data_point_);

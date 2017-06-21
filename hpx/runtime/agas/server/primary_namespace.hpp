@@ -154,7 +154,7 @@ struct HPX_EXPORT primary_namespace
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
     {
-    private:
+    public:
         HPX_NON_COPYABLE(counter_data);
 
     public:

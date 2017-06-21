@@ -63,6 +63,7 @@ namespace hpx { namespace util
         private:
             boost::detail::spinlock & sp_;
 
+        public:
             HPX_NON_COPYABLE(scoped_lock);
 
         public:

@@ -8,9 +8,6 @@
 #if !defined(HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM)
 #define HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM
 
-// sadly, MSVC12 is not able to cope with split_future
-#if !defined(HPX_MSVC) || HPX_MSVC >= 1900
-
 #if defined(DOXYGEN)
 namespace hpx
 {
@@ -67,6 +64,7 @@ namespace hpx
 #include <array>
 #endif
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -94,7 +92,7 @@ namespace hpx { namespace lcos
                         std::move(hpx::util::get<I>(*result)));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 
@@ -224,7 +222,7 @@ namespace hpx { namespace lcos
                     this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
-                    this->base_type::set_exception(boost::current_exception());
+                    this->base_type::set_exception(std::current_exception());
                 }
             }
 
@@ -367,6 +365,5 @@ namespace hpx
     using lcos::split_future;
 }
 
-#endif
 #endif
 #endif

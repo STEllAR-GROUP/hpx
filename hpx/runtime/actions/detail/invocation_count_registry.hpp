@@ -25,6 +25,7 @@ namespace hpx { namespace actions { namespace detail
 {
     class HPX_EXPORT invocation_count_registry
     {
+    public:
         HPX_NON_COPYABLE(invocation_count_registry);
 
     public:

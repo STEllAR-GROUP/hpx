@@ -43,7 +43,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
@@ -57,6 +56,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     class coroutine_impl
       : public context_base
     {
+    public:
         HPX_NON_COPYABLE(coroutine_impl);
 
     public:

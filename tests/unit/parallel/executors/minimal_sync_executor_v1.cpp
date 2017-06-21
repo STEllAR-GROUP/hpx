@@ -134,7 +134,7 @@ struct test_sync_executor2 : hpx::parallel::executor_tag
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
+    hpx::future<typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(hpx::launch::sync, std::forward<F>(f),
@@ -152,7 +152,7 @@ struct test_sync_executor1 : test_sync_executor2
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     execute(F && f, Ts &&... ts)
     {
         return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
