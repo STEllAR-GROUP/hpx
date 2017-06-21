@@ -66,26 +66,18 @@ void reduce_tests(std::size_t num,
 }
 
 template <typename T>
-void reduce_tests()
+void reduce_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 10007;
-
-    {
-        hpx::partitioned_vector<T> xvalues(num, T(1));
-        reduce_tests(num, xvalues);
-    }
-
-    {
-        hpx::partitioned_vector<T> xvalues(num, T(1), hpx::container_layout(2));
-        reduce_tests(num, xvalues);
-    }
+    hpx::partitioned_vector<T> xvalues(num, T(1),hpx::container_layout(localities));
+    reduce_tests(num, xvalues);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    reduce_tests<int>();
-    reduce_tests<double>();
-
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    reduce_tests<int>(localities);
+    reduce_tests<double>(localities);
     return 0;
 }

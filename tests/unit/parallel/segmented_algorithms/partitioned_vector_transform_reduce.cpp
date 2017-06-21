@@ -86,21 +86,18 @@ void transform_reduce_tests(std::size_t num,
 }
 
 template <typename T>
-void transform_reduce_tests()
+void transform_reduce_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 10007;
-
     {
-        hpx::partitioned_vector<T> xvalues(num, T(1));
-        hpx::partitioned_vector<T> yvalues(num, T(1));
-
+        hpx::partitioned_vector<T> xvalues(num,T(1));
+        hpx::partitioned_vector<T> yvalues(num,T(1));
         transform_reduce_tests(num, xvalues, yvalues);
     }
 
     {
-        hpx::partitioned_vector<T> xvalues(num, T(1), hpx::container_layout(2));
-        hpx::partitioned_vector<T> yvalues(num, T(1), hpx::container_layout(2));
-
+        hpx::partitioned_vector<T> xvalues(num,T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<T> yvalues(num,T(1),hpx::container_layout(localities));
         transform_reduce_tests(num, xvalues, yvalues);
     }
 }
@@ -108,9 +105,8 @@ void transform_reduce_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    transform_reduce_tests<int>();
-    transform_reduce_tests<double>();
-
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    transform_reduce_tests<int>(localities);
+    transform_reduce_tests<double>(localities);
     return 0;
 }
-

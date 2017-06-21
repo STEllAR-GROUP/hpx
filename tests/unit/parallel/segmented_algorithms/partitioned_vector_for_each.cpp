@@ -142,7 +142,7 @@ void test_for_each_n_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T 
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void for_each_tests()
+void for_each_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
 
@@ -161,7 +161,7 @@ void for_each_tests()
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(0));
+        hpx::partitioned_vector<T> v(length, T(0),hpx::container_layout(localities));
         test_for_each(hpx::parallel::execution::seq, v, T(0));
         test_for_each(hpx::parallel::execution::par, v, T(1));
         test_for_each_async(
@@ -177,7 +177,7 @@ void for_each_tests()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void for_each_n_tests()
+void for_each_n_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
 
@@ -210,7 +210,7 @@ void for_each_n_tests()
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(0));
+        hpx::partitioned_vector<T> v(length, T(0), hpx::container_layout(localities));
         test_for_each_n(hpx::parallel::execution::seq, v, T(0));
         test_for_each_n(hpx::parallel::execution::par, v, T(1));
         test_for_each_n_async(
@@ -225,9 +225,10 @@ void for_each_n_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    for_each_tests<int>();
-    for_each_tests<double>();
-    for_each_n_tests<int>();
-    for_each_n_tests<double>();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    for_each_tests<int>(localities);
+    for_each_tests<double>(localities);
+    for_each_n_tests<int>(localities);
+    for_each_n_tests<double>(localities);
     return 0;
 }

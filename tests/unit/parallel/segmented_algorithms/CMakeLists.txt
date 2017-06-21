@@ -21,13 +21,28 @@ set(tests
 
 set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_for_each_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_for_each_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 set(partitioned_vector_transform_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_transform_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_transform_reduce_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 set(partitioned_vector_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_inclusive_scan_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 set(partitioned_vector_transform_scan_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_transform_scan_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 
 set(partitioned_vector_inclusive_scan_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_inclusive_scan_PARAMETERS

@@ -197,7 +197,7 @@ void test_transform_binary2_async(ExPolicy && policy,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename U=T>
-void transform_tests()
+void transform_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
 
@@ -217,8 +217,8 @@ void transform_tests()
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(1));
-        hpx::partitioned_vector<U> w(length);
+        hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<U> w(length,hpx::container_layout(localities));
         test_transform(hpx::parallel::execution::seq, v, w, U(1));
         test_transform(hpx::parallel::execution::par, v, w, U(1));
         test_transform_async(
@@ -230,7 +230,7 @@ void transform_tests()
     }
 }
 template <typename T, typename U=T, typename V=T>
-void transform_binary_tests()
+void transform_binary_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
 
@@ -251,9 +251,9 @@ void transform_binary_tests()
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(1));
-        hpx::partitioned_vector<U> w(length, U(1));
-        hpx::partitioned_vector<V> x(length);
+        hpx::partitioned_vector<T> v(length, T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<U> w(length, U(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<V> x(length,hpx::container_layout(localities));
         test_transform_binary(hpx::parallel::execution::seq, v, w, x, V(1));
         test_transform_binary(hpx::parallel::execution::par, v, w, x, V(1));
         test_transform_binary_async(
@@ -266,7 +266,7 @@ void transform_binary_tests()
 }
 
 template <typename T, typename U=T, typename V=T>
-void transform_binary2_tests()
+void transform_binary2_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
     {
@@ -286,9 +286,9 @@ void transform_binary2_tests()
     }
 
     {
-        hpx::partitioned_vector<T> v(length, T(1));
-        hpx::partitioned_vector<U> w(length, U(1));
-        hpx::partitioned_vector<V> x(length);
+        hpx::partitioned_vector<T> v(length, T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<U> w(length, U(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<V> x(length,hpx::container_layout(localities));
         test_transform_binary2(hpx::parallel::execution::seq, v, w, x, V(1));
         test_transform_binary2(hpx::parallel::execution::par, v, w, x, V(1));
         test_transform_binary2_async(
@@ -304,11 +304,12 @@ void transform_binary2_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    transform_tests<int,double>();
-    transform_tests<double,int>();
-    transform_binary_tests<int,int,double>();
-    transform_binary_tests<double,double,int>();
-    transform_binary2_tests<int,int,double>();
-    transform_binary2_tests<double,double,int>();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    transform_tests<int,double>(localities);
+    transform_tests<double,int>(localities);
+    transform_binary_tests<int,int,double>(localities);
+    transform_binary_tests<double,double,int>(localities);
+    transform_binary2_tests<int,int,double>(localities);
+    transform_binary2_tests<double,double,int>(localities);
     return 0;
 }

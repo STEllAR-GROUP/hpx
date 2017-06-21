@@ -39,8 +39,6 @@ template <typename ExPolicy, typename T>
 void test_transform_inclusive_scan(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
-    // auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    // auto conv = [](std::size_t val) { return 2*val; };
     hpx::parallel::transform_inclusive_scan(policy, xvalues.begin(),
         xvalues.end(), out.begin(), conv(), T(0), op());
 }
@@ -50,8 +48,6 @@ void
 test_transform_inclusive_scan_async(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
-    // auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    // auto conv = [](std::size_t val) { return 2*val; };
     hpx::parallel::transform_inclusive_scan(policy,
         xvalues.begin(), xvalues.end(), out.begin(),
         conv(), T(0), op()).get();
@@ -61,8 +57,6 @@ template <typename ExPolicy, typename T>
 void test_transform_exclusive_scan(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
-    // auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    // auto conv = [](std::size_t val) { return 2*val; };
     hpx::parallel::transform_exclusive_scan(policy, xvalues.begin(),
         xvalues.end(), out.begin(), conv(), T(0), op());
 }
@@ -72,8 +66,6 @@ void
 test_transform_exclusive_scan_async(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
-    // auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
-    // auto conv = [](std::size_t val) { return 2*val; };
     hpx::parallel::transform_exclusive_scan(policy,
         xvalues.begin(), xvalues.end(), out.begin(),
         conv(), T(0), op()).get();
@@ -111,21 +103,19 @@ void transform_scan_tests(std::size_t num,
 }
 
 template <typename T>
-void transform_scan_tests()
+void transform_scan_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 12;
-
-    {
-        hpx::partitioned_vector<T> xvalues(num, T(1));
-        hpx::partitioned_vector<T> out(num);
-        transform_scan_tests(num, xvalues, out);
-    }
+    hpx::partitioned_vector<T> xvalues(num, T(1),hpx::container_layout(localities));
+    hpx::partitioned_vector<T> out(num,hpx::container_layout(localities));
+    transform_scan_tests(num, xvalues, out);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    transform_scan_tests<int>();
-    transform_scan_tests<double>();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    transform_scan_tests<int>(localities);
+    transform_scan_tests<double>(localities);
     return 0;
 }
