@@ -296,7 +296,9 @@ namespace hpx { namespace parallel { inline namespace v1
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
-        >::value)>
+        >::value)
+#endif
+    >
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
     >::type
@@ -617,7 +619,9 @@ namespace hpx { namespace parallel { inline namespace v1
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj1, InIter1>,
                 traits::projected<Proj2, InIter2>
-        >::value)>
+        >::value)
+#endif
+    >
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
