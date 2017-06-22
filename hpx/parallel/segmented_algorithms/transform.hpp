@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_transform
