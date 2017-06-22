@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [=](std::vector<shared_future<T> > && r) -> T
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);

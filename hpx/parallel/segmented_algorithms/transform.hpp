@@ -210,7 +210,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     local_iterator_type2> > > && r) -> std::pair<SegIter, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
@@ -472,7 +472,7 @@ namespace hpx { namespace parallel { inline namespace v1
                          -> hpx::util::tuple<InIter1, InIter2, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
@@ -797,7 +797,7 @@ namespace hpx { namespace parallel { inline namespace v1
                          -> hpx::util::tuple<InIter1, InIter2, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
