@@ -91,6 +91,26 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename T>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_(ExPolicy && policy, InIter first, InIter last, T const& val,
+            std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
+
+            return detail::find<InIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, val);
+        }
+
+        template <typename ExPolicy, typename InIter, typename T>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_(ExPolicy && policy, InIter first, InIter last, T const& val,
+            std::true_type);
         /// \endcond
     }
 
@@ -149,14 +169,10 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::find<InIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, val);
+        return detail::find_(policy, first, last, val, is_segmented());
+
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -222,6 +238,26 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+            std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
+
+            return detail::find_if<InIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+            std::true_type);
         /// \endcond
     }
 
@@ -294,14 +330,9 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::find_if<InIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        return detail::find_if_(policy, first, last, f, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -372,6 +403,26 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
+            std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
+
+            return detail::find_if_not<InIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+        }
+
+        template <typename ExPolicy, typename InIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, InIter>
+        find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
+            std::true_type);
         /// \endcond
     }
 
@@ -444,14 +495,9 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::find_if_not<InIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        return detail::find_if_not_(policy, first, last, f, is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
