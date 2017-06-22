@@ -102,7 +102,9 @@ void for_each_n_test()
 {
     test_for_each_n<std::random_access_iterator_tag, Proj>();
     test_for_each_n<std::forward_iterator_tag, Proj>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each_n<std::input_iterator_tag, Proj>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

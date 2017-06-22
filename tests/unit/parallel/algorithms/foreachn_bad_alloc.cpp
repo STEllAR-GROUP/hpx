@@ -111,7 +111,9 @@ void for_each_n_bad_alloc_test()
 {
     test_for_each_n_bad_alloc<std::random_access_iterator_tag>();
     test_for_each_n_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each_n_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

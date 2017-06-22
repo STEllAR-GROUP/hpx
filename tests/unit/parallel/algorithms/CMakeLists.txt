@@ -18,7 +18,6 @@ set(tests
     copy
     copyif_random
     copyif_forward
-    copyif_input
     copyif_exception
     copyif_bad_alloc
     copyn
@@ -129,6 +128,12 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       inclusive_scan_executors_v1
       is_sorted_executors_v1
       uninitialized_copy_executors_v1
+     )
+endif()
+
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  set(tests ${tests}
+      copyif_input
      )
 endif()
 

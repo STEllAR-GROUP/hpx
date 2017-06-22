@@ -99,7 +99,9 @@ void for_loop_n_test()
 {
     test_for_loop_n<std::random_access_iterator_tag>();
     test_for_loop_n<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_loop_n<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
