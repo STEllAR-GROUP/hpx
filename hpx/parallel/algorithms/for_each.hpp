@@ -200,7 +200,9 @@ namespace hpx { namespace parallel { inline namespace v1
             std::false_type, Proj && proj = Proj())
         {
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    >::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
             return detail::for_each_n<InIter>().call(
