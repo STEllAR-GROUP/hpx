@@ -1,5 +1,6 @@
-# Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2017 Denis Blank
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -124,6 +125,58 @@ macro(add_hpx_config_test variable)
   elseif(${variable}_REQUIRED)
     hpx_warn("Test failed, detailed output:\n\n${${variable}_OUTPUT}")
     hpx_error(${${variable}_REQUIRED})
+  endif()
+endmacro()
+
+# Makes it possible to provide a feature test that is able to
+# test the compiler to build parts of HPX directly when the given definition
+# is defined.
+macro(add_hpx_in_framework_config_test variable)
+  # Generate the config only if the test wasn't executed yet
+  if(NOT DEFINED ${variable})
+    # Location to generate the config headers to
+    set(${variable}_GENERATED_DIR
+      "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/header-${variable}")
+    generate_config_defines_header(${${variable}_GENERATED_DIR})
+  endif()
+
+  set(options)
+  set(one_value_args)
+  set(multi_value_args DEFINITIONS INCLUDE_DIRECTORIES COMPILE_DEFINITIONS)
+  cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  # We call the generic feature test method while modifying some
+  # existing parsed arguments in order to alter the INCLUDE_DIRECTORIES
+  # and the COMPILE_DEFINITIONS.
+  # It's important here not to link the config test against an executable
+  # because otherwise this will result in unresolved references to the
+  # HPX library, that wasn't built as of now.
+  add_hpx_config_test(${variable}
+                      ${${variable}_UNPARSED_ARGUMENTS}
+                      DEFINITIONS
+                        ${${variable}_DEFINITIONS}
+                      COMPILE_DEFINITIONS
+                        ${${variable}_COMPILE_DEFINITIONS}
+                        # We add the definitions we test to the
+                        # existing compile definitions.
+                        ${${variable}_DEFINITIONS}
+                        # Add HPX_NO_VERSION_CHECK to make header only
+                        # parts of HPX available without requiring to link
+                        # against the HPX sources.
+                        # We can remove this workaround as soon as CMake 3.6
+                        # is the minimal required version and supports:
+                        # CMAKE_TRY_COMPILE_TARGET_TYPE = STATIC_LIBRARY
+                        # when using try_compile to not to throw errors
+                        # on unresolved symbols.
+                        HPX_NO_VERSION_CHECK
+                      INCLUDE_DIRECTORIES
+                        ${${variable}_INCLUDE_DIRECTORIES}
+                        # We add the generated headers to the include dirs
+                        ${${variable}_GENERATED_DIR})
+
+  if(DEFINED ${variable}_GENERATED_DIR)
+    # Cleanup the generated header
+    file(REMOVE_RECURSE "${${variable}_GENERATED_DIR}")
   endif()
 endmacro()
 

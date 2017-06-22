@@ -171,3 +171,14 @@ macro(hpx_perform_cxx_feature_tests)
   endif()
 endmacro()
 
+################################################################################
+# C++ feature tests which require 3. party libraries
+# and a present config file to work.
+#
+# This tests are meant for testing the compiler on the capability
+# to compile parts of HPX directly without relying on generic feature tests.
+################################################################################
+macro(hpx_perform_on_framework_cxx_feature_tests)
+  hpx_check_for_cxx11_sfinae_expression_complete(
+    DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE)
+endmacro()
