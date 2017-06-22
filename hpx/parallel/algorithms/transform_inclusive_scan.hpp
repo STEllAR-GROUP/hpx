@@ -180,8 +180,8 @@ namespace hpx { namespace parallel { inline namespace v1
             OutIter dest, Conv && conv, T init, Op && op, std::false_type)
         {
             typedef std::integral_constant<bool,
-                    is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                    parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                    ::value || !hpx::traits::is_forward_iterator<InIter>::value ||
                    !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
             return detail::transform_inclusive_scan<OutIter>().call(

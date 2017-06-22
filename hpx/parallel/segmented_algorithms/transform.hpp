@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         transform_(ExPolicy&& policy, SegIter first, SegIter last, OutIter dest,
             F && f, Proj && proj, std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,
@@ -501,7 +501,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2, std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,
@@ -827,7 +827,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             OutIter dest, F && f, Proj1 && proj1,
             Proj2 && proj2, std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,

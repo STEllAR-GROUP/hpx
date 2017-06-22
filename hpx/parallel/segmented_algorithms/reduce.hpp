@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         reduce_(ExPolicy&& policy, InIter first, InIter last
             , T init, F && f, std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
             typedef typename hpx::util::decay<T>::type init_type;

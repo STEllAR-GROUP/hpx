@@ -191,8 +191,8 @@ namespace hpx { namespace parallel { inline namespace v1
             F && f, Proj && proj, std::false_type)
         {
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                    parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                    ::value || !hpx::traits::is_forward_iterator<InIter>::value ||
                    !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
 
@@ -479,8 +479,8 @@ namespace hpx { namespace parallel { inline namespace v1
             Proj1 && proj1, Proj2 && proj2, std::false_type)
         {
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<InIter1>::value ||
+                    parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                    ::value || !hpx::traits::is_forward_iterator<InIter1>::value ||
                    !hpx::traits::is_forward_iterator<InIter2>::value ||
                    !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
@@ -719,11 +719,11 @@ namespace hpx { namespace parallel { inline namespace v1
             OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2, std::false_type)
             {
                 typedef std::integral_constant<bool,
-                        execution::is_sequential_execution_policy<ExPolicy>::value ||
-                       !hpx::traits::is_forward_iterator<InIter1>::value ||
-                       !hpx::traits::is_forward_iterator<InIter2>::value ||
-                       !hpx::traits::is_forward_iterator<OutIter>::value
-                    > is_seq;
+                        parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                        ::value || !hpx::traits::is_forward_iterator<InIter1>
+                        ::value || !hpx::traits::is_forward_iterator<InIter2>
+                        ::value || !hpx::traits::is_forward_iterator<OutIter>
+                        ::value > is_seq;
 
                 typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
 
