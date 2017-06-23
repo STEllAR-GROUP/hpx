@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                        algo, policy, std::true_type(), beg, end, val, f, flag1,
+                        flag2);
                     last = traits::compose(send, out);
                 }
             }
@@ -71,8 +71,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                        algo, policy, std::true_type(), beg, end, val, f, flag1,
+                        flag2);
                 }
 
                 // handle all of the full partitions
@@ -85,8 +85,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, val
-                        );
+                            algo, policy, std::true_type(), beg, end, val, f, flag1,
+                            flag2);
                     }
                 }
 
@@ -96,8 +96,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                        algo, policy, std::true_type(), beg, end, val, f, flag1,
+                        flag2);
                 }
 
                 last = traits::compose(send, out);
@@ -105,33 +105,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(std::move(out));
         }
 
-        template <typename Algo, typename ExPolicy, typename InIter,
-            typename T, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
-        segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, T const& val, bool flag1, bool flag2, std::false_type,
-            F && f = F())
-        {
-            typedef hpx::traits::segmented_iterator_traits<InIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, InIter> result;
-
-            segment_iterator sit = traits::segment(first);
-            segment_iterator send = traits::segment(last);
-
-            std::vector<future<local_iterator_type> > segments;
-            segments.reserve(std::distance(sit, send));
-
-            if (sit == send)
-            {
-            }
-            else
-            {
-
-            }
-            return result::get(std::move(output));
-        }
+        // template <typename Algo, typename ExPolicy, typename InIter,
+        //     typename T, typename F>
+        // typename util::detail::algorithm_result<ExPolicy, InIter>
+        // segmented_find(Algo && algo, ExPolicy && policy, InIter first,
+        //     InIter last, T const& val, bool flag1, bool flag2, std::false_type,
+        //     F && f = F())
+        // {
+        //     typedef hpx::traits::segmented_iterator_traits<InIter> traits;
+        //     typedef typename traits::segment_iterator segment_iterator;
+        //     typedef typename traits::local_iterator local_iterator_type;
+        //     typedef util::detail::algorithm_result<ExPolicy, InIter> result;
+        //
+        //     segment_iterator sit = traits::segment(first);
+        //     segment_iterator send = traits::segment(last);
+        //
+        //     std::vector<future<local_iterator_type> > segments;
+        //     segments.reserve(std::distance(sit, send));
+        //
+        //     if (sit == send)
+        //     {
+        //     }
+        //     else
+        //     {
+        //
+        //     }
+        //     return result::get(std::move(output));
+        // }
 
         template <typename ExPolicy, typename InIter, typename T>
         typename util::detail::algorithm_result<ExPolicy, InIter>
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return segmented_find(
                 find_if<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,false,is_seq(),f);
+                0,true,false,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return segmented_find(
                 find_if_not<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,true,is_seq(),f);
+                0,true,true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>

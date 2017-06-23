@@ -39,19 +39,36 @@ namespace hpx { namespace parallel { inline namespace v1
                 : find::algorithm("find")
             {}
 
-            template <typename ExPolicy, typename T>
+            template <typename ExPolicy, typename T,
+                typename F = util::projection_identity>
             static InIter
-            sequential(ExPolicy, InIter first, InIter last, const T& val)
+            sequential(ExPolicy, InIter first, InIter last, const T& val,
+                        bool flag1, bool flag2, F && f = F())
             {
-                return std::find(first, last, val);
+                if(!flag1)
+                    return std::find(first, last, val);
+                else if(!flag2)
+                    return std::find_if(first, last, f);
+                else
+                {
+                    for (; first != last; ++first)
+                    {
+                        if (!f(*first))
+                        {
+                            return first;
+                        }
+                    }
+                    return last;
+                }
             }
 
-            template <typename ExPolicy, typename T>
+            template <typename ExPolicy, typename T,
+                typename F = util::projection_identity>
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
             parallel(ExPolicy && policy, InIter first, InIter last,
-                T const& val)
+                T const& val, bool flag1, bool flag2,  F && f = F())
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -67,15 +84,29 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [val, tok](InIter it, std::size_t part_size,
+                        [val, f, flag1, flag2, tok](InIter it, std::size_t part_size,
                             std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&val, &tok](type& v, std::size_t i)
+                                [&val, &f, &flag1, &flag2, &tok](type& v, std::size_t i)
                                 {
-                                    if (v == val)
-                                        tok.cancel(i);
+                                    if(!flag1)
+                                    {
+                                        if (v == val)
+                                            tok.cancel(i);
+                                    }
+                                    else if(!flag2)
+                                    {
+                                        if ( f(v) )
+                                            tok.cancel(i);
+
+                                    }
+                                    else
+                                    {
+                                        if (!f(v))
+                                            tok.cancel(i);
+                                    }
                                 });
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> InIter
@@ -104,7 +135,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return detail::find<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, val);
+                first, last, val, false, false);
         }
 
         template <typename ExPolicy, typename InIter, typename T>
@@ -249,9 +280,9 @@ namespace hpx { namespace parallel { inline namespace v1
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
-            return detail::find_if<InIter>().call(
+            return detail::find<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<F>(f));
+                first, last, 0, true, false, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -414,9 +445,9 @@ namespace hpx { namespace parallel { inline namespace v1
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
 
-            return detail::find_if_not<InIter>().call(
+            return detail::find<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<F>(f));
+                first, last, 0, true, true, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
