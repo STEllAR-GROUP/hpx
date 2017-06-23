@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val, f, flag1,
-                        flag2);
+                        algo, policy, std::true_type(), beg, end, val, flag1,
+                        flag2, f);
                     last = traits::compose(send, out);
                 }
             }
@@ -71,8 +71,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val, f, flag1,
-                        flag2);
+                        algo, policy, std::true_type(), beg, end, val, flag1,
+                        flag2, f);
                 }
 
                 // handle all of the full partitions
@@ -85,8 +85,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, val, f, flag1,
-                            flag2);
+                            algo, policy, std::true_type(), beg, end, val, flag1,
+                            flag2, f);
                     }
                 }
 
@@ -96,8 +96,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val, f, flag1,
-                        flag2);
+                        algo, policy, std::true_type(), beg, end, val, flag1,
+                        flag2, f);
                 }
 
                 last = traits::compose(send, out);
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return segmented_find(
-                find_if<InIter>(),
+                find<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<typename InIter::value_type>(0), true, false,
                 is_seq(), f);
@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return segmented_find(
-                find_if_not<InIter>(),
+                find<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<typename InIter::value_type>(0), true, true,
                 is_seq(), f);
