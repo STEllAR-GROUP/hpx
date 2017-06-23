@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return detail::find<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<T>(val));
+                first, last, std::move(val));
         }
 
         template <typename ExPolicy, typename InIter, typename T>
@@ -172,7 +172,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::find_(std::forward<ExPolicy>(policy), first, last,
-            std::forward<T>(val), is_segmented());
+            std::move(val), is_segmented());
 
     }
 

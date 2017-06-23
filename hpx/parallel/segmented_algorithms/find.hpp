@@ -11,7 +11,6 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -27,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_find
@@ -105,40 +104,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(std::move(out));
         }
 
-        template <typename Algo, typename ExPolicy, typename InIter,
-            typename T, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
-        segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, T const& val, bool flag1, bool flag2, std::false_type,
-            F && f = F())
-        {
-            typedef hpx::traits::segmented_iterator_traits<InIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, InIter> result;
-
-            segment_iterator sit = traits::segment(first);
-            segment_iterator send = traits::segment(last);
-
-            std::vector<future<local_iterator_type> > segments;
-            segments.reserve(std::distance(sit, send));
-
-            if (sit == send)
-            {
-            }
-            else
-            {
-
-            }
-            return result::get(std::move(output));
-        }
+        // template <typename Algo, typename ExPolicy, typename InIter,
+        //     typename T, typename F>
+        // typename util::detail::algorithm_result<ExPolicy, InIter>
+        // segmented_find(Algo && algo, ExPolicy && policy, InIter first,
+        //     InIter last, T const& val, bool flag1, bool flag2, std::false_type,
+        //     F && f = F())
+        // {
+        //     typedef hpx::traits::segmented_iterator_traits<InIter> traits;
+        //     typedef typename traits::segment_iterator segment_iterator;
+        //     typedef typename traits::local_iterator local_iterator_type;
+        //     typedef util::detail::algorithm_result<ExPolicy, InIter> result;
+        //
+        //     segment_iterator sit = traits::segment(first);
+        //     segment_iterator send = traits::segment(last);
+        //
+        //     std::vector<future<local_iterator_type> > segments;
+        //     segments.reserve(std::distance(sit, send));
+        //
+        //     if (sit == send)
+        //     {
+        //     }
+        //     else
+        //     {
+        //
+        //     }
+        //     return result::get(std::move(output));
+        // }
 
         template <typename ExPolicy, typename InIter, typename T>
         typename util::detail::algorithm_result<ExPolicy, InIter>
         find_(ExPolicy && policy, InIter first, InIter last, T const& val,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
@@ -165,7 +164,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
@@ -192,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
