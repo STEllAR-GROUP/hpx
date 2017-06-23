@@ -93,8 +93,10 @@ namespace hpx { namespace parallel { inline namespace v1
                                 [&val, &f, &flag1, &flag2, &tok](type& v, std::size_t i)
                                 {
                                     if(!flag1)
+                                    {
                                         if (v == val)
                                             tok.cancel(i);
+                                    }
                                     else if(!flag2)
                                     {
                                         if ( f(v) )
