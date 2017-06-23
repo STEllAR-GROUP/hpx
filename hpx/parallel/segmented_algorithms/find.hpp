@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(val),false,false,is_seq());
+                std::forward<T>(val), false, false, is_seq());
         }
 
         template <typename ExPolicy, typename InIter, typename T>
@@ -179,7 +179,8 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<InIter::value_type>(0),true,false,is_seq(),f);
+                std::forward<typename InIter::value_type>(0), true, false,
+                is_seq(), f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -206,7 +207,8 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if_not<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<InIter::value_type>(0),true,true,is_seq(),f);
+                std::forward<typename InIter::value_type>(0), true, true,
+                is_seq(), f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
