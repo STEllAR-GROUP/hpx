@@ -17,7 +17,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -40,36 +39,19 @@ namespace hpx { namespace parallel { inline namespace v1
                 : find::algorithm("find")
             {}
 
-            template <typename ExPolicy, typename T,
-                typename F = util::projection_identity>
+            template <typename ExPolicy, typename T>
             static InIter
-            sequential(ExPolicy, InIter first, InIter last, const T& val,
-                        bool flag1, bool flag2, F && f = F())
+            sequential(ExPolicy, InIter first, InIter last, const T& val)
             {
-                if(!flag1)
-                    return std::find(first, last, val);
-                else if(!flag2)
-                    return std::find_if(first, last, f);
-                else
-                {
-                    for (; first != last; ++first)
-                    {
-                        if (!f(*first))
-                        {
-                            return first;
-                        }
-                    }
-                    return last;
-                }
+                return std::find(first, last, val);
             }
 
-            template <typename ExPolicy, typename T,
-                typename F = util::projection_identity>
+            template <typename ExPolicy, typename T>
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
             parallel(ExPolicy && policy, InIter first, InIter last,
-                T const& val, bool flag1, bool flag2, F && f = F())
+                T const& val)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -85,28 +67,15 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [val, f, flag1, flag2, tok](InIter it, std::size_t part_size,
+                        [val, tok](InIter it, std::size_t part_size,
                             std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&val, &f, &flag1, &flag2, &tok](type& v, std::size_t i)
+                                [&val, &tok](type& v, std::size_t i)
                                 {
-                                    if(!flag1)
-                                    {
-                                        if (v == val)
-                                            tok.cancel(i);
-                                    }
-                                    else if(!flag2)
-                                    {
-                                        if ( f(v) )
-                                            tok.cancel(i);
-                                    }
-                                    else
-                                    {
-                                        if ( !f(v) )
-                                            tok.cancel(i);
-                                    }
+                                    if (v == val)
+                                        tok.cancel(i);
                                 });
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> InIter
@@ -135,7 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return detail::find<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, val, false, false);
+                first, last, std::forward<T>(val));
         }
 
         template <typename ExPolicy, typename InIter, typename T>
@@ -280,11 +249,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     execution::is_sequenced_execution_policy<ExPolicy>::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
-            typedef typename std::iterator_traits<InIter>::value_type type;
 
-            return detail::find<InIter>().call(
+            return detail::find_if<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, type(0), true, false, std::forward<F>(f));
+                first, last, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -447,10 +415,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     execution::is_sequenced_execution_policy<ExPolicy>::value ||
                    !hpx::traits::is_forward_iterator<InIter>::value
                 > is_seq;
-            typedef typename std::iterator_traits<InIter>::value_type type;
+
             return detail::find_if_not<InIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, type(0), true, true, std::forward<F>(f));
+                first, last, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
