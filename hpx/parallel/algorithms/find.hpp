@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 : find::algorithm("find")
             {}
 
-            template <typename ExPolicy, typename T, typename F>
+            template <typename ExPolicy, typename T>
             static InIter
             sequential(ExPolicy, InIter first, InIter last, const T& val)
             {
