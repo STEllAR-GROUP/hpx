@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 last = traits::compose(send, out);
             }
-            return result::get(std::move(out));
+            return result::get(std::move(last));
         }
 
         // template <typename Algo, typename ExPolicy, typename InIter,
