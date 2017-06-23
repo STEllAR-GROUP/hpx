@@ -42,9 +42,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : adjacent_difference::algorithm("adjacent_difference")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Op>
+            template <typename ExPolicy, typename FwdIter, typename Op>
             static Iter
-            sequential(ExPolicy, InIter first, InIter last, Iter dest,
+            sequential(ExPolicy, FwdIter first, FwdIter last, Iter dest,
                 Op && op)
             {
                 return std::adjacent_difference(
@@ -122,14 +122,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     input range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the source iterators used for the
     ///                     output range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -163,18 +163,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           predicate \a op.
     ///
 
-    template <typename ExPolicy, typename InIter, typename OutIter>
+    template <typename ExPolicy, typename FwdIter, typename OutIter>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
+    adjacent_difference(ExPolicy&& policy, FwdIter first, FwdIter last,
         OutIter dest)
     {
-        typedef typename std::iterator_traits<InIter>::value_type value_type;
+        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
@@ -184,8 +185,18 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::adjacent_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
@@ -204,14 +215,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     input range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the source iterators used for the
     ///                     output range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam Op          The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_difference requires \a Op
@@ -234,7 +245,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1  must be such
-    ///                     that objects of type \a InIter can be dereferenced
+    ///                     that objects of type \a FwdIter can be dereferenced
     ///                     and then implicitly converted to the dereferenced
     ///                     type of \a dest.
     ///
@@ -257,17 +268,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           last element in the output range.
     ///
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter,
+    template <typename ExPolicy, typename FwdIter, typename OutIter,
         typename Op>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    adjacent_difference(ExPolicy&& policy, InIter first, InIter last,
+    adjacent_difference(ExPolicy&& policy, FwdIter first, FwdIter last,
         OutIter dest, Op && op)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
@@ -277,8 +289,18 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::adjacent_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
