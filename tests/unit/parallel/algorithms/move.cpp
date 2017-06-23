@@ -82,6 +82,7 @@ void test_move_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 template <typename ExPolicy, typename IteratorTag>
 void test_outiter_move(ExPolicy policy, IteratorTag)
 {
@@ -146,6 +147,7 @@ void test_outiter_move_async(ExPolicy p, IteratorTag)
         }));
     HPX_TEST_EQ(count, d.size());
 }
+#endif
 
 template <typename IteratorTag>
 void test_move()
@@ -167,6 +169,7 @@ void test_move()
     test_move(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     // output iterator test
     test_outiter_move(execution::seq, IteratorTag());
     test_outiter_move(execution::par, IteratorTag());
@@ -183,13 +186,16 @@ void test_move()
     test_outiter_move(execution_policy(execution::seq(execution::task)), IteratorTag());
     test_outiter_move(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
+#endif
 }
 
 void move_test()
 {
     test_move<std::random_access_iterator_tag>();
     test_move<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_move<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,7 +302,9 @@ void move_exception_test()
 {
     test_move_exception<std::random_access_iterator_tag>();
     test_move_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_move_exception<std::input_iterator_tag>();
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -401,7 +409,9 @@ void move_bad_alloc_test()
 {
     test_move_bad_alloc<std::random_access_iterator_tag>();
     test_move_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_move_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

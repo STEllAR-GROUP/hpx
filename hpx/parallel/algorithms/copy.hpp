@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -71,11 +71,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy::algorithm("copy")
             {}
 
-            template <typename ExPolicy, typename InIter, typename OutIter>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
+            static std::pair<FwdIter, OutIter>
+            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest)
             {
-                std::pair<InIter, OutIter> result = util::copy(first, last, dest);
+                std::pair<FwdIter, OutIter> result = util::copy(first, last, dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -106,30 +106,30 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template<typename InIter, typename OutIter, typename Enable = void>
+        template<typename FwdIter, typename OutIter, typename Enable = void>
         struct copy_iter;
 
-        template <typename InIter, typename OutIter>
+        template <typename FwdIter, typename OutIter>
         struct copy_iter<
-            InIter, OutIter,
+            FwdIter, OutIter,
             typename std::enable_if<
-                iterators_are_segmented<InIter, OutIter>::value
+                iterators_are_segmented<FwdIter, OutIter>::value
             >::type>
           : public copy<std::pair<
-                typename hpx::traits::segmented_iterator_traits<InIter>
+                typename hpx::traits::segmented_iterator_traits<FwdIter>
                     ::local_iterator,
                 typename hpx::traits::segmented_iterator_traits<OutIter>
                     ::local_iterator
             > >
         {};
 
-        template<typename InIter, typename OutIter>
+        template<typename FwdIter, typename OutIter>
         struct copy_iter<
-            InIter, OutIter,
+            FwdIter, OutIter,
             typename std::enable_if<
-                iterators_are_not_segmented<InIter, OutIter>::value
+                iterators_are_not_segmented<FwdIter, OutIter>::value
             >::type>
-          : public copy<std::pair<InIter, OutIter> >
+          : public copy<std::pair<FwdIter, OutIter> >
         {};
 
         /// \endcond
@@ -144,13 +144,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -171,28 +171,28 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
+    ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter,
+    template <typename ExPolicy, typename FwdIter, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     >::type
-    copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
+    copy(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest)
     {
-        return detail::transfer<detail::copy_iter<InIter, OutIter> >(
+        return detail::transfer<detail::copy_iter<FwdIter, OutIter> >(
             std::forward<ExPolicy>(policy), first, last, dest);
     }
 
@@ -210,9 +210,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy_n::algorithm("copy_n")
             {}
 
-            template <typename ExPolicy, typename InIter, typename OutIter>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, std::size_t count, OutIter dest)
+            template <typename ExPolicy, typename FwdIter, typename OutIter>
+            static std::pair<FwdIter, OutIter>
+            sequential(ExPolicy, FwdIter first, std::size_t count, OutIter dest)
             {
                 return util::copy_n(first, count, dest);
             }
@@ -261,15 +261,15 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -290,11 +290,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
+    ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -302,24 +302,41 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename Size,
+    template <typename ExPolicy, typename FwdIter, typename Size,
         typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     >::type
-    copy_n(ExPolicy && policy, InIter first, Size count, OutIter dest)
+    copy_n(ExPolicy && policy, FwdIter first, Size count, OutIter dest)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Required at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value ||
+               !hpx::traits::is_forward_iterator<OutIter>::value
+            > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         using hpx::util::tagged_pair;
         using hpx::util::make_tagged_pair;
@@ -328,18 +345,12 @@ namespace hpx { namespace parallel { inline namespace v1
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<
-                    ExPolicy, tagged_pair<tag::in(InIter), tag::out(OutIter)>
+                    ExPolicy, tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
                 >::get(make_tagged_pair<tag::in, tag::out>(first, dest));
         }
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
         return make_tagged_pair<tag::in, tag::out>(
-            detail::copy_n<std::pair<InIter, OutIter> >().call(
+            detail::copy_n<std::pair<FwdIter, OutIter> >().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, std::size_t(count), dest));
     }
@@ -351,9 +362,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential copy_if with projection function
-        template <typename InIter, typename OutIter, typename Pred, typename Proj>
-        inline std::pair<InIter, OutIter>
-        sequential_copy_if(InIter first, InIter last, OutIter dest,
+        template <typename FwdIter, typename OutIter, typename Pred, typename Proj>
+        inline std::pair<FwdIter, OutIter>
+        sequential_copy_if(FwdIter first, FwdIter last, OutIter dest,
             Pred && pred, Proj && proj)
         {
             while (first != last)
@@ -372,10 +383,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy_if::algorithm("copy_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
+            template <typename ExPolicy, typename FwdIter, typename OutIter,
                 typename Pred, typename Proj = util::projection_identity>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
+            static std::pair<FwdIter, OutIter>
+            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest,
                 Pred && pred, Proj && proj/* = Proj()*/)
             {
                 return sequential_copy_if(first, last, dest,
@@ -497,13 +508,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
@@ -530,7 +541,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -548,11 +559,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(InIter), tag::out(OutIter)> >
+    ///           \a hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(InIter), tag::out(OutIter)>
+    ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -560,24 +571,25 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+    template <typename ExPolicy, typename FwdIter, typename OutIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj, InIter>
+            ExPolicy, F, traits::projected<Proj, FwdIter>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     >::type
-    copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f,
+    copy_if(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest, F && f,
         Proj && proj = Proj())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Required at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
@@ -586,12 +598,22 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::copy_if<std::pair<InIter, OutIter> >().call(
+            detail::copy_if<std::pair<FwdIter, OutIter> >().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest, std::forward<F>(f),
                 std::forward<Proj>(proj)));

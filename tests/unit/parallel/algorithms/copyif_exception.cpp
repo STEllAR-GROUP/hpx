@@ -120,7 +120,9 @@ void copy_if_exception_test()
 {
     test_copy_if_exception<std::random_access_iterator_tag>();
     test_copy_if_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_if_exception<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

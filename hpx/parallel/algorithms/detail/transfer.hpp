@@ -27,31 +27,40 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         // parallel version
-        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter,
+            typename OutIter>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
+            ExPolicy, std::pair<FwdIter, OutIter>
         >::type
-        transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+        transfer_(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest,
             std::false_type)
         {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value ||
                    !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    > is_seq;
+#endif
+
             return Algo().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest);
         }
 
         // forward declare segmented version
-        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter,
+            typename OutIter>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
+            ExPolicy, std::pair<FwdIter, OutIter>
         >::type
-        transfer_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+        transfer_(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest,
             std::true_type);
 
         // Executes transfer algorithm on the elements in the range [first, last),
@@ -67,9 +76,9 @@ namespace hpx { namespace parallel { inline namespace v1
         //                     It describes the manner in which the execution
         //                     of the algorithm may be parallelized and the manner
         //                     in which it executes the move assignments.
-        // \tparam InIter      The type of the source iterators used (deduced).
+        // \tparam FwdIter     The type of the source iterators used (deduced).
         //                     This iterator type must meet the requirements of an
-        //                     input iterator.
+        //                     forward iterator.
         // \tparam OutIter     The type of the iterator representing the
         //                     destination range (deduced).
         //                     This iterator type must meet the requirements of an
@@ -93,25 +102,34 @@ namespace hpx { namespace parallel { inline namespace v1
         //           transfered.
         //
 
-        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter,
+        template <typename Algo, typename ExPolicy, typename FwdIter, typename OutIter,
         HPX_CONCEPT_REQUIRES_(
             hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_iterator<FwdIter>::value &&
             hpx::traits::is_iterator<OutIter>::value)>
         typename util::detail::algorithm_result<
-            ExPolicy, hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+            ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
         >::type
-        transfer(ExPolicy && policy, InIter first, InIter last, OutIter dest)
+        transfer(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest)
         {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             static_assert(
-                (hpx::traits::is_input_iterator<InIter>::value),
+                (hpx::traits::is_input_iterator<FwdIter>::value),
                 "Required at least input iterator.");
             static_assert(
                 (hpx::traits::is_output_iterator<OutIter>::value ||
                     hpx::traits::is_forward_iterator<OutIter>::value),
                 "Requires at least output iterator.");
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Required at least forward iterator.");
+            static_assert(
+                (hpx::traits::is_forward_iterator<OutIter>::value),
+                "Requires at least forward iterator.");
+#endif
 
-            typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+            typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
                     transfer_<Algo>(
