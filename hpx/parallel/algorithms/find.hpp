@@ -282,8 +282,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 > is_seq;
 
             return detail::find<InIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, 0, true, false, std::forward<F>(f));
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<InIter::value_type>(0), true, false, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -447,8 +447,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 > is_seq;
 
             return detail::find<InIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, 0, true, true, std::forward<F>(f));
+                std::forward<ExPolicy>(policy), is_seq(), first, last,
+                std::forward<InIter::value_type>(0), true, true, std::forward<F>(f));
         }
 
         template <typename ExPolicy, typename InIter, typename F>
