@@ -93,7 +93,10 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename InIter, typename T>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_(ExPolicy && policy, InIter first, InIter last, T const& val,
             std::false_type)
         {
@@ -108,7 +111,10 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename InIter, typename T>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_(ExPolicy && policy, InIter first, InIter last, T const& val,
             std::true_type);
         /// \endcond
@@ -241,7 +247,10 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type)
         {
@@ -256,7 +265,10 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type);
         /// \endcond
@@ -407,7 +419,10 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type)
         {
@@ -422,7 +437,10 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type);
         /// \endcond
