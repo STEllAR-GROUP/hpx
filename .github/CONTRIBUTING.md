@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2014 Hartmut Kaiser                                            -->
+<!-- Copyright (c) 2014-2017 Hartmut Kaiser                                       -->
 <!--                                                                              -->
 <!-- Distributed under the Boost Software License, Version 1.0. (See accompanying -->
 <!-- file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)        -->
@@ -74,13 +74,12 @@ and under what circumstances it affects you.
 
 Some but not all tasks require you to have built HPX. Even if that is not
 required, your feedback can be helpful to us - so - please try. The master
-build instructions are [here](http://stellar.cct.lsu.edu/files/hpx_0.9.8/html/hpx/tutorial/getting_started.html)
+build instructions are [here](http://stellar-group.github.io/hpx/docs/html/hpx/tutorial/getting_started.html)
 with more stuff under development.
 
 ### Hacking help
 
 If you need to search constructs in the code, there is a code search engine at
-the [Ohloh HPX page](http://code.ohloh.net/project?pid=&ipid=309791) or simply
 at the top of this page.
 
 ## General info
@@ -97,10 +96,27 @@ The short version of the guidelines:
 * Use expressive identifiers.
 * Exceptions for error handling instead of C-style error codes.
 
+A more elaborate description of our coding guidelines can be found 
+[here](https://github.com/STEllAR-GROUP/hpx/wiki/HPX-Source-Code-Structure-and-Coding-Standards).
+
 There is a `.editorconfig` file in the HPX root directory which can be used
 for almost any widely available editor. Please see
 [their webpage](http://editorconfig.org) to download plugins for your favorite
 editor.
+
+There is a `.clang-format` file in the HPX root directory which you can use to
+manually format the code you contribute. This configuraton file can be used
+with [clang-format](https://clang.llvm.org/docs/ClangFormat.html), a tool created 
+by the [Clang](https://clang.llvm.org/) project.
+
+Please follow the follwoing guidelines for using it:
+
+* You should use this file for creating an initial formatting for new files.
+* Please separate edits which are pure formatting into isolated commits
+  keeping those distinct from edits changing any of the code.
+* Please do _not_ configure your editor to automatically format the source
+  file while saving edits to disk.
+* Please do _not_ reformat a full source file without dire need.
 
 A few additional ones:
 
@@ -120,7 +136,7 @@ Community is an important part of all we do.
   posting things.
 * Create an example of how to use HPX in the real world by building something
   or showing what others have built.
-* Write about other people’s work based on HPX. Show how it’s used in daily
+* Write about other people's work based on HPX. Show how it is used in daily
   life. Take screenshots and make videos!
 
 
@@ -129,5 +145,5 @@ Community is an important part of all we do.
 For our project, you can talk to the following people to receive help in
 working through your first bugfix and thinking through the problem:
 
-* @hkaiser, @heller, @wash
+* @hkaiser, @heller, @wash, @jbjnr
 
