@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
