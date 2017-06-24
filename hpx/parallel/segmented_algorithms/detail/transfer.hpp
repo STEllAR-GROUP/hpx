@@ -259,7 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename Algo, typename ExPolicy, typename FwdIter, 
+        template <typename Algo, typename ExPolicy, typename FwdIter,
             typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<FwdIter, OutIter>
@@ -283,7 +283,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename Algo, typename ExPolicy, typename FwdIter, 
+        template <typename Algo, typename ExPolicy, typename FwdIter,
             typename OutIter>
         typename util::detail::algorithm_result<
             ExPolicy, std::pair<FwdIter, OutIter>
