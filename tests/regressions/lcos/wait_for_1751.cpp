@@ -29,10 +29,9 @@ int hpx_main()
         auto f = hpx::async([](){});
 
         if (f.wait_for(std::chrono::seconds(1)) ==
-            hpx::lcos::future_status::timeout)
+                hpx::lcos::future_status::timeout)
         {
             auto now = std::chrono::high_resolution_clock::now();
-            overall_dif = now - overall_start_time;
             std::chrono::duration<double> dif = now - start_time;
 
             HPX_TEST_LTE(1.0, dif.count());
@@ -44,7 +43,6 @@ int hpx_main()
         }
 
         auto now = std::chrono::high_resolution_clock::now();
-        overall_dif = now - overall_start_time;
         std::chrono::duration<double> dif = now - start_time;
         HPX_TEST_LT(dif.count(), 1.0);
     }
