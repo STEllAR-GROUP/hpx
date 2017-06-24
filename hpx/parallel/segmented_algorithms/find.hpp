@@ -56,18 +56,22 @@ namespace hpx { namespace parallel { inline namespace v1
                 // all elements are on the same partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::local(last);
-                local_iterator_type out;
                 if (beg != end)
                 {
                     if(!flag)
-                        out = dispatch(traits::get_id(sit),
+                    {
+                        local_iterator_type out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, val
                         );
+                        last = traits::compose(send, out);
+                    }
                     else
-                        out = dispatch(traits::get_id(sit),
+                    {
+                        local_iterator_type out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, f
                         );
-                    last = traits::compose(send, out);
+                        last = traits::compose(send, out);
+                    }
                 }
             }
             else
@@ -75,7 +79,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
-                local_iterator_type out;
+                local_iterator_type out = traits::local(last);
 
                 if (beg != end)
                 {
@@ -94,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
-
+                    out = traits::begin(send);
                     if (beg != end)
                     {
                         if(!flag)
