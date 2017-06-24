@@ -56,6 +56,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // all elements are on the same partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::local(last);
+                local_iterator_type out;
                 if (beg != end)
                 {
                     if(!flag)
@@ -74,7 +75,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
-                local_iterator_type out = traits::local(last);
+                local_iterator_type out;
 
                 if (beg != end)
                 {
@@ -93,7 +94,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
-                    out = traits::begin(send);
 
                     if (beg != end)
                     {
