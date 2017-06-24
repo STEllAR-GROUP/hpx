@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,8 +42,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential exclusive_scan.
-        template <typename InIter, typename OutIter, typename T, typename Op>
-        OutIter sequential_exclusive_scan(InIter first, InIter last,
+        template <typename FwdIter, typename OutIter, typename T, typename Op>
+        OutIter sequential_exclusive_scan(FwdIter first, FwdIter last,
             OutIter dest, T init, Op && op)
         {
             T temp = init;
@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { inline namespace v1
             return dest;
         }
 
-        template <typename InIter, typename OutIter, typename T, typename Op>
-        T sequential_exclusive_scan_n(InIter first, std::size_t count,
+        template <typename FwdIter, typename OutIter, typename T, typename Op>
+        T sequential_exclusive_scan_n(FwdIter first, std::size_t count,
             OutIter dest, T init, Op && op)
         {
             T temp = init;
@@ -79,9 +79,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : exclusive_scan::algorithm("exclusive_scan")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T, typename Op>
+            template <typename ExPolicy, typename FwdIter, typename T, typename Op>
             static OutIter
-            sequential(ExPolicy, InIter first, InIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 OutIter dest, T const& init, Op && op)
             {
                 return sequential_exclusive_scan(first, last, dest,
@@ -171,19 +171,25 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+        template <typename ExPolicy, typename FwdIter, typename OutIter, typename T,
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+        exclusive_scan_(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
             T const& init, Op && op, std::false_type) {
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value ||
                    !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    > is_seq;
+#endif
 
             return exclusive_scan<OutIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -191,10 +197,10 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+        template <typename ExPolicy, typename FwdIter, typename OutIter, typename T,
             typename Op>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+        exclusive_scan_(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
             T const& init, Op && op, std::true_type);
         /// \endcond
     }
@@ -212,13 +218,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -278,24 +284,33 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename T,
+    template <typename ExPolicy, typename FwdIter, typename OutIter, typename T,
         typename Op>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    exclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+    exclusive_scan(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
         T init, Op && op)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+#endif
 
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::exclusive_scan_(
             std::forward<ExPolicy>(policy), first, last, dest,
@@ -315,13 +330,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -362,23 +377,32 @@ namespace hpx { namespace parallel { inline namespace v1
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename T>
+    template <typename ExPolicy, typename FwdIter, typename OutIter, typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    exclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+    exclusive_scan(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
         T init)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
                 hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+#endif
 
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::exclusive_scan_(
             std::forward<ExPolicy>(policy), first, last, dest,
