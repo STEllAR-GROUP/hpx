@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             typedef hpx::traits::segmented_iterator_traits<InIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_raw_iterator local_iterator_type;
+            typedef typename traits::local_iterator local_iterator_type;
             typedef util::detail::algorithm_result<ExPolicy, InIter> result;
 
             segment_iterator sit = traits::segment(first);
@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 iterator_traits;
             return segmented_find(
-                find<typename iterator_traits::local_raw_iterator>(),
+                find<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::move(val),false,is_seq());
         }
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 iterator_traits;
             return segmented_find(
-                find_if<typename iterator_traits::local_raw_iterator>(),
+                find_if<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::move(type(0)),true,is_seq(),f);
         }
@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 iterator_traits;
             return segmented_find(
-                find_if_not<typename iterator_traits::local_raw_iterator>(),
+                find_if_not<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::move(type(0)),true,is_seq(),f);
         }
