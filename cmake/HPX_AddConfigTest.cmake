@@ -235,6 +235,13 @@ macro(hpx_check_for_cxx11_sfinae_expression)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_sfinae_expression_complete)
+  add_hpx_in_framework_config_test(HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
+    SOURCE cmake/tests/cxx11_sfinae_expression_complete.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_defaulted_functions)
   add_hpx_config_test(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS
     SOURCE cmake/tests/cxx11_defaulted_functions.cpp
