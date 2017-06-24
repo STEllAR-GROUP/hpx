@@ -35,7 +35,10 @@ namespace hpx { namespace parallel { inline namespace v1
     {
         template <typename Algo, typename ExPolicy, typename InIter,
             typename T, typename F = util::projection_identity>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         segmented_find(Algo && algo, ExPolicy && policy, InIter first,
             InIter last, T const& val, bool flag, std::true_type,
             F && f = F())
@@ -128,7 +131,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // template <typename Algo, typename ExPolicy, typename InIter,
         //     typename T, typename F>
-        // typename util::detail::algorithm_result<ExPolicy, InIter>
+        // inline typename std::enable_if<
+        //     execution::is_execution_policy<ExPolicy>::value,
+        //     typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        // >::type
         // segmented_find(Algo && algo, ExPolicy && policy, InIter first,
         //     InIter last, T const& val, bool flag1, bool flag2, std::false_type,
         //     F && f = F())
@@ -176,7 +182,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(val),false,is_seq());
+                std::move(val),false,is_seq());
         }
 
         template <typename ExPolicy, typename InIter, typename T>
@@ -209,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<type>(0),true,is_seq(),f);
+                std::move(type(0)),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -242,7 +248,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if_not<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<type>(0),true,is_seq(),f);
+                std::move(type(0)),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
