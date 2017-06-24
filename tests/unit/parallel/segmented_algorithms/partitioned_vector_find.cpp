@@ -21,7 +21,8 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 template<typename T>
 struct cond1
 {
-    bool operator()(T v) const{
+    bool operator()(T v) const
+    {
         return v < T(512);
     }
 };
@@ -29,13 +30,14 @@ struct cond1
 template<typename T>
 struct cond2
 {
-    bool operator()(T v) const{
+    bool operator()(T v) const
+    {
         return v > T(512);
     }
 };
 template <typename ExPolicy, typename T>
 void test_find(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find(policy, xvalues.begin(),
         xvalues.end(), val);
@@ -44,7 +46,7 @@ void test_find(ExPolicy && policy,
 
 template <typename ExPolicy, typename T>
 void test_find_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find(policy, xvalues.begin(),
         xvalues.end(), val).get();
@@ -53,7 +55,7 @@ void test_find_async(ExPolicy && policy,
 
 template <typename ExPolicy, typename T>
 void test_find_if(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find_if(policy, xvalues.begin(),
         xvalues.end(), cond1<T>());
@@ -62,7 +64,7 @@ void test_find_if(ExPolicy && policy,
 
 template <typename ExPolicy, typename T>
 void test_find_if_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find_if(policy, xvalues.begin(),
         xvalues.end(), cond1<T>()).get();
@@ -71,7 +73,7 @@ void test_find_if_async(ExPolicy && policy,
 
 template <typename ExPolicy, typename T>
 void test_find_if_not(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find_if_not(policy, xvalues.begin(),
         xvalues.end(), cond2<T>());
@@ -80,7 +82,7 @@ void test_find_if_not(ExPolicy && policy,
 
 template <typename ExPolicy, typename T>
 void test_find_if_not_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> const& xvalues, T val)
+    hpx::partitioned_vector<T> & xvalues, T val)
 {
     auto last = hpx::parallel::find_if_not(policy, xvalues.begin(),
         xvalues.end(), cond2<T>()).get();
