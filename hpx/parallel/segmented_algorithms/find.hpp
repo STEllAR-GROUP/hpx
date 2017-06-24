@@ -15,6 +15,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <boost/exception_ptr.hpp>
 
@@ -122,7 +123,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 last = traits::compose(send, out);
             }
-            return result::get(std::move(out));
+            return result::get(std::move(last));
         }
 
         // template <typename Algo, typename ExPolicy, typename InIter,
@@ -204,11 +205,11 @@ namespace hpx { namespace parallel { inline namespace v1
                         ExPolicy, InIter
                     >::get(std::forward<InIter>(first));
             }
-
+            typedef typename std::iterator_traits<InIter>::value_type type;
             return segmented_find(
                 find_if<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,is_seq(),f);
+                std::forward<type>(0),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
@@ -237,11 +238,11 @@ namespace hpx { namespace parallel { inline namespace v1
                         ExPolicy, InIter
                     >::get(std::forward<InIter>(first));
             }
-
+            typedef typename std::iterator_traits<InIter>::value_type type;
             return segmented_find(
                 find_if_not<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,is_seq(),f);
+                std::forward<type>(0),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
