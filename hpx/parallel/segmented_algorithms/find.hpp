@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename T, typename F = util::projection_identity>
         typename util::detail::algorithm_result<ExPolicy, InIter>
         segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, T const& val, bool flag1, bool flag2, std::true_type,
+            InIter last, T const& val, bool flag, std::true_type,
             F && f = F())
         {
             typedef hpx::traits::segmented_iterator_traits<InIter> traits;
@@ -52,11 +52,17 @@ namespace hpx { namespace parallel { inline namespace v1
                 // all elements are on the same partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::local(last);
+                local_iterator_type out;
                 if (beg != end)
                 {
-                    local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                    if(!flag)
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, val
+                        );
+                    else
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, f
+                        );
                     last = traits::compose(send, out);
                 }
             }
@@ -69,9 +75,14 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 if (beg != end)
                 {
-                    out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                    if(!flag)
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, val
+                        );
+                    else
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, f
+                        );
                 }
 
                 // handle all of the full partitions
@@ -83,9 +94,14 @@ namespace hpx { namespace parallel { inline namespace v1
 
                     if (beg != end)
                     {
-                        out = dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, val
-                        );
+                        if(!flag)
+                            out = dispatch(traits::get_id(sit),
+                                algo, policy, std::true_type(), beg, end, val
+                            );
+                        else
+                            out = dispatch(traits::get_id(sit),
+                                algo, policy, std::true_type(), beg, end, f
+                            );
                     }
                 }
 
@@ -94,9 +110,14 @@ namespace hpx { namespace parallel { inline namespace v1
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, val
-                    );
+                    if(!flag)
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, val
+                        );
+                    else
+                        out = dispatch(traits::get_id(sit),
+                            algo, policy, std::true_type(), beg, end, f
+                        );
                 }
 
                 last = traits::compose(send, out);
@@ -133,7 +154,10 @@ namespace hpx { namespace parallel { inline namespace v1
         // }
 
         template <typename ExPolicy, typename InIter, typename T>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_(ExPolicy && policy, InIter first, InIter last, T const& val,
             std::true_type)
         {
@@ -151,16 +175,22 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(val),false,false,is_seq());
+                std::forward<T>(val),false,is_seq());
         }
 
         template <typename ExPolicy, typename InIter, typename T>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_(ExPolicy && policy, InIter first, InIter last, T const& val,
             std::false_type);
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
@@ -178,16 +208,22 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,false,is_seq(),f);
+                std::forward<T>(0),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type);
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
@@ -205,11 +241,14 @@ namespace hpx { namespace parallel { inline namespace v1
             return segmented_find(
                 find_if_not<InIter>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(0),true,true,is_seq(),f);
+                std::forward<T>(0),true,is_seq(),f);
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename util::detail::algorithm_result<ExPolicy, InIter>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type);
     }
