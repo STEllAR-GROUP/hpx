@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,20 +41,16 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename U>
             HPX_HOST_DEVICE
-            typename std::enable_if<
-                !hpx::traits::is_value_proxy<U>::value
-            >::type
-            operator()(U &u)
+            typename std::enable_if<!hpx::traits::is_value_proxy<U>::value>::type
+            operator()(U &u) const
             {
                 u = val_;
             }
 
             template <typename U>
             HPX_HOST_DEVICE
-            typename std::enable_if<
-                hpx::traits::is_value_proxy<U>::value
-            >::type
-            operator()(U u)
+            typename std::enable_if<hpx::traits::is_value_proxy<U>::value>::type
+            operator()(U u) const
             {
                 u = val_;
             }
@@ -65,10 +62,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : fill::algorithm("fill")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T>
+            template <typename ExPolicy, typename FwdIter, typename T>
             HPX_HOST_DEVICE
             static hpx::util::unused_type
-            sequential(ExPolicy, InIter first, InIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 T const& val)
             {
                 std::fill(first, last, val);
@@ -82,7 +79,6 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 if(first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
@@ -96,20 +92,23 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename T>
-        static typename util::detail::algorithm_result<
-            ExPolicy, void
-        >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
+        template <typename ExPolicy, typename FwdIter, typename T>
+        static typename util::detail::algorithm_result<ExPolicy>::type
+        fill_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
             std::false_type)
         {
-
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                 parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                    ExPolicy
+                > is_seq;
+#endif
 
             return detail::fill().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -117,15 +116,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T>
-        static typename util::detail::algorithm_result<
-            ExPolicy, void
-        >::type
-        fill_(ExPolicy && policy, InIter first, InIter last, T const& value,
+        template <typename ExPolicy, typename FwdIter, typename T>
+        static typename util::detail::algorithm_result<ExPolicy>::type
+        fill_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
             std::true_type);
         /// \endcond
     }
-
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -135,9 +131,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -165,54 +161,60 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename InIter, typename T>
+    template <typename ExPolicy, typename FwdIter, typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, void>::type
+        typename util::detail::algorithm_result<ExPolicy>::type
     >::type
-    fill(ExPolicy && policy, InIter first, InIter last, T value)
+    fill(ExPolicy && policy, FwdIter first, FwdIter last, T value)
     {
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+        static_assert(
+            (hpx::traits::is_input_iterator<FwdIter>::value),
+            "Requires at least input iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+#endif
+
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::fill_(
-            std::forward<ExPolicy>(policy), first, last, value,
-                is_segmented()
-            );
+            std::forward<ExPolicy>(policy),
+            first, last, value, is_segmented());
     }
-
-
 
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
-        struct fill_n : public detail::algorithm<fill_n<OutIter>, OutIter>
+        template <typename FwdIter>
+        struct fill_n : public detail::algorithm<fill_n<FwdIter>, FwdIter>
         {
             fill_n()
               : fill_n::algorithm("fill_n")
             {}
 
             template <typename ExPolicy, typename T>
-            static OutIter
-            sequential(ExPolicy, OutIter first, std::size_t count,
-                T const& val)
+            static FwdIter
+            sequential(ExPolicy, FwdIter first, std::size_t count, T const& val)
             {
                 return std::fill_n(first, count, val);
             }
 
             template <typename ExPolicy, typename T>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, OutIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 T const& val)
             {
-                typedef typename std::iterator_traits<OutIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return
-                    for_each_n<OutIter>().call(
+                    for_each_n<FwdIter>().call(
                         std::forward<ExPolicy>(policy),
                         std::false_type(), first, count,
                         [val](type& v) -> void
@@ -235,7 +237,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam OutIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
     /// \tparam Size        The type of the argument specifying the number of
@@ -267,31 +269,39 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename OutIter, typename Size, typename T>
+    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
-    fill_n(ExPolicy && policy, OutIter first, Size count, T value)
+    fill_n(ExPolicy && policy, FwdIter first, Size count, T value)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_output_iterator<FwdIter>::value ||
+                hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value
+            > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative(count))
         {
-            return util::detail::algorithm_result<ExPolicy, OutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
                 std::move(first));
         }
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::fill_n<OutIter>().call(
+        return detail::fill_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, std::size_t(count), value);
     }
