@@ -135,7 +135,7 @@ void test_std_valarray(T first)
         hpx::serialization::output_archive oarchive(buffer,
             hpx::serialization::disable_data_chunking);
         std::valarray<T> oarray(N);
-        std::iota(oarray.begin(), oarray.end(), first);
+        std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;
 
         hpx::serialization::input_archive iarchive(buffer);
@@ -151,7 +151,7 @@ void test_std_valarray(T first)
         hpx::serialization::output_archive oarchive(buffer,
             hpx::serialization::disable_data_chunking);
         std::valarray<A<T>> oarray(N);
-        std::iota(oarray.begin(), oarray.end(), first);
+        std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;
 
         hpx::serialization::input_archive iarchive(buffer);
@@ -163,7 +163,6 @@ void test_std_valarray(T first)
         }
     }
 }
-#endif
 
 int main()
 {
@@ -199,4 +198,3 @@ int main()
     return hpx::util::report_errors();
 }
 
-#endif
