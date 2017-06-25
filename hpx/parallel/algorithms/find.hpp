@@ -32,23 +32,23 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename InIter>
-        struct find : public detail::algorithm<find<InIter>, InIter>
+        template <typename Iter>
+        struct find : public detail::algorithm<find<Iter>, Iter>
         {
             find()
                 : find::algorithm("find")
             {}
 
-            template <typename ExPolicy, typename T>
-            static InIter
+            template <typename ExPolicy, typename InIter, typename T>
+            static Iter
             sequential(ExPolicy, InIter first, InIter last, const T& val)
             {
                 return std::find(first, last, val);
             }
 
-            template <typename ExPolicy, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static typename util::detail::algorithm_result<
-                ExPolicy, InIter
+                ExPolicy, Iter
             >::type
             parallel(ExPolicy && policy, InIter first, InIter last,
                 T const& val)
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, InIter, void>::
+                return util::partitioner<ExPolicy, Iter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
                         [val, tok](InIter it, std::size_t part_size,
@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> InIter
+                        [=](std::vector<hpx::future<void> > &&) mutable -> Iter
                         {
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
@@ -187,15 +187,15 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename InIter>
-        struct find_if : public detail::algorithm<find_if<InIter>, InIter>
+        template <typename Iter>
+        struct find_if : public detail::algorithm<find_if<Iter>, Iter>
         {
             find_if()
                 : find_if::algorithm("find_if")
             {}
 
-            template <typename ExPolicy, typename F>
-            static InIter
+            template <typename ExPolicy, typename InIter, typename F>
+            static Iter
             sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::find_if(first, last, f);
@@ -203,7 +203,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
+                ExPolicy, Iter
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
@@ -218,7 +218,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::
+                return util::partitioner<ExPolicy, Iter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](FwdIter it, std::size_t part_size,
@@ -232,7 +232,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     tok.cancel(i);
                             });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        [=](std::vector<hpx::future<void> > &&) mutable -> Iter
                         {
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
@@ -354,15 +354,15 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename InIter>
-        struct find_if_not : public detail::algorithm<find_if_not<InIter>, InIter>
+        template <typename Iter>
+        struct find_if_not : public detail::algorithm<find_if_not<Iter>, Iter>
         {
             find_if_not()
                 : find_if_not::algorithm("find_if_not")
             {}
 
-            template <typename ExPolicy, typename F>
-            static InIter
+            template <typename ExPolicy, typename InIter, typename F>
+            static Iter
             sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 for (; first != last; ++first) {
@@ -375,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
+                ExPolicy, Iter
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
@@ -390,7 +390,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::
+                return util::partitioner<ExPolicy, Iter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
                         [f, tok](FwdIter it, std::size_t part_size,
@@ -404,7 +404,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     tok.cancel(i);
                             });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        [=](std::vector<hpx::future<void> > &&) mutable -> Iter
                         {
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
