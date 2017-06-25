@@ -207,9 +207,9 @@ namespace hpx { namespace parallel { inline namespace v1
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
-                typedef typename std::iterator_traits<InIter>::value_type type;
-                typedef typename std::iterator_traits<InIter>::difference_type
+                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
                 difference_type count = std::distance(first, last);
@@ -379,9 +379,9 @@ namespace hpx { namespace parallel { inline namespace v1
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
-                typedef typename std::iterator_traits<InIter>::value_type type;
-                typedef typename std::iterator_traits<InIter>::difference_type
+                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
                 difference_type count = std::distance(first, last);
