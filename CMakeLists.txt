@@ -1645,7 +1645,7 @@ set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
 write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1675,7 +1675,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/"
+  DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"

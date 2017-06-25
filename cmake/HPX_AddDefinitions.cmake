@@ -115,7 +115,7 @@ function(write_config_defines_file)
       "#ifndef HPX_CONFIG_${NAMESPACE_UPPER}_HPP\n"
       "#define HPX_CONFIG_${NAMESPACE_UPPER}_HPP\n"
     )
-    set(TEMP_FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}")
+    set(TEMP_FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}")
     file(WRITE ${TEMP_FILENAME}
         ${PREAMBLE}
         ${hpx_config_defines}
