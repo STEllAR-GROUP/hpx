@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,13 +48,13 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_reduce::algorithm("transform_reduce")
             {}
 
-            template <typename ExPolicy, typename InIter, typename T_,
+            template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
             static T
-            sequential(ExPolicy, InIter first, InIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
-                typedef typename std::iterator_traits<InIter>::value_type
+                typedef typename std::iterator_traits<FwdIter>::value_type
                     value_type;
 
                 return std::accumulate(first, last, std::forward<T_>(init),
@@ -105,24 +105,26 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename T,
+        template <typename ExPolicy, typename FwdIter, typename T,
             typename Reduce, typename Convert>
         inline typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, FwdIter first, FwdIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
-            static_assert(
-                (hpx::traits::is_input_iterator<InIter>::value),
-                "Requires at least input iterator.");
-
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
                 > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    > is_seq;
+#endif
 
             typedef typename hpx::util::decay<T>::type init_type;
 
@@ -133,12 +135,12 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T,
+        template <typename ExPolicy, typename FwdIter, typename T,
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy && policy, InIter first, InIter last,
+        transform_reduce_(ExPolicy && policy, FwdIter first, FwdIter last,
             T && init, Reduce && red_op, Convert && conv_op, std::true_type);
 
         /// \endcond
@@ -154,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam F           The type of the function/function object to use
@@ -186,7 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -236,27 +238,37 @@ namespace hpx { namespace parallel { inline namespace v1
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename InIter, typename T, typename Reduce,
+    template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
         typename Convert,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_invocable<Convert,
-                typename std::iterator_traits<InIter>::value_type
+                typename std::iterator_traits<FwdIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter>::value_type
+                    typename std::iterator_traits<FwdIter>::value_type
                 >::type,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter>::value_type
+                    typename std::iterator_traits<FwdIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, InIter first, InIter last,
+    transform_reduce(ExPolicy && policy, FwdIter first, FwdIter last,
         T init, Reduce && red_op, Convert && conv_op)
     {
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+        static_assert(
+            (hpx::traits::is_input_iterator<FwdIter>::value),
+            "Requires at least input iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+#endif
+
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
@@ -266,27 +278,37 @@ namespace hpx { namespace parallel { inline namespace v1
 
 #if defined(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
     /// \cond NOINTERNAL
-    template <typename ExPolicy, typename InIter, typename T, typename Reduce,
+    template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
         typename Convert,
     HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_invocable<Convert,
-                typename std::iterator_traits<InIter>::value_type
+                typename std::iterator_traits<FwdIter>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter>::value_type
+                    typename std::iterator_traits<FwdIter>::value_type
                 >::type,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter>::value_type
+                    typename std::iterator_traits<FwdIter>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, InIter first, InIter last,
+    transform_reduce(ExPolicy && policy, FwdIter first, FwdIter last,
         T init, Convert && conv_op, Reduce && red_op)
     {
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+        static_assert(
+            (hpx::traits::is_input_iterator<FwdIter>::value),
+            "Requires at least input iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+#endif
+
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::transform_reduce_(
             std::forward<ExPolicy>(policy), first, last, std::move(init),
