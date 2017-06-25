@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
         static HPX_FORCEINLINE Iterator
-        call(typename traits::local_iterator&& it)
+        call(typename traits::local_raw_iterator&& it)
         {
             return traits::remote(std::move(it));
         }
