@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 #ifndef __HPXVALARRAY_H__
-#define __HPXVALARRAY_H__ 1
+#define __HPXVALARRAY_H__
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -15,36 +15,31 @@
 
 namespace hpx { namespace serialization {
 
-template<typename T>
-void serialize(
-  hpx::serialization::input_archive &ar,
-  std::valarray<T> &arr,
-  int) {
+  template<typename T>
+  void serialize(hpx::serialization::input_archive &ar,
+    std::valarray<T> &arr, int /* version */) 
+  {
 
-  std::size_t sz = 0;
-  ar & sz;
-  arr.resize(sz);
+    std::size_t sz = 0;
+    ar & sz;
+    arr.resize(sz);
 
-  if(sz < 1) { return; }
+    if(sz < 1) return; 
 
-  for(int i = 0; i < sz; ++i) {
-    ar >> arr[i];
+    for(int i = 0; i < sz; ++i)
+      ar >> arr[i];
   }
-}
 
-template<typename T>
-void serialize(
-  hpx::serialization::output_archive &ar,
-  const std::valarray<T> arr,
-  int) {
+  template<typename T>
+  void serialize(hpx::serialization::output_archive &ar, 
+    const std::valarray<T> arr, int /* version */) 
+  {
 
-  const std::size_t sz = s.size();
-  ar & sz;
-  for(auto v : arr) {
-    ar << v;
+    const std::size_t sz = s.size();
+    ar & sz;
+    for(auto v : arr) 
+      ar << v;
   }
-}
-
 
 } }
 
