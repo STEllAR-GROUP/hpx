@@ -6,12 +6,13 @@
 #if !defined(JENKINS_HASH_HPP_SEP_08_2007_0102PM)
 #define JENKINS_HASH_HPP_SEP_08_2007_0102PM
 
-#include <cstdlib>
+#include <hpx/config.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
