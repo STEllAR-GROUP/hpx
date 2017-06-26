@@ -9,7 +9,7 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
-#   define HPX_FALLTHROUGH [[fallthrough]];
+#   define HPX_FALLTHROUGH [[fallthrough]]
 #else
 #   define HPX_FALLTHROUGH
 #endif
