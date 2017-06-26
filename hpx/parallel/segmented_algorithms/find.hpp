@@ -121,7 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef util::detail::algorithm_result<ExPolicy, InIter> result;
 
             typedef std::integral_constant<bool,
-                    !hpx::traits::is_forward_iterator<SegIter>::value
+                    !hpx::traits::is_forward_iterator<InIter>::value
                 > forced_seq;
 
             segment_iterator sit = traits::segment(first);
