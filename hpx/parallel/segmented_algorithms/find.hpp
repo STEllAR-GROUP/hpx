@@ -106,36 +106,91 @@ namespace hpx { namespace parallel { inline namespace v1
             return result::get(std::move(last));
         }
 
-        // template <typename Algo, typename ExPolicy, typename InIter,
-        //     typename T, typename F>
-        // inline typename std::enable_if<
-        //     execution::is_execution_policy<ExPolicy>::value,
-        //     typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        // >::type
-        // segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-        //     InIter last, T const& val, bool flag1, bool flag2, std::false_type,
-        //     F && f = F())
-        // {
-        //     typedef hpx::traits::segmented_iterator_traits<InIter> traits;
-        //     typedef typename traits::segment_iterator segment_iterator;
-        //     typedef typename traits::local_iterator local_iterator_type;
-        //     typedef util::detail::algorithm_result<ExPolicy, InIter> result;
-        //
-        //     segment_iterator sit = traits::segment(first);
-        //     segment_iterator send = traits::segment(last);
-        //
-        //     std::vector<future<local_iterator_type> > segments;
-        //     segments.reserve(std::distance(sit, send));
-        //
-        //     if (sit == send)
-        //     {
-        //     }
-        //     else
-        //     {
-        //
-        //     }
-        //     return result::get(std::move(output));
-        // }
+        template <typename Algo, typename ExPolicy, typename InIter,
+            typename U>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
+        segmented_find(Algo && algo, ExPolicy && policy, InIter first,
+            InIter last, U && f_or_val, std::false_type)
+        {
+            typedef hpx::traits::segmented_iterator_traits<InIter> traits;
+            typedef typename traits::segment_iterator segment_iterator;
+            typedef typename traits::local_iterator local_iterator_type;
+            typedef util::detail::algorithm_result<ExPolicy, InIter> result;
+
+            typedef std::integral_constant<bool,
+                    !hpx::traits::is_forward_iterator<SegIter>::value
+                > forced_seq;
+
+            segment_iterator sit = traits::segment(first);
+            segment_iterator send = traits::segment(last);
+
+            std::vector<future<local_iterator_type> > segments;
+            segments.reserve(std::distance(sit, send));
+
+            if (sit == send)
+            {
+                // all elements are on the same partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::local(last);
+                if (beg != end)
+                {
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, f_or_val
+                    ));
+                }
+            }
+            else {
+                // handle the remaining part of the first partition
+                local_iterator_type beg = traits::local(first);
+                local_iterator_type end = traits::end(sit);
+                if (beg != end)
+                {
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, f_or_val
+                    ));
+                }
+
+                // handle all of the full partitions
+                for (++sit; sit != send; ++sit)
+                {
+                    beg = traits::begin(sit);
+                    end = traits::end(sit);
+                    if (beg != end)
+                    {
+                        segments.push_back(dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(), beg, end, f_or_val
+                        ));
+                    }
+                }
+
+                // handle the beginning of the last partition
+                beg = traits::begin(sit);
+                end = traits::local(last);
+                if (beg != end)
+                {
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, f_or_val
+                    ));
+                }
+            }
+
+            return result::get(
+                dataflow(
+                    [=](std::vector<hpx::future<local_iterator_type> > && r)
+                        ->  InIter
+                    {
+                        // handle any remote exceptions, will throw on error
+                        std::list<std::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+                        return traits::compose(sit, r.back().get());
+                    },
+                    std::move(segments)));
+        }
 
         template <typename ExPolicy, typename InIter, typename T>
         inline typename std::enable_if<
