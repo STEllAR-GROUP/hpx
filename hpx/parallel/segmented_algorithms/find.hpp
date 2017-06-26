@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typename util::detail::algorithm_result<ExPolicy, InIter>::type
         >::type
         segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, U && f_or_val std::true_type)
+            InIter last, U && f_or_val, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<InIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
