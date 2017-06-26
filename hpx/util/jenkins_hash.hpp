@@ -223,7 +223,6 @@ namespace hpx { namespace util
                 HPX_FALLTHROUGH
             case 1:
                 a += k[0];
-                HPX_FALLTHROUGH
                 /* case 0: nothing left to add */
             }
 
