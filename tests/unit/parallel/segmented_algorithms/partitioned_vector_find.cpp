@@ -94,9 +94,9 @@ template <typename T>
 void find_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 1000;
-    hpx::partitioned_vector<T> xvalues(num, T(1),hpx::container_layout(localities));
-    hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, xvalues.begin(),
-        xvalues.end(), xvalues.begin(), T(0), std::plus<T>());
+    hpx::partitioned_vector<T> xvalues(num, T(512),hpx::container_layout(localities));
+    // hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, xvalues.begin(),
+    //     xvalues.end(), xvalues.begin(), T(0), std::plus<T>());
 
     test_find(hpx::parallel::execution::seq, xvalues, T(512));
     test_find(hpx::parallel::execution::par, xvalues, T(512));
