@@ -26,7 +26,7 @@ namespace hpx { namespace serialization {
 
     if(sz < 1) return; 
 
-    for(int i = 0; i < sz; ++i)
+    for(size_t i = 0; i < sz; ++i)
       ar >> arr[i];
   }
 
