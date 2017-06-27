@@ -8,12 +8,12 @@
 #ifndef HPX_PARTITIONED_VECTOR_VIEW_HPP
 #define HPX_PARTITIONED_VECTOR_VIEW_HPP
 
-#include <hpx/components/containers/partitioned_vector/detail/make_index_sequence.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
 #include <hpx/lcos/spmd_block.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <array>
 #include <cstddef>
@@ -77,7 +77,8 @@ namespace hpx
             list_type hw_sizes = {})
         : begin_( begin ), end_( begin ), block_( block )
         {
-            using indices = typename hpx::detail::make_index_sequence<N>::type;
+            using indices =
+                typename hpx::util::detail::make_index_pack_unroll<N>::type;
 
             // Physical sizes is equal to logical sizes if physical sizes are
             // not defined
@@ -116,7 +117,7 @@ namespace hpx
         void fill_basis(
             list_type const & sizes,
             std::array<std::size_t,N+1> & basis,
-            hpx::detail::integer_sequence<std::size_t, I...>) const
+            hpx::util::detail::pack_c<std::size_t, I...>) const
         {
             basis[0] = 1;
 
