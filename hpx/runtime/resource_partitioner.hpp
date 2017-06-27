@@ -133,9 +133,8 @@ namespace resource
     using scheduler_function = std::function<
         hpx::threads::detail::thread_pool*(
             hpx::threads::policies::callback_notifier &notifier,
-            std::size_t index, char const* name,
-            hpx::threads::policies::scheduler_mode m,
-            std::size_t thread_offset)>;
+            std::size_t num_threads, std::size_t thread_offset,
+            std::size_t pool_index, char const* pool_name)>;
 
     // scheduler assigned to thread_pool
     // choose same names as in command-line options except with _ instead of -
@@ -252,10 +251,10 @@ namespace resource
         util::command_line_handling& get_command_line_switches();
         std::size_t get_num_threads() const;
         size_t get_num_pools() const;
-        size_t get_num_threads(const std::string &pool_name);
-        init_pool_data* get_pool(std::size_t pool_index);
+        size_t get_num_threads(const std::string &pool_name) const;
+        size_t get_num_threads(std::size_t pool_index) const;
+        const init_pool_data* get_pool(std::size_t pool_index) const;
         const std::string &get_pool_name(size_t index) const;
-        init_pool_data* get_pool(std::size_t pool_index) const;
         threads::mask_cref_type get_pu_mask(std::size_t num_thread, bool numa_sensitive) const;
         bool cmd_line_parsed() const;
         int parse(
@@ -294,6 +293,7 @@ namespace resource
 
         // has to be private bc pointers become invalid after data member thread_pools_ is resized
         // we don't want to allow the user to use it
+        const init_pool_data* get_pool(const std::string &pool_name) const;
         init_pool_data* get_pool(const std::string &pool_name);
         init_pool_data* get_default_pool();
 

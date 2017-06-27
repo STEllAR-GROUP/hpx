@@ -627,12 +627,17 @@ namespace resource
         return initial_thread_pools_.size();
     }
 
-    size_t resource_partitioner::get_num_threads(const std::string &pool_name)
+    size_t resource_partitioner::get_num_threads(std::size_t pool_index) const
+    {
+        return get_pool(pool_index)->num_threads_;
+    }
+
+    size_t resource_partitioner::get_num_threads(const std::string &pool_name) const
     {
         return get_pool(pool_name)->num_threads_;
     }
 
-    init_pool_data* resource_partitioner::get_pool(std::size_t pool_index){
+    const init_pool_data* resource_partitioner::get_pool(std::size_t pool_index) const {
 
         if(pool_index >= initial_thread_pools_.size()){
             throw std::invalid_argument(
@@ -642,6 +647,7 @@ namespace resource
 
         return &(initial_thread_pools_[pool_index]);
     }
+
     const std::string &resource_partitioner::get_pool_name(size_t index) const {
         if(index >= initial_thread_pools_.size())
             throw std::invalid_argument("pool " + std::to_string(index) + " (zero-based index) requested out of bounds. The resource_partitioner owns only "
@@ -707,6 +713,21 @@ namespace resource
 
     // has to be private bc pointers become invalid after data member thread_pools_ is resized
     // we don't want to allow the user to use it
+    const init_pool_data* resource_partitioner::get_pool(const std::string &pool_name) const {
+        auto pool = std::find_if(
+                initial_thread_pools_.begin(), initial_thread_pools_.end(),
+                [&pool_name](init_pool_data itp) -> bool {return (itp.pool_name_ == pool_name);}
+        );
+
+        if(pool != initial_thread_pools_.end()){
+            const init_pool_data* ret(&(*pool));
+            return ret;
+        }
+
+        throw std::invalid_argument(
+                "the resource partitioner does not own a thread pool named \"" + pool_name + "\". \n");
+    }
+
     init_pool_data* resource_partitioner::get_pool(const std::string &pool_name) {
         auto pool = std::find_if(
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
@@ -721,6 +742,7 @@ namespace resource
         throw std::invalid_argument(
                 "the resource partitioner does not own a thread pool named \"" + pool_name + "\". \n");
     }
+
 
     init_pool_data* resource_partitioner::get_default_pool() {
         auto pool = std::find_if(

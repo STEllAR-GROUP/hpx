@@ -39,9 +39,11 @@ namespace pools
 
 static bool use_pools     = false;
 static bool use_scheduler = false;
+static int  pool_threads   = 1;
 
 // this is our custom scheduler type
 using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
+using namespace hpx::threads::policies;
 
 // Force an instantiation of the pool type templated on our custom scheduler
 // we need this to ensure that the pool has the generated member functions needed
@@ -49,12 +51,17 @@ using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
 template class hpx::threads::detail::thread_pool_impl<high_priority_sched>;
 
 // dummy function we will call using async
-void do_stuff(std::size_t n){
-    std::cout << "[do stuff] " << n << "\n";
-    for (std::size_t  i(0); i<n; ++i){
-        std::cout << "sin(" << i << ") = " << sin(2*M_PI*i/n) << ", ";
+void do_stuff(int n, bool printout)
+{
+    if (printout)
+        std::cout << "[do stuff] " << n << "\n";
+    for (int  i(0); i<n; ++i) {
+        double f = sin(2*M_PI*i/n);
+        if (printout)
+            std::cout << "sin(" << i << ") = " << f << ", ";
     }
-    std::cout << "\n";
+    if (printout)
+        std::cout << "\n";
 }
 
 // this is called on an hpx thread after the runtime starts up
@@ -66,6 +73,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "[hpx_main] starting ..."
         << "use_pools " << use_pools << " "
         << "use_scheduler " << use_scheduler << "\n";
+
+    int num_threads = hpx::get_num_worker_threads();
+    hpx::cout << "HPX using threads = " << num_threads << hpx::endl;
+    int loop_count  = num_threads*1;
+    int async_count = num_threads*1;
 
     // create an executor with high priority for important tasks
     hpx::threads::executors::default_executor high_priority_executor(
@@ -99,19 +111,30 @@ int hpx_main(boost::program_options::variables_map& vm)
     print_system_characteristics();
 
     // use executor to schedule work on custom pool
-    hpx::future<void> future_1 = hpx::async(mpi_executor, &do_stuff, 32);
+    hpx::future<void> future_1 = hpx::async(mpi_executor, &do_stuff, 5, true);
 
-    auto future_2 = future_1.then(mpi_executor, [](hpx::future<void> &&f) {
-        do_stuff(64);
+    hpx::future<void> future_2 = future_1.then(mpi_executor, [](hpx::future<void> &&f) {
+        do_stuff(5, true);
     });
-    future_2.get();
+
+    hpx::future<void> future_3 = future_2.then(mpi_executor, [mpi_executor, high_priority_executor, async_count](hpx::future<void> &&f) mutable {
+        hpx::future<void> future_4, future_5;
+        for (int i=0; i<async_count; i++) {
+            if (i%2==0) {
+                future_4 = hpx::async(mpi_executor, &do_stuff, async_count, false);
+            }
+            else {
+                future_5 = hpx::async(high_priority_executor, &do_stuff, async_count, false);
+            }
+        }
+        // the last futures we made are stored in here
+        future_4.get();
+        future_5.get();
+    });
+
+    future_3.get();
 
     hpx::lcos::local::mutex m;
-
-    int num_threads = hpx::get_num_worker_threads();
-    hpx::cout << "HPX using threads = " << num_threads << hpx::endl;
-    int loop_count = num_threads*1000;
-
     std::set<std::thread::id> thread_set;
 
     // test a parallel algorithm on custom pool with high priority
@@ -190,6 +213,8 @@ int main(int argc, char* argv[])
     test_options.add_options()
             ("use-pools,u", "Enable advanced HPX thread pools and executors")
             ("use-scheduler,s", "Enable custom priority scheduler")
+            ("pool-threads,m", value<int>()->default_value(1),
+                "Number of threads to assign to custom pool")
     ;
 
     options_description desc_cmdline;
@@ -209,6 +234,7 @@ int main(int argc, char* argv[])
     if (vm.count("use-scheduler")) {
       use_scheduler = true;
     }
+    pool_threads = vm["pool-threads"].as<int>();
 
 
     auto &rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv);
@@ -217,26 +243,60 @@ int main(int argc, char* argv[])
 
     // create a thread pool and supply a lambda that returns a new pool with
     // the a user supplied scheduler attached
+
     rp.create_thread_pool("default", [](
         hpx::threads::policies::callback_notifier &notifier,
-        std::size_t index, char const* name,
-        hpx::threads::policies::scheduler_mode m, std::size_t thread_offset)
+        std::size_t num_threads, std::size_t thread_offset,
+        std::size_t pool_index, char const* pool_name)
     {
         std::cout << "User defined scheduler creation callback " << std::endl;
-        high_priority_sched::init_parameter_type init(
-                    hpx::get_resource_partitioner().get_num_threads(name),
-                    "shared-priority-scheduler");
-        high_priority_sched* scheduler = new high_priority_sched(init);
+        high_priority_sched* scheduler = new high_priority_sched(
+            num_threads, "shared-priority-scheduler");
+
+        scheduler_mode mode = scheduler_mode(
+            scheduler_mode::do_background_work | scheduler_mode::delay_exit);
+
         return new hpx::threads::detail::thread_pool_impl<high_priority_sched>(
-            scheduler, notifier, index, name, m, thread_offset);
+            scheduler, notifier, pool_index, pool_name, mode, thread_offset);
     });
 
     if (use_pools) {
         // Create a thread pool using the default scheduler provided by HPX
-        rp.create_thread_pool("mpi", hpx::resource::scheduling_policy::local_priority_fifo);
-        std::cout << "[main] " << "thread_pools created \n";
+//        rp.create_thread_pool("mpi", hpx::resource::scheduling_policy::local_priority_fifo);
+        //std::cout << "[main] " << "thread_pools created \n";
 
-    rp.add_resource(rp.numa_domains()[0].cores()[0].pus(), "mpi");
+        // create a thread pool and supply a lambda that returns a new pool with
+        // the a user supplied scheduler attached
+        rp.create_thread_pool("mpi", [](
+            hpx::threads::policies::callback_notifier &notifier,
+            std::size_t num_threads, std::size_t thread_offset,
+            std::size_t pool_index, char const* pool_name)
+        {
+            std::cout << "User defined scheduler creation callback " << std::endl;
+            high_priority_sched* scheduler = new high_priority_sched(
+                num_threads, "shared-priority-scheduler");
+
+            scheduler_mode mode = scheduler_mode(
+                scheduler_mode::do_background_work | scheduler_mode::delay_exit);
+
+            return new hpx::threads::detail::thread_pool_impl<high_priority_sched>(
+                scheduler, notifier, pool_index, pool_name, mode, thread_offset);
+        });
+
+        // rp.add_resource(rp.numa_domains()[0].cores()[0].pus(), "mpi");
+        // add N cores to mpi pool
+        int count = 0;
+        for (const hpx::resource::numa_domain &d : rp.numa_domains()) {
+            for (const hpx::resource::core &c : d.cores()) {
+                for (const hpx::resource::pu &p : c.pus()) {
+                    if (count<pool_threads) {
+                        std::cout << "Added pu " << count++ << " to mpi pool\n";
+                        rp.add_resource(p, "mpi");
+                    }
+                }
+            }
+        }
+
         std::cout << "[main] " << "resources added to thread_pools \n";
     }
 
