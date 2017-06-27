@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
-
+            InIter output = first;
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     local_iterator_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f_or_val
                     );
-                    last = traits::compose(send, out);
+                    output=traits::compose(send,out);
                 }
             }
             else
@@ -75,6 +75,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f_or_val
                     );
+                    if(out != end)
+                        output=traits::compose(sit,out);
                 }
 
                 // handle all of the full partitions
@@ -88,6 +90,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, f_or_val
                         );
+                        if(out != end)
+                            output=traits::compose(sit,out);
                     }
                 }
 
@@ -99,11 +103,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f_or_val
                     );
+                    if(out != end)
+                        output=traits::compose(sit,out);
                 }
-
-                last = traits::compose(sit, out);
             }
-            return result::get(std::move(last));
+            return result::get(std::move(output));
         }
 
         template <typename Algo, typename ExPolicy, typename InIter,
@@ -127,7 +131,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<future<local_iterator_type> > segments;
+            std::vector<future<InIter> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -137,9 +141,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, f_or_val
-                    ));
+                    segments.push_back(
+                        hpx::make_future<InIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f_or_val),
+                            [send,end,last](local_iterator_type const& out)
+                                -> InIter
+                            {
+                                if(out != end)
+                                    return traits::compose(send, out);
+                                else
+                                    return last;
+                            }));
                 }
             }
             else {
@@ -148,9 +161,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, f_or_val
-                    ));
+                    segments.push_back(
+                        hpx::make_future<InIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f_or_val),
+                            [sit,end,last](local_iterator_type const& out)
+                                -> InIter
+                            {
+                                if(out != end)
+                                    return traits::compose(sit, out);
+                                else
+                                    return last;
+                            }));
                 }
 
                 // handle all of the full partitions
@@ -160,9 +182,18 @@ namespace hpx { namespace parallel { inline namespace v1
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        segments.push_back(dispatch_async(traits::get_id(sit),
-                            algo, policy, forced_seq(), beg, end, f_or_val
-                        ));
+                        segments.push_back(
+                            hpx::make_future<InIter>(
+                                dispatch_async(traits::get_id(sit), algo,
+                                    policy, forced_seq(), beg, end, f_or_val),
+                                [sit,end,last](local_iterator_type const& out)
+                                    -> InIter
+                                {
+                                    if(out != end)
+                                        return traits::compose(sit, out);
+                                    else
+                                        return last;
+                                }));
                     }
                 }
 
@@ -171,15 +202,23 @@ namespace hpx { namespace parallel { inline namespace v1
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(dispatch_async(traits::get_id(sit),
-                        algo, policy, forced_seq(), beg, end, f_or_val
-                    ));
+                    segments.push_back(
+                        hpx::make_future<InIter>(
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy, forced_seq(), beg, end, f_or_val),
+                            [sit,end,last](local_iterator_type const& out)
+                                -> InIter
+                            {
+                                if(out != end)
+                                    return traits::compose(sit, out);
+                                else
+                                    return last;
+                            }));
                 }
             }
-
             return result::get(
                 dataflow(
-                    [=](std::vector<hpx::future<local_iterator_type> > && r)
+                    [=](std::vector<hpx::future<InIter> > && r)
                         ->  InIter
                     {
                         // handle any remote exceptions, will throw on error
@@ -187,7 +226,16 @@ namespace hpx { namespace parallel { inline namespace v1
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
-                        return traits::compose(sit, r.back().get());
+
+                        std::vector<InIter> res =
+                            hpx::util::unwrapped(std::move(r));
+                        auto it = res.begin();
+                        while(it!=res.end())
+                        {
+                            if(*it != last)
+                                return *it;
+                        }
+                        return res.back();
                     },
                     std::move(segments)));
         }

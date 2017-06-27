@@ -7,6 +7,7 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/include/parallel_scan.hpp>
+
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
@@ -94,9 +95,9 @@ template <typename T>
 void find_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 1000;
-    hpx::partitioned_vector<T> xvalues(num, T(512),hpx::container_layout(localities));
-    // hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, xvalues.begin(),
-    //     xvalues.end(), xvalues.begin(), T(0), std::plus<T>());
+    hpx::partitioned_vector<T> xvalues(num, T(1),hpx::container_layout(localities));
+    hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, xvalues.begin(),
+        xvalues.end(), xvalues.begin(), T(0), std::plus<T>());
 
     test_find(hpx::parallel::execution::seq, xvalues, T(512));
     test_find(hpx::parallel::execution::par, xvalues, T(512));
@@ -105,19 +106,19 @@ void find_tests(std::vector<hpx::id_type> &localities)
     test_find_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
         xvalues, T(512));
 
-    // test_find_if(hpx::parallel::execution::seq, xvalues, T(512));
-    // test_find_if(hpx::parallel::execution::par, xvalues, T(512));
-    // test_find_if_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-    //     xvalues, T(512));
-    // test_find_if_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-    //     xvalues, T(512));
-    //
-    // test_find_if_not(hpx::parallel::execution::seq, xvalues, T(512));
-    // test_find_if_not(hpx::parallel::execution::par, xvalues, T(512));
-    // test_find_if_not_async(hpx::parallel::execution::seq(
-    //     hpx::parallel::execution::task), xvalues, T(512));
-    // test_find_if_not_async(hpx::parallel::execution::par(
-    //     hpx::parallel::execution::task), xvalues, T(512));
+    test_find_if(hpx::parallel::execution::seq, xvalues, T(512));
+    test_find_if(hpx::parallel::execution::par, xvalues, T(512));
+    test_find_if_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
+        xvalues, T(512));
+    test_find_if_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
+        xvalues, T(512));
+
+    test_find_if_not(hpx::parallel::execution::seq, xvalues, T(512));
+    test_find_if_not(hpx::parallel::execution::par, xvalues, T(512));
+    test_find_if_not_async(hpx::parallel::execution::seq(
+        hpx::parallel::execution::task), xvalues, T(512));
+    test_find_if_not_async(hpx::parallel::execution::par(
+        hpx::parallel::execution::task), xvalues, T(512));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
