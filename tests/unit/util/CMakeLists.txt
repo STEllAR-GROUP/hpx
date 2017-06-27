@@ -10,6 +10,7 @@ set(tests
     bind_action
     config_entry
     function
+    pack_traversal
     parse_slurm_nodelist
     tagged
     tuple
