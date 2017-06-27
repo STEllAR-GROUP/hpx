@@ -64,13 +64,16 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
                         [tok, first, comp](RandIter it,
-                            std::size_t part_size, std::size_t base_idx) mutable
+                            std::size_t part_size, std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, first, &comp](type const& v, std::size_t i)
+                                [&tok, first, &comp](
+                                    type const& v, std::size_t i
+                                ) -> void
                                 {
-                                    if (comp(*(first + i / 2), v))
+                                    if (hpx::util::invoke(comp, *(first + i / 2), v))
                                         tok.cancel(0);
                                 });
                         },

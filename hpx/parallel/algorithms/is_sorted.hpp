@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         FwdIter trail = part_begin++;
                         util::loop_n<ExPolicy>(
                             part_begin, part_size - 1,
-                            [&trail, &tok, &pred](FwdIter it)
+                            [&trail, &tok, &pred](FwdIter it) -> void
                             {
                                 if (hpx::util::invoke(pred, *it, *trail++))
                                 {
@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         if (!tok.was_cancelled() && trail != last)
                         {
-                            return !pred(*trail, *i);
+                            return !hpx::util::invoke(pred, *trail, *i);
                         }
                         return !tok.was_cancelled();
                     };
@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         return std::all_of(
                             boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
+                            [](hpx::future<bool>& val) -> bool
                             {
                                 return val.get();
                             });
@@ -203,11 +203,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template<typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && pred)
             {
-                return std::is_sorted_until(first, last,
-                    std::forward<Pred>(pred));
+                return std::is_sorted_until(first, last, std::forward<Pred>(pred));
             }
 
             template <typename ExPolicy, typename Pred>
@@ -228,20 +226,21 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (count <= 1)
                     return result::get(std::move(last));
 
-
                 util::cancellation_token<difference_type> tok(count);
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
                     std::forward<ExPolicy>(policy), first, count, 1,
                     [tok, pred, last](FwdIter part_begin, std::size_t part_size,
-                        std::size_t base_idx) mutable
+                        std::size_t base_idx) mutable -> void
                     {
                         FwdIter trail = part_begin++;
                         util::loop_idx_n(++base_idx, part_begin,
                             part_size - 1, tok,
-                            [&trail, &tok, &pred](reference& v, std::size_t ind)
+                            [&trail, &tok, &pred](
+                                reference& v, std::size_t ind
+                            ) -> void
                             {
-                                if (pred(v, *trail++))
+                                if (hpx::util::invoke(pred, v, *trail++))
                                 {
                                     tok.cancel(ind);
                                 }
@@ -254,7 +253,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         if (!tok.was_cancelled(base_idx + part_size)
                             && trail != last)
                         {
-                            if (pred(*trail, *i))
+                            if (hpx::util::invoke(pred, *trail, *i))
                             {
                                 tok.cancel(base_idx + part_size);
                             }
