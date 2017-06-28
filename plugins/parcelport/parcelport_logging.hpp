@@ -110,7 +110,7 @@ namespace detail {
     // ------------------------------------------------------------------
     // helper fuction for printing CRC32
     // ------------------------------------------------------------------
-    static uint32_t crc32(const void *address, size_t length)
+    inline uint32_t crc32(const void *address, size_t length)
     {
         boost::crc_32_type result;
         result.process_bytes(address, length);
@@ -120,7 +120,7 @@ namespace detail {
     // ------------------------------------------------------------------
     // helper fuction for printing CRC32 and short memory dump
     // ------------------------------------------------------------------
-    static std::string mem_crc32(const void *address, size_t length, const char *txt)
+    inline std::string mem_crc32(const void *address, size_t length, const char *txt)
     {
         const uint64_t *uintBuf = static_cast<const uint64_t*>(address);
         std::stringstream temp;
