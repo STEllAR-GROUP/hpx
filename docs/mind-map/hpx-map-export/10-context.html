@@ -1,0 +1,846 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>classes that have something to do with routines and/or functions</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="1g2a8lkj53e178nb2d995actbt">classes that have something to do with routines and/or functions</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="10-context_files/images/classes that have something to do with routines and or functions.jpg"></div>
+<h2 class="topic">
+<a name="4amcq8bre8nqabsunee1hvb1l9">hpx::threads::coroutines::coroutine</a>
+</h2>
+<h3 class="topic">
+<a name="5jdmuclsk2ki1stnrptcm52j0l">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="63ufun80c4jc9167ltnvaq1623">&nbsp;&nbsp;impl_ptr m_pimpl</a>
+</h3>
+<p class="relationships">See Also: <a href="#0v7ioa7dq2m8cu82a5oma0td9b">typedef impl_type::pointer impl_ptr;</a>
+</p>
+<h3 class="topic">
+<a name="2vstj7fkhjivsm9h86tert21ro">&nbsp;&nbsp;&nbsp;Subtopic 1</a>
+</h3>
+<h3 class="topic">
+<a name="2c3m1qiretep9ooe1ons87bfqs">&nbsp;member functions</a>
+</h3>
+<h2 class="topic">
+<a name="79h9htmjnmhhalcnobfh610okt">function_base</a>
+</h2>
+<h3 class="topic">
+<a name="402pu0eroeuav6l2og64b3n5rg">&nbsp;basic_function</a>
+</h3>
+<h3 class="topic">
+<a name="60d5pd2k2hl6gdkboik9jsuv5j">&nbsp;&nbsp;template &lt;typename Sig, bool Serializable&gt;
+class unique_function;</a>
+</h3>
+<h3 class="topic">
+<a name="57o89o802esf5dt6upj2j4qltp">&nbsp;&nbsp;&nbsp;unique_function</a>
+</h3>
+<p class="relationships">See Also: <a href="#7hm60h37ai7k2kiin0dfsfrebe">typedef util::unique_function_nonser&lt;thread_function_sig&gt; thread_function_type</a>
+</p>
+<h2 class="topic">
+<a name="54u4k40hnc0bp1tf25a3h87180">enums and typedefs</a>
+</h2>
+<h3 class="topic">
+<a name="3lobdndhe8099p1p6me66364sc">&nbsp;template &lt;typename Sig&gt;
+using unique_function_nonser = unique_function&lt;Sig, false&gt;;</a>
+</h3>
+<h3 class="topic">
+<a name="7hm60h37ai7k2kiin0dfsfrebe">&nbsp;typedef util::unique_function_nonser&lt;thread_function_sig&gt; thread_function_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#57o89o802esf5dt6upj2j4qltp">unique_function</a>
+</p>
+<h3 class="topic">
+<a name="2g30nks58r05a0gvbthiumk1b5">&nbsp;typedef coroutines::coroutine coroutine_type;</a>
+</h3>
+<h3 class="topic">
+<a name="1ipaosdaop28igbd9jilp8nbd0">&nbsp;typedef typename traits::promise_local_result&lt;R&gt;::type result_type</a>
+</h3>
+<h3 class="topic">
+<a name="1mvvmmb7ukn43vufmdupdgof69">&nbsp;&nbsp;represents the type returned when invoking operator() on an instance of thread_data</a>
+</h3>
+<h3 class="topic">
+<a name="711dsfp79qgfae7fq3s8tbrmss">&nbsp;typedef detail::coroutine_impl impl_type;</a>
+</h3>
+<h3 class="topic">
+<a name="0v7ioa7dq2m8cu82a5oma0td9b">&nbsp;&nbsp;typedef impl_type::pointer impl_ptr;</a>
+</h3>
+<p class="relationships">See Also: <a href="#63ufun80c4jc9167ltnvaq1623">impl_ptr m_pimpl</a>
+</p>
+<h3 class="topic">
+<a name="15rfni2ganbefjo50vmjdiptej">&nbsp;&nbsp;typedef impl_type::thread_id_repr_type thread_id_repr_type;</a>
+</h3>
+<h3 class="topic">
+<a name="75s3bvhplo90soat22ns4vee6l">&nbsp;&nbsp;typedef impl_type::result_type result_type;</a>
+</h3>
+<h3 class="topic">
+<a name="0hgmhu5lslvuefiu1q8gulp73h">&nbsp;&nbsp;typedef impl_type::arg_type arg_type;</a>
+</h3>
+<h3 class="topic">
+<a name="3ec5ssn3p0r24suq7dh5673nlu">&nbsp;typedef default_context_impl::context_impl_base ctx_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#16jmc77q3dfc1us9v7ajpt1700">ctx_type m_caller (is)</a>
+</p>
+<h3 class="topic">
+<a name="22arofg5dgus3s30k779mpippi">&nbsp;typedef util::unique_function_nonser&lt;result_type(arg_type)&gt; functor_type;</a>
+</h3>
+<h3 class="topic">
+<a name="19t4q3secorhp06ag3rgee55qk">&nbsp;enum context_state</a>
+</h3>
+<p class="relationships">See Also: <a href="#312hgddr5cmg4u2rudm66c7vdn">context_state m_state</a>
+</p>
+<h3 class="topic">
+<a name="187kiii7e2j3cn0rmift0bih44">&nbsp;&nbsp;global coroutine state</a>
+</h3>
+<h3 class="topic">
+<a name="6al19t054vvmqp9v9jgkosjnoa">&nbsp;&nbsp;&nbsp;ctx_running,  // context running.</a>
+</h3>
+<h3 class="topic">
+<a name="5pge8js7vvk89r2nglrihqdrem">&nbsp;&nbsp;&nbsp;ctx_ready,    // context at yield point.</a>
+</h3>
+<div class="notesContainer">
+<p>what does this mean?</p>
+</div>
+<h3 class="topic">
+<a name="21gvfkn8hdvk0f1m0hprffuis8">&nbsp;&nbsp;&nbsp;ctx_waiting,  // context waiting for events.</a>
+</h3>
+<h3 class="topic">
+<a name="31bqlg7jeej2al2252farnur9p">&nbsp;&nbsp;&nbsp;ctx_exited    // context is finished.</a>
+</h3>
+<h3 class="topic">
+<a name="1qiig0ktmkrtpvjgmome43raga">&nbsp;enum context_exit_state</a>
+</h3>
+<h3 class="topic">
+<a name="73tgku6oe8dbiibk38gg8dnvcl">&nbsp;&nbsp;exit request state</a>
+</h3>
+<h3 class="topic">
+<a name="3outn4lg7mkl35p6mq2abhprqa">&nbsp;&nbsp;&nbsp;ctx_exit_not_requested,  // exit not requested.</a>
+</h3>
+<h3 class="topic">
+<a name="3p5n8ebv1s80he8k1ee9b5v5is">&nbsp;&nbsp;&nbsp;ctx_exit_pending,        // exit requested.</a>
+</h3>
+<h3 class="topic">
+<a name="2g6cqkddc0u73ncb7qa8a94amb">&nbsp;&nbsp;&nbsp;ctx_exit_signaled        // exit request delivered.</a>
+</h3>
+<h3 class="topic">
+<a name="1j1qj0u1ojgd339iurfga99kie">&nbsp;enum context_exit_status</a>
+</h3>
+<div class="notesContainer">
+<p>difference with the above??</p>
+</div>
+<h3 class="topic">
+<a name="1ccfgk23s4sj7dlloe58n1tsvc">&nbsp;&nbsp;exit status</a>
+</h3>
+<h3 class="topic">
+<a name="3l2cnuvbdanesj8s3atktpk3sq">&nbsp;&nbsp;&nbsp;ctx_not_exited,</a>
+</h3>
+<h3 class="topic">
+<a name="09pb7n52n4gr5cvvh9h6r8plna">&nbsp;&nbsp;&nbsp;ctx_exited_return,    // process exited by return.</a>
+</h3>
+<h3 class="topic">
+<a name="3n9pfpan6iagrv6uvtq6fn8m6l">&nbsp;&nbsp;&nbsp;ctx_exited_exit,      // process exited by exit().</a>
+</h3>
+<h3 class="topic">
+<a name="7om243oq0kgl9d0i98c6h4bsip">&nbsp;&nbsp;&nbsp;ctx_exited_abnormally // process exited uncleanly.</a>
+</h3>
+<h3 class="topic">
+<a name="64kf4d2i6b74cvc7pls5se0ojo">&nbsp;typedef void deleter_type(context_base const*);</a>
+</h3>
+<p class="relationships">See Also: <a href="#1s66tmqhe4ot3efmevrlgagr0g">deleter_type* m_deleter</a>
+</p>
+<h3 class="topic">
+<a name="50inlplrn0b42gleho9q6iq5cr">&nbsp;&nbsp;function that takes a pointer to a context_base as argument and returns void</a>
+</h3>
+<h3 class="topic">
+<a name="5rc6tc7q2tg10rcf84ljhrq7g7">&nbsp;typedef void* thread_id_repr_type;</a>
+</h3>
+<h3 class="topic">
+<a name="5ql0gtppae6koe32q3okqhc3bd">&nbsp;&nbsp;a void pointer</a>
+</h3>
+<h2 class="topic">
+<a name="0h4t6mstvui1921sci7lfgh6ir">default_context_impl</a>
+</h2>
+<div class="notesContainer">
+<p>in file: context_impl.hpp. Is typedefed depending on macros</p>
+</div>
+<p class="relationships">See Also: <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (is an implementation of)</a>, <a href="#658jr7br365ckf9q9bv5ir19b9">context_base (derived_from)</a>
+</p>
+<h3 class="topic">
+<a name="2d36ag4t01fugh7qvntt8luepe">&nbsp;typedef windows::context_impl 
+default_context_impl;</a>
+</h3>
+<p class="relationships">See Also: <a href="#5vc5n3dlcjru0jkqqknb8peebi">fibers_context_impl (is)</a>
+</p>
+<h3 class="topic">
+<a name="2bddq008n0g99eb6uihe01t59q">&nbsp;typedef posix::context_impl 
+default_context_impl;</a>
+</h3>
+<p class="relationships">See Also: <a href="#5nq2otcoatgirmcatodk4oet3r">ucontext_context_impl (is)</a>
+</p>
+<h3 class="topic">
+<a name="51foulh1l8qc37esq2eeiea4gv">&nbsp;typedef lx::context_impl 
+default_context_impl;</a>
+</h3>
+<p class="relationships">See Also: <a href="#27pp210kusefjcl4b850dc9n2f">x86_linux_context_impl (is)</a>
+</p>
+<h3 class="topic">
+<a name="5q6f4262cdp1dtub8go2cgckp5">&nbsp;typedef generic_context::context_impl 
+default_context_impl;</a>
+</h3>
+<p class="relationships">See Also: <a href="#5r800vnh5aglg4sqoep6q5ado5">fcontext_context_impl (is)</a>
+</p>
+<h2 class="topic">
+<a name="6kvdja7r67kkh2mfsg2buml6c1">coroutine_accessor</a>
+</h2>
+<h2 class="topic">
+<a name="4uifkl0suo0evrojr5jqm7a14m">coroutine_self</a>
+</h2>
+<h2 class="topic">
+<a name="658jr7br365ckf9q9bv5ir19b9">context_base</a>
+</h2>
+<p class="relationships">See Also: <a href="#01gp9tabnr54s2956icdlo9ikd">coroutine_impl</a>, <a href="#0h4t6mstvui1921sci7lfgh6ir">default_context_impl (derived_from)</a>
+</p>
+<h3 class="topic">
+<a name="6e5iulhs74fgj2tjq622mivhed">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="16jmc77q3dfc1us9v7ajpt1700">&nbsp;&nbsp;ctx_type m_caller</a>
+</h3>
+<div class="notesContainer">
+<p>but you already have it in heritage ... what is this???</p>
+<p>Does it rep the one whi</p>
+</div>
+<p class="relationships">See Also: <a href="#3ec5ssn3p0r24suq7dh5673nlu">typedef default_context_impl::context_impl_base ctx_type (is)</a>
+</p>
+<h3 class="topic">
+<a name="3nt357jklbgor5i0rb4vqbc1j2">&nbsp;&nbsp;static HPX_EXPORT allocation_counters m_allocation_counters</a>
+</h3>
+<h3 class="topic">
+<a name="1s66tmqhe4ot3efmevrlgagr0g">&nbsp;&nbsp;deleter_type* m_deleter</a>
+</h3>
+<p class="relationships">See Also: <a href="#64kf4d2i6b74cvc7pls5se0ojo">typedef void deleter_type(context_base const*);</a>
+</p>
+<h3 class="topic">
+<a name="4n1kcfjckhi585c1ouoiuj9v58">&nbsp;&nbsp;state indicators</a>
+</h3>
+<h3 class="topic">
+<a name="312hgddr5cmg4u2rudm66c7vdn">&nbsp;&nbsp;&nbsp;context_state m_state</a>
+</h3>
+<p class="relationships">See Also: <a href="#19t4q3secorhp06ag3rgee55qk">enum context_state</a>
+</p>
+<h3 class="topic">
+<a name="43kuuglq8a9gsr5h7i9akv2qmj">&nbsp;&nbsp;&nbsp;context_exit_state m_exit_state</a>
+</h3>
+<h3 class="topic">
+<a name="43hsi21ihihva986t8cnru1glk">&nbsp;&nbsp;&nbsp;context_exit_status m_exit_status</a>
+</h3>
+<h3 class="topic">
+<a name="317hqoe62ggc7upjcq18tltod5">&nbsp;&nbsp;mutable std::size_t m_thread_data</a>
+</h3>
+<h3 class="topic">
+<a name="54nt9e4k556jnejkgju540320h">&nbsp;&nbsp;to generate a meaningful 
+exception trace</a>
+</h3>
+<h3 class="topic">
+<a name="5fqeapj892mp2vk27fg5ean5i1">&nbsp;&nbsp;&nbsp;boost::exception_ptr m_type_info</a>
+</h3>
+<h3 class="topic">
+<a name="2oggcdjsp4nmlo08hpbb50fopc">&nbsp;&nbsp;&nbsp;thread_id_repr_type m_thread_id</a>
+</h3>
+<p class="relationships">See Also: <a href="#4po4sseq7s4rv8cbmbm1jj0ghd">returns the data member m_thread_id</a>
+</p>
+<h3 class="topic">
+<a name="5q9gtq2at1hfec8abjtncf4t3j">&nbsp;&nbsp;std::size_t continuation_recursion_count</a>
+</h3>
+<h3 class="topic">
+<a name="2anoug7b9v7doink7leflelppj">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="180m90o89ck3oahv6tcbfuu3se">&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="5nrnpiuukt4bln2jcfiet780j0">&nbsp;&nbsp;destr</a>
+</h3>
+<h3 class="topic">
+<a name="3fpu0ccd2qbb5fb03g922kf2n9">&nbsp;&nbsp;friend void intrusive_ptr_add_ref(context_base* ctx)</a>
+</h3>
+<p class="relationships">See Also: <a href="#2r74linlfsn4171kp54l163au2">increments m_counter if the coroutine is reference counted.
+Does nothing otherwise (calls this on arg)</a>
+</p>
+<h3 class="topic">
+<a name="7ho2c4hn5s4uk0puigrpop65s1">&nbsp;&nbsp;void aquire() cont</a>
+</h3>
+<h3 class="topic">
+<a name="2r74linlfsn4171kp54l163au2">&nbsp;&nbsp;&nbsp;increments m_counter if the coroutine is reference counted.
+Does nothing otherwise</a>
+</h3>
+<p class="relationships">See Also: <a href="#3fpu0ccd2qbb5fb03g922kf2n9">friend void intrusive_ptr_add_ref(context_base* ctx) (calls this on arg)</a>
+</p>
+<h3 class="topic">
+<a name="6tsa386m5vlahmmdm0mbkjik4v">&nbsp;&nbsp;friend void intrusive_ptr_release(context_base* ctx)</a>
+</h3>
+<p class="relationships">See Also: <a href="#3lr567dtq5vu032hignggd0bua">calls m_deleter (calls this on arg)</a>
+</p>
+<h3 class="topic">
+<a name="4c4832ff1kafud5q05jppcv9qo">&nbsp;&nbsp;void release() </a>
+</h3>
+<h3 class="topic">
+<a name="3lr567dtq5vu032hignggd0bua">&nbsp;&nbsp;&nbsp;calls m_deleter</a>
+</h3>
+<p class="relationships">See Also: <a href="#6tsa386m5vlahmmdm0mbkjik4v">friend void intrusive_ptr_release(context_base* ctx) (calls this on arg)</a>
+</p>
+<h3 class="topic">
+<a name="7lk9s44p4msvhke615ujakenmn">&nbsp;&nbsp;bool unique() const</a>
+</h3>
+<h3 class="topic">
+<a name="284jjathit4cob80m0eerj7m3s">&nbsp;&nbsp;&nbsp;returns true</a>
+</h3>
+<h3 class="topic">
+<a name="2u851u332u9ukf0t8qfo8io2ui">&nbsp;&nbsp;std::int64_t count() const</a>
+</h3>
+<h3 class="topic">
+<a name="7l9b7h8ljsmtq7uncb55r4h7ap">&nbsp;&nbsp;void reset()</a>
+</h3>
+<h3 class="topic">
+<a name="73f4juldtmkjem5vfmcolq5d6g">&nbsp;&nbsp;&nbsp;sets m_thread_data to 0 and m_thread_id to nullptr</a>
+</h3>
+<h3 class="topic">
+<a name="5j9c7t8f4c958d1cgq7f31gij1">&nbsp;&nbsp;int pending() const</a>
+</h3>
+<h3 class="topic">
+<a name="3kii4m1b89sd5ib307eg93rkdo">&nbsp;&nbsp;&nbsp;returns true if there are operations pending</a>
+</h3>
+<h3 class="topic">
+<a name="6cb68fr4g98mghlr4pnoqode9k">&nbsp;&nbsp;bool signal() HPX_NOEXCEPT</a>
+</h3>
+<h3 class="topic">
+<a name="2jpc33fu37djujfb7bm4a3bqt7">&nbsp;&nbsp;&nbsp;A signal may occur only when a context is not running (is delivered synchronously)
+This means that state must not be "busy": it may be "ready" or "waiting"
+Returns is_ready()</a>
+</h3>
+<h3 class="topic">
+<a name="0uthglit1e39g8asl1ojr8j931">&nbsp;&nbsp;thread_id_repr_type get_thread_id() const</a>
+</h3>
+<h3 class="topic">
+<a name="4po4sseq7s4rv8cbmbm1jj0ghd">&nbsp;&nbsp;&nbsp;returns the data member m_thread_id</a>
+</h3>
+<p class="relationships">See Also: <a href="#2oggcdjsp4nmlo08hpbb50fopc">thread_id_repr_type m_thread_id</a>
+</p>
+<h3 class="topic">
+<a name="4p3ev2111fdr26js8q99f0bi1l">&nbsp;&nbsp;functions which allow to
+check the state 
+of the context
+(simply perform check on m_state data member)</a>
+</h3>
+<h3 class="topic">
+<a name="5g94juh44g4ig7j5dkcqh9nbdd">&nbsp;&nbsp;&nbsp;bool is_ready() const</a>
+</h3>
+<h3 class="topic">
+<a name="63a7m7cps8cp2dfq0b31k25h0l">&nbsp;&nbsp;&nbsp;&nbsp;returns true if the context is runnable</a>
+</h3>
+<h3 class="topic">
+<a name="6qfc6p4hh10o3mgjresp0p4g93">&nbsp;&nbsp;&nbsp;bool waiting() const</a>
+</h3>
+<h3 class="topic">
+<a name="1n8tdo2hioc781041g38p48luv">&nbsp;&nbsp;&nbsp;&nbsp;returns true if the context is in wait state</a>
+</h3>
+<h3 class="topic">
+<a name="593i7lm9k3hnnhvga4r0i5eu2o">&nbsp;&nbsp;&nbsp;bool running() const</a>
+</h3>
+<h3 class="topic">
+<a name="11aa6f0jmeljign24d51v8fljg">&nbsp;&nbsp;&nbsp;bool exited() </a>
+</h3>
+<h3 class="topic">
+<a name="45adqu240n1sim084v1485rohk">&nbsp;&nbsp;void invoke()</a>
+</h3>
+<h3 class="topic">
+<a name="1am60lf9kemnd5q7j5esmdv7lf">&nbsp;&nbsp;&nbsp;resume the coroutine
+It garantees that the coroutine is resumed.
+Can throw only on return</a>
+</h3>
+<h3 class="topic">
+<a name="7k3fidj8lk6h9afnauojc7hces">&nbsp;&nbsp;&nbsp;&nbsp;preconditions</a>
+</h3>
+<h3 class="topic">
+<a name="16go51dju0p4l44ojvtq30i7s2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the coroutine must be ready</a>
+</h3>
+<h3 class="topic">
+<a name="4snnlf3ms39ckjid1qa8fmbaud">&nbsp;&nbsp;&nbsp;&nbsp;postconditions</a>
+</h3>
+<h3 class="topic">
+<a name="2vh5dvadsee19ajkvsni6b3te3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the coroutine relinquished control.
+It might be: ready, waiting or exited</a>
+</h3>
+<div class="notesContainer">
+<p>in which scenario would it be "ready" ?</p>
+</div>
+<h3 class="topic">
+<a name="1q0sho26o0e3g71ohqn5ce038p">&nbsp;&nbsp;&nbsp;&nbsp;throw</a>
+</h3>
+<h3 class="topic">
+<a name="4cpoaarj6li3e27dd6um9ptd9e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;waiting // if the coroutine entered the wait state</a>
+</h3>
+<h3 class="topic">
+<a name="2uthnbu89klcr4cvtdeftdtpa6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coroutine_exited // if the coroutine exited by an uncaught 'exit_exception'</a>
+</h3>
+<h3 class="topic">
+<a name="5n1g13mgjpqf9bd3gdeta64877">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;abnormal _exit // if the coroutine was exited by another uncaught exception</a>
+</h3>
+<h3 class="topic">
+<a name="1fcmhdrcoljvl6iimga8fe59kv">&nbsp;&nbsp;&nbsp;- assert(is_ready)
+- call do_invoke
+- perform checks, return and/or throw</a>
+</h3>
+<p class="relationships">See Also: <a href="#6tbfjtqc5s266ldn7dftgsp3jn">call swap_context(m_caller, *this, detail::invoke_hint()) (calls)</a>
+</p>
+<h3 class="topic">
+<a name="616gi8l43htsrllq2o7plc29qf">&nbsp;&nbsp;bool wake_up()</a>
+</h3>
+<h3 class="topic">
+<a name="75tjvgi6j25sdrs3mkk81mg2gq">&nbsp;&nbsp;&nbsp;wake up a waiting context
+similar to invoke() but DOES NOT THROW if the coroutine exited abnormally
+returns false if invoke() would have thrown, 
+               true otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="6uavjiusfjme17nl33hnaqn0si">&nbsp;&nbsp;&nbsp;- assert that the context is ready
+- call do_invoke() 
+-perform checks to decide what to return and/or whether to throw an exception</a>
+</h3>
+<p class="relationships">See Also: <a href="#6tbfjtqc5s266ldn7dftgsp3jn">call swap_context(m_caller, *this, detail::invoke_hint()) (calls)</a>
+</p>
+<h3 class="topic">
+<a name="2ga1b1v8san7udll16j25uof4e">&nbsp;&nbsp;void yield() </a>
+</h3>
+<h3 class="topic">
+<a name="2gpich67thlmfoepbi2uu7iumk">&nbsp;&nbsp;&nbsp;put coroutine in "ready"-state 
+and relinquish control to caller 
+until resumed again. </a>
+</h3>
+<h3 class="topic">
+<a name="611ih7lbes5dp2okfriag7tmpe">&nbsp;&nbsp;&nbsp;&nbsp;precondition</a>
+</h3>
+<h3 class="topic">
+<a name="2qfg93ootkja6kd77oth0sgv2n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coroutine is running</a>
+</h3>
+<h3 class="topic">
+<a name="0jrkh03kg0bsb5jubrghqbosqh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit not pending</a>
+</h3>
+<h3 class="topic">
+<a name="7q31t6diacvv8sf29nmfjuun4d">&nbsp;&nbsp;&nbsp;&nbsp;postcondiiton</a>
+</h3>
+<h3 class="topic">
+<a name="4d48ct87n1430jsa0nn6312t9d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coroutine is running</a>
+</h3>
+<h3 class="topic">
+<a name="2b0qhpfbhoeae74pnvvcgahilr">&nbsp;&nbsp;&nbsp;&nbsp;throws</a>
+</h3>
+<h3 class="topic">
+<a name="4804e3789gvbmgockid958c6sd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit_exception // if exit is pending *after* it has been resumed</a>
+</h3>
+<h3 class="topic">
+<a name="40ma1fjsjouc4u2l34pa1hher6">&nbsp;&nbsp;&nbsp;- asserts
+- change m_state to ctx_ready
+- call do_yield()
+- assert that it is running
+- check the exit state() </a>
+</h3>
+<p class="relationships">See Also: <a href="#2sme9br4c3fa8308jtkk8uk1uu">call swap_context(*this, m_caller, detail::yield_hint()) (calls)</a>, <a href="#6eklrbo9knn6b7u0ksff5hmmd9">void check_exit_state() (calls)</a>
+</p>
+<h3 class="topic">
+<a name="5fml1tqbg9q2r6ch0ev6cf2314">&nbsp;&nbsp;void exit()</a>
+</h3>
+<h3 class="topic">
+<a name="42l3mrjmrvj2cuf82m7gmu2dj4">&nbsp;&nbsp;&nbsp;Causes the coroutine to exit
+Can only be called on a coroutine that is 
+a. ready
+b. has no pending operations
+Therefore it cannot be called from 'this'</a>
+</h3>
+<h3 class="topic">
+<a name="61j7o75ch10p87ngv6kj9c60eg">&nbsp;&nbsp;&nbsp;- assert
+- call do_invoke()
+- assert that it has exited</a>
+</h3>
+<p class="relationships">See Also: <a href="#6tbfjtqc5s266ldn7dftgsp3jn">call swap_context(m_caller, *this, detail::invoke_hint()) (calls)</a>
+</p>
+<h3 class="topic">
+<a name="6kqtu291a9bk9pl9ubh4k14kes">&nbsp;&nbsp;void exit_self()</a>
+</h3>
+<h3 class="topic">
+<a name="0kiqm9816psv860kgd7cfr7d7f">&nbsp;&nbsp;std::size_t get_thread_data() const</a>
+</h3>
+<h3 class="topic">
+<a name="2ehh880ibf7q381cdkeu6ni1iq">&nbsp;&nbsp;std::size_t set_thread_data(std::size_t data)</a>
+</h3>
+<h3 class="topic">
+<a name="6po1jccojbr8f7mhf9nhal9pla">&nbsp;&nbsp;tss_storage* get_thread_tss_data(bool create_if_needed) const</a>
+</h3>
+<h3 class="topic">
+<a name="7abtlme30jcsi0teo2ur2to1k8">&nbsp;&nbsp;std::size_T&amp; get_continuation_recursion_count() </a>
+</h3>
+<h3 class="topic">
+<a name="166g7ohgf16tbum9sm050eeia6">&nbsp;&nbsp;std::uint64_t get_allocation_count_all(bool reset) </a>
+</h3>
+<h3 class="topic">
+<a name="3oii2dnta34ojapnmdhcefl0m6">&nbsp;&nbsp;static std::uint64_t get_allocation_count(std::size_t heap_num, bool reset) </a>
+</h3>
+<h3 class="topic">
+<a name="14rd6an6q2f6s083mmvv6stbtj">&nbsp;&nbsp;static std::uint64_t increment_allocation_count(std::size_t heap_num) </a>
+</h3>
+<h3 class="topic">
+<a name="0sn9ultrf2jlijf7ond1143lca">&nbsp;&nbsp;void rebind_base(thread_id_repr_type id)</a>
+</h3>
+<h3 class="topic">
+<a name="4i00brkr9ujuism1suaa7l3cdu">&nbsp;&nbsp;&nbsp;resets m_thread_id, m_state, m_exit_state, m_exit_status, m_type_info</a>
+</h3>
+<h3 class="topic">
+<a name="6eklrbo9knn6b7u0ksff5hmmd9">&nbsp;&nbsp;void check_exit_state()</a>
+</h3>
+<p class="relationships">See Also: <a href="#40ma1fjsjouc4u2l34pa1hher6">- asserts
+- change m_state to ctx_ready
+- call do_yield()
+- assert that it is running
+- check the exit state()  (calls)</a>
+</p>
+<h3 class="topic">
+<a name="205m1agdvcae47ooueiotuloud">&nbsp;&nbsp;&nbsp;causes the coroutine to exit if an exit request is pending. 
+- assert that the coroutine is running
+- if an exit request is pending, return
+- otherwise throw exception. </a>
+</h3>
+<h3 class="topic">
+<a name="6omvspt4eiburckutr02nsbcka">&nbsp;&nbsp;void do_return(
+    context_exit_status, 
+    boost::exception_ptr &amp;&amp; info) </a>
+</h3>
+<p class="relationships">See Also: <a href="#4mstn0gu248u57lntkd6vqdng6">void do_yield() (calls)</a>
+</p>
+<h3 class="topic">
+<a name="4lardadvslqukgbg601km2htmb">&nbsp;&nbsp;&nbsp;asserts</a>
+</h3>
+<h3 class="topic">
+<a name="2sebtbapn61rs4v9m7ln5ba2bk">&nbsp;&nbsp;&nbsp;&nbsp;assert that the status passed as argument is anything but not ctx_not_exited (otherwise non-sens) </a>
+</h3>
+<h3 class="topic">
+<a name="0ablib4jkl195ohrslvffhum0m">&nbsp;&nbsp;&nbsp;&nbsp;assert the the current state of the coroutine is ctx_running</a>
+</h3>
+<h3 class="topic">
+<a name="6cbug61817b1mrpjps9lepdttn">&nbsp;&nbsp;&nbsp;set data members</a>
+</h3>
+<h3 class="topic">
+<a name="5dr9g39c9v4oudrabddds6mkd1">&nbsp;&nbsp;&nbsp;&nbsp;move the arg. "info" to the data_member m_type_info </a>
+</h3>
+<h3 class="topic">
+<a name="3g94c4avh3tffb2klijq5sqbes">&nbsp;&nbsp;&nbsp;&nbsp;set m_state to ctx_exited</a>
+</h3>
+<h3 class="topic">
+<a name="4v84l9gef3urq0q3viboubn9mr">&nbsp;&nbsp;&nbsp;&nbsp;set m_exit_status to status passed as argument</a>
+</h3>
+<h3 class="topic">
+<a name="73nnij61744b9k7gcb6bepa4ru">&nbsp;&nbsp;&nbsp;actually execute</a>
+</h3>
+<h3 class="topic">
+<a name="4m9a445uuil2rdhuf0u4avcc1u">&nbsp;&nbsp;&nbsp;&nbsp;call do_yield()</a>
+</h3>
+<h3 class="topic">
+<a name="4mstn0gu248u57lntkd6vqdng6">&nbsp;&nbsp;void do_yield()</a>
+</h3>
+<p class="relationships">See Also: <a href="#6omvspt4eiburckutr02nsbcka">void do_return(
+    context_exit_status, 
+    boost::exception_ptr &amp;&amp; info)  (calls)</a>
+</p>
+<h3 class="topic">
+<a name="2sme9br4c3fa8308jtkk8uk1uu">&nbsp;&nbsp;&nbsp;call swap_context(*this, m_caller, detail::yield_hint())</a>
+</h3>
+<p class="relationships">See Also: <a href="#40ma1fjsjouc4u2l34pa1hher6">- asserts
+- change m_state to ctx_ready
+- call do_yield()
+- assert that it is running
+- check the exit state()  (calls)</a>, <a href="#1k93vc9kldjtgakeemljktlatq">comes from the 
+context implementation base</a>
+</p>
+<h3 class="topic">
+<a name="2e9mujr65nsksbo3ohrfhoo8ma">&nbsp;&nbsp;void do_invoke() throw()</a>
+</h3>
+<h3 class="topic">
+<a name="4s8qkt76ujb72rtgshbpbd6gcu">&nbsp;&nbsp;&nbsp;assert that the context is either ready or waiting</a>
+</h3>
+<h3 class="topic">
+<a name="6tbfjtqc5s266ldn7dftgsp3jn">&nbsp;&nbsp;&nbsp;call swap_context(m_caller, *this, detail::invoke_hint())</a>
+</h3>
+<p class="relationships">See Also: <a href="#6uavjiusfjme17nl33hnaqn0si">- assert that the context is ready
+- call do_invoke() 
+-perform checks to decide what to return and/or whether to throw an exception (calls)</a>, <a href="#1fcmhdrcoljvl6iimga8fe59kv">- assert(is_ready)
+- call do_invoke
+- perform checks, return and/or throw (calls)</a>, <a href="#61j7o75ch10p87ngv6kj9c60eg">- assert
+- call do_invoke()
+- assert that it has exited (calls)</a>, <a href="#1k93vc9kldjtgakeemljktlatq">comes from the 
+context implementation base</a>
+</p>
+<h3 class="topic">
+<a name="0g8e412vtlk0o8rhkf202ev8g1">&nbsp;&nbsp;template &lt;typename ActualCtx&gt;
+static void deleter(context_base const* ctx)</a>
+</h3>
+<h2 class="topic">
+<a name="01gp9tabnr54s2956icdlo9ikd">coroutine_impl</a>
+</h2>
+<p class="relationships">See Also: <a href="#658jr7br365ckf9q9bv5ir19b9">context_base</a>
+</p>
+<h2 class="topic">
+<a name="05ucrka13gfvs248hfpaqo8513">swapcontext.s</a>
+</h2>
+<h3 class="topic">
+<a name="2s2nn1fqk4uc093h2v4bcebk5k">&nbsp;assembly code where the shit actually happens</a>
+</h3>
+<h2 class="topic">
+<a name="5r800vnh5aglg4sqoep6q5ado5">fcontext_context_impl</a>
+</h2>
+<div class="notesContainer">
+<p>in file: context_generic_context.hpp</p>
+<p></p>
+</div>
+<p class="relationships">See Also: <a href="#71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_ (is an implementation of)</a>, <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (is an implementation of)</a>, <a href="#5q6f4262cdp1dtub8go2cgckp5">typedef generic_context::context_impl 
+default_context_impl; (is)</a>
+</p>
+<h3 class="topic">
+<a name="73tm7arp36nhc7v4u0d6okdird">&nbsp;Generic implementation for the context_impl_base class 
+based on Boost.Context.</a>
+</h3>
+<h3 class="topic">
+<a name="7ff5vbvl21msbgm2ded4jod2ht">&nbsp;&nbsp;typedef fcontext_context_impl context_impl_base;</a>
+</h3>
+<h3 class="topic">
+<a name="7c0qiu4kiulbg4pittrk05a14p">&nbsp;&nbsp;&nbsp;typedef fcontext_context context_impl</a>
+</h3>
+<h2 class="topic">
+<a name="71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_</a>
+</h2>
+<p class="relationships">See Also: <a href="#5r800vnh5aglg4sqoep6q5ado5">fcontext_context_impl (is an implementation of)</a>, <a href="#1qh32jd908fiprfmka5v510hl9">x86_linux_context_impl_base (is an implementation of)</a>, <a href="#3avmgsnkb31ej5h4vasp03npqb">ucontext_context_impl_base (is an implementation of)</a>, <a href="#0tu3o9ao07lilp0rhlvvj7dnom">fibers_context_impl_base (is an implementation of)</a>, <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (ContextImpl must be convertible 
+to ContextImplBase)</a>
+</p>
+<h3 class="topic">
+<a name="2um4vegh9sbldl42fjjk0g29v4">&nbsp;is meant to be used when an empty temporary context is needed to store the current context before restoring a ContextImpl
+and no current context is available. </a>
+</h3>
+<h3 class="topic">
+<a name="5vgcevmrsash4881uud1f4kife">&nbsp;DefaultConstructible</a>
+</h3>
+<h3 class="topic">
+<a name="1klvauig7gr7g0gkq00gm63lro">&nbsp;Copyable</a>
+</h3>
+<h3 class="topic">
+<a name="4oflelc7int8bauc3oa0qnff4t">&nbsp;void swap_context(
+    ContextImplBase&amp; from, 
+    const ContextImplBase&amp; to)</a>
+</h3>
+<p class="relationships">See Also: <a href="#1k93vc9kldjtgakeemljktlatq">comes from the 
+context implementation base</a>
+</p>
+<h3 class="topic">
+<a name="0hu5ffcf7iv263qoct1090tftp">&nbsp;&nbsp;preconditions</a>
+</h3>
+<h3 class="topic">
+<a name="2rml114fb5ltcb530gfaact77c">&nbsp;&nbsp;&nbsp;the 'to' arg must be an initialized ContextImplBase</a>
+</h3>
+<h3 class="topic">
+<a name="74kers54uhb4qovskg26qjju3e">&nbsp;&nbsp;&nbsp;the 'from' arg may be an unitialized ContextImplBase that will be initialized by a swap context</a>
+</h3>
+<h3 class="topic">
+<a name="5vqjv27s24v8v0nd0h1tn6i2p7">&nbsp;&nbsp;postconditions</a>
+</h3>
+<h3 class="topic">
+<a name="2vfms7js5ejpqbrip6ulv35msl">&nbsp;&nbsp;&nbsp;the current context is saved in the 'from' context
+and the 'to' context is restored</a>
+</h3>
+<h2 class="topic">
+<a name="2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept: </a>
+</h2>
+<p class="relationships">See Also: <a href="#0h4t6mstvui1921sci7lfgh6ir">default_context_impl (is an implementation of)</a>, <a href="#5r800vnh5aglg4sqoep6q5ado5">fcontext_context_impl (is an implementation of)</a>, <a href="#27pp210kusefjcl4b850dc9n2f">x86_linux_context_impl (is an implementation of)</a>, <a href="#5nq2otcoatgirmcatodk4oet3r">ucontext_context_impl (is an implementation of)</a>, <a href="#5vc5n3dlcjru0jkqqknb8peebi">fibers_context_impl (is an implementation of )</a>, <a href="#71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_ (ContextImpl must be convertible 
+to ContextImplBase)</a>
+</p>
+<h3 class="topic">
+<a name="37u12gq1cqb7ooh5ccs91a942p">&nbsp;A ContextImpl holds a context plus its stack</a>
+</h3>
+<h3 class="topic">
+<a name="7vhke157t6t808fa7dibphr6ie">&nbsp;&nbsp;Constructor</a>
+</h3>
+<h3 class="topic">
+<a name="7jk9eb9qsvs0h5ffti7iqrcoih">&nbsp;&nbsp;&nbsp;template &lt;typename Functor&gt;
+ContextImpl(Functor f, std::ptrdiff_t stack_size)</a>
+</h3>
+<h3 class="topic">
+<a name="4givgsgjeofnpf89nsne2ajrv6">&nbsp;&nbsp;&nbsp;&nbsp;preconditions</a>
+</h3>
+<h3 class="topic">
+<a name="15fd4dicut59467e2l48vrkmgn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f is a generic function object</a>
+</h3>
+<h3 class="topic">
+<a name="6mtbt5alhntnr9rjdj965rj2dg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stack_size is the size of the stack allocated for the context</a>
+</h3>
+<h3 class="topic">
+<a name="5f240iqfrbacdcg48mvjru4vrl">&nbsp;&nbsp;&nbsp;&nbsp;postconditions</a>
+</h3>
+<h3 class="topic">
+<a name="7s2llgm3fu055ah84aulgnjp2u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f is bound to this context in its own stack</a>
+</h3>
+<h3 class="topic">
+<a name="6ngt9qmt42gl458afvgabkab1l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when the context is activated with swap_context for the first time, 
+f is entered.</a>
+</h3>
+<h2 class="topic">
+<a name="1qh32jd908fiprfmka5v510hl9">x86_linux_context_impl_base</a>
+</h2>
+<p class="relationships">See Also: <a href="#27pp210kusefjcl4b850dc9n2f">x86_linux_context_impl (derived from)</a>, <a href="#71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_ (is an implementation of)</a>, <a href="#14h4s0cfdckvbvleu7hn4l5hsb">detail::context_impl_base (derived from)</a>, <a href="#556ju32ngdiongrbjsf9a1sn30">Manual assembly code.
+swapcontext.cpp determines
+which one is used</a>
+</p>
+<h3 class="topic">
+<a name="7oh56u00g4gtkpua3haala2gku">&nbsp;Linux implementation for the context_impl_base class</a>
+</h3>
+<h3 class="topic">
+<a name="72gku5je0ac4mg0kiu8t36ouin">&nbsp;&nbsp;typedef x86_linux_context_impl_base context_impl_base</a>
+</h3>
+<h2 class="topic">
+<a name="27pp210kusefjcl4b850dc9n2f">x86_linux_context_impl</a>
+</h2>
+<p class="relationships">See Also: <a href="#1qh32jd908fiprfmka5v510hl9">x86_linux_context_impl_base (derived from)</a>, <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (is an implementation of)</a>, <a href="#51foulh1l8qc37esq2eeiea4gv">typedef lx::context_impl 
+default_context_impl; (is)</a>
+</p>
+<h3 class="topic">
+<a name="69itg2tgls67vkeipbc42f3d38">&nbsp;  typedef x86_linux_context_impl context_impl;</a>
+</h3>
+<h2 class="topic">
+<a name="14h4s0cfdckvbvleu7hn4l5hsb">detail::context_impl_base</a>
+</h2>
+<div class="notesContainer">
+<p>in file: swap_context.hpp</p>
+<p></p>
+</div>
+<p class="relationships">See Also: <a href="#1qh32jd908fiprfmka5v510hl9">x86_linux_context_impl_base (derived from)</a>, <a href="#3avmgsnkb31ej5h4vasp03npqb">ucontext_context_impl_base (derived from)</a>, <a href="#0tu3o9ao07lilp0rhlvvj7dnom">fibers_context_impl_base (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="6198c9i8omf0ppkaukbn3kplm1">&nbsp;this is the base class of all context implementations</a>
+</h3>
+<h3 class="topic">
+<a name="608gqp871j7clbt43nd6qh0tuv">&nbsp;&nbsp;struct hpx::threads::coroutines::detail::context_impl_base{};</a>
+</h3>
+<h2 class="topic">
+<a name="3avmgsnkb31ej5h4vasp03npqb">ucontext_context_impl_base</a>
+</h2>
+<p class="relationships">See Also: <a href="#71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_ (is an implementation of)</a>, <a href="#14h4s0cfdckvbvleu7hn4l5hsb">detail::context_impl_base (derived from)</a>, <a href="#5nq2otcoatgirmcatodk4oet3r">ucontext_context_impl (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="52drq68qmsldhh5u15ar99a9nc">&nbsp;Posix implementation for the context_impl_base class</a>
+</h3>
+<h3 class="topic">
+<a name="60qu58q56029b821f6on3iq542">&nbsp;&nbsp;typedef ucontext_context_impl_base context_impl_base;</a>
+</h3>
+<h2 class="topic">
+<a name="5nq2otcoatgirmcatodk4oet3r">ucontext_context_impl</a>
+</h2>
+<p class="relationships">See Also: <a href="#3avmgsnkb31ej5h4vasp03npqb">ucontext_context_impl_base (derived from)</a>, <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (is an implementation of)</a>, <a href="#2bddq008n0g99eb6uihe01t59q">typedef posix::context_impl 
+default_context_impl; (is)</a>
+</p>
+<h3 class="topic">
+<a name="37uahoio0abhcnl14ovues6gva">&nbsp;typedef ucontext_context_impl context_impl;</a>
+</h3>
+<h2 class="topic">
+<a name="0tu3o9ao07lilp0rhlvvj7dnom">fibers_context_impl_base</a>
+</h2>
+<p class="relationships">See Also: <a href="#14h4s0cfdckvbvleu7hn4l5hsb">detail::context_impl_base (derived from)</a>, <a href="#5vc5n3dlcjru0jkqqknb8peebi">fibers_context_impl (derived form)</a>, <a href="#71i3e6lr3dlgj8opvnanq6j2vj">ContextImplBase concept_ (is an implementation of)</a>
+</p>
+<h3 class="topic">
+<a name="7ns9pbpleubotlh7i59mpvpkk6">&nbsp;Windows implementation for the context_impl_base class</a>
+</h3>
+<h3 class="topic">
+<a name="6dkuq9qvtrircl8eb85v4d8qbt">&nbsp;&nbsp;typedef fibers_context_impl_base context_impl_base;</a>
+</h3>
+<h2 class="topic">
+<a name="5vc5n3dlcjru0jkqqknb8peebi">fibers_context_impl</a>
+</h2>
+<p class="relationships">See Also: <a href="#0tu3o9ao07lilp0rhlvvj7dnom">fibers_context_impl_base (derived form)</a>, <a href="#2b4t4blf2ub3cqetu8ojicjijs">ContextImpl concept:  (is an implementation of )</a>, <a href="#2d36ag4t01fugh7qvntt8luepe">typedef windows::context_impl 
+default_context_impl; (is)</a>
+</p>
+<h3 class="topic">
+<a name="2pt75s2ljq33da7v96c08ij68k">&nbsp;typedef fibers_context_impl context_impl;</a>
+</h3>
+<h2 class="topic">
+<a name="1k93vc9kldjtgakeemljktlatq">comes from the 
+context implementation base</a>
+</h2>
+<p class="relationships">See Also: <a href="#4oflelc7int8bauc3oa0qnff4t">void swap_context(
+    ContextImplBase&amp; from, 
+    const ContextImplBase&amp; to)</a>, <a href="#2sme9br4c3fa8308jtkk8uk1uu">call swap_context(*this, m_caller, detail::yield_hint())</a>, <a href="#6tbfjtqc5s266ldn7dftgsp3jn">call swap_context(m_caller, *this, detail::invoke_hint())</a>
+</p>
+<h2 class="topic">
+<a name="7mpns2o87oorcjevrfbt3htrou">Where is it defined?</a>
+</h2>
+<h3 class="topic">
+<a name="297ofimjku9fovp88r2sp6vjmc">&nbsp;the ContextImplBase class implements the function void swap_context(...)
+which determines how the swap context happens. </a>
+</h3>
+<h3 class="topic">
+<a name="5i9ikp2mtmq6nrhpgths1jv10i">&nbsp;files</a>
+</h3>
+<h3 class="topic">
+<a name="6o518u58d9tg9v5s8fatkckjcm">&nbsp;&nbsp;swapcontext.s</a>
+</h3>
+<p class="relationships">See Also: <a href="#6mgaesjn68utrfs2j2uga8fnbv">swapcontext64.s (the difference is the size of the registers
+and a line .type swapcontext_stack, @function)</a>
+</p>
+<h3 class="topic">
+<a name="4v2eq1iml6jor2pdehva3t17ta">&nbsp;&nbsp;&nbsp;swapcontext_stack</a>
+</h3>
+<h3 class="topic">
+<a name="3km5vf6p95jvglgurekdkhhjdb">&nbsp;&nbsp;&nbsp;swapcontext_stack2</a>
+</h3>
+<h3 class="topic">
+<a name="7alldhcik8bn7oni71qmb6hhbc">&nbsp;&nbsp;&nbsp;swapcontext_stack3</a>
+</h3>
+<h3 class="topic">
+<a name="46gjo7cuojg7kf000u9jtt9m8p">&nbsp;&nbsp;&nbsp;swapcontext_stack_orig</a>
+</h3>
+<h3 class="topic">
+<a name="6mgaesjn68utrfs2j2uga8fnbv">&nbsp;&nbsp;swapcontext64.s</a>
+</h3>
+<p class="relationships">See Also: <a href="#6o518u58d9tg9v5s8fatkckjcm">swapcontext.s (the difference is the size of the registers
+and a line .type swapcontext_stack, @function)</a>
+</p>
+<h3 class="topic">
+<a name="68atpvh1f6n7ruqo0an9369i0h">&nbsp;&nbsp;&nbsp;swapcontext_stack</a>
+</h3>
+<h3 class="topic">
+<a name="1ooggsfhgdg1t6ahetbi63cstp">&nbsp;&nbsp;&nbsp;swapcontext_stack2</a>
+</h3>
+<h3 class="topic">
+<a name="6a8346sqqm0oj7g3spntb3mmtv">&nbsp;&nbsp;&nbsp;swapcontext_stack3</a>
+</h3>
+<h3 class="topic">
+<a name="7plj570g6iar8d5gc6cumjplab">&nbsp;&nbsp;&nbsp;swapcontext_stack_orig</a>
+</h3>
+<h3 class="topic">
+<a name="3gbdcuflq47asiuoa2gid9htnv">&nbsp;&nbsp;swapcontext64.ipp</a>
+</h3>
+<h3 class="topic">
+<a name="4o1tuob20jipogpfgdij4dlv2n">&nbsp;&nbsp;swapcontext32.ipp</a>
+</h3>
+<h3 class="topic">
+<a name="3ho1m6pedhd8oq398pblkcooia">&nbsp;&nbsp;are thes used bikhlal??</a>
+</h3>
+<p class="summary">(<a href="#6o518u58d9tg9v5s8fatkckjcm">swapcontext.s</a>, <a href="#6mgaesjn68utrfs2j2uga8fnbv">swapcontext64.s</a>)</p>
+<h3 class="topic">
+<a name="556ju32ngdiongrbjsf9a1sn30">&nbsp;&nbsp;Manual assembly code.
+swapcontext.cpp determines
+which one is used</a>
+</h3>
+<p class="summary">(<a href="#3gbdcuflq47asiuoa2gid9htnv">swapcontext64.ipp</a>, <a href="#4o1tuob20jipogpfgdij4dlv2n">swapcontext32.ipp</a>)</p>
+<p class="relationships">See Also: <a href="#1qh32jd908fiprfmka5v510hl9">x86_linux_context_impl_base</a>
+</p>
+</body>
+</html>

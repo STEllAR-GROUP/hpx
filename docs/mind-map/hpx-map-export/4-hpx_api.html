@@ -1,0 +1,1912 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+          HPX API          
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a href="http://stellar-group.github.io/hpx/docs/html/index/s05.html" name="7un0eqdp7n01c863dep2id0p7i">
+          HPX API          
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="4-hpx_api_files/images/           HPX API            4.jpg"></div>
+<div class="notesContainer">
+<p>Reference: http://stellar-group.github.io/hpx/docs/html/index/s06.html</p>
+<p>Index: http://stellar-group.github.io/hpx/docs/html/index/s05.html</p>
+</div>
+<h2 class="topic">
+<a name="7pb1mrqvlp3s5lj9q277k733un">To be sorted</a>
+</h2>
+<h3 class="topic">
+<a name="2p97euodgk0jomh8cvli8itqq1">&nbsp;callback</a>
+</h3>
+<h3 class="topic">
+<a name="1f4mtoi7c3aahkji37au69ghg4">&nbsp;&nbsp;A callback is any executable code that is passed as an argument to other code, which is expected to call back (execute) the argument at a given time. &#13;
+This execution may be &#13;
+- (blocking) immediate as in a synchronous callback, &#13;
+- (deferred)or it might happen at a later time as in an asynchronous callback. &#13;
+In all cases, the intention is to specify a function or subroutine as an entity[clarification needed] that is, depending on the language, more or less similar to a variable.&#13;
+Programming languages support callbacks in different ways, often implementing them with subroutines, lambda expressions, blocks, or function pointers.</a>
+</h3>
+<h3 class="topic">
+<a name="68c0vm8q2sn218incsrvs3ou6d">&nbsp;coroutine</a>
+</h3>
+<h3 class="topic">
+<a name="1dvual8au8i74m3jsr7m1cauel">&nbsp;thread-queue</a>
+</h3>
+<h3 class="topic">
+<a name="5kmjc4e9fthknq439980c8epce">&nbsp;hwloc</a>
+</h3>
+<h3 class="topic">
+<a name="1632jbkv30ekiicgabttvh8onq">&nbsp;&nbsp;CPU affinity&#13;
+aka CPU pinning</a>
+</h3>
+<h3 class="topic">
+<a name="1orgkhbnr2efl94ivpngtu8g7f">&nbsp;&nbsp;&nbsp;associate certain threads with a (range of) processing unit(s)&#13;
+advantages:&#13;
+- caching effects</a>
+</h3>
+<h3 class="topic">
+<a name="10j799d0ic11k14f89ugqic8og">&nbsp;&nbsp;binding</a>
+</h3>
+<h3 class="topic">
+<a name="3a3ehe8pi5flq4hsdkr6bsvos0">&nbsp;&nbsp;&nbsp;bind a process or thread to a socket or PU</a>
+</h3>
+<h3 class="topic">
+<a name="0b9gpm5n8tb99o21sngft01f1h">&nbsp;context switch</a>
+</h3>
+<p class="relationships">See Also: <a href="#5m0mn7mjcra32ijak2ob1ikh9h">context</a>
+</p>
+<h3 class="topic">
+<a name="5m0mn7mjcra32ijak2ob1ikh9h">&nbsp;context</a>
+</h3>
+<p class="relationships">See Also: <a href="#0b9gpm5n8tb99o21sngft01f1h">context switch</a>
+</p>
+<h3 class="topic">
+<a name="3ede9c2cqd16r83meb07596jl7">&nbsp;thread manager</a>
+</h3>
+<h3 class="topic">
+<a name="2sij5e6qpef918sbdte4ticcgq">&nbsp;thread_mapper</a>
+</h3>
+<h3 class="topic">
+<a name="72k0503bkm5uf58gqj9r0qdblk">&nbsp;thread pool</a>
+</h3>
+<h2 class="topic">
+<a href="#1f8aed3vp331o6s6gfajlfinbg" name="7fhhq7umq0eguk8i9523gbi2oq">Synchronization:
+LCOs</a>
+</h2>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/lcos/extend_futures.html" name="4kafr6oub6pmav4nn50uh5nbi3">&nbsp;futures</a>
+</h3>
+<div class="notesContainer">
+<p>http://stellar-group.org/2015/07/hpx-and-cpp-futures/</p>
+</div>
+<h3 class="topic">
+<a name="6n6snbtupu1jt0lf2qehqqr2gs">&nbsp;&nbsp;types of futures</a>
+</h3>
+<h3 class="topic">
+<a name="678o546hilgp9o9kj2t99jsije">&nbsp;&nbsp;&nbsp;hpx::future&lt;&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="6gcoartsc8391hdo55mkhj3j7n">&nbsp;&nbsp;&nbsp;&nbsp;doesn't block in its destructor if its value has not been set yet
+(unlike std::future)</a>
+</h3>
+<h3 class="topic">
+<a name="2gh2qrfitko09el8ju69fua5kf">&nbsp;&nbsp;&nbsp;hpx::shared_future&lt;&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="39pf1rs8a2nqfp29asfnr0aaa8">&nbsp;&nbsp;&nbsp;split future?</a>
+</h3>
+<h3 class="topic">
+<a name="0olsg3ag1cf9b3dlmvrhp254h8">&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="46jlpkce1ohu7hcnb945ejd6e3">&nbsp;&nbsp;&nbsp;unwrapping constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4ud5j8lor4ccp2vpn4l7gs4ed6">&nbsp;&nbsp;&nbsp;&nbsp;In some scenarios, you might want to create a future that returns another future, resulting in nested futures. Although it is possible to write code to unwrap the outer future and retrieve the nested future and its result, such code is not easy to write because you must handle exceptions and it may cause a blocking call. Unwrapping can allow us to mitigate this problem by doing an asynchronous call to unwrap the outermost future.</a>
+</h3>
+<h3 class="topic">
+<a name="6vi6h3u9enev83fkm7j6n5t9gj">&nbsp;&nbsp;&nbsp;wait</a>
+</h3>
+<h3 class="topic">
+<a name="3ibjfjkt662hbcu0jj18ge12dk">&nbsp;&nbsp;&nbsp;&nbsp;wait_all, wait_all_n</a>
+</h3>
+<h3 class="topic">
+<a name="3v42mi56hd56avgdfh26foabj3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Synchronously wait for all future and shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="5ra2dntea3drvca93rfl4s0h5f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;hpx::future&lt;void&gt;&gt; results;
+for (int i = 0; i != NUM; ++i)
+    results.push_back(hpx::async(...));
+hpx::wait_all(results);</a>
+</h3>
+<h3 class="topic">
+<a name="253ce793o1bevl4mci5r788ubj">&nbsp;&nbsp;&nbsp;&nbsp;wait_any, wait_any_n</a>
+</h3>
+<h3 class="topic">
+<a name="5im9gstupmeigv9roue6e4d9jf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Synchronously wait for at least one of multiple future or shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="36iif7rg7k96ir3dob3stg2opq">&nbsp;&nbsp;&nbsp;&nbsp;wait_each, wait_each_n</a>
+</h3>
+<h3 class="topic">
+<a name="15c39gd1qe7egv4pcvdnsv6p4m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Synchronously wait for multiple future and shared_future objects to finish 
+and call a function for each of the future objects as soon as it becomes ready.</a>
+</h3>
+<h3 class="topic">
+<a name="792jl2oalp4mj7fkc8774v76m1">&nbsp;&nbsp;&nbsp;&nbsp;wait_some, wait_some_n</a>
+</h3>
+<h3 class="topic">
+<a name="7loq3kebs9mm98kq3v5djnf8i7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Synchronously wait for multiple future and shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="194ftn14ilc7anello5v0c2fht">&nbsp;&nbsp;&nbsp;&nbsp;blocking (synchronous)
+return void
+futures passed as parameters are valid after the call</a>
+</h3>
+<p class="summary">(<a href="#3ibjfjkt662hbcu0jj18ge12dk">wait_all, wait_all_n</a>, <a href="#253ce793o1bevl4mci5r788ubj">wait_any, wait_any_n</a>, <a href="#36iif7rg7k96ir3dob3stg2opq">wait_each, wait_each_n</a>, <a href="#792jl2oalp4mj7fkc8774v76m1">wait_some, wait_some_n</a>)</p>
+<h3 class="topic">
+<a name="4oacvr9hi2eamjk344768ssb9h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arguments</a>
+</h3>
+<h3 class="topic">
+<a name="2n35o47vjp2t8nk83fs57eaj0m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write some more about that
+can take 2 arguments, can take vector, etc.</a>
+</h3>
+<h3 class="topic">
+<a name="4n5u2ifa2gkf4rdejs092fde4t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Since the wait_xxx functions do not &lsquo;consume&rsquo; any of the input futures, the functions will not throw if one of the tasks itself throws an exception. 
+Any exceptions occurring while the tasks are executed will be stored in the shared state of the futures themselves. 
+Thus a second loop over the input futures is necessary to perform proper error handling. 
+This behavior however is consistent with the behavior of future::wait(), so it shouldn&rsquo;t come as a surprise.</a>
+</h3>
+<h3 class="topic">
+<a name="2tg08pikukbann2iqih97621t3">&nbsp;&nbsp;&nbsp;when</a>
+</h3>
+<h3 class="topic">
+<a name="1nqj1qafpp52ntq1rj28prig5a">&nbsp;&nbsp;&nbsp;&nbsp;when_all, when_all_n</a>
+</h3>
+<h3 class="topic">
+<a name="1pme6kk7shlff3ko01l07e60h0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asynchronously wait for all future and shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="6emdbfhevu50tn3ei168vltbaj">&nbsp;&nbsp;&nbsp;&nbsp;when_any, when_any_n</a>
+</h3>
+<h3 class="topic">
+<a name="085udtfd7sua8b3hgesfu4r270">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asynchronously wait for at least one of multiple future or shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="5gnkd7m3cngnta956d91qjhbi1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a future containing an instance of a type when_any_result which becomes ready if any of the argument futures becomes ready.
+The returned structure holds all of the futures and an index to one of the futures which is ready</a>
+</h3>
+<h3 class="topic">
+<a name="4uu944jr9obmle4hrhsgs19c7o">&nbsp;&nbsp;&nbsp;&nbsp;when_each, when_each_n</a>
+</h3>
+<h3 class="topic">
+<a name="2bspf698gi8q1ak7t1dvb4f8m8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asynchronously wait for multiple future and shared_future objects to finish 
+and call a function for each of the future objects as soon as it becomes ready.</a>
+</h3>
+<h3 class="topic">
+<a name="54cv0lvqar5ntsvh8ak73nu1t1">&nbsp;&nbsp;&nbsp;&nbsp;when_some, when_some_n</a>
+</h3>
+<h3 class="topic">
+<a name="10spc2gr7m9kouu60mnu57tu0r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asynchronously wait for multiple future and shared_future objects to finish.</a>
+</h3>
+<h3 class="topic">
+<a name="0kd6qpj2pk4q7enpee0884mdh7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a future holding an instance of the type when_some_result. 
+The returned future becomes ready when a given number of the argument futures have become ready:</a>
+</h3>
+<h3 class="topic">
+<a name="2552l4onm87i694h1cm5d63hji">&nbsp;&nbsp;&nbsp;&nbsp;non-blocking (asynchronous)
+returns one future (of void??) that is ready when X the futures are ready 
+futures passed as arguments are invalidated after the call</a>
+</h3>
+<p class="summary">(<a href="#1nqj1qafpp52ntq1rj28prig5a">when_all, when_all_n</a>, <a href="#6emdbfhevu50tn3ei168vltbaj">when_any, when_any_n</a>, <a href="#4uu944jr9obmle4hrhsgs19c7o">when_each, when_each_n</a>, <a href="#54cv0lvqar5ntsvh8ak73nu1t1">when_some, when_some_n</a>)</p>
+<h3 class="topic">
+<a name="5uj6oh5uguiuu9v2p4rtgcj3in">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arguments</a>
+</h3>
+<h3 class="topic">
+<a name="7410i3bt5b4ddua3ro70q3gonv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write some more about that</a>
+</h3>
+<h3 class="topic">
+<a name="5qcdiv9a0ek9keu0qjt2lstoh0">&nbsp;&nbsp;&nbsp;then</a>
+</h3>
+<h3 class="topic">
+<a name="156ase6cm7eokjfemkaisgmth5">&nbsp;&nbsp;&nbsp;&nbsp;In asynchronous programming, it is very common for one asynchronous operation, on completion, to invoke a second operation and pass data to it. The current C++ standard does not allow one to register a continuation to a future. With then, instead of waiting for the result, a continuation is "attached" to the asynchronous operation, which is invoked when the result is ready. Continuations registered using then function will help to avoid blocking waits or wasting threads on polling, greatly improving the responsiveness and scalability of an application.</a>
+</h3>
+<h3 class="topic">
+<a name="4pe8li8vj47dhek1to8pqs99jf">&nbsp;&nbsp;&nbsp;&nbsp;the function called as a continuation has to to take a future&lt;R&gt; as argument</a>
+</h3>
+<h3 class="topic">
+<a name="1464vua7aoau2j1rj9a97rvisa">&nbsp;&nbsp;&nbsp;&nbsp;arguments</a>
+</h3>
+<h3 class="topic">
+<a name="76vdnqkufkuv0sasrl8flmqhc8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;optional: executor or launch policy</a>
+</h3>
+<h3 class="topic">
+<a name="74dbt5s6dqp4kun8k4r81kc0rv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gives the user control over where and how the continuation is executed</a>
+</h3>
+<h3 class="topic">
+<a name="0rq6n1i8tlkbcq5skure6492u2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callable object which takes a future&lt;R&gt; as parameter</a>
+</h3>
+<h3 class="topic">
+<a name="6od8j6g8lf6pa1f3q8d8bvuksq">&nbsp;&nbsp;&nbsp;&nbsp;return type </a>
+</h3>
+<h3 class="topic">
+<a name="26jnm0m29p6o85idb94dteeoqk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;future&lt;decltype(func(*this))&gt; that refers to the shared state of the continuation
+- this is the future that .then is called on
+- func is the callable object passed as parameter to then</a>
+</h3>
+<h3 class="topic">
+<a name="283d294u6hok0l55gou2nqabjo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a future of an instance representing the result of the execution of the continuation</a>
+</h3>
+<h3 class="topic">
+<a name="480dcn2fdb98hf8t6p9ftqnktq">&nbsp;&nbsp;&nbsp;&nbsp;invalidates the original future object</a>
+</h3>
+<h3 class="topic">
+<a name="6g9cn0i76obrmr5stb7d96irt2">&nbsp;&nbsp;&nbsp;&nbsp;Example</a>
+</h3>
+<h3 class="topic">
+<a name="4o1mj4pkuriqv33hfinjsrqol5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;simple case</a>
+</h3>
+<h3 class="topic">
+<a name="6vgvkg8m7brpujud5e79mpd2ga">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double dummyfoo1(long int dummy1){
+  //do nothing
+  return 4;
+};
+
+std::uint64_t dummyfoo2(hpx::future&lt;double&gt; dummy2){
+  //do nothing
+  return 3.;
+};
+
+//! further somewhere ....
+long int d1 = 2;
+hpx::future&lt;double&gt; myfuture_ = hpx::async(&amp;dummyfoo1, d1);
+hpx::future&lt;std::uint64_t&gt; continuation_ = myfuture_.then(dummyfoo2);</a>
+</h3>
+<h3 class="topic">
+<a name="1ut9nc0p2sqojg6dqb121t16oa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;okay, but what do I do
+if my continuation function 
+takes input parameters? </a>
+</h3>
+<h3 class="topic">
+<a name="1p7kk0od09uh87c0bkrb8cst9v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lambda</a>
+</h3>
+<h3 class="topic">
+<a name="6ovd3q53lckqeh3ipi9d55t03u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::future&lt;int&gt; result = myfuture_.then(
+    [](hpx::future&lt;std::vector&lt;hpx::future&lt;int&gt; &gt; &gt; &amp;&amp;futvec) -&gt; int {
+      // body or call to some function returning an int
+
+  });</a>
+</h3>
+<h3 class="topic">
+<a name="3m6auqm0bqa1lshese5ont4jv5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+you need to take an hpx::future&lt;R&gt; as parameter 
+or it won't compile!!!!!!!!!!!!
+</a>
+</h3>
+<h3 class="topic">
+<a name="6o6p902sbm5kn3cd6mi8ink52u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   auto some_fut.then(hpx::launch::sync,
+                         [](hpx::future&lt;void&gt; fv){
+								// do stuff
+						 });</a>
+</h3>
+<h3 class="topic">
+<a name="409lrd9kik52thhpa8tehdc26i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bind</a>
+</h3>
+<h3 class="topic">
+<a name="23q1liucurj4tfuq87v26iup75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frame-&gt;lhs_.then(hpx::util::bind(&amp;_fibonacci, frame_));</a>
+</h3>
+<h3 class="topic">
+<a name="0pl8cgdvgj5e342mqlb8in33co">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unwrapped ... ???</a>
+</h3>
+<h3 class="topic">
+<a name="1j7hceavefq9k302smecgn796f">&nbsp;&nbsp;&nbsp;is_ready</a>
+</h3>
+<h3 class="topic">
+<a name="2j01vsn81pde88sohrlscgsdhq">&nbsp;&nbsp;&nbsp;&nbsp;There are often situations where a get() call on a future may not be a blocking call, or is only a blocking call under certain circumstances. This function gives the ability to test for early completion and allows us to avoid associating a continuation, which needs to be scheduled with some non-trivial overhead and near-certain loss of cache efficiency.</a>
+</h3>
+<h3 class="topic">
+<a name="2nfhsgnvc7sjq3v431rsia6kdj">&nbsp;&nbsp;what is it? </a>
+</h3>
+<h3 class="topic">
+<a name="0lbfvt05o4sp2k1029130viv1c">&nbsp;&nbsp;&nbsp;allows for the separation of 
+a. the initiation of the operation
+b. the act of waiting for its result</a>
+</h3>
+<h3 class="topic">
+<a name="3enrq8jonlvpadgjcf6ft9erf6">&nbsp;&nbsp;producing
+futures</a>
+</h3>
+<h3 class="topic">
+<a name="4t3qqgn1hijnq0o98pf33fgf6v">&nbsp;&nbsp;&nbsp;packaged_task</a>
+</h3>
+<h3 class="topic">
+<a name="6g99e48oqj2vllehseqank8fqp">&nbsp;&nbsp;&nbsp;promise</a>
+</h3>
+<h3 class="topic">
+<a name="7pbp3fqlepegopk9vd5aq71ujl">&nbsp;&nbsp;&nbsp;&nbsp;what is it</a>
+</h3>
+<h3 class="topic">
+<a name="75o8s0se60fo7l3keik5nuedc0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allows to produce futures in such a way that setting the value and getting the value happen in two separate places</a>
+</h3>
+<h3 class="topic">
+<a name="4cgophrbi68vb0e3rl39t21ubk">&nbsp;&nbsp;&nbsp;&nbsp;example</a>
+</h3>
+<h3 class="topic">
+<a name="5bls5ve7vevsbgm13ko07slk8n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::lcos::local::promise&lt;int&gt; p;       // local only
+hpx::future&lt;int&gt; f = p.get_future();
+// f.is_ready() == false, f.get(); would lead to a deadlock
+p.set_value(42);
+// Print 42
+std::cout &lt;&lt; f.get() &lt;&lt; std::endl;</a>
+</h3>
+<h3 class="topic">
+<a name="4g9jida0fns2hm8bdvp7n6g85p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::promise&lt;int&gt; p;                    // globally visible
+hpx::future&lt;int&gt; f = p.get_future();
+// f.is_ready() == false, f.get(); would lead to a deadlock
+hpx::async(
+    [](hpx::id_type promise_id)
+    {
+        hpx::set_lco_value(promise_id, 42);
+    }
+  , p.get_id());
+// Print 42
+std::cout &lt;&lt; f.get() &lt;&lt; std::endl;</a>
+</h3>
+<h3 class="topic">
+<a name="1kc2isametakfg3vgkt21p5d27">&nbsp;&nbsp;&nbsp;make_ready_future</a>
+</h3>
+<h3 class="topic">
+<a name="4evfm5104pqpr392j3693ibs1f">&nbsp;&nbsp;&nbsp;&nbsp;Some functions may know the value at the point of construction. In these cases the value is immediately available, but needs to be returned as a future. By using hpx::make_ready_future a future can be created which holds a pre-computed result in its shared state. In the current standard it is non-trivial to create a future directly from a value. First a promise must be created, then the promise is set, and lastly the future is retrieved from the promise. This can now be done with one operation.</a>
+</h3>
+<h3 class="topic">
+<a name="1533kdmal91ksm3tm3stj26erc">&nbsp;&nbsp;&nbsp;make_exceptional_future</a>
+</h3>
+<h3 class="topic">
+<a name="770t387914cslf571hcegh623b">&nbsp;&nbsp;&nbsp;split_future</a>
+</h3>
+<h3 class="topic">
+<a name="1php90an344ln8q7tp6dqgogso">&nbsp;dataflow</a>
+</h3>
+<h3 class="topic">
+<a name="2fupnof9nqres8jlva9tucq0qp">&nbsp;&nbsp;Dataflow allows us to pass the results of a set of futures to a specified function when the futures are ready. </a>
+</h3>
+<h3 class="topic">
+<a name="5snblu7f05v9b9qm8v70a8nvdi">&nbsp;&nbsp;Shortcut to when_all(...).then(...)</a>
+</h3>
+<h3 class="topic">
+<a name="2ciaulg1ou37itk06kv0v51b93">&nbsp;&nbsp;The dataflow API is identical to the one exposed by async. 
+The only semantic difference is that if one or more arguments are futures, dataflow will delay invoking the function until all of those futures have become ready. 
+Any calls to future::get() from inside the invoked function are now guaranteed to not suspend and to immediately return the value encapsulated by the future.</a>
+</h3>
+<h3 class="topic">
+<a name="0hupksh734apjtnd2gv33hlsnf">&nbsp;&nbsp;three types of arguments</a>
+</h3>
+<h3 class="topic">
+<a name="5regv7023m9uujknp7c2m1bi3h">&nbsp;&nbsp;&nbsp;Instruction on how to perform the function call (async or sync)</a>
+</h3>
+<h3 class="topic">
+<a name="1dcuns6k25mk4kbh1ggut9b4i1">&nbsp;&nbsp;&nbsp;the function to call</a>
+</h3>
+<h3 class="topic">
+<a name="2cr81pich30e9v1clhn9qrptgg">&nbsp;&nbsp;&nbsp;futures to the arguments that will be passed to the function. </a>
+</h3>
+<h3 class="topic">
+<a name="0pobqqhcbl11rgtg4e20tea0ih">&nbsp;&nbsp;When called, dataflow immediately returns a future to the result of the specified function. 
+This allows users to string dataflows together and construct an execution tree.</a>
+</h3>
+<h3 class="topic">
+<a name="01pasotk73qucbm014t2jk0vaq">&nbsp;&nbsp;example</a>
+</h3>
+<h3 class="topic">
+<a name="3jap1oj7fpir81qu5pfot45tjn">&nbsp;&nbsp;&nbsp;template &lt;typename Func&gt;
+future&lt;int&gt; traverse(node&amp; n, Func &amp;&amp; f)
+{
+    // traversal of left and right sub-tree
+    future&lt;int&gt; left = 
+        n.left ? traverse(*n.left, f) : make_ready_future(0);
+    future&lt;int&gt; right = 
+        n.right ? traverse(*n.right, f) : make_ready_future(0);
+
+    // return overall result for current node
+    return dataflow(
+        [&amp;n, &amp;f](future&lt;int&gt; l, future&lt;int&gt; r) -&gt; int
+        {
+            // calling .get() does not suspend
+            return f(n) + l.get() + r.get();
+        },
+        std::move(left), std::move(right)
+    );</a>
+</h3>
+<h3 class="topic">
+<a name="7ddk1ukt27ohgoo5lf8b7gbh1j">&nbsp;&nbsp;&nbsp;&nbsp;The code however requires some additional explanations. The traversal function now returns a future&lt;int&gt; instead of just the result. If we look closer it becomes apparent, that the returned future not only represents the result of the traversal, but also all of the dependencies of the results for the traversal of all sub-nodes of the current node. In other words, the returned future will become ready only after all futures representing the sub-nodes of the current one have become ready. The dependencies between the results for a sub-tree and the result of the current node is implicitly established by dataflow and is represented by the returned future.
+
+Executing the traverse function performs two operations: traverse two sub-trees of the current node and schedule the lambda doing the actual calculation for each level of the recursion. The lambda functions are automatically scheduled to run (by data flow) as soon as both futures representing the calculations on the sub-trees have become ready (i.e. after the traversal of the sub-trees has finished).
+
+In effect, we have successfully futurized our traverse algorithm. Instead of performing the actual calculations our traverse function now constructs a dependency tree of futures, which &ndash; when executed &ndash; produces the same result as our original algorithm. The difference is that this dependency tree will be unraveled with full speed, without any suspension or waiting, using all compute resources (cores) available to HPX.</a>
+</h3>
+<h3 class="topic">
+<a name="4ddqh92pjo2olc8oj6spvefb9a">&nbsp;hpx::util::unwrapped</a>
+</h3>
+<h3 class="topic">
+<a name="6dvbdpj7ckq8bilckid2q0i5kb">&nbsp;&nbsp;facility which underneath calls get so that the function it is used on will be passed objects and not futures of objects as arguments</a>
+</h3>
+<h3 class="topic">
+<a name="4frtspcia629gjslapmarr3khg">&nbsp;barrier</a>
+</h3>
+<h3 class="topic">
+<a name="3ciod91vphu8mvlc2htn3phkn9">&nbsp;&nbsp;hpx::lcos::barrier::get_global_barrier().synchronize();</a>
+</h3>
+<h3 class="topic">
+<a name="0cq0lskt2kupckegpfe210isdd">&nbsp;broadcast</a>
+</h3>
+<h3 class="topic">
+<a name="5npt9b927o5v2b5ul27m5eu8o9">&nbsp;fold</a>
+</h3>
+<h3 class="topic">
+<a name="1cdj33b1k9nre5vledptibq26s">&nbsp;gather</a>
+</h3>
+<h3 class="topic">
+<a name="5hp43sbam52ic3ruu9s6hkpfsj">&nbsp;reduce</a>
+</h3>
+<h3 class="topic">
+<a name="3b46icvook017nlhrebt2hok5i">&nbsp;locks</a>
+</h3>
+<h3 class="topic">
+<a name="7f55ttbm8711f3ite7jhe93jao">&nbsp;&nbsp;mutex</a>
+</h3>
+<h3 class="topic">
+<a name="0ouml1sc23j3do4ovrd7o1qdlb">&nbsp;&nbsp;spinlock</a>
+</h3>
+<h3 class="topic">
+<a name="0qavtg63irot57k972m0hn45oa">&nbsp;&nbsp;spinlock_no_backoff</a>
+</h3>
+<h3 class="topic">
+<a name="6n5ao9pmj2m5ed7irckqb1nkd3">&nbsp;&nbsp;recursive mutex</a>
+</h3>
+<h3 class="topic">
+<a name="3h0t5hmhplgkq8ac5hho5jeltk">&nbsp;semaphore</a>
+</h3>
+<h3 class="topic">
+<a name="107ctdl45opsbbq5frsl61gf65">&nbsp;&nbsp;counting_semaphore</a>
+</h3>
+<h3 class="topic">
+<a name="243vuck153g19hcroitt50pkiq">&nbsp;&nbsp;object_semaphore</a>
+</h3>
+<h3 class="topic">
+<a name="5t34dr7hc3r2rgcd153q49j90k">&nbsp;event</a>
+</h3>
+<h3 class="topic">
+<a name="3qrvbg7j0j5099ktlm7esu56j1">&nbsp;once</a>
+</h3>
+<h3 class="topic">
+<a name="2gpie9gboj8msmbcer0ak0u2r9">&nbsp;condition_variable</a>
+</h3>
+<h3 class="topic">
+<a name="0ccinct9hm366rb01c6lbu085s">&nbsp;trigger</a>
+</h3>
+<h3 class="topic">
+<a name="6ba0t16iv9ucs0geqoshlsstpk">&nbsp;conditional_trigger</a>
+</h3>
+<h3 class="topic">
+<a name="48e8jqb876htdrs74ov3361qp7">&nbsp;queue</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/lcos.html#hpx.manual.lcos.channels" name="7lqcf27lng96c0vurbldqpb9m4">&nbsp;channel</a>
+</h3>
+<h3 class="topic">
+<a name="4fj1neqj172rsjtcjqsb6ob98l">&nbsp;&nbsp;what is it?</a>
+</h3>
+<h3 class="topic">
+<a name="7c6vih6le1imqgtgqejr8agqit">&nbsp;&nbsp;&nbsp;Combine 
+a. communication (exchange of a value)
+b. synchronization (garanteeing that two tasks are in a known state)</a>
+</h3>
+<h3 class="topic">
+<a name="2njbabkfhhguonbkpq9va5fmq4">&nbsp;&nbsp;&nbsp; A channel can transport any number of values of a given type from a sender to a receiver:</a>
+</h3>
+<h3 class="topic">
+<a name="4ut98qr3njspfou1hp1tj7ijel">&nbsp;&nbsp;how?</a>
+</h3>
+<h3 class="topic">
+<a name="196705t3semt0danqjsllnc2k1">&nbsp;&nbsp;&nbsp;void do_something(
+    hpx::lcos::local::receive_channel&lt;int&gt; c,
+    hpx::lcos::local::send_channel&lt;&gt; done)
+{
+    cout &lt;&lt; c.get();        // prints 42
+    done.set();             // signal back
+}
+
+{
+    hpx::lcos::local::channel&lt;int&gt; c;
+    hpx::lcos::local::channel&lt;&gt; done;
+
+    hpx::apply(&amp;do_something, c, done);
+
+    c.set(42);              // send some value
+    done.get();             // wait for thread to be done
+}</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/lcos.html#hpx.manual.lcos.composable_guards" name="2e1g0mg3c6pesot9ai6m4dqa9b">&nbsp;composable
+guard</a>
+</h3>
+<h3 class="topic">
+<a name="74364acna7ahnoatikt31lhq30">&nbsp;&nbsp;similar to locks, but are applied only to asynchronous functions</a>
+</h3>
+<h3 class="topic">
+<a name="0lsp17582hkmdvn1m06tldjhf1">&nbsp;&nbsp;automatically locked at the beginning of a task and automatically unlocked at the end</a>
+</h3>
+<h3 class="topic">
+<a name="3oec8doi8upfbdue101sphs033">&nbsp;&nbsp;guards are never added to an existing task's execution context, 
+so the calling of guards is freely composable and can never deadlock</a>
+</h3>
+<h3 class="topic">
+<a name="2vm2gdtn4dh6l3o0urs6iffb6c">&nbsp;&nbsp;they use two atomic operations (which are not called repeatedly) 
+to manage what they do, so the overhead should be low</a>
+</h3>
+<h3 class="topic">
+<a name="3cdl2s1tus9mff4n0dfeqes2a5">&nbsp;&nbsp;how? </a>
+</h3>
+<h3 class="topic">
+<a name="3al71kl5b5rj2ag7mnhqp33jav">&nbsp;&nbsp;&nbsp;regular </a>
+</h3>
+<h3 class="topic">
+<a name="2p8r6rv4dg89pg146pn1jen7ft">&nbsp;&nbsp;&nbsp;&nbsp;hpx::lcos::local::guard gu;
+run_guarded(gu,task);</a>
+</h3>
+<h3 class="topic">
+<a name="6afesakqcr3ad0r53cj9qmh641">&nbsp;&nbsp;&nbsp;if a single method needs to run with multiple guards</a>
+</h3>
+<h3 class="topic">
+<a name="3dja5p6hcmmcrg3acl4s4qu92i">&nbsp;&nbsp;&nbsp;&nbsp;boost::shared&lt;hpx::lcos::local::guard&gt; gu1(new hpx::lcos::local::guard());
+boost::shared&lt;hpx::lcos::local::guard&gt; gu2(new hpx::lcos::local::guard());
+gs.add(*gu1);
+gs.add(*gu2);
+run_guarded(gs,task);</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.org/2015/06/hpx-and-cpp-task-blocks/" name="78uj4aidpugevilbq21eompb2l">&nbsp;task-block</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/system_components/iostreams.html" name="790785fgmnhrghvavlni2ls9st">I/O-streams</a>
+</h2>
+<h3 class="topic">
+<a name="3u1dj3v83didbjdtpd7e6pegrk">&nbsp;what is this?</a>
+</h3>
+<h3 class="topic">
+<a name="53vt4udfsnpb6jh65es5h4iofr">&nbsp;&nbsp;The HPX I/O-streams subsystem extends the standard C++ output streams std::cout and std::cerr to work in the distributed setting of an HPX application. 
+All of the output streamed to hpx::cout will be dispatched to std::cout on the console locality. Likewise, all output generated from hpx::cerr will be dispatched to std::cerr on the console locality.</a>
+</h3>
+<h3 class="topic">
+<a name="0s6rean39egpn5fac8v0bf7rs8">&nbsp;how to
+use this?</a>
+</h3>
+<h3 class="topic">
+<a name="457seegtbenld604uc1d8hkde0">&nbsp;&nbsp;code</a>
+</h3>
+<h3 class="topic">
+<a name="572760ra2f9a12o0pgvetv4oj1">&nbsp;&nbsp;&nbsp;hpx::cout</a>
+</h3>
+<h3 class="topic">
+<a name="0c4mkqc80m7rqlpkp7q2gpepu4">&nbsp;&nbsp;&nbsp;hpx::cerr</a>
+</h3>
+<h3 class="topic">
+<a name="6laugidoatk1448nfghr9bmgob">&nbsp;&nbsp;&nbsp;hpx::endl</a>
+</h3>
+<h3 class="topic">
+<a name="6al7p1l097bji2fpbcbv5f6ges">&nbsp;&nbsp;&nbsp;&nbsp;it's better to just use "\n"</a>
+</h3>
+<h3 class="topic">
+<a name="5i4m1b3ql8aalaa5ba0g9fsldu">&nbsp;&nbsp;&nbsp;hpx::flush</a>
+</h3>
+<h3 class="topic">
+<a name="74hejhonv6oc3n1figorjaqvc4">&nbsp;&nbsp;&nbsp;just aliases for the standard</a>
+</h3>
+<p class="summary">(<a href="#6laugidoatk1448nfghr9bmgob">hpx::endl</a>, <a href="#5i4m1b3ql8aalaa5ba0g9fsldu">hpx::flush</a>)</p>
+<h3 class="topic">
+<a name="4kpgrtm08u3tmhm87cqcpg574v">&nbsp;&nbsp;include</a>
+</h3>
+<h3 class="topic">
+<a name="2biic5g44dvj398ora8fh666af">&nbsp;&nbsp;&nbsp;#include &lt;hpx/include/iostreams.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="58fq5fpd8d0kcrpi2t7i9el2nf">&nbsp;&nbsp;build</a>
+</h3>
+<h3 class="topic">
+<a name="2478281psrop2f2rk5c5b1f3j8">&nbsp;&nbsp;&nbsp;add_hpx_executables(
+    my_app
+    SOURCES my_source.cpp
+    COMPONENT_DEPENDENCIES iostreams
+)</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/parallel/parallel_algorithms.html" name="01skndcjb59eg1vtp0d45qveeh">Parallel
+Algorithms</a>
+</h2>
+<h3 class="topic">
+<a name="315so780qcb2630idqoeu09nas">&nbsp;what is it? </a>
+</h3>
+<h3 class="topic">
+<a name="0ls4h3f7ahp8rc7f61dd3gdvt5">&nbsp;&nbsp;a function template described declared in the inline namespace hpx::parallel::v1</a>
+</h3>
+<h3 class="topic">
+<a name="6ki8t7gqpe65n1n6fn9h0eubgh">&nbsp;&nbsp;it is the caller's responsibility to ensure correctness
+- eg that the invocation does not introduce data races or deadlocks</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/parallel/parallel_algorithms.html#hpx.manual.parallel.parallel_algorithms.parallel_exceptions" name="3em6423vkosmk5i86pm8acdshi">&nbsp;exceptions</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/parallel/parallel_algorithms.html" name="103qjftqo1npker6fm5logefnu">&nbsp;algorithms</a>
+</h3>
+<p class="topicImage">
+<img height="448" src="4-hpx_api_files/1903ja9jm7dh6kk43rejii77ac" width="845"></p>
+<h3 class="topic">
+<a name="4tjflon497ns7djdc5u72r7q70">&nbsp;&nbsp;loops</a>
+</h3>
+<h3 class="topic">
+<a name="3o873c5rjckheiu9c07h88b7fs">&nbsp;&nbsp;&nbsp;for_loop</a>
+</h3>
+<h3 class="topic">
+<a name="7mlh9u8ch7b4po3s4r7g9ui912">&nbsp;&nbsp;&nbsp;&nbsp;example</a>
+</h3>
+<h3 class="topic">
+<a name="10cbdeggj6h94led2lm27e0ajd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::for_loop(
+	hpx::parallel::execution::par, 
+	0, N,
+	[&amp;](int i){
+		// do whatever the loop does ...
+	}
+);</a>
+</h3>
+<h3 class="topic">
+<a name="5as796foq3060nu8bvggbh7llb">&nbsp;&nbsp;&nbsp;for_each</a>
+</h3>
+<h3 class="topic">
+<a name="7sonnh8d9tku749chqcnvap3v2">&nbsp;&nbsp;&nbsp;&nbsp;example</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.org/2015/05/hpx-and-cpp-executors/" name="4e3nh5n010n3advvk67jooohqe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::vector&lt;std::size_t&gt; data = { ... };
+hpx::parallel::for_each(
+        hpx::parallel::par,
+        std::begin(data), std::end(data),
+        [](std::size_t val)
+        {
+            do_some_work(val);
+        });</a>
+</h3>
+<h3 class="topic">
+<a name="3oipc2gckjvp7itp8tj6h660p1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::atomic&lt;int&gt; count_odd_numbers(0);
+    std::vector&lt;int&gt; data = { 1, 2, 3, 4, 5, ... };
+    hpx::parallel::for_each(
+        hpx::parallel::par,
+        std::begin(v), std::end(v),
+        [&amp;](int element) {
+            if (element % 2) 
+                ++count_odd_numbers;
+        });
+    hpx::cout &lt;&lt; "Number of odd integers: " 
+        &lt;&lt; count_odd_numbers &lt;&lt; std::endl;</a>
+</h3>
+<h3 class="topic">
+<a name="299u6iga3k8ipq7tq6sijaijeg">&nbsp;&nbsp;min and max</a>
+</h3>
+<h3 class="topic">
+<a name="0mc6fkib4uu1mntprln6g8u0tn">&nbsp;&nbsp;&nbsp;example</a>
+</h3>
+<h3 class="topic">
+<a name="6meop3nfmebtp3tnh8tqf4ojq2">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_chunk_size param;
+hpx::parallel::execution::parallel_task_policy par_policy;
+auto policy = par_policy.with(param);
+
+auto minmaxX_ = hpx::parallel::minmax_element(policy, x, x+N);
+auto minmaxX = minmaxX_.get();</a>
+</h3>
+<h3 class="topic">
+<a name="7d0mg785tl3oil8umesr16t3m6">&nbsp;arguments</a>
+</h3>
+<h3 class="topic">
+<a href="#793t99d12o1gerk06h4l4f9pdj" name="06vil5cqjd0su1kou2lki15ehi">&nbsp;&nbsp;execution policy</a>
+</h3>
+<h2 class="topic">
+<a href="#6291ru1mkab37845gcpctqptrm" name="15upfo4r7ckh5g5a7a1rri3o8h">Performance
+Counters</a>
+</h2>
+<h2 class="topic">
+<a name="7rajcpa5gvcfj14nrfbjkgf8vg">Data structures</a>
+</h2>
+<h3 class="topic">
+<a name="3so8vg7ae278e8udl9pb86r6q2">&nbsp;compute::vector&lt;T, Allocator&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="5evja4lshouirfhrfqp61fb58v">&nbsp;&nbsp;same interface as std::vector</a>
+</h3>
+<h3 class="topic">
+<a name="64v5fjvjus1gfjdqgkt01gmqss">&nbsp;&nbsp;manages data locally through Allocator</a>
+</h3>
+<h3 class="topic">
+<a name="3bn4n35scqvq5h0mb1frij9lbt">&nbsp;&nbsp;uses execution target objects for data placement </a>
+</h3>
+<h3 class="topic">
+<a name="32at9p5ouic4ke95qadjm8d84e">&nbsp;&nbsp;allows for direct manipulation of data on NUMA domains, GPUs, remote nodes etc.</a>
+</h3>
+<h3 class="topic">
+<a name="2g6c3ieim4bm9p7kfkt3o1l374">&nbsp;hpx::partitioned_vector&lt;T&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="6h85s20r8cbiarq1ovsg3r8jv2">&nbsp;&nbsp;(almost) same interface as std::vector&lt;T&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="6hrboq3tvn6ul2turen3hevd9n">&nbsp;&nbsp;segmented data store</a>
+</h3>
+<h3 class="topic">
+<a name="0tj69pbutcdbjpf9te1lrqlnck">&nbsp;&nbsp;segments can be hpx::compute::vector</a>
+</h3>
+<h3 class="topic">
+<a name="1n3vfd2ebh86uo0hlpjrg7feph">&nbsp;&nbsp;uses a distribution_policy for data placement</a>
+</h3>
+<h3 class="topic">
+<a name="39qm33b7sg7efnq3a18215g7m9">&nbsp;&nbsp;allows for manipulation of data on several targets</a>
+</h3>
+<h2 class="topic">
+<a name="0sum00m4l8g42pu6rmi9p0m2dl">Controlling the execution</a>
+</h2>
+<h3 class="topic">
+<a href="#4fqpt6i25goulksmvhr8fscljr" name="39ektgirao8302qihafc9q6osr">&nbsp;Thread Scheduling
+Policies</a>
+</h3>
+<h3 class="topic">
+<a name="7gljsa1id5pj4p9l4k2s1k07sk">&nbsp;&nbsp;Scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="78ngelnvs632r9m2sklsrhc80f">&nbsp;&nbsp;&nbsp;does not control how tasks are launched, but rather manages the work-queue
+(stealing or not, high-priority-tasks or not, etc). </a>
+</h3>
+<h3 class="topic">
+<a href="#7diahg2de041idlslq5tc02pj4" name="3o36iv0qj9c9gtl1rq6ti21o4e">&nbsp;&nbsp;&nbsp;choose a scheduler using the command line option at run</a>
+</h3>
+<h3 class="topic">
+<a name="24of00fsdce9mmp3qolig2bvtu">&nbsp;Launch Policy</a>
+</h3>
+<h3 class="topic">
+<a name="290pn9uh2scq8e78k9j14va6kq">&nbsp;&nbsp;where to use? </a>
+</h3>
+<h3 class="topic">
+<a name="7dq62m0p556p97opap1oivr53i">&nbsp;&nbsp;&nbsp;as first argument of 
+(but an executor could be used instead)</a>
+</h3>
+<h3 class="topic">
+<a name="2hvronuqem43tp6l0iij59r634">&nbsp;&nbsp;&nbsp;&nbsp;hpx::async</a>
+</h3>
+<h3 class="topic">
+<a name="7a29gnuvv21a6lg0nsn90e21pv">&nbsp;&nbsp;&nbsp;&nbsp;.then</a>
+</h3>
+<h3 class="topic">
+<a name="2fc9bpqcdj7hcs7hvl83i7eajj">&nbsp;&nbsp;types</a>
+</h3>
+<h3 class="topic">
+<a name="2jhsav9qe9gp5ca8dmmm71ulb2">&nbsp;&nbsp;&nbsp;hpx::launch::sync</a>
+</h3>
+<h3 class="topic">
+<a name="2mpusjrdvle93bubc653rdgv8r">&nbsp;&nbsp;&nbsp;hpx::launch::async</a>
+</h3>
+<h3 class="topic">
+<a name="6ofm1a8k91kg73fuejih9ou4sr">&nbsp;&nbsp;&nbsp;hpx::launch::fork</a>
+</h3>
+<h3 class="topic">
+<a name="2eqlmnamjtao5ch63do921ddgr">&nbsp;&nbsp;&nbsp;hpx::launch::deferred </a>
+</h3>
+<h3 class="topic">
+<a name="1os7dp5psa84blken2ejqa3lao">&nbsp;&nbsp;&nbsp;&nbsp;(artefact from std)</a>
+</h3>
+<h3 class="topic">
+<a name="3jvma12fma65qp79l5sds1q3sb">&nbsp;Execution agents</a>
+</h3>
+<div class="notesContainer">
+<p>when do we ever use this???</p>
+</div>
+<h3 class="topic">
+<a name="6berkfro0hp2c8rpb51lt073e3">&nbsp;Executors and
+Executor Traits</a>
+</h3>
+<div class="notesContainer">
+<p>for parallel execution</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a href="#2jf1a814acprosebmipouplqta" name="6k42u3bieh53ucjum90ce9q2j6">&nbsp;&nbsp;Executors</a>
+</h3>
+<div class="notesContainer">
+<p>http://stellar-group.org/2015/05/hpx-and-cpp-executors/</p>
+</div>
+<p class="relationships">See Also: <a href="#1vf10esc4212d52n53q0h6qfkk">.on() (rebind...)</a>
+</p>
+<h3 class="topic">
+<a name="7puiffhte68ko65r6begbcn4a2">&nbsp;&nbsp;&nbsp;what is it? </a>
+</h3>
+<h3 class="topic">
+<a name="6l1pv0a9n3229ob2afjcgrrq86">&nbsp;&nbsp;&nbsp;&nbsp;An executor is an object responsible for creating execution agents on which work is performed, 
+thus abstracting the (potentially platform-specific) mechanisms for launching work. </a>
+</h3>
+<h3 class="topic">
+<a name="61j6u2fp3chsv2195q6ibjmbuu">&nbsp;&nbsp;&nbsp;&nbsp;are modular components for requisitioning execution agents</a>
+</h3>
+<h3 class="topic">
+<a name="5dgdi1hhcrm1fdjcbashd6etbh">&nbsp;&nbsp;&nbsp;&nbsp;may be conceived as allocators for execution agents</a>
+</h3>
+<h3 class="topic">
+<a name="1j14nsrrhk7c04221fhfqh7m4g">&nbsp;&nbsp;&nbsp;executor types</a>
+</h3>
+<div class="notesContainer">
+<p>in hpx/runtime/threads/executors and in hpx/parallel/executors</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="79dq0k7mfbb4v4ia5eus120lrn">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::sequential_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7mfdlqklsbgoff9j0f3356up2v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;creates groups of sequential execution agents which execute in the calling thread. 
+The sequential order is given by the lexicographical order of indices in the index space.</a>
+</h3>
+<h3 class="topic">
+<a name="77h5t7jm1a21c4tcdcigp6t130">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default executor corresponding to execution policy seq</a>
+</h3>
+<p class="relationships">See Also: <a href="#4s3bnve8crp3jhrcv9kn10tb59">hpx::parallel::execution::parallel_policy 
+	aka 
+hpx::parallel::execution::par</a>
+</p>
+<h3 class="topic">
+<a name="637k6opqnjf0ipog90oba3fuup">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::parallel_executor</a>
+</h3>
+<h3 class="topic">
+<a name="2s7o0hvvprlh3d9ap7spmd8vnh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;creates groups of parallel execution agents which execute in threads implicitly created by the executor. 
+This executor uses a given launch policy.</a>
+</h3>
+<h3 class="topic">
+<a name="78fdao4snmqn1ku0rta5qi52bp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default executor corresponding to par</a>
+</h3>
+<p class="relationships">See Also: <a href="#4s3bnve8crp3jhrcv9kn10tb59">hpx::parallel::execution::parallel_policy 
+	aka 
+hpx::parallel::execution::par</a>
+</p>
+<h3 class="topic">
+<a name="6frjo3dj62m12roqsk709liqiv">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::distribution_policy_executor</a>
+</h3>
+<h3 class="topic">
+<a name="65cdje6ggrm3slevoc34pk9pp7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;creates executors using any of the existing distribution policies 
+(like `hpx::components::colocating_distribution_policy et.al.).</a>
+</h3>
+<h3 class="topic">
+<a name="0r4e6jd0j7o2t5mp02t7o9sf00">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::service_executor</a>
+</h3>
+<h3 class="topic">
+<a name="2ii59jbbnnlphbahcd1cs304p3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;creates groups of parallel execution agents which execute in one of the kernel threads associated with a given pool category 
+(I/O, parcel, or timer pool, or on the main thread of the application).</a>
+</h3>
+<h3 class="topic">
+<a name="7h2adifa1bt34fi8lcp6nor1ib">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4oplggf42abacpiapcoj9ag6im">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_queue_executor </a>
+</h3>
+<h3 class="topic">
+<a name="2k317fn2me5sn566dtr1fol6ge">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1j3k897h18vh4emfecbnqdv71k">&nbsp;&nbsp;&nbsp;&nbsp;this_thread_executor</a>
+</h3>
+<h3 class="topic">
+<a name="0rg11pddq14a41ke0mdnr3u4cd">&nbsp;&nbsp;&nbsp;&nbsp;thread_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="6n3r2bdb1ptjhsd0raduq4e0p0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;specify nodes to run on (NUMA aware)</a>
+</h3>
+<h3 class="topic">
+<a name="3i7o32n09d81074m8rtj5vfrl4">&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::cuda::default_executor</a>
+</h3>
+<h3 class="topic">
+<a name="68n4pnrb03aoeff4274v5v5kqv">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::main_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="2p0naur045hr6n8uujm8d85qvj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime error if instanciated at global scope</a>
+</h3>
+<h3 class="topic">
+<a name="303jjerbq8pgmo5q6094c8bfu0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime error if used as argument of an async, and the callable of the async does some asynchronous work, or some parallel synchronous work.</a>
+</h3>
+<h3 class="topic">
+<a name="13lei0i3pdmemapin53e2at7j9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by that, I mean:
+hpx::parallel::execution::parallel_task_policy = runtime error
+hpx::parallel::execution::par = runtime error
+hpx::parallel::execution::seq = ok</a>
+</h3>
+<h3 class="topic">
+<a name="4d19j5983i7ev1qbo4pger8j00">&nbsp;&nbsp;&nbsp;&nbsp;create executors on top of the corresponding HPX schedulers.</a>
+</h3>
+<p class="summary">(<a href="#7h2adifa1bt34fi8lcp6nor1ib">hpx::parallel::local_priority_queue_executor</a>, <a href="#4oplggf42abacpiapcoj9ag6im">hpx::parallel::local_queue_executor </a>, <a href="#2k317fn2me5sn566dtr1fol6ge">hpx::parallel::static_priority_queue_executor</a>)</p>
+<h3 class="topic">
+<a name="2gfjvo9sgf1mer8b86rq05egq5">&nbsp;&nbsp;&nbsp;all usages of executors</a>
+</h3>
+<h3 class="topic">
+<a name="2l75mme7nij5njcuiu6sdup0gm">&nbsp;&nbsp;&nbsp;&nbsp;hpx::async</a>
+</h3>
+<h3 class="topic">
+<a name="1vhghee6b0hrnu78r7fa60ie87">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;other overload: launch policy instead of executor</a>
+</h3>
+<h3 class="topic">
+<a name="47fq4apa1d7eambmlk7vubaes2">&nbsp;&nbsp;&nbsp;&nbsp;.then</a>
+</h3>
+<h3 class="topic">
+<a name="03mr2jc3vgtdknvqhhvqn5fofh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;other overload: launch policy instead of executor</a>
+</h3>
+<h3 class="topic">
+<a name="1kb6qc1lld5j2oab397pgn9suj">&nbsp;&nbsp;&nbsp;&nbsp;as template parameter of 
+hpx::components::executor&lt;component&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="6rchgvvk26ag60spklrns840s3">&nbsp;&nbsp;&nbsp;&nbsp;as a first argument of hpx::parallel::some_algorithm, 
+as part of an execution policy</a>
+</h3>
+<h3 class="topic">
+<a name="6h8qpokm6ovq1uf4k3jdeb622j">&nbsp;&nbsp;&nbsp;&nbsp;use them for synchronization! </a>
+</h3>
+<h3 class="topic">
+<a name="0oq9fcpnl12du4li8j8qgt0dqs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+	hpx::parallel::local_queue_executor;
+
+	// execute stuff
+
+} //! the executor's destructor will wait for all spawned tasks
+  //! to finish executing</a>
+</h3>
+<h3 class="topic">
+<a name="1cs0n0989dko74tbb7qpjq2t5a">&nbsp;&nbsp;Executor traits</a>
+</h3>
+<h3 class="topic">
+<a name="4v6caepfe1n9sa29u0c616ljk3">&nbsp;&nbsp;&nbsp;what is it? </a>
+</h3>
+<h3 class="topic">
+<a name="74dus3uq2tu8mnakvje7enervr">&nbsp;&nbsp;&nbsp;&nbsp;Traits class for executors: 
+Defines what qualifies a class to be an executor class, 
+ie what functionalities it must expose</a>
+</h3>
+<h3 class="topic">
+<a name="3a7ak6mu66k8erhlruvadsv08q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedefs</a>
+</h3>
+<h3 class="topic">
+<a name="7cr3asoa3b4fioe7uatpv762fs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="07s5ra66gsc2ce89bfdu6d9lit">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;async_execute</a>
+</h3>
+<h3 class="topic">
+<a name="0cpla738729pdqbi4nfrnlpeil">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(optional) apply_execute</a>
+</h3>
+<h3 class="topic">
+<a name="0nhb8k8djnuquavln894e38j19">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(optional) execute</a>
+</h3>
+<h3 class="topic">
+<a name="30adf1okosgvhm8jajt8rq2a9m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(optional) bulk_async_execute</a>
+</h3>
+<h3 class="topic">
+<a name="6gdoq5mo71rtk5iudn8aravesa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(optional) bulk_execute</a>
+</h3>
+<h3 class="topic">
+<a name="6njo24q24iur9kprmcjh2flc2a">&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="3sbl5hpcml73r592jt6fjrv3j8">&nbsp;&nbsp;&nbsp;&nbsp;executor_traits&lt;my_executor_t&gt;::execute(my_executor,
+    [](size_t i){ // perform task i },
+    range(0, n));</a>
+</h3>
+<h3 class="topic">
+<a name="5l6h2u6iq3c7o5lu0gs9iaempd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This call synchronously creates a group of invocations of the given function, 
+where each individual invocation within the group is identified by a unique integer i in [0, n). </a>
+</h3>
+<h3 class="topic">
+<a name="7ootfr6i3dkcccepb98fgt9a5a">&nbsp;&nbsp;&nbsp;&nbsp;other functions</a>
+</h3>
+<h3 class="topic">
+<a name="0hcesnfqp9nq47snr96f63ap50">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create groups of invocation asynchronously </a>
+</h3>
+<h3 class="topic">
+<a name="1m4856th4rmdegq2l6j7u2caeh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create a singleton group</a>
+</h3>
+<h3 class="topic">
+<a name="2o0tnu6ulur881sa88qsatismj">&nbsp;&nbsp;&nbsp;template &lt;typename T&gt;
+struct is_executor; // cf hpx/traits/is_executor.hpp</a>
+</h3>
+<h3 class="topic">
+<a name="5ri10d3irruop37ahh0cnhepj6">&nbsp;&nbsp;is a 
+parameter 
+of ...</a>
+</h3>
+<p class="summary">(<a href="#6k42u3bieh53ucjum90ce9q2j6">Executors</a>)</p>
+<p class="relationships">See Also: <a href="#793t99d12o1gerk06h4l4f9pdj">Execution policies</a>
+</p>
+<h3 class="topic">
+<a name="4murpgc8dpbste3k5e8o0l8ihj">&nbsp;Executor Parameters and
+Executor Parameter Traits</a>
+</h3>
+<div class="notesContainer">
+<p>for controlling execution, not necessarily parallel</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a href="#5m610ht172ka3q5hsa8ap6g5d8" name="29pg8dt0ih2af1n39ha9u0ctsg">&nbsp;&nbsp;Executor parameters</a>
+</h3>
+<p class="relationships">See Also: <a href="#0ca9nob2je441gn1pqq9mjdnnl">.with() (rebind)</a>
+</p>
+<h3 class="topic">
+<a name="2s5ic34jsvcbm8kiv1rh3745gi">&nbsp;&nbsp;&nbsp;what is it? </a>
+</h3>
+<h3 class="topic">
+<a name="3sojn1unuothp2b0s1rm3pk3ge">&nbsp;&nbsp;&nbsp;&nbsp;At this point, the only parameter which can be customized is the size of the chunks of work executed on a single HPX-thread (such as the number of loop iterations combined to run as a single task).
+An executor parameter object is responsible for exposing the calculation of the size of the chunks scheduled. It abstracts the (potential platform-specific) algorithms of determining those chunks sizes.</a>
+</h3>
+<h3 class="topic">
+<a name="27g3gu9h2h7n55cvrqnrr844hq">&nbsp;&nbsp;&nbsp;types</a>
+</h3>
+<h3 class="topic">
+<a name="10tte5622jqfhusqscj737t2sg">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::auto_chunk_size</a>
+</h3>
+<h3 class="topic">
+<a name="22mfa5deapcvo5jb0i3avgj3l3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loop iterations are divided into pieces and then assigned to threads. 
+The number of loop iterations combined is determined based on measurements of how long the execution of 1% of the overall number of iterations takes. 
+This executor parameters type makes sure that as many loop iterations are combined as necessary to run for the amount of time specified.</a>
+</h3>
+<h3 class="topic">
+<a name="0n9r5aca4haeq15sm8l6l8vo09">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_chunk_size</a>
+</h3>
+<h3 class="topic">
+<a name="6ark1t4rc2kmc5hhh6anosb771">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loop iterations are divided into pieces of a given size and then assigned to threads. If the size is not specified, the iterations are evenly (if possible) divided contiguously among the threads. 
+This executor parameters type is equivalent to OpenMP's STATIC scheduling directive.</a>
+</h3>
+<h3 class="topic">
+<a name="0qk3satba09ht24urt8i3nmmg1">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::dynamic_chunk_size</a>
+</h3>
+<h3 class="topic">
+<a name="3h9o1217sl8r34vdqfn42g6nem">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loop iterations are divided into pieces of a given size and then dynamically scheduled among the cores; when a core finishes one chunk, it is dynamically assigned another If the size is not specified, the default chunk size is 1. This executor parameters type is equivalent to OpenMP's DYNAMIC scheduling directive.</a>
+</h3>
+<h3 class="topic">
+<a name="1kksvomivit1ui24gpkcapmanq">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::guided_chunk_size</a>
+</h3>
+<h3 class="topic">
+<a name="2sn02og518hfouos9f6s9nj1tu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Iterations are dynamically assigned to cores in blocks as cores request them until no blocks remain to be assigned. Similar to dynamic_chunk_size except that the block size decreases each time a number of loop iterations is given to a thread. The size of the initial block is proportional to number_of_iterations / number_of_cores. Subsequent blocks are proportional to number_of_iterations_remaining / number_of_cores. The optional chunk size parameter defines the minimum block size. The default minimal chunk size is 1. This executor parameters type is equivalent to OpenMP's GUIDED scheduling directive.</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/parallel/v3/executor_parameter_traits.html" name="25nu10nu9dd930k8mfjfo5ih5i">&nbsp;&nbsp;Executor parameter traits</a>
+</h3>
+<h3 class="topic">
+<a name="66m47da5rmhaj13l7tu5dbrqnt">&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="41oj95qscn5dtke000jgciujqr">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t chunk_size =
+    executor_parameter_traits&lt;my_parameter_t&gt;::get_chunk_size(my_parameter,
+        my_executor, [](){ return 0; }, num_tasks);</a>
+</h3>
+<h3 class="topic">
+<a name="3rg8p11sqf4q25amevv6u45d78">&nbsp;&nbsp;is a 
+parameter 
+of ...</a>
+</h3>
+<p class="summary">(<a href="#29pg8dt0ih2af1n39ha9u0ctsg">Executor parameters</a>)</p>
+<p class="relationships">See Also: <a href="#793t99d12o1gerk06h4l4f9pdj">Execution policies</a>
+</p>
+<h3 class="topic">
+<a name="2u8bgb6uoms13o97bfeovula4v">&nbsp;bundle them up together, 
+and you get ...</a>
+</h3>
+<p class="summary">(<a href="#6berkfro0hp2c8rpb51lt073e3">Executors and
+Executor Traits</a>, <a href="#4murpgc8dpbste3k5e8o0l8ihj">Executor Parameters and
+Executor Parameter Traits</a>)</p>
+<h3 class="topic">
+<a href="#6u9lcfqk3bol0ev8f0dmg9c4c2" name="793t99d12o1gerk06h4l4f9pdj">&nbsp;&nbsp;Execution policies</a>
+</h3>
+<p class="relationships">See Also: <a href="#3rg8p11sqf4q25amevv6u45d78">is a 
+parameter 
+of ...</a>, <a href="#5ri10d3irruop37ahh0cnhepj6">is a 
+parameter 
+of ...</a>
+</p>
+<h3 class="topic">
+<a name="738stht167k2dhnbp9gq6i7bvn">&nbsp;&nbsp;&nbsp;what is it?</a>
+</h3>
+<h3 class="topic">
+<a name="525bm7lqdalomop83qq71afjmi">&nbsp;&nbsp;&nbsp;&nbsp;during parallel algorithm execution, they generate execution agents by requesting their creation from an associated executor</a>
+</h3>
+<h3 class="topic">
+<a name="4lsrif2p8qoolcqcco89qpqj2f">&nbsp;&nbsp;&nbsp;&nbsp;execution policies have associated default executor and executor parameters.
+They're basically just a struct with these two parameters</a>
+</h3>
+<h3 class="topic">
+<a name="4rh215pbepukjurjhsilpdit91">&nbsp;&nbsp;&nbsp;&nbsp;more details: execution_policy.hpp</a>
+</h3>
+<h3 class="topic">
+<a name="4hfn7uavdc0oe00kbnlhk8du96">&nbsp;&nbsp;&nbsp;types</a>
+</h3>
+<h3 class="topic">
+<a name="1d17ol1o3694c100tlbf5nh419">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::sequenced_policy 
+	aka 
+hpx::parallel::execution::seq</a>
+</h3>
+<h3 class="topic">
+<a name="0aqrq3rb9tvtml30hinru5oqqb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;execution happens
+in the calling thread.
+sequential executor, no chunking</a>
+</h3>
+<h3 class="topic">
+<a name="02udf16l0rr099frctjmji7ku7">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::sequenced_task_policy 
+	aka 
+hpx::parallel::execution::seq(task)</a>
+</h3>
+<p class="relationships">See Also: <a href="#0qitv3155qndgvvpa37p19oo6g">asynchronous
+are extensions of the standard
+Return a future&lt;R&gt;</a>
+</p>
+<h3 class="topic">
+<a name="63q44shmnsfbe0o638gpml0eb3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the algorithm is executed sequentially, 
+but it immediately returns a future instance 
+representing the fact that it finished its execution</a>
+</h3>
+<h3 class="topic">
+<a name="4s3bnve8crp3jhrcv9kn10tb59">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::parallel_policy 
+	aka 
+hpx::parallel::execution::par</a>
+</h3>
+<p class="relationships">See Also: <a href="#77h5t7jm1a21c4tcdcigp6t130">default executor corresponding to execution policy seq</a>, <a href="#78fdao4snmqn1ku0rta5qi52bp">default executor corresponding to par</a>
+</p>
+<h3 class="topic">
+<a name="4od64s0rf4p3ib98qsusbj2v5r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallel executor, static chunk size</a>
+</h3>
+<h3 class="topic">
+<a name="6d93m768oa720aptnoist7s88k">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::parallel_task_policy 
+	aka
+hpx::parallel::execution::par(task)
+
+or is it just hpx::parallel::execution::task</a>
+</h3>
+<p class="relationships">See Also: <a href="#0qitv3155qndgvvpa37p19oo6g">asynchronous
+are extensions of the standard
+Return a future&lt;R&gt;</a>
+</p>
+<h3 class="topic">
+<a name="7lveo7bkh6m0ro2a481fuv0iq1">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::unsequenced_policy 
+	aka 
+hpx::parallel::execution::unseq
+
+or is it parallel_unsequenced_policy</a>
+</h3>
+<h3 class="topic">
+<a name="1tu6loutu0n14kfd5oe0bctlkt">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::execution::parallel_vector_policy 
+	aka 
+hpx::parallel::execution::par_vec</a>
+</h3>
+<h3 class="topic">
+<a name="2ttd3tfv5aqljtq7d7v92r8f5g">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::datapar_execution</a>
+</h3>
+<h3 class="topic">
+<a name="7872gk80gf8dd65qtgpatgkug4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallel execution with vectorization: 
+Instead of passing along the current element of the input sequence, the implementation of the parallel algorithm will construct a vector pack out of a number of subsequent elements, passing this to the body instead. These vector packs are special data types implemented in one of the mentioned libraries. They represent types which are defined by the target hardware as a group of values with a fixed number of entries. Typically one these vector pack objects fits into a SIMD register on the target system. Such a SIMD register consequently stores several scalar values; in contrast to a general purpose register, which stores only one scalar value at a time. The fixed number of entries combined by such a vector pack is an unchangeable property of the hardware but it may vary depending on the scalar type it is built upon.</a>
+</h3>
+<h3 class="topic">
+<a name="74hh667o4okjlucgfpfmt72f90">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::datapar_execution(task)</a>
+</h3>
+<h3 class="topic">
+<a name="5mcrg0htfl1edf0esohl4i6ui7">&nbsp;&nbsp;&nbsp;&nbsp;execute
+- in an unordered fashion
+- in in unspecified threads
+- indeterminately sequenced within each thread</a>
+</h3>
+<p class="summary">(<a href="#4s3bnve8crp3jhrcv9kn10tb59">hpx::parallel::execution::parallel_policy 
+	aka 
+hpx::parallel::execution::par</a>, <a href="#6d93m768oa720aptnoist7s88k">hpx::parallel::execution::parallel_task_policy 
+	aka
+hpx::parallel::execution::par(task)
+
+or is it just hpx::parallel::execution::task</a>, <a href="#7lveo7bkh6m0ro2a481fuv0iq1">hpx::parallel::execution::unsequenced_policy 
+	aka 
+hpx::parallel::execution::unseq
+
+or is it parallel_unsequenced_policy</a>, <a href="#1tu6loutu0n14kfd5oe0bctlkt">hpx::parallel::execution::parallel_vector_policy 
+	aka 
+hpx::parallel::execution::par_vec</a>, <a href="#2ttd3tfv5aqljtq7d7v92r8f5g">hpx::parallel::datapar_execution</a>, <a href="#74hh667o4okjlucgfpfmt72f90">hpx::parallel::datapar_execution(task)</a>)</p>
+<h3 class="topic">
+<a name="4t9hddvqgjpa1686aechs1i72c">&nbsp;&nbsp;&nbsp;&nbsp;sequential order</a>
+</h3>
+<p class="summary">(<a href="#1d17ol1o3694c100tlbf5nh419">hpx::parallel::execution::sequenced_policy 
+	aka 
+hpx::parallel::execution::seq</a>, <a href="#02udf16l0rr099frctjmji7ku7">hpx::parallel::execution::sequenced_task_policy 
+	aka 
+hpx::parallel::execution::seq(task)</a>)</p>
+<h3 class="topic">
+<a name="48t4vopgp699m8il44ujd62mdc">&nbsp;&nbsp;&nbsp;rebind them t an executor and/or an execution parameter</a>
+</h3>
+<h3 class="topic">
+<a name="1vf10esc4212d52n53q0h6qfkk">&nbsp;&nbsp;&nbsp;&nbsp;.on()</a>
+</h3>
+<p class="relationships">See Also: <a href="#6k42u3bieh53ucjum90ce9q2j6">Executors (rebind...)</a>
+</p>
+<h3 class="topic">
+<a name="1f8i6c0n3gh2rt6tf5gduprn4f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rebind an executor</a>
+</h3>
+<h3 class="topic">
+<a name="0ca9nob2je441gn1pqq9mjdnnl">&nbsp;&nbsp;&nbsp;&nbsp;.with()</a>
+</h3>
+<p class="relationships">See Also: <a href="#29pg8dt0ih2af1n39ha9u0ctsg">Executor parameters (rebind)</a>
+</p>
+<h3 class="topic">
+<a name="6n3kd0thvkchcqeg4khk946o9c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rebind an executor parameter</a>
+</h3>
+<h3 class="topic">
+<a name="0r3eni3n6i2pphbu76gov6jbcv">&nbsp;&nbsp;&nbsp;&nbsp;.on(...).with(...)</a>
+</h3>
+<h3 class="topic">
+<a name="2439bntvm394hq9purak2uvchf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;both</a>
+</h3>
+<h3 class="topic">
+<a name="3llmah22mlajontkeujqh58c0l">&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="4pgqvee4bboa9dcnbe6ud2gvbs">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_chunk_size param;
+hpx::parallel::execution::parallel_task_policy par_policy;
+auto policy = par_policy.with(param);
+
+auto minmaxX_ = hpx::parallel::minmax_element(policy, x, x+N);
+auto minmaxX = minmaxX_.get();</a>
+</h3>
+<h3 class="topic">
+<a name="5o48d1g5te98p5ra2nnsgnlqq3">&nbsp;&nbsp;&nbsp;&nbsp;    std::vector&lt;std::size_t&gt; data = { ... };
+    hpx::future&lt;void&gt; f = hpx::parallel::for_each(
+        hpx::parallel::par(task),
+        std::begin(data), std::end(data),
+        [](std::size_t val)
+        {
+            do_some_work(val);
+        });
+
+    // more parallel work can be performed here
+    do_other_work();
+
+    // wait for the for_each to be finished
+    f.wait();</a>
+</h3>
+<h3 class="topic">
+<a name="4bapcoq62soe4vjc0o4euorove">&nbsp;&nbsp;&nbsp;&nbsp;// parallel and vectorized execution
+std::vector&lt;double&gt; v = { ... };
+parallel::for_each(
+    parallel::datapar_execution, std::begin(v), std::end(v), 
+    [](auto&amp; d) {
+        d = 42.0;
+    });</a>
+</h3>
+<h3 class="topic">
+<a name="2hi3e2miq81etrh8pcqskrhsqq">&nbsp;&nbsp;&nbsp;&nbsp;// uses default executor: par
+std::vector&lt;double&gt; d = { ... };
+parallel::fill(par, begin(d), end(d), 0.0);
+
+// rebind par to user-defined executor
+my_executor my_exec = ...;
+parallel::fill(par.on(my_exec), begin(d), end(d), 0.0);
+
+// rebind par to user-defined executor and
+// user defined executor parameters
+my_params my_par = ...
+parallel::fill(par.on(my_exec).with(my_par), begin(d), end(d), 0.0);</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/parallel/task_block.html" name="065p9f5c53m1tgshrrpm4857tf">Task Blocks</a>
+</h2>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/error_handling.html" name="00v0920p0op3gpeifh4i3nc2a0">Error 
+Handling</a>
+</h2>
+<h2 class="topic">
+<a name="3dpjfhp5ia2tscs30v5bqaltnk">
+Functions, where:
+- f function to invoke
+- p... (optional) arguments
+- R return type of f
+- action action type defined by HPX_DEFINE_PLAIN_ACTION or HPX_DEFINE_COMPONENT_ACTION encapsulating f
+- a an instance of the type action
+- id the global address the action is applied to (eg hpx::find_here())
+</a>
+</h2>
+<p class="topicImage">
+<img height="741" src="4-hpx_api_files/2i6gqlaq4holn94tjalmramkml." width="1378"></p>
+<h3 class="topic">
+<a name="3ijde7i3umsd5trk0lcu1ri8i9">&nbsp;Actions</a>
+</h3>
+<p class="relationships">See Also: <a href="#5u494voh84c8fpqo7e69cvsd78">Distributed 
+programming</a>
+</p>
+<h3 class="topic">
+<a name="70mqin7mhoeou8392cna1q0r38">&nbsp;&nbsp;#include &lt;hpx/include/actions.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="6l82rnot420h1ha2onm4ptao82">&nbsp;&nbsp;what is it?</a>
+</h3>
+<h3 class="topic">
+<a name="633k7jupf5t7u2jb6rgi6fm90a">&nbsp;&nbsp;&nbsp;Type used to describe remote operations</a>
+</h3>
+<h3 class="topic">
+<a name="5a7qrmnnmj43qc1mf7jhhjofgj">&nbsp;&nbsp;&nbsp;Type for functions that have to be invoked remotely</a>
+</h3>
+<h3 class="topic">
+<a name="59qiqqpdfdpu5vuvvoos90qdfa">&nbsp;&nbsp;types of actions</a>
+</h3>
+<h3 class="topic">
+<a name="6nl4a0nbaal7323n1lnpc4q32k">&nbsp;&nbsp;&nbsp;basic_action</a>
+</h3>
+<h3 class="topic">
+<a name="2jmf23vut4fknqqblv15utvhvj">&nbsp;&nbsp;&nbsp;component_action</a>
+</h3>
+<h3 class="topic">
+<a name="4p61geq198f69enn023ishtsft">&nbsp;&nbsp;&nbsp;&nbsp;DEFINE_COMPONENT_ACTION</a>
+</h3>
+<div class="notesContainer">
+<p>example: cf component_in_executable.cpp&sect;</p>
+</div>
+<h3 class="topic">
+<a name="0ntgfesr77iu097dfi33bdf091">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;header file</a>
+</h3>
+<h3 class="topic">
+<a name="7ve1qgkj227i9sgj7b6kaahsp9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;namespace app
+{
+    struct some_component
+      : hpx::components::simple_component_base&lt;some_component&gt;
+    {
+        int some_member_function(std::string s)
+        {
+            return boost::lexical_cast&lt;int&gt;(s);
+        }
+
+        // This will define the action type 'some_member_action' which
+        // represents the member function 'some_member_function' of the
+        // object type 'some_component'.
+        HPX_DEFINE_COMPONENT_ACTION(some_component, some_member_function,
+            some_member_action);
+    };
+}
+
+// Note: The second argument to the macro below has to be systemwide-unique C++ identifiers
+HPX_REGISTER_ACTION_DECLARATION(app::some_component::some_member_action, some_component_some_action);</a>
+</h3>
+<h3 class="topic">
+<a name="2u988vnglmm5hk98p03h6edau1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;source file</a>
+</h3>
+<h3 class="topic">
+<a name="3djtokjbn918vd736hlhbnlmhk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef hpx::components::simple_component&lt;app::some_component&gt; component_type;
+typedef app::some_component some_component;
+
+HPX_REGISTER_COMPONENT(component_type, some_component);
+
+// The parameters for this macro have to be the same as used in the corresponding
+// HPX_REGISTER_ACTION_DECLARATION() macro invocation above
+typedef some_component::some_member_action some_component_some_action;
+HPX_REGISTER_ACTION(some_component_some_action);</a>
+</h3>
+<h3 class="topic">
+<a name="17o5ucdef6e7c0b2l6keo4cp4l">&nbsp;&nbsp;&nbsp;plain_action</a>
+</h3>
+<h3 class="topic">
+<a name="0rflk0n6estkhhs2dol1bghm3u">&nbsp;&nbsp;&nbsp;&nbsp;HPX_PLAIN_ACTION</a>
+</h3>
+<h3 class="topic">
+<a name="4395a0h4up26152gg3dfsd1tjf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in the global namespace</a>
+</h3>
+<h3 class="topic">
+<a name="4kjp8p4gac7jo2q8ukoh67uhos">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;namespace app
+{
+    void some_global_function(double d)
+    {
+        cout &lt;&lt; d;
+    }
+}
+
+// This will define the action type 'some_global_action' which represents
+// the function 'app::some_global_function'.
+// Has to be placed in the global namespace
+HPX_PLAIN_ACTION(app::some_global_function, some_global_action);</a>
+</h3>
+<h3 class="topic">
+<a name="0n264535ac8uqlfv8tr6vtjflt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in another namespace</a>
+</h3>
+<h3 class="topic">
+<a name="1o0bk587fh0mv7jr13k99ivv5i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;namespace app
+{
+    void some_global_function(double d)
+    {
+        cout &lt;&lt; d;
+    }
+
+    // On conforming compilers the following macro expands to:
+    //
+    //    typedef hpx::actions::make_action&lt;
+    //        decltype(&amp;some_global_function), &amp;some_global_function
+    //    &gt;::type some_global_action;
+    //
+    // This will define the action type 'some_global_action' which represents
+    // the function 'some_global_function'.
+    HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
+}
+
+// The following macro expands to a series of definitions of global objects
+// which are needed for proper serialization and initialization support
+// enabling the remote invocation of the function `some_global_function`.
+HPX_REGISTER_ACTION(app::some_global_action, app_some_global_action);</a>
+</h3>
+<h3 class="topic">
+<a name="4tv2rv921kte3nk9rdrb1q4d14">&nbsp;&nbsp;argument</a>
+</h3>
+<h3 class="topic">
+<a name="5qupquqq1fvdpuvc0g83lo7pfd">&nbsp;&nbsp;&nbsp;- for global functions:
+the global address of the locality the associated function should be invoked on
+- for member functions
+the global address of the targeted object instance </a>
+</h3>
+<h3 class="topic">
+<a name="33c93qkedatvbd06h7cdj5m21v">&nbsp;&nbsp;&nbsp;&nbsp; If the target of the operation is local to the invocation, a new HPX thread will be created on the current locality. This is very similar to what a purely local operation would do. </a>
+</h3>
+<h3 class="topic">
+<a name="52a73ld8abgm96skf8s5soo2d7">&nbsp;&nbsp;&nbsp;&nbsp;If the target of the operation is remote, HPX sends the action through the parcel-port to the destination, where the encapsulated function will be scheduled as a new HPX thread.</a>
+</h3>
+<h3 class="topic">
+<a name="6aa2m5puf6eprq98f6o8nr2r2o">&nbsp;&nbsp;&nbsp;&nbsp;From the user&rsquo;s perspective, in both cases the semantics are 100% equivalent. 
+The only difference is the locality where the HPX thread executing the required function is scheduled.</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation.html" name="6bumtpe2tf03i4qrhniv218616">&nbsp;&nbsp;Action 
+invocation</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation/apply.html" name="68qg9om7ah3n8fai3dup3f1sms">&nbsp;&nbsp;&nbsp;asynchronously
+and without synchronization
+(fire&amp;forget)</a>
+</h3>
+<h3 class="topic">
+<a name="76l4qd6bhs9f5t4oaeehskq64o">&nbsp;&nbsp;&nbsp;&nbsp;the function associated with the acion is scheduled to run on the target locality</a>
+</h3>
+<h3 class="topic">
+<a name="37piqpivsop3jv90jd9vtr76hl">&nbsp;&nbsp;&nbsp;&nbsp;doesn't wait for the function to start running</a>
+</h3>
+<h3 class="topic">
+<a name="7m7paeul5j320rm2jr4uk09spi">&nbsp;&nbsp;&nbsp;&nbsp;how?</a>
+</h3>
+<h3 class="topic">
+<a name="23u5ojhuv2hm7ol6c63kviftt4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply()</a>
+</h3>
+<h3 class="topic">
+<a name="6i0p7qo397ntmbipm1rp2mtmqd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// define an instance of some_global_action
+some_global_action act;
+hpx::apply(act, hpx::find_here(), 2.0);</a>
+</h3>
+<h3 class="topic">
+<a name="0g6u8c3so8g6mt0s6sfoktb2tu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// define an instance of some_component_action
+some_component_action act;
+hpx::apply(act, id, "42");</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation/async.html" name="57j9111as0dnkv3v0sc6k7pm0l">&nbsp;&nbsp;&nbsp;asynchronously 
+with synchronization</a>
+</h3>
+<h3 class="topic">
+<a name="0ifav17j71frb986fl45p0jgoh">&nbsp;&nbsp;&nbsp;&nbsp;the function associated with the acion is scheduled to run on the target locality</a>
+</h3>
+<h3 class="topic">
+<a name="3ju77o5hokvoq7k64lqk6sjs3b">&nbsp;&nbsp;&nbsp;&nbsp;applying the action does not wait for the function to start running or to complete, 
+instead it's fully asynchronous.</a>
+</h3>
+<h3 class="topic">
+<a name="54fmiv6rt08hatmcu6hnss07tc">&nbsp;&nbsp;&nbsp;&nbsp;returns a hpx::future&lt;...&gt; encapsulating the result of the (possibly remote) execution</a>
+</h3>
+<h3 class="topic">
+<a name="4bopot1ei7qvsu3kldu4agpev8">&nbsp;&nbsp;&nbsp;&nbsp;trick: we can use a future&lt;void&gt;
+to allow the thread to synchronize with any remote operation not returning any value</a>
+</h3>
+<h3 class="topic">
+<a name="5i7ann5i1vcpqli88sf10il398">&nbsp;&nbsp;&nbsp;&nbsp;how? </a>
+</h3>
+<h3 class="topic">
+<a name="0ma34p49a2hjgqfrnv5t1iclfn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;async()</a>
+</h3>
+<h3 class="topic">
+<a name="1ufrc32invulkfm1u5pnnbbr8r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some_global_action act;     
+// define an instance of some_global_action
+hpx::future&lt;void&gt; f = hpx::async(act, hpx::find_here(), 2.0);
+//
+// ... other code can be executed here
+//
+f.get();
+// will return immediately 
+// if the result from the asynchronous operation has already been returned
+// otherwise, this invocation will suspend the execution of the calling thread 
+// until the asynchronous operation returns its result</a>
+</h3>
+<h3 class="topic">
+<a name="4f8ldigqdl5vhc30817u0bg0ro">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some_component_action act;     // define an instance of some_component_action
+hpx::future&lt;int&gt; f = hpx::async(act, id, "42");
+//
+// ... other code can be executed here
+//
+cout &lt;&lt; f.get();    
+// this will possibly wait for the asynchronous operation to 'return' 42</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation/sync.html" name="6uqujpgqnftpjlr919ad6beiuh">&nbsp;&nbsp;&nbsp;synchronously</a>
+</h3>
+<h3 class="topic">
+<a name="276prnmc5gha21gs291uc4pv30">&nbsp;&nbsp;&nbsp;&nbsp;the function associated with that action is scheduled to run on the target locality</a>
+</h3>
+<h3 class="topic">
+<a name="1sr2hk284emis5br1t5v498jbi">&nbsp;&nbsp;&nbsp;&nbsp;The calling thread will be suspended while waiting for the function to return. 
+This "synchronous invocation in fact conceals an asynchronous function call.</a>
+</h3>
+<p class="relationships">See Also: <a href="#1rni655hodjsg4rssn0a3v1h0g">this looks just like a regular function call, but: 
+- the function wrapped by the action will be scheduled to run on a new thread
+- the calling thread will be suspended
+after the new thread has executed the wrapped function:
+- the waiting thread will resume and return from the synchronous call</a>
+</p>
+<h3 class="topic">
+<a name="705t1lbok2l4qgfdmnoutgq732">&nbsp;&nbsp;&nbsp;&nbsp;how?</a>
+</h3>
+<h3 class="topic">
+<a name="4ljvhesqbj74kmd0fj8lq8hjva">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action_instance(...)</a>
+</h3>
+<h3 class="topic">
+<a name="6jmgitucdke39e10hcdruh13d6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some_global_action act;     
+// define an instance of some_global_action
+act(hpx::find_here(), 2.0);</a>
+</h3>
+<h3 class="topic">
+<a name="1rni655hodjsg4rssn0a3v1h0g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this looks just like a regular function call, but: 
+- the function wrapped by the action will be scheduled to run on a new thread
+- the calling thread will be suspended
+after the new thread has executed the wrapped function:
+- the waiting thread will resume and return from the synchronous call</a>
+</h3>
+<p class="relationships">See Also: <a href="#1sr2hk284emis5br1t5v498jbi">The calling thread will be suspended while waiting for the function to return. 
+This "synchronous invocation in fact conceals an asynchronous function call.</a>
+</p>
+<h3 class="topic">
+<a name="7b084453g55g06e8po7vb2r73d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some_component_action act;     
+// define an instance of some_component_action
+int result = act(id, "42");</a>
+</h3>
+<h3 class="topic">
+<a name="0jb5mthfrec3cnjkm82ndivgur">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The action invocation will either 
+a. schedule a new thread locally to execute the wrapped member function 
+(as before, id is the global address of the component instance the member function should be invoked on), or 
+b. it will send a parcel to the remote locality of the component causing a new thread to be scheduled there. 
+- The calling thread will be suspended until the function returns its result. 
+- This result will be returned from the synchronous action invocation.</a>
+</h3>
+<h3 class="topic">
+<a name="68l4l0hcc7968lbf3dhmh6cgaq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but the syntax is exactly the same, whether the target locality is remote to the invocation locality or not!! </a>
+</h3>
+<h3 class="topic">
+<a name="0onjkmcmh7ba28l4n7mln1tm61">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. If the target for applying an action is local, a new thread is automatically created and scheduled. Once this thread is scheduled and run, it will execute the function encapsulated by that action. </a>
+</h3>
+<h3 class="topic">
+<a name="2te63065dvm8ktdl42esgu2707">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. If the target is remote, HPX will send a parcel to the remote locality which encapsulates the action and its parameters.</a>
+</h3>
+<h3 class="topic">
+<a name="6m2jtbt99k846tif1n4jggj3l1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Once the parcel is received on the remote locality HPX will create and schedule a new thread there. 
+Once this thread runs on the remote locality, it will execute the function encapsulated by the action.</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation/async_continue.html" name="3ji3pvuueoem90ncd5ubs6tql2">&nbsp;&nbsp;&nbsp;with a continuation
+without synchronization</a>
+</h3>
+<h3 class="topic">
+<a name="7fjburmcfsbbsv1sgdiju4afvr">&nbsp;&nbsp;&nbsp;&nbsp;how? </a>
+</h3>
+<h3 class="topic">
+<a name="146e8nao7dm2o8iv1ke8nqdb8n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply_continue()</a>
+</h3>
+<h3 class="topic">
+<a name="4qvi1jb4qoh1ggqge42gk4q6su">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asynchronously triggers a chain of functions without the need for the execution flow to "come back" to the invocation site.</a>
+</h3>
+<h3 class="topic">
+<a name="30a4jsb4iou7ftih1vtqp8i645">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Each of the asynchronous functions can be executed on a different locality</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_invocation/apply_continue.html" name="0v3ljatpdlulca8g2cpbpn0vqn">&nbsp;&nbsp;&nbsp;with continuation
+with synchronization</a>
+</h3>
+<h3 class="topic">
+<a name="3bqlu4b68qf62fdgqu578c3rl4">&nbsp;&nbsp;&nbsp;&nbsp;how?</a>
+</h3>
+<h3 class="topic">
+<a name="2s4f44qgpu08ldl2kqie81l1d5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;async_continue()
+and 
+make_continuation</a>
+</h3>
+<h3 class="topic">
+<a name="2t2be8qhae3g3d5ul9rmvm8po6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;like async() but takes an additional function argument: 
+this function will be called as the continuation of the executed action
+It is expected to perform additional operations and to make sure that a result is returned to the original invocation site.</a>
+</h3>
+<h3 class="topic">
+<a name="23r3fdejom62pgnuqa75a9npv7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;chain 2 operations</a>
+</h3>
+<h3 class="topic">
+<a name="51h8vvea5dl04d36ukssakvjvb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::async_continue(action1,id, p...,
+        hpx::make_continuation(action2));</a>
+</h3>
+<h3 class="topic">
+<a name="2qam97rbl95vb48g9bc8t8r8oc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;chain 3 operations</a>
+</h3>
+<h3 class="topic">
+<a name="3m0rgk46p416hkmhe0jp80prnr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::async_continue(action1, id, p...,
+        hpx::make_continuation(action2,
+            hpx::make_continuation(action3)));</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applying_actions/action_error_handling.html" name="1p0dc67287b1dsih4lqpgc7s9v">&nbsp;&nbsp;Error handling</a>
+</h3>
+<h3 class="topic">
+<a name="3hv8ib5drniu50v30a8l84vrv6">&nbsp;re-implementations
+of std facilities</a>
+</h3>
+<h3 class="topic">
+<a name="0ft3er03af3ri92lm31q4ckvtp">&nbsp;&nbsp;hpx::bind</a>
+</h3>
+<h3 class="topic">
+<a name="7p7kea3nfo9midnlb1t7cflkkk">&nbsp;&nbsp;hpx::function</a>
+</h3>
+<h3 class="topic">
+<a name="0u8pgt9qpbbq3sacs8kecfi1qr">&nbsp;&nbsp;hpx::async</a>
+</h3>
+<h3 class="topic">
+<a name="6a24be4bq9pcoua0tb348bl9bh">&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="1rhb56bm32glt4bm0kvgd15arm">&nbsp;&nbsp;&nbsp;&nbsp;int convert(std::string s) { return std::stoi(s); }
+future&lt;int&gt; f = async(convert, "42");
+std::cout &lt;&lt; f.get() &lt;&lt; std::endl;    // prints: 42</a>
+</h3>
+<h3 class="topic">
+<a name="3jeruar51fbbe5bra1gg32i17i">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/include/lcos.hpp&gt;
+#include &lt;hpx/include/async.hpp&gt;
+
+void setup(double a);
+// definition of the body of the function ...
+
+double aa = ...;
+hpx::future&lt;void&gt; setup_fut = hpx::async(&amp;node_setup, aa);
+
+// then I can do stuff with this future, like
+setup.then(...);
+setup.get();</a>
+</h3>
+<h3 class="topic">
+<a name="2fhbkbs3jeuit248dmfqun1bdt">&nbsp;&nbsp;&nbsp;
+ENORMOUS SUPER ANNOYING AND NASTY 
+
+!!!! PITFALL !!!!
+
+Doesn't compile if the function called by async takes references as arguments!
+
+Possible solutions:
+
+a. wrap that function in a lambda and capture the arguments by reference 
+
+b. change the function signature so that it takes these arguments by pointer instead of by reference
+</a>
+</h3>
+<h3 class="topic">
+<a name="6o2diuvih94o1iaftkjn9cqu8a">&nbsp;&nbsp;&nbsp;&nbsp;If in lambda: make sure the reurn type of lambda mathes the return type of the function (avoid turtle in a turtle problem)</a>
+</h3>
+<h3 class="topic">
+<a name="5gtbv6n2fv9vccvav9h75hq4qs">&nbsp;&nbsp;hpx::apply</a>
+</h3>
+<h3 class="topic">
+<a name="38p962pj4ge1rkfudtaj7oq2rj">&nbsp;&nbsp;hpx::async_continue</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.org/2015/06/hpx-and-cpp-distributed-computing/" name="5u494voh84c8fpqo7e69cvsd78">Distributed 
+programming</a>
+</h2>
+<p class="relationships">See Also: <a href="#3ijde7i3umsd5trk0lcu1ri8i9">Actions</a>
+</p>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/components.html" name="28sb2akfdvebktf2smek8vhom7">&nbsp;component</a>
+</h3>
+<h3 class="topic">
+<a name="06km9vnokjrc6ck3dn4jgu5n2g">&nbsp;&nbsp;A component in HPX is a C++ class which can be created remotely &#13;
+and for which its member functions can be invoked remotely as well</a>
+</h3>
+<h3 class="topic">
+<a name="4utfsrqgklde4rv5pmcpqnpgf8">&nbsp;&nbsp;&nbsp;how to? </a>
+</h3>
+<h3 class="topic">
+<a name="79odb9l4mdmh25dmirr8gpspkt">&nbsp;&nbsp;&nbsp;&nbsp;// header file some_component.hpp
+
+#include &lt;hpx/include/components.hpp&gt;
+
+namespace app
+{
+    // Define a new component type 'some_component'
+    struct some_component
+      : hpx::components::simple_component_base&lt;some_component&gt;
+    {
+        // This member function is has to be invoked remotely
+        int some_member_function(std::string const&amp; s)
+        {
+            return boost::lexical_cast&lt;int&gt;(s);
+        }
+
+        // This will define the action type 'some_member_action' which
+        // represents the member function 'some_member_function' of the
+        // object type 'some_component'.
+        HPX_DEFINE_COMPONENT_ACTION(some_component, some_member_function, 
+			some_member_action);
+    };
+}
+
+// This will generate the necessary boiler-plate code for the action allowing
+// it to be invoked remotely. This declaration macro has to be placed in the
+// header file defining the component itself.
+//
+// Note: The second argument to the macro below has to be systemwide-unique
+//       C++ identifiers
+//
+HPX_REGISTER_ACTION_DECLARATION(app::some_component::some_member_action, some_component_some_action);</a>
+</h3>
+<h3 class="topic">
+<a name="0absd49egsa26rjmqd2c1ajo73">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;has to be derived from the 
+hpx::components::simple_component_base 
+template type</a>
+</h3>
+<h3 class="topic">
+<a name="61eh3m85nrk6e17vc645i10kir">&nbsp;&nbsp;&nbsp;&nbsp;// source file some_component.cpp
+
+#include "some_component.hpp"
+
+// The following code generates all necessary boiler plate to enable the
+// remote creation of 'app::some_component' instances with 'hpx::new_&lt;&gt;()'
+//
+using some_component = app::some_component;
+using some_component_type = hpx::components::simple_component&lt;some_component&gt;;
+
+// Please note that the second argument to this macro must be a
+// (system-wide) unique C++-style identifier (without any namespaces)
+//
+HPX_REGISTER_COMPONENT(some_component_type, some_component);
+
+// The parameters for this macro have to be the same as used in the corresponding
+// HPX_REGISTER_ACTION_DECLARATION() macro invocation in the corresponding
+// header file.
+//
+// Please note that the second argument to this macro must be a
+// (system-wide) unique C++-style identifier (without any namespaces)
+//
+HPX_REGISTER_ACTION(app::some_component::some_member_action, some_component_some_action);</a>
+</h3>
+<h3 class="topic">
+<a name="0111bksuh4sb746oree9hqcfg6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Every component type is required to have macros placed into its source file, one for each component type and one macro for each of the actions defined by the component type.</a>
+</h3>
+<h3 class="topic">
+<a name="5vc2thstrfohqcpdii67a8td3a">&nbsp;&nbsp;A component is an object which can be remotely accessed using its global address. Components are made of two parts: a server and a client class. While the client class is not required, abstracting the server behind a client allows us to ensure type safety instead of having to pass around pointers to global objects. </a>
+</h3>
+<h3 class="topic">
+<a name="0c9usdhn2k841h0rps5tivoll2">&nbsp;Execution targets</a>
+</h3>
+<h3 class="topic">
+<a name="351ca7cvvbs18bs75td811otd5">&nbsp;&nbsp;opaque type which represents a place in the system
+Used to 
+- identify data placement
+- specify execution site close to data placement</a>
+</h3>
+<h3 class="topic">
+<a name="2a922iuf2sqfe8epq4n5td46dq">&nbsp;&nbsp;Targets encapsulate architecture specifics</a>
+</h3>
+<h3 class="topic">
+<a name="0c97sfafgi9pjhfcuqqph319rv">&nbsp;&nbsp;&nbsp;NUMA domains (CPU sets)</a>
+</h3>
+<h3 class="topic">
+<a name="7b2479ov9bam6477tcf8ss0mib">&nbsp;&nbsp;&nbsp;Scratch Pad Memory</a>
+</h3>
+<h3 class="topic">
+<a name="2v0nb5j1vdhhv7tluhln614hkg">&nbsp;&nbsp;&nbsp;GPU devices</a>
+</h3>
+<h3 class="topic">
+<a name="5mgbpo70i24tbp3pbct7diq6d0">&nbsp;&nbsp;&nbsp;remote nodes</a>
+</h3>
+<h3 class="topic">
+<a name="6ub5jbgs42nnf8luv8p3us1kmn">&nbsp;&nbsp;work closely with executors and allocators</a>
+</h3>
+<h3 class="topic">
+<a href="#35qce04tomjbnipk821ev0umd4" name="44513avd0c4vkvbq7ltv048h0e">&nbsp;AGAS</a>
+</h3>
+<h3 class="topic">
+<a name="2tugmulljlc784jbph44a6h5g8">&nbsp;&nbsp;Active Global Address Space
+Exposes a single uniform address space spanning all localities an application runs on.
+Conceptually there is no rigid demarcation of local or global memory
+All available memory is part of the same address space
+Enables objects to be moved across localities without having to change the object's name 
+(ie no references have to be updated)
+Allows dynamic object distribution</a>
+</h3>
+<h3 class="topic">
+<a name="62iobdn0idkv0aaqbi3nk6vn54">&nbsp;&nbsp;GID : a tuple of meta-data used to dynamicaly locate an object in the system</a>
+</h3>
+<h3 class="topic">
+<a name="42pkpt1lm03ofbmusqccamr2oa">&nbsp;&nbsp;hpx::id_type 
+(struct defined in id_type.hpp)</a>
+</h3>
+<h3 class="topic">
+<a name="7j0h8hfncsb69gof0c55tmp52u">&nbsp;&nbsp;&nbsp;HPX Global Addresses are represented uses that type.
+This data type is conceptually very similar to void* pointers 
+as it does not expose any type information of the object it is referring to.</a>
+</h3>
+<h3 class="topic">
+<a name="2a5tkcqlbleh9lb3bh69kgabrj">&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="1c7nvave7j7b9ki6uvip1ekksk">&nbsp;&nbsp;&nbsp;hpx::find_here()</a>
+</h3>
+<h3 class="topic">
+<a name="441drdkukiifv7ubl2sde5vfdf">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the global address of the locality this function is called on.</a>
+</h3>
+<h3 class="topic">
+<a name="4mr91on3i8qm5aqis3n0lrofck">&nbsp;&nbsp;&nbsp;hpx::find_all_localities()</a>
+</h3>
+<h3 class="topic">
+<a name="2kkbs1gbn9pk7hc4hndaf5l6he">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the global addresses of all localities available to this application 
+(including the locality the function is being called on).</a>
+</h3>
+<h3 class="topic">
+<a name="7gquuvdmprd2g423aqqr49g6rk">&nbsp;&nbsp;&nbsp;hpx::find_remote_localities()</a>
+</h3>
+<h3 class="topic">
+<a name="5if17r18og9m6umrfbk31t1q7a">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the global addresses of all remote localities available to this application 
+(not including the locality the function is being called on)</a>
+</h3>
+<h3 class="topic">
+<a name="0bdo5th8mkp8njrng51b8mkkbg">&nbsp;&nbsp;&nbsp;hpx::get_num_localities()</a>
+</h3>
+<h3 class="topic">
+<a name="79jq50nija0cr43pekbb1mr4ir">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the number of localities available to this application.</a>
+</h3>
+<h3 class="topic">
+<a name="2c8akhbpic309p53do6mej3eja">&nbsp;&nbsp;&nbsp;hpx::find_locality()</a>
+</h3>
+<h3 class="topic">
+<a name="0o8skkbmpo15dl6grgept1ggnd">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the global address of any locality supporting the given component type.</a>
+</h3>
+<h3 class="topic">
+<a name="1dslpdccfef7h627a1humn2437">&nbsp;&nbsp;&nbsp;hpx::get_colocation_id()</a>
+</h3>
+<h3 class="topic">
+<a name="5kleialkdvqslco1crlokum4mt">&nbsp;&nbsp;&nbsp;&nbsp;retrieve the global address of the locality currently hosting the object with the given global address.</a>
+</h3>
+<h3 class="topic">
+<a name="5rk1iue47ujulo4t83d4h3bh1k">&nbsp;&nbsp;&nbsp;hpx::new_&lt;Component&gt;()</a>
+</h3>
+<h3 class="topic">
+<a name="048o0sfqrs2jj4rdq31jprntbv">&nbsp;&nbsp;&nbsp;&nbsp;Create a new instance of the given Component type on the specified locality.</a>
+</h3>
+<h2 class="topic">
+<a name="0qitv3155qndgvvpa37p19oo6g">asynchronous
+are extensions of the standard
+Return a future&lt;R&gt;</a>
+</h2>
+<p class="relationships">See Also: <a href="#02udf16l0rr099frctjmji7ku7">hpx::parallel::execution::sequenced_task_policy 
+	aka 
+hpx::parallel::execution::seq(task)</a>, <a href="#6d93m768oa720aptnoist7s88k">hpx::parallel::execution::parallel_task_policy 
+	aka
+hpx::parallel::execution::par(task)
+
+or is it just hpx::parallel::execution::task</a>
+</p>
+</body>
+</html>

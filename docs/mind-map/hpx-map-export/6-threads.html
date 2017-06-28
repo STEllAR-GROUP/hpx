@@ -1,0 +1,2398 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+classes that have something to do
+with threads
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="2otp0pi1v1q3d0r14auglnbote">
+classes that have something to do
+with threads
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="6-threads_files/images/ classes that have something to do with threads .jpg"></div>
+<div class="notesContainer">
+<p>Important helper functions in file thread_helper.[h/c]pp, with long commentary.</p>
+<p>Read this to understand the API.</p>
+</div>
+<h2 class="topic">
+<a name="6ussjrdb1ltr9aubh90j0mj299">
+	ParalleX threads		
+</a>
+</h2>
+<h3 class="topic">
+<a href="#5kkrc2t6l6ejfl6vlt3kt8ma66" name="546dekou3u0226ntiiemt6efp2">&nbsp;thread_queue</a>
+</h3>
+<p class="relationships">See Also: <a href="#3rqn3otadm90s1si73ncotn03m">thread_pool (has as a 
+data 
+member ...)</a>, <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data (has as a data member 
+an unordered_set of pointers to ... )</a>
+</p>
+<h3 class="topic">
+<a name="1q24oegh981bdshp0lj1r4hntd">&nbsp;&nbsp;
+in file: thread_queue.hpp
+
+template &lt;typename Mutex = boost::mutex,
+        typename PendingQueuing = lockfree_lifo,
+        typename StagedQueuing = lockfree_lifo,
+        typename TerminatedQueuing = lockfree_fifo&gt;
+class thread_queue
+
+hpx::threads::policies::thread_queue
+
+Representation of a work queue
+
+Super important. This is what actually holds a map of all Parallex-threads
+(all: as in all of the ones that aren't depleted, even the ones that aren't pending)
+
+Is some way or another a data member of all scheduler classes
+(i.e. classes derived from scheduler_base)
+
+Some scheduler classes have several of those queues
+</a>
+</h3>
+<h3 class="topic">
+<a name="5otsnm5u24j9ohjduqogrlrqoo">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="2v1tt62465csmqdmn2hjcs4mnc">&nbsp;&nbsp;&nbsp;&nbsp;some counts managing the 
+creation, deletion and stealing 
+of threads</a>
+</h3>
+<h3 class="topic">
+<a name="1riaq1kfcbaces4d6u2e0ctpnl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int const min_tasks_to_steal_pending</a>
+</h3>
+<h3 class="topic">
+<a name="3k8uugu8rnu9l41k0dq80215cn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;don't steal if less than this amount of tasks are left</a>
+</h3>
+<h3 class="topic">
+<a name="73askqcneocqa2crmv29vfdpfh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int const min_tasks_to_steal_staged</a>
+</h3>
+<h3 class="topic">
+<a name="78kstfpgsd5uba1rf4k9bqn05a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;don't steal if less than this amount of tasks are left</a>
+</h3>
+<h3 class="topic">
+<a name="3q0bknhs2k6e53ffu5ep07eshq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int const_min_add_new_count</a>
+</h3>
+<h3 class="topic">
+<a name="3uc7l7dvgdmdo45lvnaemubc89">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create at least this amount of threads from tasks</a>
+</h3>
+<h3 class="topic">
+<a name="2ssu32r4vn6koppkvg7prplmqr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int const max_add_new_count</a>
+</h3>
+<h3 class="topic">
+<a name="6gbmt828975u0pei2n62s4qgqa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create not more than this amount of threads from tasks</a>
+</h3>
+<h3 class="topic">
+<a name="7t9nnauq619fi2uqe71rsi3fnj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int const max_delete_count</a>
+</h3>
+<h3 class="topic">
+<a name="670mqguftn9n5o4vhtai7rgea9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of terminated threads to discrad</a>
+</h3>
+<h3 class="topic">
+<a name="313qfn150a9td7vojb010qh1dh">&nbsp;&nbsp;&nbsp;&nbsp;mutable mutex_type mtx_</a>
+</h3>
+<p class="relationships">See Also: <a href="#6qf0t7b50g1apicn7t99otscc5">typedef boost::mutex mutex_type; </a>
+</p>
+<h3 class="topic">
+<a name="14b356tcevgl1dssb9bcn3lqqc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mutex protecting the members</a>
+</h3>
+<h3 class="topic">
+<a name="52rtgmhg6uc674vac0k7mp129k">&nbsp;&nbsp;&nbsp;&nbsp;all items</a>
+</h3>
+<h3 class="topic">
+<a name="7r9sqp14d9bsqvbodmf3qpqaio">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_map_type thread_map</a>
+</h3>
+<p class="relationships">See Also: <a href="#7b2o45ktm1s5qm4oj35tpb3f33">typedef std::unordered_set&lt;thread_id_type&gt; thread_map_type</a>, <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data</a>
+</p>
+<h3 class="topic">
+<a name="1jjerqgfdqqtl0kbttucl6ueed">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map (actually: std::unordered_set) holding all threads in the form of thread_id_type
+(except depleted ones)
+mapping of thread id's to HPX-threads.
+This is NOT the working queue which accumulates all pending threads.
+This map contains all threads, including the ones that aren't pending.</a>
+</h3>
+<h3 class="topic">
+<a name="47icqvik3jtrknpqct76epgvd4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef std::unordered_set&lt;thread_id_type&gt; thread_map_type</a>
+</h3>
+<h3 class="topic">
+<a name="07k4isvmgnqlnt213v31p93gjs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost:atomic&lt;std::int64_T&gt; thread_map_count_</a>
+</h3>
+<h3 class="topic">
+<a name="210bigq6vd9rje4c1ous9c39ai">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;overall count of thread items</a>
+</h3>
+<h3 class="topic">
+<a name="47r3ud9jvtsaff5l3kbhe6inu3">&nbsp;&nbsp;&nbsp;&nbsp;work items</a>
+</h3>
+<h3 class="topic">
+<a name="07gunfdckdfjkdnljto752v5eh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;work_items_type work_items</a>
+</h3>
+<p class="relationships">See Also: <a href="#0214hqea83v479funju3th97co">typedef typename PendingQueuing::template
+    apply&lt;thread_description*&gt;::type work_items_type;</a>, <a href="#3ubctk6ga1n1l881ji33tltkl0">thread_description</a>
+</p>
+<h3 class="topic">
+<a name="0odvv92hm1k308i8bsrfb98qb6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list of active work items
+this corresponds to the working queue, 
+ie the queue of threads that have been scheduled and are waiting to be pulled off to be executed.</a>
+</h3>
+<h3 class="topic">
+<a name="6mjmur7krtu1pap7lo62dfq052">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef typename PendingQueuing::template
+            apply&lt;thread_description*&gt;::type work_items_type;</a>
+</h3>
+<h3 class="topic">
+<a name="7g7o443bm5j6vqj5rlaqr366rn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::int64_t&gt; work_items_count_</a>
+</h3>
+<h3 class="topic">
+<a name="5vt2rrtfgkpjot3ca8plqnvqnd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count of active work items</a>
+</h3>
+<h3 class="topic">
+<a name="4r2mj5ies1ev7d9ucrhgpc0ft1">&nbsp;&nbsp;&nbsp;&nbsp;terminated items</a>
+</h3>
+<h3 class="topic">
+<a name="3abq609ed4qocnfcjf1ns2dd8o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;terminated_items_type terminated_items_</a>
+</h3>
+<p class="relationships">See Also: <a href="#458g6q0lcf12dghloo646spcnj">Cleanup the terminated threads.
+This deletes all threads which have been terminated 
+but which are still held in the queue of terminated threads.
+Come schedulers might not do anything here. </a>
+</p>
+<h3 class="topic">
+<a name="3p98aoep4hnu5o9mmt3tk7ftvg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list of terminated threads</a>
+</h3>
+<h3 class="topic">
+<a name="4ep24vv3ann3bg57jrb7fv5puq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef typename TerminatedQueuing::template
+            apply&lt;thread_data*&gt;::type terminated_items_type;</a>
+</h3>
+<h3 class="topic">
+<a name="1tkmqfkpevhshac9m46fbl2jq9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost:atomicstd::int64_t&gt; terminated items count</a>
+</h3>
+<h3 class="topic">
+<a name="3qi9bda1or0ga8ivrrei6muv5t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count of terminated items</a>
+</h3>
+<h3 class="topic">
+<a name="3figd5reuk18i1l05fjni8nbrr">&nbsp;&nbsp;&nbsp;&nbsp;new tasks to run</a>
+</h3>
+<h3 class="topic">
+<a name="4gsuhnau4tsb85bsn7ga4kfnd2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;task_items_type new_tasks_</a>
+</h3>
+<h3 class="topic">
+<a href="#486kt7al9qjc24teib70nuc06n" name="7bmd5gtakvcncj8q3mphbrsohe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list of new tasks to run.&#13;
+These are the "staged" threads.&#13;
+Ie tasks that haven't yet been instantiated as threads &#13;
+and are waiting to be so.</a>
+</h3>
+<h3 class="topic">
+<a name="6446rbediqe0n6ct79tftm7tnd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef typename StagedQueuing::template
+apply&lt;task_description*&gt;::type task_items_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#4p0i6rkhlb7970n6890bqbit02">typedef util::tuple&lt;thread_init_data, thread_state_enum&gt; task_description;</a>
+</p>
+<h3 class="topic">
+<a name="11h0e5s6dm42put216fkppru61">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef util::tuple&lt;thread_init_data, thread_state_enum&gt; task_description;</a>
+</h3>
+<h3 class="topic">
+<a name="6i5i18gdiig55v9t985q0s0vmp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::uint64_t&gt; new_tasks_count_</a>
+</h3>
+<h3 class="topic">
+<a name="24bkpbjvhbn36t7ai3hghvncm7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count of new tasks to run</a>
+</h3>
+<h3 class="topic">
+<a name="0pnenc7b5m1vs0dmjhmoukpq3q">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t max_count_</a>
+</h3>
+<div class="notesContainer">
+<p>why are you not atomic</p>
+</div>
+<h3 class="topic">
+<a name="6v7l1lki49lvj323rv9jg8b8uv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max number of exiting HPX-threads.
+Set in thread_queue::max_thread_count to be 1000
+the cstr picks up on that.
+
+The maximum number of active threads this thread manager should create. 
+This number will be a constraint only as long as the work items queue is not empty. 
+Otherwise the number of active threads will be incremented in steps equal to the in_add_new_count specified above.</a>
+</h3>
+<h3 class="topic">
+<a name="3041i02s738erpjjiivdk6i015">&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_pool memory_pool</a>
+</h3>
+<h3 class="topic">
+<a name="1nptmekmhq29vtcdoi68iac89a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OS thread local memory pools for HPX_threads</a>
+</h3>
+<h3 class="topic">
+<a name="56lh32460ibddsd7tc8su9sjqi">&nbsp;&nbsp;&nbsp;&nbsp;std::list&lt;thread_id_type&gt; thread_heap_small_;
+std::list&lt;thread_id_type&gt; thread_heap_medium_;
+std::list&lt;thread_id_type&gt; thread_heap_large_;
+std::list&lt;thread_id_type&gt; thread_heap_huge_;</a>
+</h3>
+<div class="notesContainer">
+<p>dunno what this is</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="57nmbs27l7575sala3137hah6p">&nbsp;&nbsp;&nbsp;&nbsp;util::block_profiler&lt;add_new_tag&gt; add_new_logger_;</a>
+</h3>
+<h3 class="topic">
+<a name="20ii37q09cmoq1k21clhdj0nqo">&nbsp;&nbsp;&nbsp;&nbsp;yet more data members activated by #ifdefs but I'll ignore those for the moment</a>
+</h3>
+<h3 class="topic">
+<a name="0r1ch4n0cvgvnr6uqga9h60p2i">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="2lkp8c3ibupohhb2t5sh4iq904">&nbsp;&nbsp;&nbsp;&nbsp;void create_thread_object(
+    threads::thread_id_type&amp; thrd,
+    threads::thread_init_data&amp; data, 
+    thread_state_enum state,
+    Lock&amp; lk)</a>
+</h3>
+<h3 class="topic">
+<a name="31acns7ks0bhuam7p21bmg54vo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create a thread object (using threads::thread_data::create)
+with state state and initial data data
+and assign it to argument "thrd".
+Does not affect thread_map</a>
+</h3>
+<h3 class="topic">
+<a name="5cfnvffrble1hf0sem2ptru1ii">&nbsp;&nbsp;&nbsp;&nbsp;void create_thread(
+		thread_init_data&amp; data, 
+		thread_id_type* id,
+        thread_state_enum initial_state,
+		bool run_now, error_code&amp; ec)</a>
+</h3>
+<p class="relationships">See Also: <a href="#1e2qkrajrru5e0pucbn4p710nd">thread_queue.create_thread(...)</a>
+</p>
+<h3 class="topic">
+<a name="5j0cb11hl5s93sdan6h0aahn8l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create a new thread and schedule it if the initial state is equal to pending</a>
+</h3>
+<h3 class="topic">
+<a name="08en7dcp5c85ub1tmomat6ebt6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if run_now = true</a>
+</h3>
+<h3 class="topic">
+<a name="7enk88i3i31p5c2i80m7n587lu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;push the thread to the pending queue thread</a>
+</h3>
+<h3 class="topic">
+<a name="787h3relj86g0540dmkt9076f1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if run_now = false</a>
+</h3>
+<h3 class="topic">
+<a name="4c3n93smk4k12usr0vnu7sms72">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do not execute the work, 
+but register a task description for later thread creation </a>
+</h3>
+<h3 class="topic">
+<a name="4s1jj30hgd9jb92sge3ts6qtja">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment new_tasks_count:</a>
+</h3>
+<h3 class="topic">
+<a name="2mj6cgm73gq5i15gmbd9nj1f31">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create a task_description and push it to the new_tasks_ queue</a>
+</h3>
+<h3 class="topic">
+<a name="0ar1b43dq19ubdoiscoo3icbqg">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t add_new(
+    std::int64_t add_count, 
+    thread_queue* addfrom, 
+    std::unique_lock&lt;mutex_type&gt; &amp;lk, 
+    bool steal = false)</a>
+</h3>
+<h3 class="topic">
+<a name="7d34m2037sbpae9rhqrrln5br8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adds new threads to current instance of thread_queue 
+if there is some amount of work available
+add_count: max number to be added
+
+- pop tasks from the addfrom-queue and use create_thread_object to make threads out of them. 
+- add this thread to the map of all threads, using insert
+- increment the thread_map_count
+- if it is in pending state, add it to the work_items queue
+- return the number of threads added to the work-items queue (aka the pending queue).</a>
+</h3>
+<h3 class="topic">
+<a name="1dpr7kdcubcfpdd4aqgbus3qeb">&nbsp;&nbsp;&nbsp;&nbsp;void schedule_thread(
+    threads::thread_data* thrd,
+    bool other_end = false)</a>
+</h3>
+<h3 class="topic">
+<a name="25s3cdb99hnaa926qkff14bchg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduled the thread thrd passed as argument to the working queue
+- increment the work items count
+- push the thread to the work_items list</a>
+</h3>
+<h3 class="topic">
+<a name="4h4vne2hrtj6gtdvm643uengsg">&nbsp;&nbsp;&nbsp;&nbsp;bool destroy_thread(
+    threads::thread_data* thrd, 
+    std::int64_t&amp; busy_count)</a>
+</h3>
+<h3 class="topic">
+<a name="14nj29p9r20j0jmjdav2cafj5h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destroy the passed thread
+the passed thread is a thread that has been terminated
+
+- check whether the passed thread's pool corresponds to the pool of the current instance of thread_queue
+- add the passed thread to the list of terminated threads
+- increment the corresponding count
+- cleanup if there is more than a certain number of threads on the list of terminated threads.
+- return true if succeeded, false otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="6p8jn8u11h6q9mb1bn7j5f9mbt">&nbsp;&nbsp;&nbsp;&nbsp;inline bool wait_or_add_new(
+    bool running,
+    std::int64_t&amp; idle_loop_count,
+    std::size_t&amp; added,
+    thread_queue* addfrom = nullptr,
+    bool steal = false)</a>
+</h3>
+<h3 class="topic">
+<a name="58ibqsl4rdpo7nb43n61rfnhkp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is a function which gets called periodically by the thread manager 
+to allow for maintenance tasks to be executed in the scheduler. 
+Returns true if the OS thread calling this function has to be terminated 
+(i.e. no more work has to be done).</a>
+</h3>
+<h3 class="topic">
+<a name="1q3lckv06mqits58mtvn8v6vt6">&nbsp;&nbsp;&nbsp;&nbsp;bool get_next_thread(
+    threads::thread_data*&amp; thrd,
+    bool allow_stealing = false,
+    bool steal = false)</a>
+</h3>
+<h3 class="topic">
+<a name="7tvi00lksel4em30eh2ug7ejgf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pop the pointer to the next thread from the thread queue 
+and assign "thrd" a reference to that pointer.
+Returns false if it didn't work.</a>
+</h3>
+<h3 class="topic">
+<a href="#2uva8u9sg47di2lgskkdpjqg2a" name="5cgktbq3qmtkj34kgr9hf7tmp3">&nbsp;thread_data</a>
+</h3>
+<p class="relationships">See Also: <a href="#4a0kctp8mfie7330sjr61jcq7l">thread_init_data (uses this 
+in its 
+constructor
+and in 
+"create_thread" 
+member 
+function)</a>, <a href="#3ubctk6ga1n1l881ji33tltkl0">thread_description (has as 
+data 
+member
+...)</a>, <a href="#41044q3h9bja9av36bqq3omptt">enum thread_state_enum (has as
+data
+member
+...)</a>, <a href="#6gn9gfgq2qu11ijpvjjuttbh4c">enum thread_priority (has as
+data
+member
+...)</a>, <a href="#7r9sqp14d9bsqvbodmf3qpqaio">thread_map_type thread_map</a>, <a href="#546dekou3u0226ntiiemt6efp2">thread_queue (has as a data member 
+an unordered_set of pointers to ... )</a>
+</p>
+<h3 class="topic">
+<a name="00ihjt86upfj2mfqru5pkcdp7g">&nbsp;&nbsp;
+class hpx::threads::thread_data
+
+Representation of a ParalleX thread
+</a>
+</h3>
+<h3 class="topic">
+<a name="48u7pt7u7ohsna5r8gerliaq9t">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1majjjru6e5tb3038eqdvqt0mb">&nbsp;&nbsp;&nbsp;&nbsp;mutable boost::atomic&lt;thread_state&gt; current_state_</a>
+</h3>
+<h3 class="topic">
+<a name="5u6er1v0fpn8tnrmen3i4t2abv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state status word</a>
+</h3>
+<h3 class="topic">
+<a name="1340t2k43hrdick1tic7gudmoo">&nbsp;&nbsp;&nbsp;&nbsp;naming:::address_type component_id_</a>
+</h3>
+<h3 class="topic">
+<a name="4ddn01t019iqt1odftmepvjk66">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;debugging and logging information</a>
+</h3>
+<h3 class="topic">
+<a name="3094rp7303rlbneko7belfvhnj">&nbsp;&nbsp;&nbsp;&nbsp;util::thread_description description_</a>
+</h3>
+<p class="relationships">See Also: <a href="#3ubctk6ga1n1l881ji33tltkl0">thread_description</a>
+</p>
+<h3 class="topic">
+<a name="4bhhn9v4miht44odipb95ds9l2">&nbsp;&nbsp;&nbsp;&nbsp;util::thread_descritpion lco_description_</a>
+</h3>
+<h3 class="topic">
+<a name="0trvh9t6bqc6pivsnb8ieu5acv">&nbsp;&nbsp;&nbsp;&nbsp;thread_id_repr_type parent_thread_id</a>
+</h3>
+<h3 class="topic">
+<a name="0t07fll5basamco0p8648ovr16">&nbsp;&nbsp;&nbsp;&nbsp;std::uint32_t parent_locality_id_</a>
+</h3>
+<h3 class="topic">
+<a name="4q9gk43qfm86v1mshrnage7hbj">&nbsp;&nbsp;&nbsp;&nbsp;mutable thread_state_enum marked_state_</a>
+</h3>
+<p class="relationships">See Also: <a href="#41044q3h9bja9av36bqq3omptt">enum thread_state_enum</a>
+</p>
+<h3 class="topic">
+<a name="00okkb2b2odi1t4nrj38oo8213">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t parent_thread_phase</a>
+</h3>
+<h3 class="topic">
+<a name="5d8vd6abqi8cp1ng0o2gv63hag">&nbsp;&nbsp;&nbsp;&nbsp;thread_priority priority</a>
+</h3>
+<p class="relationships">See Also: <a href="#6gn9gfgq2qu11ijpvjjuttbh4c">enum thread_priority</a>
+</p>
+<h3 class="topic">
+<a name="63m7dukfu71cm8e8gn1arccvcf">&nbsp;&nbsp;&nbsp;&nbsp;bool requested_interrupt</a>
+</h3>
+<h3 class="topic">
+<a name="1v1t94h9lr18tk3ilf08hvab3h">&nbsp;&nbsp;&nbsp;&nbsp;bool ran_exit_funcs</a>
+</h3>
+<h3 class="topic">
+<a name="2a4v2m0u4du3i8d17aec7qjrpu">&nbsp;&nbsp;&nbsp;&nbsp;bool enabled_interrupt</a>
+</h3>
+<h3 class="topic">
+<a name="6fv53iv2r4b5fl9skofqi394gn">&nbsp;&nbsp;&nbsp;&nbsp;std::deque&lt;util::function_nonser&lt;void()&gt; &gt; exit_funcs</a>
+</h3>
+<div class="notesContainer">
+<p>What is this???</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="2d08pl1hguiq962eeod290vd2m">&nbsp;&nbsp;&nbsp;&nbsp;policies::scheduler_base* scheduler_base_</a>
+</h3>
+<h3 class="topic">
+<a name="7daevjp7hsc484sk28msqg3ein">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reference to the scheduler which created/manages this thread</a>
+</h3>
+<h3 class="topic">
+<a name="6ms8nevnkhaue1omnfkfqkhdhv">&nbsp;&nbsp;&nbsp;&nbsp;util::atomic_count count_</a>
+</h3>
+<h3 class="topic">
+<a name="60hofm79lu8i1tvh1i0ro6g07q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reference count </a>
+</h3>
+<h3 class="topic">
+<a name="67o9lojddkptob07tn3vb7db32">&nbsp;&nbsp;&nbsp;&nbsp;std::ptrdiff_t stacksize_</a>
+</h3>
+<h3 class="topic">
+<a name="41nradjqmc2ckufmsif4ahfb22">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a frame 
+(a block of memory used as the thread's stack)</a>
+</h3>
+<h3 class="topic">
+<a href="#2g30nks58r05a0gvbthiumk1b5" name="2irjfgm1pheusokrafpcqoco9h">&nbsp;&nbsp;&nbsp;&nbsp;coroutine_type coroutine_</a>
+</h3>
+<h3 class="topic">
+<a name="7ud08pre4tqu8vuvnn7i2583pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function to execute
+(the thread function)</a>
+</h3>
+<h3 class="topic">
+<a name="3vs126lku0680gib18jrqre5dl">&nbsp;&nbsp;&nbsp;&nbsp;pool_type* pool_</a>
+</h3>
+<div class="notesContainer">
+<p></p>
+<p>typedef boost::lockfree::caching_freelist&lt;thread_data&gt; pool_type;</p>
+</div>
+<p class="relationships">See Also: <a href="#7rdlabann019p7b6lsd15l6glo">typedef boost::lockfree::caching_freelist&lt;thread_data&gt; pool_type</a>
+</p>
+<h3 class="topic">
+<a name="0oki5prodnfv3v2to6052ph674">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="59fnsbdnbioeag6sqpj1fbidoo">&nbsp;&nbsp;&nbsp;&nbsp;constructor
+thread_data(
+    thread_init_data&amp; init_data,
+    pool_type* pool, 
+    thread_state_enum newstate)</a>
+</h3>
+<h3 class="topic">
+<a name="25gh7kcevvo4qjpgosgs0agd6o">&nbsp;&nbsp;&nbsp;&nbsp;static boost::intrusive_ptr&lt;thread_data&gt; create(
+    thread_init_data&amp; init_data, 
+    pool_type&amp; pool,
+    thread_state_enum newstate)</a>
+</h3>
+<h3 class="topic">
+<a name="016rrpkavv9as411766if4pu37">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- allocate space on the pool for a new pointer to a thread_data, then
+- create a pointer to a new thread_data
+- the thread_data is created by calling its cstr with the args init_data, &amp;pool and newstate</a>
+</h3>
+<h3 class="topic">
+<a name="0erc0eg7mh7s293clmk22kh92e">&nbsp;&nbsp;&nbsp;&nbsp;thread_state get_state() const</a>
+</h3>
+<h3 class="topic">
+<a name="0agrlhh29bar2vt5ble91o2ugo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queries the current state of this thread instance.
+Seldom used directly. Most of the time,called by threadmanager::get_state</a>
+</h3>
+<h3 class="topic">
+<a name="4i8kj6lq1gg9g5hnu98l37t9oc">&nbsp;&nbsp;&nbsp;&nbsp;thread_state set_state(
+    thread_state_enum state, 
+    thread_state_ex_enum state_ex = wait_unknown)</a>
+</h3>
+<h3 class="topic">
+<a name="0rbe5im1a03vcmora6rr17p8lc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sets the state of this thread instance to parameter state.
+seldom used directly, usually set through threadmanager.
+WARNING changing the thread state using this function doesn't change its scheduling status! It only sets the status word.
+RETURNS previous state</a>
+</h3>
+<h3 class="topic">
+<a name="02hdblou84juaiprbqs3c5q81o">&nbsp;&nbsp;&nbsp;&nbsp;bool set_state_tagged(
+    thread_state_enum newstate,
+    thread_state&amp; prev_state,
+    thread_state&amp; new_tagged_state)</a>
+</h3>
+<h3 class="topic">
+<a name="70r6utossbvac2vibhvjqd5h20">&nbsp;&nbsp;&nbsp;&nbsp;bool restore_state(
+    thread_state new_state,
+    thread_state old_state)</a>
+</h3>
+<h3 class="topic">
+<a name="139dki5dr0j7rlm76phtr6p3ql">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;changes the state of this thread instance depending on its current state
+Returns true if the state has been changed successfully</a>
+</h3>
+<h3 class="topic">
+<a name="6peh1uhqnn3ortv6trvua6te4t">&nbsp;&nbsp;&nbsp;&nbsp;Lots of pretty trivial get and set functions</a>
+</h3>
+<h3 class="topic">
+<a href="#1ipaosdaop28igbd9jilp8nbd0" name="6fvjnnu376pqc6fb49tpv912t7">&nbsp;&nbsp;&nbsp;&nbsp;coroutine_type::result_type operator()()</a>
+</h3>
+<h3 class="topic">
+<a name="6qabddih5f7ht8m5k20b10i3f8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;execute the thread function
+returns the thread state the thread should be scheduled at from this point on.
+The thread manager will use the returned value to set the thread's scheduling status</a>
+</h3>
+<h3 class="topic">
+<a name="3k7iq3hopc0hs8e3kdrnop25pu">&nbsp;&nbsp;&nbsp;&nbsp;void rebind(
+    thread_init_data&amp; init_data,
+    thread_state_enum newstate
+)</a>
+</h3>
+<h3 class="topic">
+<a name="4a0kctp8mfie7330sjr61jcq7l">&nbsp;thread_init_data</a>
+</h3>
+<p class="relationships">See Also: <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data (uses this 
+in its 
+constructor
+and in 
+"create_thread" 
+member 
+function)</a>, <a href="#3eolvh8lsnkm34ntepj1d9gvth">void register_work(&#13;
+    thread_init_data&amp; data,&#13;
+    thread_state_enum initial_state = pending,&#13;
+    error_code&amp; ec = throws) (added as an item to the thread manager)</a>, <a href="#5okgg0snbbah5bsgaourl7vihc">thread_init_data</a>, <a href="#3ubctk6ga1n1l881ji33tltkl0">thread_description (has as
+data 
+member 
+...)</a>, <a href="#6gn9gfgq2qu11ijpvjjuttbh4c">enum thread_priority (has as
+data
+member
+...)</a>
+</p>
+<h3 class="topic">
+<a name="4jdbpd8bi2s9aifq47trriltot">&nbsp;&nbsp;
+hpx::threads::thread_init_data
+
+movable only
+
+lightweight container for a staged thread, 
+before it is initialized to a real thread and 
+put on to a queue
+(that is done in the register_work method of threadmanager_impl btw)
+</a>
+</h3>
+<h3 class="topic">
+<a name="74htshlphffml4frvk50vfeimg">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a href="#7hm60h37ai7k2kiin0dfsfrebe" name="22j9vtjopjuuk67p9p9hcqgp8a">&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_function_type func</a>
+</h3>
+<h3 class="topic">
+<a name="5onh7ase1kise3b9n3j50efgfo">&nbsp;&nbsp;&nbsp;&nbsp;naming:::address_type lva; </a>
+</h3>
+<h3 class="topic">
+<a name="5bpsmuquldhcrp0mocdc2hlk55">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;only if HPX_HAVE_THREAD_TARGET_ADDRESS is defined</a>
+</h3>
+<h3 class="topic">
+<a name="1bomeon0li10ndgusru0sv7gbu">&nbsp;&nbsp;&nbsp;&nbsp;thread_description description</a>
+</h3>
+<p class="relationships">See Also: <a href="#3ubctk6ga1n1l881ji33tltkl0">thread_description</a>
+</p>
+<h3 class="topic">
+<a name="4bho4ncsd4rurb9ev2bq716teg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used for logging purposes mainly, but may be used for debugging as well</a>
+</h3>
+<h3 class="topic">
+<a name="1j8sbcht76hdfg3ptb8uuq2cp9">&nbsp;&nbsp;&nbsp;&nbsp;std::uint32_t parent_locality_id</a>
+</h3>
+<h3 class="topic">
+<a name="5jn1535i0kk1ngjlcmdqlfo2r6">&nbsp;&nbsp;&nbsp;&nbsp;threads:::thread_id_repr_type parent_id</a>
+</h3>
+<h3 class="topic">
+<a name="0shihe703o6fmf9qv5sn2unrjq">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t parent_phase</a>
+</h3>
+<h3 class="topic">
+<a name="4bng9351mdkt7ntpuac2pf3ldt">&nbsp;&nbsp;&nbsp;&nbsp;std::ptrdiff_t stacksize</a>
+</h3>
+<h3 class="topic">
+<a name="053t56unsd3ckullhcvclqaacd">&nbsp;&nbsp;&nbsp;&nbsp;thread_priority priority</a>
+</h3>
+<p class="relationships">See Also: <a href="#6gn9gfgq2qu11ijpvjjuttbh4c">enum thread_priority</a>
+</p>
+<h3 class="topic">
+<a name="4a2d960cidbk0jd1nr10ij9ekq">&nbsp;&nbsp;&nbsp;&nbsp;policies::scheduler_base</a>
+</h3>
+<h3 class="topic">
+<a name="34mdg8p2nff16ovhlj1sona6j5">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="5v21nnkmle7ucgcinrpoiimk4b">&nbsp;&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="3ubctk6ga1n1l881ji33tltkl0">&nbsp;thread_description</a>
+</h3>
+<p class="relationships">See Also: <a href="#3094rp7303rlbneko7belfvhnj">util::thread_description description_</a>, <a href="#1bomeon0li10ndgusru0sv7gbu">thread_description description</a>, <a href="#4a0kctp8mfie7330sjr61jcq7l">thread_init_data (has as
+data 
+member 
+...)</a>, <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data (has as 
+data 
+member
+...)</a>, <a href="#07gunfdckdfjkdnljto752v5eh">work_items_type work_items</a>
+</p>
+<h3 class="topic">
+<a name="2bvu3uu3t4eglfmkq28rsf7u0j">&nbsp;&nbsp;
+hpx::util::thread_description
+
+- optionally passed as an argument to register_thread.
+- This description will be printed into the logs.
+- useful for debugging and logging
+
+is a data member of
+- thread_init_data
+- thread_data
+</a>
+</h3>
+<h3 class="topic">
+<a name="7g1rj9r221jvgdseeou88dl3gl">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="75i1la2ps6d4dt57trdm484qiv">&nbsp;&nbsp;&nbsp;&nbsp;data_type type_	</a>
+</h3>
+<p class="relationships">See Also: <a href="#219n0m39n3q66rnpg2v2e44vn3">enum data_type</a>
+</p>
+<h3 class="topic">
+<a name="19g69sh990k9iqal8gg7enk1i0">&nbsp;&nbsp;&nbsp;&nbsp;data data_</a>
+</h3>
+<p class="relationships">See Also: <a href="#7i5u589q7eugp2jl6lhmbd7m3s">union data</a>
+</p>
+<h3 class="topic">
+<a name="2kjidelujer5hnu9nqrfi52jks">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="7d8v0jd974rr7lcqqinsp2mshl">&nbsp;&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="7p5c19spj5pbqqfk7vtquq9ld0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default</a>
+</h3>
+<h3 class="topic">
+<a name="6ja55f3kute0jm4gooub1v4l0q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from char* const</a>
+</h3>
+<h3 class="topic">
+<a name="22rgietj4radpiae802bl5apf7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and more</a>
+</h3>
+<h3 class="topic">
+<a name="68ljgrshhb1onqrhppfik4uh02">&nbsp;&nbsp;&nbsp;&nbsp;queries</a>
+</h3>
+<h3 class="topic">
+<a name="1ohbo4kk5r7rtogfu99ri3herp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data_type kind()</a>
+</h3>
+<h3 class="topic">
+<a name="4bjinsql2f45u0ufhs0fehscs2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns data member type_</a>
+</h3>
+<h3 class="topic">
+<a name="7ia62kt720qp396qlrld50kbva">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;char const* get_description()</a>
+</h3>
+<h3 class="topic">
+<a name="1e045u466kq1ltckiu8v1h809d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_address() </a>
+</h3>
+<h3 class="topic">
+<a name="0vrm7c4nf8ea5rq6js99fv1s0c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool valid()</a>
+</h3>
+<h3 class="topic">
+<a name="4r1m4t7sfvkqv45spafiesak58">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns true if data members hold values</a>
+</h3>
+<h3 class="topic">
+<a name="41044q3h9bja9av36bqq3omptt">&nbsp;enum thread_state_enum</a>
+</h3>
+<p class="relationships">See Also: <a href="#6i1ra9vmms2r0senr4evu96jb7">enum hpx::state (counterpart of)</a>, <a href="#4q9gk43qfm86v1mshrnage7hbj">mutable thread_state_enum marked_state_</a>, <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data (has as
+data
+member
+...)</a>
+</p>
+<h3 class="topic">
+<a href="#1l1qd2p247u405lqt8rl8lvftd" name="0d9reks0kqpdk0hu4svka3tpg5">&nbsp;&nbsp;
+encodes the current state of a thread instance
+
+in thread_enums.hpp
+</a>
+</h3>
+<h3 class="topic">
+<a href="#23s87bc73j2fqof5enge6isoqk" name="3clu4r826dnt1shap8j379c3su">&nbsp;&nbsp;&nbsp;0. unknown</a>
+</h3>
+<h3 class="topic">
+<a href="#4tapi41eif78nhksff979vc26t" name="2b61l2bnrjvhl9pd1cchg1gvrb">&nbsp;&nbsp;&nbsp;1. active</a>
+</h3>
+<h3 class="topic">
+<a name="4gm5o8ebm4rc6bfmf7s1m9bnb5">&nbsp;&nbsp;&nbsp;&nbsp;this thread is currently active
+(is running, has resources)</a>
+</h3>
+<h3 class="topic">
+<a href="#5c5mippu6mkj01t7tbhpblqfk4" name="0smlkt422q9fg739u8o8924rhd">&nbsp;&nbsp;&nbsp;2. pending</a>
+</h3>
+<h3 class="topic">
+<a name="1t8otpnoheqv2csnsqus9288ja">&nbsp;&nbsp;&nbsp;&nbsp;this thread is pending
+(ready to run, but  there are no hardware resources available)</a>
+</h3>
+<h3 class="topic">
+<a href="#5it9ndf61j4b44c7a9d882csj8" name="7f6ihspgo7459s12meq3c23pqa">&nbsp;&nbsp;&nbsp;3. suspended</a>
+</h3>
+<h3 class="topic">
+<a name="165u2l015ma97pj88227evl2g6">&nbsp;&nbsp;&nbsp;&nbsp;this thread has been suspended
+(it is waiting for a synchronization event, 
+but is still known andunder control of the thread manager)</a>
+</h3>
+<h3 class="topic">
+<a href="#5hlut54a85sn833of29qdkb9qt" name="3ajfoaulh0dnjbkvbgq16s4029">&nbsp;&nbsp;&nbsp;4. depleted</a>
+</h3>
+<div class="notesContainer">
+<p>when does this happen???</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="59108jq2aoi1up0vja2jkhuhmi">&nbsp;&nbsp;&nbsp;&nbsp;this thread has been depleted
+(deeply suspended, 
+it is not known by the thread manager)</a>
+</h3>
+<h3 class="topic">
+<a href="#748sc0flhtgpr7eeaskfrqgnji" name="288satl2pub5ss36kvs8n5ngu5">&nbsp;&nbsp;&nbsp;5. terminated</a>
+</h3>
+<h3 class="topic">
+<a name="3qft38objv6k5a3k7itern9vhp">&nbsp;&nbsp;&nbsp;&nbsp;this thread has been stopped and may now be garbage collected</a>
+</h3>
+<h3 class="topic">
+<a href="#486kt7al9qjc24teib70nuc06n" name="6lr14r8bf1aroulabk2vfv26oj">&nbsp;&nbsp;&nbsp;6. staged</a>
+</h3>
+<h3 class="topic">
+<a name="12gsec3s1lvfaaphm4kel3sbkd">&nbsp;&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to reference staged task descriptions
+which will eventually be converted to thread objects</a>
+</h3>
+<h3 class="topic">
+<a href="#363m36maps56epiq48v0aeu1h7" name="3ka01lp3j79od858ocrvicjvlf">&nbsp;&nbsp;&nbsp;7. pending_do_not_schedule</a>
+</h3>
+<h3 class="topic">
+<a name="3rs2hor53bg0dgc3p4le53u2hj">&nbsp;&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to create a thread in pending state 
+without scheduling it
+(internal, do not use)</a>
+</h3>
+<h3 class="topic">
+<a href="#2bemfbht0lj3lg8ppkbchukea2" name="0pfk7vi10u06t8c0k3stkoa6u0">&nbsp;&nbsp;&nbsp;8. pending_boost</a>
+</h3>
+<h3 class="topic">
+<a name="1mu3lpb828e35vfkdb4g2lt1sb">&nbsp;&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to suspend a thread in pending state
+without high priority rescheduling</a>
+</h3>
+<h3 class="topic">
+<a name="6gn9gfgq2qu11ijpvjjuttbh4c">&nbsp;enum thread_priority</a>
+</h3>
+<p class="relationships">See Also: <a href="#5d8vd6abqi8cp1ng0o2gv63hag">thread_priority priority</a>, <a href="#053t56unsd3ckullhcvclqaacd">thread_priority priority</a>, <a href="#4a0kctp8mfie7330sjr61jcq7l">thread_init_data (has as
+data
+member
+...)</a>, <a href="#5cgktbq3qmtkj34kgr9hf7tmp3">thread_data (has as
+data
+member
+...)</a>
+</p>
+<h3 class="topic">
+<a name="1k04hj95d8bcpl42dgtf6rnr8b">&nbsp;&nbsp;
+encodes the priority of a thread instance
+</a>
+</h3>
+<h3 class="topic">
+<a name="5h5vde2oh4fi68amc0e3m2i98n">&nbsp;&nbsp;&nbsp;unknown = -1</a>
+</h3>
+<h3 class="topic">
+<a name="7o87qclro651ohmuoc1iq5gnj4">&nbsp;&nbsp;&nbsp;default = 0</a>
+</h3>
+<h3 class="topic">
+<a name="3l8re4hujaol2vhvls8ii2ivoj">&nbsp;&nbsp;&nbsp;low=1</a>
+</h3>
+<h3 class="topic">
+<a name="322td0jm9io99l6erod8lkt0j8">&nbsp;&nbsp;&nbsp;normal = 2</a>
+</h3>
+<h3 class="topic">
+<a name="51nqsd1fo11n8qp1e76u7iokmv">&nbsp;&nbsp;&nbsp;&nbsp;is the default</a>
+</h3>
+<h3 class="topic">
+<a name="6bob752f859qrvr5u1ms8ausgb">&nbsp;&nbsp;&nbsp;critical  =3</a>
+</h3>
+<h3 class="topic">
+<a name="48m6aic32j4gg2v58p2t6m2lmc">&nbsp;&nbsp;&nbsp;boost = 4</a>
+</h3>
+<h3 class="topic">
+<a name="10ffvm02evmhicuo5lp3inu7f6">&nbsp;&nbsp;&nbsp;&nbsp;high thread  priority for first invocation, normal afterwards</a>
+</h3>
+<h2 class="topic">
+<a name="2iee6tv02d4hk02fh5flgdsgvp">part of 
+performance counting</a>
+</h2>
+<h3 class="topic">
+<a name="3rj5hl8vh8b17hf96le2pjlig2">&nbsp;thread_mapper</a>
+</h3>
+<div class="notesContainer">
+<p>Don't understand what he des exactly...</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="1co4jq17efqjoklnc7uidit3om">&nbsp;&nbsp;
+file: thread_mapper.hpp
+
+hpx::util::thread_mapper
+
+non-copyable
+
+enumerates active OS-threads
+and maintains their meta-data
+
+Part of the performance counting: 
+not used in actual OS/HPX-thread management
+</a>
+</h3>
+<h3 class="topic">
+<a name="2ia5id7bho1i7liuca0c8bdch5">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="11lchnfl8037umbns2pgqj5h15">&nbsp;&nbsp;&nbsp;&nbsp;static members</a>
+</h3>
+<h3 class="topic">
+<a name="3r0pkcaumkm9ti6i0o2ikf3rhm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static std::uint32_t const invalid_index</a>
+</h3>
+<h3 class="topic">
+<a name="424vddujtn4io8lvpjjkne4jbc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;erroneous thread index</a>
+</h3>
+<h3 class="topic">
+<a name="3db4qkh4i8241ch3cnsi83h5nc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static long const invalid_tid</a>
+</h3>
+<h3 class="topic">
+<a name="4vobrpj3s7g3onbuvnoivj5qi8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;erroneous low-level thread ID</a>
+</h3>
+<h3 class="topic">
+<a name="7lcmtgqq6sco60l98cc0v5g4sh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static const std::string invalid_label</a>
+</h3>
+<h3 class="topic">
+<a name="2vck6o0639hnr98kfjbj0dotem">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;empty label for failed lookups</a>
+</h3>
+<h3 class="topic">
+<a name="5ib7f09df6nvna901iog80i1b0">&nbsp;&nbsp;&nbsp;&nbsp;mutable mutex_type mtx_</a>
+</h3>
+<h3 class="topic">
+<a name="5rqfvgdtcikh7oi8tu90oct6mj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main lock</a>
+</h3>
+<h3 class="topic">
+<a name="4mbb86rsnhspms0dfisb2ud4jq">&nbsp;&nbsp;&nbsp;&nbsp;thread_map_type thread_map_</a>
+</h3>
+<p class="relationships">See Also: <a href="#4vnb2ichog64orqeshqk44lti8">typedef std::map&lt;boost::thread::id, std::uint32_t&gt; thread_map_type;</a>
+</p>
+<h3 class="topic">
+<a name="20fdsb6cb8kqganq5p76p2lb4q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping from boost thread IDs to OS-thread indices</a>
+</h3>
+<h3 class="topic">
+<a name="3bnko83o7gkko82lihao0vie4n">&nbsp;&nbsp;&nbsp;&nbsp;label_map_type label_map</a>
+</h3>
+<p class="relationships">See Also: <a href="#75ae5boehmpsal5vc5as4uv6i2">typedef boost::bimap&lt;std::string, std::uint32_t&gt; label_map_type;</a>
+</p>
+<h3 class="topic">
+<a name="4hi4oqcnrkpbf8ds3qkc5dpkab">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping between HPX thread labels and thread indices</a>
+</h3>
+<h3 class="topic">
+<a name="2chhlrs0c397nnm771q37cmiqf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef boost::bimap&lt;std::string, std::uint32_t&gt; label_map_type;</a>
+</h3>
+<h3 class="topic">
+<a name="73g8ru24joo9q5ddff46hr5pdd">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;thread_data&gt; thread_info_</a>
+</h3>
+<h3 class="topic">
+<a name="17bk9km729j20jcovo5cb1hdpi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table of OS/kernel-thread specific data</a>
+</h3>
+<h3 class="topic">
+<a name="40m1sl2pk5gbv91vhffk61d95k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;struct thread_data</a>
+</h3>
+<h3 class="topic">
+<a name="22f0nolfa9m3vqssi2uglfpe4o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;encapsulates the thread-specific data</a>
+</h3>
+<h3 class="topic">
+<a name="25ft2fithc81j5lkot99r4a4gd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long int tid_</a>
+</h3>
+<h3 class="topic">
+<a name="5j9qs3fcj5fi3dd6bcvgvc96rq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;associated system thread ID that can be passed to PAPI_attach
+typically an ID of a kernel thread</a>
+</h3>
+<h3 class="topic">
+<a name="13mpvd3otnf860sfa248s2gf4b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback_type cleanup_</a>
+</h3>
+<h3 class="topic">
+<a name="7782ue33usmfa116fstjl45c43">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback function invoked when unregistering a thread</a>
+</h3>
+<h3 class="topic">
+<a name="515j21gl3p3p6rnmcfi16ataum">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="0smnj8qav1ingrdn4prulbi2n8">&nbsp;&nbsp;&nbsp;&nbsp;static bool null_cb(std::uint32_t)</a>
+</h3>
+<h3 class="topic">
+<a name="2op6rt1s152kia8fnl3f7s0ept">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;null callback</a>
+</h3>
+<h3 class="topic">
+<a name="76flhre89uqf19b1qjqdfl3h41">&nbsp;&nbsp;&nbsp;&nbsp;long int get_system_thread_id()</a>
+</h3>
+<h3 class="topic">
+<a name="3mq0j1npa2qnlruan99e2c4a16">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;retrieve low level ID of caller thread (system dependent)</a>
+</h3>
+<h3 class="topic">
+<a name="5ei1c9ck0ab2pmqjdd5r6i5gpa">&nbsp;&nbsp;&nbsp;&nbsp;bool unmap_thread(thread_map_type::iterator&amp;)</a>
+</h3>
+<h3 class="topic">
+<a name="1sgbbg3pd1o8o3d2aq3p9a101p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unmap thread being unregistered</a>
+</h3>
+<h3 class="topic">
+<a name="1e1hocun3dsv8747bticdsuii7">&nbsp;&nbsp;&nbsp;&nbsp;bool unregister_thread()</a>
+</h3>
+<h3 class="topic">
+<a name="4014evb97de5eekgte57172l7i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unregisters the calling OS thread</a>
+</h3>
+<h3 class="topic">
+<a name="7mhom3uajkncpct773vtbahlvr">&nbsp;&nbsp;&nbsp;&nbsp;bool register_callback(std::uint32_t tix, callback_type const&amp;)</a>
+</h3>
+<h3 class="topic">
+<a name="1cna5fcmq6466enpdki21aijfs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;register callback function for a thread
+invoked when unregistering that thread</a>
+</h3>
+<h3 class="topic">
+<a name="7brk0p4q7lj97hosf9irmmi1kn">&nbsp;&nbsp;&nbsp;&nbsp;bool revoke_callback(std::uint32_t tix)</a>
+</h3>
+<h3 class="topic">
+<a name="5tjtgfci7eusug23m207idb23f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cancel callback</a>
+</h3>
+<h3 class="topic">
+<a name="62r9lru0k62t3eumkbe8r832ie">&nbsp;&nbsp;&nbsp;&nbsp;long int get_thread_id(std::uint32_t tix) const</a>
+</h3>
+<h3 class="topic">
+<a name="64be5m6b06rug2dcaf6lfv3ltn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns low level thread id</a>
+</h3>
+<h3 class="topic">
+<a name="49p9uknbjtsluki81vi3keat4c">&nbsp;&nbsp;&nbsp;&nbsp;std::string const&amp; get_thread_label(std::uint32_t tix) const</a>
+</h3>
+<h3 class="topic">
+<a name="39ah8kviqp0ktgkbenoc6k7jlm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns the label of registered thread tix</a>
+</h3>
+<h3 class="topic">
+<a name="0vtihmeogbg12i8hpr82fo4jdg">&nbsp;&nbsp;&nbsp;&nbsp;std::uint32_t get_thread_index(std::uint32_t tix) const</a>
+</h3>
+<h3 class="topic">
+<a name="73683sus1sc15osamamkmcudrq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns unique index based on registered thread label</a>
+</h3>
+<h3 class="topic">
+<a name="5nbq8qhm2phe1ur7obfte2rgal">&nbsp;&nbsp;&nbsp;&nbsp;std::uint32_t get_thread_count() const</a>
+</h3>
+<h3 class="topic">
+<a name="01m9inepjlnf14ik6lseelfnli">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns the number of threads registered so far</a>
+</h3>
+<h2 class="topic">
+<a name="54nhded01s5bogdhem31kepffh">part of the API</a>
+</h2>
+<h3 class="topic">
+<a name="31lj57ljopk553r31783d60mce">&nbsp;thread</a>
+</h3>
+<p class="relationships">See Also: <a href="#5cpfdf3shh6d209ast340bqclb">thread::id (friend of)</a>
+</p>
+<h3 class="topic">
+<a name="22rhnl34i6tc6490hit8r0o2sk">&nbsp;&nbsp;
+in file: thread.hpp
+class hpx::thread
+
+movable only
+
+HPX reimplementation of a std::thread.
+That is a class part of the API which allows to manually 
+spawn and join threads
+</a>
+</h3>
+<h3 class="topic">
+<a name="7uk7obg6fk83d62sp9188cnd9b">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="35usfvhtf1264batjecral9b1g">&nbsp;&nbsp;&nbsp;&nbsp;mutable mutex_type mtx_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#325nj899n1qgctbpi1bocvedbu">typedef lcos::local::spinlock mutex_type;</a>
+</p>
+<h3 class="topic">
+<a name="5k3b215eop2c0qtu6e7spuea5b">&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_id_type id_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#4pmpskia1uh3ot8uv1u4l3l627">typedef boost::intrusive_ptr&lt;threads::thread_data&gt; thread_id_type;</a>
+</p>
+<h3 class="topic">
+<a name="1ac2r2k1p3gr1buu201msc62ac">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="6r10r97gvju1j57rlu8ism69bb">&nbsp;&nbsp;&nbsp;&nbsp;cstr. etc.</a>
+</h3>
+<h3 class="topic">
+<a name="636a8kva905o3fs23ovtqockoh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"move" constructor</a>
+</h3>
+<h3 class="topic">
+<a name="0t6ribo18i655vbfrd49snqth9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default constructor</a>
+</h3>
+<h3 class="topic">
+<a name="7l0fgv3fq0abhs1p3dv12ln8mi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="7sb6ai965vme2irbf35knugdcv">&nbsp;&nbsp;&nbsp;&nbsp;stuff you would expect
+from a thread</a>
+</h3>
+<h3 class="topic">
+<a name="4rrsvmtcskhrpoeq73dm3o34or">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;swap</a>
+</h3>
+<h3 class="topic">
+<a name="2ag2oiqlt77lo0hl0vf7tkcpjh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool joignable()</a>
+</h3>
+<h3 class="topic">
+<a name="11iusk5sq5sf0ongjr4oujkghk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void join()</a>
+</h3>
+<h3 class="topic">
+<a name="5envo6qoc8qa6oa2v2v3h38d0g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void detach() </a>
+</h3>
+<h3 class="topic">
+<a name="09c0fm2roimob3dt9oma6thg0c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id get_id()</a>
+</h3>
+<h3 class="topic">
+<a name="1682tel6nq0451l3n5qp6dq7st">&nbsp;&nbsp;&nbsp;&nbsp;extensions</a>
+</h3>
+<h3 class="topic">
+<a name="3aob02676pqonadad6ed0m4stb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void interrupt(bool flag = true)</a>
+</h3>
+<h3 class="topic">
+<a name="40i7mnea23b2r30t6mju2294fm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool interruption_requested() const;</a>
+</h3>
+<h3 class="topic">
+<a name="3cqvhqqspmr5q2tkksad4c1rb2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static void interrupt(id, bool flag = true)</a>
+</h3>
+<h3 class="topic">
+<a name="6va48frthock0a5vkbrcu6164l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcos::future&lt;void&gt; get_future(error_code&amp; ec = throws);</a>
+</h3>
+<h3 class="topic">
+<a name="6dqub95shgakmda764pgpnudq6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_T get_thread_data() const;</a>
+</h3>
+<h3 class="topic">
+<a name="1s4gd4md1p1drk5cah4k3a1n80">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t set_thread_data(std::size_t);</a>
+</h3>
+<h3 class="topic">
+<a name="2vvaq9b6nls0fdada6mus1v5sc">&nbsp;&nbsp;&nbsp;&nbsp;other</a>
+</h3>
+<h3 class="topic">
+<a name="73upc7ll9b13d5afa917doa01m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void terminate(cont char* function, const char* reason) const;</a>
+</h3>
+<h3 class="topic">
+<a name="47k8s3ort4qn11rmij40pvehmo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assignment operator</a>
+</h3>
+<h3 class="topic">
+<a name="7ij4jnq3sot9d14f1foecatqkg">&nbsp;&nbsp;&nbsp;&nbsp;some more private ones...</a>
+</h3>
+<h3 class="topic">
+<a name="60roqalv1c662d1ebaggga1dct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool joinable_locked() const</a>
+</h3>
+<h3 class="topic">
+<a name="6tklob3nu8sil2de8cf9uallj6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void detach_locked()</a>
+</h3>
+<h3 class="topic">
+<a name="0m6s8ftj1q4v8c8ak5uqhfkcpr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void start_thread(util::unique_function_nonser&lt;void()&gt;&amp;&amp; func);</a>
+</h3>
+<h3 class="topic">
+<a name="7dm4rs10g162mj53cvnem8a3e1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static thread::thread_result_type thread_function_nullary(
+    util::unique_function_nonser&lt;void()&gt; const&amp; func);</a>
+</h3>
+<h3 class="topic">
+<a name="5cpfdf3shh6d209ast340bqclb">&nbsp;thread::id</a>
+</h3>
+<p class="relationships">See Also: <a href="#31lj57ljopk553r31783d60mce">thread (friend of)</a>
+</p>
+<h3 class="topic">
+<a name="5srah0fve1u4kkn243p6oe1731">&nbsp;&nbsp;
+Class used to identify threads
+friend of class hpx::thread
+used for comparison operations
+</a>
+</h3>
+<p class="relationships">See Also: <a href="#4pmpskia1uh3ot8uv1u4l3l627">typedef boost::intrusive_ptr&lt;threads::thread_data&gt; thread_id_type;</a>
+</p>
+<h3 class="topic">
+<a name="1mofcgp0hrnnkkscpgakh98s8t">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="5qj0v235orqmknkr36o7pph1s2">&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_id_type id_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#4pmpskia1uh3ot8uv1u4l3l627">typedef boost::intrusive_ptr&lt;threads::thread_data&gt; thread_id_type;</a>
+</p>
+<h3 class="topic">
+<a name="3v16h1g5b2kirpcmd3b0cd9g9d">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="5bspqt6mglpar3le6gp1302cse">&nbsp;&nbsp;&nbsp;&nbsp;operators</a>
+</h3>
+<h3 class="topic">
+<a name="75bledsidu7ulo2gu3qi9rgfn1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==</a>
+</h3>
+<h3 class="topic">
+<a name="17n1se5590jkdfqg2d5heqk4j6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!=</a>
+</h3>
+<h3 class="topic">
+<a name="6om466kftjl2lemq5o9ll3a78d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</a>
+</h3>
+<h3 class="topic">
+<a name="0po05c4n4tb1caf7fpq18bnl5a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="2uqvr346prc05649h41cbletac">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=</a>
+</h3>
+<h3 class="topic">
+<a name="21gvq1s1jfka4h2oe9doedl46v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt;=</a>
+</h3>
+<h3 class="topic">
+<a name="4iftt93223k40ag7qdess379pk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&lt;</a>
+</h3>
+<h3 class="topic">
+<a name="5iq8899bt0gvuoe906p4ga9epf">&nbsp;&nbsp;&nbsp;&nbsp;cstr. etc.</a>
+</h3>
+<h3 class="topic">
+<a name="11h40doc8qua438sk5m476if8a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default</a>
+</h3>
+<h3 class="topic">
+<a name="2kb8oa9d0pd1p4mommg6grdo0l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;copy</a>
+</h3>
+<h3 class="topic">
+<a name="6bjr9lqif9ootb5dpkmc0j4rui">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;move</a>
+</h3>
+<h2 class="topic">
+<a name="33pt6jueb2ui41086l6h34ep8v">io_service_pool</a>
+</h2>
+<div class="notesContainer">
+<p>a pool of io service objects</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="784nv1m1248tf7vm1f58cg591v">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="7e6b6at9jndsd7uq847ie4plcf">&nbsp;&nbsp;std::vector&lt;io_service_ptr&gt; io_services_</a>
+</h3>
+<h3 class="topic">
+<a name="2pfiss29dhkpobb6l4s69jcvdk">&nbsp;&nbsp;std::vector&lt;boost::thread&gt; threads_</a>
+</h3>
+<h3 class="topic">
+<a name="5ih6lbqjdhq3o0athv9cd605lk">&nbsp;&nbsp;std::vector&lt;work_type&gt; work_</a>
+</h3>
+<h3 class="topic">
+<a name="6rht7ne9lka7tc6ulqp3vjckif">&nbsp;&nbsp;&nbsp;the work that keeps the io services running</a>
+</h3>
+<h3 class="topic">
+<a name="3ej3fqfm67lrc804s06f5nucn1">&nbsp;&nbsp;bool stopped_</a>
+</h3>
+<h3 class="topic">
+<a name="01gkmj7n3opjt2q9ie0kc1kqsu">&nbsp;&nbsp;&nbsp;set to true if stopped</a>
+</h3>
+<h3 class="topic">
+<a name="5rh79js17r08ssq8ilicovng2e">&nbsp;&nbsp;std::size_t const pool_size</a>
+</h3>
+<h3 class="topic">
+<a name="197k1rpfiubng6pidcmjtat2pb">&nbsp;&nbsp;&nbsp;initial number of OS threads to execute in this pool</a>
+</h3>
+<h3 class="topic">
+<a name="2ia6j0h62m82l4vmrqis6o6kuo">&nbsp;&nbsp;util::function_nonser&lt;void(std::size_t, char const*)&gt; on_start_thread_</a>
+</h3>
+<h3 class="topic">
+<a name="089aku41qhf5g6oapnskjc115t">&nbsp;&nbsp;util::function_nonser&lt;void()&gt; on_stop_thread_</a>
+</h3>
+<h3 class="topic">
+<a name="40og5aoovafrj1pghr5n09bkn9">&nbsp;&nbsp;char const* pool_name_</a>
+</h3>
+<h3 class="topic">
+<a name="154jfr8dfrmsqgs2478jvpmqjr">&nbsp;&nbsp;char const* pool_name_postfix_</a>
+</h3>
+<h3 class="topic">
+<a name="58n0gs7de65q67ub41fn80vh08">&nbsp;&nbsp;the pool of io services</a>
+</h3>
+<p class="summary">(<a href="#7e6b6at9jndsd7uq847ie4plcf">std::vector&lt;io_service_ptr&gt; io_services_</a>, <a href="#2pfiss29dhkpobb6l4s69jcvdk">std::vector&lt;boost::thread&gt; threads_</a>)</p>
+<h3 class="topic">
+<a name="2rm4kop38dd9fqeenlb572rp4f">&nbsp;&nbsp;call these for each thread start or stop</a>
+</h3>
+<p class="summary">(<a href="#2ia6j0h62m82l4vmrqis6o6kuo">util::function_nonser&lt;void(std::size_t, char const*)&gt; on_start_thread_</a>, <a href="#089aku41qhf5g6oapnskjc115t">util::function_nonser&lt;void()&gt; on_stop_thread_</a>)</p>
+<h3 class="topic">
+<a name="17uoaf96iepg1l8mt6ohhapodv">&nbsp;member functions</a>
+</h3>
+<h2 class="topic">
+<a name="3k6an6kf1ggfta0v85gk3qdfut">enums and typedefs to keep in mind</a>
+</h2>
+<h3 class="topic">
+<a name="4pmpskia1uh3ot8uv1u4l3l627">&nbsp;typedef boost::intrusive_ptr&lt;threads::thread_data&gt; thread_id_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#5k3b215eop2c0qtu6e7spuea5b">threads::thread_id_type id_;</a>, <a href="#5qj0v235orqmknkr36o7pph1s2">threads::thread_id_type id_;</a>, <a href="#5srah0fve1u4kkn243p6oe1731">
+Class used to identify threads
+friend of class hpx::thread
+used for comparison operations
+</a>
+</p>
+<h3 class="topic">
+<a name="325nj899n1qgctbpi1bocvedbu">&nbsp;typedef lcos::local::spinlock mutex_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#35usfvhtf1264batjecral9b1g">mutable mutex_type mtx_;</a>
+</p>
+<h3 class="topic">
+<a name="6qf0t7b50g1apicn7t99otscc5">&nbsp;typedef boost::mutex mutex_type; </a>
+</h3>
+<div class="notesContainer">
+<p>(in file threadmanager_impl.hpp and thread_queue.hpp</p>
+</div>
+<p class="relationships">See Also: <a href="#0vquom2gfue8jhsgf39ruf6mg2">mutable mutex_type mtx_</a>, <a href="#313qfn150a9td7vojb010qh1dh">mutable mutex_type mtx_</a>
+</p>
+<h3 class="topic">
+<a name="7b2o45ktm1s5qm4oj35tpb3f33">&nbsp;typedef std::unordered_set&lt;thread_id_type&gt; thread_map_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#7r9sqp14d9bsqvbodmf3qpqaio">thread_map_type thread_map</a>
+</p>
+<h3 class="topic">
+<a name="1v4e7sqr94n3h0arh7rrghfi4g">&nbsp;&nbsp;this is the type of a map holding all threads 
+(except depleted ones)</a>
+</h3>
+<h3 class="topic">
+<a name="0vhtj4s9psj70188o2dv7cl9u9">&nbsp;&nbsp;&nbsp;std::unordered_set
+
+An associative container that contains a set of unique objects of type Key. 
+Search, insertion, and removal have average constant-time complexity.
+Internally, the elements are not sorted in any particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the hash of its value. This allows fast access to individual elements, since once a hash is computed, it refers to the exact bucket the element is placed into.
+Container elements may not be modified (even by non const iterators) since modification could change an element's hash and corrupt the container. </a>
+</h3>
+<h3 class="topic">
+<a name="4vnb2ichog64orqeshqk44lti8">&nbsp;typedef std::map&lt;boost::thread::id, std::uint32_t&gt; thread_map_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#4mbb86rsnhspms0dfisb2ud4jq">thread_map_type thread_map_</a>
+</p>
+<h3 class="topic">
+<a name="4273nemtco026qmmkpmqn6tc9h">&nbsp;&nbsp;mapping from boost thread ids to OS thread indices</a>
+</h3>
+<h3 class="topic">
+<a name="75ae5boehmpsal5vc5as4uv6i2">&nbsp;typedef boost::bimap&lt;std::string, std::uint32_t&gt; label_map_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#3bnko83o7gkko82lihao0vie4n">label_map_type label_map</a>
+</p>
+<h3 class="topic">
+<a name="7rdlabann019p7b6lsd15l6glo">&nbsp;typedef boost::lockfree::caching_freelist&lt;thread_data&gt; pool_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#3vs126lku0680gib18jrqre5dl">pool_type* pool_</a>
+</p>
+<h3 class="topic">
+<a name="219n0m39n3q66rnpg2v2e44vn3">&nbsp;enum data_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#75i1la2ps6d4dt57trdm484qiv">data_type type_	</a>
+</p>
+<h3 class="topic">
+<a name="4a4jh2mleuvcnel0vqrsvt8ris">&nbsp;&nbsp;enumerator of underlying type int which can take two values</a>
+</h3>
+<h3 class="topic">
+<a name="3cdtenam5108e96ovdsadvl1dp">&nbsp;&nbsp;data_type_description</a>
+</h3>
+<h3 class="topic">
+<a name="4vevnvjmi8ihu738c9j0geh3j8">&nbsp;&nbsp;data_type_address</a>
+</h3>
+<h3 class="topic">
+<a name="7i5u589q7eugp2jl6lhmbd7m3s">&nbsp;union data</a>
+</h3>
+<p class="relationships">See Also: <a href="#19g69sh990k9iqal8gg7enk1i0">data data_</a>
+</p>
+<h3 class="topic">
+<a name="741oo1vhfmucit6175n2eo9jdh">&nbsp;&nbsp;union with two members (only one member is held at a time) </a>
+</h3>
+<h3 class="topic">
+<a name="048j3912gfiom1nkbqtc4l3ger">&nbsp;&nbsp;char const* descr_</a>
+</h3>
+<h3 class="topic">
+<a name="66luie2rhhf8jj6ma6q72qbgod">&nbsp;&nbsp;std::size_t addr_</a>
+</h3>
+<h3 class="topic">
+<a name="4p0i6rkhlb7970n6890bqbit02">&nbsp;typedef util::tuple&lt;thread_init_data, thread_state_enum&gt; task_description;</a>
+</h3>
+<div class="notesContainer">
+<p>in thread_queue.hpp</p>
+</div>
+<p class="relationships">See Also: <a href="#6446rbediqe0n6ct79tftm7tnd">typedef typename StagedQueuing::template
+apply&lt;task_description*&gt;::type task_items_type;</a>
+</p>
+<h3 class="topic">
+<a name="1ocn566jo4ic2rv820a5cd1o75">&nbsp;typedef util::function_nonser&lt;&#13;
+            void(std::size_t, char const*)&gt; on_startstop_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#2dmp08ednrs45cve3aas8rimme">on_startstop_type on_stop_thread_</a>
+</p>
+<h3 class="topic">
+<a name="202hub8atmbc852o0vorrql0uj">&nbsp;typedef util::function_nonser&lt;&#13;
+            void(std::size_t, boost::exception_ptr const&amp;)&gt; on_error_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#772nsgh5p3rku59mqgc6lkarbv">on_startstop_type on_start_thread_</a>
+</p>
+<h3 class="topic">
+<a name="0214hqea83v479funju3th97co">&nbsp;typedef typename PendingQueuing::template
+    apply&lt;thread_description*&gt;::type work_items_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#07gunfdckdfjkdnljto752v5eh">work_items_type work_items</a>
+</p>
+<h2 class="topic">
+<a name="4qfmpu3ibcta37dkr6o7cqcada">
+		OS - threads		
+</a>
+</h2>
+<h3 class="topic">
+<a name="6t46ltndb0evubmqbjnk2jfjhj">&nbsp;hpx::threads::threadmanager_base</a>
+</h3>
+<p class="relationships">See Also: <a href="#7qsajurpk86lbi06tuckop0fme">threadmanager_impl (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="710cu8o5h8nst75gb5fpq0qa8n">&nbsp;&nbsp;
+in file: runtime/threads/threadmanager.hpp
+
+non copyable struct
+
+Abstract base class for (OS-)thread managers
+</a>
+</h3>
+<h3 class="topic">
+<a name="2jevbrk2clfq0p11u4do49omev">&nbsp;&nbsp;&nbsp;data members: none</a>
+</h3>
+<h3 class="topic">
+<a name="6piurstodad94hqs8qtsagsfuj">&nbsp;&nbsp;&nbsp;member functions: 
+all virtual except constructor
+just a few helper functions 
+defined in threadmanager_base.cpp</a>
+</h3>
+<h3 class="topic">
+<a name="1fbo30kv4uvljdj21pb0gbbjii">&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="30jsjannot467ro347q60oqnml">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;threadmanager_base() {}</a>
+</h3>
+<h3 class="topic">
+<a name="30vb8ttbntt3gn49aae7dsgm0l">&nbsp;&nbsp;&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="3gb85959sg55hnotf4nl34680i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  virtual ~threadmanager_base() {}</a>
+</h3>
+<h3 class="topic">
+<a name="7qsajurpk86lbi06tuckop0fme">&nbsp;threadmanager_impl</a>
+</h3>
+<p class="relationships">See Also: <a href="#6t46ltndb0evubmqbjnk2jfjhj">hpx::threads::threadmanager_base (is derived from)</a>, <a href="#3rqn3otadm90s1si73ncotn03m">thread_pool (has as a
+data 
+member 
+...)</a>
+</p>
+<h3 class="topic">
+<a name="508iskip19o8qq0ncrpi272qpq">&nbsp;&nbsp;
+header file: threadmanager_impl.hpp
+declaration file: threadmanager.cpp
+
+template &lt;typename SchedulingPolicy&gt;
+class HPX_EXPORT threadmanager_impl: public threadmanager_base
+
+hpx::threads::threadmanager_impl
+
+Central instance of management for all (non-depleted) OS-threads
+</a>
+</h3>
+<h3 class="topic">
+<a name="4ipvlg3g4b3pcasuc3582hqsmc">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="0vquom2gfue8jhsgf39ruf6mg2">&nbsp;&nbsp;&nbsp;&nbsp;mutable mutex_type mtx_</a>
+</h3>
+<p class="relationships">See Also: <a href="#6qf0t7b50g1apicn7t99otscc5">typedef boost::mutex mutex_type; </a>
+</p>
+<h3 class="topic">
+<a name="4e78pnm6tuh6rtr08dhoc931iv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mutex protecting the data members</a>
+</h3>
+<h3 class="topic">
+<a name="1e4tus1schu8l22q769a9l1kd4">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="5ccshp16o8ctte4jt6o6ard96s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of managed OS threads
+(= number requested by --hpx:threads in cmd line)</a>
+</h3>
+<h3 class="topic">
+<a name="3991q7q83qgbt68n98cpo5ba0r">&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool&amp; timer_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="6rbgc0qps7mvfo59geshe0n5e6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used for timed set_state</a>
+</h3>
+<h3 class="topic">
+<a name="7r882h859jgugnsbprnaqd12gr">&nbsp;&nbsp;&nbsp;&nbsp;util::block_profiler&lt;register_thread_tag&gt; thread_logger</a>
+</h3>
+<h3 class="topic">
+<a name="7cn93v3iessf8ss0ak9kddrn2r">&nbsp;&nbsp;&nbsp;&nbsp;util::block_profiler&lt;register_work_tag&gt; work_logger_</a>
+</h3>
+<h3 class="topic">
+<a name="4c5rktv3hn0jaka0opfdlqf91v">&nbsp;&nbsp;&nbsp;&nbsp;util::block_profiler&lt;set_state_tag&gt; set_state_logger_</a>
+</h3>
+<h3 class="topic">
+<a name="311d4ha0ckjdc0bboo9mtfks3m">&nbsp;&nbsp;&nbsp;&nbsp;detail::thread_pool&lt;scheduling_policy_type&gt; pool_</a>
+</h3>
+<h3 class="topic">
+<a name="4le8n5g18ta4kg9vaplv9od85q">&nbsp;&nbsp;&nbsp;&nbsp;notification_policy_type&amp;notifier_</a>
+</h3>
+<p class="relationships">See Also: <a href="#4kdartpc20pgg9tdeqc9ibohp0">callback_notifier</a>
+</p>
+<h3 class="topic">
+<a name="3d26rh3efk7uk21gqiuo9jqp7g">&nbsp;&nbsp;&nbsp;&nbsp;The block_profiler class can be used to collect timings for a block of code. 
+It measures the execution time for each of the executions 
+and collects the number of invocations, the average, and the variance 
+of the measured execution times.</a>
+</h3>
+<p class="summary">(<a href="#7r882h859jgugnsbprnaqd12gr">util::block_profiler&lt;register_thread_tag&gt; thread_logger</a>, <a href="#7cn93v3iessf8ss0ak9kddrn2r">util::block_profiler&lt;register_work_tag&gt; work_logger_</a>, <a href="#4c5rktv3hn0jaka0opfdlqf91v">util::block_profiler&lt;set_state_tag&gt; set_state_logger_</a>)</p>
+<h3 class="topic">
+<a name="39nuuv9k6mbvp4cqiuobjb9afj">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="4g1kshfu7kur31p0o66fu5bh0s">&nbsp;&nbsp;&nbsp;&nbsp;setup</a>
+</h3>
+<h3 class="topic">
+<a name="2b5i2ms5th7os55s9qnc9fgt12">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="5f8vvg1ve1cakitt4bg6q3qik7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="0i90c1kdj02gsfcpu9f2tn44qs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t init(&#13;
+    policies::init_affinity_data const&amp; data);</a>
+</h3>
+<h3 class="topic">
+<a name="7a1306n4cjhjkgkkg7povrrchp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;called from runtime::assign_cores()</a>
+</h3>
+<h3 class="topic">
+<a href="#17fa1dsq0gs3ieufordnrg0eif" name="6k07lvdq6pfukq0p1e7ugrkurs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns pool_.init(num_threads_, data)</a>
+</h3>
+<h3 class="topic">
+<a name="0ofps51lqfvrefa5km22i3eije">&nbsp;&nbsp;&nbsp;&nbsp;add items to the queue</a>
+</h3>
+<h3 class="topic">
+<a name="3eolvh8lsnkm34ntepj1d9gvth">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void register_work(&#13;
+    thread_init_data&amp; data,&#13;
+    thread_state_enum initial_state = pending,&#13;
+    error_code&amp; ec = throws)</a>
+</h3>
+<p class="relationships">See Also: <a href="#4a0kctp8mfie7330sjr61jcq7l">thread_init_data (added as an item to the thread manager)</a>
+</p>
+<h3 class="topic">
+<a name="5nbl42iqq46bh7hu05j4g84am6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adds a new work item to the thread manager.&#13;
+it doesn't immediately create a new thread, it just adds the task parameters&#13;
+(function, initial state and description)&#13;
+to the internal management data structures.&#13;
+The thread itself will be created when the number of existing threads &#13;
+drops below the number of threads specified by the constructor's max_count parameter</a>
+</h3>
+<div class="notesContainer">
+<p>the comments on this part of the code are out-of-date, this might not be true...</p>
+</div>
+<h3 class="topic">
+<a name="09lomnqul1gtplbkjdur2fphad">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls</a>
+</h3>
+<h3 class="topic">
+<a name="0uku8nm4ri3v85vt7b3gc58m5t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pool_.create_work(...)</a>
+</h3>
+<p class="relationships">See Also: <a href="#0muoirjvd59ui8dldjjoq5gafo">void create_work(&#13;
+    thread_init_data&amp; data,&#13;
+    thread_state_enum initial_state, &#13;
+    error_code&amp; ec);</a>
+</p>
+<h3 class="topic">
+<a name="5okgg0snbbah5bsgaourl7vihc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_init_data</a>
+</h3>
+<p class="relationships">See Also: <a href="#4a0kctp8mfie7330sjr61jcq7l">thread_init_data</a>
+</p>
+<h3 class="topic">
+<a name="71icm1up3lnrmrhvpflqsh2r76">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holds minimal information to "build" a thread</a>
+</h3>
+<h3 class="topic">
+<a name="4najr269ta1vqvm84b8hc21ms2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;define the initial state of the newly created thread</a>
+</h3>
+<h3 class="topic">
+<a name="3scb9eov48u2hpmh3smgd7taej">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void register_thread(&#13;
+    thread_init_data&amp; data,&#13;
+    thread_id_type&amp; id,&#13;
+    thread_state_enum iniitial_state = pending,&#13;
+    bool run_now = true, &#13;
+    error_code&amp; ec = throws)</a>
+</h3>
+<h3 class="topic">
+<a name="748qv8kug9gn0joqnd1b7cqr21">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds a new work item to the thread manager (ite an HPX-thread, not an OS-thread)&#13;
+Creates a new thread, adds it to the internal management data structures, &#13;
+and schedules the new thread (if appropriate)</a>
+</h3>
+<h3 class="topic">
+<a name="2vnq5rh0sovofsa8qac1jm9jfb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_init_data</a>
+</h3>
+<h3 class="topic">
+<a name="4m4cg1n1070t2l9bhepjf20rqk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id [out]&#13;
+this parameter will hold the id of the created thread. &#13;
+The id is guaranteed to be validly initialized &#13;
+before the thread function is executed</a>
+</h3>
+<h3 class="topic">
+<a name="2q6evvcuo363gn29hr8hbltd9n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_now [in] &#13;
+if the parameter is true and the initial state given as a parameter is "pending"&#13;
+the thread will be run immediately. &#13;
+Otherwise it will be scheduled to run later.</a>
+</h3>
+<h3 class="topic">
+<a name="7qfkqveeed8puoair9tm169k82">&nbsp;&nbsp;&nbsp;&nbsp;run, stop or manage&#13;
+the queue </a>
+</h3>
+<h3 class="topic">
+<a href="#0l3qdjhf7ucuektbp1kvgs18pr" name="6k34kc2q9q4jm8p1hmr92fl76j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run(std::size_t num_threads_)</a>
+</h3>
+<h3 class="topic">
+<a name="1edcaajk22hk90ia6r2qavte02">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="262niajlct71ijk4f31alin0nd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if already running, do nothing</a>
+</h3>
+<h3 class="topic">
+<a name="57d2j6ch1kab5oqf0brhc6hr3p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="5ts90hkjja3kd55mcaiio4mttk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instanciate a unique_lock and calls</a>
+</h3>
+<h3 class="topic">
+<a name="5bi82hll45sccb3rh57rnbct76">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pool_.run(lock, num_threads)</a>
+</h3>
+<p class="relationships">See Also: <a href="#7m76mrlteml94qtc0cjbn7gjeq">bool run(
+    std::unique_lock&lt;boost::mutex&gt;&amp; l, 
+    std::size_t num_threads
+)</a>
+</p>
+<h3 class="topic">
+<a name="2seslldp5kddltreei0qbqi15j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run the thread manager's work queue&#13;
+This function instantiates the specified number of OS threads&#13;
+(specified number = num_threads)&#13;
+All OS threads are started to executed the function thread_func</a>
+</h3>
+<p class="relationships">See Also: <a href="#31k7f4dbmsqcnod5kg4esge6ld">void thread_func(&#13;
+		std::size_t num_thread,				&#13;
+		topology const&amp; topology,			&#13;
+		boost::barrier&amp; startup)			</a>
+</p>
+<h3 class="topic">
+<a name="6odp2rtb3n9q7pna7fhd6anurg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num_threads [in]:&#13;
+the initial number of OS threads to be started by this thread manager instance&#13;
+optional, defaults to 1.</a>
+</h3>
+<h3 class="topic">
+<a name="4rdppdl67uviq1vci1hucob31m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns true if the thread manager has been started successfully, &#13;
+otherwise false.</a>
+</h3>
+<h3 class="topic">
+<a name="7qp4el8g5ei1r7rm23cfe7qnd3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void stop(bool blocking = true); </a>
+</h3>
+<h3 class="topic">
+<a name="5qnm702810n7cusfctnjlee35h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;forcefully stop the thread-manager</a>
+</h3>
+<h3 class="topic">
+<a name="11vk1taf42kaqipb4dojt5adt3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls</a>
+</h3>
+<h3 class="topic">
+<a name="6b20ea8prf12hmhgfgim4f8915">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pool_.stop(lock, blocking)</a>
+</h3>
+<h3 class="topic">
+<a name="5qntbfp0sdi6an5027vq4nm8qn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;timer_pool_.stop()</a>
+</h3>
+<h3 class="topic">
+<a name="6lgn08fto9s03gm5rfofd85t3o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void abort_all_suspended_threads()</a>
+</h3>
+<h3 class="topic">
+<a name="27j07h9iduflou6mlb13lunj4n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Abort all threads which are in suspended state.
+This will set the state of all suspended threads to pending
+while supplying the wait_abort extended state flag</a>
+</h3>
+<h3 class="topic">
+<a name="42t2fv7137vti8oi7odmqongmq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool cleanup_terminated(bool delete_all = false)</a>
+</h3>
+<h3 class="topic">
+<a name="458g6q0lcf12dghloo646spcnj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cleanup the terminated threads.
+This deletes all threads which have been terminated 
+but which are still held in the queue of terminated threads.
+Come schedulers might not do anything here. </a>
+</h3>
+<p class="relationships">See Also: <a href="#3abq609ed4qocnfcjf1ns2dd8o">terminated_items_type terminated_items_</a>
+</p>
+<h3 class="topic">
+<a href="#748sc0flhtgpr7eeaskfrqgnji" name="3ih88345bv86e7ppukc96n7rc1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deletes all threads which have been terminated but which are still held in the queue of terminated threads</a>
+</h3>
+<h3 class="topic">
+<a name="2t0721d1s7ls927v7p98qc5kcb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void do_some_work(std::size_t num_thread = std::size_t(-1)</a>
+</h3>
+<h3 class="topic">
+<a name="36te9kdn9bq59obqhr5o50p1fv">&nbsp;&nbsp;&nbsp;&nbsp;queries</a>
+</h3>
+<h3 class="topic">
+<a name="09kneph0fguelefv1hk43ire73">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state status() const</a>
+</h3>
+<p class="relationships">See Also: <a href="#6i1ra9vmms2r0senr4evu96jb7">enum hpx::state</a>
+</p>
+<h3 class="topic">
+<a name="5ksm8co4eia730ads0krqo5otg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return whether the thread-manager is still running</a>
+</h3>
+<h3 class="topic">
+<a name="4pul5tfal8s0qvtc83fca4pdrn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std:: int64_t get_thread_count(&#13;
+    thread_state_enum state = unknown,&#13;
+    thread_priority priority = thread_priority_default,&#13;
+    std::size_t num_thread = std::size_t(-1), &#13;
+    bool reset = false) const;</a>
+</h3>
+<h3 class="topic">
+<a name="65tii6kq7rjls8ugukqgup1u3c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the number of HPX-threads in the given state</a>
+</h3>
+<h3 class="topic">
+<a name="3h9vfhub88oqs87p2sj14vho7r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool enumerate_threads(&#13;
+    util::function_nonser&lt;bool(thread_id_type)&gt; const&amp; f,&#13;
+    thread_state_enum state = unknown) const</a>
+</h3>
+<h3 class="topic">
+<a name="4ojdnat8g31kkml2nfeipjf6gg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_os_thread_count() const</a>
+</h3>
+<h3 class="topic">
+<a name="69jedhsuulrl88gq2g7ttupkpq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the number of OS threads running in this thread manager</a>
+</h3>
+<h3 class="topic">
+<a name="1tielkhvmk25e11j7v6t6hjv8e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::thread&amp; get_os_thread_handle(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="1cit2qvha9p5bp41u94fh9r659">&nbsp;&nbsp;&nbsp;&nbsp;counters</a>
+</h3>
+<h3 class="topic">
+<a name="2rl71g5glk8j9b28cgbaj53dnd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cumulative counts</a>
+</h3>
+<h3 class="topic">
+<a name="7pcvh4v0p53e1hgetvp6dq843c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idle rates</a>
+</h3>
+<h3 class="topic">
+<a name="3rqn3otadm90s1si73ncotn03m">&nbsp;thread_pool</a>
+</h3>
+<p class="relationships">See Also: <a href="#546dekou3u0226ntiiemt6efp2">thread_queue (has as a 
+data 
+member ...)</a>, <a href="#7qsajurpk86lbi06tuckop0fme">threadmanager_impl (has as a
+data 
+member 
+...)</a>
+</p>
+<h3 class="topic">
+<a name="3ntfs6t2l4amtk3h5gojii7j8o">&nbsp;&nbsp;
+template&lt;typename Scheduler&gt;
+class thread_pool
+hpx::threads::detail::thread_pool
+
+Holds a vector containing all OS-threads
+Data member of thread managers.
+
+This is the class that calls *scheduling_loop*
+</a>
+</h3>
+<h3 class="topic">
+<a name="1dk1ui9qpqc244o3984h69j7bd">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="4bkr1gp5o58vs1iqrk1ah0fqeb">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;boost::threads&gt; threads_</a>
+</h3>
+<p class="relationships">See Also: <a href="#0jm3ts5q4atl075staiqqd0u30">std::size_t get_os_thread_count() const) (size of )</a>
+</p>
+<h3 class="topic">
+<a name="5lfvaqbkcqqcp3d94n3fqjh3gh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of OS-threads (well, actually: boost::threads)</a>
+</h3>
+<h3 class="topic">
+<a name="6gkjhdr6v2n34dgrb53s4thpq4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this thread manager has exactly as many OS-threads as requested</a>
+</h3>
+<h3 class="topic">
+<a name="0tv8vpud8ej0ih0pthl5u1q09c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is set in method "run"</a>
+</h3>
+<h3 class="topic">
+<a name="2aru9llp03rvg3o4s5lolan1b1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the size of this vector is the number of OS threads&#13;
+(ie the "os thread count") </a>
+</h3>
+<h3 class="topic">
+<a href="#0rgss3afmf9urnpbrubcc0mnum" name="04e516ht227d4bv1smb793iifc">&nbsp;&nbsp;&nbsp;&nbsp;Scheduler&amp; scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="6gpthrtvk3h10f9g4ftrsvpqds">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reference to the used scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="0rg3bi4rkpqbl5vki15g7e3mjf">&nbsp;&nbsp;&nbsp;&nbsp;threads::policies::callback_notifier&amp; notifier</a>
+</h3>
+<p class="relationships">See Also: <a href="#4kdartpc20pgg9tdeqc9ibohp0">callback_notifier</a>
+</p>
+<h3 class="topic">
+<a name="4f6uinsfqkeov2apmuar70ekb7">&nbsp;&nbsp;&nbsp;&nbsp;std::string pool_name_</a>
+</h3>
+<h3 class="topic">
+<a name="57lc6ak23hsnjrsfo523kicok2">&nbsp;&nbsp;&nbsp;&nbsp;boost::scoped_ptr&lt;boost::barrier&gt; startup_</a>
+</h3>
+<h3 class="topic">
+<a name="456mli8f6h9lguhd8qqriqolob">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startup barrier</a>
+</h3>
+<h3 class="topic">
+<a name="02bsrvpbc4kgbtslpnu91d055p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used in run(...) and thread_func(...) 
+to make sure all OS-threads have finished setting up 
+before starting HPX work</a>
+</h3>
+<h3 class="topic">
+<a name="07lmvk6kj7j7rsicagojfupavs">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;std::int64_t&gt; executed_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="0q7ddhsian01lncp1qeeed688v">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;std::int64_t&gt; executed_thread_phases</a>
+</h3>
+<h3 class="topic">
+<a name="1rvg7og7i7h5e4k114m4vv08t2">&nbsp;&nbsp;&nbsp;&nbsp;boost_atomic&lt;long&gt; thread_count_</a>
+</h3>
+<h3 class="topic">
+<a name="7hmidsujdge22n4sq7c2dmio63">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used together with the struct 
+manage_active_thread_count</a>
+</h3>
+<h3 class="topic">
+<a name="4v0858i19acodltaptnrn9uv9b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;counts OS-threads</a>
+</h3>
+<h3 class="topic">
+<a name="0r0j9q8bh8fvq6uad7b65qr84p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which increments the counter everytime it's instanciated</a>
+</h3>
+<h3 class="topic">
+<a name="40evhhtb96t2nusshadmscqi49">&nbsp;&nbsp;&nbsp;&nbsp;some counters and timers</a>
+</h3>
+<h3 class="topic">
+<a name="44i12nh0klsdqlffq5kv6upf9b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cumulative counts</a>
+</h3>
+<h3 class="topic">
+<a name="56iivtasl6ba4mpbdka2bspoec">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idle rates</a>
+</h3>
+<h3 class="topic">
+<a name="11v1b14cg5vprek9rg9l0ll0p3">&nbsp;&nbsp;&nbsp;&nbsp;threads::mask_type used_processing units_</a>
+</h3>
+<h3 class="topic">
+<a name="4mqjdqqkm38laqqv2ah7ucusld">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stores the mask identifying all processing units used by this thread manager</a>
+</h3>
+<h3 class="topic">
+<a name="132if04c9vbkkmmocvpi63b8ut">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;setup in init(...)</a>
+</h3>
+<h3 class="topic">
+<a name="7ouc7ik2tl2nt74iklsfh05kkc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of bits = number of actual cores (=hardware_concurrency())</a>
+</h3>
+<h3 class="topic">
+<a name="1ajhqredisgbf97u4g1c5cicuq">&nbsp;&nbsp;&nbsp;&nbsp;policies::scheduler_mode mode_</a>
+</h3>
+<h3 class="topic">
+<a name="67s1auna4ksa45ssjvtd3gbi1c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode of operation of the pool</a>
+</h3>
+<div class="notesContainer">
+<p>isn't that already contained in the scheduler??</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="19g06n3f78oaaotn19glto4t3b">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="4fe8jlodf7glrcfp89f76eoagp">&nbsp;&nbsp;&nbsp;&nbsp;setup stuff</a>
+</h3>
+<h3 class="topic">
+<a name="793op3l0gp28h7teacha27moe1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="7ih3p00gsqe973fbgtl4stak92">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_pool(&#13;
+    Scheduler&amp; sched,&#13;
+    threads::policies::callback_notifier&amp; notifier,&#13;
+    char const* pool_name,&#13;
+    policies::scheduler_mode m = policies::nothing_special)</a>
+</h3>
+<h3 class="topic">
+<a name="44ph9ha30g1gbvc8hhekmp5vq3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destr</a>
+</h3>
+<h3 class="topic">
+<a name="17fa1dsq0gs3ieufordnrg0eif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t init(&#13;
+    std::size_t num_threads, &#13;
+    policies::init_affinity_data const&amp; data)</a>
+</h3>
+<h3 class="topic">
+<a href="#0i90c1kdj02gsfcpu9f2tn44qs" name="7al246e7pfemunv3k51th13os4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;called from threadmanager_impl&lt;SchedulingPolicy&gt;::init</a>
+</h3>
+<h3 class="topic">
+<a name="3mq6sa3eptjbclv70hfma8jvql">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="2voq16gibvjthhc7n6hdpejcmu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the topology</a>
+</h3>
+<h3 class="topic">
+<a name="5tbknoan6k11aquh679d1q12or">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the number of cores used</a>
+</h3>
+<h3 class="topic">
+<a name="7rjuq86lh3d2taoeji7a9nhahf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t cores_used = sched_.Scheduler::init(data, topology_);</a>
+</h3>
+<h3 class="topic">
+<a name="7ehueilqk07v4jlv7uipclt6hl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by calling</a>
+</h3>
+<h3 class="topic">
+<a href="#581faviog74ep5o9ffvbrvenom" name="19s0ei9n6snq9qbvkahtee6mvq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scheduler::init</a>
+</h3>
+<h3 class="topic">
+<a name="4d07724rpruod9f32j9ktc3227">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resize used_processing_units to hardware_concurrency()</a>
+</h3>
+<h3 class="topic">
+<a name="0oecpfpb9cgv64tdbcis1vf816">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loop on argument num_threads
+(= num OS threads)</a>
+</h3>
+<h3 class="topic">
+<a name="5vfq2uvto51jk1q8c3hvq5i7td">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used_processing_units_ BITWISE_OR sched_.get_pu_mask(topology, i)</a>
+</h3>
+<h3 class="topic">
+<a name="3hncbhs3i75rgdp3i175in9a33">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;effectively sets to 1 all bits of used_processing_units 
+that correspond to real cores that are actually used</a>
+</h3>
+<h3 class="topic">
+<a name="0n55b1rf99k88vd84rhlsp6cus">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns cores_used</a>
+</h3>
+<h3 class="topic">
+<a name="2dmjcp0cnm98osnjaohl3cfnbk">&nbsp;&nbsp;&nbsp;&nbsp;run stuff</a>
+</h3>
+<h3 class="topic">
+<a name="7m76mrlteml94qtc0cjbn7gjeq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool run(
+    std::unique_lock&lt;boost::mutex&gt;&amp; l, 
+    std::size_t num_threads
+)</a>
+</h3>
+<div class="notesContainer">
+<p>called from threadmanager_impl::run</p>
+<p></p>
+</div>
+<p class="relationships">See Also: <a href="#5bi82hll45sccb3rh57rnbct76">pool_.run(lock, num_threads)</a>
+</p>
+<h3 class="topic">
+<a name="0r4g7lmtu31b2bh904q1d0qd59">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#13;
+runs the whole work: &#13;
+instanciates OS threads and goes through queue&#13;
+numthreads: the number of OS-threads to instantiate&#13;
+</a>
+</h3>
+<h3 class="topic">
+<a name="49cci0nsliie8cllmmlgaqae28">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;preparation</a>
+</h3>
+<h3 class="topic">
+<a name="4ui9chbav8ci07jlgln8ngp613">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert that I own the lock </a>
+</h3>
+<h3 class="topic">
+<a name="6vhobo8vpvj05150u7b1v0rvib">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print all sorts of things to the log</a>
+</h3>
+<h3 class="topic">
+<a name="60s5fpfqton17npil6j7h8qaa6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if num_threads == 0</a>
+</h3>
+<h3 class="topic">
+<a name="4nvkk09avek9v4nks4m05bsdj1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw exception</a>
+</h3>
+<h3 class="topic">
+<a name="3ieiblbak1j6926lofpldja8oj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if already running, do nothing</a>
+</h3>
+<h3 class="topic">
+<a name="7nedltdshdgas4pv58du004ss2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resize all pools and counters to "num_threads"</a>
+</h3>
+<h3 class="topic">
+<a name="7vgpmg7epm4t4mhe5uar6luhch">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scale timestamps to nanoseconds</a>
+</h3>
+<h3 class="topic">
+<a name="5d5dp4pr240jhq09kt4hfhv3dk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set clocks</a>
+</h3>
+<h3 class="topic">
+<a name="616qs53o994j1213c8ha13a8c1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resize more data members</a>
+</h3>
+<h3 class="topic">
+<a name="1dj1shorsaq5rc8habtd90aobi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="79ajlis95mf3bh6vjllai57fjr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main work (in a "try" block)
+- run the threads
+- wait for initialization to complete</a>
+</h3>
+<h3 class="topic">
+<a name="03p9h0tkpe75tmn0m4g4j08ecv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert that startup_ does not point to any barrier yet</a>
+</h3>
+<h3 class="topic">
+<a name="7phghhejt4h62ns26njb209tok">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reset the barrier</a>
+</h3>
+<h3 class="topic">
+<a name="2afmt8qtb875kfob5nsd6gnp9t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the topology</a>
+</h3>
+<h3 class="topic">
+<a name="2arfvm4rsv8oe9260q51b0jspq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHILE&#13;
+loop on num_thread&#13;
+(the number of OS-threads to instanciate)</a>
+</h3>
+<h3 class="topic">
+<a name="47af1i4mlpsbhf4sr2l4pf00i2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the pu mask from the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="4a74vcpvgdp9jvkci4lm9o3hti">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="1g6tsog9nvd1pjjt1oc8avunfi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;push a boost::thread to threads_ 
+(data member representing the main vector of threads)</a>
+</h3>
+<h3 class="topic">
+<a name="0obgas3b8tjv3n54em8gfan12r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                // create a new thread
+                threads_.push_back(boost::thread(
+                        &amp;thread_pool::thread_func, this, thread_num,
+                        std::ref(topology_), std::ref(*startup_)
+                    ));</a>
+</h3>
+<h3 class="topic">
+<a name="78sb56240mt3m9sf6mjl8q2i97">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialized with&#13;
+void thread_func(...)</a>
+</h3>
+<p class="relationships">See Also: <a href="#31k7f4dbmsqcnod5kg4esge6ld">void thread_func(&#13;
+		std::size_t num_thread,				&#13;
+		topology const&amp; topology,			&#13;
+		boost::barrier&amp; startup)			 (calls)</a>
+</p>
+<h3 class="topic">
+<a name="76v1ss87r25mes7hldvlkesmji">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the thread's affinity</a>
+</h3>
+<h3 class="topic">
+<a name="59ho8g7fc83bspkpo8nj0jdk7f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="7ugkfo0dv9e5j9cb6s12u5la69">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait at the global barrier</a>
+</h3>
+<h3 class="topic">
+<a name="6tu2bgp5939okticld65ud64oc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startup_-&gt;wait();</a>
+</h3>
+<h3 class="topic">
+<a name="1o4in943l45h8qcfjaa3obnlvm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set all states to running, via the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="20olve1p6hacmjanltl13q8433">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void stop(std::unique_lock&lt;boost::mutex&gt;&amp; l, bool blocking = true)</a>
+</h3>
+<h3 class="topic">
+<a name="55sejpor5u54ptq9gonu33h5t0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void stop_locked(lock&amp; l, bool blocking = true);</a>
+</h3>
+<h3 class="topic">
+<a name="31k7f4dbmsqcnod5kg4esge6ld">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void thread_func(&#13;
+		std::size_t num_thread,				&#13;
+		topology const&amp; topology,			&#13;
+		boost::barrier&amp; startup)			</a>
+</h3>
+<p class="relationships">See Also: <a href="#78sb56240mt3m9sf6mjl8q2i97">initialized with&#13;
+void thread_func(...) (calls)</a>, <a href="#2seslldp5kddltreei0qbqi15j">Run the thread manager's work queue&#13;
+This function instantiates the specified number of OS threads&#13;
+(specified number = num_threads)&#13;
+All OS threads are started to executed the function thread_func</a>
+</p>
+<h3 class="topic">
+<a name="3gk9nk2sgf827smr75r7inl65e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the PU mask from the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="5q283lt88dv18t26ibeoh1bn9s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write to log</a>
+</h3>
+<h3 class="topic">
+<a name="0r6svf7fov620na357uf35cs3g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the thread affinity mask</a>
+</h3>
+<h3 class="topic">
+<a name="5kicp91o5stpvavl8ump6ptuh6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if relevant</a>
+</h3>
+<h3 class="topic">
+<a href="#5pacmtl4trueik97amu9k23nos" name="5qfktmcdaessavvalvbevn4s4e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set priority of worker threads to a lower priority</a>
+</h3>
+<h3 class="topic">
+<a name="2sgbs69plcv8i8c064navjjnq6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this needs to be done in order to give the parcel pool threads higher priority</a>
+</h3>
+<h3 class="topic">
+<a name="24ftp7i6753629fkt6bqft7lrv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;manage the number of this thread in its TSS</a>
+</h3>
+<h3 class="topic">
+<a name="692du1vptq16gbevtch034g2a3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;init_tss_helper&lt;Scheduler&gt; tss_helper(*this, num_thread);</a>
+</h3>
+<h3 class="topic">
+<a name="6cg9ippai99oep79ns177s1784">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait for the startup barrier</a>
+</h3>
+<h3 class="topic">
+<a name="65bkm04uujj8aja8qukoocvcel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait for all threads to start up before starting HPX work</a>
+</h3>
+<h3 class="topic">
+<a name="0o9m9cjtk4u2o74v72b8f5u64v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main part</a>
+</h3>
+<h3 class="topic">
+<a name="5dh5jvofphvtuaf2lh8rofpnog">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="5vrc55iiaa0t6q8h7tr5152d1j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment the thread_count_ data member</a>
+</h3>
+<h3 class="topic">
+<a name="7j6bl8alkplgtefppg2ceff07p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on Windows, special preparation is needed for the main coroutines thread</a>
+</h3>
+<h3 class="topic">
+<a name="5b5fma9ebr3nsgps7d4d910qbv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::coroutines::prepare_main_thread;</a>
+</h3>
+<h3 class="topic">
+<a name="4s2le3pot7t9ro94csn4mjoufi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;declare and initialize scheduling counters</a>
+</h3>
+<h3 class="topic">
+<a name="4t9trj575u4tv8bars5t5d9bu1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;declare and initialize scheduling callbacks</a>
+</h3>
+<h3 class="topic">
+<a name="621ha4n41c5mgk2pbv5n196ke7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do background work if relevant</a>
+</h3>
+<h3 class="topic">
+<a name="59qr356310r2s5jqg04u5gofrg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set scheduler mode</a>
+</h3>
+<h3 class="topic">
+<a name="0jc5mpg2knlmmp9uns04eouodo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run main scheduling loop until terminated</a>
+</h3>
+<h3 class="topic">
+<a href="#5ea20qcc816u66t4ngjj0sd7au" name="5lg9dfmqm925ocmg6g25c6g334">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;detail::scheduling_loop(
+    num_thread, 
+    sched_, 
+    counters,
+    callbacks
+);</a>
+</h3>
+<h3 class="topic">
+<a name="7v9rpqfm64dpmou3luj5cmuluh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert that no more HPX threads exist &#13;
+or that this OS-thread is terminating</a>
+</h3>
+<h3 class="topic">
+<a name="4kopsu9fmh16h4rufltsealfng">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the OS thread is allowed to exit</a>
+</h3>
+<h3 class="topic">
+<a name="7qvtg3phcsn25c1t6hq21hvafa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log</a>
+</h3>
+<h3 class="topic">
+<a name="6edai721uhhg8pup5bjrdih6m1">&nbsp;&nbsp;&nbsp;&nbsp;get stuff</a>
+</h3>
+<h3 class="topic">
+<a name="07t9qqtnoia3uhtaemoi4c9jp4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_worker_thread_num()</a>
+</h3>
+<h3 class="topic">
+<a name="2tkl2rmctfsot70d7gahg6stqm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in get_worker_thread_num.hpp</a>
+</h3>
+<h3 class="topic">
+<a name="57slpsdfd85mosdhdtj8ugdj6c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the number of the current OS-thread&#13;
+running in the runtime instance &#13;
+the current HPX thread is executed with.</a>
+</h3>
+<h3 class="topic">
+<a name="2cf97u33udrpr69ukjrqlkb8cd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return a zero-based index</a>
+</h3>
+<h3 class="topic">
+<a name="0q16ihglpcnps98kts236807f7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this function needs to be executed on an HPX-thread &#13;
+(otherwise it will fail, ie return -1)</a>
+</h3>
+<h3 class="topic">
+<a name="0jm3ts5q4atl075staiqqd0u30">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_os_thread_count() const)</a>
+</h3>
+<p class="relationships">See Also: <a href="#4bkr1gp5o58vs1iqrk1ah0fqeb">std::vector&lt;boost::threads&gt; threads_ (size of )</a>
+</p>
+<h3 class="topic">
+<a name="67hens5vu5g0nuvertfkpk41si">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::thread&amp; get_os_thread_handle(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="0qbk0fls5ht0f46uvsbhd5dfgr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return a reference to the OS-thread indexed by num_thread&#13;
+in the vector of OS-threads</a>
+</h3>
+<h3 class="topic">
+<a name="01guagqca4nvqejhf3phbuduu2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::int64_t get_thread_count(&#13;
+    thread_state_enum state,&#13;
+    thread_priority priority,&#13;
+    std::size_t num_thread,&#13;
+    bool reset) const;</a>
+</h3>
+<h3 class="topic">
+<a name="0b81c6dc6j7fulk81cca34s4ei">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call this function on the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="7q4rfhlk2jtp2sddrncs9snn4g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns the number of HPX threads in the queue &#13;
+of the OS-thread #num_thread </a>
+</h3>
+<h3 class="topic">
+<a name="4l1gjb3cdrogfg2smm7rhnl2ao">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::int64_T get_scheduler_utilization() const</a>
+</h3>
+<h3 class="topic">
+<a name="5s0oc6pd0td4fbn256peq2p4kv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        std::size_t get_pu_num(std::size_t num_thread) const;</a>
+</h3>
+<h3 class="topic">
+<a name="5s40vk4f9jtdff88o7lm15kgee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mask_cref_type get_pu_mask(&#13;
+    topology const&amp; topology,&#13;
+    std::size_t num_thread) const;</a>
+</h3>
+<h3 class="topic">
+<a name="747h7cper0i12qt9tl3omffaka">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        mask_cref_type get_used_processing_units() const;</a>
+</h3>
+<h3 class="topic">
+<a name="2ovdndhpblq7be7a451pbv5ggb">&nbsp;&nbsp;&nbsp;&nbsp;create and set stuff</a>
+</h3>
+<h3 class="topic">
+<a name="14na356hde7lpbjf9eie99dvcv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void create_thread(&#13;
+    thread_init_data&amp; data, &#13;
+    thread_id_type&amp; id,&#13;
+    thread_state_enum initial_state, &#13;
+    bool run_now, &#13;
+    error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="4k091r3udldrlv771a4mtia58b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls</a>
+</h3>
+<h3 class="topic">
+<a name="62uvn4fe5mm6mqmg0h4ug5eoji">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::detail::
+create_thread(
+    &amp;sched_, data, id, initial_state, run_now, ec);</a>
+</h3>
+<h3 class="topic">
+<a name="3fj8c6m4thonn3s048ovk9tqv5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pretty much same as below</a>
+</h3>
+<h3 class="topic">
+<a name="0muoirjvd59ui8dldjjoq5gafo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void create_work(&#13;
+    thread_init_data&amp; data,&#13;
+    thread_state_enum initial_state, &#13;
+    error_code&amp; ec);</a>
+</h3>
+<p class="relationships">See Also: <a href="#0uku8nm4ri3v85vt7b3gc58m5t">pool_.create_work(...)</a>
+</p>
+<h3 class="topic">
+<a name="1uhdjqj3akl5l4sgbeje04ferl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls</a>
+</h3>
+<h3 class="topic">
+<a name="0ghcr260cgmt5050rvij7gebnr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::detail::
+create_work(
+    &amp;sched_, data, initial_state, ec) </a>
+</h3>
+<h3 class="topic">
+<a name="18n21cg1bio45qc5ooos3l3dcn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="5f00es0dfd26v0jd7ei0cjhalq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;make sure the parameter initial_state
+has a valid value</a>
+</h3>
+<h3 class="topic">
+<a name="594l4pno43o5njibg735icrqkk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write some things to the log</a>
+</h3>
+<h3 class="topic">
+<a name="4b0fp6u3p7jq73i2jqc5drqam1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call</a>
+</h3>
+<h3 class="topic">
+<a name="0ga20k5hc10eiv37erblide6hl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get_self_ptr()</a>
+</h3>
+<h3 class="topic">
+<a name="2cs4a4j1pkqqpma02ta01puhor">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pass critical priority from parent to child</a>
+</h3>
+<h3 class="topic">
+<a name="00qbcak7m5v3uiie5gf8rknrcg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create a new thread</a>
+</h3>
+<h3 class="topic">
+<a name="1g2vnv56q6n50h8nase8idg0ae">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if thread priority is critical/boost</a>
+</h3>
+<h3 class="topic">
+<a name="7jbb1276nt4brj98e5d7ogt76e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call</a>
+</h3>
+<h3 class="topic">
+<a name="4960lufis41ubg2tfovbpqfq55">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduler-&gt;create_thread(
+    data, nullptr, initial_state,true, ec, 
+    data.num_os_thread);</a>
+</h3>
+<h3 class="topic">
+<a name="5iumlstbhlgt9d8ek6co5emj4i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_now = true</a>
+</h3>
+<h3 class="topic">
+<a name="1tuls9d7epn0i9ifdld95n4q5q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;en gros: </a>
+</h3>
+<h3 class="topic">
+<a name="6ujp3lm3v7pgrs7nhcdnfv578h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adapt num_thread_ parameter depending on actual number of threads</a>
+</h3>
+<h3 class="topic">
+<a name="24t0s3e6mfb0f80br2eol31paa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;figure out which queue to put it on</a>
+</h3>
+<h3 class="topic">
+<a name="3b5fga4e8vfce2sqcom4nnq9j8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call </a>
+</h3>
+<h3 class="topic">
+<a name="1e2qkrajrru5e0pucbn4p710nd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_queue.create_thread(...)</a>
+</h3>
+<p class="relationships">See Also: <a href="#5cfnvffrble1hf0sem2ptru1ii">void create_thread(
+		thread_init_data&amp; data, 
+		thread_id_type* id,
+        thread_state_enum initial_state,
+		bool run_now, error_code&amp; ec)</a>
+</p>
+<h3 class="topic">
+<a name="0vfvq3jqtj0lq384omr2faprg0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="4r6dmtdjbs7tucg042k4kufej1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call</a>
+</h3>
+<h3 class="topic">
+<a name="0o2e9vpac7jilmn79ch8qog7t7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduler-&gt;create_thread(
+    data, nullptr, initial_state, false, ec, 
+    data.num_os_thread);</a>
+</h3>
+<h3 class="topic">
+<a name="601e61qag7t71v7dspg5sp0adr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_now = false</a>
+</h3>
+<h3 class="topic">
+<a name="23pgnuueeutr0loilif3ga6r8m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_state set_state(&#13;
+    thread_id_type const&amp; id,&#13;
+    thread_state_enum new_state, &#13;
+    thread_state_ex_enum new_state_ex,&#13;
+    thread_priority priority, &#13;
+    error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="787ou7avnvq6uvvf4pdio5s9g3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_id_type set_state(&#13;
+    util::steady_time_point const&amp; abs_time,&#13;
+    thread_id_type const&amp; id, &#13;
+    thread_state_enum newstate,&#13;
+    thread_state_ex_enum newstate_ex, &#13;
+    thread_priority priority,&#13;
+    error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="7647n8k9m1ajfg5adnvfnlg05i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void set_scheduler_mode(threads::policies::scheduler_mode mode)</a>
+</h3>
+<h3 class="topic">
+<a name="7ha0de3pp84tph5jjm880no632">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void reset_thread_distribution()</a>
+</h3>
+<h3 class="topic">
+<a name="0miicr2gbk22nkuboh92aotlqu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::state get_state() const</a>
+</h3>
+<p class="relationships">See Also: <a href="#6i1ra9vmms2r0senr4evu96jb7">enum hpx::state</a>
+</p>
+<h3 class="topic">
+<a name="6b0uhc61b1u8koh2ucbj11l82r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first finds out which OS-thread it's running on &#13;
+with get_worker_thread_number, &#13;
+then call get_state(num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="22eb3146nqj7fah949k5m15sis">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::get_state(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="7t342lqvnc94imu2lscvmdbu9a">&nbsp;&nbsp;&nbsp;&nbsp;performance counters</a>
+</h3>
+<h3 class="topic">
+<a name="56u7ac12t84oa68n0713o81dj0">&nbsp;&nbsp;&nbsp;&nbsp;do stuff</a>
+</h3>
+<h3 class="topic">
+<a name="105msj6uujdhd0idoq82fa2fen">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool enumerate_threads(&#13;
+    util::function_nonser&lt;bool(thread_id_type)&gt; const&amp; f,&#13;
+    thread_state_enum state) const</a>
+</h3>
+<h3 class="topic">
+<a name="6pif812bmdrrgl0g1ejnvrqo0s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;invoke the callback function f&#13;
+on all threads of state "state"</a>
+</h3>
+<h3 class="topic">
+<a name="314hbggaiebp2ks1oo4ed4mmp9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void abort_all_suspended_threads()</a>
+</h3>
+<h3 class="topic">
+<a name="20rliqroj1eeriraq8ctfvqtev">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool cleanup_terminated(bool delete_all)</a>
+</h3>
+<h3 class="topic">
+<a name="03nuisuei1q83mevee2r3onti7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void do_some_work(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="4obdkdcimh0mc324s14ks5n0fg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This function gets called by the thread-manager &#13;
+whenever new work has been added, &#13;
+allowing the scheduler to reactivate &#13;
+one or more possibly idling OS threads</a>
+</h3>
+<h3 class="topic">
+<a name="6rgrkusomafj2j8uio6qmq912v">&nbsp;&nbsp;&nbsp;&nbsp;there's some more detail stuff ...</a>
+</h3>
+<h3 class="topic">
+<a name="6i1ra9vmms2r0senr4evu96jb7">&nbsp;enum hpx::state</a>
+</h3>
+<p class="relationships">See Also: <a href="#0miicr2gbk22nkuboh92aotlqu">hpx::state get_state() const</a>, <a href="#41044q3h9bja9av36bqq3omptt">enum thread_state_enum (counterpart of)</a>, <a href="#09kneph0fguelefv1hk43ire73">state status() const</a>
+</p>
+<h3 class="topic">
+<a name="5cmfm5h5p9b7nrtqrl8fkeuuru">&nbsp;&nbsp;
+used to describe the state of
+threadmanager or AGAS's resolver client 
+</a>
+</h3>
+<h3 class="topic">
+<a name="37g6mf5nvdl4auf0r7i82t6cm6">&nbsp;&nbsp;&nbsp;        state_invalid = -1,</a>
+</h3>
+<h3 class="topic">
+<a name="04eatjc5v4r5o7cc72pa22a87h">&nbsp;&nbsp;&nbsp;        state_initialized = 0,</a>
+</h3>
+<h3 class="topic">
+<a name="1afu5lsd5hug3ossmtu4vqenak">&nbsp;&nbsp;&nbsp;        first_valid_runtime_state = state_initialized,</a>
+</h3>
+<h3 class="topic">
+<a name="42denm6volgp5qu7sli4gpge88">&nbsp;&nbsp;&nbsp;        state_pre_startup = 1,</a>
+</h3>
+<h3 class="topic">
+<a name="229n231775vb9mm01tu3204dvp">&nbsp;&nbsp;&nbsp;        state_startup = 2,</a>
+</h3>
+<h3 class="topic">
+<a name="08lr82hi0f5allu9m39hdort9k">&nbsp;&nbsp;&nbsp;        state_pre_main = 3,</a>
+</h3>
+<h3 class="topic">
+<a name="78afanao9h2a5m2bcd6v8v8inf">&nbsp;&nbsp;&nbsp;        state_starting = 4,</a>
+</h3>
+<h3 class="topic">
+<a name="680tstdas0jhovdmpb2cp9dlhj">&nbsp;&nbsp;&nbsp;        state_running = 5,</a>
+</h3>
+<h3 class="topic">
+<a name="7athsifk0evo70dlu3p15aluc9">&nbsp;&nbsp;&nbsp;        state_suspended = 6,</a>
+</h3>
+<h3 class="topic">
+<a name="6a7ki6qa56bhjd4n515i5hf9bi">&nbsp;&nbsp;&nbsp;        state_pre_shutdown = 7,</a>
+</h3>
+<h3 class="topic">
+<a name="19garo9eu8thr2aeqo1gpvs5pj">&nbsp;&nbsp;&nbsp;        state_shutdown = 8,</a>
+</h3>
+<h3 class="topic">
+<a name="39iag140sj2apsit1gf2mm5e6j">&nbsp;&nbsp;&nbsp;        state_stopping = 9,</a>
+</h3>
+<h3 class="topic">
+<a name="0rvjvnjtc6cspjoilja0s9lo9o">&nbsp;&nbsp;&nbsp;        state_terminating = 10,</a>
+</h3>
+<h3 class="topic">
+<a name="6mjdck2gk34c0q969j5r35q6ib">&nbsp;&nbsp;&nbsp;        state_stopped = 11,</a>
+</h3>
+<h3 class="topic">
+<a name="2ag31uhmbagsbfvib78ojafnne">&nbsp;&nbsp;&nbsp;        last_valid_runtime_state = state_stopped</a>
+</h3>
+<h2 class="topic">
+<a name="4kdartpc20pgg9tdeqc9ibohp0">callback_notifier</a>
+</h2>
+<p class="relationships">See Also: <a href="#0rg3bi4rkpqbl5vki15g7e3mjf">threads::policies::callback_notifier&amp; notifier</a>, <a href="#4le8n5g18ta4kg9vaplv9od85q">notification_policy_type&amp;notifier_</a>
+</p>
+<h3 class="topic">
+<a name="6ifs5mvh5r07vd6hqsblngr7sm">&nbsp;hpx::threads::policies::callback_notifier</a>
+</h3>
+<h3 class="topic">
+<a name="7qvv5vknknefvejgfhujucf3jl">&nbsp;&nbsp;data member</a>
+</h3>
+<h3 class="topic">
+<a name="772nsgh5p3rku59mqgc6lkarbv">&nbsp;&nbsp;&nbsp;on_startstop_type on_start_thread_</a>
+</h3>
+<p class="relationships">See Also: <a href="#202hub8atmbc852o0vorrql0uj">typedef util::function_nonser&lt;&#13;
+            void(std::size_t, boost::exception_ptr const&amp;)&gt; on_error_type;</a>
+</p>
+<h3 class="topic">
+<a name="5k2j4k07eq4r7iicfggdjrgjgk">&nbsp;&nbsp;&nbsp;&nbsp;function to call for each created thread</a>
+</h3>
+<h3 class="topic">
+<a name="2dmp08ednrs45cve3aas8rimme">&nbsp;&nbsp;&nbsp;on_startstop_type on_stop_thread_</a>
+</h3>
+<p class="relationships">See Also: <a href="#1ocn566jo4ic2rv820a5cd1o75">typedef util::function_nonser&lt;&#13;
+            void(std::size_t, char const*)&gt; on_startstop_type;</a>
+</p>
+<h3 class="topic">
+<a name="225vs2813neb4veacrjtg9p6b3">&nbsp;&nbsp;&nbsp;&nbsp;function to call in case of unexpected stop</a>
+</h3>
+<h3 class="topic">
+<a name="6u5fuls2t72socj4tfd41b4hra">&nbsp;&nbsp;&nbsp;on_error_type on_error_</a>
+</h3>
+<h3 class="topic">
+<a name="3o18nkds4r11q5v4e4k83t5ums">&nbsp;&nbsp;&nbsp;&nbsp;function to call in case of error</a>
+</h3>
+<h3 class="topic">
+<a name="08stpsh0o3s7d7dkcqk1vtpi4p">&nbsp;&nbsp;member function</a>
+</h3>
+<h3 class="topic">
+<a name="7t9ft4rvvasu7m5pfgi5ggup29">&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="2cjii7n3v1h47k52pm8qn5c37r">&nbsp;&nbsp;&nbsp;methods that call the member functions if they exist</a>
+</h3>
+</body>
+</html>

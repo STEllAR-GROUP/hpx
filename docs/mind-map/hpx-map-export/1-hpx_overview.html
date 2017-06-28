@@ -1,0 +1,653 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+What is HPX?
+
+A general purpose 
+C++ runtime system 
+for parallel and distributed 
+applications 
+of any scale
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="350um41p4tdubelvd2s12dhoje">
+What is HPX?
+
+A general purpose 
+C++ runtime system 
+for parallel and distributed 
+applications 
+of any scale
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="1-hpx_overview_files/images/ What is HPX   A general purpose  C++ runtime system  for parallel and distributed  applications  of any scale .jpg"></div>
+<h2 class="topic">
+<a name="2jv6rebaj7c5hjvikgvt9p34fg">The programming model</a>
+</h2>
+<div class="overview">
+<img src="1-hpx_overview_files/images/The programming model.jpg"></div>
+<h3 class="topic">
+<a name="351i3qssekf44epqflh6pn6q8v">&nbsp;The programming model</a>
+</h3>
+<p class="topicImage">
+<img height="508" src="1-hpx_overview_files/35tpi56i4gdjs0sbpsb6fg6aa1.png" width="709"></p>
+<h3 class="topic">
+<a name="01f2o0c4a027mptg2hk8fi31ei">&nbsp;Principles</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Principles.jpg"></div>
+<h3 class="topic">
+<a name="5csr87m9l88lkfvjgk9eq71263">&nbsp;&nbsp;global system-wide address space</a>
+</h3>
+<h3 class="topic">
+<a name="4bn0gh0rnpl8miuva4ei0v6jb1">&nbsp;&nbsp;fine-grained parallelism</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/fine-grained parallelism.jpg"></div>
+<h3 class="topic">
+<a name="3idgv3lau10lgdifasdm6g6fje">&nbsp;&nbsp;&nbsp; instead of heavy-weight threads</a>
+</h3>
+<h3 class="topic">
+<a name="1p0t3u543sa36asluhjnecgajj">&nbsp;&nbsp;&nbsp;numbers</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/numbers.jpg"></div>
+<h3 class="topic">
+<a name="2nkmof58s1ucg23cq029ce0b1v">&nbsp;&nbsp;&nbsp;&nbsp;overhead per HPX thread: about 700 ns</a>
+</h3>
+<h3 class="topic">
+<a name="22h7nfnfmsknp05cno57u2ei07">&nbsp;&nbsp;&nbsp;&nbsp;recommended grain size: 100 to 200 micros</a>
+</h3>
+<h3 class="topic">
+<a name="03eqqe856nfov387hqg5p1itt0">&nbsp;&nbsp;&nbsp;&nbsp;HPX is designed to handle millions of concurrent threads</a>
+</h3>
+<h3 class="topic">
+<a name="06jtlpmsccl3rq7joc9fuqkfj1">&nbsp;&nbsp;work follows data</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/work follows data.jpg"></div>
+<h3 class="topic">
+<a name="1i85j0hh8ga3sn8ff44ectk950">&nbsp;&nbsp;&nbsp;instead of data follows work</a>
+</h3>
+<h3 class="topic">
+<a name="1p765u9on96c27qriv85fkeolt">&nbsp;&nbsp;latency hiding</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/latency hiding.jpg"></div>
+<h3 class="topic">
+<a name="1g5fq8j171v5uvdv1i30n7ric8">&nbsp;&nbsp;&nbsp;instead of latency avoiding</a>
+</h3>
+<h3 class="topic">
+<a name="311u71h4jjg7pn2883gu3tcp0n">&nbsp;&nbsp;percolation</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/percolation.jpg"></div>
+<h3 class="topic">
+<a name="3071qjj8qsv3j0fueusqshhtio">&nbsp;&nbsp;&nbsp;explicit support for hardware acceleration</a>
+</h3>
+<h3 class="topic">
+<a name="2r4r1pbgocpftd6ujd3suit4fi">&nbsp;&nbsp;&nbsp;intrinsic latency hiding: moves work to unused parts of the system</a>
+</h3>
+<h3 class="topic">
+<a name="5mncankt82sfdq9k7fp1hq6fdj">&nbsp;&nbsp;&nbsp;Percolation is special use case scenario for parcels. Through percolation, messages carrying work, are directly targeted at the hardware resources rather than logical data objects. 
+This allows an efficient utilization of expensive resources, crosscutting the
+overheads involved in added abstraction layers when using logical means. Percolation, thus, provides a means of heterogeneous computation on specialized hardware devices such as FPGA and GPGPUs as a means of doing generic computing. 
+Since, within a synchronous domain such specialized hardware, also referred to as accelerators, have a different address space than the generic processing units; accelerators can be targeted by parcels, with parcel layer bridging the two architecturally disparate hardware units.</a>
+</h3>
+<h3 class="topic">
+<a name="6nkpub9v2h85qeq1i470msi878">&nbsp;&nbsp;message driven</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/message driven.jpg"></div>
+<h3 class="topic">
+<a name="1t2npiflms4dtg0i2euhta4r4h">&nbsp;&nbsp;&nbsp;instead of message passing</a>
+</h3>
+<h3 class="topic">
+<a name="6n0dct927touunm5mustjfur8e">&nbsp;&nbsp;&nbsp;ie send messages without need for receiver to "actively" wait for them</a>
+</h3>
+<h3 class="topic">
+<a name="4jo10br8dbon9g4es8nbo6llnn">&nbsp;&nbsp;work-queue model</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/work-queue model.jpg"></div>
+<h3 class="topic">
+<a name="1ke4d95u2r5bs2sma53nfcs112">&nbsp;&nbsp;&nbsp;instead of fork-join model</a>
+</h3>
+<h3 class="topic">
+<a name="38me8bgdp15eas8npgo3ev3mev">&nbsp;&nbsp;lightweight constraint-based synchronization </a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/lightweight constraint-based synchronization .jpg"></div>
+<h3 class="topic">
+<a name="0pla32n7egn6biii5vojlj7l5n">&nbsp;&nbsp;&nbsp;instead of things like global barriers</a>
+</h3>
+<h3 class="topic">
+<a name="031hcufvheo711bmc36rsio04j">&nbsp;&nbsp;full semantic equivalence of local and remote execution</a>
+</h3>
+<h3 class="topic">
+<a name="460s4oo3rah0hoeo19nf5h20l6">&nbsp;Types of parallelism</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Types of parallelism.jpg"></div>
+<h3 class="topic">
+<a name="5t1s8s3o31vokvh61vpghg6llq">&nbsp;&nbsp;fork-join parallelism</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/fork-join parallelism.jpg"></div>
+<h3 class="topic">
+<a name="6eso85la46m4qd6bdid4eqm8pv">&nbsp;&nbsp;&nbsp;task_block</a>
+</h3>
+<h3 class="topic">
+<a name="0pc1ja42k9cb1os95pp9jaln7h">&nbsp;&nbsp;parallel iterative execution
+(loop-based parallelism)</a>
+</h3>
+<h3 class="topic">
+<a name="2o30a84a8fc0b83fq1h3668p7q">&nbsp;&nbsp;asynchronous execution flows
+(continuation-style computation)</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/asynchronous execution flows (continuation-style computation).jpg"></div>
+<h3 class="topic">
+<a name="739jnmn5csik9qoj6v4u7bk9it">&nbsp;&nbsp;&nbsp;.then</a>
+</h3>
+<h3 class="topic">
+<a name="6hnlj6utmdv9tr3r560kuch78t">&nbsp;&nbsp;&nbsp;when_all etc.</a>
+</h3>
+<h3 class="topic">
+<a name="3rjqf97sc9m0fhff4i31gavgvf">&nbsp;&nbsp;&nbsp;dataflow</a>
+</h3>
+<h3 class="topic">
+<a name="4nfgqmjar1scq88omb4idkfvej">&nbsp;&nbsp;task-based parallelism</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/task-based parallelism.jpg"></div>
+<h3 class="topic">
+<a name="450i4cr2srf4pinocu4s6jt75n">&nbsp;&nbsp;&nbsp;async</a>
+</h3>
+<h3 class="topic">
+<a name="786pud5gvt5fao4l3hg7t4cma8">&nbsp;&nbsp;&nbsp;futures</a>
+</h3>
+<h3 class="topic">
+<a name="3psd8oq3si2i33h7cb1ml4a38s">&nbsp;&nbsp;HPX exposes a coherent programming model unifying all different types of parallelism available in HPC systems</a>
+</h3>
+<p class="summary">(<a href="#5t1s8s3o31vokvh61vpghg6llq">fork-join parallelism</a>, <a href="#0pc1ja42k9cb1os95pp9jaln7h">parallel iterative execution
+(loop-based parallelism)</a>, <a href="#2o30a84a8fc0b83fq1h3668p7q">asynchronous execution flows
+(continuation-style computation)</a>, <a href="#4nfgqmjar1scq88omb4idkfvej">task-based parallelism</a>)</p>
+<p class="topicImage">
+<img height="544" src="1-hpx_overview_files/11jdvubst8v42g8buljimqepes" width="749"></p>
+<h2 class="topic">
+<a name="5lncov1vp10f7co2khfvlttq11">Terminology</a>
+</h2>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Terminology.jpg"></div>
+<div class="notesContainer">
+<p>taken in part from http://stellar-group.github.io/hpx/docs/html/hpx/terminology.html</p>
+</div>
+<h3 class="topic">
+<a href="#44513avd0c4vkvbq7ltv048h0e" name="35qce04tomjbnipk821ev0umd4">&nbsp;AGAS : Active Global (system-wide) Address Space</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/AGAS   Active Global (system-wide) Address Space.jpg"></div>
+<h3 class="topic">
+<a name="5qqqef4kiiu0btdk7va0nm2i6h">&nbsp;&nbsp;exposes a single uniform address space spanning all localities an application runs on. </a>
+</h3>
+<h3 class="topic">
+<a name="1sel0afvvh5bftg289tr8k9dpe">&nbsp;&nbsp;- conceptually, there is no rigid demarcation of local or global memory in AGAS; all available memory is a part of the same address space. &#13;
+- AGAS enables named objects to be moved (migrated) across localities without having to change the object's name, i.e., no references to migrated objects have to be ever updated. &#13;
+- This feature has significance for dynamic load balancing and in applications where the workflow is highly dynamic, allowing work to be migrated from heavily loaded nodes to less loaded nodes. &#13;
+- immutability of names ensures that AGAS does not have to keep extra indirections ("bread crumbs") when objects move, hence minimizing complexity of code management for system developers as well as minimizing overheads in maintaining and managing aliases. </a>
+</h3>
+<h3 class="topic">
+<a name="6p12ir4i0anrjbpes7c270efib">&nbsp;&nbsp;In HPX global addresses (global names) are represented using the hpx::id_type data type. &#13;
+This data type is conceptually very similar to void* pointers as it does not expose any type information of the object it is referring to. </a>
+</h3>
+<h3 class="topic">
+<a name="7u836k793c9hnveav6ogd5pqq5">&nbsp;&nbsp;HPX incorporates a global address space. Any executing thread can access any object within the domain of the parallel application with the caveat that it must have appropriate access privileges. The model does not assume that global addresses are cache coherent; all loads and stores will deal directly with the site of the target object. All global addresses within a Synchronous Domain are assumed to be cache coherent for those processor cores that incorporate transparent caches. The Active Global Address Space used by HPX differs from research PGAS models. Partitioned Global Address Space is passive in their means of address translation. Copy semantics, distributed compound operations, and affinity relationships are some of the global functionality supported by AGAS.</a>
+</h3>
+<h3 class="topic">
+<a href="#0sum00m4l8g42pu6rmi9p0m2dl" name="6k3noojdcl5v2ns4l2birtmhf6">&nbsp;Execution properties</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Execution properties.jpg"></div>
+<div class="notesContainer">
+<p>taken from </p>
+<p>H. Kaiser, T. Heller, D. Bourgeois, D. Fey, Higher-level Parallelization for Local and Distributed Asynchronous Task-Based Programming</p>
+<p></p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="5j4on5skaunaeplkt8fjl4esiu">&nbsp;&nbsp;Execution restrictions</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Execution restrictions.jpg"></div>
+<h3 class="topic">
+<a name="5307b37uoamul4ecke16o2sq7i">&nbsp;&nbsp;&nbsp;Guarantees on thread safety 
+that are applicable for the work items</a>
+</h3>
+<h3 class="topic">
+<a name="2i5mco8ifoqpmgq2mvldkl8n3j">&nbsp;&nbsp;&nbsp;"can be run concurrently"</a>
+</h3>
+<h3 class="topic">
+<a name="0hnejqaip9lo223osrr8r8nk4d">&nbsp;&nbsp;&nbsp;"has to be run sequentially"</a>
+</h3>
+<h3 class="topic">
+<a name="2qihfigokfvr7iv500vsonc1dd">&nbsp;&nbsp;
+
+
+
+
+
+
+
+
+
+
+</a>
+</h3>
+<h3 class="topic">
+<a name="79vpbl2tc9o5oq7csgi764l8jc">&nbsp;&nbsp;Sequence of execution (how)</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Sequence of execution (how).jpg"></div>
+<h3 class="topic">
+<a name="45jq5ltalpdal8ios3r4hou188">&nbsp;&nbsp;&nbsp;"no restrictions apply"</a>
+</h3>
+<h3 class="topic">
+<a name="20m7bckcbcie897tv5q0f97e8m">&nbsp;&nbsp;&nbsp;"this work item depends on the availability of this result"</a>
+</h3>
+<h3 class="topic">
+<a name="56u9p4ignvgm69glr9nd3aj9ih">&nbsp;&nbsp;Where execution happens</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Where execution happens.jpg"></div>
+<h3 class="topic">
+<a name="1lbbss0j8mrcmu0rctoaprl6p1">&nbsp;&nbsp;&nbsp;"on this core"</a>
+</h3>
+<h3 class="topic">
+<a name="1fc75gkfmdf1rho4qpqjrfaumc">&nbsp;&nbsp;&nbsp;"on that NUMA domain"</a>
+</h3>
+<h3 class="topic">
+<a name="5ia5l4c0as7c5pkh90u8s0gi0l">&nbsp;&nbsp;&nbsp;"wherever this data item is located"</a>
+</h3>
+<h3 class="topic">
+<a name="05uc5qoi7egkdr87qq1qh48vli">&nbsp;&nbsp;Grain size of work items</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Grain size of work items.jpg"></div>
+<h3 class="topic">
+<a name="1k4velt2tjk9joigab1fvlr5r3">&nbsp;&nbsp;&nbsp;"each thread of execution should run the same number of work items"</a>
+</h3>
+<h3 class="topic">
+<a href="#793t99d12o1gerk06h4l4f9pdj" name="6u9lcfqk3bol0ev8f0dmg9c4c2">&nbsp;&nbsp;execution_policy</a>
+</h3>
+<p class="summary">(<a href="#5j4on5skaunaeplkt8fjl4esiu">Execution restrictions</a>)</p>
+<div class="overview">
+<img src="1-hpx_overview_files/images/execution_policy.jpg"></div>
+<h3 class="topic">
+<a href="http:// http://www.open-%0Astd.org/jtc1/sc22/wg21/docs/papers/2015/n4501.html" name="66v8fve2cg9hnt4gv2oijvf49m">&nbsp;&nbsp;&nbsp;&ldquo;an object that expresses the requirements on the
+ordering of functions invoked as a consequence of the invocation
+of a standard algorithm&rdquo; (Parallelism TS N4501)</a>
+</h3>
+<h3 class="topic">
+<a name="118v8koa0mb83a9slnlr92huke">&nbsp;&nbsp;&nbsp;types</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/types.jpg"></div>
+<h3 class="topic">
+<a name="4svjnuoqfvk6elfrtd599udg8e">&nbsp;&nbsp;&nbsp;&nbsp;seq</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/seq.jpg"></div>
+<h3 class="topic">
+<a name="7d50pgqih8j5rm2tlp24r13dlc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sequential execution</a>
+</h3>
+<h3 class="topic">
+<a name="4lmpo8ebeotsuegm0gs2ikphpi">&nbsp;&nbsp;&nbsp;&nbsp;par</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/par.jpg"></div>
+<h3 class="topic">
+<a name="3sci1amn93tqinak1ukm6lign2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallel execution</a>
+</h3>
+<h3 class="topic">
+<a name="5p4b580kn9kmregmcftq00hg21">&nbsp;&nbsp;&nbsp;&nbsp;par_vec</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/par_vec.jpg"></div>
+<h3 class="topic">
+<a name="5gt3fbsd7j9udqmiugrneua1r4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallel and vectorized execution</a>
+</h3>
+<h3 class="topic">
+<a name="31b3k8n7fmflpik6u640mg8bod">&nbsp;&nbsp;&nbsp;&nbsp;seq(task)</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/seq(task).jpg"></div>
+<h3 class="topic">
+<a name="7vob0418s04fqo51effr88hrmr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sequential and asynchronous execution</a>
+</h3>
+<h3 class="topic">
+<a name="60c9da858d2j87g3pct7cdtgse">&nbsp;&nbsp;&nbsp;&nbsp;par(task)</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/par(task).jpg"></div>
+<h3 class="topic">
+<a name="7jrleuk0ueminqp44ua8qb89i9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parallel and asynchronous execution</a>
+</h3>
+<h3 class="topic">
+<a name="2mcv2k30v7gjrgrfmgdc82afrj">&nbsp;&nbsp;&nbsp;&nbsp; task execution policies instruct any of the algorithms to
+return immediately, giving back to the invocation site a future ob-
+ject representing the final outcome of the algorithm.
+Task execution policies also enable
+the integration of parallel algorithms and fork-join task blocks with
+asynchronous execution flow</a>
+</h3>
+<p class="summary">(<a href="#31b3k8n7fmflpik6u640mg8bod">seq(task)</a>, <a href="#60c9da858d2j87g3pct7cdtgse">par(task)</a>)</p>
+<h3 class="topic">
+<a href="#6k42u3bieh53ucjum90ce9q2j6" name="2jf1a814acprosebmipouplqta">&nbsp;&nbsp;executor</a>
+</h3>
+<p class="summary">(<a href="#79vpbl2tc9o5oq7csgi764l8jc">Sequence of execution (how)</a>, <a href="#56u9p4ignvgm69glr9nd3aj9ih">Where execution happens</a>)</p>
+<div class="overview">
+<img src="1-hpx_overview_files/images/executor.jpg"></div>
+<h3 class="topic">
+<a href="http://www.open-%0Astd.org/jtc1/sc22/wg21/docs/papers/2015/n4406.pdf" name="72htdd6i03jq7kef5lkhg0pcei">&nbsp;&nbsp;&nbsp;"an object responsible for creating execution agents on which work is performed, thus abstracting the (potentially platform-specific) mechanisms for launching work&rdquo; 
+
+"In addition to preemptive thread pools common on some platforms, implementations of these algorithms may want to take advantage of a number of mechanisms for parallel
+execution, including cooperative fibers, GPU threads, and SIMD vector units, among others. This diversity of possible execution resources strongly suggests that a suitable abstraction encapsulating the details of how work is created across diverse platforms would be of significant value to parallel algorithm implementations. We believe that suitably defined executors provide just such a facility."
+
+(Parallelism TS N4406)</a>
+</h3>
+<h3 class="topic">
+<a href="#29pg8dt0ih2af1n39ha9u0ctsg" name="5m610ht172ka3q5hsa8ap6g5d8">&nbsp;&nbsp;executor_parameter</a>
+</h3>
+<p class="summary">(<a href="#05uc5qoi7egkdr87qq1qh48vli">Grain size of work items</a>)</p>
+<h3 class="topic">
+<a href="#6k42u3bieh53ucjum90ce9q2j6" name="542ncmikg3uqjvvg82qfa9q9hp">&nbsp;Executor</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Executor.jpg"></div>
+<h3 class="topic">
+<a name="4m1pmth2qb994j4saemq4e3c8r">&nbsp;&nbsp;Entities responsible for the creation of execution agents which control where execution of tasks happens. </a>
+</h3>
+<h3 class="topic">
+<a name="5ef7jickaa0rlt0ubclv3r3835">&nbsp;&nbsp;controls "how do tasks get put on to the queue" (execution)
+This is not the same thing as a scheduler, which controls "how do tasks get pulled off the queue" (scheduling)</a>
+</h3>
+<h3 class="topic">
+<a name="1egvvjv5ec666io3k0ke1flkj9">&nbsp;Future</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Future.jpg"></div>
+<h3 class="topic">
+<a name="6913k8a2q44uegsfilcpq6c00v">&nbsp;&nbsp;is an LCO</a>
+</h3>
+<h3 class="topic">
+<a name="01and3dqd04n66qbj9h970hn9d">&nbsp;&nbsp;Enable a transparent synchronization between the producer of the result and its consumer</a>
+</h3>
+<h3 class="topic">
+<a name="09jqvln9o3s4cclon6qh06ja5e">&nbsp;&nbsp;Hide the notion of directly dealing with threads</a>
+</h3>
+<h3 class="topic">
+<a name="2kustc018l7bkuqjjrgmfckk5g">&nbsp;&nbsp;Make asynchrony manageable as a future represents a data dependency</a>
+</h3>
+<h3 class="topic">
+<a name="38k3au8kiqoj2t6jvcgj05qlmb">&nbsp;&nbsp;Allow to coordinate asynchronous execution of several tasks</a>
+</h3>
+<h3 class="topic">
+<a name="7nl0iepqg9kuvedfrhn4kpdjub">&nbsp;&nbsp;Support and encourage a programming style which favors parallelism over concurrency</a>
+</h3>
+<h3 class="topic">
+<a href="#7fhhq7umq0eguk8i9523gbi2oq" name="1f8aed3vp331o6s6gfajlfinbg">&nbsp;LCO : Local Control Object</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/LCO   Local Control Object.jpg"></div>
+<h3 class="topic">
+<a name="2ga4r7v76jd5d4eogv7d419t9u">&nbsp;&nbsp;Any object that may create a new HPX thread or reactivate a suspended one is an LCO</a>
+</h3>
+<h3 class="topic">
+<a name="3v2tbgnpqrjotd8fpcbee6sira">&nbsp;&nbsp;A local control object (sometimes called a lightweight control object) is a general term for the synchronization mechanisms used in HPX. 
+Any object implementing a certain concept can be seen as an LCO. 
+This concepts encapsulates the ability to be triggered by one or more events which when taking the object into a predefined state will cause a thread to be executed. 
+This could either create a new thread or resume an existing thread.</a>
+</h3>
+<h3 class="topic">
+<a name="6q0aq179glusq372i4ddtb7ptt">&nbsp;&nbsp;The LCO is a family of synchronization functions potentially representing many classes of synchronization constructs, each with many possible variations and multiple instances. 
+The LCO is sufficiently general that it can subsume the functionality of conventional synchronization primitives such as spinlocks, mutexes, semaphores, and global barriers. 
+However due to the rich concept an LCO can represent powerful synchronization and control functionality not widely employed, such as dataflow and futures (among others), which open up enormous opportunities for rich diversity of distributed control and operation.</a>
+</h3>
+<h3 class="topic">
+<a name="6bvimqi0q16ujr3bslqgam0enh">&nbsp;Locality</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Locality.jpg"></div>
+<h3 class="topic">
+<a name="51p78gj4tfjca81caes7haelle">&nbsp;&nbsp;A locality in HPX describes a synchronous domain of execution, or the domain of bounded upper response time. </a>
+</h3>
+<h3 class="topic">
+<a name="2s9l3ah54a2j7af9ga0ht6tovs">&nbsp;&nbsp;This normally is just a single node in a cluster or a NUMA domain in a SMP machine.</a>
+</h3>
+<h3 class="topic">
+<a name="67p4cl0tlpbov3jujb1b27m1to">&nbsp;&nbsp;is an entity that can communicate parcels</a>
+</h3>
+<h3 class="topic">
+<a name="6cd7edh75cdpfsjm3gu99kt8ls">&nbsp;&nbsp;is a set of hardware resources with bounded finite latencies 
+Each locality asynchronously receives and transmits parcels </a>
+</h3>
+<h3 class="topic">
+<a name="03lo3ososgeoehp0cs4k630ldm">&nbsp;Parcel</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Parcel.jpg"></div>
+<h3 class="topic">
+<a name="4bhqbu6ohctrbi0r4o8o5n3tn3">&nbsp;&nbsp;encapsulates remote method calls
+this is the basis of all network communication</a>
+</h3>
+<h3 class="topic">
+<a name="0tcopq9svikbd1r05bu33eogg1">&nbsp;&nbsp;The Parcel is a component in HPX that communicates data, invokes an action at a distance, and distributes flow-control through the migration of continuations. Parcels bridge the gap of asynchrony between synchronous domains while maintaining symmetry of semantics between local and global execution. Parcels enable message-driven computation and may be seen as a form of "active messages". Other important forms of message-driven computation predating active messages include dataflow tokens, the J-machine's support for remote method instantiation, and at the coarse grained variations of Unix remote procedure calls, among others. This enables work to be moved to the data as well as performing the more common action of bringing data to the work. A parcel can cause actions to occur remotely and asynchronously, among which are the creation of threads at different system nodes or synchronous domains.</a>
+</h3>
+<h3 class="topic">
+<a href="#5cgktbq3qmtkj34kgr9hf7tmp3" name="2uva8u9sg47di2lgskkdpjqg2a">&nbsp;Process or HPX threads or ParalleX  threads or tasks</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Process or HPX threads or ParalleX  threads or tasks.jpg"></div>
+<h3 class="topic">
+<a name="3j6misdh1dvpqe2g1q5mjk213n">&nbsp;&nbsp;Is a lightweight thread. Millions of such tasks can be created and executed in an HPX application.</a>
+</h3>
+<h3 class="topic">
+<a name="6qcj7ll6orch65c5rkngvthf5i">&nbsp;&nbsp;The concept of the "process" in HPX is extended beyond that of either sequential execution or communicating sequential processes. While the notion of process suggests action (as do "function" or "subroutine") it has a further responsibility of context, that is, the logical container of program state. It is this aspect of operation that process is employed in HPX. Furthermore, referring to "parallel processes" in HPX designates the presence of parallelism within the context of a given process, as well as the coarse grained parallelism achieved through concurrency of multiple processes of an executing user job. HPX processes provide a hierarchical name space within the framework of the active global address space and support multiple means of internal state access from external sources. It also incorporates capabilities based access rights for protection and security.</a>
+</h3>
+<h3 class="topic">
+<a href="#28ria9uha9teeumuued0ofng95" name="3o24mqvtqn2v749nq6421vc719">&nbsp;Scheduler</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Scheduler.jpg"></div>
+<h3 class="topic">
+<a name="7dogdqkru421i8joqvni3no0jg">&nbsp;&nbsp;manages the work-queues</a>
+</h3>
+<h3 class="topic">
+<a name="1fa3bodccvcv1t9muoa7a6mugi">&nbsp;&nbsp;this diagram is misleading: there's actually only one scheduler for the whole runtime.
+This scheduler holds the work queues of all OS-threads.</a>
+</h3>
+<h3 class="topic">
+<a name="2mcu66dhimlrk9o7jgn5468vvs">&nbsp;&nbsp;The thread-pool holding all OS-threads has a reference to a Scheduler as a data member</a>
+</h3>
+<h3 class="topic">
+<a href="#546dekou3u0226ntiiemt6efp2" name="5kkrc2t6l6ejfl6vlt3kt8ma66">&nbsp;Work-queue</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Work-queue.jpg"></div>
+<h3 class="topic">
+<a name="18amevreuh1dltmhdrkvgk1fcf">&nbsp;&nbsp;holds HPX tasks to be executed.</a>
+</h3>
+<h3 class="topic">
+<a name="5jeu5o4ofe65ijg23u37qkf14o">&nbsp;&nbsp;there can be one or several of those per core (with different priorities)</a>
+</h3>
+<h2 class="topic">
+<a name="2b18ihdbcg2nf8edrdl6b46qpe">Where to find information?</a>
+</h2>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Where to find information .jpg"></div>
+<h3 class="topic">
+<a name="7fe5c0adaleds2vdvptpmqu3av">&nbsp;Github page</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Github page.jpg"></div>
+<h3 class="topic">
+<a href="http://github.com/STEllAR-GROUP/hpx" name="5tfqi30jd2gbn9b5qd1qloies5">&nbsp;&nbsp;https://github.com/STEllAR-GROUP/hpx</a>
+</h3>
+<h3 class="topic">
+<a name="4600f3uoh25bhfq9nkgjeojsmu">&nbsp;&nbsp;Github page: tutorials</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Github page  tutorials.jpg"></div>
+<h3 class="topic">
+<a href="http://github.com/STEllAR-GROUP/tutorials" name="4j3s4rh9ndbt4mrl196nk0qcvr">&nbsp;&nbsp;&nbsp;https://github.com/STEllAR-GROUP/tutorials</a>
+</h3>
+<h3 class="topic">
+<a name="29c41u8c2kopvarhi6bfb0t0ij">&nbsp;Reference</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Reference.jpg"></div>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html" name="0m6kcrg55hmreu945us043rnjo">&nbsp;&nbsp;http://stellar-group.github.io/hpx/docs/html</a>
+</h3>
+<h3 class="topic">
+<a name="0mu4uddud462b23vma2i5n6i1m">&nbsp;Website</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Website.jpg"></div>
+<h3 class="topic">
+<a href="http://stellar-group.org/" name="2t1cartlvmj5mtfn5u9prp1fhn">&nbsp;&nbsp;http://stellar-group.org/</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/http   stellar-group.org .jpg"></div>
+<h3 class="topic">
+<a href="http://stellar-group.org/blog/" name="4k2hi7g09tiluof3flaabuuo74">&nbsp;&nbsp;&nbsp;Blog</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.org/publications/" name="668temopkildorsi503t76n8gj">&nbsp;&nbsp;&nbsp;Publications</a>
+</h3>
+<h3 class="topic">
+<a name="3soc8j04usglek4k2d4ms0fv88">&nbsp;IRC channel</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/IRC channel.jpg"></div>
+<h3 class="topic">
+<a name="06o17g7ur26q38gvokqg7qp8qs">&nbsp;&nbsp;ste||ar at FreeNode</a>
+</h3>
+<h3 class="topic">
+<a name="0ras731um5recmhron8l7osits">&nbsp;Videos</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Videos.jpg"></div>
+<h3 class="topic">
+<a name="54m0aok5s8u96h78du0sejbbhj">&nbsp;&nbsp;talks</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/talks.jpg"></div>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=INS1xKWKBQE" name="6kl0u942dv78r48p7qani363sb">&nbsp;&nbsp;&nbsp;Hartmut Kaiser and Vinay Amatya: 
+HPX: A C++ Runtime System For Parallel And Distributed Computing</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=5xyztU__yys" name="3r8e98bv55degbar29790ga7q1">&nbsp;&nbsp;&nbsp;CppCon 2014: Hartmut Kaiser "Asynchronous Computation in C++"</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=6Z3_qaFYF84" name="4sg1d9v50o8sid8ihn92gaehin">&nbsp;&nbsp;&nbsp;CppCon 2016: Hartmut Kaiser &ldquo;Parallelism in Modern C++"</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=5rtY4Da4Ec8" name="1scolq6c9q7dobcep84gju1v8p">&nbsp;&nbsp;&nbsp;Modern C++ Workshop: HPX (C++ libs)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=rNl0KqGF12U" name="3safo0mteds0s4m13l4j94f27c">&nbsp;&nbsp;&nbsp;Bryce Adelstein-Lelbach, Matthew Anderson, Hartmut Kaiser: 
+HPX: A C++11 parallel runtime system</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=No1knGsLGko" name="7au1jfk0g0h5kt7isc6ff8d4vm">&nbsp;&nbsp;&nbsp;Thomas Heller - HPX - High Perfomant Parallel Runtime for C++</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=uM4oRWsZJKc" name="0ja85c725eukep3a9lrhlm5sok">&nbsp;&nbsp;&nbsp;Bryce Lelbach: HPX: A C++ Parallel Programming Framework</a>
+</h3>
+<h3 class="topic">
+<a name="2s3ib2rvj4gcirrmar2le80nhj">&nbsp;&nbsp;Workshop at CSCS
+(Heller and Biddiscombe)</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Workshop at CSCS (Heller and Biddiscombe).jpg"></div>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=NToOo-T3Q3w" name="0houa90bkvnjrbtjba6m0gbmfl">&nbsp;&nbsp;&nbsp;Introduction to HPX Part 1 (Biddiscombe)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=ZZxvqJszLxU" name="5u904rutodobpph2pa3ns73a3j">&nbsp;&nbsp;&nbsp;Introduction to HPX Part 2 (Biddiscombe, Heller)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=h09p0d2grxY" name="5tolqptjn1deaa446fhb85uvjt">&nbsp;&nbsp;&nbsp;Building HPX CMake Options and Dependencies (Heller, Biddiscombe)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=Orv9vS6_IUU" name="0g2i36a1b9oij7raseurn0efh3">&nbsp;&nbsp;&nbsp;Hello World! Options and Running Applications (Heller)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=ORlYc5xNQ0E" name="3g52v40jrkng4k30ffskqb36ll">&nbsp;&nbsp;&nbsp;Worked 2D Stencil Example From Serial to Distributed (Heller)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=jsU12lAAkgk" name="56o3sge0qnvq2fhcab97fmq2s3">&nbsp;&nbsp;&nbsp;Resource Management and Performance Issues (Biddiscombe)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=Ih1qAC-TOQk" name="0oru5vt83spghkvk0etcocmsn0">&nbsp;&nbsp;&nbsp;Debugging HPX Applications (Biddiscombe, Heller)</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.youtube.com/watch?v=8-1D4EF57fo&amp;feature=youtu.be" name="56tegkq4er4hu8l816s575f7r2">&nbsp;&nbsp;C++Chat episode</a>
+</h3>
+<h3 class="topic">
+<a name="5mhlrhsce56b7rgkic59l23d30">&nbsp;Examples</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Examples.jpg"></div>
+<h3 class="topic">
+<a name="4dicilr471ljs2hb3af4i9hlh6">&nbsp;&nbsp;in the Git repository</a>
+</h3>
+<h2 class="topic">
+<a href="#7un0eqdp7n01c863dep2id0p7i" name="5adpc7ka8klp7rldr8gcm4qcm4">The HPX API</a>
+</h2>
+<div class="overview">
+<img src="1-hpx_overview_files/images/The HPX API.jpg"></div>
+<h3 class="topic">
+<a name="20prgqiquiai34iea3vvistom5">&nbsp;Functions</a>
+</h3>
+<div class="overview">
+<img src="1-hpx_overview_files/images/Functions.jpg"></div>
+<p class="topicImage">
+<img height="915" src="1-hpx_overview_files/0j3ss2o3533vkcnsl6i2japipe.png" width="1701"></p>
+<h3 class="topic">
+<a name="7acl39b661gkc24jqrvttdd3re">&nbsp;&nbsp;conforming to and extending the C++ Standard</a>
+</h3>
+<p class="topicImage">
+<img height="912" src="1-hpx_overview_files/5aa8j27m1kfl5lkfu6uaje99vl.png" width="1280"></p>
+<h3 class="topic">
+<a name="2gu3v9b44qqes0pde86d69q34m">&nbsp;Exposes a coherent and uniform, standards-oriented API
+ for ease of programming parallel, distributed, 
+and heterogeneous applications.</a>
+</h3>
+<h3 class="topic">
+<a name="7cp8v6clo44lv6afgqeevro0ni">&nbsp;Enables to write fully asynchronous code using hundreds of millions of threads.</a>
+</h3>
+<h3 class="topic">
+<a name="3jcuocbpbklf3hct6sgpkvt68t">&nbsp;Provides unified syntax and semantics for local and remote operations.</a>
+</h3>
+<h2 class="topic">
+<a name="6isiumt4bd6akotkh2h7n4v6fv">A C++ library</a>
+</h2>
+<div class="overview">
+<img src="1-hpx_overview_files/images/A C++ library.jpg"></div>
+<h3 class="topic">
+<a name="2638ino52geub6msk2p68p4m7e">&nbsp;The source code: a C++ Standard Library</a>
+</h3>
+<p class="topicImage">
+<img height="939" src="1-hpx_overview_files/7aoqfdb4kogs7iql00pnb8sal2.png" width="1648"></p>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+hpx::init(...)
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="4g4mbem46ig0kav5jmjr0uolvi">
+hpx::init(...)
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="14-hpx_init_files/images/ hpx  init(...) .jpg"></div>
+<h2 class="topic">
+<a name="79v7q6m02sptkgsv9685nbn4v9">int main(int argc, char* argv[])
+{
+    // ...
+    return hpx::init(argc, argv);
+}</a>
+</h2>
+<h3 class="topic">
+<a name="0to5m230gq9f4fu0o4gn9dueqo">&nbsp;and then what? </a>
+</h3>
+<h3 class="topic">
+<a name="3hb6vm2mvnfio0d1h1d3inlgtd">&nbsp;&nbsp;jump from init to init, depending on the arguments, 
+until I get to ...</a>
+</h3>
+<h3 class="topic">
+<a name="13g2k9tslrtjkm33hr0feqhup9">&nbsp;&nbsp;&nbsp;inline int init(
+        util::function_nonser&lt;
+            int(boost::program_options::variables_map&amp; vm)
+        &gt; const&amp; f,
+        boost::program_options::options_description const&amp; desc_cmdline,
+        int argc, 
+        char** argv, 
+        std::vector&lt;std::string&gt; const&amp; cfg,
+        startup_function_type startup, 
+        shutdown_function_type shutdown,
+        hpx::runtime_mode mode)</a>
+</h3>
+<p class="relationships">See Also: <a href="#5u7v8ss4s3aq4nsob0gu6d5s64">return detail::run_or_start(
+        f, 
+        desc_cmdline, 
+        argc, argv,
+        hpx_startup::user_main_config(cfg),
+        std::move(startup), 
+        std::move(shutdown), 
+        mode, true);</a>
+</p>
+<h3 class="topic">
+<a name="5u7v8ss4s3aq4nsob0gu6d5s64">&nbsp;&nbsp;return detail::run_or_start(
+        f, 
+        desc_cmdline, 
+        argc, argv,
+        hpx_startup::user_main_config(cfg),
+        std::move(startup), 
+        std::move(shutdown), 
+        mode, true);</a>
+</h3>
+<div class="notesContainer">
+<p>hpx_init.cpp:1092</p>
+<p></p>
+</div>
+<p class="relationships">See Also: <a href="#13g2k9tslrtjkm33hr0feqhup9">inline int init(
+        util::function_nonser&lt;
+            int(boost::program_options::variables_map&amp; vm)
+        &gt; const&amp; f,
+        boost::program_options::options_description const&amp; desc_cmdline,
+        int argc, 
+        char** argv, 
+        std::vector&lt;std::string&gt; const&amp; cfg,
+        startup_function_type startup, 
+        shutdown_function_type shutdown,
+        hpx::runtime_mode mode)</a>
+</p>
+<h3 class="topic">
+<a name="5fdtdrtro23u2qo653k433209f">&nbsp;&nbsp;&nbsp;HPX_EXPORT int run_or_start(
+            util::function_nonser&lt;
+                int(boost::program_options::variables_map&amp; vm)
+            &gt; const&amp; f,
+            boost::program_options::options_description const&amp; desc_cmdline,
+            int argc, 
+			char** argv, 
+			std::vector&lt;std::string&gt; &amp;&amp; ini_config,
+            startup_function_type startup,
+            shutdown_function_type shutdown, 
+			hpx::runtime_mode mode,
+            bool blocking)</a>
+</h3>
+<div class="notesContainer">
+<p>hpx_init.cpp:1092</p>
+</div>
+<h3 class="topic">
+<a name="0n37muapvj6d6hah9o0236ep89">&nbsp;&nbsp;&nbsp;&nbsp;set error handlers</a>
+</h3>
+<h3 class="topic">
+<a name="72qh6cr28kipbeoje56u8lf3m7">&nbsp;&nbsp;&nbsp;&nbsp;make sure the runtime system is not active yet</a>
+</h3>
+<h3 class="topic">
+<a name="0nesehcmkpjo9e5vcappe96ida">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by making sure that</a>
+</h3>
+<h3 class="topic">
+<a name="3hjdc5blfqt69drst601l15k0o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get_runtime_ptr() == nullptr</a>
+</h3>
+<h3 class="topic">
+<a name="1fss6f8d3ntqoenqhe3hsgpua7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if it is, cerr and return -1</a>
+</h3>
+<h3 class="topic">
+<a name="182jf94re1sg1n83d4h2f1s1ef">&nbsp;&nbsp;&nbsp;&nbsp;instanciate commandline_handling instance 
+cfg</a>
+</h3>
+<p class="relationships">See Also: <a href="#232mgq3gjkqp9c9apulh83bhto">struct hpx::util::command_line_handling</a>
+</p>
+<h3 class="topic">
+<a name="113495rvt41kaqvhrbhan1s50a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::command_line_handling cfg(
+    mode, f, std::move(ini_config), argv)</a>
+</h3>
+<h3 class="topic">
+<a name="320fc6hrd1ovolfjeu5fg416he">&nbsp;&nbsp;&nbsp;&nbsp;handle command line switches</a>
+</h3>
+<h3 class="topic">
+<a name="46akl9g2m5ie89qhimu6o76juk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result=cfg.call(desc_cmdline, argc, argv)</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv);</a>
+</p>
+<h3 class="topic">
+<a name="4jvtrm2tq0b4d60m5aqs2hcnl7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="2a8heccqk85do9kuokoiammh4t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...</a>
+</h3>
+<h3 class="topic">
+<a name="5v3tfmkc7opqfhqm4rsi476bkv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initial analysis of the command line options
+(does not take aliases from the runtime configuration file into account) </a>
+</h3>
+<h3 class="topic">
+<a name="1b0cuuit23eg9805ilc1dgbh2g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instanciate</a>
+</h3>
+<h3 class="topic">
+<a name="00vb6g9g9nsd4l6n98583lhgdj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::programm_options::variables_map prevm</a>
+</h3>
+<h3 class="topic">
+<a name="1thi8i6hciq7m9irc39pglerkl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call </a>
+</h3>
+<h3 class="topic">
+<a name="03u9ip7lvdlalne4g4s326mqq5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::parse_commandline(...)</a>
+</h3>
+<h3 class="topic">
+<a name="38dh39qegdrdjigm42rvm9f423">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if in the command line, there was --version, --info or --help, result is !=0 and we exit</a>
+</h3>
+<h3 class="topic">
+<a name="4bqtakh8o5vj036fkrfgi121ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise, we want to run an application, so we just go on</a>
+</h3>
+<h3 class="topic">
+<a name="78p4rq2u0dbp0u1m7nkeibb2qp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sets them as data members of cfg</a>
+</h3>
+<h3 class="topic">
+<a name="7dqg5vgmnjepfef5b0gcpgalrh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;now cfg contains all the parameters we need to setup the runtime</a>
+</h3>
+<h3 class="topic">
+<a name="6dna1i0pc14cn6n63ju0a80he0">&nbsp;&nbsp;&nbsp;&nbsp;initialize the affinity data</a>
+</h3>
+<h3 class="topic">
+<a name="3ptdgc8behtf4u8bvq00mm0pi0">&nbsp;&nbsp;&nbsp;&nbsp;initialize the resource partitioner</a>
+</h3>
+<h3 class="topic">
+<a name="15imphofmjaa05qgtvan1q0pcv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize its hardware affinity data</a>
+</h3>
+<h3 class="topic">
+<a name="5jkblm1ksndef8vers5frlbllh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the default pool</a>
+</h3>
+<h3 class="topic">
+<a name="2rojd4dj6ghnulkr0oi87kf9np">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the default scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="69nr51a4u21jih8b28mrnib8fi">&nbsp;&nbsp;&nbsp;&nbsp;initialize logging and apex_wrapper</a>
+</h3>
+<h3 class="topic">
+<a name="1trnp9tvtbhrkjgnqmp6co10sm">&nbsp;&nbsp;&nbsp;&nbsp;initialize and start the HPX runtime</a>
+</h3>
+<h3 class="topic">
+<a name="5dmv2592grlljbhvkdh340d2s8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;depending on cfg.queuing_, call the "run" function
+corresponding to the scheduler specified in the cmd line</a>
+</h3>
+<h3 class="topic">
+<a name="13redjsnj205nebhdtr2ujsl5o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int run_priority_local(
+			startup_function_type startup,
+            shutdown_function_type shutdown,
+            util::command_line_handling&amp; cfg, 
+			bool blocking)</a>
+</h3>
+<p class="topicImage">
+<img height="324" src="14-hpx_init_files/7in8fjtk5ec92plg2cve31b4ks" width="580"></p>
+<h3 class="topic">
+<a name="0b8j73vbhumgtr402i61f5i733">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ensure arity compatibility</a>
+</h3>
+<div class="notesContainer">
+<p>Idk what this mean</p>
+</div>
+<h3 class="topic">
+<a name="4eq55juerq3kirjdjdc99vd006">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get settings from "cfg" argument</a>
+</h3>
+<h3 class="topic">
+<a name="54arih2tprfbmub8ae1cktimaa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num_high_priority_queues</a>
+</h3>
+<h3 class="topic">
+<a name="4bq4le78m5u7bkc2oahtv9ooqn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pu_offset</a>
+</h3>
+<h3 class="topic">
+<a name="7ibdatu0phgui3pg0r9gn68ro1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pu_step</a>
+</h3>
+<h3 class="topic">
+<a name="46di6jtpaebp42lg26k7s8k32u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;affinity_domain</a>
+</h3>
+<h3 class="topic">
+<a name="6c3ldihoa9jj3mh4f671ggcreh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;affinity_desc</a>
+</h3>
+<h3 class="topic">
+<a name="1hhr9j0os6fco7qsec7nca9keh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numa_sensitive</a>
+</h3>
+<h3 class="topic">
+<a name="2ulmpkspk7jqd8tl62csd8lubm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef the scheduling policy</a>
+</h3>
+<h3 class="topic">
+<a name="6h1b57n0er4l611q44e3borohs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            // scheduling policy
+            typedef hpx::threads::policies::local_priority_queue_scheduler&lt;
+                    boost::mutex, Queuing
+                &gt; local_queue_policy;</a>
+</h3>
+<h3 class="topic">
+<a name="59f4beq9qmp7ls834vqiam1nml">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set init</a>
+</h3>
+<h3 class="topic">
+<a name="60jkfjuagpemieaus8a7aplmi9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::policies::local_priority_queue_scheduler::init_parameter_type</a>
+</h3>
+<h3 class="topic">
+<a name="7umllr509itv3pl2slb9phlu0t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            typename local_queue_policy::init_parameter_type init(
+                cfg.num_threads_, num_high_priority_queues, 1000,
+                numa_sensitive, "core-local_priority_queue_scheduler");</a>
+</h3>
+<h3 class="topic">
+<a name="7c6s5taimi295r2hj5eh954s5a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000 = max_thread_count</a>
+</h3>
+<h3 class="topic">
+<a name="4723srq4atf8hosir4m4s713ej">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set affinity_init</a>
+</h3>
+<h3 class="topic">
+<a name="2mjrumckmu85e629ha8nqnop77">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::policies::init_affinity_data</a>
+</h3>
+<h3 class="topic">
+<a name="5un3v2cf4v3ul9d6gljv5tkjlb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instanciate and initialize the runtime system</a>
+</h3>
+<h3 class="topic">
+<a href="#3u05e8h1iit8s981s78k7b12uc" name="7kmlv6va0velppn5138nsbn01g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef hpx::runtime_impl&lt;local_queue_policy&gt; runtime_type;
+
+std::unique_ptr&lt;hpx::runtime&gt; rt(
+    new runtime_type(
+			cfg.rtcfg_, 
+			cfg.mode_, 
+			cfg.num_threads_, 
+			init,
+ 		       affinity_init));</a>
+</h3>
+<h3 class="topic">
+<a name="2gtthpusvu65k1cc2o5btumhaa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+</h3>
+<p class="topicImage">
+<img height="700" src="14-hpx_init_files/6bhkk1vga6rsnfgrd09vohc4lq" width="1853"></p>
+<h3 class="topic">
+<a name="4jeanggu1u89an8uebrnsb1d4d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call run_or_start</a>
+</h3>
+<h3 class="topic">
+<a name="624n9039cd3snm95i9d3od8fck">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return run_or_start(
+	blocking, 
+	std::move(rt), 
+	cfg,
+    std::move(startup), 
+	std::move(shutdown));</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kusj255d75l765pge8eeo1pt5">int run_or_start(
+	bool blocking, 
+	std::unique_ptr&lt;hpx::runtime&gt; rt,
+    util::command_line_handling&amp; cfg,
+    startup_function_type startup, 
+	shutdown_function_type shutdown)</a>
+</p>
+<h3 class="topic">
+<a name="7e7je46g8hnj9h13ecf7d7j7b6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return its result</a>
+</h3>
+<h3 class="topic">
+<a name="61r73g82u840evv1rkj4nj3mnr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;there is a different version of run_blahblah
+for each scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="6kusj255d75l765pge8eeo1pt5">&nbsp;&nbsp;int run_or_start(
+	bool blocking, 
+	std::unique_ptr&lt;hpx::runtime&gt; rt,
+    util::command_line_handling&amp; cfg,
+    startup_function_type startup, 
+	shutdown_function_type shutdown)</a>
+</h3>
+<div class="notesContainer">
+<p>hpx_init.cpp:734</p>
+</div>
+<p class="relationships">See Also: <a href="#624n9039cd3snm95i9d3od8fck">return run_or_start(
+	blocking, 
+	std::move(rt), 
+	cfg,
+    std::move(startup), 
+	std::move(shutdown));</a>
+</p>
+<h3 class="topic">
+<a name="7os29v8q5254isc02nrappu8c2">&nbsp;&nbsp;&nbsp;blocking</a>
+</h3>
+<h3 class="topic">
+<a name="237c6c2ov1f96ss2s6bgktdj5e">&nbsp;&nbsp;&nbsp;&nbsp;return run(
+	*rt, 
+	cfg.hpx_main_f_, 
+	cfg.vm_, 
+	cfg.mode_,
+    std::move(startup), 
+	std::move(shutdown));</a>
+</h3>
+<h3 class="topic">
+<a name="20e4lb64ecohub36e2seap8iul">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int run(
+		hpx::runtime&amp; rt,
+        util::function_nonser&lt;int(boost::program_options::variables_map&amp; vm)&gt; const&amp; f,
+		boost::program_options::variables_map&amp; vm, 
+		runtime_mode mode,
+        startup_function_type startup, 
+		shutdown_function_type shutdown)</a>
+</h3>
+<div class="notesContainer">
+<p>hpx_init.cpp:694</p>
+</div>
+<h3 class="topic">
+<a name="7u2cl1qen87bqcofe5q310poph">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="13mrmfsq8puqkdcbv5ifb6db8k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logging</a>
+</h3>
+<h3 class="topic">
+<a name="27sg4bta6krvd5erjfu2ra95ph">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add_startup_functions</a>
+</h3>
+<h3 class="topic">
+<a name="3uppfqf3ac6pi5k519kektfjto">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add startup and shutdown functions to runtime 
+by calling member functions</a>
+</h3>
+<h3 class="topic">
+<a name="1metlgaumpb1t63llk6ktoobig">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run the runtime instance</a>
+</h3>
+<h3 class="topic">
+<a name="23fd03e7p2njephmkuithp0s29">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if "f" isn't empty</a>
+</h3>
+<div class="notesContainer">
+<p>usual cas</p>
+</div>
+<h3 class="topic">
+<a name="1ootdp0gu8r7r4so2h0bk7fh3m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run the runtime instance using 
+the given function "f"</a>
+</h3>
+<h3 class="topic">
+<a href="#0gtq2dc1n3ku134h5rakgq10ul" name="7opk2s5h4tsu0a1qj7jbvo5089">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return rt.run(util::bind(f, vm));</a>
+</h3>
+<h3 class="topic">
+<a name="4c2iddjn55brandont0kssm4os">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if it is empty</a>
+</h3>
+<h3 class="topic">
+<a name="1m4udk99b63ber7ovgqudtl0pi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run the runtime instance 
+without any hpx_main</a>
+</h3>
+<h3 class="topic">
+<a href="#2nca93v25ng8crtvq8f4g08bcn" name="659dkejniebk8qgaeun8713fma">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return rt.run();</a>
+</h3>
+<h3 class="topic">
+<a name="2bnjlq6ahcau2a5ktlpgm0877t">&nbsp;&nbsp;&nbsp;non-blocking </a>
+</h3>
+<h3 class="topic">
+<a name="0m48c6akq90bcgm88a9vvha81f">&nbsp;&nbsp;&nbsp;&nbsp;start(
+		*rt, 
+		cfg.hpx_main_f_, 
+		cfg.vm_, 
+		cfg.mode_, 
+		std::move(startup),
+        std::move(shutdown));</a>
+</h3>
+<h3 class="topic">
+<a name="6p3qfn8onn7haplufd9qt2flj2">&nbsp;&nbsp;&nbsp;&nbsp;rt.release();          // pointer to runtime is stored in TLS</a>
+</h3>
+<h3 class="topic">
+<a name="6hc9q3h1g37kalh3iu0krs493p">&nbsp;&nbsp;&nbsp;&nbsp;return 0;</a>
+</h3>
+<h2 class="topic">
+<a name="00ti7akrcfqoorhallbj3evhpa">related structs, classes
+and functions</a>
+</h2>
+<h3 class="topic">
+<a name="232mgq3gjkqp9c9apulh83bhto">&nbsp;struct hpx::util::command_line_handling</a>
+</h3>
+<p class="relationships">See Also: <a href="#182jf94re1sg1n83d4h2f1s1ef">instanciate commandline_handling instance 
+cfg</a>
+</p>
+<h3 class="topic">
+<a name="5309dddtusk1k9idm73mv7jrvp">&nbsp;&nbsp;
+structure used for handling all command line options. 
+This is used for initialization of the runtime
+</a>
+</h3>
+<h3 class="topic">
+<a name="7bvpg2sgohnc5haon0cudnvudt">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="3pjooe1rm6qeasshss67rt8que">&nbsp;&nbsp;&nbsp;&nbsp;boost::program_options::variables_map vm_;</a>
+</h3>
+<h3 class="topic">
+<a name="2pnc0avj3b9mbkac6vc27lrk8c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contains the user-specified command-line options</a>
+</h3>
+<h3 class="topic">
+<a name="4fjp5li1hng9t5njgq68ldnipb">&nbsp;&nbsp;&nbsp;&nbsp;        util::runtime_configuration rtcfg_;</a>
+</h3>
+<h3 class="topic">
+<a name="5jt9lo07o26adg6fltd92hg767">&nbsp;&nbsp;&nbsp;&nbsp;        hpx::runtime_mode mode_;</a>
+</h3>
+<h3 class="topic">
+<a name="633ebc2dhe0r0jheg4arp9gbsk">&nbsp;&nbsp;&nbsp;&nbsp;        std::vector&lt;std::string&gt; ini_config_;</a>
+</h3>
+<h3 class="topic">
+<a name="1km14nj20p30s32fk4q7ufancj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;things are written into this as setting up progresses. 
+Used for output/debugging? </a>
+</h3>
+<h3 class="topic">
+<a name="2a9u1heef95bjd71dk797kdvjv">&nbsp;&nbsp;&nbsp;&nbsp;util::function_nonser&lt;
+    int(boost::program_options::variables_map&amp; vm)
+&gt; hpx_main_f_;</a>
+</h3>
+<h3 class="topic">
+<a name="59g2tfaktb27nme8dg0ib3k7ud">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t node_;</a>
+</h3>
+<h3 class="topic">
+<a name="1ap550q3glost8p47ggcisucls">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_threads_;</a>
+</h3>
+<h3 class="topic">
+<a name="7i828pckb19hu6v66dm0dbha14">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="61uo2aou8jn7qjgiev9uven02l">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_localities_;</a>
+</h3>
+<h3 class="topic">
+<a name="47mggkkm527nmcepjmrgoev4dm">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t pu_step_;</a>
+</h3>
+<h3 class="topic">
+<a name="1sv5gg4vqfeud9ua36eh2cjl7s">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t pu_offset_;</a>
+</h3>
+<h3 class="topic">
+<a name="7g7fv1rg5eic0251clp2kbvgkd">&nbsp;&nbsp;&nbsp;&nbsp;std::string queuing_;</a>
+</h3>
+<h3 class="topic">
+<a name="11pjqbjrl1kq6fsurt39445rov">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;corresponds to scheduler type</a>
+</h3>
+<h3 class="topic">
+<a name="2cscv2lpmcfm9ee4otkvpqhijk">&nbsp;&nbsp;&nbsp;&nbsp;std::string affinity_domain_;</a>
+</h3>
+<h3 class="topic">
+<a name="66nd617ku5d22odvq2icvae867">&nbsp;&nbsp;&nbsp;&nbsp;std::string affinity_bind_;</a>
+</h3>
+<h3 class="topic">
+<a name="6bo0lq1b453k0b07comqk9lbvl">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t numa_sensitive_;</a>
+</h3>
+<h3 class="topic">
+<a name="6n5dbtc0etaj1tmi6l67v1cp57">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="1kkdiaftvg6bdsqaa2ug0lb5j9">&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="6kln1jj4849gt9a0a2hh2mendu">&nbsp;&nbsp;&nbsp;&nbsp;int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv);</a>
+</h3>
+<p class="relationships">See Also: <a href="#304e8m9v23tuqul3alqbfi0k62">        void handle_attach_debugger(); (calls 1)</a>, <a href="#2r38rv2pr0fppckmk71p7jfgge">bool handle_arguments(
+    util::manage_config&amp; cfgmap,
+    boost::program_options::variables_map&amp; vm,
+    std::vector&lt;std::string&gt;&amp; ini_config, 
+    std::size_t&amp; node,
+    bool initial = false); (calls 2)</a>, <a href="#7ecin6ds01cu7t223evvb811ro">        void store_command_line(int argc, char** argv); (calls 3)</a>, <a href="#45oj6fm74758o9eru5g7dgak73">        void store_unregistered_options(std::string const&amp; cmd_name, (calls 4)</a>, <a href="#1vqeglfj8d5v5gfdu20oa5ijs6">bool handle_help_options(
+    boost::program_options::options_description const&amp; help); (calls 5)</a>, <a href="#46akl9g2m5ie89qhimu6o76juk">result=cfg.call(desc_cmdline, argc, argv)</a>
+</p>
+<h3 class="topic">
+<a name="3023g3qc0iarvrv7kec5dljpg3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;preliminary command-line handling</a>
+</h3>
+<h3 class="topic">
+<a name="4gctia2n7pjeuc5s8gokp9rupr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this reconfigures rtcfg_</a>
+</h3>
+<h3 class="topic">
+<a name="5tidds1h249vnbrt29pmt6lium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="5jp725h0uc449m5mhlcr4vbgbj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...stuff...</a>
+</h3>
+<h3 class="topic">
+<a name="6cbgbhl95oc38j5e5u5d19sdn9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls store_command_line</a>
+</h3>
+<h3 class="topic">
+<a name="1pipo1pq57bovek7rjslpntu8d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls store_unregistered_options</a>
+</h3>
+<h3 class="topic">
+<a name="525nrtnhnuib33qn48pivvng4o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call handle_help_options</a>
+</h3>
+<h3 class="topic">
+<a name="7i6qiljcl2m2jc4h3n45u3qjdn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...</a>
+</h3>
+<h3 class="topic">
+<a name="3bj5ha98l5aooivnft4sfas4dc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle version, info ... </a>
+</h3>
+<h3 class="topic">
+<a name="00chjojjd547bcecpv0qael4gr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if it's one of these, then return 1</a>
+</h3>
+<h3 class="topic">
+<a name="73i9v55df51if12cqui7pc7adc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if not, we actually want to run the application, return 0</a>
+</h3>
+<h3 class="topic">
+<a name="2r38rv2pr0fppckmk71p7jfgge">&nbsp;&nbsp;&nbsp;&nbsp;bool handle_arguments(
+    util::manage_config&amp; cfgmap,
+    boost::program_options::variables_map&amp; vm,
+    std::vector&lt;std::string&gt;&amp; ini_config, 
+    std::size_t&amp; node,
+    bool initial = false);</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv); (calls 2)</a>
+</p>
+<h3 class="topic">
+<a name="6r9ad7g0au95k1n518qro7udqp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this is where the data members actually get set</a>
+</h3>
+<h3 class="topic">
+<a name="2gsbdm0tacku90t5alguiqen35">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do?</a>
+</h3>
+<h3 class="topic">
+<a name="5qbrkm52v0rqtjt1qamppjjkq3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...stuff...</a>
+</h3>
+<h3 class="topic">
+<a name="7uck1jkb639krctpf5a5pflhp3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle number of cores</a>
+</h3>
+<h3 class="topic">
+<a name="7parit1n2e16spnhgd5jscphvp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set data member num_threads_ to detail::handle_num_threads(...)</a>
+</h3>
+<h3 class="topic">
+<a name="6oaum2n211hudra0k4bvri2naq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle number of threads</a>
+</h3>
+<h3 class="topic">
+<a name="56eno310c68pu0lsnflmhppi34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set data member num_cores_ to detail::handle_num_cores(...)</a>
+</h3>
+<h3 class="topic">
+<a name="16l6bp1i7s3tl69bgr99bsob9q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle number of localities</a>
+</h3>
+<h3 class="topic">
+<a name="72qg9sf2qtm25984eetusi1drf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set data member num_localities_ to detail::handle_num_localities(...)</a>
+</h3>
+<h3 class="topic">
+<a name="4320t4rrr6v4nuvok97cdnpglc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;determine network port and some other things</a>
+</h3>
+<h3 class="topic">
+<a name="33qnpag45ft6lvjpod5gi0gmir">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set runtime mode</a>
+</h3>
+<h3 class="topic">
+<a name="30s3jlsha3n9rm1j7opinj0kvv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;depending on command-line option which is in vm</a>
+</h3>
+<h3 class="topic">
+<a name="7jrh6u5a3nu252m5dfl3peh9sp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...set more things that have to do with netwroking...</a>
+</h3>
+<h3 class="topic">
+<a name="405kqgnlda5raj74ugkrhpsf00">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write things to ini_config</a>
+</h3>
+<h3 class="topic">
+<a name="7ecin6ds01cu7t223evvb811ro">&nbsp;&nbsp;&nbsp;&nbsp;        void store_command_line(int argc, char** argv);</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv); (calls 3)</a>
+</p>
+<h3 class="topic">
+<a name="3q8n2c7rb0lugdhtg6e5lfjcq3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do?</a>
+</h3>
+<h3 class="topic">
+<a name="68b0bas2p34p0sbh32lej8a9qv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;collect the command line into a string for diagnostic purposes</a>
+</h3>
+<h3 class="topic">
+<a name="1renu5v82n9ev3be6n29f4jup2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add it to ini_config_</a>
+</h3>
+<h3 class="topic">
+<a name="45oj6fm74758o9eru5g7dgak73">&nbsp;&nbsp;&nbsp;&nbsp;        void store_unregistered_options(std::string const&amp; cmd_name,</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv); (calls 4)</a>
+</p>
+<h3 class="topic">
+<a name="413thk6hq4tmsi3l1fb2t5d63f">&nbsp;&nbsp;&nbsp;&nbsp;            std::vector&lt;std::string&gt; const&amp; unregistered_options);</a>
+</h3>
+<h3 class="topic">
+<a name="1vqeglfj8d5v5gfdu20oa5ijs6">&nbsp;&nbsp;&nbsp;&nbsp;bool handle_help_options(
+    boost::program_options::options_description const&amp; help);</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv); (calls 5)</a>
+</p>
+<h3 class="topic">
+<a name="304e8m9v23tuqul3alqbfi0k62">&nbsp;&nbsp;&nbsp;&nbsp;        void handle_attach_debugger();</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kln1jj4849gt9a0a2hh2mendu">int call(
+    boost::program_options::options_description const&amp; desc_cmdline,
+    int argc, char** argv); (calls 1)</a>
+</p>
+<h3 class="topic">
+<a name="543l237ipmgr3os0ka0a9q0p3r">&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="61ibveq7cgpoit0icn608efq63">&nbsp;&nbsp;&nbsp;&nbsp;void handle_print_bind(
+    boost::program_options::variables_map const&amp; vm,         
+    std::size_t num_threads);</a>
+</h3>
+<h3 class="topic">
+<a name="3m920oshsu0iutctfvamvdfibj">&nbsp;&nbsp;&nbsp;&nbsp;    void handle_list_parcelports();</a>
+</h3>
+<h3 class="topic">
+<a name="6un0f5vjq2u498edobbnqs1t6b">&nbsp;&nbsp;&nbsp;&nbsp;    void HPX_EXPORT attach_debugger();</a>
+</h3>
+<h3 class="topic">
+<a name="09ue5istk91pgjtgtrq6fn9foe">&nbsp;bool util::parse_commandline(
+	...)</a>
+</h3>
+<h3 class="topic">
+<a name="68e23aiu9bm2qrjj59c0ece9lo">&nbsp;parse_affinity_options</a>
+</h3>
+</body>
+</html>

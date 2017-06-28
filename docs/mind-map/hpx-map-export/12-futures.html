@@ -1,0 +1,305 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>hpx::lcos::detail::
+future_base&lt;future&lt;R&gt;, R&gt;</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="4umj1g77v6grtugbqjndchd7jv">hpx::lcos::detail::
+future_base&lt;future&lt;R&gt;, R&gt;</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="12-futures_files/images/hpx  lcos  detail   future_base future R , R .jpg"></div>
+<div class="notesContainer">
+<p>hpx/lcos/future.hpp&sect;</p>
+</div>
+<p class="relationships">See Also: <a href="#46kenuqpf6tqq6afl1pih3mgfk">future (derives from)</a>, <a href="#4d9dvrit56p8blh3hkci34cv62">shared_future (derives from)</a>
+</p>
+<h2 class="topic">
+<a name="4eo3ivr1lq9ut29tju40qr3mfd">data members</a>
+</h2>
+<h3 class="topic">
+<a name="66r5j8lrp45lcjtj637h4o2kjh">&nbsp;boost::intrusive_ptr&lt;shared_state_type&gt; shared_state_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#2l5duc51gl537cqpv0csv0ecjn">typedef future_data&lt;
+                typename traits::detail::shared_state_ptr_result&lt;R&gt;::type
+            &gt; shared_state_type; (is (typedef))</a>
+</p>
+<h2 class="topic">
+<a name="0lj83al3ppgvh7m8oe5aitld8o">member functions</a>
+</h2>
+<h3 class="topic">
+<a name="7lthrmof833d2l1dsdlul1tq72">&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="1f8vqch5rjl8j05lii06q11nr8">&nbsp;swap</a>
+</h3>
+<h3 class="topic">
+<a name="31ttqrhkuhv552i29ecc9o5tef">&nbsp;operators</a>
+</h3>
+<h3 class="topic">
+<a name="6ao5cf80skke6q7bu63vm1dj6h">&nbsp;&nbsp;=</a>
+</h3>
+<h3 class="topic">
+<a name="35rkh7p6o8f85cnghc6pgvatju">&nbsp;query the state</a>
+</h3>
+<h3 class="topic">
+<a name="1ohq1fmc4kje4emel517ns5d7b">&nbsp;&nbsp;valid</a>
+</h3>
+<h3 class="topic">
+<a name="7d1281p0k7cr9uthjj2sc99ja8">&nbsp;&nbsp;is_ready</a>
+</h3>
+<h3 class="topic">
+<a name="51pcr6pf6hon1ljiqr4d0r4vin">&nbsp;&nbsp;has_value</a>
+</h3>
+<h3 class="topic">
+<a name="7rmu9t1u8i42a7pn5t93e5mgnh">&nbsp;get_exception_ptr()</a>
+</h3>
+<h3 class="topic">
+<a name="407991g2mjoqqu89um7b4u5423">&nbsp;&nbsp;blocks until the future is ready</a>
+</h3>
+<h3 class="topic">
+<a href="#5qcdiv9a0ek9keu0qjt2lstoh0" name="162fidutn0bf4170fjnnsspalf">&nbsp;then</a>
+</h3>
+<h3 class="topic">
+<a name="16icac7g8rfvb741e6vhadmkc1">&nbsp;&nbsp;What is it?</a>
+</h3>
+<h3 class="topic">
+<a name="0mcgonhs9ietjod2qvvfehlkf5">&nbsp;&nbsp;&nbsp;tool to attach a continuation to a future.</a>
+</h3>
+<h3 class="topic">
+<a name="1m5g846j8hljfm4kbflg9684g0">&nbsp;&nbsp;Effects</a>
+</h3>
+<h3 class="topic">
+<a name="09kjcvkpo7uaklp7n5cucep0cp">&nbsp;&nbsp;&nbsp;the continuation gets called when the object's shared state is ready
+(ie has a value or an exception is stored)</a>
+</h3>
+<h3 class="topic">
+<a name="17u7rkknff22b06j63vcbsupko">&nbsp;&nbsp;which launch policy gets called:</a>
+</h3>
+<h3 class="topic">
+<a name="2hb87pumuhs8el0ql4odhqqo8d">&nbsp;&nbsp;&nbsp;if launch policy provided as parameter</a>
+</h3>
+<h3 class="topic">
+<a name="66l32lgouc37v1ksuk23dt0c5h">&nbsp;&nbsp;&nbsp;if not</a>
+</h3>
+<h3 class="topic">
+<a name="6kpa6iak27enlcvg5daob6rqoj">&nbsp;&nbsp;&nbsp;&nbsp;launch policy inherited from parent</a>
+</h3>
+<h3 class="topic">
+<a name="5hhfpfu5te5a5m0f7djituhmrd">&nbsp;&nbsp;&nbsp;&nbsp;if the parent has no associated launch policy
+(e.g. it was created with std::promise or packaged_task)</a>
+</h3>
+<h3 class="topic">
+<a name="4begq28k1vop97qtlueqnl0eo2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;then ... </a>
+</h3>
+<h3 class="topic">
+<a name="6s5aue1t5d1j6g586jd1r5j3m3">&nbsp;&nbsp;&nbsp;&nbsp;if the parent ....</a>
+</h3>
+<h3 class="topic">
+<a name="03s0hi2q4rlq0b05906r9951jq">&nbsp;&nbsp;Technicalities</a>
+</h3>
+<h3 class="topic">
+<a name="0gkqni7ehd5ddi0so3s6ob2k09">&nbsp;&nbsp;&nbsp;Signature</a>
+</h3>
+<h3 class="topic">
+<a name="6vnkqksaa69tgf6o0ud5218ot0">&nbsp;&nbsp;&nbsp;&nbsp;then(F &amp;&amp; f, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="376bqjrqgrid0kt4n9vdpe8ral">&nbsp;&nbsp;&nbsp;&nbsp;then(launch policy, F &amp;&amp; f, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="2janl3ca9ve3eob9dqm9nnog5b">&nbsp;&nbsp;&nbsp;&nbsp;then(threads::executor&amp; sched, F &amp;&amp; f, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="6iu0ahgja8srvhbn399ekf33a0">&nbsp;&nbsp;&nbsp;&nbsp;hen(Executor&amp; exec, F &amp;&amp; f, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="5b88ihp05n0gidhnc6ujhejd1l">&nbsp;&nbsp;&nbsp;Arguments</a>
+</h3>
+<h3 class="topic">
+<a name="4j2gr6srm8mgv77upp5ah1sjbl">&nbsp;&nbsp;&nbsp;&nbsp;f</a>
+</h3>
+<h3 class="topic">
+<a name="62gl9gkj1ucqeh596ia3734voq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a callable object which accepts a future object as parameter</a>
+</h3>
+<h3 class="topic">
+<a name="63b7uma6rctqtle0mrni9rske9">&nbsp;&nbsp;&nbsp;&nbsp;exec</a>
+</h3>
+<h3 class="topic">
+<a name="4bs3aeubft3128vt4jt64rao1a">&nbsp;&nbsp;&nbsp;&nbsp;launch policy</a>
+</h3>
+<h3 class="topic">
+<a name="6dpeju7q21bq9idl1rtkaom8jr">&nbsp;&nbsp;&nbsp;Return value</a>
+</h3>
+<h3 class="topic">
+<a name="4cgn11li845e85pg5ll47ric48">&nbsp;&nbsp;&nbsp;&nbsp;An object of type future&lt;decltype(f(*this))&gt; that refers to the shared state created by the continuation</a>
+</h3>
+<h3 class="topic">
+<a name="7hrfs1papbcbq3io2ejui8ofsm">&nbsp;&nbsp;&nbsp;&nbsp;in cases where decltype(f(*this)) is future&lt;R&gt;, 
+the resulting return type will be future&lt;R&gt; instead of future&lt;future&lt;R&gt;&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="2u2pmosid9g2nbsjtmm5u5rio2">&nbsp;&nbsp;&nbsp;Postconditions</a>
+</h3>
+<h3 class="topic">
+<a name="62os54c0c3a255pb0p3gf96frd">&nbsp;&nbsp;&nbsp;&nbsp;the future object is moved to the parameter of the continuation function</a>
+</h3>
+<h3 class="topic">
+<a name="1fu8lp5mnejvmqkt5vee9hpfim">&nbsp;&nbsp;&nbsp;&nbsp;valid() == false on original future object immediately after it returns</a>
+</h3>
+<h3 class="topic">
+<a name="599sqfji6d7lcl3boi314jtt4f">&nbsp;waiting
+for the 
+result</a>
+</h3>
+<h3 class="topic">
+<a name="1vqhbr8bg6pl54l3d24otdlkur">&nbsp;&nbsp;wait</a>
+</h3>
+<h3 class="topic">
+<a name="2vnlv2h8s22iaknuu5p16pdll1">&nbsp;&nbsp;&nbsp;Effect: blocks until the shared state is ready</a>
+</h3>
+<h3 class="topic">
+<a name="36oa53ru6oh797slj2vbu89om4">&nbsp;&nbsp;wait_for</a>
+</h3>
+<h3 class="topic">
+<a name="3n79jfoumt602n8e0s6kr38fnr">&nbsp;&nbsp;wait_until</a>
+</h3>
+<h2 class="topic">
+<a name="4d9dvrit56p8blh3hkci34cv62">shared_future</a>
+</h2>
+<p class="relationships">See Also: <a href="#4umj1g77v6grtugbqjndchd7jv">hpx::lcos::detail::
+future_base&lt;future&lt;R&gt;, R&gt; (derives from)</a>
+</p>
+<h3 class="topic">
+<a name="6ierf01tu3ubd6eru399pvk90e">&nbsp;not very different from future in its structure</a>
+</h3>
+<h3 class="topic">
+<a name="1g2okspn5fe5epuph5tcl48pkb">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="73nrg05t7kscmkrhu635fuvtk7">&nbsp;data members</a>
+</h3>
+<h2 class="topic">
+<a name="46kenuqpf6tqq6afl1pih3mgfk">future</a>
+</h2>
+<p class="relationships">See Also: <a href="#4umj1g77v6grtugbqjndchd7jv">hpx::lcos::detail::
+future_base&lt;future&lt;R&gt;, R&gt; (derives from)</a>
+</p>
+<h3 class="topic">
+<a name="6a0qur4vo0p4212ocljgvedfcv">&nbsp;implements wrapping, unwrapping, converting to and from a "shared_future"</a>
+</h3>
+<h3 class="topic">
+<a name="6aplpjq01776v6ri2dunjkc3vg">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="0va9pjthu48tfst3vt3s3m85vj">&nbsp;&nbsp;get()</a>
+</h3>
+<h3 class="topic">
+<a name="19l2j1f5hlotfjkt9be4kvp370">&nbsp;&nbsp;&nbsp;returns the moved future. 
+So the future is invalidated after this call</a>
+</h3>
+<h3 class="topic">
+<a name="5fepcku6c8abvhk39a6id4338s">&nbsp;&nbsp;then(...)</a>
+</h3>
+<h3 class="topic">
+<a name="5a6c5ck9ussuoitv9if16io6vk">&nbsp;&nbsp;&nbsp;call member function of base class, but invalidate on exit first</a>
+</h3>
+<h3 class="topic">
+<a name="2tr9hachn1qdnc0sg6b3voa9rg">&nbsp;data members</a>
+</h3>
+<h2 class="topic">
+<a name="59dqvbmt1pv1m1oi2fcmdh9ip7">typedefs</a>
+</h2>
+<h3 class="topic">
+<a name="4us4p2m964prbjt38va3f8c3kh">&nbsp;typedef R result_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#2l5duc51gl537cqpv0csv0ecjn">typedef future_data&lt;
+                typename traits::detail::shared_state_ptr_result&lt;R&gt;::type
+            &gt; shared_state_type;</a>
+</p>
+<h3 class="topic">
+<a name="2l5duc51gl537cqpv0csv0ecjn">&nbsp;typedef future_data&lt;
+                typename traits::detail::shared_state_ptr_result&lt;R&gt;::type
+            &gt; shared_state_type;</a>
+</h3>
+<p class="relationships">See Also: <a href="#66r5j8lrp45lcjtj637h4o2kjh">boost::intrusive_ptr&lt;shared_state_type&gt; shared_state_; (is (typedef))</a>, <a href="#4us4p2m964prbjt38va3f8c3kh">typedef R result_type;</a>
+</p>
+<h3 class="topic">
+<a name="7slmfcg2suocb4gvib343pi850">&nbsp;enum future_state</a>
+</h3>
+<h3 class="topic">
+<a name="1h6ri2ka26oitnsoljef3q7mam">&nbsp;&nbsp;invalid = 0</a>
+</h3>
+<h3 class="topic">
+<a name="4k5gs7emc2ti247bq33bm50n9o">&nbsp;&nbsp;has_value = 1</a>
+</h3>
+<h3 class="topic">
+<a name="4npge08q13n6mm1j9orelpujmq">&nbsp;&nbsp;has_exception = 2</a>
+</h3>
+<h3 class="topic">
+<a name="4neiu8vrj649ccn4sqm8h56i38">&nbsp;&nbsp;ready</a>
+</h3>
+<p class="summary">(<a href="#4k5gs7emc2ti247bq33bm50n9o">has_value = 1</a>, <a href="#4npge08q13n6mm1j9orelpujmq">has_exception = 2</a>)</p>
+<h2 class="topic">
+<a name="3tngc10lfqsbd3oomuij29nodb">helper objects</a>
+</h2>
+<h3 class="topic">
+<a name="0cusn8k2ag0b6erdu0oe8eocb3">&nbsp;helper structures</a>
+</h3>
+<h3 class="topic">
+<a name="2i9vemtsp7bkrdmjvk0vb60gdq">&nbsp;&nbsp;future_then_result</a>
+</h3>
+<h3 class="topic">
+<a name="65si31ip5dtq444i53q4jl4dqi">&nbsp;&nbsp;future_unwrap_result</a>
+</h3>
+<h3 class="topic">
+<a name="2lvnpra5e3ssnvc6fdrbtou1d6">&nbsp;&nbsp;future_iterator_traits</a>
+</h3>
+<h3 class="topic">
+<a name="3otv8apct5ernpaokpej8iu8uk">&nbsp;&nbsp;future_value</a>
+</h3>
+<h3 class="topic">
+<a name="4335knh7li0t5vv7fgsedbmoep">&nbsp;&nbsp;future_get_result</a>
+</h3>
+<h3 class="topic">
+<a name="1sf94rbr2m0mo0d0v2qpbm4v0a">&nbsp;&nbsp;continuation_result</a>
+</h3>
+<h3 class="topic">
+<a name="5cnodpjcrav5r65tv8u400vlv1">&nbsp;helper functions </a>
+</h3>
+<h3 class="topic">
+<a name="1or71gr1rsaahufjkhpqk8jnbt">&nbsp;&nbsp;serialize_future_load</a>
+</h3>
+<h3 class="topic">
+<a name="7ienbrogeh6cmvjic817egdke0">&nbsp;&nbsp;serialize_future_save</a>
+</h3>
+<h3 class="topic">
+<a name="1cs0jj20gsrskjv1suhpacjl6m">&nbsp;&nbsp;seralize_future</a>
+</h3>
+<h3 class="topic">
+<a name="2e5m67stpimcp9cn70dv3bjs6g">&nbsp;&nbsp;make_continuation</a>
+</h3>
+<h3 class="topic">
+<a name="79o2h58na1ldc4git0nka1jivt">&nbsp;&nbsp;make_continuation_exec</a>
+</h3>
+<h3 class="topic">
+<a name="0bfof0qhq5vrj7r0sbuuor0i0h">&nbsp;&nbsp;unwrap</a>
+</h3>
+<h3 class="topic">
+<a name="6k76isl7ub6pdv2an1dl02al85">&nbsp;&nbsp;downcast_to_void</a>
+</h3>
+<h3 class="topic">
+<a name="298e58vqhv2usecmm2rhtku2ue">&nbsp;&nbsp;make_future</a>
+</h3>
+<h3 class="topic">
+<a name="382g4tqjq93uhlp2dfflbrv3sc">&nbsp;&nbsp;make_ready_future</a>
+</h3>
+<h3 class="topic">
+<a name="3rg18simfsp937vkemvdisqrac">&nbsp;&nbsp;and many more ...</a>
+</h3>
+</body>
+</html>

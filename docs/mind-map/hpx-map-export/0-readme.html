@@ -1,0 +1,525 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+HPX-MAP
+README 
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="29cs1q010k83gh45l7qujvqq7f">
+HPX-MAP
+README 
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="0-readme_files/images/ HPX-MAP README  .jpg"></div>
+<h2 class="topic">
+<a name="6f982ju34920j9q0ekg5nfmdoa">Table of content</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/Table of content.jpg"></div>
+<h3 class="topic">
+<a name="50ft1engnas2977ch8hkaelrns">&nbsp;Concepts</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Concepts.jpg"></div>
+<h3 class="topic">
+<a href="#350um41p4tdubelvd2s12dhoje" name="713vciq19ri102g35groi3tpgh">&nbsp;&nbsp;What is HPX? an overview</a>
+</h3>
+<h3 class="topic">
+<a href="#1l1qd2p247u405lqt8rl8lvftd" name="4d22qlpeo9irpdpdj67fiid5c3">&nbsp;&nbsp;thread life-cycle</a>
+</h3>
+<h3 class="topic">
+<a href="#7hgc104tpas71kufqa8aoubehv" name="755m5jodn8isvr3qdctkrlmqpu">&nbsp;&nbsp;class hierarchy</a>
+</h3>
+<h3 class="topic">
+<a href="#0hs6tteoe109eu7000t02as3g4" name="51k3315vihkgi220et9454j1hi">&nbsp;&nbsp;class hierarchy (with resource partitioner changes)</a>
+</h3>
+<h3 class="topic">
+<a name="0piknp7ghdpqdkg8ok916u86lv">&nbsp;For the user</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/For the user.jpg"></div>
+<p class="relationships">See Also: <a href="#5b3d4bc73465ckis91c4vnfen5">API</a>
+</p>
+<h3 class="topic">
+<a href="#7un0eqdp7n01c863dep2id0p7i" name="00snls36grbt45b984fa7ct4ke">&nbsp;&nbsp;API</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/API.jpg"></div>
+<h3 class="topic">
+<a name="7q6hl4sujcf457jh2g6itsui82">&nbsp;&nbsp;&nbsp;how to use various facilities of the HPX API</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/how to use various facilities of the HPX API.jpg"></div>
+<h3 class="topic">
+<a href="#7fhhq7umq0eguk8i9523gbi2oq" name="5f7vav3d12j46feggq5n1g3l9i">&nbsp;&nbsp;&nbsp;&nbsp;LCOs</a>
+</h3>
+<h3 class="topic">
+<a href="#5u494voh84c8fpqo7e69cvsd78" name="0a4m47rf1vhe2mjp0vcvu0fgj7">&nbsp;&nbsp;&nbsp;&nbsp;distributed programming</a>
+</h3>
+<h3 class="topic">
+<a href="#3dpjfhp5ia2tscs30v5bqaltnk" name="2gj18el1th1ri84m2ohvd8gb9b">&nbsp;&nbsp;&nbsp;&nbsp;actions</a>
+</h3>
+<h3 class="topic">
+<a href="#01skndcjb59eg1vtp0d45qveeh" name="3g6heu8jtig4c8c6buc161q781">&nbsp;&nbsp;&nbsp;&nbsp;parallel algorithms</a>
+</h3>
+<h3 class="topic">
+<a href="#457o8akvev9tc20hml96poc4th" name="4v876134v0jpgvmfem9pil4vkl">&nbsp;&nbsp;Application</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Application.jpg"></div>
+<h3 class="topic">
+<a name="14o3k7soajkk6q0c96dsvq3off">&nbsp;&nbsp;&nbsp;everything surrounding the HPX code...</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/everything surrounding the HPX code....jpg"></div>
+<h3 class="topic">
+<a href="#07u87h6lrpufh3s6njdj2s7btk" name="3gpimdrlpe6t2pt2cn68do24ms">&nbsp;&nbsp;&nbsp;&nbsp;how to build HPX</a>
+</h3>
+<h3 class="topic">
+<a href="#79nl9agbgiqudf8l48a602v7q1" name="3hm3upvpjstrvvqps8276ve6p5">&nbsp;&nbsp;&nbsp;&nbsp;HPX entry points: how to write an HPX application</a>
+</h3>
+<h3 class="topic">
+<a href="#52hov7u3812r253capquei894j" name="176q3gcmaec3e5i8hq7hb4omrv">&nbsp;&nbsp;&nbsp;&nbsp;how to write a CMakeLists.txt for an HPX application</a>
+</h3>
+<h3 class="topic">
+<a href="#7qn1dk966fucqc0o37fb0khe26" name="3m1tgns5b888ld87pnf79bue7k">&nbsp;&nbsp;&nbsp;&nbsp;how to build an HPX-application</a>
+</h3>
+<h3 class="topic">
+<a href="#7iv5fv72noogul78mhcfkua526" name="1ucs19v8g0t3qks8j496a70e2p">&nbsp;&nbsp;&nbsp;&nbsp;how to run an HPX application and command-line options</a>
+</h3>
+<h3 class="topic">
+<a href="#77mpasoshi0dihic1290034q6t" name="58tuqabqihho2d6ri0f27sn4q2">&nbsp;&nbsp;&nbsp;&nbsp;performance analysis</a>
+</h3>
+<h3 class="topic">
+<a name="6307tdofo378klb28rbvrivbg9">&nbsp;Source code (classes)</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Source code (classes).jpg"></div>
+<p class="relationships">See Also: <a href="#4bll9pl6a98cks439nrb4s73p0">Source code</a>
+</p>
+<h3 class="topic">
+<a href="#2otp0pi1v1q3d0r14auglnbote" name="6nfuufqg8c7bp7ffrh4j2u4akn">&nbsp;&nbsp;threads</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/threads.jpg"></div>
+<h3 class="topic">
+<a name="047onuqgbje3ljt51808hrneag">&nbsp;&nbsp;&nbsp;all classes that are related to threads</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/all classes that are related to threads.jpg"></div>
+<h3 class="topic">
+<a href="#4qfmpu3ibcta37dkr6o7cqcada" name="1gk9v2vfmmm2l79ppcink1ffle">&nbsp;&nbsp;&nbsp;&nbsp;OS-threads</a>
+</h3>
+<h3 class="topic">
+<a href="#6ussjrdb1ltr9aubh90j0mj299" name="1pemgsu3r0p8gcek1fg7nu1dku">&nbsp;&nbsp;&nbsp;&nbsp;HPX-threads</a>
+</h3>
+<h3 class="topic">
+<a href="#0aevd55l01le98rslmgt09r1k8" name="4n5pfd6jhvjqt3s0apk1n4boqq">&nbsp;&nbsp;topology</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/topology.jpg"></div>
+<h3 class="topic">
+<a name="5hngjvi5jfhgcr4d9dm9dau148">&nbsp;&nbsp;&nbsp;all classes that are related to the system's topology</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/all classes that are related to the system's topology.jpg"></div>
+<h3 class="topic">
+<a href="#0k424984tiqt34r38490p8c0fv" name="3bvq6rp3jg09onpn7a7450jgjp">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::topology</a>
+</h3>
+<h3 class="topic">
+<a href="#18020kb7gks9bcsr3gqq0u3n3j" name="03o91h19i3dfgmuojmkod3ihu8">&nbsp;&nbsp;&nbsp;&nbsp;hx::threads::hwloc_topology_info</a>
+</h3>
+<h3 class="topic">
+<a href="#60hqb63f2p4luui5doh661ton2" name="0tbm2kl80vu3b0hmuuc68vg1dm">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::policies::init_affinity_data</a>
+</h3>
+<h3 class="topic">
+<a href="#301quj5rmefs3hglcaae8ekaef" name="0r6b45jklfdnlu9togb136eaob">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::policies::detail::affinity_data</a>
+</h3>
+<h3 class="topic">
+<a href="#10qhs5aaor5icaevmshi07ofe6" name="5imp65raeov5r730rtopvg5c27">&nbsp;&nbsp;runtime</a>
+</h3>
+<h3 class="topic">
+<a href="#4fqpt6i25goulksmvhr8fscljr" name="5qpuou9sa8ia2ugkl0i3de27c3">&nbsp;&nbsp;scheduler</a>
+</h3>
+<h3 class="topic">
+<a href="#1g2a8lkj53e178nb2d995actbt" name="24ip0iokir9i1nlotfu9o5t0qc">&nbsp;&nbsp;context</a>
+</h3>
+<h3 class="topic">
+<a href="#4k8p41uh687ec01smf2fei6v79" name="7hr6ecc78cse7ci5kdncr8hhgb">&nbsp;&nbsp;executors</a>
+</h3>
+<h3 class="topic">
+<a href="#4umj1g77v6grtugbqjndchd7jv" name="41ujlvgi0713upjgkddijgrs0p">&nbsp;&nbsp;futures</a>
+</h3>
+<h3 class="topic">
+<a href="#575o02d903h274ft9dgtakir0b" name="5ao8825doil5kse1pks2fniihm">&nbsp;&nbsp;virtual resource manager</a>
+</h3>
+<h3 class="topic">
+<a name="1aqqv71faoldvnj94foe5en744">&nbsp;Source code (big functions)</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Source code (big functions).jpg"></div>
+<h3 class="topic">
+<a href="#4g4mbem46ig0kav5jmjr0uolvi" name="4m7bf53p3kk0dnh6oea4hktstr">&nbsp;&nbsp;hpx::init</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/hpx  init.jpg"></div>
+<h3 class="topic">
+<a name="31djto60k8rfte1te09ge1qdan">&nbsp;&nbsp;&nbsp;initialization of the HPX runtime</a>
+</h3>
+<h2 class="topic">
+<a name="7c6jgcidlar7it8unq9fah3bps">Color code</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/Color code.jpg"></div>
+<h3 class="topic">
+<a name="5b3d4bc73465ckis91c4vnfen5">&nbsp;API</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/API 2.jpg"></div>
+<p class="relationships">See Also: <a href="#0piknp7ghdpqdkg8ok916u86lv">For the user</a>
+</p>
+<h3 class="topic">
+<a name="77e23l2nhbj7af45q44ur0g6gf">&nbsp;&nbsp;main facility</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/main facility.jpg"></div>
+<h3 class="topic">
+<a name="62h3anidmga6qr3204abeu1uvs">&nbsp;&nbsp;&nbsp;secondary facility</a>
+</h3>
+<h3 class="topic">
+<a name="1o999151rmhajnargksc4mqeuf">&nbsp;&nbsp;&nbsp;or member function</a>
+</h3>
+<h3 class="topic">
+<a name="5rk94mvmd2j4u443m2m100nkla">&nbsp;&nbsp;
+// code snippet
+// demonstrating the use of a facility
+</a>
+</h3>
+<h3 class="topic">
+<a name="3f32sju7e3sq1pt71mo2125sri">&nbsp;&nbsp;
+Warning or common pitfall
+</a>
+</h3>
+<h3 class="topic">
+<a name="4bll9pl6a98cks439nrb4s73p0">&nbsp;Source code</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Source code.jpg"></div>
+<p class="relationships">See Also: <a href="#6307tdofo378klb28rbvrivbg9">Source code (classes)</a>
+</p>
+<h3 class="topic">
+<a name="11i3i7kpojakdk8m5fd6qk9489">&nbsp;&nbsp;complete_namespace::class</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/complete_namespace  class.jpg"></div>
+<div class="notesContainer">
+<p></p>
+<p>note on this class</p>
+</div>
+<p class="relationships">See Also: <a href="#5sb53j8bl9goaj4fnt8tefb42v">complete_namespace::derived_class (is derived
+from)</a>
+</p>
+<h3 class="topic">
+<a name="2f992j2hv5ijbobtpumapc9pj4">&nbsp;&nbsp;&nbsp;
+description of the functionalities of the class
+and its general role in HPX
+</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/ description of the functionalities of the class and its general role in HPX .jpg"></div>
+<h3 class="topic">
+<a name="33njhg3idjgdj47on5j839riha">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/data members.jpg"></div>
+<h3 class="topic">
+<a name="2sr02ak0fvf8hmsuu3qjnkvuuk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_1 data_member_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/type_1 data_member_1.jpg"></div>
+<h3 class="topic">
+<a name="642se77klhnrcomcdc2tnel3eo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="4oqcjfefrbrnk5hirkbupaes7k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_2 important_data_member_2</a>
+</h3>
+<h3 class="topic">
+<a name="2pa9vup00gm1380h2pe2gi8sic">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_3 data_member_3</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/type_3 data_member_3.jpg"></div>
+<h3 class="topic">
+<a name="27pmdh2njo6mvntagl1bm20s78">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main description</a>
+</h3>
+<h3 class="topic">
+<a name="1uh50d207kar4sh4ra8scg12mp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;secondary description</a>
+</h3>
+<h3 class="topic">
+<a name="6t9oc6m4hbc7i63srpkk7rhhh0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_4 data_member_4</a>
+</h3>
+<h3 class="topic">
+<a name="29eacusc3ulv81kl6dkevnn228">&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/member functions.jpg"></div>
+<h3 class="topic">
+<a name="49fbekhadt8d703gmilm45iqmn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/function_signature_1.jpg"></div>
+<p class="relationships">See Also: <a href="#1i2pr3fcptgmvvuhcv0vgc9q54">function_signature_2 (calls)</a>
+</p>
+<h3 class="topic">
+<a name="4sfhim7ignr5948nqj5ki91pc8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="1udq22rujpksn8uho3kjgpepro">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_2</a>
+</h3>
+<h3 class="topic">
+<a name="5pjvbjvns2gb28jj6vac9qha96">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_3</a>
+</h3>
+<h3 class="topic">
+<a name="0eli19d2fjhtpgk74pfjf1lp7g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_4</a>
+</h3>
+<h3 class="topic">
+<a name="2n8ejdj5sunt9hvnjnkhkvetol">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;important_function_signature_5</a>
+</h3>
+<h3 class="topic">
+<a name="224a2ropr5c7fcm9frl6fbcuqn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_6</a>
+</h3>
+<h3 class="topic">
+<a name="3jvrfds110q8kqc96fp0ulf6ka">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description of some common 
+feature or role</a>
+</h3>
+<p class="summary">(<a href="#5pjvbjvns2gb28jj6vac9qha96">function_signature_3</a>, <a href="#0eli19d2fjhtpgk74pfjf1lp7g">function_signature_4</a>, <a href="#2n8ejdj5sunt9hvnjnkhkvetol">important_function_signature_5</a>)</p>
+<h3 class="topic">
+<a name="5sb53j8bl9goaj4fnt8tefb42v">&nbsp;&nbsp;complete_namespace::derived_class</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/complete_namespace  derived_class.jpg"></div>
+<p class="relationships">See Also: <a href="#11i3i7kpojakdk8m5fd6qk9489">complete_namespace::class (is derived
+from)</a>, <a href="#4jm1qg9hd4cmotpbdflqv2v7t7">complete_namespace::some_other_class (owns a 
+(has as a data member))</a>
+</p>
+<h3 class="topic">
+<a name="1ka6gkhm7kc4n4u2ahn238t8nh">&nbsp;&nbsp;&nbsp;
+description of the functionalities of the class
+and its general role in HPX
+</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/ description of the functionalities of the class and its general role in HPX  2.jpg"></div>
+<h3 class="topic">
+<a name="4l6ruqba1j9rujk08lhmnn6v2r">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/data members 2.jpg"></div>
+<h3 class="topic">
+<a name="2olvj3mkj561vp6dpmkcsgmggi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_1 data_member_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/type_1 data_member_1 2.jpg"></div>
+<h3 class="topic">
+<a name="1fpjo9e7lk6b5guvnucm04vrtc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="1rel34dkd2557ogf2dr9n9g3ch">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_2 data_member_2</a>
+</h3>
+<h3 class="topic">
+<a name="7upq6ffhuq412c56pjp2l292ts">&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/member functions 2.jpg"></div>
+<h3 class="topic">
+<a name="1fbeo2tdgfvqomesabkidjmlcg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/function_signature_1 2.jpg"></div>
+<h3 class="topic">
+<a name="3muvsipk7u0qb2j04ulisbvkif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="1i2pr3fcptgmvvuhcv0vgc9q54">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_2</a>
+</h3>
+<p class="relationships">See Also: <a href="#49fbekhadt8d703gmilm45iqmn">function_signature_1 (calls)</a>
+</p>
+<h3 class="topic">
+<a name="4jm1qg9hd4cmotpbdflqv2v7t7">&nbsp;&nbsp;complete_namespace::some_other_class</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/complete_namespace  some_other_class.jpg"></div>
+<p class="relationships">See Also: <a href="#5sb53j8bl9goaj4fnt8tefb42v">complete_namespace::derived_class (owns a 
+(has as a data member))</a>
+</p>
+<h3 class="topic">
+<a name="237ukouo5ilrkkeja76rvtie53">&nbsp;&nbsp;&nbsp;
+description of the functionalities of the class
+and its general role in HPX
+</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/ description of the functionalities of the class and its general role in HPX  3.jpg"></div>
+<h3 class="topic">
+<a name="12rgfu1fnpq54c45ji8n6evj7g">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/data members 3.jpg"></div>
+<h3 class="topic">
+<a name="51iieetft8cu4jupk6aclnbqiv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_1 data_member_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/type_1 data_member_1 3.jpg"></div>
+<p class="relationships">See Also: <a href="#18i5d6ll2kbm124ok1duuc7h2m">enums,typedefs, etc (this data type corresponds 
+to following typedef)</a>
+</p>
+<h3 class="topic">
+<a name="5k9b26hboags3qi6req0jjksmm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="2umckl9tft3a23gfmtokmk3fq4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type_2 data_member_2</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/type_2 data_member_2.jpg"></div>
+<h3 class="topic">
+<a name="1111g6n64f6t8d2fv4r7nqppor">&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/member functions 3.jpg"></div>
+<h3 class="topic">
+<a name="5s5spu04m1n3ppb2g0j8b87cdo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_1</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/function_signature_1 3.jpg"></div>
+<h3 class="topic">
+<a name="14k04q263varhdt71j9620l3tr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description</a>
+</h3>
+<h3 class="topic">
+<a name="05c6kj33neflqpoqtvftvuugcj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function_signature_2</a>
+</h3>
+<h3 class="topic">
+<a name="18i5d6ll2kbm124ok1duuc7h2m">&nbsp;&nbsp;enums,typedefs, etc</a>
+</h3>
+<p class="relationships">See Also: <a href="#51iieetft8cu4jupk6aclnbqiv">type_1 data_member_1 (this data type corresponds 
+to following typedef)</a>
+</p>
+<h2 class="topic">
+<a name="6jsplvfu2ct756dlqo91q13qni">Author</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/Author.jpg"></div>
+<h3 class="topic">
+<a name="1pq5tq1gvf1lq3jg4dklrb2vs3">&nbsp;Shoshana Jakobovits</a>
+</h3>
+<h3 class="topic">
+<a name="04bvog4v59037a769prl5aijti">&nbsp;email</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/email.jpg"></div>
+<h3 class="topic">
+<a href="mailto:as.jak@protonmail.ch" name="2b7inuv105ieenklb50nfl7vt0">&nbsp;&nbsp;as.jak@protonmail.ch</a>
+</h3>
+<h3 class="topic">
+<a name="7geur9c7080b3kas34okv8p6ap">&nbsp;github page</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/github page.jpg"></div>
+<h3 class="topic">
+<a href="https://github.com/shoshijak" name="1oreuu6rrggn3up96j40puip6k">&nbsp;&nbsp;https://github.com/shoshijak</a>
+</h3>
+<h2 class="topic">
+<a name="4ukonaflcm08jat9p20opourqn">Do you want to contribute to this map?</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/Do you want to contribute to this map .jpg"></div>
+<h3 class="topic">
+<a name="73otnhilbb30flc70ae1srpqu0">&nbsp;HPX is constantly evolving and expanding, and this map is by no means complete. Thank you for your desire to contribute to completing this map!</a>
+</h3>
+<h3 class="topic">
+<a href="https://github.com/shoshijak/hpx/tree/mind-map" name="39rlih6r2o1qgb2etes5on71l1">&nbsp;fork this branch of HPX on GitHub and submit a pull request</a>
+</h3>
+<h3 class="topic">
+<a name="61jafus30eh2m3ln21rhdef4va">&nbsp;while adding to this map, please don't forget to ...</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/while adding to this map, please don't forget to ....jpg"></div>
+<h3 class="topic">
+<a href="#6f982ju34920j9q0ekg5nfmdoa" name="42c85vfprofic1fkg4b8j8v0v3">&nbsp;&nbsp;color the tab of your map and complete the table of content</a>
+</h3>
+<h3 class="topic">
+<a href="#4bll9pl6a98cks439nrb4s73p0" name="2s5665hr391qhkhmlj92i05i64">&nbsp;&nbsp;please respect the color code!</a>
+</h3>
+<h3 class="topic">
+<a name="3cuq87i4dip75hr19fpjg0avea">&nbsp;&nbsp;the fonts used in this map are</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/the fonts used in this map are.jpg"></div>
+<h3 class="topic">
+<a href="https://www.fontsquirrel.com/fonts/open-sans" name="6higpl4ktmlu5ejks2qj4mdm40">&nbsp;&nbsp;&nbsp;Open Sans</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Open Sans.jpg"></div>
+<h3 class="topic">
+<a name="3u9acelulvl80f8ve99sa9260e">&nbsp;&nbsp;&nbsp;&nbsp;for (english) text</a>
+</h3>
+<h3 class="topic">
+<a href="http://fontsgeek.com/fonts/Courier-10-Pitch-Regular" name="2hl28jo8cdltgra4016hgfor8b">&nbsp;&nbsp;&nbsp;Courier 10 Pitch</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Courier 10 Pitch.jpg"></div>
+<h3 class="topic">
+<a name="53gvdimf9no7tvrt7r4ahpolla">&nbsp;&nbsp;&nbsp;&nbsp;for code (C++, cmake and bash)</a>
+</h3>
+<h3 class="topic">
+<a href="#6jsplvfu2ct756dlqo91q13qni" name="4vkdjsh6c0rb19kvo1j4o5nu84">&nbsp;Questions or comments? Email me! </a>
+</h3>
+<h2 class="topic">
+<a name="51lk9ac3g98nak4p7nnjo02jdm">Mind-maps</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/Mind-maps.jpg"></div>
+<h3 class="topic">
+<a href="https://en.wikipedia.org/wiki/Mind_map" name="009b6c2gdf1490tt3267puc06i">&nbsp;are maps (diagrams) used to display information in an organized way. 
+They allow to visualize hierarchies and connections between different pieces of information.</a>
+</h3>
+<h3 class="topic">
+<a name="5m7a4sg0mf4h4rnss2fd4kh7nu">&nbsp;This map was created using ... </a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/This map was created using ... .jpg"></div>
+<h3 class="topic">
+<a href="http://www.xmind.net/" name="1h205sl303ref9qqkvgfkq2ohc">&nbsp;&nbsp;XMind</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/XMind.jpg"></div>
+<h3 class="topic">
+<a name="37icoi62ia46cd9r0imr9vrjju">&nbsp;&nbsp;&nbsp;an open-source (except for some professional features) 
+mind-mapping tool for Linux, Windows and Mac.</a>
+</h3>
+<h2 class="topic">
+<a name="1c7kocmna80rerpl31ihsq46c0">HPX</a>
+</h2>
+<div class="overview">
+<img src="0-readme_files/images/HPX.jpg"></div>
+<h3 class="topic">
+<a name="679r9ti75sk9sai7o7o9ds789g">&nbsp;is a general purpose C++ runtime system 
+for parallel and distributed applications of any scale</a>
+</h3>
+<h3 class="topic">
+<a name="62buihnn2lud0t9of5fro1emsk">&nbsp;Learn more about HPX</a>
+</h3>
+<div class="overview">
+<img src="0-readme_files/images/Learn more about HPX.jpg"></div>
+<h3 class="topic">
+<a href="#6f982ju34920j9q0ekg5nfmdoa" name="01elvs9c44brr8v1e97j67o8ff">&nbsp;&nbsp;start navigating this map</a>
+</h3>
+<h3 class="topic">
+<a href="#2b18ihdbcg2nf8edrdl6b46qpe" name="0lukd0fsvlpjss0iae5nv04gpt">&nbsp;&nbsp;take at look at some external links</a>
+</h3>
+</body>
+</html>

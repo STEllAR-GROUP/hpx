@@ -1,0 +1,269 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>Initialization</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="1l1qd2p247u405lqt8rl8lvftd">Initialization</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="2-thread_life_cycle_files/images/Initialization.jpg"></div>
+<div class="notesContainer">
+<p>numbers correspond to the values ofenum thread_state_enum</p>
+</div>
+<p class="relationships">See Also: <a href="#5c5mippu6mkj01t7tbhpblqfk4">pending (2)</a>
+</p>
+<h2 class="topic">
+<a name="486kt7al9qjc24teib70nuc06n">staged (6)</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/staged (6).jpg"></div>
+<h3 class="topic">
+<a name="2rm87629eu8ck6bhjrrju20as1">&nbsp;this is not a real thread state, but allows to reference staged task descriptions, which eventually will be converted into thread objects.</a>
+</h3>
+<h3 class="topic">
+<a name="18gr13uomqf6r4fkhjmb18kd0u">&nbsp;when a thread is being staged, it does not go into the work queue immediately, because that might imply allocating a lot of memory, for example.</a>
+</h3>
+<h3 class="topic">
+<a href="#4gsuhnau4tsb85bsn7ga4kfnd2" name="75l7dedjbn3pbqio6u4pqg9n71">&nbsp;these tasks wait in the new_tasks_ list, which is a data member of thread_queue</a>
+</h3>
+<h3 class="topic">
+<a name="5df1npp91e4h8gb04atvoqtvg0">&nbsp;An HPX-thread is actually created only when the code that instantiates it is executed</a>
+</h3>
+<h3 class="topic">
+<a href="#3eolvh8lsnkm34ntepj1d9gvth" name="6o7ocfgngi312k8sap675rmfb2">&nbsp;this happens where thread_init_data is added to a staged queue (in the register_work function) </a>
+</h3>
+<h2 class="topic">
+<a name="5c5mippu6mkj01t7tbhpblqfk4">pending (2)</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/pending (2).jpg"></div>
+<p class="relationships">See Also: <a href="#1l1qd2p247u405lqt8rl8lvftd">Initialization</a>, <a href="#4tapi41eif78nhksff979vc26t">active (1)</a>, <a href="#5it9ndf61j4b44c7a9d882csj8">suspended (3)</a>
+</p>
+<h3 class="topic">
+<a name="7gmgk6ltvcf3fso8vmm56mp8ua">&nbsp;The thread is ready to run, 
+but no hardware resources 
+are available yet</a>
+</h3>
+<h3 class="topic">
+<a name="5uc527lbepkc5g2tjud6l46ifj">&nbsp;it is waiting in a queue</a>
+</h3>
+<h2 class="topic">
+<a name="4tapi41eif78nhksff979vc26t">active (1)</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/active (1).jpg"></div>
+<p class="relationships">See Also: <a href="#5c5mippu6mkj01t7tbhpblqfk4">pending (2)</a>, <a href="#5it9ndf61j4b44c7a9d882csj8">suspended (3) (thread has to stop
+(because of a data dependency, for example)
+but has not yet run to completion)</a>
+</p>
+<h3 class="topic">
+<a name="6em2oqtleb0hs96b1qbk04dthl">&nbsp;thread is currently active (ie it is active and has ressources)</a>
+</h3>
+<h3 class="topic">
+<a name="76doqh9j5pugnrqlj84fbv8nc8">&nbsp;context is active</a>
+</h3>
+<h3 class="topic">
+<a name="4slgl3tib5b37aq1hdudbme04q">&nbsp;code is running as it would on a native OS-thread</a>
+</h3>
+<h2 class="topic">
+<a name="748sc0flhtgpr7eeaskfrqgnji">terminated (5) </a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/terminated (5) .jpg"></div>
+<h3 class="topic">
+<a name="1s8crgf8h77i6pori0qg745bih">&nbsp;the thread has been stopped and may be garbage collected.
+For performance reasons, a thread is not destroyed, and its resources not liberated right after the thread has been terminated, because of expensive calls.
+Instead, the threads to be destroyed are accumulated, and when there are enough, or there is no other work to do, they are cleaned up. </a>
+</h3>
+<h3 class="topic">
+<a href="#42t2fv7137vti8oi7odmqongmq" name="24f4m3p1feevfc05q9cdqnuqls">&nbsp;awaiting cleanup</a>
+</h3>
+<h2 class="topic">
+<a name="5it9ndf61j4b44c7a9d882csj8">suspended (3)</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/suspended (3).jpg"></div>
+<p class="relationships">See Also: <a href="#4tapi41eif78nhksff979vc26t">active (1) (thread has to stop
+(because of a data dependency, for example)
+but has not yet run to completion)</a>, <a href="#5c5mippu6mkj01t7tbhpblqfk4">pending (2)</a>
+</p>
+<h3 class="topic">
+<a name="5koups929bvncou3dgg1tan02f">&nbsp;the thread has been suspended 
+(waiting for a synchronization event 
+but still known and under control of the thread-manager)</a>
+</h3>
+<h3 class="topic">
+<a name="2qlova17mrckbdufh1tqvnqgsg">&nbsp;the task ran, but then had to wait for something</a>
+</h3>
+<h2 class="topic">
+<a name="45a397mpmloektkat7jjm4jqc6">enum thread_state_ex_enum</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/enum thread_state_ex_enum.jpg"></div>
+<p class="relationships">See Also: <a href="#54dt4te459b5dqj35u7il4666s">typedef threads::detail::combined_tagged_state&lt;
+            thread_state_enum, thread_state_ex_enum
+        &gt; thread_state; </a>
+</p>
+<h3 class="topic">
+<a name="4b4l8j2jgq930lmci9oue7a4h4">&nbsp;Encodes the reason why a thread is being restarted.
+Stands for "extended state"</a>
+</h3>
+<h3 class="topic">
+<a name="0fqdumgmqpfg2cua9241r2n8as">&nbsp;wait_unknown = 0 </a>
+</h3>
+<h3 class="topic">
+<a name="6c91feq8ig2j5d14lp4f814en9">&nbsp;wait_signaled = 1</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/wait_signaled = 1.jpg"></div>
+<h3 class="topic">
+<a name="59muujfnta31q79fu8gtsk2o1k">&nbsp;&nbsp;the thread has been signaled</a>
+</h3>
+<h3 class="topic">
+<a name="4doje2miaqhdqpks5tdbagu9ki">&nbsp;wait_timeout = 2</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/wait_timeout = 2.jpg"></div>
+<h3 class="topic">
+<a name="2dg6r1kkj97muqjmv31sddr7ta">&nbsp;&nbsp;the thread has been reactivated after a timeout</a>
+</h3>
+<h3 class="topic">
+<a name="6q8k71kajb0urtvsn19la6qovu">&nbsp;wait_terminate = 3</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/wait_terminate = 3.jpg"></div>
+<h3 class="topic">
+<a name="4he072o1enjjocr3un678j8jns">&nbsp;&nbsp;the thread needs to be terminated</a>
+</h3>
+<h3 class="topic">
+<a name="6hauhe88esa9e0ck9iviv7bmjq">&nbsp;wait_abort = 4</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/wait_abort = 4.jpg"></div>
+<h3 class="topic">
+<a name="6e822hc1vim7ah67vla08h9tlg">&nbsp;&nbsp;the thread needs to be aborted</a>
+</h3>
+<h2 class="topic">
+<a name="54dt4te459b5dqj35u7il4666s">typedef threads::detail::combined_tagged_state&lt;
+            thread_state_enum, thread_state_ex_enum
+        &gt; thread_state; </a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/typedef threads  detail  combined_tagged_state              thread_state_enum, thread_state_ex_enum           thread_state; .jpg"></div>
+<p class="relationships">See Also: <a href="#0pjcc0vn5sc4phe12ftp8i4oq1">enum thread_state_enum</a>, <a href="#45a397mpmloektkat7jjm4jqc6">enum thread_state_ex_enum</a>
+</p>
+<h3 class="topic">
+<a name="5fkgrn4ajv6ai1r1mojiq790ft">&nbsp;
+Typing which stores the following two states
+- the current sate of the thread
+- reason why it has to be restarted in one structure 
+</a>
+</h3>
+<h2 class="topic">
+<a name="0pjcc0vn5sc4phe12ftp8i4oq1">enum thread_state_enum</a>
+</h2>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/enum thread_state_enum.jpg"></div>
+<p class="relationships">See Also: <a href="#54dt4te459b5dqj35u7il4666s">typedef threads::detail::combined_tagged_state&lt;
+            thread_state_enum, thread_state_ex_enum
+        &gt; thread_state; </a>
+</p>
+<h3 class="topic">
+<a href="#1l1qd2p247u405lqt8rl8lvftd" name="5jbjvhh1su5s1obddirlr6eoqu">&nbsp;
+encodes the current state of a thread instance
+
+in thread_enums.hpp
+</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/ encodes the current state of a thread instance  in thread_enums.hpp .jpg"></div>
+<h3 class="topic">
+<a href="#23s87bc73j2fqof5enge6isoqk" name="08ft21nrada3tt7l07m897tiik">&nbsp;&nbsp;0. unknown</a>
+</h3>
+<h3 class="topic">
+<a href="#4tapi41eif78nhksff979vc26t" name="71kn6i3ciaholh63h647nm855m">&nbsp;&nbsp;1. active</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/1. active.jpg"></div>
+<h3 class="topic">
+<a name="2aov3u16m7ojtpc0i98ms1n8kd">&nbsp;&nbsp;&nbsp;this thread is currently active
+(is running, has resources)</a>
+</h3>
+<h3 class="topic">
+<a href="#5c5mippu6mkj01t7tbhpblqfk4" name="133rs7c6umbmp43cq0147pfaio">&nbsp;&nbsp;2. pending</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/2. pending.jpg"></div>
+<h3 class="topic">
+<a name="40dbrd8l7i3lnb6crrrei7qlu4">&nbsp;&nbsp;&nbsp;this thread is pending
+(ready to run, but  there are no hardware resources available)</a>
+</h3>
+<h3 class="topic">
+<a href="#5it9ndf61j4b44c7a9d882csj8" name="76d2kde7ekm8knt3lndkt2fqdu">&nbsp;&nbsp;3. suspended</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/3. suspended.jpg"></div>
+<h3 class="topic">
+<a name="10k03ccisareo1iua87a477ekv">&nbsp;&nbsp;&nbsp;this thread has been suspended
+(it is waiting for a synchronization event, 
+but is still known andunder control of the thread manager)</a>
+</h3>
+<h3 class="topic">
+<a href="#5hlut54a85sn833of29qdkb9qt" name="2in3vpuck6s0ahlkppf1gams17">&nbsp;&nbsp;4. depleted</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/4. depleted.jpg"></div>
+<div class="notesContainer">
+<p>when does this happen???</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="2elt8voqqrg9gq8p7i8g9t1pdl">&nbsp;&nbsp;&nbsp;this thread has been depleted
+(deeply suspended, 
+it is not known by the thread manager)</a>
+</h3>
+<h3 class="topic">
+<a href="#748sc0flhtgpr7eeaskfrqgnji" name="16fr8mhlhnlrm1r44e2k9fqnfj">&nbsp;&nbsp;5. terminated</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/5. terminated.jpg"></div>
+<h3 class="topic">
+<a name="010g7qfoinmf529qu73jcbuvn0">&nbsp;&nbsp;&nbsp;this thread has been stopped and may now be garbage collected</a>
+</h3>
+<h3 class="topic">
+<a href="#486kt7al9qjc24teib70nuc06n" name="1i9b66u2vrkh2c5sg8ms3ol2e6">&nbsp;&nbsp;6. staged</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/6. staged.jpg"></div>
+<h3 class="topic">
+<a name="46emeav94s933tujkb1j8q3i1l">&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to reference staged task descriptions
+which will eventually be converted to thread objects</a>
+</h3>
+<h3 class="topic">
+<a href="#363m36maps56epiq48v0aeu1h7" name="6tv1ngvljkl3qfcm2iiicj8c15">&nbsp;&nbsp;7. pending_do_not_schedule</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/7. pending_do_not_schedule.jpg"></div>
+<h3 class="topic">
+<a name="7rrgc8lq45boqgpmlqi7cmuaq2">&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to create a thread in pending state 
+without scheduling it
+(internal, do not use)</a>
+</h3>
+<h3 class="topic">
+<a href="#2bemfbht0lj3lg8ppkbchukea2" name="4v64llbftp5gedqcrkqh3c99ss">&nbsp;&nbsp;8. pending_boost</a>
+</h3>
+<div class="overview">
+<img src="2-thread_life_cycle_files/images/8. pending_boost.jpg"></div>
+<h3 class="topic">
+<a name="6lvd55ra6jnbi5gqa65sorfrk7">&nbsp;&nbsp;&nbsp;this is not a real thread state
+but allows to suspend a thread in pending state
+without high priority rescheduling</a>
+</h3>
+</body>
+</html>
