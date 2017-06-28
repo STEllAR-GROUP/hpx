@@ -568,6 +568,13 @@ macro(hpx_check_for_cxx17_fold_expressions)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx17_fallthrough_attribute)
+  add_hpx_config_test(HPX_WITH_CXX17_FALLTHROUGH_ATTRIBUTE
+    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_mm_prefetch)
   add_hpx_config_test(HPX_WITH_MM_PREFECTH
     SOURCE cmake/tests/mm_prefetch.cpp

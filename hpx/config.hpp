@@ -14,6 +14,7 @@
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
+#include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>

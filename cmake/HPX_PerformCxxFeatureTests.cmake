@@ -168,6 +168,9 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_variable_templates(
       DEFINITIONS HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+    
+    hpx_check_for_cxx17_fallthrough_attribute(
+      DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
 endmacro()
 
