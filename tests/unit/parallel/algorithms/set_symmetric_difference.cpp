@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2107 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -109,7 +109,9 @@ void set_symmetric_difference_test1()
 {
     test_set_symmetric_difference1<std::random_access_iterator_tag>();
     test_set_symmetric_difference1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference1<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,7 +214,9 @@ void set_symmetric_difference_test2()
 {
     test_set_symmetric_difference2<std::random_access_iterator_tag>();
     test_set_symmetric_difference2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -341,7 +345,9 @@ void set_symmetric_difference_exception_test()
 {
     test_set_symmetric_difference_exception<std::random_access_iterator_tag>();
     test_set_symmetric_difference_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference_exception<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -468,7 +474,9 @@ void set_symmetric_difference_bad_alloc_test()
 {
     test_set_symmetric_difference_bad_alloc<std::random_access_iterator_tag>();
     test_set_symmetric_difference_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

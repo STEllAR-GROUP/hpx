@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         return parallel::util::partitioner<ExPolicy, OutIter, void>::call(
             policy, chunks.get(), cores,
             // first step, is applied to all partitions
-            [=](set_chunk_data* curr_chunk, std::size_t part_size)
+            [=](set_chunk_data* curr_chunk, std::size_t part_size) -> void
             {
                 HPX_ASSERT(part_size == 1);
 

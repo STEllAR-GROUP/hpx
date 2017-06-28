@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -38,11 +38,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : set_union::algorithm("set_union")
             {}
 
-            template <typename ExPolicy, typename InIter1, typename InIter2,
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static OutIter
-            sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2, OutIter dest, F && f)
+            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2, OutIter dest, F && f)
             {
                 return std::set_union(first1, last1, first2, last2, dest,
                     std::forward<F>(f));
@@ -96,6 +96,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     first1, last1, first2, last2, dest, std::forward<F>(f),
                     // calculate approximate destination index
                     [](difference_type1 idx1, difference_type2 idx2)
+                    ->  difference_type1
                     {
                         return idx1 + idx2;
                     },
@@ -103,6 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
                         buffer_type* dest, func_type const& f)
+                    ->  buffer_type*
                     {
                         return std::set_union(part_first1, part_last1,
                             part_first2, part_last2, dest, f);
@@ -133,9 +135,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -192,30 +199,42 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename OutIter, typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, OutIter dest, Pred && op = Pred())
+    set_union(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, OutIter dest, Pred && op = Pred())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+#endif
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<InIter1>::value ||
-               !hpx::traits::is_random_access_iterator<InIter2>::value ||
+               !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
+               !hpx::traits::is_random_access_iterator<FwdIter2>::value ||
                !hpx::traits::is_random_access_iterator<OutIter>::value
             > is_seq;
 
