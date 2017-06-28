@@ -33,7 +33,7 @@ namespace hpx { namespace serialization
 
     template<typename T>
     void serialize(hpx::serialization::output_archive &ar,
-        const std::valarray<T> arr, int /* version */)
+        const std::valarray<T> &arr, int /* version */)
     {
 
         const std::size_t sz = arr.size();
