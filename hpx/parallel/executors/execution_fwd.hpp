@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { namespace execution
 
 #ifdef HPX_HAVE_CXX14_AUTO
         template <>
-        struct customization_point<async_execute_tag>
+        struct customization_point<post_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE
@@ -86,16 +86,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct customization_point<then_execute_tag>
-        {
-            template <typename Executor, typename F, typename Future,
-                typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Future& predecessor,
-                Ts &&... ts) const;
-        };
-        template <>
-        struct customization_point<post_tag>
+        struct customization_point<async_execute_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE
@@ -103,13 +94,13 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct customization_point<async_bulk_execute_tag>
+        struct customization_point<then_execute_tag>
         {
-            template <typename Executor, typename F, typename Shape,
+            template <typename Executor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Shape const& shape,
-                            Ts &&... ts) const;
+            auto operator()(Executor && exec, F && f, Future& predecessor,
+                Ts &&... ts) const;
         };
 
         template <>
@@ -119,7 +110,17 @@ namespace hpx { namespace parallel { namespace execution
                 typename ... Ts>
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Shape const& shape,
-                            Ts &&... ts) const;
+                Ts &&... ts) const;
+        };
+
+        template <>
+        struct customization_point<async_bulk_execute_tag>
+        {
+            template <typename Executor, typename F, typename Shape,
+                typename ... Ts>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, F && f, Shape const& shape,
+                Ts &&... ts) const;
         };
 
         template <>
