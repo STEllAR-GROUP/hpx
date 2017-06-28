@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +14,6 @@
 #include <hpx/traits/is_executor.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/execution_information_fwd.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -73,7 +73,8 @@ namespace hpx { namespace parallel { namespace execution
             template <typename AnyExecutor, typename Parameters>
             HPX_FORCEINLINE static auto
             call(hpx::traits::detail::wrap_int, AnyExecutor && exec,
-                Parameters& params)
+                 Parameters& params) -> decltype(parallel::v3::detail::
+                    call_processing_units_parameter_count(params))
             {
                 return parallel::v3::detail::
                     call_processing_units_parameter_count(params);
@@ -101,15 +102,6 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), params);
         }
-
-        template <typename Executor, typename Parameters>
-        HPX_FORCEINLINE
-        auto customization_point<processing_units_count_tag>::operator()(
-            Executor && exec, Parameters& params) const
-        {
-            return processing_units_count(std::forward<Executor>(exec),
-                params);
-        }
         /// \endcond
     }
 
@@ -128,7 +120,7 @@ namespace hpx { namespace parallel { namespace execution
             >::type>
         {
             template <typename AnyExecutor>
-            HPX_FORCEINLINE static auto
+            HPX_FORCEINLINE static bool
             call(hpx::traits::detail::wrap_int, AnyExecutor && exec)
             {
                 return false;   // assume stateless scheduling
@@ -156,14 +148,6 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec));
         }
-
-        template <typename Executor>
-        HPX_FORCEINLINE
-        auto customization_point<has_pending_closures_tag>::operator()(
-            Executor && exec) const
-        {
-            return has_pending_closures(std::forward<Executor>(exec));
-        }
         /// \endcond
     }
 
@@ -182,10 +166,10 @@ namespace hpx { namespace parallel { namespace execution
             >::type>
         {
             template <typename AnyExecutor>
-            HPX_FORCEINLINE static auto
+            HPX_FORCEINLINE static hpx::threads::mask_cref_type
             call(hpx::traits::detail::wrap_int,
                     AnyExecutor && exec, threads::topology& topo,
-                    std::size_t thread_num)
+                 std::size_t thread_num)
             {
                 return hpx::threads::get_pu_mask(topo, thread_num);
             }
@@ -215,14 +199,6 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
-
-        template <typename Executor>
-        HPX_FORCEINLINE
-        auto customization_point<get_pu_mask_tag>::operator()(
-            Executor && exec, threads::topology& topo, std::size_t thread_num) const
-        {
-            return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
-        }
         /// \endcond
     }
 
@@ -241,7 +217,7 @@ namespace hpx { namespace parallel { namespace execution
             >::type>
         {
             template <typename AnyExecutor, typename Mode>
-            HPX_FORCEINLINE static auto
+            HPX_FORCEINLINE static void
             call(hpx::traits::detail::wrap_int,
                 AnyExecutor && exec, Mode const& mode)
             {
@@ -269,15 +245,138 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), mode);
         }
-
-        template <typename Executor, typename Mode>
-        HPX_FORCEINLINE
-        auto customization_point<set_scheduler_mode_tag>::operator()(
-            Executor && exec, Mode const& mode) const
-        {
-            return set_scheduler_mode(std::forward<Executor>(exec), mode);
-        }
         /// \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Define infrastructure for customization points
+    namespace detail
+    {
+        struct processing_units_count_tag {};
+        struct has_pending_closures_tag {};
+        struct get_pu_mask_tag {};
+        struct set_scheduler_mode_tag {};
+
+        // forward declare customization point implementations
+        template <>
+        struct customization_point<processing_units_count_tag>
+        {
+            template <typename Executor, typename Parameters>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, Parameters& params) const
+                -> decltype(processing_units_count(std::forward<Executor>(exec),
+                                              params))
+            {
+                return processing_units_count(std::forward<Executor>(exec),
+                                              params);
+            }
+        };
+
+        template <>
+        struct customization_point<has_pending_closures_tag>
+        {
+            template <typename Executor>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec) const
+                -> decltype(has_pending_closures(std::forward<Executor>(exec)))
+            {
+                return has_pending_closures(std::forward<Executor>(exec));
+            }
+        };
+
+        template <>
+        struct customization_point<get_pu_mask_tag>
+        {
+            template <typename Executor>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, threads::topology& topo,
+                std::size_t thread_num) const
+                -> decltype(get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
+            {
+                return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
+            }
+        };
+
+        template <>
+        struct customization_point<set_scheduler_mode_tag>
+        {
+            template <typename Executor, typename Mode>
+            HPX_FORCEINLINE
+            auto operator()(Executor && exec, Mode const& mode) const
+                -> decltype(set_scheduler_mode(std::forward<Executor>(exec), mode))
+            {
+                return set_scheduler_mode(std::forward<Executor>(exec), mode);
+            }
+        };
+    }
+    /// \endcond
+
+    // define customization points
+    namespace
+    {
+        /// Retrieve the number of (kernel-)threads used by the associated
+        /// executor.
+        ///
+        /// \param exec  [in] The executor object to use to extract the
+        ///              requested information for.
+        ///
+        /// \note This calls exec.os_thread_count() if it exists;
+        ///       otherwise it executes hpx::get_os_thread_count().
+        ///
+        constexpr detail::customization_point<
+                detail::processing_units_count_tag
+            > const& processing_units_count = detail::static_const<
+                    detail::customization_point<detail::processing_units_count_tag>
+                >::value;
+
+        /// Retrieve whether this executor has operations pending or not.
+        ///
+        /// \param exec  [in] The executor object to use to extract the
+        ///              requested information for.
+        ///
+        /// \note If the executor does not expose this information, this call
+        ///       will always return \a false
+        ///
+        constexpr detail::customization_point<
+                detail::has_pending_closures_tag
+            > const& has_pending_closures = detail::static_const<
+                    detail::customization_point<detail::has_pending_closures_tag>
+                >::value;
+
+        /// Retrieve the bitmask describing the processing units the given
+        /// thread is allowed to run on
+        ///
+        /// All threads::executors invoke sched.get_pu_mask().
+        ///
+        /// \param exec  [in] The executor object to use for querying the
+        ///              number of pending tasks.
+        /// \param topo  [in] The topology object to use to extract the
+        ///              requested information.
+        /// \param thream_num [in] The sequence number of the thread to
+        ///              retrieve information for.
+        ///
+        /// \note If the executor does not support this operation, this call
+        ///       will always invoke hpx::threads::get_pu_mask()
+        ///
+        constexpr detail::customization_point<detail::get_pu_mask_tag> const&
+            get_pu_mask = detail::static_const<
+                    detail::customization_point<detail::get_pu_mask_tag>
+                >::value;
+
+        /// Set various modes of operation on the scheduler underneath the
+        /// given executor.
+        ///
+        /// \param exec     [in] The executor object to use.
+        /// \param mode     [in] The new mode for the scheduler to pick up
+        ///
+        /// \note This calls exec.set_scheduler_mode(mode) if it exists;
+        ///       otherwise it does nothing.
+        ///
+        constexpr detail::customization_point<
+                detail::set_scheduler_mode_tag
+            > const& set_scheduler_mode = detail::static_const<
+                    detail::customization_point<detail::set_scheduler_mode_tag>
+                >::value;
     }
 }}}
 
