@@ -69,6 +69,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
 #ifdef HPX_HAVE_CXX14_AUTO
+        // forward declare customization point implementations
         template <>
         struct customization_point<post_tag>
         {
