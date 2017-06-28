@@ -84,8 +84,6 @@ namespace hpx { namespace threads { namespace detail
         }
 
         virtual void init(std::size_t num_threads, std::size_t threads_offset) = 0;
-        virtual void init(std::size_t num_threads, std::size_t threads_offset,
-                          policies::detail::affinity_data const& data) = 0;
 
         virtual bool run(std::unique_lock<compat::mutex>& l, compat::barrier& startup, std::size_t num_threads) = 0;
         virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;
