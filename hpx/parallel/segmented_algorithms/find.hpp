@@ -234,6 +234,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             if(*it != last)
                                 return *it;
+                            it++;
                         }
                         return res.back();
                     },
