@@ -546,9 +546,9 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx17_variable_templates)
-  add_hpx_config_test(HPX_WITH_CXX17_VARIABLE_TEMPLATES
-    SOURCE cmake/tests/cxx17_variable_templates.cpp
+macro(hpx_check_for_cxx14_variable_templates)
+  add_hpx_config_test(HPX_WITH_CXX14_VARIABLE_TEMPLATES
+    SOURCE cmake/tests/cxx14_variable_templates.cpp
     FILE ${ARGN}
     CMAKECXXFEATURE cxx_variable_templates)
 endmacro()

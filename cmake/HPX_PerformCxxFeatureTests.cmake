@@ -154,6 +154,9 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_std_result_of_sfinae(
       DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
+    hpx_check_for_cxx14_variable_templates(
+      DEFINITIONS HPX_HAVE_CXX14_VARIABLE_TEMPLATES)
+
     # check for experimental facilities
 
     # check for Library Fundamentals TS v2's experimental/optional
@@ -166,9 +169,6 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx17_fold_expressions(
         DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
-    hpx_check_for_cxx17_variable_templates(
-      DEFINITIONS HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
-    
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
