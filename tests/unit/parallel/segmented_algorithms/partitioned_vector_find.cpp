@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <iostream>
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
@@ -24,7 +25,7 @@ struct cond1
 {
     bool operator()(T v) const
     {
-        return v < T(512);
+        return v > T(511);
     }
 };
 
@@ -33,7 +34,7 @@ struct cond2
 {
     bool operator()(T v) const
     {
-        return v > T(512);
+        return v < T(512);
     }
 };
 template <typename ExPolicy, typename T>
@@ -60,7 +61,7 @@ void test_find_if(ExPolicy && policy,
 {
     auto last = hpx::parallel::find_if(policy, xvalues.begin(),
         xvalues.end(), cond1<T>());
-    HPX_TEST_LT(*last,val);
+    HPX_TEST_EQ(*last,val);
 }
 
 template <typename ExPolicy, typename T>
@@ -69,7 +70,7 @@ void test_find_if_async(ExPolicy && policy,
 {
     auto last = hpx::parallel::find_if(policy, xvalues.begin(),
         xvalues.end(), cond1<T>()).get();
-    HPX_TEST_LT(*last,val);
+    HPX_TEST_EQ(*last,val);
 }
 
 template <typename ExPolicy, typename T>
@@ -78,7 +79,7 @@ void test_find_if_not(ExPolicy && policy,
 {
     auto last = hpx::parallel::find_if_not(policy, xvalues.begin(),
         xvalues.end(), cond2<T>());
-    HPX_TEST_LT(*last,val);
+    HPX_TEST_EQ(*last,val);
 }
 
 template <typename ExPolicy, typename T>
@@ -87,7 +88,7 @@ void test_find_if_not_async(ExPolicy && policy,
 {
     auto last = hpx::parallel::find_if_not(policy, xvalues.begin(),
         xvalues.end(), cond2<T>()).get();
-    HPX_TEST_LT(*last,val);
+    HPX_TEST_EQ(*last,val);
 }
 
 
