@@ -531,6 +531,10 @@ invoke_r                              "" "header\.hpx\.util\.invoke_r.*"
 invoke_fused                          "" "header\.hpx\.util\.invoke_fused.*"
 invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
 
+# hpx/util/pack_traversal.hpp
+map_pack                              "" "header\.hpx\.util\.pack_traversal.*"
+traverse_pack                         "" "header\.hpx\.util\.pack_traversal.*"
+
 # hpx/util/unwrapped.hpp
 unwrapped                             "" "header\.hpx\.util\.unwrapped.*"
 unwrapped2                            "" "header\.hpx\.util\.unwrapped2.*"

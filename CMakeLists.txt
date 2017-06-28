@@ -915,7 +915,7 @@ endif()
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
@@ -924,8 +924,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    hpx_error("GCC 4.8 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    hpx_error("GCC 4.9 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -1547,6 +1547,28 @@ hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
+# Provide a macro for generating config headers
+################################################################################
+macro(generate_config_defines_header TARGET_DIRECTORY)
+  # Generate a defines.hpp to be used in the build directory ...
+  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
+  write_config_defines_file(
+    TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+    NAMESPACE default
+    FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
+endmacro()
+
+###############################################################################
+# Perform the on framework CXX feature tests
+###############################################################################
+hpx_perform_on_framework_cxx_feature_tests()
+
+################################################################################
+# Set basic search paths for the generated HPX headers
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
+
+################################################################################
 # Configure compression and other plugins
 ################################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -1633,19 +1655,14 @@ add_plugin_modules()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-# Generate a defines.hpp to be used in the build directory ...
-set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-write_config_defines_file(
-  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-  NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp")
+generate_config_defines_header(${CMAKE_BINARY_DIR})
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
 write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1675,7 +1692,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/"
+  DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"

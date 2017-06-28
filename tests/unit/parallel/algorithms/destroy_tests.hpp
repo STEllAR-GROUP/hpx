@@ -26,6 +26,8 @@
 
 #include "test_utils.hpp"
 
+boost::atomic<std::size_t> destruct_count(0);
+
 struct destructable
 {
     destructable()
@@ -34,7 +36,7 @@ struct destructable
 
     ~destructable()
     {
-        std::memset(&value_, 0xcd, sizeof(value_));
+        ++destruct_count;
     }
 
     std::uint32_t value_;
@@ -64,18 +66,13 @@ void test_destroy(ExPolicy && policy, IteratorTag)
             ::new (static_cast<void*>(std::addressof(d))) destructable;
         });
 
+    destruct_count.store(0);
+
     hpx::parallel::destroy(
         std::forward<ExPolicy>(policy),
         iterator(p), iterator(p + data_size));
 
-    std::size_t count = 0;
-    std::for_each(p, p + data_size,
-        [&count](destructable v1)
-        {
-            HPX_TEST_EQ(v1.value_, (std::uint32_t)0xcdcdcdcd);
-            ++count;
-        });
-    HPX_TEST_EQ(count, data_size);
+    HPX_TEST_EQ(destruct_count.load(), data_size);
 
     std::free(p);
 }
@@ -97,20 +94,15 @@ void test_destroy_async(ExPolicy && policy, IteratorTag)
             ::new (static_cast<void*>(std::addressof(d))) destructable;
         });
 
+    destruct_count.store(0);
+
     auto f =
         hpx::parallel::destroy(
             std::forward<ExPolicy>(policy),
             iterator(p), iterator(p + data_size));
     f.wait();
 
-    std::size_t count = 0;
-    std::for_each(p, p + data_size,
-        [&count](destructable v1)
-        {
-            HPX_TEST_EQ(v1.value_, (std::uint32_t)0xcdcdcdcd);
-            ++count;
-        });
-    HPX_TEST_EQ(count, data_size);
+    HPX_TEST_EQ(destruct_count.load(), data_size);
 
     std::free(p);
 }
