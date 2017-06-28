@@ -19,7 +19,7 @@
 #include <hpx/util/tagged_tuple.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/exception.hpp>
+#include <exception>
 
 #include <algorithm>
 #include <iterator>
