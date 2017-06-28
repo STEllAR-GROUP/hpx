@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 
+#include <hpx/config/defines.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -735,7 +736,7 @@ namespace hpx { namespace parallel { namespace execution
     {
         ///////////////////////////////////////////////////////////////////////
         // customization points
-       // declare customization point implementations
+        // declare customization point implementations
 
         template <>
         struct customization_point<async_execute_tag>
@@ -743,8 +744,10 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(async_execute(std::forward<Executor>(exec),
                                           std::forward<F>(f), std::forward<Ts>(ts)...))
+#endif
             {
                 return async_execute(std::forward<Executor>(exec),
                                      std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -757,8 +760,10 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(sync_execute(std::forward<Executor>(exec),
                                     std::forward<F>(f), std::forward<Ts>(ts)...))
+#endif
             {
                 return sync_execute(std::forward<Executor>(exec),
                                     std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -773,8 +778,10 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Future& predecessor,
                 Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(then_execute(std::forward<Executor>(exec),
                                     std::forward<F>(f), predecessor, std::forward<Ts>(ts)...))
+#endif
             {
                 return then_execute(std::forward<Executor>(exec),
                                     std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
@@ -787,8 +794,10 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename ... Ts>
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(post(std::forward<Executor>(exec), std::forward<F>(f),
                             std::forward<Ts>(ts)...))
+#endif
             {
                 return post(std::forward<Executor>(exec), std::forward<F>(f),
                             std::forward<Ts>(ts)...);
@@ -803,9 +812,11 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Shape const& shape,
                             Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(async_bulk_execute(
                                 std::forward<Executor>(exec),
                                 std::forward<F>(f), shape, std::forward<Ts>(ts)...))
+#endif
             {
                 return async_bulk_execute(
                     std::forward<Executor>(exec),
@@ -821,8 +832,10 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Shape const& shape,
                             Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
                 -> decltype(sync_bulk_execute(std::forward<Executor>(exec),
                                               std::forward<F>(f), shape, std::forward<Ts>(ts)...))
+#endif
             {
                 return sync_bulk_execute(std::forward<Executor>(exec),
                                          std::forward<F>(f), shape, std::forward<Ts>(ts)...);
@@ -837,9 +850,11 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Shape const& shape,
                 Future& predecessor, Ts &&... ts) const
+#ifndef HPX_HAVE_CXX14_AUTO
             -> decltype(then_bulk_execute(std::forward<Executor>(exec),
                                           std::forward<F>(f), shape, predecessor,
                                           std::forward<Ts>(ts)...))
+#endif
             {
                 return then_bulk_execute(std::forward<Executor>(exec),
                                          std::forward<F>(f), shape, predecessor,
