@@ -16,7 +16,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/exception_ptr.hpp>
+#include <boost/exception.hpp>
 
 #include <algorithm>
 #include <iterator>
