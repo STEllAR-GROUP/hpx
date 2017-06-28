@@ -24,7 +24,7 @@
      && (!defined(__ANDROID__) || !defined(ANDROID))
 #define BOOST_HAVE_EXECINFO
 #define BOOST_HAVE_DLFCN
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__)
 #  define BOOST_HAVE_UNWIND
 #endif
 #endif

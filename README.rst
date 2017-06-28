@@ -93,6 +93,12 @@ Also, if you have any questions feel free to ask it over at
 `stackoverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
+We have adopted a
+`code of conduct <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/CODE_OF_CONDUCT.md>`_
+for this project. Please refer to this document if you would like to know more
+about the expectations for members of our community, with regard to how they
+will behave toward each other.
+
 ********************
  Build Instructions
 ********************

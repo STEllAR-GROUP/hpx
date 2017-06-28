@@ -131,5 +131,5 @@ write_config_defines_file(
   TEMPLATE ""
   NAMESPACE "parcelport"
   FILENAME
-  "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_defines.hpp")
+  "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_defines.hpp")
 

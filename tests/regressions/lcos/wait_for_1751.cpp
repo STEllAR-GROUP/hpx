@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -28,14 +29,12 @@ int hpx_main()
         auto f = hpx::async([](){});
 
         if (f.wait_for(std::chrono::seconds(1)) ==
-            hpx::lcos::future_status::timeout)
+                hpx::lcos::future_status::timeout)
         {
             auto now = std::chrono::high_resolution_clock::now();
-            overall_dif = now - overall_start_time;
             std::chrono::duration<double> dif = now - start_time;
 
-            std::cout << "Future timed out after "
-                      << dif.count() << " (" << overall_dif.count() << ") seconds.\n";
+            HPX_TEST_LTE(1.0, dif.count());
             break;
         }
         else
@@ -44,10 +43,8 @@ int hpx_main()
         }
 
         auto now = std::chrono::high_resolution_clock::now();
-        overall_dif = now - overall_start_time;
         std::chrono::duration<double> dif = now - start_time;
-        std::cout << "Future took "
-                  << dif.count() << " (" << overall_dif.count() << ") seconds.\n";
+        HPX_TEST_LT(dif.count(), 1.0);
     }
 
     return hpx::finalize();
@@ -55,5 +52,6 @@ int hpx_main()
 
 int main(int argc, char *argv[])
 {
-    return hpx::init(argc, argv);
+    hpx::init(argc, argv);
+    return hpx::util::report_errors();
 }
