@@ -128,6 +128,27 @@ namespace hpx { namespace detail
             return std::move(*this);
         }
 
+        // Note: Put operation. Race condition may occur, be sure that
+        // operator=() is called by only one thread at a time.
+        view_element && operator=(Data const & other)
+        {
+            if ( is_data_here() )
+            {
+                Data & ref = data();
+
+                HPX_ASSERT_MSG( ref.size() == other.size(), \
+                    "r-value vector has invalid size");
+
+                ref = other;
+            }
+            else
+            {
+                this->set_data(hpx::launch::sync, Data(other) );
+            }
+
+            return std::move(*this);
+        }
+
         // Note: Put operation. Free of race conditions.
         view_element && operator=(view_element<T,Data> && other)
         {

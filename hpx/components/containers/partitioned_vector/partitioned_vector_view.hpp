@@ -55,6 +55,12 @@ namespace hpx
         using iterator
             = typename hpx::partitioned_vector_view_iterator<T,N,Data>;
 
+        // Minimal dummy construction
+        explicit partitioned_vector_view(
+            hpx::lcos::spmd_block const & block)
+        : block_( block )
+        {}
+
         explicit partitioned_vector_view(
             hpx::lcos::spmd_block const & block,
             pvector_iterator && v_begin,
