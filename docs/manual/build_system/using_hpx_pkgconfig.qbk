@@ -131,7 +131,7 @@ we do:
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
     c++ -o hello_world_client hello_world_client.cpp \
         `pkg-config --cflags --libs hpx_application` \
-        -L${HOME}/my_hpx_libs -lhello_world -lhpx_iostreams
+        -L${HOME}/my_hpx_libs -lhpx_hello_world -lhpx_iostreams
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
