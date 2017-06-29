@@ -105,7 +105,7 @@ for almost any widely available editor. Please see
 editor.
 
 There is a `.clang-format` file in the HPX root directory which you can use to
-manually format the code you contribute. This configuraton file can be used
+manually format the code you contribute. This configuration file can be used
 with [clang-format](https://clang.llvm.org/docs/ClangFormat.html), a tool created 
 by the [Clang](https://clang.llvm.org/) project.
 
