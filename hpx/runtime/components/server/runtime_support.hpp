@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -799,8 +799,11 @@ namespace hpx { namespace components { namespace server
         }
 
         typedef typename Component::wrapping_type wrapping_type;
+        typename wrapping_type::derived_type* new_instance = nullptr;
+
         naming::gid_type id = factory->create_with_args(migrated_id,
-            detail::construct_function<wrapping_type>(std::move(*p)));
+            detail::construct_function<wrapping_type>(std::move(*p)),
+            reinterpret_cast<void**>(&new_instance));
 
         // sanity checks
         if (!id)
@@ -832,6 +835,11 @@ namespace hpx { namespace components { namespace server
         agas::unmark_as_migrated(id);
 
         to_migrate.make_unmanaged();
+
+        // inform the newly created component that it has been migrated
+        if (new_instance != nullptr)
+            new_instance->on_migrated();
+
         return id;
     }
 }}}
