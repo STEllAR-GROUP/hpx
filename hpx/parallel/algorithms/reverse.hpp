@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last)),
                         std::distance(first, last) / 2,
-                        [](reference t)
+                        [](reference t) -> void
                         {
                             using hpx::util::get;
                             std::swap(get<0>(t), get<1>(t));
@@ -214,10 +214,10 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \tparam BidirIter   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     bidirectional iterator.
-    /// \tparam OutputIter  The type of the iterator representing the
+    /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -264,15 +264,23 @@ namespace hpx { namespace parallel { inline namespace v1
         static_assert(
             (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
             detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(

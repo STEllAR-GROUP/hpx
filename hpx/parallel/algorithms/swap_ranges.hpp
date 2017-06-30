@@ -65,7 +65,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2),
                         std::distance(first1, last1),
-                        [](reference t) {
+                        [](reference t) -> void
+                        {
                             using hpx::util::get;
                             std::swap(get<0>(t), get<1>(t));
                         },

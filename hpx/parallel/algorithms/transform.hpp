@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -94,7 +94,8 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            transform_iteration& operator=(transform_iteration const&) = delete;
+            transform_iteration& operator=(transform_iteration const&) = default;
+            transform_iteration& operator=(transform_iteration &&) = default;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -142,11 +143,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform::algorithm("transform")
             {}
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
+            template <typename ExPolicy, typename FwdIter, typename OutIter,
                 typename F, typename Proj>
             HPX_HOST_DEVICE
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy && policy, InIter first, InIter last,
+            static std::pair<FwdIter, OutIter>
+            sequential(ExPolicy && policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f, Proj && proj)
             {
                 return util::transform_loop(std::forward<ExPolicy>(policy),
@@ -191,13 +192,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -222,7 +223,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type. The type \a Ret
     ///                     must be such that an object of type \a OutIter can
     ///                     be dereferenced and assigned a value of type
@@ -253,24 +254,25 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename F,
+    template <typename ExPolicy, typename FwdIter, typename OutIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj, InIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj, InIter>
+            ExPolicy, F, traits::projected<Proj, FwdIter>
         >::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(InIter), tag::out(OutIter)>
+        hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
     >::type
-    transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
+    transform(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest,
         F && f, Proj && proj = Proj())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
@@ -279,12 +281,22 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_input_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::transform<std::pair<InIter, OutIter> >().call(
+            detail::transform<std::pair<FwdIter, OutIter> >().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest, std::forward<F>(f),
                 std::forward<Proj>(proj)));
@@ -357,7 +369,9 @@ namespace hpx { namespace parallel { inline namespace v1
 #endif
 
             transform_binary_iteration& operator=(
-                transform_binary_iteration const&) = delete;
+                transform_binary_iteration const&) = default;
+            transform_binary_iteration& operator=(
+                transform_binary_iteration &&) = default;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -394,11 +408,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_binary::algorithm("transform_binary")
             {}
 
-            template <typename ExPolicy, typename InIter1, typename InIter2,
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<InIter1, InIter2, OutIter>
-            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
-                InIter2 first2, OutIter dest, F && f, Proj1 && proj1,
+            static hpx::util::tuple<FwdIter1, FwdIter2, OutIter>
+            sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, OutIter dest, F && f, Proj1 && proj1,
                 Proj2 && proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(
@@ -450,18 +464,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam InIter1     The type of the source iterators for the first
+    /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators for the second
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators for the second
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -492,7 +506,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types InIter1 and InIter2 can be
+    ///                     objects of types FwdIter1 and FwdIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively. The type \a Ret
     ///                     must be such that an object of type \a OutIter can
@@ -518,10 +532,10 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
+    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
@@ -531,50 +545,64 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           copied.
     ///
     template <
-        typename ExPolicy, typename InIter1, typename InIter2,
+        typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename OutIter, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter1>::value &&
-        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value &&
+        traits::is_projected<Proj1, FwdIter1>::value &&
+        traits::is_projected<Proj2, FwdIter2>::value &&
         traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj1, InIter1>,
-                traits::projected<Proj2, InIter2>
+            ExPolicy, F, traits::projected<Proj1, FwdIter1>,
+                traits::projected<Proj2, FwdIter2>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
-            tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+            tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)
         >
     >::type
     transform(ExPolicy && policy,
-        InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
+        FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, OutIter dest, F && f,
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
 
-        typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+        typedef hpx::util::tuple<FwdIter1, FwdIter2, OutIter> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
             detail::transform_binary<result_type>().call(
@@ -596,11 +624,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_binary2::algorithm("transform_binary")
             {}
 
-            template <typename ExPolicy, typename InIter1, typename InIter2,
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<InIter1, InIter2, OutIter>
-            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2,
+            static hpx::util::tuple<FwdIter1, FwdIter2, OutIter>
+            sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2,
                 OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(
@@ -655,18 +683,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam InIter1     The type of the source iterators for the first
+    /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators for the second
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators for the second
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -699,7 +727,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types InIter1 and InIter2 can be
+    ///                     objects of types FwdIter1 and FwdIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively. The type \a Ret
     ///                     must be such that an object of type \a OutIter can
@@ -728,10 +756,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///       the end of the shorter of the two given input sequences
     ///
     /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_tuple<tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
+    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)>
     ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
@@ -741,51 +769,65 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           copied.
     ///
     template <
-        typename ExPolicy, typename InIter1, typename InIter2,
+        typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename OutIter, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter1>::value &&
-        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
-        traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value &&
+        traits::is_projected<Proj1, FwdIter1>::value &&
+        traits::is_projected<Proj2, FwdIter2>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
-                traits::projected<Proj1, InIter1>,
-                traits::projected<Proj2, InIter2>
+                traits::projected<Proj1, FwdIter1>,
+                traits::projected<Proj2, FwdIter2>
         >::value)>
     typename util::detail::algorithm_result<
             ExPolicy,
             hpx::util::tagged_tuple<
-                tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+                tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(OutIter)
             >
         >::type
     transform(ExPolicy && policy,
-        InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
+        FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
         OutIter dest, F && f, Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
         static_assert(
             (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
+                hpx::traits::is_forward_iterator<OutIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value ||
                !hpx::traits::is_forward_iterator<OutIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<OutIter>::value),
+            "Requires at least forward iterator.");
 
-        typedef hpx::util::tuple<InIter1, InIter2, OutIter> result_type;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+        typedef hpx::util::tuple<FwdIter1, FwdIter2, OutIter> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
             detail::transform_binary2<result_type>().call(
