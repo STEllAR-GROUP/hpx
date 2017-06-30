@@ -5,6 +5,7 @@
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
+# Copyright (c) 2017      Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -154,7 +155,6 @@ hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
   BOOL
   "Enable Stack Overflow Detection (default: OFF)"
   OFF ADVANCED)
-
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -1393,6 +1393,8 @@ if(HPX_WITH_HWLOC)
   hpx_add_config_define(HPX_HAVE_HWLOC)
 endif()
 
+hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
+
 if(HPX_WITH_STACKOVERFLOW_DETECTION)
   find_package(LibSigSegv)
   if(NOT LIBSIGSEGV_FOUND)
@@ -1400,7 +1402,7 @@ if(HPX_WITH_STACKOVERFLOW_DETECTION)
   endif()
   hpx_libraries(${LIBSIGSEGV_LIBRARIES})
   include_directories(${LIBSIGSEGV_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_LIBSIGSEGV)
+  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
 endif()
 
 ################################################################################

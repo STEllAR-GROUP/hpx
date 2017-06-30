@@ -1,7 +1,3 @@
-# Copyright (c)      2014 Thomas Heller
-# Copyright (c) 2007-2012 Hartmut Kaiser
-# Copyright (c) 2010-2011 Matt Anderson
-# Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2017      Abhimanyu Rawat
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +31,7 @@ find_package_handle_standard_args(LibSigSegv DEFAULT_MSG
 
 get_property(_type CACHE LIBSIGSEGV_ROOT PROPERTY TYPE)
 if(_type)
-  set_property(CACHE HWLOC_ROOT PROPERTY ADVANCED 1)
+  set_property(CACHE LIBSIGSEGV_ROOT PROPERTY ADVANCED 1)
   if("x${_type}" STREQUAL "xUNINITIALIZED")
     set_property(CACHE LIBSIGSEGV_ROOT PROPERTY TYPE PATH)
   endif()
