@@ -18,6 +18,7 @@ set(exclude_from_all_headers
 
 set(exclude_from_headers
   "parallel/executors/execution_fwd.hpp"
+  "parallel/executors/customization_point.hpp"
 )
 
 # If we compile with the MPI parcelport enabled, we need to additionally
