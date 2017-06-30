@@ -250,11 +250,14 @@ namespace hpx { namespace parallel { inline namespace v1
                 iterator_traits2;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                segmented_transform(transform<std::pair<
-                typename iterator_traits1::local_iterator,
-                typename iterator_traits2::local_iterator> >(),
-                std::forward<ExPolicy>(policy), first, last,
-                dest, std::forward<F>(f), proj, is_seq()));
+              segmented_transform(
+                  transform<std::pair<
+                      typename iterator_traits1::local_iterator,
+                      typename iterator_traits2::local_iterator
+                  > >(),
+              std::forward<ExPolicy>(policy), first, last,
+              dest, std::forward<F>(f), std::forward<Proj>(proj),
+              is_seq()));
         }
 
         // forward declare the non-segmented version of this algorithm
@@ -400,7 +403,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator3 sdest =  traits3::segment(dest);
 
             std::vector<future<hpx::util::tuple<local_iterator_type1,
-             local_iterator_type2, local_iterator_type3> > > segments;
+                local_iterator_type2, local_iterator_type3> > > segments;
             segments.reserve(std::distance(sit1, send1));
 
             if (sit1 == send1)
@@ -464,7 +467,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
             }
 
-            return result::get((
+            return result::get(
                 dataflow(
                     [=](std::vector<hpx::future<hpx::util::tuple<
                         local_iterator_type1, local_iterator_type2,
@@ -482,7 +485,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         auto odest = traits3::compose(sdest, hpx::util::get<2>(rl));
                         return hpx::util::make_tuple(olast1, olast2, odest);
                     },
-                    std::move(segments))));
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -523,12 +526,14 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::traits::segmented_iterator_traits<OutIter>
                 iterator3_traits;
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-                segmented_transform(transform_binary<hpx::util::tuple<
-                typename iterator1_traits::local_iterator,
-                typename iterator2_traits::local_iterator,
-                typename iterator3_traits::local_iterator> >(),
+                    segmented_transform(transform_binary<hpx::util::tuple<
+                        typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator
+                    > >(),
                 std::forward<ExPolicy>(policy), first1, last1, first2,
-                dest, std::forward<F>(f), proj1, proj2, is_seq()));
+                dest, std::forward<F>(f), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2), is_seq()));
         }
 
         // forward declare the non-segmented version of this algorithm
@@ -700,7 +705,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator3 sdest =  traits3::segment(dest);
 
             std::vector<future<hpx::util::tuple<local_iterator_type1,
-             local_iterator_type2, local_iterator_type3> > > segments;
+                local_iterator_type2, local_iterator_type3> > > segments;
             segments.reserve(std::distance(sit1, send1));
 
             if (sit1 == send1 && sit2 == send2)

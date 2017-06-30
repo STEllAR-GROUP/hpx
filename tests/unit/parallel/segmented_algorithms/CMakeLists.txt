@@ -36,6 +36,9 @@ set(partitioned_vector_transform_reduce_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)
 set(partitioned_vector_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_reduce_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
 set(partitioned_vector_inclusive_scan_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)

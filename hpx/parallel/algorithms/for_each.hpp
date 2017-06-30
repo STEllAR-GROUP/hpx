@@ -333,7 +333,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::for_each_n_(policy, first, count, f, is_segmented(),proj);
+        return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
+            std::forward<F>(f), is_segmented(), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////

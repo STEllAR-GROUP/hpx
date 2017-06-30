@@ -191,9 +191,9 @@ namespace hpx { namespace parallel { inline namespace v1
             F && f, Proj && proj, std::false_type)
         {
             typedef std::integral_constant<bool,
-                    parallel::execution::is_sequenced_execution_policy<ExPolicy>
-                    ::value || !hpx::traits::is_forward_iterator<InIter>::value ||
-                   !hpx::traits::is_forward_iterator<OutIter>::value
+                parallel::execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                !hpx::traits::is_forward_iterator<InIter>::value ||
+                !hpx::traits::is_forward_iterator<OutIter>::value
                 > is_seq;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
@@ -447,8 +447,8 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 if (first1 != last1)
                 {
-                    auto f1 = transform_binary_iteration<ExPolicy, F, Proj1,
-                        Proj2>(std::forward<F>(f), std::forward<Proj1>(proj1),
+                    auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
+                        std::forward<F>(f), std::forward<Proj1>(proj1),
                         std::forward<Proj2>(proj2));
 
                     return get_iter_tuple(
