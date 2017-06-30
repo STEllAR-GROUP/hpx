@@ -8,9 +8,9 @@
 #if !defined(PARTITIONED_VECTOR_VIEW_ITERATOR_HPP)
 #define PARTITIONED_VECTOR_VIEW_ITERATOR_HPP
 
-#include <hpx/components/containers/partitioned_vector/detail/make_index_sequence.hpp>
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -32,11 +32,12 @@ namespace hpx {
     private:
         using pvector_iterator = hpx::vector_iterator<T,Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
-        using indices = typename hpx::detail::make_index_sequence<N>::type;
+        using indices =
+            typename hpx::util::detail::make_index_pack_unroll<N>::type;
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
-        hpx::detail::integer_sequence<std::size_t, I...> ) const
+        hpx::util::detail::pack_c<std::size_t, I...> ) const
     {
         std::size_t max = N-1;
         std::size_t offset = 0;
