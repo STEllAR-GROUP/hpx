@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DISPATCH_JUN_21_2017_1145PM)
-#define HPX_PARALLEL_DISPATCH_JUN_21_2017_1145PM
+#if !defined(HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM)
+#define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -19,6 +19,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/util/tuple.hpp>
+
 #include <string>
 #include <type_traits>
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)

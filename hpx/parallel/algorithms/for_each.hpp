@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/for_each.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_JUN_21_2017_0932PM)
-#define HPX_PARALLEL_DETAIL_FOR_EACH_JUN_21_2017_0932PM
+#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
+#define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
@@ -218,7 +218,7 @@ namespace hpx { namespace parallel { inline namespace v1
             std::true_type, Proj && proj = Proj())
         {
             auto last = first;
-            detail::advance(last,std::size_t(count));
+            detail::advance(last, std::size_t(count));
             return for_each(
                 std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj));
@@ -496,7 +496,7 @@ namespace hpx { namespace parallel { inline namespace v1
     //         Cuda host code
 
     template <typename ExPolicy, typename InIter, typename F,
-        typename Proj = util::projection_identity,
+        typename Proj,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<InIter>::value &&

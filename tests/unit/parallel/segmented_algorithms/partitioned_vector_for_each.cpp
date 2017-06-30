@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2015 Hartmut Kaiser
 //  Copyright (c) 2017 Ajai V George
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying

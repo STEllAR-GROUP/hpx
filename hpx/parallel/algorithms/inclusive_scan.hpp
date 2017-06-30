@@ -188,9 +188,9 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy, typename InIter, typename OutIter,
             typename T, typename Op, typename Conv = util::projection_identity>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter
-            dest, T const& init, Op && op, std::true_type, Conv && conv =
-            Conv());
+        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
+            OutIter dest, T const& init, Op && op, std::true_type,
+            Conv && conv = Conv());
         /// \endcond
     }
 

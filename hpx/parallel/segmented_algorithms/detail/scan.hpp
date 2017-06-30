@@ -47,12 +47,13 @@ namespace hpx { namespace parallel { inline namespace v1
         T sequential_segmented_scan_T(InIter first, InIter last,
             Op && op, Conv && conv)
         {
-            T ret = conv(*first);
+            T ret = hpx::util::invoke(conv, *first);
             if (first != last)
             {
                 for(++first; first != last; ++first)
                 {
-                    ret = hpx::util::invoke(op, ret, conv(*first));
+                    ret = hpx::util::invoke(op, ret,
+                        hpx::util::invoke(conv, *first));
                 }
             }
             return ret;
@@ -103,7 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                 [&ret, op, conv](FwdIter const& curr)
                                 {
                                     ret = hpx::util::invoke(op, ret,
-                                        conv(*curr));
+                                        hpx::util::invoke(conv, *curr));
                                 });
                         }
                         return ret;

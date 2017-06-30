@@ -18,7 +18,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/util/tuple.hpp>
-#include <exception>
 
 #include <exception>
 #include <list>
