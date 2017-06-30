@@ -5,6 +5,7 @@
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
+# Copyright (c) 2017      Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -149,6 +150,11 @@ hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
+
+hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
+  BOOL
+  "Enable Stack Overflow Detection (default: OFF)"
+  OFF ADVANCED)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -1385,6 +1391,18 @@ if(HPX_WITH_HWLOC)
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_HWLOC)
+endif()
+
+hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
+
+if(HPX_WITH_STACKOVERFLOW_DETECTION)
+  find_package(LibSigSegv)
+  if(NOT LIBSIGSEGV_FOUND)
+    hpx_error("LibSigSegv could not be found and HPX_WITH_STACKOVERFLOW_DETECTION=ON, please specify LIBSIGSEGV_ROOT to point to the correct location or set HPX_WITH_STACKOVERFLOW_DETECTION to OFF")
+  endif()
+  hpx_libraries(${LIBSIGSEGV_LIBRARIES})
+  include_directories(${LIBSIGSEGV_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
 endif()
 
 ################################################################################
