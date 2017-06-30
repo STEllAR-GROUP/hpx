@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     value_type;
 
                 return std::accumulate(first, last, std::forward<T_>(init),
-                    [&r, &conv](T const& res, value_type const& next)
+                    [&r, &conv](T const& res, value_type const& next) -> T
                     {
                         return hpx::util::invoke(r, res,
                             hpx::util::invoke(conv, next));
@@ -91,17 +91,18 @@ namespace hpx { namespace parallel { inline namespace v1
                             std::move(val),
                             // MSVC14 bails out if r and conv are captured by
                             // reference
-                            [=](T const& res, reference next)
+                            [=](T const& res, reference next)-> T
                             {
                                 return hpx::util::invoke(r, res,
                                     hpx::util::invoke(conv, next));
                             });
                     },
-                    hpx::util::unwrapped([init, r](std::vector<T> && results)
-                    {
-                        return util::accumulate_n(boost::begin(results),
-                            boost::size(results), init, r);
-                    }));
+                    hpx::util::unwrapped(
+                        [init, r](std::vector<T> && results) -> T
+                        {
+                            return util::accumulate_n(boost::begin(results),
+                                boost::size(results), init, r);
+                        }));
             }
         };
 

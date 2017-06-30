@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // of the elements of a value-pack
                 auto result =
                     util::detail::accumulate_values<ExPolicy>(
-                        [&op1](T const& sum, T const& val)
+                        [&op1](T const& sum, T const& val) -> T
                         {
                             return hpx::util::invoke(op1, sum, val);
                         },
@@ -202,7 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         // this is to support vectorization, it will call op1
                         // for each of the elements of a value-pack
                         auto result = util::detail::accumulate_values<ExPolicy>(
-                            [&op1](T const& sum, T const& val)
+                            [&op1](T const& sum, T const& val) -> T
                             {
                                 return hpx::util::invoke(op1, sum, val);
                             },
@@ -295,6 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
             (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
@@ -307,6 +308,16 @@ namespace hpx { namespace parallel { inline namespace v1
                !hpx::traits::is_forward_iterator<FwdIter1>::value ||
                !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -416,6 +427,7 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
             (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
@@ -424,10 +436,20 @@ namespace hpx { namespace parallel { inline namespace v1
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequenced_execution_policy<ExPolicy>::value ||
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_forward_iterator<FwdIter1>::value ||
                !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
