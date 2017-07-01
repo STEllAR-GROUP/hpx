@@ -24,10 +24,11 @@ namespace hpx { namespace components
             "component_memory_block",                           /*  3 */
             "component_base_lco",                               /*  4 */
             "component_base_lco_with_value",                    /*  5 */
-            "component_latch",                                  /*  6 (0x60005) */
-            "component_barrier",                                /*  7 (0x70004) */
-            "component_flex_barrier",                           /*  8 (0x80004) */
-            "component_promise",                                /*  9 (0x90005) */
+            "component_base_lco_with_value_managed",            /*  6 */
+            "component_latch",                                  /*  7 (0x70006) */
+            "component_barrier",                                /*  8 (0x80004) */
+            "component_flex_barrier",                           /*  9 (0x90004) */
+            "component_promise",                                /* 10 (0xa0006) */
 
             "component_agas_locality_namespace",                /* 10 */
             "component_agas_primary_namespace",                 /* 11 */

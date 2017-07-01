@@ -44,8 +44,8 @@ namespace hpx { namespace components
     {
     protected:
         typedef typename std::conditional<
-            std::is_same<Component, detail::this_type>::value,
-            simple_component_base, Component
+                std::is_same<Component, detail::this_type>::value,
+                simple_component_base, Component
             >::type this_component_type;
 
         Component& derived()
