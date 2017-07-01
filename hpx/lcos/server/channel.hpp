@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,14 +11,17 @@
 #include <hpx/lcos/local/channel.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <type_traits>
 #include <utility>
+
+#include <boost/preprocessor/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
@@ -31,14 +34,17 @@ namespace hpx { namespace lcos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename RemoteType>
     class channel
-      : public lcos::base_lco_with_value<T, RemoteType>
-      , public components::managed_component_base<channel<T, RemoteType> >
+      : public lcos::base_lco_with_value<
+            T, RemoteType, traits::detail::component_tag>
+      , public components::component_base<channel<T, RemoteType> >
     {
     public:
-        typedef lcos::base_lco_with_value<T, RemoteType> base_type_holder;
+        typedef lcos::base_lco_with_value<
+                T, RemoteType, traits::detail::component_tag
+            > base_type_holder;
 
     private:
-        typedef components::managed_component_base<channel> base_type;
+        typedef components::component_base<channel> base_type;
         typedef typename std::conditional<
             std::is_void<T>::value, util::unused_type, T
         >::type result_type;
@@ -120,20 +126,22 @@ namespace hpx { namespace lcos { namespace server
     HPX_REGISTER_CHANNEL_DECLARATION_2(type, type)                            \
 /**/
 #define HPX_REGISTER_CHANNEL_DECLARATION_2(type, name)                        \
-    typedef ::hpx::lcos::server::channel<type>                                \
+    typedef ::hpx::lcos::server::channel< type>                               \
         BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name));                   \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::lcos::server::channel<type>::get_generation_action,              \
+        hpx::lcos::server::channel< type>::get_generation_action,             \
         BOOST_PP_CAT(__channel_get_generation_action,                         \
             BOOST_PP_CAT(type, name)));                                       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::lcos::server::channel<type>::set_generation_action,              \
+        hpx::lcos::server::channel< type>::set_generation_action,             \
         BOOST_PP_CAT(__channel_set_generation_action,                         \
             BOOST_PP_CAT(type, name)));                                       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::lcos::server::channel<type>::close_action,                       \
+        hpx::lcos::server::channel< type>::close_action,                      \
         BOOST_PP_CAT(__channel_close_action,                                  \
-            BOOST_PP_CAT(type, name)))                                        \
+            BOOST_PP_CAT(type, name)));                                       \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(                             \
+        type, type, name, hpx::traits::detail::component_tag)                 \
 /**/
 
 #define HPX_REGISTER_CHANNEL(...)                                             \
@@ -149,9 +157,9 @@ namespace hpx { namespace lcos { namespace server
     HPX_REGISTER_CHANNEL_2(type, type)                                        \
 /**/
 #define HPX_REGISTER_CHANNEL_2(type, name)                                    \
-    typedef ::hpx::lcos::server::channel<type>                                \
+    typedef ::hpx::lcos::server::channel< type>                               \
         BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name));                   \
-    typedef ::hpx::components::managed_component<                             \
+    typedef ::hpx::components::component<                                     \
             BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name))                \
         > BOOST_PP_CAT(__channel_component_, name);                           \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                   \
@@ -159,17 +167,19 @@ namespace hpx { namespace lcos { namespace server
         BOOST_PP_CAT(__channel_component_, name),                             \
         BOOST_PP_STRINGIZE(BOOST_PP_CAT(__base_lco_with_value_channel_, name)));\
     HPX_REGISTER_ACTION(                                                      \
-        hpx::lcos::server::channel<type>::get_generation_action,              \
+        hpx::lcos::server::channel< type>::get_generation_action,             \
         BOOST_PP_CAT(__channel_get_generation_action,                         \
             BOOST_PP_CAT(type, name)));                                       \
     HPX_REGISTER_ACTION(                                                      \
-        hpx::lcos::server::channel<type>::set_generation_action,              \
+        hpx::lcos::server::channel< type>::set_generation_action,             \
         BOOST_PP_CAT(__channel_set_generation_action,                         \
             BOOST_PP_CAT(type, name)));                                       \
     HPX_REGISTER_ACTION(                                                      \
-        hpx::lcos::server::channel<type>::close_action,                       \
+        hpx::lcos::server::channel< type>::close_action,                      \
         BOOST_PP_CAT(__channel_close_action,                                  \
             BOOST_PP_CAT(type, name)))                                        \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE(                                         \
+        type, type, name, hpx::traits::detail::component_tag)                 \
 /**/
 
 #endif
