@@ -859,7 +859,7 @@ namespace hpx { namespace parallel { inline namespace v1
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value
+        traits::is_projected<Proj2, InIter2>::value)
 #if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
