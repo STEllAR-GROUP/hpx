@@ -69,21 +69,22 @@ namespace hpx { namespace actions
         struct continuation_thread_function
         {
         public:
-            typedef typename Action::continuation_type
-                continuation_type;
+            typedef typename Action::continuation_type continuation_type;
 
             explicit continuation_thread_function(
-                continuation_type&& cont,
-                naming::address::address_type lva, F&& f, Ts&&... vs)
+                    continuation_type&& cont,
+                    naming::address::address_type lva,
+                    F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
               , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
             {}
 
             explicit continuation_thread_function(
-                naming::id_type target,
-                continuation_type&& cont,
-                naming::address::address_type lva, F&& f, Ts&&... vs)
+                    naming::id_type target,
+                    continuation_type&& cont,
+                    naming::address::address_type lva,
+                    F&& f, Ts&&... vs)
               : target_(std::move(target))
               , cont_(std::move(cont))
               , lva_(lva)
@@ -91,14 +92,16 @@ namespace hpx { namespace actions
             {}
 
             continuation_thread_function(continuation_thread_function && other)
-              : cont_(std::move(other.cont_)), lva_(std::move(other.lva_))
+              : cont_(std::move(other.cont_))
+              , lva_(std::move(other.lva_))
               , f_(std::move(other.f_))
             {}
 
             HPX_FORCEINLINE threads::thread_result_type
             operator()(threads::thread_state_ex_enum)
             {
-                LTM_(debug) << "Executing " << Action::get_action_name(lva_)
+                LTM_(debug)
+                    << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_.get_id() << ")";
 
                 actions::trigger(std::move(cont_), f_);
@@ -180,7 +183,8 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type /*lva*/, Ts&&... /*vs*/);
+        static R invoke(naming::address::address_type /*lva*/,
+            naming::address::component_type /*comptype*/, Ts&&... /*vs*/);
 
     protected:
         struct invoker
@@ -192,25 +196,29 @@ namespace hpx { namespace actions
                 result_type;
             template <typename ...Ts>
             HPX_FORCEINLINE result_type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
                 return invoke(
-                    typename std::is_void<R>::type(), lva, std::forward<Ts>(vs)...);
+                    typename std::is_void<R>::type(), lva, comptype,
+                    std::forward<Ts>(vs)...);
             }
 
             template <typename ...Ts>
             HPX_FORCEINLINE result_type invoke(std::true_type,
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
-                Derived::invoke(lva, std::forward<Ts>(vs)...);
+                Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
                 return util::unused;
             }
 
             template <typename ...Ts>
             HPX_FORCEINLINE result_type invoke(std::false_type,
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
-                return Derived::invoke(lva, std::forward<Ts>(vs)...);
+                return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
             }
         };
 
@@ -228,14 +236,15 @@ namespace hpx { namespace actions
 
             template <typename ...Ts>
             HPX_FORCEINLINE threads::thread_result_type
-            operator()(naming::address::address_type lva, Ts&&... vs) const
+            operator()(naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
                 try {
                     LTM_(debug) << "Executing "
                         << Derived::get_action_name(lva) << ".";
 
                     // call the function, ignoring the return value
-                    Derived::invoke(lva, std::forward<Ts>(vs)...);
+                    Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
                 }
                 catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
@@ -277,19 +286,21 @@ namespace hpx { namespace actions
         static threads::thread_function_type
         construct_thread_function(naming::id_type const& target,
             naming::address::address_type lva,
-            Ts&&... vs)
+            naming::address::component_type comptype, Ts&&... vs)
         {
             if (target && target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(typename Derived::thread_function()),
-                        lva, std::forward<Ts>(vs)...));
+                    util::bind(util::one_shot(
+                        typename Derived::thread_function()),
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
             else
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(typename Derived::thread_function(target)),
-                        lva, std::forward<Ts>(vs)...));
+                    util::bind(util::one_shot(
+                        typename Derived::thread_function(target)),
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
         }
 
@@ -300,24 +311,25 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static threads::thread_function_type
         construct_thread_function(naming::id_type const& target,
-            continuation_type&& cont,
-            naming::address::address_type lva, Ts&&... vs)
+            continuation_type&& cont, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type&, Ts&&...
+                Derived, invoker, naming::address::address_type&,
+                naming::address::component_type&, Ts&&...
             > thread_function;
 
             if (target && target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     thread_function(std::move(cont), lva, invoker(),
-                        lva, std::forward<Ts>(vs)...));
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
             else
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     thread_function(target, std::move(cont), lva, invoker(),
-                        lva, std::forward<Ts>(vs)...));
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
         }
 
@@ -325,13 +337,14 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static HPX_FORCEINLINE
         typename invoker::result_type
-        execute_function(naming::address::address_type lva, Ts&&... vs)
+        execute_function(naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
             LTM_(debug)
                 << "basic_action::execute_function"
                 << Derived::get_action_name(lva);
 
-            return invoker()(lva, std::forward<Ts>(vs)...);
+            return invoker()(lva, comptype, std::forward<Ts>(vs)...);
         }
 
     private:
@@ -342,8 +355,8 @@ namespace hpx { namespace actions
         {
             template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                std::false_type, Policy policy,
-                IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
+                std::false_type, Policy policy, IdOrPolicy const& id_or_policy,
+                error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);

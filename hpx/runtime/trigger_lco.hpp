@@ -356,6 +356,60 @@ namespace hpx
         {
             return detail::make_rvalue_impl<T>::call(v);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename Result>
+        void set_lco_value(naming::id_type const& id,
+            naming::address && addr, Result && t, bool move_credits)
+        {
+            if (move_credits &&
+                id.get_management_type() != naming::id_type::unmanaged)
+            {
+                naming::id_type target(id.get_gid(),
+                    naming::id_type::managed_move_credit);
+                id.make_unmanaged();
+
+                detail::apply_impl<Action>(target, std::move(addr),
+                    actions::action_priority<Action>(),
+                    detail::make_rvalue<Result>(t));
+            }
+            else
+            {
+                detail::apply_impl<Action>(id, std::move(addr),
+                    actions::action_priority<Action>(),
+                    detail::make_rvalue<Result>(t));
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename LocalResult, typename RemoteResult, typename Action,
+            typename Result>
+        void set_lco_value(naming::id_type const& id,
+            naming::address && addr, Result && t, naming::id_type const& cont,
+            bool move_credits)
+        {
+            if (move_credits &&
+                id.get_management_type() != naming::id_type::unmanaged)
+            {
+                naming::id_type target(id.get_gid(),
+                    naming::id_type::managed_move_credit);
+                id.make_unmanaged();
+
+                detail::apply_impl<Action>(
+                    actions::typed_continuation<
+                        LocalResult, RemoteResult
+                    >(cont),
+                    target, std::move(addr), detail::make_rvalue<Result>(t));
+            }
+            else
+            {
+                detail::apply_impl<Action>(
+                    actions::typed_continuation<
+                        LocalResult, RemoteResult
+                    >(cont),
+                    id, std::move(addr), detail::make_rvalue<Result>(t));
+            }
+        }
     }
     /// \endcond
 
@@ -367,26 +421,31 @@ namespace hpx
         typedef typename traits::promise_local_result<
                 remote_result_type
             >::type local_result_type;
-        typedef typename lcos::base_lco_with_value<
-                local_result_type, remote_result_type
-            >::set_value_action set_value_action;
 
-        if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+        if (components::get_base_type(addr.type_) ==
+                components::component_base_lco_with_value_managed)
         {
-            naming::id_type target(id.get_gid(),
-                naming::id_type::managed_move_credit);
-            id.make_unmanaged();
+            typedef typename lcos::base_lco_with_value<
+                    local_result_type, remote_result_type,
+                    traits::detail::managed_component_tag
+                >::set_value_action set_value_action;
 
-            detail::apply_impl<set_value_action>(target, std::move(addr),
-                actions::action_priority<set_value_action>(),
-                detail::make_rvalue<Result>(t));
+            detail::set_lco_value<set_value_action>(id, std::move(addr),
+                std::forward<Result>(t), move_credits);
         }
         else
         {
-            detail::apply_impl<set_value_action>(id, std::move(addr),
-                actions::action_priority<set_value_action>(),
-                detail::make_rvalue<Result>(t));
+            HPX_ASSERT(
+                components::get_base_type(addr.type_) ==
+                components::component_base_lco_with_value);
+
+            typedef typename lcos::base_lco_with_value<
+                    local_result_type, remote_result_type,
+                    traits::detail::simple_component_tag
+                >::set_value_action set_value_action;
+
+            detail::set_lco_value<set_value_action>(id, std::move(addr),
+                std::forward<Result>(t), move_credits);
         }
     }
 
@@ -398,30 +457,35 @@ namespace hpx
         typedef typename traits::promise_local_result<
                 remote_result_type
             >::type local_result_type;
-        typedef typename lcos::base_lco_with_value<
-                local_result_type, remote_result_type
-            >::set_value_action set_value_action;
 
-        if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+        if (components::get_base_type(addr.type_) ==
+                components::component_base_lco_with_value_managed)
         {
-            naming::id_type target(id.get_gid(),
-                naming::id_type::managed_move_credit);
-            id.make_unmanaged();
+            typedef typename lcos::base_lco_with_value<
+                    local_result_type, remote_result_type,
+                    traits::detail::managed_component_tag
+                >::set_value_action set_value_action;
 
-            detail::apply_impl<set_value_action>(
-                actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont),
-                target, std::move(addr),
-                detail::make_rvalue<Result>(t));
+            detail::set_lco_value<
+                    local_result_type, remote_result_type, set_value_action
+                >(id, std::move(addr),
+                std::forward<Result>(t), cont, move_credits);
         }
         else
         {
-            detail::apply_impl<set_value_action>(
-                actions::typed_continuation<
-                    local_result_type, remote_result_type>(cont),
-                id, std::move(addr),
-                detail::make_rvalue<Result>(t));
+            HPX_ASSERT(
+                components::get_base_type(addr.type_) ==
+                components::component_base_lco_with_value);
+
+            typedef typename lcos::base_lco_with_value<
+                    local_result_type, remote_result_type,
+                    traits::detail::simple_component_tag
+                >::set_value_action set_value_action;
+
+            detail::set_lco_value<
+                    local_result_type, remote_result_type, set_value_action
+                >(id, std::move(addr),
+                std::forward<Result>(t), cont, move_credits);
         }
     }
 }

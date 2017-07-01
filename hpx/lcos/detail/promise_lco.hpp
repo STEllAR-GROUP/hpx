@@ -203,7 +203,7 @@ namespace traits {
             if (value == components::component_invalid)
             {
                 value = derived_component_type(++detail::unique_type,
-                    components::component_base_lco_with_value);
+                    components::component_base_lco_with_value_managed);
             }
             return value;
         }
