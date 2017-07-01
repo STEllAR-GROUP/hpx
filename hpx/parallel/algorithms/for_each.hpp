@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1
             std::true_type, Proj && proj)
         {
             auto last = first;
-            advance(last, std::size_t(count));
+            detail::advance(last, std::size_t(count));
             return for_each_(
                 std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
