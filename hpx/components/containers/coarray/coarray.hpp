@@ -17,8 +17,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <initializer_list>
+#include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,16 +134,22 @@ namespace hpx
             std::size_t num_segments,
             std::size_t unroll)
         {
+        using iterator = typename
+                std::vector<hpx::naming::id_type>::iterator;
+
+        using const_iterator = typename
+                std::vector<hpx::naming::id_type>::const_iterator;
+
             std::vector<hpx::naming::id_type> out ( num_segments );
 
-            auto o_end = out.end();
-            auto i_begin = in.cbegin();
-            auto i_end   = in.cend();
-            auto i = i_begin;
+            iterator o_end = out.end();
+            const_iterator i_begin = in.cbegin();
+            const_iterator i_end   = in.cend();
+            const_iterator i = i_begin;
 
-            for( auto o = out.begin() ; o<o_end  ; o+=unroll )
+            for( iterator o = out.begin() ; o<o_end  ; o+=unroll )
             {
-               std::fill(o, std::min(o + unroll, o_end ), *i);
+               std::fill(o, std::min( (o + unroll), o_end ), *i);
                i = (++i != i_end) ? i : i_begin;
            }
 
@@ -203,8 +212,8 @@ namespace hpx
         {
             return base_type::operator()(
                 (std::is_same<I,detail::auto_subscript>::value
-		            ? this_image_
-		            : index)... );
+                    ? this_image_
+                    : index)... );
         }
 
         template<typename... I,
