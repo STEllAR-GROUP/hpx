@@ -867,6 +867,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 traits::projected<Proj2, InIter2>
         >::value)
 #endif
+    >
     typename util::detail::algorithm_result<
             ExPolicy,
             hpx::util::tagged_tuple<
