@@ -794,7 +794,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
             }
 
-            return result::get((
+            return result::get(
                 dataflow(
                     [=](std::vector<hpx::future<hpx::util::tuple<
                         local_iterator_type1, local_iterator_type2,
@@ -812,7 +812,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         auto odest = traits3::compose(sdest, hpx::util::get<2>(rl));
                         return hpx::util::make_tuple(olast1, olast2, odest);
                     },
-                    std::move(segments))));
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
