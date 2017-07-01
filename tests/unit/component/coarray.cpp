@@ -34,7 +34,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     hpx::coarray<double,3> a(block, name, {height,width,_}, elt_size);
 
-    int idx = 0;
+    int idx = block.this_image()*height*width;
 
     for (std::size_t j = 0; j<width; j++)
     for (std::size_t i = 0; i<height; i++)
@@ -48,32 +48,27 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     if(block.this_image() == 0)
     {
+        int idx = 0;
+
         for (std::size_t k = 0; k<numlocs; k++)
+        for (std::size_t j = 0; j<width; j++)
+        for (std::size_t i = 0; i<height; i++)
         {
-            int idx = 0;
+            std::vector<double> result(elt_size,idx);
 
-            for (std::size_t j = 0; j<width; j++)
-                for (std::size_t i = 0; i<height; i++)
-                {
-                    std::vector<double> result(elt_size,idx);
+            // It's a Get operation
+            std::vector<double> value =
+                (std::vector<double>) a(i,j,k);
 
-                    // It's a Get operation
-                    std::vector<double> value =
-                        (std::vector<double>) a(i,j,k);
+            const_iterator it1 = result.begin(), it2 = value.begin();
+            const_iterator end1 = result.end(), end2 = value.end();
 
-                    const_iterator it1 = result.begin(),
-                        it2 = value.begin();
+            for (; it2 != end2; ++it1, ++it2)
+            {
+                 HPX_TEST_EQ(*it1, *it2);
+            }
 
-                    const_iterator end1 = result.end(),
-                         end2 = value.end();
-
-                    for (; it1 != end1 && it2 != end2; ++it1, ++it2)
-                    {
-                         HPX_TEST_EQ(*it1, *it2);
-                    }
-
-                    idx++;
-                }
+            idx++;
         }
     }
 }
