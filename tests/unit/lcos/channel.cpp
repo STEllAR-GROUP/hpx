@@ -63,10 +63,10 @@ void pong(
     pongs.set(msg);
 }
 
-void pingpong(hpx::id_type const& loc)
+void pingpong(hpx::id_type const& here, hpx::id_type const& there)
 {
-    hpx::lcos::channel<std::string> pings(loc);
-    hpx::lcos::channel<std::string> pongs(loc);
+    hpx::lcos::channel<std::string> pings(here);
+    hpx::lcos::channel<std::string> pongs(there);
 
     ping(pings, "passed message");
     pong(pings, pongs);
@@ -91,10 +91,10 @@ void pong_void(
     pingponged = true;
 }
 
-void pingpong_void(hpx::id_type const& loc)
+void pingpong_void(hpx::id_type const& here, hpx::id_type const& there)
 {
-    hpx::lcos::channel<> pings(loc);
-    hpx::lcos::channel<> pongs(loc);
+    hpx::lcos::channel<> pings(here);
+    hpx::lcos::channel<> pongs(there);
 
     bool pingponged = false;
 
@@ -264,13 +264,29 @@ void closed_channel_set(hpx::id_type const& loc)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+int return42()
+{
+    return 42;
+}
+HPX_PLAIN_ACTION(return42);
+
+void channel_as_lco(hpx::id_type const& here, hpx::id_type const& there)
+{
+    hpx::lcos::channel<int> lco(here);
+
+    hpx::apply_c(return42_action(), lco.get_id(), there);
+
+    HPX_TEST_EQ(lco.get(hpx::launch::sync), 42);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     hpx::id_type here = hpx::find_here();
 
     calculate_sum(here);
-    pingpong(here);
-    pingpong_void(here);
+    pingpong(here, here);
+    pingpong_void(here, here);
     dispatch_work(here);
     channel_range(here);
     channel_range_void(here);
@@ -279,6 +295,20 @@ int main(int argc, char* argv[])
     closed_channel_get(here);
     closed_channel_get_generation(here);
     closed_channel_set(here);
+
+    channel_as_lco(here, here);
+
+    std::vector<hpx::id_type> remote_localities = hpx::find_remote_localities();
+    for (hpx::id_type id : remote_localities)
+    {
+        pingpong(id, here);
+        pingpong(here, id);
+        pingpong_void(id, here);
+        pingpong_void(here, id);
+
+        channel_as_lco(id, here);
+        channel_as_lco(here, id);
+    }
 
     return hpx::util::report_errors();
 }
