@@ -212,7 +212,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return for_each_(
                 std::forward<ExPolicy>(policy),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj),
-                std::true_type);
+                std::true_type());
         }
         /// \endcond
     }
