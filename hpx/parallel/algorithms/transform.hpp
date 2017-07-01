@@ -292,7 +292,7 @@ namespace hpx { namespace parallel { inline namespace v1
         hpx::traits::is_iterator<InIter>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj, InIter>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800     // MSVC12 can't pattern match this
+#if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, InIter>
@@ -614,7 +614,7 @@ namespace hpx { namespace parallel { inline namespace v1
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
         traits::is_projected<Proj2, InIter2>::value)
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800     // MSVC12 can't pattern match this
+#if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
   , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj1, InIter1>,
@@ -859,12 +859,14 @@ namespace hpx { namespace parallel { inline namespace v1
         hpx::traits::is_iterator<InIter2>::value &&
         hpx::traits::is_iterator<OutIter>::value &&
         traits::is_projected<Proj1, InIter1>::value &&
-        traits::is_projected<Proj2, InIter2>::value &&
+        traits::is_projected<Proj2, InIter2>::value
+#if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
+  , HPX_CONCEPT_REQUIRES_(
         traits::is_indirect_callable<
-            ExPolicy, F,
-                traits::projected<Proj1, InIter1>,
+            ExPolicy, F, traits::projected<Proj1, InIter1>,
                 traits::projected<Proj2, InIter2>
-        >::value)>
+        >::value)
+#endif
     typename util::detail::algorithm_result<
             ExPolicy,
             hpx::util::tagged_tuple<
