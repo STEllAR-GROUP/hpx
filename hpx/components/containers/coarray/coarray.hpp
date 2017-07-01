@@ -79,7 +79,7 @@ namespace hpx
                     "hpx::coarray() needs the number of sizes to be " \
                     "equal to its dimension");
 
-                static_assert( detail::are_integral<
+                static_assert(detail::are_integral<
                     typename detail::cast_if_autosubscript<I>::type...>::value,
                         "One or more elements in sizes given to hpx::coarray() "\
                         "is not integral");
@@ -95,7 +95,7 @@ namespace hpx
                 return sizes_.end();
             }
 
-            template<typename View, typename Iterator, std::size_t ... I >
+            template<typename View, typename Iterator, std::size_t ... I>
             void update_view(
                 View & v,
                 std::size_t num_images,
@@ -140,16 +140,16 @@ namespace hpx
         using const_iterator = typename
                 std::vector<hpx::naming::id_type>::const_iterator;
 
-            std::vector<hpx::naming::id_type> out ( num_segments );
+            std::vector<hpx::naming::id_type> out(num_segments);
 
             iterator o_end = out.end();
             const_iterator i_begin = in.cbegin();
             const_iterator i_end   = in.cend();
             const_iterator i = i_begin;
 
-            for( iterator o = out.begin() ; o<o_end  ; o+=unroll )
+            for(iterator o = out.begin(); o<o_end; o+=unroll)
             {
-               std::fill(o, std::min( (o + unroll), o_end ), *i);
+               std::fill(o, (std::min)(o + unroll, o_end), *i);
                i = (++i != i_end) ? i : i_begin;
            }
 
@@ -169,11 +169,11 @@ namespace hpx
 
             std::size_t num_images = block.get_num_images();
 
-            if ( block.this_image() == 0 )
+            if (block.this_image() == 0)
             {
                 std::size_t num_segments = N > 0 ? 1 : 0;
 
-                for( std::size_t i : cosizes )
+                for(std::size_t i : cosizes)
                 {
                     num_segments *= (i != std::size_t(-1) ? i : num_images);
                 }
@@ -205,7 +205,7 @@ namespace hpx
             typename = std::enable_if_t<
                 ! std::is_same<
                     typename hpx::detail::last_element< I... >::type,
-                        detail::auto_subscript>::value >
+                        detail::auto_subscript>::value>
             >
         hpx::detail::view_element<T,Data>
         operator()(I... index) const
@@ -213,14 +213,14 @@ namespace hpx
             return base_type::operator()(
                 (std::is_same<I,detail::auto_subscript>::value
                     ? this_image_
-                    : index)... );
+                    : index)...);
         }
 
         template<typename... I,
             typename = std::enable_if_t<
                 std::is_same<
                     typename hpx::detail::last_element< I... >::type,
-                        detail::auto_subscript>::value >
+                        detail::auto_subscript>::value>
             >
         Data &
         operator()(I... index)
@@ -228,7 +228,7 @@ namespace hpx
             return base_type::operator()(
                 (std::is_same<I,detail::auto_subscript>::value
                     ? this_image_
-                    : index)... ).data();
+                    : index)...).data();
         }
 
     private:

@@ -32,7 +32,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     std::size_t numlocs = block.get_num_images();
 
-    hpx::coarray<double,3> a (block, name, {height,width,_}, elt_size);
+    hpx::coarray<double,3> a(block, name, {height,width,_}, elt_size);
 
     int idx = 0;
 
