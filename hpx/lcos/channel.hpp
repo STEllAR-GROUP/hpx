@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -147,30 +147,217 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    class channel
-      : public components::client_base<channel<T>, lcos::server::channel<T> >
+    namespace detail
     {
-        typedef components::client_base<
-                channel<T>, lcos::server::channel<T>
-            > base_type;
+        template <typename T, bool Migratable>
+        class channel_base
+          : public components::client_base<
+                channel_base<T, Migratable>,
+                lcos::server::channel<T, Migratable> >
+        {
+        protected:
+            typedef components::client_base<
+                    channel_base, lcos::server::channel<T, Migratable>
+                > base_type;
 
-        HPX_CONSTEXPR_OR_CONST
-        static std::size_t default_generation = std::size_t(-1);
+            HPX_CONSTEXPR_OR_CONST
+            static std::size_t default_generation = std::size_t(-1);
+
+        public:
+            // FIXME: this typedef is currently needed for traits::is_future_range
+            // to work properly. This typedef is to workaround that defect in the
+            // trait implementation which expects the value_type typedef once begin
+            // and end members are present.
+            typedef T value_type;
+
+            channel_base() = default;
+
+            // create a new instance of a channel component
+            explicit channel_base(naming::id_type const& loc)
+              : base_type(hpx::new_<lcos::server::channel<T, Migratable> >(loc))
+            {}
+
+            explicit channel_base(hpx::future<naming::id_type>&& id)
+              : base_type(std::move(id))
+            {}
+
+            explicit channel_base(hpx::shared_future<naming::id_type>&& id)
+              : base_type(std::move(id))
+            {}
+
+            explicit channel_base(hpx::shared_future<naming::id_type> const& id)
+              : base_type(id)
+            {}
+
+            ///////////////////////////////////////////////////////////////////
+            hpx::future<T>
+            get(launch::async_policy,
+                std::size_t generation = default_generation) const
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::get_generation_action action_type;
+                return hpx::async(action_type(), this->get_id(), generation);
+            }
+            hpx::future<T>
+            get(std::size_t generation = default_generation) const
+            {
+                return get(launch::async, generation);
+            }
+            T get(launch::sync_policy, std::size_t generation = default_generation,
+                hpx::error_code& ec = hpx::throws) const
+            {
+                return get(generation).get(ec);
+            }
+            T get(launch::sync_policy, hpx::error_code& ec,
+                std::size_t generation = default_generation) const
+            {
+                return get(launch::sync, generation, ec);
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            template <typename U, typename U2 = T>
+            typename std::enable_if<!std::is_void<U2>::value, bool>::type
+            set(launch::apply_policy, U val,
+                std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::set_generation_action action_type;
+                return hpx::apply(action_type(), this->get_id(), std::move(val),
+                    generation);
+            }
+            template <typename U, typename U2 = T>
+            typename std::enable_if<
+                !std::is_void<U2>::value, hpx::future<void>
+            >::type
+            set(launch::async_policy, U val,
+                std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<T>::set_generation_action
+                    action_type;
+                return hpx::async(action_type(), this->get_id(), std::move(val),
+                    generation);
+            }
+            template <typename U, typename U2 = T>
+            typename std::enable_if<!std::is_void<U2>::value>::type
+            set(launch::sync_policy, U val,
+                std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::set_generation_action action_type;
+                action_type()(this->get_id(), std::move(val), generation);
+            }
+            template <typename U, typename U2 = T>
+            typename std::enable_if<
+                !std::is_void<U2>::value &&
+                !traits::is_launch_policy<U>::value
+            >::type
+            set(U val, std::size_t generation = default_generation)
+            {
+                set(launch::sync, std::move(val), generation);
+            }
+
+            template <typename U = T>
+            typename std::enable_if<std::is_void<U>::value, bool>::type
+            set(launch::apply_policy, std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<
+                        void, Migratable
+                    >::set_generation_action action_type;
+                return hpx::apply(action_type(), this->get_id(), util::unused,
+                    generation);
+            }
+            template <typename U = T>
+            typename std::enable_if<
+                std::is_void<U>::value, hpx::future<void>
+            >::type
+            set(launch::async_policy, std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<
+                        void, Migratable
+                    >::set_generation_action action_type;
+                return hpx::async(action_type(), this->get_id(), util::unused,
+                    generation);
+            }
+            template <typename U = T>
+            typename std::enable_if<std::is_void<U>::value>::type
+            set(launch::sync_policy, std::size_t generation = default_generation)
+            {
+                typedef typename lcos::server::channel<
+                        void, Migratable
+                    >::set_generation_action action_type;
+                return action_type()(this->get_id(), util::unused, generation);
+            }
+            template <typename U = T>
+            typename std::enable_if<std::is_void<U>::value>::type
+            set(std::size_t generation = default_generation)
+            {
+                set(launch::sync, generation);
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            void close(launch::apply_policy)
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::close_action action_type;
+                hpx::apply(action_type(), this->get_id());
+            }
+            hpx::future<void> close(launch::async_policy)
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::close_action action_type;
+                return hpx::async(action_type(), this->get_id());
+            }
+            void close(launch::sync_policy)
+            {
+                typedef typename lcos::server::channel<
+                        T, Migratable
+                    >::close_action action_type;
+                action_type()(this->get_id());
+            }
+            void close()
+            {
+                close(launch::sync);
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            channel_iterator<T, channel_base> begin() const
+            {
+                return channel_iterator<T, channel_base>(*this);
+            }
+            channel_iterator<T, channel_base> end() const
+            {
+                return channel_iterator<T, channel_base>();
+            }
+
+            channel_iterator<T, channel_base> rbegin() const
+            {
+                return channel_iterator<T, channel_base>(*this);
+            }
+            channel_iterator<T, channel_base> rend() const
+            {
+                return channel_iterator<T, channel_base>();
+            }
+       };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    class channel : public detail::channel_base<T, false>
+    {
+    private:
+        typedef detail::channel_base<T, false> base_type;
 
     public:
-        // FIXME: this typedef is currently needed for traits::is_future_range
-        // to work properly. This typedef is to workaround that defect in the
-        // trait implementation which expects the value_type typedef once begin
-        // and end members are present.
-        typedef T value_type;
-
-        channel()
-        {}
+        channel() = default;
 
         // create a new instance of a channel component
         explicit channel(naming::id_type const& loc)
-          : base_type(hpx::new_<lcos::server::channel<T> >(loc))
+          : base_type(loc)
         {}
 
         explicit channel(hpx::future<naming::id_type>&& id)
@@ -185,170 +372,34 @@ namespace hpx { namespace lcos
           : base_type(id)
         {}
 
-        ///////////////////////////////////////////////////////////////////////
-        hpx::future<T>
-        get(launch::async_policy,
-            std::size_t generation = default_generation) const
-        {
-            typedef typename lcos::server::channel<T>::get_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), generation);
-        }
-        hpx::future<T>
-        get(std::size_t generation = default_generation) const
-        {
-            return get(launch::async, generation);
-        }
-        T get(launch::sync_policy, std::size_t generation = default_generation,
-            hpx::error_code& ec = hpx::throws) const
-        {
-            return get(generation).get(ec);
-        }
-        T get(launch::sync_policy, hpx::error_code& ec,
-            std::size_t generation = default_generation) const
-        {
-            return get(launch::sync, generation, ec);
-        }
+        typedef typename base_type::value_type value_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value, bool>::type
-        set(launch::apply_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            return hpx::apply(action_type(), this->get_id(), std::move(val),
-                generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
-        set(launch::async_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), std::move(val),
-                generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value>::type
-        set(launch::sync_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            action_type()(this->get_id(), std::move(val), generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<
-            !std::is_void<U2>::value &&
-            !traits::is_launch_policy<U>::value
-        >::type
-        set(U val, std::size_t generation = default_generation)
-        {
-            set(launch::sync, std::move(val), generation);
-        }
+        using base_type::get_id;
 
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value, bool>::type
-        set(launch::apply_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return hpx::apply(action_type(), this->get_id(), util::unused,
-                generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
-        set(launch::async_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), util::unused,
-                generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value>::type
-        set(launch::sync_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return action_type()(this->get_id(), util::unused, generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value>::type
-        set(std::size_t generation = default_generation)
-        {
-            set(launch::sync, generation);
-        }
+        using base_type::get;
+        using base_type::set;
+        using base_type::close;
 
-        ///////////////////////////////////////////////////////////////////////
-        void close(launch::apply_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            hpx::apply(action_type(), this->get_id());
-        }
-        hpx::future<void> close(launch::async_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            return hpx::async(action_type(), this->get_id());
-        }
-        void close(launch::sync_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            action_type()(this->get_id());
-        }
-        void close()
-        {
-            close(launch::sync);
-        }
+        using base_type::begin;
+        using base_type::end;
+        using base_type::rbegin;
+        using base_type::rend;
+    };
 
-        ///////////////////////////////////////////////////////////////////////
-        channel_iterator<T, channel<T> > begin() const
-        {
-            return channel_iterator<T, channel<T> >(*this);
-        }
-        channel_iterator<T, channel<T> > end() const
-        {
-            return channel_iterator<T, channel<T> >();
-        }
-
-        channel_iterator<T, channel<T> > rbegin() const
-        {
-            return channel_iterator<T, channel<T> >(*this);
-        }
-        channel_iterator<T, channel<T> > rend() const
-        {
-            return channel_iterator<T, channel<T> >();
-        }
-   };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class receive_channel
-      : public components::client_base<
-            receive_channel<T>, lcos::server::channel<T> >
+    class receive_channel : public detail::channel_base<T, false>
     {
-        typedef components::client_base<
-                receive_channel<T>, lcos::server::channel<T>
-            > base_type;
+    private:
+        typedef detail::channel_base<T, false> base_type;
 
-        HPX_CONSTEXPR_OR_CONST
-        static std::size_t default_generation = std::size_t(-1);
+        using base_type::set;
+        using base_type::close;
 
     public:
-        // FIXME: this typedef is currently needed for traits::is_future_range
-        // to work properly. This typedef is to workaround that defect in the
-        // trait implementation which expects the value_type typedef once begin
-        // and end members are present.
-        typedef T value_type;
-
-        receive_channel()
-        {}
+        receive_channel() = default;
 
         receive_channel(channel<T> const& c)
-          : base_type(c.get_id())
+          : base_type(c)
         {}
 
         explicit receive_channel(hpx::future<naming::id_type>&& id)
@@ -363,76 +414,37 @@ namespace hpx { namespace lcos
           : base_type(id)
         {}
 
-        ///////////////////////////////////////////////////////////////////////
-        hpx::future<T>
-        get(launch::async_policy,
-            std::size_t generation = default_generation) const
-        {
-            typedef typename lcos::server::channel<T>::get_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), generation);
-        }
-        hpx::future<T>
-        get(std::size_t generation = default_generation) const
-        {
-            return get(launch::async, generation);
-        }
-        T get(launch::sync_policy, std::size_t generation = default_generation,
-            hpx::error_code& ec = hpx::throws) const
-        {
-            return get(generation).get(ec);
-        }
-        T get(launch::sync_policy, hpx::error_code& ec,
-            std::size_t generation = default_generation) const
-        {
-            return get(launch::sync, generation, ec);
-        }
+        typedef typename base_type::value_type value_type;
 
-        ///////////////////////////////////////////////////////////////////////
-        channel_iterator<T, channel<T> > begin() const
-        {
-            return channel_iterator<T, channel<T> >(*this);
-        }
-        channel_iterator<T, channel<T> > end() const
-        {
-            return channel_iterator<T, channel<T> >();
-        }
+        using base_type::get_id;
 
-        channel_iterator<T, channel<T> > rbegin() const
-        {
-            return channel_iterator<T, channel<T> >(*this);
-        }
-        channel_iterator<T, channel<T> > rend() const
-        {
-            return channel_iterator<T, channel<T> >();
-        }
+        using base_type::get;
+
+        using base_type::begin;
+        using base_type::end;
+        using base_type::rbegin;
+        using base_type::rend;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class send_channel
-      : public components::client_base<
-            send_channel<T>, lcos::server::channel<T> >
+    class send_channel : public detail::channel_base<T, false>
     {
-        typedef components::client_base<
-                send_channel<T>, lcos::server::channel<T>
-            > base_type;
+    private:
+        typedef detail::channel_base<T, false> base_type;
 
-        HPX_CONSTEXPR_OR_CONST
-        static std::size_t default_generation = std::size_t(-1);
+        using base_type::get;
+
+        using base_type::begin;
+        using base_type::end;
+        using base_type::rbegin;
+        using base_type::rend;
 
     public:
-        // FIXME: this typedef is currently needed for traits::is_future_range
-        // to work properly. This typedef is to workaround that defect in the
-        // trait implementation which expects the value_type typedef once begin
-        // and end members are present.
-        typedef T value_type;
-
-        send_channel()
-        {}
+        send_channel() = default;
 
         send_channel(channel<T> const& c)
-          : base_type(c.get_id())
+          : base_type(c)
         {}
 
         explicit send_channel(hpx::future<naming::id_type>&& id)
@@ -447,99 +459,12 @@ namespace hpx { namespace lcos
           : base_type(id)
         {}
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value, bool>::type
-        set(launch::apply_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            return hpx::apply(action_type(), this->get_id(), std::move(val),
-                generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
-        set(launch::async_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), std::move(val),
-                generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<!std::is_void<U2>::value>::type
-        set(launch::sync_policy, U val,
-            std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<T>::set_generation_action
-                action_type;
-            action_type()(this->get_id(), std::move(val), generation);
-        }
-        template <typename U, typename U2 = T>
-        typename std::enable_if<
-            !std::is_void<U2>::value &&
-            !traits::is_launch_policy<U>::value
-        >::type
-        set(U val, std::size_t generation = default_generation)
-        {
-            set(launch::sync, std::move(val), generation);
-        }
+        typedef typename base_type::value_type value_type;
 
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value, bool>::type
-        set(launch::apply_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return hpx::apply(action_type(), this->get_id(), util::unused,
-                generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
-        set(launch::async_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return hpx::async(action_type(), this->get_id(), util::unused,
-                generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value>::type
-        set(launch::sync_policy, std::size_t generation = default_generation)
-        {
-            typedef typename lcos::server::channel<void>::set_generation_action
-                action_type;
-            return action_type()(this->get_id(), util::unused, generation);
-        }
-        template <typename U = T>
-        typename std::enable_if<std::is_void<U>::value>::type
-        set(std::size_t generation = default_generation)
-        {
-            set(launch::sync, generation);
-        }
+        using base_type::get_id;
 
-        ///////////////////////////////////////////////////////////////////////
-        void close(launch::apply_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            hpx::apply(action_type(), this->get_id());
-        }
-        hpx::future<void> close(launch::async_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            return hpx::async(action_type(), this->get_id());
-        }
-        void close(launch::sync_policy)
-        {
-            typedef typename lcos::server::channel<T>::close_action action_type;
-            action_type()(this->get_id());
-        }
-        void close()
-        {
-            close(launch::sync);
-        }
+        using base_type::set;
+        using base_type::close;
     };
 }}
 

@@ -14,6 +14,7 @@
 #include <hpx/lcos/local/receive_buffer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
@@ -755,6 +756,15 @@ namespace hpx { namespace lcos { namespace local
         using base_type::begin;
         using base_type::end;
         using base_type::range;
+
+    private:
+        friend class serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            ar & this->base_type::channel_;
+        }
     };
 
     // channel with a one-element buffer
