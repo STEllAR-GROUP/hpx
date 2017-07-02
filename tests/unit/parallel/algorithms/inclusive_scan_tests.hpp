@@ -39,7 +39,7 @@ void inclusive_scan_benchmark()
         hpx::util::high_resolution_timer t;
         hpx::parallel::inclusive_scan(hpx::parallel::execution::par,
             boost::begin(c), boost::end(c), boost::begin(d),
-            val, op);
+            op, val);
         double elapsed = t.elapsed();
 
         // verify values
@@ -486,8 +486,8 @@ void test_inclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
     a.clear();
     std::fill_n(std::back_inserter(a), ARRAY_SIZE, FILL_VALUE);
     b.resize(a.size());
-    hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
-                                  [](int bar, int baz){ return bar+baz; });
+    hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(),
+                                  [](int bar, int baz){ return bar+baz; }, 0);
     //
     for (int i = 0; i < static_cast<int>(b.size()); ++i) {
         int value = b[i]; //-V108
