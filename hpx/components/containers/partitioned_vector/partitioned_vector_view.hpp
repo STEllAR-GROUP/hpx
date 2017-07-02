@@ -108,7 +108,7 @@ namespace hpx
                 "is too small");
 
             // Update end_
-            end_  += hw_basis_[N-1] * sw_sizes[N-1];
+            end_  += hw_basis_[N-1] * sw_sizes.begin()[N-1];
         }
 
     private:
