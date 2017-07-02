@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -187,7 +188,7 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::parallel::copy(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
@@ -222,7 +223,7 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::copy(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c),
                         [](){ throw std::runtime_error("test"); }),
@@ -294,7 +295,7 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::copy(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c),
                     [](){ throw std::bad_alloc(); }),
@@ -328,7 +329,7 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::copy(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c),
                         [](){ throw std::bad_alloc(); }),

@@ -16,11 +16,11 @@
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/iterator_range.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/range/iterator_range.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -163,7 +163,7 @@ namespace hpx { namespace compute { namespace host
                         parallel::execution::bulk_async_execute(
                             executors_[i],
                             std::forward<F>(f),
-                            boost::make_iterator_range(begin, part_end),
+                            util::make_iterator_range(begin, part_end),
                             std::forward<Ts>(ts)...);
                     results.insert(
                         results.end(),
@@ -205,7 +205,7 @@ namespace hpx { namespace compute { namespace host
                         parallel::execution::bulk_sync_execute(
                             executors_[i],
                             std::forward<F>(f),
-                            boost::make_iterator_range(begin, part_end),
+                            util::make_iterator_range(begin, part_end),
                             std::forward<Ts>(ts)...);
                     results.insert(
                         results.end(),
