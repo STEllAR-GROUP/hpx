@@ -806,7 +806,7 @@ namespace hpx { namespace components { namespace server
             reinterpret_cast<void**>(&new_instance));
 
         // sanity checks
-        if (!id)
+        if (!id || new_instance == nullptr)
         {
             // we should not get here (id should not be invalid)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
@@ -828,6 +828,9 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
 
+        // inform the newly created component that it has been migrated
+        new_instance->on_migrated();
+
         // At this point the object has been fully migrated. We now remove
         // the object from the AGAS table of migrated objects. This is
         // necessary as this object might have been migrated off this locality
@@ -835,10 +838,6 @@ namespace hpx { namespace components { namespace server
         agas::unmark_as_migrated(id);
 
         to_migrate.make_unmanaged();
-
-        // inform the newly created component that it has been migrated
-        if (new_instance != nullptr)
-            new_instance->on_migrated();
 
         return id;
     }
