@@ -1,0 +1,43 @@
+#  Copyright (c) 2017 Hartmut Kaiser
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+version: '{branch}-{build}'
+
+branches:
+  only:
+  - appveyor
+
+image:
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+
+platform:
+  - x64
+
+shallow_clone: true
+
+init:
+  - cmd: git config --global core.autocrlf input
+
+install:
+  - cmd: >-
+      git clone https://github.com/Microsoft/vcpkg C:\projects\vcpkg
+
+      cd C:\projects\vcpkg
+
+      powershell -exec bypass scripts\bootstrap.ps1
+
+      vcpkg install boost:x64-windows hwloc:x64-windows
+
+      cd C:\projects\hpx
+
+before_build:
+  - cmd: cmake -H. -Bbuild -A%PLATFORM% -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake -DHPX_WITH_GIT_COMMIT=%APPVEYOR_REPO_COMMIT% -DHPX_WITH_PSEUDO_DEPENDENCIES=On -DHPX_WITH_VS_STARTUP_PROJECT=core -DHPX_WITH_EXAMPLES=On -DHPX_WITH_TESTS=On
+
+build_script:
+  - cmd: cmake --build build --config Debug --target core
+
