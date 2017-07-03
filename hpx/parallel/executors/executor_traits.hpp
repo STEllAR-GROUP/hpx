@@ -97,15 +97,15 @@ namespace hpx { namespace parallel { inline namespace v3
             template <typename Executor, typename F, typename ... Ts>
             static auto call(int, Executor&& exec, F && f, Ts &&... ts)
             ->  decltype(
-                    exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...)
+                    exec.post(std::forward<F>(f), std::forward<Ts>(ts)...)
                 )
             {
-                exec.apply_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+                exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 
         template <typename Executor, typename F, typename ... Ts>
-        void call_apply_execute(Executor&& exec, F && f, Ts && ... ts)
+        void call_post(Executor&& exec, F && f, Ts && ... ts)
         {
             apply_helper::call(0, std::forward<Executor>(exec),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -451,14 +451,14 @@ namespace hpx { namespace parallel { inline namespace v3
         ///             given executor.
         /// \param ts   [in] Additional arguments to use to invoke \a f.
         ///
-        /// \note This calls exec.apply_execute(f, ts...), if available, otherwise
+        /// \note This calls exec.post(f, ts...), if available, otherwise
         ///       it calls exec.async_execute() while discarding the returned
         ///       future
         ///
         template <typename Executor_, typename F, typename ... Ts>
         static void apply_execute(Executor_ && exec, F && f, Ts &&... ts)
         {
-            detail::call_apply_execute(std::forward<Executor_>(exec),
+            detail::call_post(std::forward<Executor_>(exec),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -653,7 +653,7 @@ namespace hpx { namespace parallel { inline namespace v3
             std::forward<Ts>(ts)...);
     }
 
-    // async_bulk_execute()
+    // bulk_async_execute()
     template <typename Executor, typename F, typename Shape, typename ... Ts>
     typename std::enable_if<
         hpx::traits::is_executor<Executor>::value,
@@ -663,7 +663,7 @@ namespace hpx { namespace parallel { inline namespace v3
             >::type
         > >
     >::type
-    async_bulk_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
     {
         typedef typename std::decay<Executor>::type executor_type;
         return executor_traits<executor_type>::bulk_async_execute(

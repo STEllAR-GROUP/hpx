@@ -118,7 +118,7 @@ namespace hpx { namespace compute { namespace cuda
         }
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
             std::size_t current = ++current_ % cuda_executors_.size();
             parallel::execution::post(
@@ -167,7 +167,7 @@ namespace hpx { namespace compute { namespace cuda
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<void> >
-        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
 // Before Boost V1.56 boost::size() does not respect the iterator category of
 // its argument.
@@ -190,7 +190,7 @@ namespace hpx { namespace compute { namespace cuda
                             shape_type;
 
                         std::array<shape_type, 1> cuda_shape{{s}};
-                        parallel::execution::sync_bulk_execute(
+                        parallel::execution::bulk_sync_execute(
                             cuda_executors_[current], std::forward<F>(f),
                             cuda_shape, std::forward<Ts>(ts)...);
                     },

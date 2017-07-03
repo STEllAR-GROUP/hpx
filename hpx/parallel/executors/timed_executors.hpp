@@ -252,7 +252,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Tag>
-        struct apply_execute_at_helper
+        struct post_at_helper
         {
             template <typename Executor, typename F>
             void operator()(hpx::future<void> && fut, Executor && exec, F && f) const
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { namespace execution
                 auto predecessor = make_ready_future_at(abs_time);
                 execution::then_execute(sequenced_executor(),
                     hpx::util::bind(
-                        hpx::util::one_shot(apply_execute_at_helper()),
+                        hpx::util::one_shot(post_at_helper()),
                         hpx::util::placeholders::_1, std::forward<Executor>(exec),
                         hpx::util::deferred_call(std::forward<F>(f),
                             std::forward<Ts>(ts)...)),
@@ -284,17 +284,17 @@ namespace hpx { namespace parallel { namespace execution
                     std::chrono::steady_clock::time_point const& abs_time,
                     F && f, Ts &&... ts)
             ->  decltype(
-                    exec.apply_execute_at(abs_time, std::forward<F>(f),
+                    exec.post_at(abs_time, std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
             {
-                return exec.apply_execute_at(abs_time, std::forward<F>(f),
+                return exec.post_at(abs_time, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
         };
 
         template <>
-        struct apply_execute_at_helper<sequential_execution_tag>
+        struct post_at_helper<sequential_execution_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             static void
@@ -315,17 +315,17 @@ namespace hpx { namespace parallel { namespace execution
                     std::chrono::steady_clock::time_point const& abs_time,
                     F && f, Ts &&... ts)
             ->  decltype(
-                    exec.apply_execute_at(abs_time, std::forward<F>(f),
+                    exec.post_at(abs_time, std::forward<F>(f),
                         std::forward<Ts>(ts)...)
                 )
             {
-                exec.apply_execute_at(abs_time, std::forward<F>(f),
+                exec.post_at(abs_time, std::forward<F>(f),
                     std::forward<Ts>(ts)...);
             }
         };
 
         template <typename Executor, typename F, typename ... Ts>
-        void call_apply_execute_at(Executor && exec,
+        void call_post_at(Executor && exec,
             std::chrono::steady_clock::time_point const& abs_time, F && f,
             Ts &&... ts)
         {
@@ -333,7 +333,7 @@ namespace hpx { namespace parallel { namespace execution
                     typename hpx::util::decay<Executor>::type
                 >::type tag;
 
-            return apply_execute_at_helper<tag>::call(0,
+            return post_at_helper<tag>::call(0,
                 std::forward<Executor>(exec), abs_time, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -418,9 +418,9 @@ namespace hpx { namespace parallel { namespace execution
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
-            detail::call_apply_execute_at(exec_, execute_at_,
+            detail::call_post_at(exec_, execute_at_,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -454,9 +454,9 @@ namespace hpx { namespace traits
     {};
 
     template <typename BaseExecutor>
-    struct is_non_blocking_one_way_executor<
+    struct is_never_blocking_one_way_executor<
             parallel::execution::timed_executor<BaseExecutor> >
-      : is_non_blocking_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_never_blocking_one_way_executor<typename std::decay<BaseExecutor>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

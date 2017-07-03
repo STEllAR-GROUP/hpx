@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
         template <typename Executor_, typename F, typename ... Ts>
-        static void apply_execute(Executor_ && sched, F && f, Ts &&... ts)
+        static void post(Executor_ && sched, F && f, Ts &&... ts)
         {
             hpx::apply(std::forward<Executor_>(sched), std::forward<F>(f),
                 std::forward<Ts>(ts)...);

@@ -201,7 +201,7 @@ struct test_sync_executor2 : test_sync_executor1
     typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static void apply_execute(F && f, Ts &&... ts)
+    static void post(F && f, Ts &&... ts)
     {
         ++count_apply;
         hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -211,7 +211,7 @@ struct test_sync_executor2 : test_sync_executor1
 struct test_timed_sync_executor2 : test_sync_executor2
 {
     template <typename F, typename ... Ts>
-    static void apply_execute_at(hpx::util::steady_time_point const& abs_time,
+    static void post_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {
         ++count_apply_at;

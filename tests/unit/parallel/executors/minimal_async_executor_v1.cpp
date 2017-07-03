@@ -183,7 +183,7 @@ struct test_async_executor4 : test_async_executor2
 struct test_async_executor5 : test_async_executor2
 {
     template <typename F, typename ... Ts>
-    void apply_execute(F && f, Ts &&... ts)
+    void post(F && f, Ts &&... ts)
     {
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

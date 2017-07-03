@@ -37,7 +37,7 @@ void test_bulk_sync(Executor& exec)
     using hpx::util::placeholders::_2;
 
     std::vector<int> results =
-        hpx::parallel::execution::sync_bulk_execute(exec,
+        hpx::parallel::execution::bulk_sync_execute(exec,
             hpx::util::bind(&bulk_test, tid, _1, false, _2), v, 42);
 
     HPX_TEST(std::equal(
@@ -57,7 +57,7 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_2;
 
     std::vector<hpx::future<int> > results =
-        hpx::parallel::execution::async_bulk_execute(exec,
+        hpx::parallel::execution::bulk_async_execute(exec,
             hpx::util::bind(&bulk_test, tid, _1, true, _2), v, 42);
 
     HPX_TEST(std::equal(

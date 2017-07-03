@@ -109,7 +109,7 @@ namespace hpx { namespace compute { namespace host
         /// \endcond
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
             parallel::execution::post(executors_[current_],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -140,7 +140,7 @@ namespace hpx { namespace compute { namespace host
                 F, Shape, Ts...
             >::type>
         >
-        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             std::vector<hpx::future<
                 typename hpx::parallel::v3::detail::bulk_async_execute_result<
@@ -165,7 +165,7 @@ namespace hpx { namespace compute { namespace host
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto futures =
-                        parallel::execution::async_bulk_execute(
+                        parallel::execution::bulk_async_execute(
                             executors_[i],
                             std::forward<F>(f),
                             boost::make_iterator_range(begin, part_end),
@@ -190,7 +190,7 @@ namespace hpx { namespace compute { namespace host
         typename hpx::parallel::v3::detail::bulk_execute_result<
             F, Shape, Ts...
         >::type
-        sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             typename hpx::parallel::v3::detail::bulk_execute_result<
                     F, Shape, Ts...
@@ -213,7 +213,7 @@ namespace hpx { namespace compute { namespace host
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto part_results =
-                        parallel::execution::sync_bulk_execute(
+                        parallel::execution::bulk_sync_execute(
                             executors_[i],
                             std::forward<F>(f),
                             boost::make_iterator_range(begin, part_end),
