@@ -290,7 +290,7 @@ static void testMixedFallThrough()
         hpx::util::make_tuple(77.f, 2));
 
     auto res2 = map_pack(
-        [](int /*i*/) {
+        [](int) {
             // ...
             return 0;
         },
@@ -519,9 +519,10 @@ static void testStrategicContainerTraverse()
     // The container type itself is changed
     // - Plain container
     {
-        std::vector<int> container;
+        std::vector<int> container{1, 2, 3};
         std::vector<float> res =
             map_pack([](int) { return 0.f; }, std::move(container));
+        HPX_TEST_EQ(res.size(), 3U);
     }
 
     // - Nested container
@@ -529,6 +530,18 @@ static void testStrategicContainerTraverse()
         std::vector<std::vector<int>> container;
         std::vector<std::vector<float>> res =
             map_pack([](int) { return 0.f; }, std::move(container));
+    }
+
+    // - Move only container
+    {
+        std::vector<std::unique_ptr<int>> container;
+        container.push_back(std::unique_ptr<int>(new int(5)));
+        std::vector<int> res =
+            map_pack([](std::unique_ptr<int>&& ptr) { return *ptr; },
+                std::move(container));
+
+        HPX_TEST_EQ(res.size(), 1U);
+        HPX_TEST_EQ(res[0], 5);
     }
 
     // Every element in the container is remapped

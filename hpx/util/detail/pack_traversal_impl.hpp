@@ -17,6 +17,7 @@
 #include <hpx/util/tuple.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -142,9 +143,83 @@ namespace util {
                 return Base<NewType, decltype(allocator)>(std::move(allocator));
             }
 
+            /// Returns the default iterators of the container in case
+            /// the container was passed as an l-value reference.
+            /// Otherwise move iterators of the container are returned.
+            template <typename C, typename = void>
+            class container_accessor
+            {
+                static_assert(std::is_lvalue_reference<C>::value,
+                    "This should be a lvalue reference here!");
+
+                C container_;
+
+            public:
+                container_accessor(C container)
+                  : container_(container)
+                {
+                }
+
+                auto begin() -> decltype(container_.begin())
+                {
+                    return container_.begin();
+                }
+
+                auto end() -> decltype(container_.end())
+                {
+                    return container_.end();
+                }
+            };
+            template <typename C>
+            class container_accessor<C,
+                typename std::enable_if<
+                    std::is_rvalue_reference<C&&>::value>::type>
+            {
+                C&& container_;
+
+            public:
+                container_accessor(C&& container)
+                  : container_(std::move(container))
+                {
+                }
+
+                auto begin()
+                    -> decltype(std::make_move_iterator(container_.begin()))
+                {
+                    return std::make_move_iterator(container_.begin());
+                }
+
+                auto end()
+                    -> decltype(std::make_move_iterator(container_.end()))
+                {
+                    return std::make_move_iterator(container_.end());
+                }
+            };
+
+            template <typename T>
+            container_accessor<T> container_accessor_of(T&& container)
+            {
+                // Don't use any decay here
+                return container_accessor<T>(std::forward<T>(container));
+            }
+
             /// Deduces to the type the homogeneous container is containing
+            ///
+            /// This alias deduces to the same type on which
+            /// container_accessor<T> is iterating.
+            ///
+            /// The basic idea is that we deduce to the type the homogeneous
+            /// container T is carrying as reference while preserving the
+            /// original reference type of the container:
+            /// - If the container was passed as l-value its containing
+            ///   values are referenced through l-values.
+            /// - If the container was passed as r-value its containing
+            ///   values are referenced through r-values.
             template <typename Container>
-            using element_of_t = decltype(*std::declval<Container>().begin());
+            using element_of_t = typename std::conditional<
+                std::is_rvalue_reference<Container&&>::value,
+                decltype(std::move(*(std::declval<Container>().begin()))),
+                decltype(*(std::declval<Container>().begin()))>::type;
 
             /// Returns the type which is resulting if the mapping is applied to
             /// an element in the container.
@@ -177,7 +252,8 @@ namespace util {
                 // the destination.
                 // We could have used std::transform for this, however,
                 // I didn't want to pull a whole header for it in.
-                for (auto&& val : std::forward<T>(container))
+                for (auto&& val :
+                    container_accessor_of(std::forward<T>(container)))
                 {
                     remapped.push_back(std::forward<M>(mapper)(
                         std::forward<decltype(val)>(val)));
@@ -192,7 +268,8 @@ namespace util {
             auto remap_container(std::true_type, M&& mapper, T&& container) ->
                 typename std::decay<T>::type
             {
-                for (auto&& val : std::forward<T>(container))
+                for (auto&& val :
+                    container_accessor_of(std::forward<T>(container)))
                 {
                     val = std::forward<M>(mapper)(
                         std::forward<decltype(val)>(val));
