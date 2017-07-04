@@ -28,9 +28,9 @@ before_build:
   - cmd: cmake -H. -Bbuild -A%PLATFORM% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_TOOLCHAIN_FILE=C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake -DHPX_WITH_GIT_COMMIT=%APPVEYOR_REPO_COMMIT% -DHPX_WITH_PSEUDO_DEPENDENCIES=On -DHPX_WITH_EXAMPLES=On -DHPX_WITH_TESTS=On -DHPX_WITH_RUNTIME=Off
 
 build_script:
-  - cmd: cmake --build build --config %CONFIGURATION% --target core -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
-  - cmd: cmake --build build --config %CONFIGURATION% --target examples -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
-  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
+  - cmd: cmake --build build --config %CONFIGURATION% --target core -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+  - cmd: cmake --build build --config %CONFIGURATION% --target examples -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+#  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
 
 test_script:
   - cmd: |
