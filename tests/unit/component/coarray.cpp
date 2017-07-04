@@ -26,7 +26,7 @@ void bulk_test( hpx::lcos::spmd_block block,
                 std::string name)
 {
 
-    using hpx::_;
+    using hpx::container::placeholders::_;
     using const_iterator
         = typename std::vector<double>::const_iterator;
 

@@ -8,8 +8,6 @@
 #ifndef HPX_COARRAY_HPP
 #define HPX_COARRAY_HPP
 
-#include <hpx/components/containers/coarray/detail/are_integral.hpp>
-#include <hpx/components/containers/coarray/detail/last_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/lcos/spmd_block.hpp>
@@ -27,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
 
-#define HPX_REGISTER_COARRAY(T) HPX_REGISTER_PARTITIONED_VECTOR(T)
+#define HPX_REGISTER_COARRAY(...) HPX_REGISTER_PARTITIONED_VECTOR(__VA_ARGS__)
 
 namespace hpx
 {
@@ -66,8 +64,8 @@ namespace hpx
             coarray_sizes(I... i)
             : sizes_({{i...}})
             {
-                using last_element
-                    = typename hpx::detail::last_element< I... >::type;
+                using last_element =
+                    typename util::detail::at_index<sizeof...(I)-1, I...>::type;
                 using condition =
                     typename std::is_same<last_element,detail::auto_subscript>;
 
@@ -79,8 +77,10 @@ namespace hpx
                     "hpx::coarray() needs the number of sizes to be " \
                     "equal to its dimension");
 
-                static_assert(detail::are_integral<
-                    typename detail::cast_if_autosubscript<I>::type...>::value,
+                static_assert( util::detail::all_of<
+                    typename std::is_integral<
+                        typename detail::cast_if_autosubscript<I>::type
+                    >::type ... >::value,
                         "One or more elements in sizes given to hpx::coarray() "\
                         "is not integral");
             }
@@ -117,7 +117,9 @@ namespace hpx
     }
 
     // Used for "automatic" coarray subscript and "automatic" coarray size
-    constexpr hpx::detail::auto_subscript _;
+    namespace container{ namespace placeholders{
+        constexpr hpx::detail::auto_subscript _;
+    }}
 
     template<typename T, std::size_t N, typename Data = std::vector<T>>
     struct coarray
@@ -204,8 +206,9 @@ namespace hpx
         template<typename... I,
             typename = std::enable_if_t<
                 ! std::is_same<
-                    typename hpx::detail::last_element< I... >::type,
-                        detail::auto_subscript>::value>
+                    typename util::detail::at_index<sizeof...(I)-1,I...>::type,
+                        detail::auto_subscript>::value
+                >
             >
         hpx::detail::view_element<T,Data>
         operator()(I... index) const
@@ -219,8 +222,9 @@ namespace hpx
         template<typename... I,
             typename = std::enable_if_t<
                 std::is_same<
-                    typename hpx::detail::last_element< I... >::type,
-                        detail::auto_subscript>::value>
+                    typename util::detail::at_index<sizeof...(I)-1,I...>::type,
+                        detail::auto_subscript>::value
+                >
             >
         Data &
         operator()(I... index)
