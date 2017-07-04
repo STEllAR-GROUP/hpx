@@ -149,7 +149,7 @@ void test_bulk_then()
     ).get();
 }
 
-constexpr void static_check_executor()
+void static_check_executor()
 {
     using namespace hpx::traits;
     using executor =  hpx::parallel::execution::parallel_executor;

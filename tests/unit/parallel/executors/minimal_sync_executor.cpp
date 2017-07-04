@@ -329,7 +329,7 @@ namespace hpx { namespace traits
 }}
 
 template <typename Executor, typename B1, typename B2>
-constexpr void static_check_executor(B1, B2)
+void static_check_executor(B1, B2)
 {
     using namespace hpx::traits;
 

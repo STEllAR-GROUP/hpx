@@ -146,7 +146,7 @@ void test_bulk_async()
     ).get();
 }
 
-constexpr void static_check_executor()
+void static_check_executor()
 {
     using namespace hpx::traits;
     using executor =  hpx::parallel::execution::sequenced_executor;
