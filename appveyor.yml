@@ -28,13 +28,12 @@ before_build:
   - cmd: cmake -H. -Bbuild -A%PLATFORM% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_TOOLCHAIN_FILE=C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake -DHPX_WITH_GIT_COMMIT=%APPVEYOR_REPO_COMMIT% -DHPX_WITH_PSEUDO_DEPENDENCIES=On -DHPX_WITH_EXAMPLES=On -DHPX_WITH_TESTS=On -DHPX_WITH_RUNTIME=Off
 
 build_script:
-  - cmd: cmake --build build --config %CONFIGURATION% --target core
-  - cmd: cmake --build build --config %CONFIGURATION% --target examples
-  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions
+  - cmd: cmake --build build --config %CONFIGURATION% --target core -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
+  - cmd: cmake --build build --config %CONFIGURATION% --target examples -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
+  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal
 
 test_script:
-  - cmd: >-
+  - cmd: |
       set PATH=%PATH%;C:\projects\vcpkg\installed\x64-windows\debug\bin
-
       python build\bin\hpxrun.py -l2 -t2 build\Debug\bin\hello_world.exe -- --hpx:bind=none
 
