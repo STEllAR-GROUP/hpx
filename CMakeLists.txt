@@ -125,6 +125,13 @@ if(MSVC)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
+
+  hpx_option(HPX_WITH_VS_STARTUP_PROJECT STRING
+    "Define the startup project for the HPX solution (default: ALL_BUILD)."
+    "ALL_BUILD" ADVANCED)
+  if(HPX_WITH_VS_STARTUP_PROJECT)
+    set(VS_STARTUP_PROJECT ${HPX_WITH_VS_STARTUP_PROJECT})
+  endif()
 endif()
 
 ################################################################################
