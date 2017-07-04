@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -81,14 +81,16 @@ namespace hpx { namespace components
         ///        GID to the new object.
         ///
         /// \param assign_gid [in] The GID to assign to the newly created object.
-        /// \param f  [in] The constructor function to call in order to
-        ///           initialize the newly allocated object.
+        /// \param f          [in] The constructor function to call in order to
+        ///                   initialize the newly allocated object.
+        /// \param p          [in] Used to return the address of the newly
+        ///                   created object (if non-zero)
         ///
         /// \return   Returns the GID of the first newly created component
         ///           instance (this is the same as assign_gid, if successful).
         virtual naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::unique_function_nonser<void(void*)> const& f) = 0;
+            util::unique_function_nonser<void(void*)> const& f, void **p) = 0;
 
         /// \brief Destroy one or more component instances
         ///

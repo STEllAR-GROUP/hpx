@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor)
+        util::unique_function_nonser<void(void*)> const& ctor, void** p)
     {
         void * cv = Component::heap_type::alloc(1);
         try {
@@ -98,6 +98,8 @@ namespace hpx { namespace components { namespace server
         if (assigned_gid && assigned_gid == gid)
         {
             // everything is ok, return the new id
+            if (p != nullptr)
+                *p = c;         // return the raw address as well
             return gid;
         }
 
