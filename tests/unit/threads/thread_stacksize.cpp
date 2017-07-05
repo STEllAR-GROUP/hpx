@@ -22,7 +22,11 @@ void test_small_stacksize()
             hpx::threads::thread_stacksize_small));
 
     // allocate HPX_SMALL_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
-    char array[HPX_SMALL_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
+    //char array[HPX_SMALL_STACK_SIZE-HPX_THREADS_STACK_OVERHEAD];
+    char array[HPX_SMALL_STACK_SIZE*HPX_THREADS_STACK_OVERHEAD];
+
+std::cout << HPX_SMALL_STACK_SIZE << '\t' << (HPX_SMALL_STACK_SIZE*HPX_THREADS_STACK_OVERHEAD) << std::endl;
+std::cout.flush();
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -95,12 +99,16 @@ int main()
 
     for (hpx::id_type const& id : localities)
     {
-        if(id != hpx::find_here())
+std::cout << id << '\t' << hpx::find_here() << std::endl;
+
+        if(id == hpx::find_here())
         {
+std::cout << "running" << std::endl;
             test_small_stacksize_action test_action;
             test_action(id);
         }
 
+/*
         {
             test_medium_stacksize_action test_action;
             test_action(id);
@@ -115,6 +123,7 @@ int main()
             test_huge_stacksize_action test_action;
             test_action(id);
         }
+*/
     }
 
     return hpx::util::report_errors();

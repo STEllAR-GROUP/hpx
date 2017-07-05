@@ -29,6 +29,17 @@
 #include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <signal.h>
+#include <stdlib.h>
+#include <strings.h>
+
+#ifndef SEGV_STACK_SIZE
+  #define SEGV_STACK_SIZE MINSIGSTKSZ+4096
+#endif
+
+#include <iostream>
+#include <iomanip>
+
 #if defined(HPX_HAVE_VALGRIND)
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
@@ -140,7 +151,19 @@ namespace hpx { namespace threads { namespace coroutines
 
             x86_linux_context_impl()
                 : m_stack(nullptr)
-            {}
+            {
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
+
+                bzero(&action, sizeof(action));
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_sigaction = &sigsegv_handler;
+
+                sigaltstack(&segv_stack, NULL);
+                sigfillset(&action.sa_mask);
+                sigaction(SIGSEGV, &action, NULL);
+            }
 
             /**
              * Create a context that on restore invokes Functor on
@@ -189,6 +212,36 @@ namespace hpx { namespace threads { namespace coroutines
                         VALGRIND_STACK_REGISTER(m_stack, eos));
                 }
 #endif
+
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
+
+                bzero(&action, sizeof(action));
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_sigaction = &sigsegv_handler;
+
+                sigaltstack(&segv_stack, NULL);
+                sigfillset(&action.sa_mask);
+                sigaction(SIGSEGV, &action, NULL);
+
+            }
+
+            static void sigsegv_handler(int signum, siginfo_t *info,
+                void *data) 
+            {
+                void *addr = info->si_addr;
+
+                std::cerr << "Stack overflow in coroutine at address "
+                    << std::internal << std::hex << std::setw(sizeof(addr)*2+2) 
+                    << std::setfill('0') << static_cast<int*>(addr) << "." std::endl
+                    << "Configure the hpx runtime to allocate a larger "
+                    << "coroutine stack size." << std::endl
+                    << "Use the hpx.stacks.small_size, hpx.stacks.medium_size, " << std::endl;
+                    << "hpx.stacks.large_size, or hpx.stacks.huge_size runtime " << std::endl;
+                    << "flags to configure coroutine heap sizes." << std::endl;
+
+                std::exit(EXIT_FAILURE);
             }
 
             ~x86_linux_context_impl()
@@ -344,6 +397,9 @@ namespace hpx { namespace threads { namespace coroutines
 
             std::ptrdiff_t m_stack_size;
             void* m_stack;
+
+            struct sigaction action;
+            stack_t segv_stack;
         };
 
         typedef x86_linux_context_impl context_impl;
