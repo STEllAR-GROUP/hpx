@@ -183,7 +183,7 @@ namespace hpx
                 std::vector< hpx::id_type > localities
                     = hpx::find_all_localities();
 
-                vector_ = hpx::partitioned_vector<T>(
+                vector_ = hpx::partitioned_vector<T,Data>(
                     segment_size*num_segments, T(0),
                         hpx::container_layout(
                             num_segments,
