@@ -38,19 +38,6 @@ namespace hpx
         using traits
             = typename hpx::traits::segmented_iterator_traits<pvector_iterator>;
         using list_type = std::initializer_list<std::size_t>;
-
-        // Small utilities needed for partitioned_vector_view subscripts
-        template<bool ...>
-        struct bools;
-
-        template<typename ... I>
-        struct are_integral
-        : public std::integral_constant< bool,
-            std::is_same<
-                bools<true, std::is_integral<I>::value ...>,
-                bools<std::is_integral<I>::value ...,true > >::value >
-        {};
-
     public:
         using iterator
             = typename hpx::partitioned_vector_view_iterator<T,N,Data>;
@@ -144,7 +131,8 @@ namespace hpx
 
             // Check that all the elements are of integral type
             static_assert(
-                partitioned_vector_view::are_integral<I...>::value,
+                util::detail::all_of<
+                    typename std::is_integral<I>::type ... >::value,
                 "One or more elements in subscript is not integral");
 
             std::size_t  offset = 0;
@@ -187,7 +175,7 @@ namespace hpx
         iterator end()
         {
             return iterator( block_
-                           , begin_, end_
+                           , end_, end_
                            , sw_basis_, hw_basis_
                            , sw_basis_.back());
         }

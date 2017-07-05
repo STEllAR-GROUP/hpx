@@ -61,9 +61,9 @@ void bulk_test( hpx::lcos::spmd_block block,
                 (std::vector<double>) a(i,j,k);
 
             const_iterator it1 = result.begin(), it2 = value.begin();
-            const_iterator end1 = result.end(), end2 = value.end();
+            const_iterator end1 = result.end();
 
-            for (; it2 != end2; ++it1, ++it2)
+            for (; it1 != end1; ++it1, ++it2)
             {
                  HPX_TEST_EQ(*it1, *it2);
             }
