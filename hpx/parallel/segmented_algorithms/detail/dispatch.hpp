@@ -12,12 +12,12 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <exception>
 #include <list>
