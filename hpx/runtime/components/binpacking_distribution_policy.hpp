@@ -20,7 +20,7 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -98,7 +98,7 @@ namespace hpx { namespace components
                 values.push_back(counter.get_value<std::uint64_t>());
 
             return hpx::dataflow(hpx::launch::sync,
-                hpx::util::unwrapped(
+                hpx::util::unwrapping(
                     [](std::vector<std::uint64_t> && values)
                     {
                         return values;

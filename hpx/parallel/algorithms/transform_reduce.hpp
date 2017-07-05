@@ -15,7 +15,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     hpx::util::invoke(conv, next));
                             });
                     },
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [init, r](std::vector<T> && results) -> T
                         {
                             return util::accumulate_n(hpx::util::begin(results),

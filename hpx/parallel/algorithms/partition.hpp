@@ -435,7 +435,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [](output_iterator_offset const& prev_sum,
                             output_iterator_offset const& curr)
                         -> output_iterator_offset

@@ -13,7 +13,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/range.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
                     std::move(f1),
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [](std::vector<difference_type>&& results)
                         {
                             return util::accumulate_n(
@@ -312,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
                     std::move(f1),
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [](std::vector<difference_type> && results)
                         {
                             return util::accumulate_n(

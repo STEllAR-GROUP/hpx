@@ -18,7 +18,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
