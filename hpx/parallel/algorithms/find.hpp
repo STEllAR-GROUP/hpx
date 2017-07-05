@@ -526,31 +526,33 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
-        struct find_end : public detail::algorithm<find_end<FwdIter>, FwdIter>
+        template <typename Iter>
+        struct find_end : public detail::algorithm<find_end<Iter>, Iter>
         {
             find_end()
               : find_end::algorithm("find_end")
             {}
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first1, FwdIter last1,
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+                typename Pred>
+            static FwdIter1
+            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 return std::find_end(first1, last1, first2, last2, op);
             }
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+                typename Pred>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
+                ExPolicy, FwdIter1
             >::type
-            parallel(ExPolicy && policy, FwdIter first1, FwdIter last1,
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
-                typedef typename std::iterator_traits<FwdIter>::reference reference;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+                typedef typename std::iterator_traits<FwdIter1>::reference reference;
+                typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type;
 
                 difference_type diff = std::distance(first2, last2);
@@ -565,13 +567,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type, std::greater<difference_type>
                 > tok(-1);
 
-                return util::partitioner<ExPolicy, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter1, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-                        [=](FwdIter it, std::size_t part_size,
+                        [=](FwdIter1 it, std::size_t part_size,
                             std::size_t base_idx) mutable
                         {
-                            FwdIter curr = it;
+                            FwdIter1 curr = it;
 
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -582,7 +584,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     {
                                         difference_type local_count = 1;
                                         FwdIter2 needle = first2;
-                                        FwdIter mid = curr;
+                                        FwdIter1 mid = curr;
 
                                         for (difference_type len = 0;
                                              local_count != diff && len != count;
@@ -597,7 +599,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
+                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter1
                         {
                             difference_type find_end_res = tok.get_data();
                             if (find_end_res != count)
@@ -609,6 +611,30 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Pred>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+        >::type
+        find_end_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred && op, std::false_type)
+        {
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+            return detail::find_end<FwdIter1>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first1, last1, first2, last2, std::forward<Pred>(op));
+        }
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Pred>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+        >::type
+        find_end_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred && op, std::true_type);
         /// \endcond
     }
 
@@ -701,11 +727,10 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
-        return detail::find_end<FwdIter1>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, std::forward<Pred>(op));
+        return detail::find_end_(std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, std::forward<Pred>(op), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
