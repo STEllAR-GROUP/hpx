@@ -39,7 +39,7 @@ void stack_remaining(const char *txt, info_stack &stack) {
 
 void stack_waste(int N, info_stack &stack) {
   // declare 1 MB of stack vars
-  char bytes[1<<10];
+  char bytes[1<<10] = {0};
   // prevent the compiler optimizing it away
   std::fill_n(&bytes[0], 32, 0);
   std::stringstream dummy;
