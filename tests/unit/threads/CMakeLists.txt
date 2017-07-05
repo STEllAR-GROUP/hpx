@@ -14,9 +14,9 @@ set(tests
     thread_launching
     thread_mf
     thread_stacksize
+    thread_stacksize_overflow
     thread_suspension_executor
     thread_yield
-    thread_stacksize
    )
 
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
