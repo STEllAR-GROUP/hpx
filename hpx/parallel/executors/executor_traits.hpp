@@ -283,9 +283,9 @@ namespace hpx { namespace parallel { inline namespace v3
         template <typename F, typename Shape, typename ... Ts>
         struct bulk_execute_result_impl<F, Shape, false, Ts...>
         {
-            typedef typename hpx::util::detail::unwrap_impl<
-                    typename bulk_async_execute_result<F, Shape, Ts...>::type
-                >::type type;
+            typedef decltype(
+                util::unwrapped(std::declval<typename bulk_async_execute_result<F,
+                        Shape, Ts...>::type>())) type;
         };
 
         template <typename F, typename Shape, typename ... Ts>
