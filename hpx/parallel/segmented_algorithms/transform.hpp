@@ -295,7 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 hpx::util::tuple<InIter1,InIter2,OutIter>
             > result;
             auto last2 = first2;
-            detail::advance(last2,std::size_t(last1 - first1));
+            detail::advance(last2,std::distance(first1,last1));
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     !hpx::traits::is_forward_iterator<InIter2>::value
                 > forced_seq;
             auto last2 = first2;
-            detail::advance(last2,std::size_t(last1 - first1));
+            detail::advance(last2,std::distance(first1,last1));
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
@@ -511,7 +511,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
             > result;
             auto last2 = first2;
-            detail::advance(last2,std::size_t(last1 - first1));
+            detail::advance(last2,std::distance(first1,last1));
             if (first1 == last1)
             {
                 return result::get(hpx::util::make_tuple<InIter1, InIter2,
@@ -618,7 +618,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
 
                 // handle all of the full partitions
-                if(last1-first1 <= last2-first2)
+                if(std::distance(first1,last1) <= std::distance(first2,last2))
                 {
                     for (++sit1; sit1 != send1; ++sit1)
                     {
@@ -742,7 +742,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
 
                 // handle all of the full partitions
-                if(last1-first1 <= last2-first2)
+                if(std::distance(first1,last1) <= std::distance(first2,last2))
                 {
                     for (++sit1; sit1 != send1; ++sit1)
                     {
