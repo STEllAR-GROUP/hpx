@@ -337,7 +337,7 @@ namespace util {
 
             /// Specialization for std::tuple like types which contain
             /// an arbitrary amount of heterogenous arguments.
-            template <typename M, template <class...> class Base,
+            template <typename M, template <typename...> class Base,
                 typename... OldArgs>
             struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>
 #ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
@@ -358,7 +358,7 @@ namespace util {
                         mapper_(std::forward<Args>(args))...};
                 }
             };
-            template <typename M, template <class...> class Base,
+            template <typename M, template <typename...> class Base,
                 typename... OldArgs>
             struct tuple_like_remapper<strategy_traverse_tag, M,
                 Base<OldArgs...>
@@ -384,7 +384,7 @@ namespace util {
 
             /// Specialization for std::array like types, which contains a
             /// compile-time known amount of homogeneous types.
-            template <typename M, template <class, std::size_t> class Base,
+            template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
             struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArg, Size>
 #ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
@@ -404,7 +404,7 @@ namespace util {
                         {mapper_(std::forward<Args>(args))...}};
                 }
             };
-            template <typename M, template <class, std::size_t> class Base,
+            template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
             struct tuple_like_remapper<strategy_traverse_tag, M,
                 Base<OldArg, Size>
@@ -433,12 +433,13 @@ namespace util {
             template <typename Strategy, typename T, typename M>
             auto remap(Strategy, T&& container, M&& mapper) -> decltype(
                 invoke_fused(std::declval<tuple_like_remapper<Strategy,
-                                 typename std::decay<M>::type, T>>(),
+                                 typename std::decay<M>::type,
+                                 typename std::decay<T>::type>>(),
                     std::forward<T>(container)))
             {
                 return invoke_fused(
                     tuple_like_remapper<Strategy, typename std::decay<M>::type,
-                        T>{std::forward<M>(mapper)},
+                        typename std::decay<T>::type>{std::forward<M>(mapper)},
                     std::forward<T>(container));
             }
         }    // end namespace tuple_like_remapping

@@ -17,6 +17,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
+
 using namespace hpx;
 using namespace hpx::util;
 using namespace hpx::util::detail;
@@ -467,6 +471,19 @@ static void testStrategicTraverse()
         HPX_TEST_EQ((*get<2>(res)), 4U);
     }
 
+    // Move only types contained in a pack which was passed as l-value
+    // reference is forwarded to the mapper as reference too.
+    {
+        std::vector<std::unique_ptr<int>> container;
+        container.push_back(std::unique_ptr<int>(new int(3)));
+
+        std::vector<int> res =
+            map_pack([](std::unique_ptr<int>& p) { return *p; }, container);
+
+        HPX_TEST_EQ(res.size(), 1U);
+        HPX_TEST_EQ(res[0], 3);
+    }
+
     // Single object remapping returns the value itself without any boxing
     {
         int res = map_pack([](int i) { return i; }, 1);
@@ -617,6 +634,16 @@ static void testStrategicTupleLikeTraverse()
             "Type mismatch!");
         HPX_TEST((res == expected));
     }
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    // Fixed size homogeneous container
+    {
+        std::array<int, 3> values{{1, 2, 3}};
+        std::array<float, 3> res = map_pack([](int) { return 1.f; }, values);
+
+        HPX_TEST((res == std::array<float, 3>{{1.f, 1.f, 1.f}}));
+    }
+#endif
 }
 
 int main(int, char**)
