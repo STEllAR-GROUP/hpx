@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -17,8 +18,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -75,8 +74,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     },
                     hpx::util::unwrapped([init, r](std::vector<T> && results)
                     {
-                        return util::accumulate_n(boost::begin(results),
-                            boost::size(results), init, r);
+                        return util::accumulate_n(hpx::util::begin(results),
+                            hpx::util::size(results), init, r);
                     }));
             }
         };

@@ -31,12 +31,12 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t sum = 0;
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_plus(sum),
         [](iterator it, std::size_t& sum)
         {
@@ -46,7 +46,7 @@ void test_for_loop_reduction_plus(ExPolicy && policy, IteratorTag)
 
     // verify values
     std::size_t sum2 =
-        std::accumulate(boost::begin(c), boost::end(c), std::size_t(0));
+        std::accumulate(std::begin(c), std::end(c), std::size_t(0));
     HPX_TEST_EQ(sum, sum2);
 }
 
@@ -61,12 +61,12 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t prod = 0;
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_multiplies(prod),
         [](iterator it, std::size_t& prod)
         {
@@ -75,7 +75,7 @@ void test_for_loop_reduction_multiplies(ExPolicy && policy, IteratorTag)
     f.wait();
 
     // verify values
-    std::size_t prod2 = std::accumulate(boost::begin(c), boost::end(c),
+    std::size_t prod2 = std::accumulate(std::begin(c), std::end(c),
         std::size_t(1), std::multiplies<std::size_t>());
     HPX_TEST_EQ(prod, prod2);
 }
@@ -91,13 +91,13 @@ void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t minval = c[0];
 
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         hpx::parallel::reduction_min(minval),
         [](iterator it, std::size_t& minval)
         {
@@ -106,7 +106,7 @@ void test_for_loop_reduction_min(ExPolicy && policy, IteratorTag)
     f.wait();
 
     // verify values
-    std::size_t minval2 = std::accumulate(boost::begin(c), boost::end(c),
+    std::size_t minval2 = std::accumulate(std::begin(c), std::end(c),
         c[0], hpx::parallel::v1::detail::min_of<std::size_t>());
     HPX_TEST_EQ(minval, minval2);
 }
@@ -143,7 +143,7 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t bits = ~std::size_t(0);
     auto f = hpx::parallel::for_loop(
@@ -157,7 +157,7 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy && policy)
     f.wait();
 
     // verify values
-    std::size_t bits2 = std::accumulate(boost::begin(c), boost::end(c),
+    std::size_t bits2 = std::accumulate(std::begin(c), std::end(c),
         ~std::size_t(0), std::bit_and<std::size_t>());
     HPX_TEST_EQ(bits, bits2);
 }
@@ -170,7 +170,7 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t bits = 0;
     auto f = hpx::parallel::for_loop(
@@ -184,7 +184,7 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy && policy)
     f.wait();
 
     // verify values
-    std::size_t bits2 = std::accumulate(boost::begin(c), boost::end(c),
+    std::size_t bits2 = std::accumulate(std::begin(c), std::end(c),
         std::size_t(0), std::bit_or<std::size_t>());
     HPX_TEST_EQ(bits, bits2);
 }

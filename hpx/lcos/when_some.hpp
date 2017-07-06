@@ -231,6 +231,7 @@ namespace hpx
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -479,19 +480,20 @@ namespace hpx { namespace lcos
     template <typename Range>
     typename std::enable_if<traits::is_future_range<Range>::value,
         lcos::future<when_some_result<typename std::decay<Range>::type> > >::type
-    when_some(std::size_t n,
-        Range& lazy_values,
+    when_some(std::size_t n, Range&& lazy_values,
         error_code& ec = throws)
     {
-        typedef Range result_type;
+        typedef typename std::decay<Range>::type result_type;
+
+        result_type lazy_values_ = traits::acquire_future<result_type>()(lazy_values);
 
         if (n == 0)
         {
             return lcos::make_ready_future(
-                when_some_result<result_type>(std::move(lazy_values)));
+                when_some_result<result_type>(std::move(lazy_values_)));
         }
 
-        if (n > lazy_values.size())
+        if (n > lazy_values_.size())
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::lcos::when_some",
@@ -499,9 +501,6 @@ namespace hpx { namespace lcos
             return lcos::make_ready_future(
                 when_some_result<result_type>(result_type()));
         }
-
-        result_type lazy_values_ =
-            traits::acquire_future<result_type>()(lazy_values);
 
         std::shared_ptr<detail::when_some<result_type> > f =
             std::make_shared<detail::when_some<result_type> >(
@@ -512,16 +511,6 @@ namespace hpx { namespace lcos
 
         p.apply();
         return p.get_future();
-    }
-
-    template <typename Range>
-    typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<when_some_result<typename std::decay<Range>::type> > >::type
-    when_some(std::size_t n,
-        Range&& lazy_values,
-        error_code& ec = throws)
-    {
-        return lcos::when_some(n, lazy_values, ec);
     }
 
     template <typename Iterator, typename Container =
@@ -580,18 +569,27 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    lcos::future<when_some_result<
-        util::tuple<typename traits::acquire_future<Ts>::type...>
-    > >
-    when_some(std::size_t n, Ts&&... ts)
+    template <typename T, typename... Ts>
+    typename std::enable_if<
+        !(traits::is_future_range<T>::value && sizeof...(Ts) == 0),
+        lcos::future<when_some_result<
+            util::tuple<
+                typename traits::acquire_future<T>::type,
+                typename traits::acquire_future<Ts>::type...
+            >
+        > >
+    >::type
+    when_some(std::size_t n, T&& t, Ts&&... ts)
     {
         typedef util::tuple<
+                typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...
             > result_type;
 
         traits::acquire_future_disp func;
-        result_type lazy_values(func(std::forward<Ts>(ts))...);
+        result_type lazy_values(
+            func(std::forward<T>(t)),
+            func(std::forward<Ts>(ts))...);
 
         if (n == 0)
         {
@@ -599,7 +597,7 @@ namespace hpx { namespace lcos
                 when_some_result<result_type>(std::move(lazy_values)));
         }
 
-        if (n > sizeof...(Ts))
+        if (n > 1 + sizeof...(Ts))
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::when_some",
@@ -618,18 +616,27 @@ namespace hpx { namespace lcos
         return p.get_future();
     }
 
-    template <typename... Ts>
-    lcos::future<when_some_result<
-        util::tuple<typename traits::acquire_future<Ts>::type...>
-    > >
-    when_some(std::size_t n, error_code& ec, Ts&&... ts)
+    template <typename T, typename... Ts>
+    typename std::enable_if<
+        !(traits::is_future_range<T>::value && sizeof...(Ts) == 0),
+        lcos::future<when_some_result<
+            util::tuple<
+                typename traits::acquire_future<T>::type,
+                typename traits::acquire_future<Ts>::type...
+            >
+        > >
+    >::type
+    when_some(std::size_t n, error_code& ec, T&& t, Ts&&... ts)
     {
         typedef util::tuple<
+                typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...
             > result_type;
 
         traits::acquire_future_disp func;
-        result_type lazy_values(func(std::forward<Ts>(ts))...);
+        result_type lazy_values(
+            func(std::forward<T>(t)),
+            func(std::forward<Ts>(ts))...);
 
         if (n == 0)
         {
@@ -637,7 +644,7 @@ namespace hpx { namespace lcos
                 when_some_result<result_type>(std::move(lazy_values)));
         }
 
-        if (n > sizeof...(Ts))
+        if (n > 1 + sizeof...(Ts))
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::lcos::when_some",

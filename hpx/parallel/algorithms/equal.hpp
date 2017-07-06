@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -19,8 +20,6 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -136,7 +135,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
-                            boost::begin(results), boost::end(results),
+                            hpx::util::begin(results), hpx::util::end(results),
                             [](hpx::future<bool>& val)
                             {
                                 return val.get();
@@ -313,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
-                            boost::begin(results), boost::end(results),
+                            hpx::util::begin(results), hpx::util::end(results),
                             [](hpx::future<bool>& val)
                             {
                                 return val.get();

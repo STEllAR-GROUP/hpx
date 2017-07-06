@@ -8,11 +8,11 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
 #include <boost/atomic.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,12 +31,12 @@ void test_for_each_n_exception(ExPolicy policy, IteratorTag, Proj && proj)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::for_each_n(policy,
-            iterator(boost::begin(c)), c.size(),
+            iterator(std::begin(c)), c.size(),
             [](std::size_t v) { throw std::runtime_error("test"); },
             proj);
 
@@ -60,14 +60,14 @@ void test_for_each_n_exception_async(ExPolicy p, IteratorTag, Proj && proj)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<iterator> f =
             hpx::parallel::for_each_n(p,
-                iterator(boost::begin(c)), c.size(),
+                iterator(std::begin(c)), c.size(),
                 [](std::size_t v) { throw std::runtime_error("test"); },
                 proj);
         returned_from_algorithm = true;

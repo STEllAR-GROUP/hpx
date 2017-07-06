@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -30,7 +29,7 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t val(42);
     auto op =
@@ -39,10 +38,10 @@ void test_reduce1(ExPolicy policy, IteratorTag)
         };
 
     std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), val, op);
+        iterator(std::begin(c)), iterator(std::end(c)), val, op);
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), val, op);
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
     HPX_TEST_EQ(r1, r2);
 }
 
@@ -53,7 +52,7 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t val(42);
     auto op =
@@ -63,11 +62,11 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
 
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)), val, op);
+            iterator(std::begin(c)), iterator(std::end(c)), val, op);
     f.wait();
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), val, op);
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
     HPX_TEST_EQ(f.get(), r2);
 }
 
@@ -112,14 +111,14 @@ void test_reduce2(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t const val(42);
     std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), val);
+        iterator(std::begin(c)), iterator(std::end(c)), val);
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), val);
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val);
     HPX_TEST_EQ(r1, r2);
 }
 
@@ -130,16 +129,16 @@ void test_reduce2_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t const val(42);
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)), val);
+            iterator(std::begin(c)), iterator(std::end(c)), val);
     f.wait();
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), val);
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val);
     HPX_TEST_EQ(f.get(), r2);
 }
 
@@ -184,13 +183,13 @@ void test_reduce3(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t r1 = hpx::parallel::reduce(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)));
+        iterator(std::begin(c)), iterator(std::end(c)));
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), std::size_t(0));
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), std::size_t(0));
     HPX_TEST_EQ(r1, r2);
 }
 
@@ -201,15 +200,15 @@ void test_reduce3_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::future<std::size_t> f =
         hpx::parallel::reduce(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     // verify values
-    std::size_t r2 = std::accumulate(boost::begin(c), boost::end(c), std::size_t(0));
+    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), std::size_t(0));
     HPX_TEST_EQ(f.get(), r2);
 }
 
@@ -254,12 +253,12 @@ void test_reduce_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::reduce(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
@@ -285,14 +284,14 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::reduce(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 std::size_t(42),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::runtime_error("test"), v1 + v2;
@@ -358,12 +357,12 @@ void test_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::reduce(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             std::size_t(42),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
@@ -388,14 +387,14 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::reduce(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 std::size_t(42),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::bad_alloc(), v1 + v2;

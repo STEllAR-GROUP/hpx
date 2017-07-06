@@ -9,10 +9,10 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -32,13 +32,13 @@ void test_uninitialized_copy_n(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::parallel::uninitialized_copy_n(policy,
-        iterator(boost::begin(c)), c.size(), boost::begin(d));
+        iterator(std::begin(c)), c.size(), std::begin(d));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -55,15 +55,15 @@ void test_uninitialized_copy_n_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::future<base_iterator> f =
         hpx::parallel::uninitialized_copy_n(p,
-            iterator(boost::begin(c)), c.size(), boost::begin(d));
+            iterator(std::begin(c)), c.size(), std::begin(d));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -120,7 +120,7 @@ void test_uninitialized_copy_n_exception(ExPolicy policy, IteratorTag)
 
     std::vector<test::count_instances> c(10007);
     std::vector<test::count_instances> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
@@ -129,14 +129,14 @@ void test_uninitialized_copy_n_exception(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::uninitialized_copy_n(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [&throw_after]()
                 {
                     if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
             c.size(),
-            boost::begin(d));
+            std::begin(d));
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -160,7 +160,7 @@ void test_uninitialized_copy_n_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<test::count_instances> c(10007);
     std::vector<test::count_instances> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
@@ -171,14 +171,14 @@ void test_uninitialized_copy_n_exception_async(ExPolicy p, IteratorTag)
         hpx::future<base_iterator> f =
             hpx::parallel::uninitialized_copy_n(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [&throw_after]()
                     {
                         if (throw_after-- == 0)
                             throw std::runtime_error("test");
                     }),
                 c.size(),
-                boost::begin(d));
+                std::begin(d));
 
         returned_from_algorithm = true;
         f.get();
@@ -250,7 +250,7 @@ void test_uninitialized_copy_n_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<test::count_instances> c(10007);
     std::vector<test::count_instances> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
@@ -259,14 +259,14 @@ void test_uninitialized_copy_n_bad_alloc(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::uninitialized_copy_n(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [&throw_after]()
                 {
                     if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
             c.size(),
-            boost::begin(d));
+            std::begin(d));
 
         HPX_TEST(false);
     }
@@ -290,7 +290,7 @@ void test_uninitialized_copy_n_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<test::count_instances> c(10007);
     std::vector<test::count_instances> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
@@ -301,14 +301,14 @@ void test_uninitialized_copy_n_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<base_iterator> f =
             hpx::parallel::uninitialized_copy_n(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [&throw_after]()
                     {
                         if (throw_after-- == 0)
                             throw std::bad_alloc();
                     }),
                 c.size(),
-                boost::begin(d));
+                std::begin(d));
 
         returned_from_algorithm = true;
         f.get();

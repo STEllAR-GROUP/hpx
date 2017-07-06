@@ -9,7 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <array>
@@ -17,6 +16,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <type_traits>

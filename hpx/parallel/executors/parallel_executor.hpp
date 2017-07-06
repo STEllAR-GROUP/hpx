@@ -21,6 +21,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/range.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -28,8 +29,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -117,18 +116,10 @@ namespace hpx { namespace parallel { namespace execution
                 > > result_type;
 
             result_type results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-            std::size_t size = std::distance(boost::begin(shape),
-                boost::end(shape));
-#else
-            std::size_t size = boost::size(shape);
-#endif
-
+            std::size_t size = hpx::util::size(shape);
             results.resize(size);
-            spawn(results, 0, size, num_tasks, f, boost::begin(shape), ts...).get();
+
+            spawn(results, 0, size, num_tasks, f, hpx::util::begin(shape), ts...).get();
             return results;
         }
         /// \endcond

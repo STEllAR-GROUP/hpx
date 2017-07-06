@@ -18,6 +18,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrapped.hpp>
 
@@ -27,8 +28,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // define customization point specializations for thread executors
@@ -126,14 +125,7 @@ namespace hpx { namespace threads
                     F, Shape, Ts...
                 >::type
             > > results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-        results.reserve(std::distance(boost::begin(shape), boost::end(shape)));
-#else
-        results.reserve(boost::size(shape));
-#endif
+        results.reserve(util::size(shape));
 
         for (auto const& elem: shape)
         {
@@ -160,14 +152,7 @@ namespace hpx { namespace threads
                     F, Shape, Ts...
                 >::type
             > > results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-        results.reserve(std::distance(boost::begin(shape), boost::end(shape)));
-#else
-        results.reserve(boost::size(shape));
-#endif
+        results.reserve(util::size(shape));
 
         for (auto const& elem: shape)
         {

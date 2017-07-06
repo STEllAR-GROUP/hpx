@@ -31,9 +31,9 @@ void test_for_loop_n_strided(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
         {
             if (v == 42)
@@ -44,7 +44,7 @@ void test_for_loop_n_strided(ExPolicy && policy, IteratorTag)
 
     hpx::parallel::for_loop_n_strided(
         std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), c.size(), stride,
+        iterator(std::begin(c)), c.size(), stride,
         [](iterator it)
         {
             *it = 42;
@@ -74,9 +74,9 @@ void test_for_loop_n_strided_async(ExPolicy && p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
         {
             if (v == 42)
@@ -88,7 +88,7 @@ void test_for_loop_n_strided_async(ExPolicy && p, IteratorTag)
     auto f =
         hpx::parallel::for_loop_n_strided(
             std::forward<ExPolicy>(p),
-            iterator(boost::begin(c)), c.size(), stride,
+            iterator(std::begin(c)), c.size(), stride,
             [](iterator it)
             {
                 *it = 42;
@@ -141,9 +141,9 @@ void test_for_loop_n_strided_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
         {
             if (v == 42)
@@ -183,9 +183,9 @@ void test_for_loop_n_strided_idx_async(ExPolicy && p)
     typedef std::vector<std::size_t>::iterator base_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
         {
             if (v == 42)
