@@ -105,12 +105,16 @@ namespace posix { namespace pth
 #include <cstddef>                  // ptrdiff_t
 #include <ucontext.h>
 
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+
 #include <signal.h>
 #include <stdlib.h>
 #include <strings.h>
 
 #ifndef SEGV_STACK_SIZE
   #define SEGV_STACK_SIZE MINSIGSTKSZ+4096
+#endif
+
 #endif
 
 #include <iostream>
