@@ -160,9 +160,9 @@ namespace hpx { namespace threads { namespace coroutines
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
                 action.sa_sigaction = &sigsegv_handler;
 
-                sigaltstack(&segv_stack, NULL);
+                sigaltstack(&segv_stack, nullptr);
                 sigfillset(&action.sa_mask);
-                sigaction(SIGSEGV, &action, NULL);
+                sigaction(SIGSEGV, &action, nullptr);
             }
 
             /**
@@ -228,18 +228,27 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
             static void sigsegv_handler(int signum, siginfo_t *info,
-                void *data) 
+                void *data)
             {
                 void *addr = info->si_addr;
-                std::cerr << "Stack overflow in coroutine at address "
-                    << std::internal << std::hex << std::setw(sizeof(addr)*2+2)
-                    << std::setfill('0') << static_cast<int*>(addr) << "." << std::endl;
 
-                std::cerr << std::endl << "Configure the hpx runtime to allocate a larger "
+                std::cerr << "Stack overflow in coroutine at address "
+                    << std::internal << std::hex
+                    << std::setw(sizeof(addr)*2+2)
+                    << std::setfill('0') << static_cast<int*>(addr)
+                    << "." << std::endl;
+
+                std::cerr << std::endl << "Configure the hpx runtime to "
+                    << "allocate a larger "
                     << "coroutine stack size." << std::endl
-                    << "Use the hpx.stacks.small_size, hpx.stacks.medium_size, " << std::endl
-                    << "hpx.stacks.large_size, or hpx.stacks.huge_size runtime " << std::endl
-                    << "flags to configure coroutine heap sizes." << std::endl;
+                    << "Use the hpx.stacks.small_size, "
+                    << "hpx.stacks.medium_size, "
+                    << std::endl
+                    << "hpx.stacks.large_size, "
+                    << "or hpx.stacks.huge_size runtime "
+                    << std::endl
+                    << "flags to configure coroutine heap sizes." 
+                    << std::endl << std::endl;
 
                 std::exit(EXIT_FAILURE);
             }
