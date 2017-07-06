@@ -231,9 +231,9 @@ namespace hpx { namespace threads { namespace coroutines
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
                 action.sa_sigaction = &sigsegv_handler;
 
-                sigaltstack(&segv_stack, NULL);
+                sigaltstack(&segv_stack, nullptr);
                 sigfillset(&action.sa_mask);
-                sigaction(SIGSEGV, &action, NULL);
+                sigaction(SIGSEGV, &action, nullptr);
 #endif
             }
 
@@ -258,7 +258,7 @@ namespace hpx { namespace threads { namespace coroutines
                     << "hpx.stacks.large_size, "
                     << "or hpx.stacks.huge_size runtime "
                     << std::endl
-                    << "flags to configure coroutine heap sizes." 
+                    << "flags to configure coroutine heap sizes."
                     << std::endl << std::endl;
 
                 std::exit(EXIT_FAILURE);

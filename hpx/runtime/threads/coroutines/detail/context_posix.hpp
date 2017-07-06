@@ -276,7 +276,7 @@ namespace hpx { namespace threads { namespace coroutines
                     << "hpx.stacks.large_size, "
                     << "or hpx.stacks.huge_size runtime "
                     << std::endl
-                    << "flags to configure coroutine heap sizes." 
+                    << "flags to configure coroutine heap sizes."
                     << std::endl << std::endl;
 
                 std::exit(EXIT_FAILURE);
