@@ -169,7 +169,13 @@ namespace hpx { namespace performance_counters { namespace server
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
-            {}
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
 
             double get_value()
             {
@@ -204,7 +210,13 @@ namespace hpx { namespace performance_counters { namespace server
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
-            {}
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
 
             double get_value()
             {
@@ -301,7 +313,13 @@ namespace hpx { namespace performance_counters { namespace server
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
-            {}
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
 
             double get_value()
             {
@@ -335,7 +353,13 @@ namespace hpx { namespace performance_counters { namespace server
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
-            {}
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
 
             double get_value()
             {
@@ -361,7 +385,8 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::size_t parameter1, std::size_t parameter2)
+            std::size_t parameter1, std::size_t parameter2,
+            bool reset_base_counter)
       : base_type_holder(info),
         timer_(util::bind(&statistics_counter::evaluate, this_()),
             util::bind(&statistics_counter::on_terminate, this_()),
@@ -369,7 +394,8 @@ namespace hpx { namespace performance_counters { namespace server
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(new detail::counter_type_from_statistic<Statistic>(parameter2)),
         has_prev_value_(false),
-        parameter1_(parameter1), parameter2_(parameter2)
+        parameter1_(parameter1), parameter2_(parameter2),
+        reset_base_counter_(reset_base_counter)
     {
         if (parameter1 == 0) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -496,7 +522,7 @@ namespace hpx { namespace performance_counters { namespace server
             return false;
 
         value = stubs::performance_counter::get_value(
-            launch::sync, base_counter_id_);
+            launch::sync, base_counter_id_, reset_base_counter_);
 
         if (!has_prev_value_)
         {
@@ -731,22 +757,45 @@ namespace hpx { namespace performance_counters { namespace detail
 
                 std::vector<std::size_t> parameters;
                 if (!paths.parameters_.empty()) {
-                    // try to interpret the additional parameter as interval
-                    // time (ms)
+                    // try to interpret the additional parameters
                     namespace qi = boost::spirit::qi;
                     if (!qi::parse(paths.parameters_.begin(), paths.parameters_.end(),
-                            qi::int_ % ',', parameters))
+                            qi::uint_ % ',', parameters))
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "statistics_counter_creator",
-                            "invalid parameter specification for counter: " +
-                                paths.parameters_);
+                            "invalid parameter specification format for "
+                            "this counter: " + paths.parameters_);
+                        return naming::invalid_gid;
+                    }
+                    if (paths.countername_.find("rolling") != std::string::npos)
+                    {
+                        if (parameters.size() > 3)
+                        {
+                            HPX_THROWS_IF(ec, bad_parameter,
+                                "statistics_counter_creator",
+                                "too many parameter specifications for "
+                                "this counter: " + paths.parameters_);
+                            return naming::invalid_gid;
+                        }
+                    }
+                    else if (parameters.size() > 2)
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "statistics_counter_creator",
+                            "too many parameter specifications for "
+                            "this counter: " + paths.parameters_);
                         return naming::invalid_gid;
                     }
                 }
+                else if (paths.countername_.find("rolling") != std::string::npos) {
+                    parameters.push_back(1000); // sample interval
+                    parameters.push_back(10);   // rolling window
+                    parameters.push_back(0);    // don't reset underlying counter
+                }
                 else {
-                    parameters.push_back(1000);       // sample interval
-                    parameters.push_back(10);         // rolling window
+                    parameters.push_back(1000); // sample interval
+                    parameters.push_back(0);    // don't reset underlying counter
                 }
                 return create_statistics_counter(info, base_name, parameters, ec);
             }
