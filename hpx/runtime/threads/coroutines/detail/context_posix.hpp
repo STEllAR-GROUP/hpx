@@ -110,6 +110,7 @@ namespace posix { namespace pth
 #include <signal.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <cstring>
 
 #ifndef SEGV_STACK_SIZE
   #define SEGV_STACK_SIZE MINSIGSTKSZ+4096
@@ -244,7 +245,7 @@ namespace hpx { namespace threads { namespace coroutines
                 segv_stack.ss_flags = 0;
                 segv_stack.ss_size = SEGV_STACK_SIZE;
 
-                bzero(&action, sizeof(action));
+                std::memset(&action, '\0', sizeof(action));
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
                 action.sa_sigaction = &sigsegv_handler;
 
