@@ -139,6 +139,14 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 #    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
+hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
+  BOOL
+  "Enable stackoverflow detection for HPX threads/coroutines. (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+  hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+endif()
+  
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"

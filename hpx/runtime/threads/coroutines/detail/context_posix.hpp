@@ -235,6 +235,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
 
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
                 segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
                 segv_stack.ss_flags = 0;
                 segv_stack.ss_size = SEGV_STACK_SIZE;
@@ -246,8 +247,10 @@ namespace hpx { namespace threads { namespace coroutines
                 sigaltstack(&segv_stack, nullptr);
                 sigfillset(&action.sa_mask);
                 sigaction(SIGSEGV, &action, nullptr);
+#endif
             }
 
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
             static void sigsegv_handler(int signum, siginfo_t *info,
                 void *data)
             {
@@ -273,6 +276,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 std::exit(EXIT_FAILURE);
             }
+#endif
 
             ~ucontext_context_impl()
             {
