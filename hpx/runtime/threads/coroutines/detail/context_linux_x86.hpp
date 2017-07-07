@@ -3,6 +3,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
+//  Copyright (c) 2017 Christopher Taylor
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -158,6 +159,12 @@ namespace hpx { namespace threads { namespace coroutines
                 : m_stack(nullptr)
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
             {
+
+                // concept inspired by the following links:
+                //
+                // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
+                // http://www.evanjones.ca/software/threading.html
+                //
                 segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
                 segv_stack.ss_flags = 0;
                 segv_stack.ss_size = SEGV_STACK_SIZE;
