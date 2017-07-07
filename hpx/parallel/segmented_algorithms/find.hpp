@@ -352,19 +352,17 @@ namespace hpx { namespace parallel { inline namespace v1
             int partial_position;
         };
 
-        typedef struct find_end_return find_end_return;
-
         /// \cond NOINTERNAL
-        template <typename Iter>
-        struct segmented_find_end : public detail::algorithm<find_end<Iter>, Iter>
+        template<typename Iter>
+        struct seg_find_end : public detail::algorithm<seg_find_end<Iter>, find_end_return<Iter> >
         {
-            segmented_find_end()
-              : find_end::algorithm("segmented_find_end")
+            seg_find_end()
+              : seg_find_end<Iter>::algorithm("segmented_find_end")
             {}
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred>
-            static find_end_return
+            static find_end_return<FwdIter1>
             sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op,
                 FwdIter1 start, int g_cursor = 0)
@@ -372,18 +370,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 int cursor = g_cursor;
                 while(last1 != first1)
                 {
-                    if(*first1 == first2[cursor])
+                    if(op(*first1, first2[cursor]))
                     {
                         if(cursor == 0)
                             start = first1;
                         cursor++;
                         if(cursor == std::distance(first2,last2))
                         {
-                            find_end_return ret = {start,-1};
+                            find_end_return<FwdIter1> ret = {start,-1};
                             return ret;
                         }
                     }
-                    else if(*first1 == *first2)
+                    else if(op(*first1, *first2))
                     {
                         start = first1;
                         cursor = 1;
@@ -392,16 +390,16 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         cursor = 0;
                     }
-                    first1++
-                }
-                find_end_return ret = {start, cursor};
+                    first1++;
+                };
+                find_end_return<FwdIter1> ret = {start, cursor};
                 return ret;
             }
 
             // template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             //     typename Pred>
             // static typename util::detail::algorithm_result<
-            //     ExPolicy, find_end_return
+            //     ExPolicy, find_end_return<FwdIter1>
             // >::type
             // parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
             //     FwdIter2 first2, FwdIter2 last2, Pred && op)
@@ -492,10 +490,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type end = traits::local(last1);
                 if (beg != end)
                 {
-                    local_iterator_type out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2, op
+                    find_end_return<local_iterator_type> out = dispatch(traits::get_id(sit),
+                        algo, policy, std::true_type(), beg, end, first2, last2, op, beg
                     );
-                    output=traits::compose(send,out);
+                    output=traits::compose(send, out.seq_first);
                 }
             }
             else
@@ -503,15 +501,16 @@ namespace hpx { namespace parallel { inline namespace v1
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first1);
                 local_iterator_type end = traits::end(sit);
-                local_iterator_type out = traits::local(last1);
+                find_end_return<local_iterator_type> out;
+                out.seq_first = traits::local(last1);
 
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2, op
+                        algo, policy, std::true_type(), beg, end, first2, last2, op, beg
                     );
-                    if(out != end)
-                        output=traits::compose(sit,out);
+                    if(out.seq_first != end)
+                        output=traits::compose(sit, out.seq_first);
                 }
 
                 // handle all of the full partitions
@@ -519,14 +518,15 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
-                    out = traits::begin(send);
+                    out.seq_first = traits::begin(send);
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, first2, last2, op
+                            algo, policy, std::true_type(), beg, end, first2, last2,
+                            op, out.seq_first, out.partial_position
                         );
-                        if(out != end)
-                            output=traits::compose(sit,out);
+                        if(out.seq_first != end)
+                            output=traits::compose(sit,out.seq_first);
                     }
                 }
 
@@ -536,24 +536,29 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2, op
+                        algo, policy, std::true_type(), beg, end, first2, last2,
+                        op, out.seq_first, out.partial_position
                     );
-                    if(out != end)
-                        output=traits::compose(sit,out);
+                    if(out.seq_first != end)
+                        output=traits::compose(sit,out.seq_first);
                 }
             }
             return result::get(std::move(output));
         }
 
-        // template <typename Algo, typename ExPolicy, typename FwdIter1,
-        //     typename FwdIter2, typename Pred>
-        // inline typename std::enable_if<
-        //     execution::is_execution_policy<ExPolicy>::value,
-        //     typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-        // >::type
-        // segmented_find_end(Algo && algo, ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        //     FwdIter2 first2, FwdIter2 last2, Pred && op, std::false_type)
-        // {
+        template <typename Algo, typename ExPolicy, typename FwdIter1,
+            typename FwdIter2, typename Pred>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+        >::type
+        segmented_find_end(Algo && algo, ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred && op, std::false_type)
+        {
+          return util::detail::algorithm_result<
+                  ExPolicy, FwdIter1
+              >::get(std::forward<FwdIter1>(first1));
+        }
         //     typedef hpx::traits::segmented_iterator_traits<FwdIter1> traits;
         //     typedef typename traits::segment_iterator segment_iterator;
         //     typedef typename traits::local_iterator local_iterator_type;
@@ -699,7 +704,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::traits::segmented_iterator_traits<FwdIter1>
                 iterator_traits;
             return segmented_find_end(
-                find_end<typename iterator_traits::local_iterator>(),
+                seg_find_end<typename iterator_traits::local_iterator>(),
                 std::forward<ExPolicy>(policy), first1, last1, first2, last2,
                 std::forward<Pred>(op),is_seq());
         }

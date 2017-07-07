@@ -60,6 +60,10 @@ set(partitioned_vector_find_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_find_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)
+set(partitioned_vector_find_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_find_PARAMETERS
+    LOCALITIES 10
+    THREADS_PER_LOCALITY 4)
 
 # add dependencies to partitioned_vector_target when Cuda is enabled
 if(HPX_WITH_CUDA)
