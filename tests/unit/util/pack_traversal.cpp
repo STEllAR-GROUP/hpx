@@ -489,6 +489,47 @@ static void testStrategicTraverse()
         int res = map_pack([](int i) { return i; }, 1);
         HPX_TEST_EQ(res, 1);
     }
+
+    // Make it possible to pass move only objects in as reference,
+    // while returning those as reference.
+    {
+        std::unique_ptr<int> ptr(new int(7));
+
+        std::unique_ptr<int> const& ref = map_pack(
+            [](std::unique_ptr<int> const& ref) -> std::unique_ptr<int> const& {
+                // ...
+                return ref;
+            },
+            ptr);
+
+        HPX_TEST_EQ(*ref, 7);
+        *ptr = 0;
+        HPX_TEST_EQ(*ref, 0);
+    }
+
+    // Multiple args: Make it possible to pass move only objects in
+    // as reference, while returning those as reference.
+    {
+        std::unique_ptr<int> ptr1(new int(6));
+        std::unique_ptr<int> ptr2(new int(7));
+
+        hpx::util::tuple<std::unique_ptr<int> const&,
+            std::unique_ptr<int> const&>
+            ref = map_pack(
+                [](std::unique_ptr<int> const& ref)
+                    -> std::unique_ptr<int> const& {
+                    // ...
+                    return ref;
+                },
+                ptr1, ptr2);
+
+        HPX_TEST_EQ((*get<0>(ref)), 6);
+        HPX_TEST_EQ((*get<1>(ref)), 7);
+        *ptr1 = 1;
+        *ptr2 = 2;
+        HPX_TEST_EQ((*get<0>(ref)), 1);
+        HPX_TEST_EQ((*get<1>(ref)), 2);
+    }
 }
 
 static void testStrategicContainerTraverse()
@@ -644,6 +685,30 @@ static void testStrategicTupleLikeTraverse()
         HPX_TEST((res == std::array<float, 3>{{1.f, 1.f, 1.f}}));
     }
 #endif
+
+    // Make it possible to pass tuples containing move only objects
+    // in as reference, while returning those as reference.
+    {
+        auto value = hpx::util::make_tuple(
+            std::unique_ptr<int>(new int(6)), std::unique_ptr<int>(new int(7)));
+
+        hpx::util::tuple<std::unique_ptr<int> const&,
+            std::unique_ptr<int> const&>
+            ref = map_pack(
+                [](std::unique_ptr<int> const& ref)
+                    -> std::unique_ptr<int> const& {
+                    // ...
+                    return ref;
+                },
+                value);
+
+        HPX_TEST_EQ((*get<0>(ref)), 6);
+        HPX_TEST_EQ((*get<1>(ref)), 7);
+        (*get<0>(ref)) = 1;
+        (*get<1>(ref)) = 2;
+        HPX_TEST_EQ((*get<0>(ref)), 1);
+        HPX_TEST_EQ((*get<1>(ref)), 2);
+    }
 }
 
 int main(int, char**)

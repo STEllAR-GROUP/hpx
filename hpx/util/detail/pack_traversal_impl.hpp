@@ -658,6 +658,13 @@ namespace util {
                     std::forward<T>(element));
             }
 
+            /// Boxes the given values into an according tuple
+            template <typename... T>
+            tuple<T...> box(T&&... args)
+            {
+                return tuple<T...>{std::forward<T>(args)...};
+            }
+
         public:
             explicit mapping_helper(M mapper)
               : mapper_(std::move(mapper))
@@ -678,7 +685,7 @@ namespace util {
             template <typename First, typename Second, typename... T>
             auto init_traverse(strategy_remap_tag strategy, First&& first,
                 Second&& second, T&&... rest)
-                -> decltype(util::make_tuple(
+                -> decltype(std::declval<mapping_helper>().box(
                     std::declval<mapping_helper>().try_traverse(
                         strategy, std::forward<First>(first)),
                     std::declval<mapping_helper>().try_traverse(
@@ -686,8 +693,7 @@ namespace util {
                     std::declval<mapping_helper>().try_traverse(
                         strategy, std::forward<T>(rest))...))
             {
-                return util::make_tuple(
-                    try_traverse(strategy, std::forward<First>(first)),
+                return box(try_traverse(strategy, std::forward<First>(first)),
                     try_traverse(strategy, std::forward<Second>(second)),
                     try_traverse(strategy, std::forward<T>(rest))...);
             }
