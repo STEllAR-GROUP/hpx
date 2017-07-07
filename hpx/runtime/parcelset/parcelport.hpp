@@ -37,10 +37,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
-#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
 {
@@ -342,18 +338,10 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
-        typedef util::tuple<
-            std::shared_ptr<std::vector<parcel> >
-          , std::vector<write_handler_type>
-        >
-#else
         typedef util::tuple<
             std::vector<parcel>
           , std::vector<write_handler_type>
-        >
-#endif
-            map_second_type;
+        > map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 

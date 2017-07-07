@@ -106,6 +106,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
 
+  hpx_check_for_cxx11_std_range_access(
+    REQUIRED "HPX needs support for C++11 std::begin/end")
+
   hpx_check_for_cxx11_std_reference_wrapper(
     REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
@@ -154,6 +157,9 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_std_result_of_sfinae(
       DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
+    hpx_check_for_cxx14_variable_templates(
+      DEFINITIONS HPX_HAVE_CXX14_VARIABLE_TEMPLATES)
+
     # check for experimental facilities
 
     # check for Library Fundamentals TS v2's experimental/optional
@@ -166,8 +172,19 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx17_fold_expressions(
         DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
-    hpx_check_for_cxx17_variable_templates(
-      DEFINITIONS HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+    hpx_check_for_cxx17_fallthrough_attribute(
+      DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
 endmacro()
 
+################################################################################
+# C++ feature tests which require 3. party libraries
+# and a present config file to work.
+#
+# This tests are meant for testing the compiler on the capability
+# to compile parts of HPX directly without relying on generic feature tests.
+################################################################################
+macro(hpx_perform_on_framework_cxx_feature_tests)
+  hpx_check_for_cxx11_sfinae_expression_complete(
+    DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE)
+endmacro()

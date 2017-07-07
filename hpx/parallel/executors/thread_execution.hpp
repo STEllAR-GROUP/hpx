@@ -18,6 +18,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrapped.hpp>
 
@@ -27,8 +28,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // define customization point specializations for thread executors
@@ -109,7 +108,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // async_bulk_execute()
+    // bulk_async_execute()
     template <typename Executor, typename F, typename Shape, typename ... Ts>
         typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
@@ -119,21 +118,14 @@ namespace hpx { namespace threads
             >::type
         > >
     >::type
-    async_bulk_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
     {
         std::vector<hpx::future<
                 typename parallel::execution::detail::bulk_function_result<
                     F, Shape, Ts...
                 >::type
             > > results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-        results.reserve(std::distance(boost::begin(shape), boost::end(shape)));
-#else
-        results.reserve(boost::size(shape));
-#endif
+        results.reserve(util::size(shape));
 
         for (auto const& elem: shape)
         {
@@ -145,7 +137,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // sync_bulk_execute()
+    // bulk_sync_execute()
     template <typename Executor, typename F, typename Shape, typename ... Ts>
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
@@ -153,21 +145,14 @@ namespace hpx { namespace threads
             F, Shape, Ts...
         >::type
     >::type
-    sync_bulk_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
+    bulk_sync_execute(Executor && exec, F && f, Shape const& shape, Ts &&... ts)
     {
         std::vector<hpx::future<
                 typename parallel::execution::detail::bulk_function_result<
                     F, Shape, Ts...
                 >::type
             > > results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-        results.reserve(std::distance(boost::begin(shape), boost::end(shape)));
-#else
-        results.reserve(boost::size(shape));
-#endif
+        results.reserve(util::size(shape));
 
         for (auto const& elem: shape)
         {
@@ -179,19 +164,19 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // then_bulk_execute()
+    // bulk_then_execute()
     template <typename Executor, typename F, typename Shape, typename Future,
         typename ... Ts>
     HPX_FORCEINLINE
     typename std::enable_if<
         hpx::traits::is_threads_executor<Executor>::value,
         hpx::future<
-            typename parallel::execution::detail::then_bulk_execute_result<
+            typename parallel::execution::detail::bulk_then_execute_result<
                 F, Shape, Future, Ts...
             >::type
         >
     >::type
-    then_bulk_execute(Executor && exec, F && f, Shape const& shape,
+    bulk_then_execute(Executor && exec, F && f, Shape const& shape,
         Future& predecessor, Ts &&... ts)
     {
         typedef typename parallel::execution::detail::then_bulk_function_result<
@@ -208,7 +193,7 @@ namespace hpx { namespace threads
             [exec, f, shape, args](Future predecessor) mutable
             ->  result_type
             {
-                return parallel::execution::detail::fused_async_bulk_execute(
+                return parallel::execution::detail::fused_bulk_async_execute(
                     exec, f, shape, predecessor,
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)

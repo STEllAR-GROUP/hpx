@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -149,6 +149,10 @@ namespace hpx { namespace components
                     return std::make_pair(true, std::move(f));
                 });
         }
+
+        /// This hook is invoked on the newly created object after the migration
+        /// has been finished
+        void on_migrated() {}
 
         /// This is the hook implementation for decorate_action which makes
         /// sure that the object becomes pinned during the execution of an

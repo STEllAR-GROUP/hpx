@@ -5,6 +5,7 @@
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
+# Copyright (c) 2017      Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -124,6 +125,13 @@ if(MSVC)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
+
+  hpx_option(HPX_WITH_VS_STARTUP_PROJECT STRING
+    "Define the startup project for the HPX solution (default: ALL_BUILD)."
+    "ALL_BUILD" ADVANCED)
+  if(HPX_WITH_VS_STARTUP_PROJECT)
+    set(VS_STARTUP_PROJECT ${HPX_WITH_VS_STARTUP_PROJECT})
+  endif()
 endif()
 
 ################################################################################
@@ -149,6 +157,11 @@ hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
+
+hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
+  BOOL
+  "Enable Stack Overflow Detection (default: OFF)"
+  OFF ADVANCED)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -906,7 +919,7 @@ endif()
 
 # HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclkusive_scan (default: ON)"
+    "Enable old overloads for inclusive_scan (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
@@ -923,7 +936,7 @@ endif()
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
@@ -932,8 +945,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    hpx_error("GCC 4.8 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    hpx_error("GCC 4.9 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -1395,6 +1408,18 @@ if(HPX_WITH_HWLOC)
   hpx_add_config_define(HPX_HAVE_HWLOC)
 endif()
 
+hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
+
+if(HPX_WITH_STACKOVERFLOW_DETECTION)
+  find_package(LibSigSegv)
+  if(NOT LIBSIGSEGV_FOUND)
+    hpx_error("LibSigSegv could not be found and HPX_WITH_STACKOVERFLOW_DETECTION=ON, please specify LIBSIGSEGV_ROOT to point to the correct location or set HPX_WITH_STACKOVERFLOW_DETECTION to OFF")
+  endif()
+  hpx_libraries(${LIBSIGSEGV_LIBRARIES})
+  include_directories(${LIBSIGSEGV_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
+endif()
+
 ################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
@@ -1555,6 +1580,28 @@ hpx_include(SetOutputPaths)
 ##############################################################################
 
 ################################################################################
+# Provide a macro for generating config headers
+################################################################################
+macro(generate_config_defines_header TARGET_DIRECTORY)
+  # Generate a defines.hpp to be used in the build directory ...
+  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
+  write_config_defines_file(
+    TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+    NAMESPACE default
+    FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
+endmacro()
+
+###############################################################################
+# Perform the on framework CXX feature tests
+###############################################################################
+hpx_perform_on_framework_cxx_feature_tests()
+
+################################################################################
+# Set basic search paths for the generated HPX headers
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
+
+################################################################################
 # Configure compression and other plugins
 ################################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -1641,19 +1688,14 @@ add_plugin_modules()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-# Generate a defines.hpp to be used in the build directory ...
-set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-write_config_defines_file(
-  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-  NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp")
+generate_config_defines_header(${CMAKE_BINARY_DIR})
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
 write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1683,7 +1725,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/"
+  DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"

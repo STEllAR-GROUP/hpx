@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,24 +30,24 @@ void test_copy_if(ExPolicy policy)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
-    std::fill(middle, boost::end(c), -1);
+    auto middle = std::begin(c) + c.size()/2;
+    std::iota(std::begin(c), middle, std::rand());
+    std::fill(middle, std::end(c), -1);
 
     hpx::parallel::copy_if(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        boost::begin(d), [](int i){ return !(i < 0); });
+        iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), [](int i){ return !(i < 0); });
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
         [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, boost::end(c),
-        boost::begin(d) + d.size()/2,
+    HPX_TEST(std::equal(middle, std::end(c),
+        std::begin(d) + d.size()/2,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -66,26 +65,26 @@ void test_copy_if_async(ExPolicy p)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
-    std::fill(middle, boost::end(c), -1);
+    auto middle = std::begin(c) + c.size()/2;
+    std::iota(std::begin(c), middle, std::rand());
+    std::fill(middle, std::end(c), -1);
 
     auto f =
         hpx::parallel::copy_if(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d), [](int i){ return !(i < 0); });
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d), [](int i){ return !(i < 0); });
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
         [&count](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
         }));
 
-    HPX_TEST(std::equal(middle, boost::end(c),
-        boost::begin(d) + d.size()/2,
+    HPX_TEST(std::equal(middle, std::end(c),
+        std::begin(d) + d.size()/2,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -108,15 +107,15 @@ void test_copy_if_outiter(ExPolicy policy)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
-    std::fill(middle, boost::end(c), -1);
+    auto middle = std::begin(c) + c.size()/2;
+    std::iota(std::begin(c), middle, std::rand());
+    std::fill(middle, std::end(c), -1);
 
     hpx::parallel::copy_if(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         std::back_inserter(d), [](int i){ return !(i < 0); });
 
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
         [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;
@@ -134,17 +133,17 @@ void test_copy_if_outiter_async(ExPolicy p)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
-    std::fill(middle, boost::end(c), -1);
+    auto middle = std::begin(c) + c.size()/2;
+    std::iota(std::begin(c), middle, std::rand());
+    std::fill(middle, std::end(c), -1);
 
     auto f =
         hpx::parallel::copy_if(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             std::back_inserter(d), [](int i){ return !(i < 0); });
     f.wait();
 
-    HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), middle, std::begin(d),
         [](int v1, int v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             return v1 == v2;

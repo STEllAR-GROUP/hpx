@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,12 +30,12 @@ void test_copy(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
     hpx::parallel::copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -53,16 +52,16 @@ void test_copy_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto f =
         hpx::parallel::copy(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -84,12 +83,12 @@ void test_copy_outiter(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
     hpx::parallel::copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), std::back_inserter(d));
+        iterator(std::begin(c)), iterator(std::end(c)), std::back_inserter(d));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -106,16 +105,16 @@ void test_copy_outiter_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto f =
         hpx::parallel::copy(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             std::back_inserter(d));
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -188,16 +187,16 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::copy(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d));
+            decorated_iterator(std::end(c)),
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -220,7 +219,7 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -228,10 +227,10 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
         auto f =
             hpx::parallel::copy(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d));
+                decorated_iterator(std::end(c)),
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 
@@ -295,16 +294,16 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::copy(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d));
+            decorated_iterator(std::end(c)),
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -326,7 +325,7 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -334,10 +333,10 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
         auto f =
             hpx::parallel::copy(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d));
+                decorated_iterator(std::end(c)),
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 

@@ -6,12 +6,13 @@
 #if !defined(JENKINS_HASH_HPP_SEP_08_2007_0102PM)
 #define JENKINS_HASH_HPP_SEP_08_2007_0102PM
 
-#include <cstdlib>
+#include <hpx/config.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -192,25 +193,35 @@ namespace hpx { namespace util
             {
             case 11:
                 c += ((size_type)k[10] << 24);
+                HPX_FALLTHROUGH;
             case 10:
                 c += ((size_type)k[9] << 16);
+                HPX_FALLTHROUGH;
             case 9:
                 c += ((size_type)k[8] << 8);
+                HPX_FALLTHROUGH;
                 /* the first byte of c is reserved for the length */
             case 8:
                 b += ((size_type)k[7] << 24);
+                HPX_FALLTHROUGH;
             case 7:
                 b += ((size_type)k[6] << 16);
+                HPX_FALLTHROUGH;
             case 6:
                 b += ((size_type)k[5] << 8);
+                HPX_FALLTHROUGH;
             case 5:
                 b += k[4];
+                HPX_FALLTHROUGH;
             case 4:
                 a += ((size_type)k[3] << 24);
+                HPX_FALLTHROUGH;
             case 3:
                 a += ((size_type)k[2] << 16);
+                HPX_FALLTHROUGH;
             case 2:
                 a += ((size_type)k[1] << 8);
+                HPX_FALLTHROUGH;
             case 1:
                 a += k[0];
                 /* case 0: nothing left to add */

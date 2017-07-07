@@ -31,11 +31,11 @@ void test_for_loop(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         [](iterator it)
         {
             *it = 42;
@@ -43,7 +43,7 @@ void test_for_loop(ExPolicy && policy, IteratorTag)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(42));
@@ -59,12 +59,12 @@ void test_for_loop_async(ExPolicy && p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto f =
         hpx::parallel::for_loop(
             std::forward<ExPolicy>(p),
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             [](iterator it)
             {
                 *it = 42;
@@ -73,7 +73,7 @@ void test_for_loop_async(ExPolicy && p, IteratorTag)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(42));
@@ -113,7 +113,7 @@ void test_for_loop_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
@@ -125,7 +125,7 @@ void test_for_loop_idx(ExPolicy && policy)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(42));
@@ -140,7 +140,7 @@ void test_for_loop_idx_async(ExPolicy && p)
     typedef std::vector<std::size_t>::iterator base_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto f =
         hpx::parallel::for_loop(
@@ -154,7 +154,7 @@ void test_for_loop_idx_async(ExPolicy && p)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](std::size_t v) -> void
         {
             HPX_TEST_EQ(v, std::size_t(42));

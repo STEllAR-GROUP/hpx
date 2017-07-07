@@ -8,9 +8,8 @@
 #include <hpx/include/parallel_is_partitioned.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
+#include <iterator>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,13 +30,13 @@ void test_partitioned1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     bool parted = hpx::parallel::is_partitioned(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         [](std::size_t n){ return n % 2 == 0; });
 
     HPX_TEST(parted);
@@ -52,14 +51,14 @@ void test_partitioned1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     hpx::future<bool> f =
         hpx::parallel::is_partitioned(p,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         [](std::size_t n){ return n % 2 == 0; });
     f.wait();
 
@@ -108,18 +107,18 @@ void test_partitioned2(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c_odd(10007);
     //fill all of array with odds
-    std::fill(boost::begin(c_odd), boost::end(c_odd),
+    std::fill(std::begin(c_odd), std::end(c_odd),
         2*(std::rand() % 100) + 1);
     std::vector<std::size_t> c_even(10007);
     //fill all of array with evens
-    std::fill(boost::begin(c_odd), boost::end(c_odd),
+    std::fill(std::begin(c_odd), std::end(c_odd),
         2*(std::rand() % 100));
 
     bool parted_odd = hpx::parallel::is_partitioned(policy,
-        iterator(boost::begin(c_odd)), iterator(boost::end(c_odd)),
+        iterator(std::begin(c_odd)), iterator(std::end(c_odd)),
         [](std::size_t n){ return n % 2 == 0; });
     bool parted_even = hpx::parallel::is_partitioned(policy,
-        iterator(boost::begin(c_even)), iterator(boost::end(c_even)),
+        iterator(std::begin(c_even)), iterator(std::end(c_even)),
         [](std::size_t n){ return n % 2 == 0; });
 
     HPX_TEST(parted_odd);
@@ -134,18 +133,18 @@ void test_partitioned2_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c_odd(10007);
     //fill all of array with odds
-    std::fill(boost::begin(c_odd), boost::end(c_odd),
+    std::fill(std::begin(c_odd), std::end(c_odd),
         2*(std::rand() % 100) + 1);
     std::vector<std::size_t> c_even(10007);
     //fill all of array with evens
-    std::fill(boost::begin(c_odd), boost::end(c_odd),
+    std::fill(std::begin(c_odd), std::end(c_odd),
         2*(std::rand() % 100));
 
     hpx::future<bool> f_odd = hpx::parallel::is_partitioned(p,
-        iterator(boost::begin(c_odd)), iterator(boost::end(c_odd)),
+        iterator(std::begin(c_odd)), iterator(std::end(c_odd)),
         [](std::size_t n){ return n % 2 == 0; });
     hpx::future<bool> f_even = hpx::parallel::is_partitioned(p,
-        iterator(boost::begin(c_even)), iterator(boost::end(c_even)),
+        iterator(std::begin(c_even)), iterator(std::end(c_even)),
         [](std::size_t n){ return n % 2 == 0; });
 
     f_odd.wait();
@@ -197,9 +196,9 @@ void test_partitioned3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c_beg), boost::begin(c_beg) + c_beg.size()/2,
+    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c_beg) + c_beg.size()/2, boost::end(c_beg),
+    std::fill(std::begin(c_beg) + c_beg.size()/2, std::end(c_beg),
         2*(std::rand() % 100) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
@@ -208,10 +207,10 @@ void test_partitioned3(ExPolicy policy, IteratorTag)
     c_end[c_end.size()-1] -= 1;
 
     bool parted1 = hpx::parallel::is_partitioned(policy,
-        iterator(boost::begin(c_beg)), iterator(boost::end(c_beg)),
+        iterator(std::begin(c_beg)), iterator(std::end(c_beg)),
         [](std::size_t n){ return n % 2 == 0; });
     bool parted2 = hpx::parallel::is_partitioned(policy,
-        iterator(boost::begin(c_end)), iterator(boost::end(c_end)),
+        iterator(std::begin(c_end)), iterator(std::end(c_end)),
         [](std::size_t n){ return n % 2 == 0; });
 
     HPX_TEST(!parted1);
@@ -234,9 +233,9 @@ void test_partitioned3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c_beg), boost::begin(c_beg) + c_beg.size()/2,
+    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c_beg) + c_beg.size()/2, boost::end(c_beg),
+    std::fill(std::begin(c_beg) + c_beg.size()/2, std::end(c_beg),
         2*(std::rand() % 100) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
@@ -245,10 +244,10 @@ void test_partitioned3_async(ExPolicy p, IteratorTag)
     c_end[c_end.size()-1] -= 1;
 
     hpx::future<bool> f_beg = hpx::parallel::is_partitioned(p,
-        iterator(boost::begin(c_beg)), iterator(boost::end(c_beg)),
+        iterator(std::begin(c_beg)), iterator(std::end(c_beg)),
         [](std::size_t n){ return n % 2 == 0; });
     hpx::future<bool> f_end = hpx::parallel::is_partitioned(p,
-        iterator(boost::begin(c_end)), iterator(boost::end(c_end)),
+        iterator(std::begin(c_end)), iterator(std::end(c_end)),
         [](std::size_t n){ return n % 2 == 0; });
 
     f_beg.wait();
@@ -301,19 +300,19 @@ void test_partitioned_exception(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     bool caught_exception = false;
     try{
         hpx::parallel::is_partitioned(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
             decorated_iterator(
-                boost::end(c),
+                std::end(c),
                 [](){ throw std::runtime_error("test"); }),
             [](std::size_t n){ return n % 2 == 0; });
     }
@@ -338,9 +337,9 @@ void test_partitioned_async_exception(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     bool caught_exception = false;
@@ -348,10 +347,10 @@ void test_partitioned_async_exception(ExPolicy p, IteratorTag)
         hpx::future<bool> f =
             hpx::parallel::is_partitioned(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
                 decorated_iterator(
-                    boost::end(c),
+                    std::end(c),
                     [](){ throw std::runtime_error("test"); }),
                 [](std::size_t n){ return n % 2 == 0; });
         f.get();
@@ -417,19 +416,19 @@ void test_partitioned_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::is_partitioned(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
             decorated_iterator(
-                boost::end(c),
+                std::end(c),
                 [](){ throw std::bad_alloc(); }),
             [](std::size_t n){ return n % 2 == 0; });
         HPX_TEST(false);
@@ -454,9 +453,9 @@ void test_partitioned_async_bad_alloc(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(boost::begin(c), boost::begin(c) + c.size()/2,
+    std::fill(std::begin(c), std::begin(c) + c.size()/2,
         2*(std::rand() % 100));
-    std::fill(boost::begin(c) + c.size()/2, boost::end(c),
+    std::fill(std::begin(c) + c.size()/2, std::end(c),
         2*(std::rand() % 100) + 1);
 
     bool caught_bad_alloc = false;
@@ -464,10 +463,10 @@ void test_partitioned_async_bad_alloc(ExPolicy p, IteratorTag)
         hpx::future<bool> f =
             hpx::parallel::is_partitioned(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
                 decorated_iterator(
-                    boost::end(c),
+                    std::end(c),
                     [](){ throw std::bad_alloc(); }),
                 [](std::size_t n){ return n % 2 == 0; });
 

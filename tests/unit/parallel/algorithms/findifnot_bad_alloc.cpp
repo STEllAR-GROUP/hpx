@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,16 +30,16 @@ void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), std::rand()+1);
     c[c.size()/2]=0;
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::find_if_not(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
+            decorated_iterator(std::end(c)),
             [](std::size_t v){return 1;});
         HPX_TEST(false);
     }
@@ -62,7 +61,7 @@ void test_find_if_not_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), std::rand()+1);
     c[c.size()/2] = 0;
 
     bool caught_bad_alloc = false;
@@ -71,9 +70,9 @@ void test_find_if_not_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<decorated_iterator> f =
             hpx::parallel::find_if_not(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
+                decorated_iterator(std::end(c)),
                 [](std::size_t v){return 1;});
         returned_from_algorithm = true;
         f.get();

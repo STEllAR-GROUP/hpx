@@ -1,28 +1,29 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2016 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACQUIRE_FUTURE_DEC_23_2014_0911AM)
-#define HPX_TRAITS_ACQUIRE_FUTURE_DEC_23_2014_0911AM
+#ifndef HPX_TRAITS_ACQUIRE_FUTURE_HPP
+#define HPX_TRAITS_ACQUIRE_FUTURE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/range.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/traits/is_range.hpp>
 
-#include <boost/range/functions.hpp>
-#include <boost/range/iterator_range.hpp>
-
+#include <algorithm>
 #if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
 #endif
 #include <cstddef>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx { namespace traits
 {
@@ -34,7 +35,7 @@ namespace hpx { namespace traits
 
     template <typename T, typename Enable = void>
     struct acquire_future
-      : detail::acquire_future_impl<typename util::decay<T>::type>
+      : detail::acquire_future_impl<typename std::decay<T>::type>
     {};
 
     struct acquire_future_disp
@@ -49,12 +50,12 @@ namespace hpx { namespace traits
 
     namespace detail
     {
-        template <typename T>
-        struct acquire_future_impl<T,
-            typename std::enable_if<
-                !is_future_or_future_range<T>::value
-            >::type>
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Enable>
+        struct acquire_future_impl
         {
+            static_assert(!is_future_or_future_range<T>::value, "");
+
             typedef T type;
 
             template <typename T_>
@@ -65,6 +66,7 @@ namespace hpx { namespace traits
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename R>
         struct acquire_future_impl<hpx::lcos::future<R> >
         {
@@ -89,84 +91,34 @@ namespace hpx { namespace traits
             typedef hpx::lcos::shared_future<R> type;
 
             HPX_FORCEINLINE hpx::lcos::shared_future<R>
-            operator()(hpx::lcos::shared_future<R> future) const
+            operator()(hpx::lcos::shared_future<R> const& future) const
             {
                 return future;
             }
+
+            HPX_FORCEINLINE hpx::lcos::shared_future<R>
+            operator()(hpx::lcos::shared_future<R>&& future) const
+            {
+                return std::move(future);
+            }
         };
-
-        // Reserve sufficient space in the given vector if the underlying
-        // iterator type of the given range allow calculating the size on O(1).
-        template <typename Future, typename Range>
-        HPX_FORCEINLINE
-        void reserve_if_random_access(std::vector<Future>&, Range const&,
-            std::false_type)
-        {
-        }
-
-        template <typename Future, typename Range>
-        HPX_FORCEINLINE
-        void reserve_if_random_access(std::vector<Future>& v, Range const& r,
-            std::true_type)
-        {
-            v.reserve(boost::size(r));
-        }
-
-        template <typename Range1, typename Range2>
-        HPX_FORCEINLINE
-        void reserve_if_random_access(Range1&, Range2 const&)
-        {
-            // do nothing if it's not a vector
-        }
-
-        template <typename Future, typename Range>
-        HPX_FORCEINLINE
-        void reserve_if_random_access(std::vector<Future>& v, Range const& r)
-        {
-            typedef typename std::iterator_traits<
-                    typename Range::iterator
-                >::iterator_category iterator_category;
-
-            typedef std::is_same<
-                    iterator_category, std::random_access_iterator_tag
-                > is_random_access;
-
-            reserve_if_random_access(v, r, is_random_access());
-        }
-
-        template <typename Container>
-        HPX_FORCEINLINE
-        void reserve_if_vector(Container&, std::size_t)
-        {
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        void reserve_if_vector(std::vector<Future>& v, std::size_t n)
-        {
-            v.reserve(n);
-        }
 
         ///////////////////////////////////////////////////////////////////////
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>
-        struct acquire_future_impl<Range,
+        struct acquire_future_impl<
+            Range,
             typename std::enable_if<
                 traits::is_future_range<Range>::value
-            >::type>
+            >::type
+        >
         {
             typedef typename traits::future_range_traits<Range>::future_type
                 future_type;
 
             typedef Range type;
-
-            HPX_FORCEINLINE Range
-            operator()(Range&& futures) const
-            {
-                return std::move(futures);
-            }
 
             template <typename Range_>
             typename std::enable_if<
@@ -175,7 +127,8 @@ namespace hpx { namespace traits
             transform_future_disp(Range_ && futures, Range& values) const
             {
                 detail::reserve_if_random_access(values, futures);
-                std::transform(boost::begin(futures), boost::end(futures),
+                std::transform(
+                    util::begin(futures), util::end(futures),
                     std::back_inserter(values), acquire_future_disp());
             }
 
@@ -187,8 +140,8 @@ namespace hpx { namespace traits
             transform_future_disp(Range_ && futures, Range& values) const
             {
                 detail::reserve_if_random_access(values, futures);
-                std::transform(boost::begin(futures), boost::end(futures),
-                    boost::begin(values), acquire_future_disp());
+                std::transform(util::begin(futures), util::end(futures),
+                    util::begin(values), acquire_future_disp());
             }
 #endif
 
@@ -204,4 +157,4 @@ namespace hpx { namespace traits
     }
 }}
 
-#endif
+#endif /*HPX_TRAITS_ACQUIRE_FUTURE_HPP*/

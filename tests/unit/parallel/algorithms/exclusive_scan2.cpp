@@ -9,10 +9,10 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -31,20 +31,20 @@ void test_exclusive_scan2(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
     hpx::parallel::exclusive_scan(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
         val);
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val,
+        std::begin(c), std::end(c), std::begin(e), val,
         std::plus<std::size_t>());
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -55,22 +55,22 @@ void test_exclusive_scan2_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
     hpx::future<void> f =
         hpx::parallel::exclusive_scan(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             val);
     f.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val,
+        std::begin(c), std::end(c), std::begin(e), val,
         std::plus<std::size_t>());
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename IteratorTag>

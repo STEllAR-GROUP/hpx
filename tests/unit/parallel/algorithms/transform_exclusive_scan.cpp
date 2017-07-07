@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -30,22 +29,22 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2*val; };
 
     hpx::parallel::transform_exclusive_scan(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
         val, op, conv);
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), conv, val, op);
+        std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -56,7 +55,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
@@ -64,16 +63,16 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
 
     hpx::future<void> f =
         hpx::parallel::transform_exclusive_scan(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             val, op, conv);
     f.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), conv, val, op);
+        std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename IteratorTag>
@@ -129,13 +128,13 @@ void test_transform_exclusive_scan_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
     try {
         hpx::parallel::transform_exclusive_scan(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2)
             {
@@ -165,15 +164,15 @@ void test_transform_exclusive_scan_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::transform_exclusive_scan(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
-                boost::begin(d),
+                iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(d),
                 std::size_t(0),
                 [](std::size_t v1, std::size_t v2)
                 {
@@ -254,13 +253,13 @@ void test_transform_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
     try {
         hpx::parallel::transform_exclusive_scan(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2)
             {
@@ -289,15 +288,15 @@ void test_transform_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::fill(boost::begin(c), boost::end(c), std::size_t(1));
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<void> f =
             hpx::parallel::transform_exclusive_scan(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
-                boost::begin(d),
+                iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(d),
                 std::size_t(0),
                 [](std::size_t v1, std::size_t v2)
                 {

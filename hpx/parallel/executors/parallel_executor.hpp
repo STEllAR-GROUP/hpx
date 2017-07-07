@@ -21,6 +21,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/range.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -28,8 +29,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -91,7 +90,7 @@ namespace hpx { namespace parallel { namespace execution
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        static void apply_execute(F && f, Ts &&... ts)
+        static void post(F && f, Ts &&... ts)
         {
             hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
@@ -101,7 +100,7 @@ namespace hpx { namespace parallel { namespace execution
         std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type
         > >
-        async_bulk_execute(F && f, S const& shape, Ts &&... ts) const
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts) const
         {
             // lazily initialize once
             static std::size_t global_num_tasks =
@@ -117,18 +116,10 @@ namespace hpx { namespace parallel { namespace execution
                 > > result_type;
 
             result_type results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-            std::size_t size = std::distance(boost::begin(shape),
-                boost::end(shape));
-#else
-            std::size_t size = boost::size(shape);
-#endif
-
+            std::size_t size = hpx::util::size(shape);
             results.resize(size);
-            spawn(results, 0, size, num_tasks, f, boost::begin(shape), ts...).get();
+
+            spawn(results, 0, size, num_tasks, f, hpx::util::begin(shape), ts...).get();
             return results;
         }
         /// \endcond
@@ -248,7 +239,7 @@ namespace hpx { namespace parallel { inline namespace v3
         bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
             using base_type = parallel::execution::parallel_executor;
-            return base_type::async_bulk_execute(std::forward<F>(f), shape,
+            return base_type::bulk_async_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...);
         }
     };

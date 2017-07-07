@@ -292,6 +292,7 @@
 [template algorefv2[name] [funcref hpx::parallel::v2::[name] hpx::parallel::[name]]]
 [template cpprefalgodocs[name] [@http://en.cppreference.com/w/cpp/algorithm/[name] [name]]]
 [template cpprefmemdocs[name] [@http://en.cppreference.com/w/cpp/memory/[name] [name]]]
+[template cpprefcontdocs[name] [@http://en.cppreference.com/w/cpp/container/[name] [name]]]
 
 [/ CONTENT]
 
@@ -341,6 +342,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include manual/exceptions.qbk]
 [include manual/performance_counters.qbk]
 [include manual/scheduling_policies.qbk]
+[include manual/vector.qbk]
 
 [endsect] [/ Manual]
 
