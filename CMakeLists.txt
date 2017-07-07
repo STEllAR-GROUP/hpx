@@ -146,7 +146,7 @@ hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
 endif()
-  
+ 
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
