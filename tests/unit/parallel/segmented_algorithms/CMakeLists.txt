@@ -18,6 +18,7 @@ set(tests
     partitioned_vector_transform_scan
     partitioned_vector_reduce
     partitioned_vector_find
+    partitioned_vector_find_end
    )
 
 set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
