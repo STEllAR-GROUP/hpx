@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -38,12 +38,10 @@ namespace sheneos
 namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(input_archive& ar, sheneos::dimension& dim,
-        unsigned int const);
+    serialize(input_archive&, sheneos::dimension&, unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(output_archive& ar, sheneos::dimension& dim,
-        unsigned int const);
+    serialize(output_archive&, sheneos::dimension&, unsigned int const);
 }}
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,25 +14,28 @@
 #include <string>
 #include <vector>
 
-#include "stubs/partition3d.hpp"
+#include "server/partition3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
 {
     class partition3d
       : public hpx::components::client_base<
-            partition3d, sheneos::stubs::partition3d>
+            partition3d, sheneos::server::partition3d>
     {
     private:
         typedef hpx::components::client_base<
-            partition3d, sheneos::stubs::partition3d> base_type;
+                partition3d, sheneos::server::partition3d
+            > base_type;
 
     public:
+        partition3d() {}
+
         /// Create a new partition instance locally and initialize it
         /// synchronously.
         partition3d(std::string const& datafilename, dimension const& dimx,
                 dimension const& dimy, dimension const& dimz)
-          : base_type(sheneos::stubs::partition3d::create(hpx::find_here()))
+          : base_type(hpx::new_<server::partition3d>(hpx::find_here()))
         {
             init(datafilename, dimx, dimy, dimz);
         }
@@ -41,24 +44,28 @@ namespace sheneos
         /// initialize it synchronously.
         ///
         /// \param gid [in] The locality where the partition should be created.
-        partition3d(hpx::naming::id_type const& gid, std::string const& datafilename,
+        partition3d(hpx::id_type const& id, std::string const& datafilename,
                 dimension const& dimx, dimension const& dimy, dimension const& dimz)
-          : base_type(sheneos::stubs::partition3d::create(gid))
+          : base_type(hpx::new_<server::partition3d>(id))
         {
             init(datafilename, dimx, dimy, dimz);
         }
 
         /// Connect to an existing partition instance.
-        partition3d(hpx::naming::id_type const& gid)
-          : base_type(gid)
+        partition3d(hpx::id_type const& id)
+          : base_type(id)
+        {}
+        partition3d(hpx::future<hpx::id_type> && id)
+          : base_type(std::move(id))
         {}
 
         /// Initialize this partition asynchronously.
-        hpx::lcos::future<void>
+        hpx::future<void>
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            return stubs::partition3d::init_async(this->get_id(), datafilename,
+            using init_action = server::partition3d::init_action;
+            return hpx::async(init_action(), this->get_id(), datafilename,
                 dimx, dimy, dimz);
         }
 
@@ -66,7 +73,7 @@ namespace sheneos
         void init(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            stubs::partition3d::init(this->get_id(), datafilename, dimx, dimy, dimz);
+            init_async(datafilename, dimx, dimy, dimz), get();
         }
 
         /// Asynchronously perform an interpolation on this partition.
@@ -76,11 +83,12 @@ namespace sheneos
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
-        hpx::lcos::future<std::vector<double> >
+        hpx::future<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
-            std::uint32_t eosvalues)
+            std::uint32_t eosvalues) const
         {
-            return stubs::partition3d::interpolate_async(this->get_id(),
+            using interpolate_action = server::partition3d::interpolate_action;
+            return hpx::async(interpolate_action(), this->get_id(),
                 ye, temp, rho, eosvalues);
         }
 
@@ -92,10 +100,9 @@ namespace sheneos
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
-            std::uint32_t eosvalues)
+            std::uint32_t eosvalues) const
         {
-            return stubs::partition3d::interpolate(this->get_id(),
-                ye, temp, rho, eosvalues);
+            return interpolate_async(ye, temp, rho, eosvalues).get();
         }
 
         /// Asynchronously perform an interpolation of one given field on this
@@ -106,11 +113,13 @@ namespace sheneos
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
-        hpx::lcos::future<double>
+        hpx::future<double>
         interpolate_one_async(double ye, double temp, double rho,
-            std::uint32_t eosvalue)
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_one_async(this->get_id(),
+            using interpolate_one_action =
+                server::partition3d::interpolate_one_action;
+            return hpx::async(interpolate_one_action(), this->get_id(),
                 ye, temp, rho, eosvalue);
         }
 
@@ -123,10 +132,9 @@ namespace sheneos
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
         double interpolate_one(double ye, double temp, double rho,
-            std::uint32_t eosvalue)
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_one(this->get_id(),
-                ye, temp, rho, eosvalue);
+            return interpolate_one_async(ye, temp, rho, eosvalue).get();
         }
 
         /// Asynchronously perform an interpolation of one given field on this
@@ -138,9 +146,11 @@ namespace sheneos
         ///                  in the range of the given partition.
         hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
-            std::uint32_t eosvalue)
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_one_bulk_async(this->get_id(),
+            using interpolate_one_bulk_action =
+                server::partition3d::interpolate_one_bulk_action;
+            return hpx::async(interpolate_one_bulk_action(), this->get_id(),
                 coords, eosvalue);
         }
 
@@ -152,12 +162,11 @@ namespace sheneos
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
         std::vector<double> interpolate_one_bulk(
-            std::vector<sheneos_coord> const& coords, std::uint32_t eosvalue)
+            std::vector<sheneos_coord> const& coords,
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_one_bulk(this->get_id(),
-                coords, eosvalue);
+            return interpolate_one_bulk_async(coords, eosvalue).get();
         }
-
 
         /// Asynchronously perform an interpolation of one given field on this
         /// partition.
@@ -166,11 +175,13 @@ namespace sheneos
         ///                  and rest mass densities of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
-        hpx::lcos::future<std::vector<std::vector<double> > >
+        hpx::future<std::vector<std::vector<double> > >
         interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
-            std::uint32_t eosvalue)
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_bulk_async(this->get_id(),
+            using interpolate_bulk_action =
+                server::partition3d::interpolate_bulk_action;
+            return hpx::async(interpolate_bulk_action(), this->get_id(),
                 coords, eosvalue);
         }
 
@@ -183,10 +194,9 @@ namespace sheneos
         ///                  in the range of the given partition.
         std::vector<std::vector<double> >
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
-            std::uint32_t eosvalue)
+            std::uint32_t eosvalue) const
         {
-            return stubs::partition3d::interpolate_bulk(this->get_id(),
-                coords, eosvalue);
+            return interpolate_bulk_async(coords, eosvalue).get();
         }
     };
 }

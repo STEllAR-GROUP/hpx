@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,14 +12,12 @@
 
 #include "sheneos/interpolator.hpp"
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
+#include <boost/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool
 eval(char const* expr, sheneos::interpolator& shen, double ye,
-    double temp, double rho, std::vector<double>& expected)
+    double temp, double rho, std::vector<double> const& expected)
 {
     std::vector<double> results = shen.interpolate(ye, temp, rho);
     std::cout << expr << std::endl;
@@ -40,7 +38,7 @@ eval(char const* expr, sheneos::interpolator& shen, double ye,
     return true;
 }
 
-int hpx_main(variables_map& vm)
+int hpx_main(boost::program_options::variables_map& vm)
 {
     std::string const datafilename = vm["file"].as<std::string>();
     int num_partitions = 27;
@@ -60,8 +58,7 @@ int hpx_main(variables_map& vm)
         };
 
         // create the distributed interpolation object on num_localities
-        sheneos::interpolator shen;
-        shen.create(datafilename, shen_symbolic_name, num_partitions);
+        sheneos::interpolator shen(datafilename, shen_symbolic_name, num_partitions);
 
         eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen,
             0.2660725, 63.0, std::pow(10., 14.74994), expected);
@@ -87,11 +84,11 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description desc_commandline(
+    boost::program_options::options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("file", value<std::string>()->default_value(
+        ("file", boost::program_options::value<std::string>()->default_value(
                 "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
             "name of HDF5 data file containing the Shen EOS tables")
         ;
