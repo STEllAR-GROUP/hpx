@@ -38,6 +38,7 @@
 #include <list>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <boost/shared_array.hpp>
 
@@ -317,8 +318,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(dest_true), std::move(dest_false));
         }
 
-        template <typename IterPair>
-        struct partition_copy : public detail::algorithm<partition_copy<IterPair>, IterPair>
+        template <typename IterTuple>
+        struct partition_copy
+          : public detail::algorithm<partition_copy<IterTuple>, IterTuple>
         {
             partition_copy()
               : partition_copy::algorithm("partition_copy")
@@ -393,7 +395,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     ++true_count;
                             });
 
-                        return output_iterator_offset( true_count, part_size - true_count );
+                        return output_iterator_offset(
+                            true_count, part_size - true_count);
                     };
                 auto f3 =
                     [dest_true, dest_false, flags, policy](
@@ -484,12 +487,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam OutIter1    The type of the iterator representing the
-    ///                     destination range for the elements that satisfy 
+    ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
     /// \tparam OutIter2    The type of the iterator representing the
-    ///                     destination range for the elements that don't satisfy 
+    ///                     destination range for the elements that don't satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
