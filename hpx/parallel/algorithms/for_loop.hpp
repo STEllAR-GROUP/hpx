@@ -161,12 +161,12 @@ namespace hpx { namespace parallel { inline namespace v2
               : for_loop_algo::algorithm("for_loop_algo")
             {}
 
-            template <typename ExPolicy, typename B, typename Size, typename S,
-                typename F, typename... Args>
+            template <typename ExPolicy, typename InIter, typename Size,
+                typename S, typename F, typename... Args>
             HPX_HOST_DEVICE
             static hpx::util::unused_type
-            sequential(ExPolicy policy, B first, Size size, S stride, F && f,
-                Args &&... args)
+            sequential(ExPolicy policy, InIter first, Size size, S stride,
+                F && f, Args &&... args)
             {
                 int const init_sequencer[] = {
                     0, (args.init_iteration(0), 0)...

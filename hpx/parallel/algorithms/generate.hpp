@@ -41,9 +41,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : generate::algorithm("generate")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
+            template <typename ExPolicy, typename InIter, typename F>
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 std::generate(first, last, std::forward<F>(f));
                 return last;
@@ -172,9 +172,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : generate_n::algorithm("generate_n")
             {}
 
-            template <typename ExPolicy, typename F>
+            template <typename ExPolicy, typename InIter, typename F>
             static FwdIter
-            sequential(ExPolicy, FwdIter first, std::size_t count, F && f)
+            sequential(ExPolicy, InIter first, std::size_t count, F && f)
             {
                 return std::generate_n(first, count, f);
             }

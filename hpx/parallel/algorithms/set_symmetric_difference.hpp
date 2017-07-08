@@ -39,11 +39,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : set_symmetric_difference::algorithm("set_symmetric_difference")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static OutIter
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, OutIter dest, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, OutIter dest, F && f)
             {
                 return std::set_symmetric_difference(first1, last1,
                     first2, last2, dest, std::forward<F>(f));

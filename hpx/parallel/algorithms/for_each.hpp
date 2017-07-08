@@ -143,11 +143,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : for_each_n::algorithm("for_each_n")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj = util::projection_identity>
             HPX_HOST_DEVICE
             static Iter
-            sequential(ExPolicy && policy, FwdIter first, std::size_t count,
+            sequential(ExPolicy && policy, InIter first, std::size_t count,
                 F && f, Proj && proj/* = Proj()*/)
             {
                 return util::loop_n<ExPolicy>(first, count,
@@ -310,10 +310,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : for_each::algorithm("for_each")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static FwdIter
-            sequential(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            static InIter
+            sequential(ExPolicy && policy, InIter first, InIter last, F && f,
                 Proj && proj)
             {
                 return util::loop(std::forward<ExPolicy>(policy), first, last,

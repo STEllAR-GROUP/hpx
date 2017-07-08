@@ -45,8 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && pred)
             {
                 return std::is_sorted(first, last, std::forward<Pred>(pred));
             }

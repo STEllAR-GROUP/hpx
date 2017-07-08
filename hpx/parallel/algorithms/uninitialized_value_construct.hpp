@@ -39,21 +39,22 @@ namespace hpx { namespace parallel { inline namespace v1
         // provide our own implementation of std::uninitialized_value_construct
         // as some versions of MSVC horribly fail at compiling it for some types
         // T
-        template <typename FwdIter>
-        void std_uninitialized_value_construct(FwdIter first, FwdIter last)
+        template <typename InIter>
+        void std_uninitialized_value_construct(InIter first, InIter last)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter s_first = first;
+            InIter s_first = first;
             try {
-                for (/* */; first != last; ++first) {
-                    ::new (static_cast<void*>(std::addressof(*first)))
-                        value_type();
+                for (/* */; first != last; ++first)
+                {
+                    ::new (std::addressof(*first)) value_type();
                 }
             }
             catch (...) {
-                for (/* */; s_first != first; ++s_first) {
+                for (/* */; s_first != first; ++s_first)
+                {
                     (*s_first).~value_type();
                 }
                 throw;
@@ -61,22 +62,23 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter>
-        FwdIter sequential_uninitialized_value_construct_n(
-            FwdIter first, std::size_t count,
+        template <typename InIter>
+        InIter sequential_uninitialized_value_construct_n(
+            InIter first, std::size_t count,
             util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
             return
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
-                    [](FwdIter it) {
-                        ::new (static_cast<void*>(std::addressof(*it)))
-                            value_type();
+                    [](InIter it) -> void
+                    {
+                        ::new (std::addressof(*it)) value_type();
                     },
-                    [](FwdIter it) {
+                    [](InIter it) -> void
+                    {
                         (*it).~value_type();
                     });
         }
@@ -141,9 +143,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     "uninitialized_value_construct")
             {}
 
-            template <typename ExPolicy>
+            template <typename ExPolicy, typename InIter>
             static hpx::util::unused_type
-            sequential(ExPolicy, FwdIter first, FwdIter last)
+            sequential(ExPolicy, InIter first, InIter last)
             {
                 std_uninitialized_value_construct(first, last);
                 return hpx::util::unused;
@@ -226,19 +228,17 @@ namespace hpx { namespace parallel { inline namespace v1
         // provide our own implementation of std::uninitialized_value_construct
         // as some versions of MSVC horribly fail at compiling it for some
         // types T
-        template <typename FwdIter>
-        FwdIter std_uninitialized_value_construct_n(FwdIter first,
-            std::size_t count)
+        template <typename InIter>
+        InIter std_uninitialized_value_construct_n(InIter first, std::size_t count)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter s_first = first;
+            InIter s_first = first;
             try {
                 for (/* */; count != 0; (void) ++first, --count)
                 {
-                    ::new (static_cast<void*>(std::addressof(*first)))
-                        value_type();
+                    ::new (std::addressof(*first)) value_type();
                 }
                 return first;
             }
@@ -261,8 +261,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     "uninitialized_value_construct_n")
             {}
 
-            template <typename ExPolicy>
-            static FwdIter sequential(ExPolicy, FwdIter first, std::size_t count)
+            template <typename ExPolicy, typename InIter>
+            static InIter sequential(ExPolicy, InIter first, std::size_t count)
             {
                 return std_uninitialized_value_construct_n(first, count);
             }

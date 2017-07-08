@@ -143,11 +143,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform::algorithm("transform")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename F, typename Proj>
             HPX_HOST_DEVICE
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy && policy, FwdIter first, FwdIter last,
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy && policy, InIter first, InIter last,
                 OutIter dest, F && f, Proj && proj)
             {
                 return util::transform_loop(std::forward<ExPolicy>(policy),
@@ -408,11 +408,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_binary::algorithm("transform_binary")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<FwdIter1, FwdIter2, OutIter>
-            sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, OutIter dest, F && f, Proj1 && proj1,
+            static hpx::util::tuple<InIter1, InIter2, OutIter>
+            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
+                InIter2 first2, OutIter dest, F && f, Proj1 && proj1,
                 Proj2 && proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(
@@ -624,11 +624,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_binary2::algorithm("transform_binary")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F, typename Proj1, typename Proj2>
-            static hpx::util::tuple<FwdIter1, FwdIter2, OutIter>
-            sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2,
+            static hpx::util::tuple<InIter1, InIter2, OutIter>
+            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2,
                 OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2)
             {
                 return util::transform_binary_loop<ExPolicy>(

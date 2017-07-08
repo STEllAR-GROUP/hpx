@@ -42,9 +42,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : adjacent_difference::algorithm("adjacent_difference")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename Op>
+            template <typename ExPolicy, typename InIter, typename Op>
             static Iter
-            sequential(ExPolicy, FwdIter first, FwdIter last, Iter dest,
+            sequential(ExPolicy, InIter first, InIter last, Iter dest,
                 Op && op)
             {
                 return std::adjacent_difference(

@@ -44,11 +44,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : lexicographical_compare::algorithm("lexicographical_compare")
             {}
 
-           template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+           template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename Pred>
            static bool
-           sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-                FwdIter2 last2, Pred && pred)
+           sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
+                InIter2 last2, Pred && pred)
             {
                 return std::lexicographical_compare(first1, last1, first2, last2, pred);
             }

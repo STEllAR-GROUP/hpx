@@ -41,32 +41,30 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // Our own version of the sequential transform_exclusive_scan.
-        template <typename FwdIter, typename OutIter, typename Conv, typename T,
+        template <typename InIter, typename OutIter, typename Conv, typename T,
             typename Op>
-        OutIter sequential_transform_exclusive_scan(FwdIter first, FwdIter last,
+        OutIter sequential_transform_exclusive_scan(InIter first, InIter last,
             OutIter dest, Conv && conv, T init, Op && op)
         {
             T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(op, init,
-                    hpx::util::invoke(conv, *first));
+                init = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
                 *dest = temp;
                 temp = init;
             }
             return dest;
         }
 
-        template <typename FwdIter, typename OutIter, typename Conv, typename T,
+        template <typename InIter, typename OutIter, typename Conv, typename T,
             typename Op>
-        T sequential_transform_exclusive_scan_n(FwdIter first, std::size_t count,
+        T sequential_transform_exclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, Conv && conv, T init, Op && op)
         {
             T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(op, init,
-                    hpx::util::invoke(conv, *first));
+                init = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
                 *dest = temp;
                 temp = init;
             }
@@ -82,10 +80,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_exclusive_scan::algorithm("transform_exclusive_scan")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename Conv,
+            template <typename ExPolicy, typename InIter, typename Conv,
                 typename T, typename Op>
             static OutIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, Conv && conv, T && init, Op && op)
             {
                 return sequential_transform_exclusive_scan(first, last, dest,

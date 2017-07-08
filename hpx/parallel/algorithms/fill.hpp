@@ -62,11 +62,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : fill::algorithm("fill")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             HPX_HOST_DEVICE
             static hpx::util::unused_type
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                T const& val)
+            sequential(ExPolicy, InIter first, InIter last, T const& val)
             {
                 std::fill(first, last, val);
                 return hpx::util::unused;
@@ -197,9 +196,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : fill_n::algorithm("fill_n")
             {}
 
-            template <typename ExPolicy, typename T>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, std::size_t count, T const& val)
+            template <typename ExPolicy, typename InIter, typename T>
+            static InIter
+            sequential(ExPolicy, InIter first, std::size_t count, T const& val)
             {
                 return std::fill_n(first, count, val);
             }

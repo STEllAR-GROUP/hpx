@@ -47,16 +47,17 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_reduce::algorithm("transform_reduce")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T_,
+            template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce, typename Convert>
             static T
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                T_ && init, Reduce && r, Convert && conv)
+            sequential(ExPolicy, InIter first, InIter last, T_ && init,
+                Reduce && r, Convert && conv)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type
+                typedef typename std::iterator_traits<InIter>::value_type
                     value_type;
 
-                return std::accumulate(first, last, std::forward<T_>(init),
+                return std::accumulate(
+                    first, last, std::forward<T_>(init),
                     [&r, &conv](T const& res, value_type const& next) -> T
                     {
                         return hpx::util::invoke(r, res,

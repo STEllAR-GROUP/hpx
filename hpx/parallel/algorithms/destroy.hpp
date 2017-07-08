@@ -39,10 +39,10 @@ namespace hpx { namespace parallel { inline namespace v1
         // provide our own implementation of std::destroy
         // as some versions of MSVC horribly fail at compiling it for some types
         // T
-        template <typename FwdIter>
-        void std_destroy(FwdIter first, FwdIter last)
+        template <typename InIter>
+        void std_destroy(InIter first, InIter last)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
             for (/* */; first != last; ++first)
@@ -88,9 +88,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : destroy::algorithm("destroy")
             {}
 
-            template <typename ExPolicy>
+            template <typename ExPolicy, typename InIter>
             static hpx::util::unused_type
-            sequential(ExPolicy, FwdIter first, FwdIter last)
+            sequential(ExPolicy, InIter first, InIter last)
             {
                 std_destroy(first, last);
                 return hpx::util::unused;
@@ -170,10 +170,10 @@ namespace hpx { namespace parallel { inline namespace v1
         // provide our own implementation of std::destroy
         // as some versions of MSVC horribly fail at compiling it for some
         // types T
-        template <typename FwdIter>
-        FwdIter std_destroy_n(FwdIter first, std::size_t count)
+        template <typename InIter>
+        InIter std_destroy_n(InIter first, std::size_t count)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
             for (/* */; count != 0; (void) ++first, --count)
@@ -193,8 +193,8 @@ namespace hpx { namespace parallel { inline namespace v1
               : destroy_n::algorithm("destroy_n")
             {}
 
-            template <typename ExPolicy>
-            static FwdIter sequential(ExPolicy, FwdIter first, std::size_t count)
+            template <typename ExPolicy, typename InIter>
+            static InIter sequential(ExPolicy, InIter first, std::size_t count)
             {
                 return std_destroy_n(first, count);
             }

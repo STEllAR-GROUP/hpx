@@ -41,9 +41,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 : find::algorithm("find")
             {}
 
-            template <typename ExPolicy, typename T>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last, const T& val)
+            template <typename ExPolicy, typename InIter, typename T>
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, T const& val)
             {
                 return std::find(first, last, val);
             }
@@ -182,9 +182,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : find_if::algorithm("find_if")
             {}
 
-            template <typename ExPolicy, typename F>
-            static Iter
-            sequential(ExPolicy, Iter first, Iter last, F && f)
+            template <typename ExPolicy, typename InIter, typename F>
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::find_if(first, last, f);
             }
@@ -337,9 +337,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : find_if_not::algorithm("find_if_not")
             {}
 
-            template <typename ExPolicy, typename F>
-            static Iter
-            sequential(ExPolicy, Iter first, Iter last, F && f)
+            template <typename ExPolicy, typename InIter, typename F>
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 for (; first != last; ++first)
                 {
@@ -496,10 +496,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : find_end::algorithm("find_end")
             {}
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first1, FwdIter last1,
-                FwdIter2 first2, FwdIter2 last2, Pred && op)
+            template <typename ExPolicy, typename InIter1, typename InIter2,
+                typename Pred>
+            static InIter1
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, Pred && op)
             {
                 return std::find_end(first1, last1, first2, last2, op);
             }
@@ -687,17 +688,18 @@ namespace hpx { namespace parallel { inline namespace v1
               : find_first_of::algorithm("find_first_of")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename Pred>
-            static Iter
-            sequential(ExPolicy, Iter first, Iter last, FwdIter s_first,
-                FwdIter s_last, Pred && op)
+            template <typename ExPolicy, typename InIter1, typename InIter2,
+                typename Pred>
+            static InIter1
+            sequential(ExPolicy, InIter1 first, InIter1 last, InIter2 s_first,
+                InIter2 s_last, Pred && op)
             {
-                if(first == last)
+                if (first == last)
                     return last;
 
-                for ( ; first != last; ++first)
+                for (/* */; first != last; ++first)
                 {
-                    for (FwdIter iter = s_first; iter != s_last; ++iter)
+                    for (InIter2 iter = s_first; iter != s_last; ++iter)
                     {
                         if (hpx::util::invoke(op, *first, *iter))
                             return first;

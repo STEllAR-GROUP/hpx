@@ -37,22 +37,23 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_copy as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter1, typename FwdIter2>
-        FwdIter2 std_uninitialized_copy(FwdIter1 first, FwdIter1 last, FwdIter2 d_first)
+        template <typename InIter1, typename InIter2>
+        InIter2 std_uninitialized_copy(InIter1 first, InIter1 last, InIter2 d_first)
         {
-            typedef typename std::iterator_traits<FwdIter2>::value_type
+            typedef typename std::iterator_traits<InIter2>::value_type
                 value_type;
 
-            FwdIter2 current = d_first;
+            InIter2 current = d_first;
             try {
-                for (/* */; first != last; ++first, (void) ++current) {
-                    ::new (static_cast<void*>(std::addressof(*current)))
-                        value_type(*first);
+                for (/* */; first != last; (void) ++first, ++current)
+                {
+                    ::new (std::addressof(*current)) value_type(*first);
                 }
                 return current;
             }
             catch (...) {
-                for (/* */; d_first != current; ++d_first) {
+                for (/* */; d_first != current; ++d_first)
+                {
                     (*d_first).~value_type();
                 }
                 throw;
@@ -60,22 +61,23 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter, typename FwdIter2>
-        FwdIter2
-        sequential_uninitialized_copy_n(Iter first, std::size_t count,
-            FwdIter2 dest, util::cancellation_token<util::detail::no_data>& tok)
+        template <typename InIter1, typename InIter2>
+        InIter2
+        sequential_uninitialized_copy_n(InIter1 first, std::size_t count,
+            InIter2 dest, util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<FwdIter2>::value_type
+            typedef typename std::iterator_traits<InIter2>::value_type
                 value_type;
 
             return
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
-                    [](Iter it, FwdIter2 dest) {
-                        ::new (static_cast<void*>(std::addressof(*dest)))
-                            value_type(*it);
+                    [](InIter1 it, InIter2 dest) -> void
+                    {
+                        ::new (std::addressof(*dest)) value_type(*it);
                     },
-                    [](FwdIter2 dest) {
+                    [](InIter2 dest) -> void
+                    {
                         (*dest).~value_type();
                     });
         }
@@ -143,9 +145,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_copy::algorithm("uninitialized_copy")
             {}
 
-            template <typename ExPolicy, typename Iter>
+            template <typename ExPolicy, typename InIter1>
             static FwdIter2
-            sequential(ExPolicy, Iter first, Iter last, FwdIter2 dest)
+            sequential(ExPolicy, InIter1 first, InIter1 last, FwdIter2 dest)
             {
                 return std_uninitialized_copy(first, last, dest);
             }
@@ -154,8 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter2
             >::type
-            parallel(ExPolicy && policy, Iter first, Iter last,
-                FwdIter2 dest)
+            parallel(ExPolicy && policy, Iter first, Iter last, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_copy_n(
                     std::forward<ExPolicy>(policy), first,
@@ -261,9 +262,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_copy_n::algorithm("uninitialized_copy_n")
             {}
 
-            template <typename ExPolicy, typename Iter>
+            template <typename ExPolicy, typename InIter>
             static FwdIter2
-            sequential(ExPolicy, Iter first, std::size_t count,
+            sequential(ExPolicy, InIter first, std::size_t count,
                 FwdIter2 dest)
             {
                 return std::uninitialized_copy_n(first, count, dest);

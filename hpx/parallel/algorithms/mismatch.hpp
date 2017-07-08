@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -33,12 +34,13 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter1, typename FwdIter2, typename F>
-        std::pair<FwdIter1, FwdIter2>
-        sequential_mismatch_binary(FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, F && f)
+        template <typename InIter1, typename InIter2, typename F>
+        std::pair<InIter1, InIter2>
+        sequential_mismatch_binary(InIter1 first1, InIter1 last1,
+            InIter2 first2, InIter2 last2, F && f)
         {
-            while (first1 != last1 && first2 != last2 && f(*first1, *first2))
+            while (first1 != last1 && first2 != last2 &&
+                   hpx::util::invoke(f, *first1, *first2))
             {
                 ++first1, ++first2;
             }
@@ -52,11 +54,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : mismatch_binary::algorithm("mismatch_binary")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F && f)
             {
                 return sequential_mismatch_binary(first1, last1, first2, last2,
                     std::forward<F>(f));
@@ -263,11 +265,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : mismatch::algorithm("mismatch")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
+                F && f)
             {
                 return std::mismatch(first1, last1, first2, std::forward<F>(f));
             }

@@ -81,11 +81,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : transform_reduce_binary::algorithm("transform_reduce_binary")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename T_, typename Op1, typename Op2>
             static T
-            sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, T_ init, Op1 && op1, Op2 && op2)
+            sequential(ExPolicy && policy, InIter1 first1, InIter1 last1,
+                InIter2 first2, T_ init, Op1 && op1, Op2 && op2)
             {
                 if (first1 == last1)
                     return std::move(init);
@@ -106,7 +106,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 auto part_sum = util::loop_step<ExPolicy>(std::true_type(),
                     transform_reduce_binary_indirect<Op2>{op2}, first1, first2);
 
-                std::pair<FwdIter1, FwdIter2> p = util::loop2<ExPolicy>(
+                std::pair<InIter1, InIter2> p = util::loop2<ExPolicy>(
                     std::true_type(), first1, last1, first2,
                     transform_reduce_binary_partition<
                             Op1, Op2, decltype(part_sum)

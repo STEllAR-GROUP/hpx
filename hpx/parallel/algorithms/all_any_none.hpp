@@ -40,9 +40,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : none_of::algorithm("none_of")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::none_of(first, last, std::forward<F>(f));
             }
@@ -196,9 +196,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : any_of::algorithm("any_of")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::any_of(first, last, std::forward<F>(f));
             }
@@ -352,9 +352,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : all_of::algorithm("all_of")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::all_of(first, last, std::forward<F>(f));
             }

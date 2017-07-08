@@ -35,11 +35,11 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
-        void sequential_rotate_helper(FwdIter first, FwdIter new_first,
-            FwdIter last)
+        template <typename InIter>
+        void sequential_rotate_helper(InIter first, InIter new_first,
+            InIter last)
         {
-            FwdIter next = new_first;
+            InIter next = new_first;
             while (first != next)
             {
                 std::iter_swap(first++, next++);
@@ -54,9 +54,9 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         }
 
-        template <typename FwdIter>
-        inline std::pair<FwdIter, FwdIter>
-        sequential_rotate(FwdIter first, FwdIter new_first, FwdIter last)
+        template <typename InIter>
+        inline std::pair<InIter, InIter>
+        sequential_rotate(InIter first, InIter new_first, InIter last)
         {
             if (first != new_first && new_first != last)
                 sequential_rotate_helper(first, new_first, last);
@@ -106,10 +106,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : rotate::algorithm("rotate")
             {}
 
-            template <typename ExPolicy, typename FwdIter>
+            template <typename ExPolicy, typename InIter>
             static IterPair
-            sequential(ExPolicy, FwdIter first, FwdIter new_first,
-                FwdIter last)
+            sequential(ExPolicy, InIter first, InIter new_first, InIter last)
             {
                 return sequential_rotate(first, new_first, last);
             }
@@ -208,14 +207,14 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential rotate_copy
-        template <typename FwdIter, typename OutIter>
-        inline std::pair<FwdIter, OutIter>
-        sequential_rotate_copy(FwdIter first, FwdIter new_first, FwdIter last,
+        template <typename InIter, typename OutIter>
+        inline std::pair<InIter, OutIter>
+        sequential_rotate_copy(InIter first, InIter new_first, InIter last,
             OutIter dest_first)
         {
-            std::pair<FwdIter, OutIter> p1 =
+            std::pair<InIter, OutIter> p1 =
                 util::copy(new_first, last, dest_first);
-            std::pair<FwdIter, OutIter> p2 =
+            std::pair<InIter, OutIter> p2 =
                 util::copy(first, new_first, std::move(p1.second));
             return std::make_pair(std::move(p1.first), std::move(p2.second));
         }
@@ -256,10 +255,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : rotate_copy::algorithm("rotate_copy")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter new_first,
-                FwdIter last, OutIter dest_first)
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter new_first, InIter last,
+                OutIter dest_first)
             {
                 return sequential_rotate_copy(first, new_first, last, dest_first);
             }

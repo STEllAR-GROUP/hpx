@@ -37,43 +37,44 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_fill as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter, typename T>
-        void std_uninitialized_fill(FwdIter first, FwdIter last,
-            T const& value)
+        template <typename InIter, typename T>
+        void std_uninitialized_fill(InIter first, InIter last, T const& value)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter current = first;
+            InIter current = first;
             try {
-                for (/* */; current != last; ++current) {
-                    ::new (static_cast<void*>(std::addressof(*current)))
-                        value_type(value);
+                for (/* */; current != last; ++current)
+                {
+                    ::new (std::addressof(*current)) value_type(value);
                 }
             }
             catch (...) {
-                for (/* */; first != current; ++first) {
+                for (/* */; first != current; ++first)
+                {
                     (*first).~value_type();
                 }
                 throw;
             }
         }
 
-        template <typename FwdIter, typename T>
-        FwdIter sequential_uninitialized_fill_n(FwdIter first, std::size_t count,
+        template <typename InIter, typename T>
+        InIter sequential_uninitialized_fill_n(InIter first, std::size_t count,
             T const& value, util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
             return
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
-                    [&value](FwdIter it) {
-                        ::new (static_cast<void*>(std::addressof(*it)))
-                            value_type(value);
+                    [&value](InIter it) -> void
+                    {
+                        ::new (std::addressof(*it)) value_type(value);
                     },
-                    [](FwdIter it) {
+                    [](InIter it) -> void
+                    {
                         (*it).~value_type();
                     });
         }
@@ -128,9 +129,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_fill::algorithm("uninitialized_fill")
             {}
 
-            template <typename ExPolicy, typename Iter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy, InIter first, InIter last, T const& value)
             {
                 std_uninitialized_fill(first, last, value);
                 return hpx::util::unused;
@@ -230,14 +231,14 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_fill_n as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter, typename Size, typename T>
-        FwdIter std_uninitialized_fill_n(FwdIter first, Size count,
+        template <typename InIter, typename Size, typename T>
+        InIter std_uninitialized_fill_n(InIter first, Size count,
             T const& value)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter current = first;
+            InIter current = first;
             try {
                 for (/* */; count > 0; ++current, (void) --count) {
                     ::new (static_cast<void*>(std::addressof(*current)))
@@ -260,10 +261,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_fill_n::algorithm("uninitialized_fill_n")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy, FwdIter first, std::size_t count,
-                T const& value)
+            sequential(ExPolicy, InIter first, std::size_t count, T const& value)
             {
                 std_uninitialized_fill_n(first, count, value);
                 return hpx::util::unused;

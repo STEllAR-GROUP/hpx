@@ -41,11 +41,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : reduce::algorithm("reduce")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T_,
+            template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce>
             static T
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                T_ && init, Reduce && r)
+            sequential(ExPolicy, InIter first, InIter last, T_ && init,
+                Reduce && r)
             {
                 return std::accumulate(first, last, std::forward<T_>(init),
                     std::forward<Reduce>(r));

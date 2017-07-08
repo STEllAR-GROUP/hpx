@@ -37,11 +37,12 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // Our own version of the C++14 equal (_binary).
-        template <typename FwdIter1, typename FwdIter2, typename F>
-        bool sequential_equal_binary(FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, F && f)
+        template <typename InIter1, typename InIter2, typename F>
+        bool sequential_equal_binary(InIter1 first1, InIter1 last1,
+            InIter2 first2, InIter2 last2, F && f)
         {
-            for (; first1 != last1 && first2 != last2; (void) ++first1, ++first2)
+            for (/* */; first1 != last1 && first2 != last2;
+                 (void) ++first1, ++first2)
             {
                 if (!f(*first1, *first2))
                     return false;
@@ -56,11 +57,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : equal_binary::algorithm("equal_binary")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F && f)
             {
                 return sequential_equal_binary(first1, last1, first2, last2,
                     std::forward<F>(f));
@@ -268,11 +269,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : equal::algorithm("equal")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, F && f)
             {
                 return std::equal(first1, last1, first2, std::forward<F>(f));
             }

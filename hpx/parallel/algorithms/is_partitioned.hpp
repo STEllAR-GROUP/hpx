@@ -67,9 +67,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : is_partitioned::algorithm("is_partitioned")
             {}
 
-            template<typename ExPolicy, typename Pred>
+            template<typename ExPolicy, typename InIter, typename Pred>
             static bool
-            sequential(ExPolicy, Iter first, Iter last, Pred && pred)
+            sequential(ExPolicy, InIter first, InIter last, Pred && pred)
             {
                 return std::is_partitioned(first, last, std::forward<Pred>(pred));
             }

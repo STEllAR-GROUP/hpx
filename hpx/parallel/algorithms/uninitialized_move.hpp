@@ -40,22 +40,23 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_move as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter1, typename FwdIter2>
-        FwdIter2 std_uninitialized_move(FwdIter1 first, FwdIter1 last, FwdIter2 d_first)
+        template <typename InIter1, typename InIter2>
+        InIter2 std_uninitialized_move(InIter1 first, InIter1 last, InIter2 d_first)
         {
-            typedef typename std::iterator_traits<FwdIter2>::value_type
+            typedef typename std::iterator_traits<InIter2>::value_type
                 value_type;
 
-            FwdIter2 current = d_first;
+            InIter2 current = d_first;
             try {
-                for (/* */; first != last; ++first, (void) ++current) {
-                    ::new (static_cast<void*>(std::addressof(*current)))
-                        value_type(std::move(*first));
+                for (/* */; first != last; ++first, (void) ++current)
+                {
+                    ::new (std::addressof(*current)) value_type(std::move(*first));
                 }
                 return current;
             }
             catch (...) {
-                for (/* */; d_first != current; ++d_first) {
+                for (/* */; d_first != current; ++d_first)
+                {
                     (*d_first).~value_type();
                 }
                 throw;
@@ -63,21 +64,22 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter, typename FwdIter2>
-        FwdIter2 sequential_uninitialized_move_n(Iter first, std::size_t count,
-            FwdIter2 dest, util::cancellation_token<util::detail::no_data>& tok)
+        template <typename InIter1, typename InIter2>
+        InIter2 sequential_uninitialized_move_n(InIter1 first, std::size_t count,
+            InIter2 dest, util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<FwdIter2>::value_type
+            typedef typename std::iterator_traits<InIter2>::value_type
                 value_type;
 
             return
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
-                    [](Iter it, FwdIter2 dest) {
-                        ::new (static_cast<void*>(std::addressof(*dest)))
-                            value_type(std::move(*it));
+                    [](InIter1 it, InIter2 dest) -> void
+                    {
+                        ::new (std::addressof(*dest)) value_type(std::move(*it));
                     },
-                    [](FwdIter2 dest) {
+                    [](InIter2 dest) -> void
+                    {
                         (*dest).~value_type();
                     });
         }
@@ -149,9 +151,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_move::algorithm("uninitialized_move")
             {}
 
-            template <typename ExPolicy, typename Iter>
+            template <typename ExPolicy, typename InIter1>
             static FwdIter2
-            sequential(ExPolicy, Iter first, Iter last, FwdIter2 dest)
+            sequential(ExPolicy, InIter1 first, InIter1 last, FwdIter2 dest)
             {
                 return std_uninitialized_move(first, last, dest);
             }
@@ -268,23 +270,24 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_move_n as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter1, typename FwdIter2>
-        std::pair<FwdIter1, FwdIter2> std_uninitialized_move_n(FwdIter1 first,
-            std::size_t count, FwdIter2 d_first)
+        template <typename InIter1, typename InIter2>
+        std::pair<InIter1, InIter2>
+        std_uninitialized_move_n(InIter1 first, std::size_t count, InIter2 d_first)
         {
-            typedef typename std::iterator_traits<FwdIter2>::value_type
+            typedef typename std::iterator_traits<InIter2>::value_type
                 value_type;
 
-            FwdIter2 current = d_first;
+            InIter2 current = d_first;
             try {
-                for (/* */; count != 0; ++first, (void) ++current, --count) {
-                    ::new (static_cast<void*>(std::addressof(*current)))
-                        value_type(std::move(*first));
+                for (/* */; count != 0; ++first, (void) ++current, --count)
+                {
+                    ::new (std::addressof(*current)) value_type(std::move(*first));
                 }
                 return std::make_pair(first, current);
             }
             catch (...) {
-                for (/* */; d_first != current; ++d_first) {
+                for (/* */; d_first != current; ++d_first)
+                {
                     (*d_first).~value_type();
                 }
                 throw;
@@ -299,9 +302,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_move_n::algorithm("uninitialized_move_n")
             {}
 
-            template <typename ExPolicy, typename Iter, typename FwdIter2>
+            template <typename ExPolicy, typename InIter1, typename InIter2>
             static IterPair
-            sequential(ExPolicy, Iter first, std::size_t count, FwdIter2 dest)
+            sequential(ExPolicy, InIter1 first, std::size_t count, InIter2 dest)
             {
                 return std_uninitialized_move_n(first, count, dest);
             }

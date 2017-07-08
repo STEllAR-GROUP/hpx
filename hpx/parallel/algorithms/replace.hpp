@@ -38,9 +38,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential replace
-        template <typename FwdIter, typename T1, typename T2, typename Proj>
-        inline FwdIter
-        sequential_replace(FwdIter first, FwdIter last, T1 const& old_value,
+        template <typename InIter, typename T1, typename T2, typename Proj>
+        inline InIter
+        sequential_replace(InIter first, InIter last, T1 const& old_value,
             T2 const& new_value, Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -60,10 +60,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : replace::algorithm("replace")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T1,
+            template <typename ExPolicy, typename InIter, typename T1,
                 typename T2, typename Proj>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last,
                 T1 const& old_value, T2 const& new_value, Proj && proj)
             {
                 return sequential_replace(first, last, old_value, new_value,
@@ -180,9 +180,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential replace_if
-        template <typename FwdIter, typename F, typename T, typename Proj>
-        inline FwdIter
-        sequential_replace_if(FwdIter first, FwdIter last, F && f,
+        template <typename InIter, typename F, typename T, typename Proj>
+        inline InIter
+        sequential_replace_if(InIter first, InIter last, F && f,
             T const& new_value, Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -203,10 +203,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : replace_if::algorithm("replace_if")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F,
+            template <typename ExPolicy, typename InIter, typename F,
                 typename T, typename Proj>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f,
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, F && f,
                 T const& new_value, Proj && proj)
             {
                 return sequential_replace_if(first, last, std::forward<F>(f),
@@ -340,9 +340,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential replace_copy
-        template <typename FwdIter, typename OutIter, typename T, typename Proj>
-        inline std::pair<FwdIter, OutIter>
-        sequential_replace_copy(FwdIter first, FwdIter last, OutIter dest,
+        template <typename InIter, typename OutIter, typename T, typename Proj>
+        inline std::pair<InIter, OutIter>
+        sequential_replace_copy(InIter first, InIter last, OutIter dest,
             T const& old_value, T const& new_value, Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -363,10 +363,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : replace_copy::algorithm("replace_copy")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename T, typename Proj>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest,
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
                 T const& old_value, T const& new_value, Proj && proj)
             {
                 return sequential_replace_copy(first, last, dest,
@@ -525,10 +525,10 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential replace_copy_if
-        template <typename FwdIter, typename OutIter, typename F, typename T,
+        template <typename InIter, typename OutIter, typename F, typename T,
             typename Proj>
-        inline std::pair<FwdIter, OutIter>
-        sequential_replace_copy_if(FwdIter first, FwdIter last, OutIter dest,
+        inline std::pair<InIter, OutIter>
+        sequential_replace_copy_if(InIter first, InIter last, OutIter dest,
             F && f, T const& new_value, Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -550,10 +550,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : replace_copy_if::algorithm("replace_copy_if")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename F, typename T, typename Proj>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last,
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, F && f, T const& new_value, Proj && proj)
             {
                 return sequential_replace_copy_if(first, last, dest,

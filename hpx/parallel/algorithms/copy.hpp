@@ -71,11 +71,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy::algorithm("copy")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest)
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
-                std::pair<FwdIter, OutIter> result = util::copy(first, last, dest);
+                std::pair<InIter, OutIter> result = util::copy(first, last, dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -210,9 +210,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy_n::algorithm("copy_n")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, std::size_t count, OutIter dest)
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, std::size_t count, OutIter dest)
             {
                 return util::copy_n(first, count, dest);
             }
@@ -362,9 +362,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential copy_if with projection function
-        template <typename FwdIter, typename OutIter, typename Pred, typename Proj>
-        inline std::pair<FwdIter, OutIter>
-        sequential_copy_if(FwdIter first, FwdIter last, OutIter dest,
+        template <typename InIter, typename OutIter, typename Pred, typename Proj>
+        inline std::pair<InIter, OutIter>
+        sequential_copy_if(InIter first, InIter last, OutIter dest,
             Pred && pred, Proj && proj)
         {
             while (first != last)
@@ -383,10 +383,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : copy_if::algorithm("copy_if")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename Pred, typename Proj = util::projection_identity>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest,
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
                 Pred && pred, Proj && proj/* = Proj()*/)
             {
                 return sequential_copy_if(first, last, dest,

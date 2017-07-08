@@ -42,8 +42,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential exclusive_scan.
-        template <typename FwdIter, typename OutIter, typename T, typename Op>
-        OutIter sequential_exclusive_scan(FwdIter first, FwdIter last,
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        OutIter sequential_exclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
             T temp = init;
@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { inline namespace v1
             return dest;
         }
 
-        template <typename FwdIter, typename OutIter, typename T, typename Op>
-        T sequential_exclusive_scan_n(FwdIter first, std::size_t count,
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        T sequential_exclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, T init, Op && op)
         {
             T temp = init;
@@ -79,10 +79,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : exclusive_scan::algorithm("exclusive_scan")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T, typename Op>
+            template <typename ExPolicy, typename InIter, typename T, typename Op>
             static OutIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                OutIter dest, T const& init, Op && op)
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
+                T const& init, Op && op)
             {
                 return sequential_exclusive_scan(first, last, dest,
                     init, std::forward<Op>(op));

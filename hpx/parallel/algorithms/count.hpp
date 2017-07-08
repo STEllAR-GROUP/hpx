@@ -105,16 +105,16 @@ namespace hpx { namespace parallel { inline namespace v1
               : count::algorithm("count")
             {}
 
-            template <typename ExPolicy, typename Iter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static difference_type
-            sequential(ExPolicy && policy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy && policy, InIter first, InIter last, T const& value)
             {
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T> >(
                         detail::compare_to<T>(value));
 
                 using hpx::util::placeholders::_1;
-                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
@@ -277,14 +277,14 @@ namespace hpx { namespace parallel { inline namespace v1
               : count_if::algorithm("count_if")
             {}
 
-            template <typename ExPolicy, typename Iter, typename Pred>
+            template <typename ExPolicy, typename InIter, typename Pred>
             static difference_type
-            sequential(ExPolicy && policy, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy && policy, InIter first, InIter last, Pred && op)
             {
                 auto f1 = count_iteration<ExPolicy, Pred>(op);
 
                 using hpx::util::placeholders::_1;
-                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,

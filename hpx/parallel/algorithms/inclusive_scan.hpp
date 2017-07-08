@@ -41,8 +41,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential inclusive_scan.
-        template <typename FwdIter, typename OutIter, typename T, typename Op>
-        OutIter sequential_inclusive_scan(FwdIter first, FwdIter last,
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        OutIter sequential_inclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
             for (/* */; first != last; (void) ++first, ++dest)
@@ -53,8 +53,8 @@ namespace hpx { namespace parallel { inline namespace v1
             return dest;
         }
 
-        template <typename FwdIter, typename OutIter, typename T, typename Op>
-        T sequential_inclusive_scan_n(FwdIter first, std::size_t count,
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        T sequential_inclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, T init, Op && op)
         {
             for (/* */; count-- != 0; (void) ++first, ++dest)
@@ -74,10 +74,10 @@ namespace hpx { namespace parallel { inline namespace v1
               : inclusive_scan::algorithm("inclusive_scan")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T, typename Op>
+            template <typename ExPolicy, typename InIter, typename T, typename Op>
             static OutIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                OutIter dest, T const& init, Op && op)
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
+                T const& init, Op && op)
             {
                 return sequential_inclusive_scan(first, last, dest,
                     init, std::forward<Op>(op));

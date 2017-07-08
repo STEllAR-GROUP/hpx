@@ -43,9 +43,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : move_pair::algorithm("move")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last, OutIter dest)
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
             {
                 return util::move(first, last, dest);
             }

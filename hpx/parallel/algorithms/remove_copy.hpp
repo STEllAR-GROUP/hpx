@@ -36,9 +36,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential remove_copy
-        template <typename FwdIter, typename OutIter, typename T, typename Proj>
-        inline std::pair<FwdIter, OutIter>
-        sequential_remove_copy(FwdIter first, FwdIter last, OutIter dest,
+        template <typename InIter, typename OutIter, typename T, typename Proj>
+        inline std::pair<InIter, OutIter>
+        sequential_remove_copy(InIter first, InIter last, OutIter dest,
             T const& value, Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -59,11 +59,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : remove_copy::algorithm("remove_copy")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename T, typename Proj>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                OutIter dest, const T& val, Proj && proj)
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
+                T const& val, Proj && proj)
             {
                 return sequential_remove_copy(first, last, dest, val,
                     std::forward<Proj>(proj));
@@ -212,9 +212,9 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         // sequential remove_copy_if
-        template <typename FwdIter, typename OutIter, typename F, typename Proj>
-        inline std::pair<FwdIter, OutIter>
-        sequential_remove_copy_if(FwdIter first, FwdIter last, OutIter dest, F p,
+        template <typename InIter, typename OutIter, typename F, typename Proj>
+        inline std::pair<InIter, OutIter>
+        sequential_remove_copy_if(InIter first, InIter last, OutIter dest, F p,
             Proj && proj)
         {
             for (/* */; first != last; ++first)
@@ -236,11 +236,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : remove_copy_if::algorithm("remove_copy_if")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename OutIter,
                 typename F, typename Proj>
-            static std::pair<FwdIter, OutIter>
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                OutIter dest, F && f, Proj && proj)
+            static std::pair<InIter, OutIter>
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
+                F && f, Proj && proj)
             {
                 return sequential_remove_copy_if(first, last, dest,
                     std::forward<F>(f), std::forward<Proj>(proj));

@@ -120,11 +120,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : includes::algorithm("includes")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, F && f)
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F && f)
             {
                 return std::includes(first1, last1, first2, last2,
                     std::forward<F>(f));
