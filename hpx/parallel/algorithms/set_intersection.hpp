@@ -31,16 +31,16 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
+        template <typename FwdIter3>
         struct set_intersection
-          : public detail::algorithm<set_intersection<OutIter>, OutIter>
+          : public detail::algorithm<set_intersection<FwdIter3>, FwdIter3>
         {
             set_intersection()
               : set_intersection::algorithm("set_intersection")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename F>
+                typename OutIter, typename F>
             static OutIter
             sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F && f)
@@ -52,10 +52,10 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, FwdIter3
             >::type
             parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
-                RanIter2 first2, RanIter2 last2, OutIter dest, F && f)
+                RanIter2 first2, RanIter2 last2, FwdIter3 dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
                     difference_type1;
@@ -65,12 +65,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first1 == last1 || first2 == last2)
                 {
                     typedef util::detail::algorithm_result<
-                            ExPolicy, OutIter
+                            ExPolicy, FwdIter3
                         > result;
                     return result::get(std::move(dest));
                 }
 
-                typedef typename set_operations_buffer<OutIter>::type buffer_type;
+                typedef typename set_operations_buffer<FwdIter3>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
                 return set_operation(std::forward<ExPolicy>(policy),
@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     representing the first sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -171,23 +171,23 @@ namespace hpx { namespace parallel { inline namespace v1
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_intersection algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_intersection algorithm returns a \a hpx::future<FwdIter3>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a FwdIter3 otherwise.
     ///           The \a set_intersection algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename OutIter, typename Pred = detail::less>
+        typename FwdIter3, typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
     >::type
     set_intersection(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, OutIter dest, Pred && op = Pred())
+        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred && op = Pred())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
@@ -197,8 +197,8 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_output_iterator<FwdIter3>::value ||
+                hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least output iterator.");
 #else
         static_assert(
@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least forward iterator.");
 #endif
 
@@ -216,10 +216,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
                !hpx::traits::is_random_access_iterator<FwdIter2>::value ||
-               !hpx::traits::is_random_access_iterator<OutIter>::value
+               !hpx::traits::is_random_access_iterator<FwdIter3>::value
             > is_seq;
 
-        return detail::set_intersection<OutIter>().call(
+        return detail::set_intersection<FwdIter3>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, dest, std::forward<Pred>(op));
     }

@@ -50,14 +50,14 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::move(first, last, dest);
             }
 
-            template <typename ExPolicy, typename FwdIter, typename OutIter>
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
             static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter, OutIter>
+                ExPolicy, std::pair<FwdIter1, FwdIter2>
             >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                OutIter dest)
+            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+                FwdIter2 dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
                 return get_iter_pair(
@@ -81,30 +81,30 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template<typename FwdIter, typename OutIter, typename Enable = void>
+        template<typename FwdIter1, typename FwdIter2, typename Enable = void>
         struct move;
 
-        template <typename FwdIter, typename OutIter>
+        template <typename FwdIter1, typename FwdIter2>
         struct move<
-            FwdIter, OutIter,
+            FwdIter1, FwdIter2,
             typename std::enable_if<
-                iterators_are_segmented<FwdIter, OutIter>::value
+                iterators_are_segmented<FwdIter1, FwdIter2>::value
             >::type>
           : public move_pair<std::pair<
-                typename hpx::traits::segmented_iterator_traits<FwdIter>
+                typename hpx::traits::segmented_iterator_traits<FwdIter1>
                     ::local_iterator,
-                typename hpx::traits::segmented_iterator_traits<OutIter>
+                typename hpx::traits::segmented_iterator_traits<FwdIter2>
                     ::local_iterator
             > >
         {};
 
-        template<typename FwdIter, typename OutIter>
+        template<typename FwdIter1, typename FwdIter2>
         struct move<
-            FwdIter, OutIter,
+            FwdIter1, FwdIter2,
             typename std::enable_if<
-                iterators_are_not_segmented<FwdIter, OutIter>::value
+                iterators_are_not_segmented<FwdIter1, FwdIter2>::value
             >::type>
-          : public move_pair<std::pair<FwdIter, OutIter> >
+          : public move_pair<std::pair<FwdIter1, FwdIter2> >
         {};
         /// \endcond
     }
@@ -120,10 +120,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the move assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -148,29 +148,29 @@ namespace hpx { namespace parallel { inline namespace v1
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a
-    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter), tag::out(OutIter)> >
+    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
+    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
     ///           otherwise.
     ///           The \a move algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           moved.
     ///
-    template <typename ExPolicy, typename FwdIter, typename OutIter,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter), tag::out(OutIter)>
+        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
     >::type
-    move(ExPolicy && policy, FwdIter first, FwdIter last, OutIter dest)
+    move(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         return detail::transfer<
-                detail::move<FwdIter, OutIter>
+                detail::move<FwdIter1, FwdIter2>
             >(std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}

@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
     /// \note This function is deprecated and is replaced by the binary version
     ///       of \a transform_reduce.
@@ -159,7 +159,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
     /// \note This function is deprecated and is replaced by the binary version
     ///       of \a transform_reduce.
