@@ -12,12 +12,12 @@ if(HPX_WITH_EXAMPLES_HDF5)
   include_directories(${HDF5_INCLUDE_DIRS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.sheneos.sheneos)
+  add_hpx_pseudo_target(examples.sheneos.sheneos_)
 
   add_subdirectory(sheneos)
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.sheneos examples.sheneos.sheneos)
+  add_hpx_pseudo_dependencies(examples.sheneos examples.sheneos.sheneos_)
 
   ###############################################################################
   # add example executable

@@ -31,14 +31,14 @@ if(HPX_WITH_EXAMPLES_HDF5)
       FOLDER "Examples/Interpolate1D")
 
     # add a custom target for this example
-    add_hpx_pseudo_target(examples.interpolate1d.${subdir})
+    add_hpx_pseudo_target(examples.interpolate1d.${subdir}_)
 
     # make pseudo-targets depend on master pseudo-target
     add_hpx_pseudo_dependencies(examples.interpolate1d
-                                examples.interpolate1d.${subdir})
+                                examples.interpolate1d.${subdir}_)
 
     # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(examples.interpolate1d.${subdir}
+    add_hpx_pseudo_dependencies(examples.interpolate1d.${subdir}_
                                 ${subdir}_client_exe)
   endforeach()
 
